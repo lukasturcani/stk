@@ -36,7 +36,7 @@ from .utilities import get_plane_normal
         ),
     ),
 )
-def test_get_plane_normal(position_matrix, atom_ids, normal):
+def test_get_plane_normal_helper(position_matrix, atom_ids, normal):
     """
     Test :func:`.get_plane_normal`.
 

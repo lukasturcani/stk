@@ -36,7 +36,7 @@ from ..utilities import get_direction
         ),
     ),
 )
-def test_get_direction(position_matrix, atom_ids, direction):
+def test_get_direction_helper(position_matrix, atom_ids, direction):
     """
     Test the :func:`.get_direction`.
 

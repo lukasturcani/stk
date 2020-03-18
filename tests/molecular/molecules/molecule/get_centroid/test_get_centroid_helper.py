@@ -27,7 +27,7 @@ from ..utilities import get_centroid
         ),
     ),
 )
-def test_get_centroid(position_matrix, atom_ids, centroid):
+def test_get_centroid_helper(position_matrix, atom_ids, centroid):
     """
     Test :func:`.get_centroid`.
 
