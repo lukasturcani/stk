@@ -231,11 +231,15 @@ def case_data(request):
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
-        f'{_counter.count}.dump',
+        f'{_counter.count}.npy',
     )
     _counter.count += 1
 
     if not os.path.exists(path):
-        request.param.molecule.get_position_matrix().dump(path)
+        np.save(
+            file=path,
+            arr=request.param.molecule.get_position_matrix(),
+            allow_pickle=False,
+        )
 
     return request.param.with_position_matrix(path)
