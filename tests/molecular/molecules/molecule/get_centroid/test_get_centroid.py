@@ -8,6 +8,21 @@ def test_get_centroid(case_data, get_atom_ids):
     """
     Test :meth:`.Molecule.get_centroid`.
 
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        A test case. Holds the molecule to test and the correct atom
+        positions.
+
+    get_atom_ids : :class:`callable`
+        Takes a single parameter, `molecule`, and returns a valid
+        `atom_ids` parameter. This allows the testing of different
+        values of this parameter.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
     Notes
     -----
     This test compares the result of :meth:`.Molecule.get_centroid`
@@ -24,21 +39,6 @@ def test_get_centroid(case_data, get_atom_ids):
     match, the fault can be placed on :meth:`.Molecule.get_centroid`,
     because :func:`.get_centroid` has already been verified to be
     correct by its own tests.
-
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the molecule to test and the correct atom
-        positions.
-
-    get_atom_ids : :class:`callable`
-        Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
-
-    Returns
-    -------
-    None : :class:`NoneType`
 
     """
 
