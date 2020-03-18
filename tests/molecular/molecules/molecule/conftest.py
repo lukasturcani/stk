@@ -222,10 +222,11 @@ _name_counts = {}
     ),
 )
 def case_data(request):
-    name = request.param.molecule.__class__.__qualname___
+    name = request.param.molecule.__class__.__qualname__
     count = _name_counts.get(name, 0)
     _name_counts[name] = count + 1
     path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
         name,
