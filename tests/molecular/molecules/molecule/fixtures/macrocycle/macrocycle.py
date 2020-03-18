@@ -1,4 +1,5 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture
 import stk
 
 from ...case_data import CaseData
@@ -50,4 +51,13 @@ from ...case_data import CaseData
     ),
 )
 def macrocycle_macrocycle(request):
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        lazy_fixture('macrocycle_macrocycle'),
+    ),
+)
+def macrocycle(request):
     return request.param
