@@ -42,8 +42,6 @@ def test_get_direction_helper(position_matrix, atom_ids, direction):
 
     """
 
-    assert np.allclose(
-        a=get_direction(position_matrix, atom_ids),
-        b=direction,
-        atol=1e-32,
-    )
+    # The direction can be either parallel or anti-parallel.
+    result = get_direction(position_matrix, atom_ids)
+    assert abs(abs(result @ direction) - 1) < 1e-32

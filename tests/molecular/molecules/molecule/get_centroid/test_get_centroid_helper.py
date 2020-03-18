@@ -23,7 +23,7 @@ from ..utilities import get_centroid
                 [-1., -2., -3.],
             ]),
             (0, 1),
-            np.array([1., 2., 3.]),
+            np.array([.5, 1., 1.5]),
         ),
     ),
 )
