@@ -1,8 +1,6 @@
 import pytest
-import numpy as np
 import stk
-
-from ..utilities import has_same_structure, get_displacement_vector
+import numpy as np
 
 
 @pytest.fixture(
@@ -47,26 +45,3 @@ def target(request):
     """
 
     return request.param
-
-
-def test_with_rotation_between_vectors(molecule, target, get_origin):
-    # Use to check that immutability is not violated.
-    clone = molecule.clone()
-    _test_with_rotation_between_vectors(molecule, target, get_origin)
-    has_same_structure(molecule, clone)
-
-
-def _test_with_rotation_between_vectors(molecule, target, get_origin):
-    start = get_displacement_vector(molecule, 0, 1)
-    new = molecule.with_rotation_between_vectors(
-        start=start,
-        target=target,
-        origin=get_origin(molecule),
-    )
-    result = get_displacement_vector(new, 0, 1)
-    assert np.allclose(
-        a=stk.normalize_vector(result),
-        b=stk.normalize_vector(target),
-        atol=1e-12,
-    )
-    assert abs(np.linalg.norm(start) - np.linalg.norm(result)) < 1e-14
