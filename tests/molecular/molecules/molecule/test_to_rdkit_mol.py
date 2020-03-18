@@ -1,4 +1,18 @@
 def test_to_rdkit_mol(molecule):
+    """
+    Test :meth:`.Molecule.to_rdkit_mol`.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule to test.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     rdkit_molecule = molecule.to_rdkit_mol()
     assert rdkit_molecule.GetNumConformers() == 1
 

@@ -33,7 +33,7 @@ def get_atom_ids(request):
     molecule : :class:`.Molecule`
         The molecule for which `atom_ids` are returned.
 
-    Retruns
+    Returns
     -------
     :class:`iterable` of :class:`int`
         An `atom_ids` parameter.
