@@ -41,7 +41,7 @@ class CaseData:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        CaseData.__init__(self.molecule, self.smiles)
+        CaseData.__init__(clone, self.molecule, self.smiles)
         clone.position_matrix = np.load(path)
         return clone
 

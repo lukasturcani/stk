@@ -227,13 +227,11 @@ _counter = _Counter()
     ),
 )
 def case_data(request):
-    name = request.param.molecule.__class__.__qualname__
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
-        name,
-        f'_{_counter.count}.dump',
+        f'{_counter.count}.dump',
     )
     _counter.count += 1
 
