@@ -1,7 +1,7 @@
 import numpy as np
 
 from ..utilities import get_direction
-from ...utilities import get_num_atom_ids, normalize_ids
+from ...utilities import get_num_atom_ids
 
 
 def test_get_direction(case_data, get_atom_ids):
@@ -46,10 +46,7 @@ def test_get_direction(case_data, get_atom_ids):
         molecule=case_data.molecule,
         direction=get_direction(
             position_matrix=case_data.position_matrix,
-            atom_ids=normalize_ids(
-                molecule=case_data.molecule,
-                ids=get_atom_ids(case_data.molecule),
-            ),
+            atom_ids=tuple(get_atom_ids(case_data.molecule)),
         ),
         get_atom_ids=get_atom_ids,
     )
