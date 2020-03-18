@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 
 
@@ -32,7 +31,7 @@ def get_atom_ids(request):
     molecule : :class:`.Molecule`
         The molecule for which `atom_ids` are returned.
 
-    Retruns
+    Returns
     -------
     :class:`iterable` of :class:`int`
         An `atom_ids` parameter.
@@ -40,33 +39,3 @@ def get_atom_ids(request):
     """
 
     return request.param
-
-
-def test_get_centroid(case_data, get_atom_ids):
-    _test_get_centroid(
-        molecule=case_data.molecule,
-        centroid=get_centroid(
-            position_matrix=case_data.position_matrix,
-            atom_ids=get_atom_ids(case_data.molecule),
-        ),
-        get_atom_ids=get_atom_ids,
-    )
-
-
-def _test_get_centroid(molecule, centroid, get_atom_ids):
-    assert np.allclose(
-        a=centroid,
-        b=molecule.get_centroid(get_atom_ids(molecule)),
-        atol=1e-32,
-    )
-
-
-def get_centroid(position_matrix, atom_ids):
-    if atom_ids is None:
-        atom_ids = range(len(position_matrix))
-    elif isinstance(atom_ids, int):
-        atom_ids = (atom_ids, )
-    else:
-        atom_ids = len(atom_ids)
-
-    return np.sum(position_matrix[atom_ids, :], axis=0) / len(atom_ids)
