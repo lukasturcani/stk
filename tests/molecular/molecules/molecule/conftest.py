@@ -207,7 +207,12 @@ def building_block(request):
     return request.param
 
 
-_name_counts = {}
+class _Counter:
+    def __init__(self):
+        self.count = 0
+
+
+_counter = _Counter()
 
 
 @pytest.fixture(
@@ -223,15 +228,15 @@ _name_counts = {}
 )
 def case_data(request):
     name = request.param.molecule.__class__.__qualname__
-    count = _name_counts.get(name, 0)
-    _name_counts[name] = count + 1
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
         name,
-        f'_{count}.dump',
+        f'_{_counter.count}.dump',
     )
+    _counter.count += 1
+
     if not os.path.exists(path):
         request.param.molecule.get_position_matrix().dump(path)
 
