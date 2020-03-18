@@ -1,9 +1,29 @@
 import numpy as np
 
+from .utilities import get_centroid
+from ...utilities import normalize_ids
+
 
 def test_get_centroid(case_data, get_atom_ids):
     """
     Test :meth:`.Molecule.get_centroid`.
+
+    Notes
+    -----
+    This test compares the result of :meth:`.Molecule.get_centroid`
+    to the result of :func:`.get_centroid`, which is a utility
+    function defined for the purposes of this test. Because
+    :func:`.get_centroid` is tested independently, in
+    :mod:`.test_get_centroid_helper`, if its tests pass, then
+    it can be assumed, that :func:`.get_centroid` gives correct
+    results.
+
+    Now, assuming that :func:`.get_centroid` passed all of its tests,
+    this test compares the results of :meth:`.Molecule.get_centroid`
+    to the results of :func:`.get_centroid`. If the results do not
+    match, the fault can be placed on :meth:`.Molecule.get_centroid`,
+    because :func:`.get_centroid` has already been verified to be
+    correct by its own tests.
 
     Parameters
     ----------
@@ -26,7 +46,10 @@ def test_get_centroid(case_data, get_atom_ids):
         molecule=case_data.molecule,
         centroid=get_centroid(
             position_matrix=case_data.position_matrix,
-            atom_ids=get_atom_ids(case_data.molecule),
+            atom_ids=normalize_ids(
+                molecule=case_data.molecule,
+                ids=get_atom_ids(case_data.molecule),
+            ),
         ),
         get_atom_ids=get_atom_ids,
     )
@@ -60,14 +83,3 @@ def _test_get_centroid(molecule, centroid, get_atom_ids):
         b=molecule.get_centroid(get_atom_ids(molecule)),
         atol=1e-32,
     )
-
-
-def get_centroid(position_matrix, atom_ids):
-    if atom_ids is None:
-        atom_ids = range(len(position_matrix))
-    elif isinstance(atom_ids, int):
-        atom_ids = (atom_ids, )
-    else:
-        atom_ids = len(atom_ids)
-
-    return np.sum(position_matrix[atom_ids, :], axis=0) / len(atom_ids)
