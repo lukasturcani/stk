@@ -5,7 +5,7 @@ def test_get_num_bonds(case_data):
     Parameters
     ----------
     case_data : :class:`.CaseData`
-        A test case. Holds the molecule to test and the correct nubmer
+        A test case. Holds the molecule to test and the correct number
         of bonds.
 
     Returns

@@ -43,11 +43,7 @@ from .utilities import get_maximum_diameter
         ),
     ),
 )
-def test_get_direction_helper(
-    position_matrix,
-    atom_ids,
-    maximum_diameter,
-):
+def test_get_direction(position_matrix, atom_ids, maximum_diameter):
     """
     Test :func:`.get_maximum_diameter`.
 
