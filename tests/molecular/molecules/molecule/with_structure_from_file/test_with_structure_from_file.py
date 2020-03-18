@@ -1,17 +1,6 @@
 import numpy as np
-import os
 import pytest
 import stk
-
-
-@pytest.fixture(
-    params=[
-        'molecule.mol',
-        'molecule.xyz',
-    ],
-)
-def path(request, tmpdir):
-    return os.path.join(tmpdir, request.param)
 
 
 def test_with_structure_from_file_0(
