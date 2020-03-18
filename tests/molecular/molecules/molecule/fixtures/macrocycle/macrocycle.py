@@ -49,5 +49,5 @@ from ...case_data import CaseData
         ),
     ),
 )
-def macrocycle(request):
+def macrocycle_macrocycle(request):
     return request.param

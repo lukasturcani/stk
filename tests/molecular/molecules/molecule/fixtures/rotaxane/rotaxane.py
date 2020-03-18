@@ -81,5 +81,5 @@ cycle2 = stk.ConstructedMolecule(
         ),
     ),
 )
-def rotaxane(request):
+def rotaxane_nrotaxane(request):
     return request.param
