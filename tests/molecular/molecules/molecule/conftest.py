@@ -1,4 +1,5 @@
 import pytest
+import re
 import os
 from pytest_lazyfixture import lazy_fixture
 import stk
@@ -219,7 +220,13 @@ def building_block(request):
     ),
 )
 def case_data(request):
-    name = request.node.name
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
+    p = re.compile(r'\[(.*)\]')
+    name = p.search(request.node.name).group(1).split('-')[-1]
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
