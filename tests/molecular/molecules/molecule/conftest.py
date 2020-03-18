@@ -207,14 +207,6 @@ def building_block(request):
     return request.param
 
 
-class _Counter:
-    def __init__(self):
-        self.count = 0
-
-
-_counter = _Counter()
-
-
 @pytest.fixture(
     params=(
         lazy_fixture('building_block'),
@@ -227,14 +219,13 @@ _counter = _Counter()
     ),
 )
 def case_data(request):
-    name = request.node.__name__
+    name = request.node.name
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
         f'{name}.npy',
     )
-    _counter.count += 1
 
     if not os.path.exists(path):
         np.save(
