@@ -1,16 +1,14 @@
-import itertools as it
-import stk
 import pytest
+import stk
 
-from ..utilities import is_equivalent_bond
+from .case_data import CaseData
 
 
-@pytest.mark.parametrize(
-    argnames=('molecule', 'bonds'),
-    argvalues=(
-        (
-            stk.BuildingBlock('NCCN'),
-            (
+@pytest.fixture(
+    params=(
+        CaseData(
+            molecule=stk.BuildingBlock('NCCN'),
+            bonds=(
                 stk.Bond(stk.N(0), stk.C(1), 1),
                 stk.Bond(stk.C(1), stk.C(2), 1),
                 stk.Bond(stk.C(2), stk.N(3), 1),
@@ -26,6 +24,5 @@ from ..utilities import is_equivalent_bond
         ),
     ),
 )
-def test_get_bonds(molecule, bonds):
-    for bond1, bond2 in it.zip_longest(molecule.get_bonds(), bonds):
-        is_equivalent_bond(bond1, bond2)
+def case_data(request):
+    return request.param
