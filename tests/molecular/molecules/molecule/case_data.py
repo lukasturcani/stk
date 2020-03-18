@@ -15,9 +15,12 @@ class CaseData:
 
     """
 
-    def __init__(self, molecule, smiles, position_matrix):
+    def __init__(self, molecule, smiles, position_matrix=None):
         self.molecule = molecule
         self.smiles = smiles
+
+        if position_matrix is None:
+            position_matrix = molecule.get_position_matrix()
         self.position_matrix = position_matrix
 
     def __str__(self):
