@@ -16,5 +16,5 @@ def test_get_building_block_id(case_data):
 
     assert (
         case_data.atom_info.get_building_block_id()
-        is case_data.building_block_id
+        == case_data.building_block_id
     )
