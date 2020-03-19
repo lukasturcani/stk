@@ -1,4 +1,5 @@
 import itertools as it
+import numpy as np
 
 
 def test_get_reaction(case_data):
@@ -63,12 +64,24 @@ def _test_get_reaction(
 
 
 def is_same_result(result1, result2):
-    are_same_atoms(result1.get_new_atoms(), result2.get_new_atoms())
     are_same_bonds(result1.get_new_bonds(), result2.get_new_bonds())
+    are_same_new_atoms(
+        new_atoms1=result1.get_new_atoms(),
+        new_atoms2=result2.get_new_atoms(),
+    )
     are_same_atoms(
         atoms1=result1.get_deleted_atoms(),
         atoms2=result2.get_deleted_atoms(),
     )
+
+
+def are_same_new_atoms(new_atoms1, new_atoms2):
+    for (atom1, position1), (atom2, position2) in it.zip_longest(
+        new_atoms1,
+        new_atoms2,
+    ):
+        is_same_atom(atom1, atom2)
+        assert np.allclose(position1, position2, atol=1e-13)
 
 
 def are_same_atoms(atoms1, atoms2):
