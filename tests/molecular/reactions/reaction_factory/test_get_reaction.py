@@ -49,6 +49,10 @@ def _test_get_reaction(
         The expected result of the reaction returned by
         `factory`.
 
+    Returns
+    -------
+    None : :class:`NoneType`
+
     """
 
     reaction = factory.get_reaction(
