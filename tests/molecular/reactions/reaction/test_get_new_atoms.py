@@ -28,7 +28,7 @@ def test_get_new_atoms(case_data):
 
 def _test_get_new_atoms(reaction_result, new_atoms):
     """
-    Test the correct atoms are found in `reaction_result`.
+    Test that the correct atoms are added by `reaction_result`.
 
     Parameters
     ----------

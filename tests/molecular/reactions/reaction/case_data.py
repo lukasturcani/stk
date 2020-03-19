@@ -8,13 +8,13 @@ class CaseData:
         The reaction to test.
 
     new_atoms : :class:`tuple` of :class:`.NewAtom`
-        The atoms, which should be added by `reaction`.
+        The atoms, which should be added by :attr:`reaction`.
 
     new_bonds : :class:`tuple` of :class:`.Bond`
-        The bonds, which should be added by `reaction`.
+        The bonds, which should be added by :attr:`reaction`.
 
     deleted_atoms : :class:`tuple` of :class:`.Atom`
-        The atoms, which should be deleted by `reaction`.
+        The atoms, which should be deleted by :attr:`reaction`.
 
     """
 

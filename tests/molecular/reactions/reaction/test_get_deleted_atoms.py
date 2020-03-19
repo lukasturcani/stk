@@ -25,7 +25,7 @@ def test_get_deleted_atoms(case_data):
 
 def _test_get_deleted_atoms(reaction_result, deleted_atoms):
     """
-    Test the correct atoms were deleted in `reaction_result`.
+    Test that the correct atoms are deleted by `reaction_result`.
 
     Parameters
     ----------

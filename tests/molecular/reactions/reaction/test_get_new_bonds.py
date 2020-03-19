@@ -9,7 +9,7 @@ def test_get_new_bonds(case_data):
     ----------
     case_data : :class:`.CaseData`
         A test case. Holds the reaction to test and the bonds which
-        should be addeed.
+        should be added.
 
     Returns
     -------
@@ -25,7 +25,7 @@ def test_get_new_bonds(case_data):
 
 def _test_get_new_bonds(reaction_result, new_bonds):
     """
-    Test that correct bonds are found in `reaction_result`.
+    Test that the correct bonds are added by `reaction_result`.
 
     Parameters
     ----------
@@ -33,7 +33,11 @@ def _test_get_new_bonds(reaction_result, new_bonds):
         The result of a reaction.
 
     new_bonds : :class:`tuple` of :class:`.Bond`
-        The bonds which should be found in `reaction_result`.
+        The bonds, which should be added by `reaction_result`.
+
+    Returns
+    -------
+    None : :class:`NoneType`
 
     """
 

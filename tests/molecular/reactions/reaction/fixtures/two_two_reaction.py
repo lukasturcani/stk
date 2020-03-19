@@ -82,11 +82,6 @@ def get_bonds(
 
 
 class MockConstructionState(ConstructionState):
-    """
-    A mock implementation for the tests here.
-
-    """
-
     def __init__(self, position_matrix):
         self.position_matrix = position_matrix
 
