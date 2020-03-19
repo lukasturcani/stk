@@ -3,20 +3,44 @@ import itertools as it
 import pytest
 
 
+from .case_data import CaseData
+
+
 @pytest.fixture(
-    params=[
-        stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
-        stk.BuildingBlock(
-            smiles='BrCC(Br)C(Br)C(Br)C(Br)C(Br)C(Br)CBr',
-            functional_groups=[stk.BromoFactory()],
+    params=(
+        CaseData(
+            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            functional_groups=(),
+            core_atoms=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
+            placers=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
         ),
-        stk.BuildingBlock('N[C+][C+2]N'),
-    ],
+        CaseData(
+            building_block=stk.BuildingBlock(
+                smiles='Br[C+2][C+2]Br',
+                functional_groups=[stk.BromoFactory()],
+            ),
+            functional_groups=(
+                stk.Bromo(
+                    bromine=stk.Br(0),
+                    atom=stk.C(1),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.Br(0), ),
+                ),
+                stk.Bromo(
+                    bromine=stk.Br(3),
+                    atom=stk.C(2),
+                    bonders=(stk.C(2), ),
+                    deleters=(stk.Br(3), ),
+                ),
+            ),
+            core_atoms=(stk.C(1), stk.C(2)),
+            placers=(stk.C(1), stk.C(2)),
+        ),
+    ),
 )
-def building_block(request):
+def case_data(request):
     """
-    A :class:`.BuildingBlock` instance.
+    A :class:`.CaseData` instance.
 
     """
 
