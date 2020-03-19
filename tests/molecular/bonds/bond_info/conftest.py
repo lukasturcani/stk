@@ -21,6 +21,7 @@ def bond(request):
 @pytest.fixture(
     params=(
         stk.BuildingBlock('NCCN'),
+        None,
     ),
 )
 def building_block(request):
@@ -35,6 +36,7 @@ def building_block(request):
 @pytest.fixture(
     params=(
         1,
+        None,
     ),
 )
 def building_block_id(request):
