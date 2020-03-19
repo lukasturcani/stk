@@ -10,6 +10,11 @@ from .utilities import MockEdge, MockConstructionState
 
 @pytest.fixture
 def functional_group2_2(functional_group2):
+    """
+    A :class:`.GenericFunctionalGroup` with 2 bonder atoms.
+
+    """
+
     return functional_group2.clone()
 
 

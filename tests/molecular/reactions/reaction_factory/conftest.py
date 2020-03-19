@@ -149,7 +149,7 @@ from .fixtures import *  # noqa
 )
 def functional_group1(request):
     """
-    A :class:`.FunctionalGroup` with 1 bonder atom.
+    A :class:`.GenericFunctionalGroup` with 1 bonder atom.
 
     """
 
@@ -188,7 +188,7 @@ def functional_group1(request):
 )
 def functional_group2(request):
     """
-    A :class:`.FunctionalGroup` with 2 bonder atoms.
+    A :class:`.GenericFunctionalGroup` with 2 bonder atoms.
 
     """
 
