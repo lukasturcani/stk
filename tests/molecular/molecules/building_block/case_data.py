@@ -10,12 +10,11 @@ class CaseData:
     functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
         The functional groups :attr:`building_block` should be holding.
 
-    core_atoms : :class:`tuple` of :class:`.Atom`
-        The core atoms which :attr:`building_block` should be holding.
+    core_atom_ids : :class:`tuple` of :class:`int`
+        The correct core atom ids for :attr:`building_block`.
 
-    placers : :class:`tuple` of :class:`.Atom`
-        The *placer* atoms, which :attr:`building_block` should be
-        holding.
+    placer_ids : :class:`tuple` of :class:`.Atom`
+        The correct *placer* ids for :attr:building_block.
 
     """
 
@@ -23,8 +22,8 @@ class CaseData:
         self,
         building_block,
         functional_groups,
-        core_atoms,
-        placers,
+        core_atom_ids,
+        placer_ids,
     ):
         """
         Initialize a :class:`.CaseData` instance.
