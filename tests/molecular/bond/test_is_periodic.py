@@ -5,7 +5,7 @@ def test_is_periodic(case_data):
     Parameters
     ----------
     case_data : :class:`.CaseData`
-        A test case. Holds the bond to test and its periodicity.
+        A test case. Holds the bond to test and its true periodicity.
 
     Returns
     -------
@@ -26,7 +26,7 @@ def _test_is_periodic(bond, periodicity):
         The bond to test.
 
     periodicity : :class:`tuple` of :class:`int`
-        The periodicity of `bond`.
+        The true periodicity of `bond`.
 
     Returns
     -------

@@ -5,7 +5,7 @@ def test_get_charge(case_data):
     Parameters
     ----------
     case_data : :class:`.CaseData`
-        The test case. Holds the atom to test and the expected result.
+        The test case. Holds the atom to test and its correct charge.
 
     Returns
     -------

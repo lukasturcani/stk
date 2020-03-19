@@ -11,7 +11,7 @@ def test_with_id(atom, id):
         The atom to test.
 
     id : :class:`int`
-        The correct id of the clone.
+        The correct id of the new atom.
 
     Returns
     -------
