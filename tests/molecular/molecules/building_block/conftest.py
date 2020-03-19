@@ -7,6 +7,75 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
+    params=[
+        'building_block.mol',
+        'building_block.pdb',
+    ],
+)
+def path(tmpdir, request):
+    return str(tmpdir / request.param)
+
+
+class InitFromFileData:
+    """
+    Stores data for the :meth:`.BuildingBlock.init_from_file`.
+
+    """
+
+    def __init__(
+        self,
+        building_block,
+        init_functional_groups,
+        init_placer_ids,
+        case_data_functional_groups,
+        case_data_core_atoms,
+        case_data_placers,
+    ):
+        self.building_block = building_block
+        self.init_functional_groups = init_functional_groups
+        self.init_placer_ids = init_placer_ids
+        self.case_functional_groups = case_data_functional_groups
+        self.case_core_atoms = case_data_core_atoms
+        self.case_placers = case_data_placers
+
+
+@pytest.fixture(
+    params=(
+        InitFromFileData(
+            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            init_functional_groups=(),
+            init_placer_ids=None,
+            case_data_functional_groups=(),
+            case_data_core_atoms=(
+                stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)
+            ),
+            case_data_placers=(
+                stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)
+            ),
+        ),
+    ),
+)
+def init_from_file_data(request):
+    return request.param
+
+
+@pytest.fixture
+def case_data_2(path, init_from_file_data):
+    data = init_from_file_data
+    data.building_block.write(path)
+    return CaseData(
+        building_block=stk.BuildingBlock.init_from_file(
+            path=path,
+            functional_groups=data.init_functional_groups,
+            placer_ids=data.init_placer_ids,
+        ),
+        functional_groups=data.case_data_functional_groups,
+        core_atoms=data.case_data_core_atoms,
+        placers=data.case_data_placers,
+    )
+
+
+@pytest.fixture(
     params=(
         CaseData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
@@ -76,6 +145,11 @@ from .case_data import CaseData
             functional_groups=(),
             core_atoms=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
             placers=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
+        ),
+        CaseData(
+            building_block=stk.BuildingBlock.init_from_file(
+
+            ),
         ),
     ),
 )
