@@ -15,5 +15,6 @@ def test_get_building_block(case_data):
     """
 
     assert (
-        case_data.atom.get_building_block() is case_data.building_block
+        case_data.atom_info.get_building_block()
+        is case_data.building_block
     )
