@@ -21,9 +21,8 @@ import numpy as np
 )
 def molecule(request):
     """
-    A :class:`.Molecule` instance which gets rotated.
+    A :class:`.Molecule` instance with at least 2 atoms.
 
-    The molecule must have at least 2 atoms for the test to work.
 
     """
 

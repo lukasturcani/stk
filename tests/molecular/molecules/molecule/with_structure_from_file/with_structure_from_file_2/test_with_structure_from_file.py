@@ -20,8 +20,9 @@ def test_with_structure_from_file(datadir, case_data):
 
     """
 
-    # Save a copy of the position matrix, to ensure the original is
-    # not modified by the test.
+    # Save a copy of the position matrix, to ensure the original
+    # molecule is not modified by the test, because it is meant to be
+    # immutable.
     position_matrix = case_data.molecule.get_position_matrix()
     _test_with_structure_from_file(
         molecule=case_data.molecule,

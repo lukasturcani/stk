@@ -12,8 +12,8 @@ def test_with_centroid(molecule, get_atom_ids, centroid):
 
     get_atom_ids : :class:`callable`
         Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
+        `atom_ids` parameter for :meth:`.Molecule.with_centroid`. This
+        allows the testing of different values of this parameter.
 
     centroid : :class:`numpy.ndarray`
         The desired centroid of the clone molecule.
@@ -25,7 +25,7 @@ def test_with_centroid(molecule, get_atom_ids, centroid):
     """
 
     # Save a copy of the position matrix, to ensure the original is
-    # not modified by the test.
+    # not modified by the test, because it is meant to be immutable.
     position_matrix = molecule.get_position_matrix()
     _test_with_centroid(molecule, get_atom_ids, centroid)
     assert np.all(np.equal(
@@ -45,8 +45,8 @@ def _test_with_centroid(molecule, get_atom_ids, centroid):
 
     get_atom_ids : :class:`callable`
         Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
+        `atom_ids` parameter for :meth:`.Molecule.with_centroid`. This
+        allows the testing of different values of this parameter.
 
     centroid : :class:`numpy.ndarray`
         The desired centroid of the clone molecule.

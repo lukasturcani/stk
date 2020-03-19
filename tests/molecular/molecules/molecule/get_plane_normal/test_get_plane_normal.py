@@ -17,8 +17,8 @@ def test_get_plane_normal(case_data, get_atom_ids):
 
     get_atom_ids : :class:`callable`
         Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
+        `atom_ids` parameter for :meth:`.Molecule.get_plane_normal`.
+        This allows the testing of different values of this parameter.
 
     Returns
     -------
@@ -42,7 +42,6 @@ def test_get_plane_normal(case_data, get_atom_ids):
     fault can be placed on :meth:`.Molecule.get_plane_normal`,
     because :func:`.get_plane_normal` has already been verified to
     be correct by its own tests.
-
 
     """
 
@@ -70,8 +69,8 @@ def _test_get_plane_normal(molecule, get_atom_ids, normal):
 
     get_atom_ids : :class:`callable`
         Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
+        `atom_ids` parameter for :meth:`.Molecule.get_plane_normal`.
+        This allows the testing of different values of this parameter.
 
     normal : :class:`numpy.ndarray`
         The correct plane normal.

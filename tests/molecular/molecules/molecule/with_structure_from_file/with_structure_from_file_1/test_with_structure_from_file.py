@@ -27,8 +27,9 @@ def test_with_structure_from_file(
 
     """
 
-    # Save a copy of the position matrix, to ensure the original is
-    # not modified by the test.
+    # Save a copy of the position matrix, to ensure the original
+    # molecule is not modified by the test, because it is meant to be
+    # immutable.
     position_matrix = molecule.get_position_matrix()
     _test_with_structure_from_file(
         molecule=molecule,
@@ -73,5 +74,7 @@ def _test_with_structure_from_file(
     assert np.allclose(
         a=position_matrix,
         b=loaded.get_position_matrix(),
+        # Not very precise because the file does not hold many
+        # significant figures.
         atol=1e-4,
     )

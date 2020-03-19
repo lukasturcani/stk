@@ -4,7 +4,7 @@ import stk
 
 def test_with_rotation_about_axis(molecule, angle, axis, get_origin):
     """
-    Test :meth:`.Moleucle.with_rotation_about_axis`.
+    Test :meth:`.Molecule.with_rotation_about_axis`.
 
     Parameters
     ----------

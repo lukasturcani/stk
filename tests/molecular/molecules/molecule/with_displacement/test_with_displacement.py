@@ -8,7 +8,7 @@ def test_with_displacement(molecule, displacement):
     Parameters
     ----------
     molecule : :class:`.Molecule`
-        The moleclue to test.
+        The molecule to test.
 
     displacement : :class:`numpy.ndarray`
         The displacement the clone should have.

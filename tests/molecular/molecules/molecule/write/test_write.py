@@ -12,7 +12,7 @@ def test_write(molecule, get_position_matrix, path):
 
     get_position_matrix : :class:`callable
         Takes a single parameter, `molecule`, and returns a valid
-        postion matrix to use for this test.
+        position matrix to use for this test.
 
     path : :class:`str`
         The path to which the test writes.
