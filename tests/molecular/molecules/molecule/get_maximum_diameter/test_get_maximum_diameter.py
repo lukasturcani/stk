@@ -16,8 +16,9 @@ def test_get_maximum_diameter(case_data, get_atom_ids):
 
     get_atom_ids : :class:`callable`
         Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
+        `atom_ids` parameter for
+        :meth:`.Molecule.get_maximum_diameter`. This allows the
+        testing of different values of this parameter.
 
     Returns
     -------
@@ -72,8 +73,9 @@ def _test_get_maximum_diameter(
 
     get_atom_ids : :class:`callable`
         Takes a single parameter, `molecule`, and returns a valid
-        `atom_ids` parameter. This allows the testing of different
-        values of this parameter.
+        `atom_ids` parameter for
+        :meth:`.Molecule.get_maximum_diameter`. This allows the
+        testing of different values of this parameter.
 
     maximum_diameter : :class:`float`
         The correct maximum_diameter.

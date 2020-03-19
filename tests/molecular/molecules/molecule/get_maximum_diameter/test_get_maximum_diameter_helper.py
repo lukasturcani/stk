@@ -60,7 +60,7 @@ def test_get_direction_helper(
         The ids of atoms included in the test.
 
     maximum_diameter : :class:`float`
-        The correct maximum_diameter.
+        The correct maximum diameter.
 
     Returns
     -------
