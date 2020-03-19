@@ -21,7 +21,7 @@ def test_with_position_matrix(molecule, get_position_matrix):
     """
 
     # Save a copy of the position matrix, to ensure the original is
-    # not modified by the test.
+    # not modified by the test, because it is meant to be immutable.
     position_matrix = molecule.get_position_matrix()
     _test_with_position_matrix(molecule, get_position_matrix)
     assert np.all(np.equal(
