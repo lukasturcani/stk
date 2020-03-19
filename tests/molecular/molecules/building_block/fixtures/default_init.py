@@ -9,8 +9,8 @@ from ..case_data import CaseData
         CaseData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
             functional_groups=(),
-            core_atoms=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
-            placers=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
+            core_atoms_ids=(0, 1, 2, 3),
+            placer_ids=(0, 1, 2, 3),
         ),
         CaseData(
             building_block=stk.BuildingBlock(
@@ -31,8 +31,8 @@ from ..case_data import CaseData
                     deleters=(stk.Br(3), ),
                 ),
             ),
-            core_atoms=(stk.C(1), stk.C(2)),
-            placers=(stk.C(1), stk.C(2)),
+            core_atom_ids=(1, 2),
+            placer_ids=(1, 2),
         ),
         CaseData(
             building_block=stk.BuildingBlock(
@@ -40,8 +40,8 @@ from ..case_data import CaseData
                 placer_ids=(1, 2),
             ),
             functional_groups=(),
-            core_atoms=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
-            placers=(stk.C(1), stk.C(2)),
+            core_atom_ids=(0, 1, 2, 3),
+            placer_ids=(1, 2),
         ),
         CaseData(
             building_block=stk.BuildingBlock(
@@ -63,8 +63,8 @@ from ..case_data import CaseData
                     deleters=(stk.Br(3), ),
                 ),
             ),
-            core_atoms=(stk.C(1), stk.C(2)),
-            placers=(stk.Br(0), stk.Br(3)),
+            core_atom_ids=(1, 2),
+            placer_ids=(0, 3),
         ),
         CaseData(
             building_block=stk.BuildingBlock(
@@ -72,13 +72,8 @@ from ..case_data import CaseData
                 functional_groups=[stk.IodoFactory()],
             ),
             functional_groups=(),
-            core_atoms=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
-            placers=(stk.Br(0), stk.C(1), stk.C(2), stk.Br(3)),
-        ),
-        CaseData(
-            building_block=stk.BuildingBlock.init_from_file(
-
-            ),
+            core_atoms_ids=(0, 1, 2, 3),
+            placer_ids=(0, 1, 2, 3),
         ),
     ),
 )
