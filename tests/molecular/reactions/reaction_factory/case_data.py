@@ -16,6 +16,14 @@ class CaseData:
     reaction_result : :class:`.ReactionResult`
         The expected result of the reaction returned by the factory.
 
+    Notes
+    -----
+    The reason the test case looks at the :attr:`.reaction_result`,
+    rather than the actual :class:`.Reaction` returned by the
+    :attr:`factory`, is that :class:`.Reaction` does not provide a
+    public API through which its identity can be determined, except for
+    the :attr:`.reaction_result`.
+
     """
 
     def __init__(
