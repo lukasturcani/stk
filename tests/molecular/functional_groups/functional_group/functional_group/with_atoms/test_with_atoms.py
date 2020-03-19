@@ -25,7 +25,7 @@ def test_with_atoms(functional_group, get_atom_map):
     """
 
     # Save a clone to ensure that "functional_group" is not changed by
-    # the test.
+    # the test, because it should be immutable.
     before = functional_group.clone()
     _test_with_atoms(functional_group, get_atom_map)
     is_clone_functional_group(before, functional_group)

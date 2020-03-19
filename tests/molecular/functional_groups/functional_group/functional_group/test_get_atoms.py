@@ -45,4 +45,4 @@ def _test_get_atoms(functional_group, atoms):
         functional_group.get_atoms(),
         atoms
     ):
-        atom1 is atom2
+        assert atom1 is atom2

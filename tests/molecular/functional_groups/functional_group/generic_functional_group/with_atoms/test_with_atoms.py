@@ -25,7 +25,7 @@ def test_with_atoms(generic_functional_group, get_atom_map):
     """
 
     # Save a clone to ensure that "generic_functional_group" is not
-    # changed by the test.
+    # changed by the test, because it meant to be immutable.
     before = generic_functional_group.clone()
     _test_with_atoms(generic_functional_group, get_atom_map)
     is_clone_generic_functional_group(before, generic_functional_group)

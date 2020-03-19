@@ -45,4 +45,4 @@ def _test_get_deleters(functional_group, deleters):
         functional_group.get_deleters(),
         deleters,
     ):
-        atom1 is atom2
+        assert atom1 is atom2

@@ -5,7 +5,7 @@ def test_get_num_bonders(generic_case_data):
     Parameters
     ----------
     generic_case_data : :class:`.GenericCaseData`
-        Test case. Holds the functional group to test and the
+        The test case. Holds the functional group to test and the
         correct number of bonder atoms.
 
     Returns
@@ -31,6 +31,10 @@ def _test_get_num_bonders(functional_group, num_bonders):
 
     num_bonders : :class:`int`
         The correct number of bonder atoms.
+
+    Returns
+    -------
+    None : :class:`NoneType`
 
     """
 

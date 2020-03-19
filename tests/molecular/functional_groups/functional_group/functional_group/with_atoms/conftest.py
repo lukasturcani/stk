@@ -29,7 +29,7 @@ def get_atom_map(request):
     Parameters
     ----------
     functional_group : :class:`.FunctionalGroup`
-        A functional group being cloned, for which a valid
+        A functional group being tested, for which a valid
         `atom_map` parameter needs to created.
 
     Returns

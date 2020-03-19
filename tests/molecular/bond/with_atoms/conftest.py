@@ -20,7 +20,7 @@ def get_atom_map(request):
     Parameters
     ----------
     bond : :class:`.Bond`
-        The bond for which the `atom_map` parameter needs to be
+        The bond, for which the `atom_map` parameter needs to be
         created.
 
     Returns

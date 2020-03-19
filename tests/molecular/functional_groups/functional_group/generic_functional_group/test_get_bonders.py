@@ -45,4 +45,4 @@ def _test_get_bonders(functional_group, bonders):
         functional_group.get_bonders(),
         bonders,
     ):
-        atom1 is atom2
+        assert atom1 is atom2
