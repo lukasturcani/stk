@@ -125,22 +125,19 @@ class InitFromFileData:
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(1, 2),
         ),
-        CaseData(
-            building_block=stk.BuildingBlock(
-                smiles='Br[C+2][C+2]Br',
-                placer_ids=(1, 2),
-            ),
-            functional_groups=(),
-            core_atom_ids=(0, 1, 2, 3),
-            placer_ids=(1, 2),
+        InitFromFileData(
+            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            init_functional_groups=(),
+            init_placer_ids=(1, 2),
+            case_data_functional_groups=(),
+            case_data_core_atom_ids=(0, 1, 2, 3),
+            case_data_placer_ids=(1, 2),
         ),
-        CaseData(
-            building_block=stk.BuildingBlock(
-                smiles='Br[C+2][C+2]Br',
-                functional_groups=[stk.BromoFactory()],
-                placer_ids=(0, 3),
-            ),
-            functional_groups=(
+        InitFromFileData(
+            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            init_functional_groups=[stk.BromoFactory()],
+            init_placer_ids=(0, 3),
+            case_data_functional_groups=(
                 stk.Bromo(
                     bromine=stk.Br(0),
                     atom=stk.C(1),
@@ -154,8 +151,16 @@ class InitFromFileData:
                     deleters=(stk.Br(3), ),
                 ),
             ),
-            core_atom_ids=(1, 2),
-            placer_ids=(0, 3),
+            case_data_core_atom_ids=(1, 2),
+            case_data_placer_ids=(0, 3),
+        ),
+        InitFromFileData(
+            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            init_functional_groups=[stk.IodoFactory()],
+            init_placer_ids=None,
+            case_data_functional_groups=(),
+            case_data_core_atoms_ids=(0, 1, 2, 3),
+            case_data_placer_ids=(0, 1, 2, 3),
         ),
     ),
 )
