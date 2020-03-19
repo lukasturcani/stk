@@ -5,8 +5,8 @@ def test_get_atomic_number(case_data):
     Parameters
     ----------
     case_data : :class:`.CaseData`
-        A test case, containing the atom to test and the expected
-        result.
+        A test case, containing the atom to test and its correct atomic
+        number.
 
     Returns
     -------
