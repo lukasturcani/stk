@@ -25,6 +25,16 @@ def case_data(request):
     return request.param
 
 
+@pytest.fixture
+def building_block(case_data):
+    """
+    A :class:`.BuildingBlock` instance.
+
+    """
+
+    return case_data.building_block
+
+
 @pytest.fixture(
     params=(
         lambda molecule:

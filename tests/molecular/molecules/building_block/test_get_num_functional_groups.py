@@ -1,20 +1,20 @@
-import pytest
-import stk
+def test_get_num_functional_groups(case_data):
+    """
+    Test :meth:`.BuildingBlock.get_num_functional_groups`.
 
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        A test case. Holds the building block to test and the
+        correct number of functional groups.
 
-@pytest.mark.parametrize(
-    argnames=('building_block', 'num_functional_groups'),
-    argvalues=(
-        (stk.BuildingBlock('NCCN'), 0),
-        (stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]), 2),
-        (stk.BuildingBlock('NCCN', [stk.BromoFactory()]), 0),
-    )
-)
-def test_get_num_functional_groups(
-    building_block,
-    num_functional_groups,
-):
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     assert (
-        building_block.get_num_functional_groups()
-        == num_functional_groups
+        case_data.building_block.get_num_functional_groups()
+        == len(case_data.functional_groups)
     )
