@@ -3,7 +3,7 @@ import rdkit.Chem.AllChem as rdkit
 import numpy as np
 import stk
 
-from .....case_data import CaseData
+from ....case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.rotaxane.vertices
 
@@ -28,11 +28,16 @@ def get_plane_normal(building_block):
         rdkit.GetSymmSSSR(building_block.to_rdkit_mol()),
         key=len,
     )
-    normal = building_block.get_plane_normal(macrocycle)
+    centroid = building_block.get_centroid()
+    atom1_position, = building_block.get_atomic_positions(0)
+    normal = -stk.get_acute_vector(
+        reference=atom1_position - centroid,
+        vector=building_block.get_plane_normal(macrocycle),
+    )
     if np.allclose(normal, [1, 0, 0], atol=1e-13):
         return np.array([1, 0, 0], dtype=np.float64)
     elif np.allclose(normal, [-1, 0, 0], atol=1e-13):
-        return np.array([1, 0, 0], dtype=np.float64)
+        return np.array([-1, 0, 0], dtype=np.float64)
 
     return normal
 
@@ -64,7 +69,7 @@ def get_plane_normal(building_block):
                 # If correctly aligned, get_plane_normal returns the
                 # same vector, regardless of flip status.
                 get_plane_normal:
-                    np.array([1, 0, 0], dtype=np.float64),
+                    np.array([-1, 0, 0], dtype=np.float64),
             },
             functional_group_edges={},
             position_ids=macrocycle_ids,
