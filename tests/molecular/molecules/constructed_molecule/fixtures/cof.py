@@ -92,13 +92,13 @@ class CofData:
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
                     smiles=(
                         'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
                     ),
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='Br[C+]=NC#CBr',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -106,19 +106,19 @@ class CofData:
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=20,
-            num_building_blocks={0: 12, 1: 8},
+            num_building_blocks={0: 8, 1: 12},
         ),
         CofData(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
                     smiles=(
                         'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
                     ),
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='Br[C+]=NC#CBr',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -126,19 +126,19 @@ class CofData:
             vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
             num_new_atoms=0,
             num_new_bonds=20,
-            num_building_blocks={0: 12, 1: 8},
+            num_building_blocks={0: 8, 1: 12},
         ),
         CofData(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
                     smiles=(
                         'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
                     ),
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='Br[C+]=NC#CBr',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -146,7 +146,7 @@ class CofData:
             vertex_alignments={0: 2, 1: 2},
             num_new_atoms=0,
             num_new_bonds=20,
-            num_building_blocks={0: 12, 1: 8},
+            num_building_blocks={0: 8, 1: 12},
         ),
         CofData(
             topology_graph=stk.cof.LinkerlessHoneycomb,
@@ -168,10 +168,6 @@ class CofData:
             topology_graph=stk.cof.Hexagonal,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
                     smiles=(
                         'Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)C1Br'
                     ),
@@ -181,20 +177,20 @@ class CofData:
                         stk.FluoroFactory(),
                     ],
                 ),
+                stk.BuildingBlock(
+                    smiles='Br[C+]=NC#CBr',
+                    functional_groups=[stk.BromoFactory()],
+                ),
             ),
             lattice_size=(2, 2, 1),
             vertex_alignments={0: 5},
             num_new_atoms=0,
             num_new_bonds=81,
-            num_building_blocks={0: 48, 1: 16},
+            num_building_blocks={0: 16, 1: 48},
         ),
         CofData(
             topology_graph=stk.cof.Kagome,
             building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
                 stk.BuildingBlock(
                     smiles=(
                         'Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)'
@@ -202,22 +198,26 @@ class CofData:
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
+                stk.BuildingBlock(
+                    smiles='Br[C+]=NC#CBr',
+                    functional_groups=[stk.BromoFactory()],
+                ),
             ),
             lattice_size=(2, 2, 1),
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=41,
-            num_building_blocks={0: 24, 1: 12},
+            num_building_blocks={0: 12, 1: 24},
         ),
         CofData(
             topology_graph=stk.cof.Square,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
+                    smiles='Br[C+]=NC#CBr',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -225,7 +225,7 @@ class CofData:
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=12,
-            num_building_blocks={0: 8, 1: 4},
+            num_building_blocks={0: 4, 1: 8},
         ),
     ),
 )

@@ -318,8 +318,12 @@ class TopologyGraph:
                     building_block
                 )
 
+        yielded = set()
         for vertex_id in range(num_vertices):
-            yield vertex_building_blocks[vertex_id]
+            building_block = vertex_building_blocks[vertex_id]
+            if building_block not in yielded:
+                yielded.add(building_block)
+                yield building_block
 
     def get_num_building_block(self, building_block):
         """
