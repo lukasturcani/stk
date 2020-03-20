@@ -1,7 +1,7 @@
 import numpy as np
 import stk
 
-from .utilities import is_clone
+from ..utilities import is_clone
 
 
 def test_with_scale(case_data):
