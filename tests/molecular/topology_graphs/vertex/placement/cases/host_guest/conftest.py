@@ -12,4 +12,9 @@ from .fixtures import *  # noqa
     ),
 )
 def case_data(request):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
     return request.param
