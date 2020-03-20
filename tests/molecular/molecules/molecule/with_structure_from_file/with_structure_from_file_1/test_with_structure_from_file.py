@@ -1,5 +1,7 @@
 import numpy as np
 
+from ....utilities import is_clone
+
 
 def test_with_structure_from_file(
     molecule,
@@ -71,6 +73,7 @@ def _test_with_structure_from_file(
     position_matrix = get_position_matrix(molecule)
     molecule.with_position_matrix(position_matrix).write(path)
     loaded = molecule.with_structure_from_file(path)
+    is_clone(loaded, molecule)
     assert np.allclose(
         a=position_matrix,
         b=loaded.get_position_matrix(),

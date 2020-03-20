@@ -1,6 +1,8 @@
 import numpy as np
 import stk
 
+from ...utilities import is_clone
+
 
 def test_with_rotation_about_axis(molecule, angle, axis, get_origin):
     """
@@ -32,6 +34,7 @@ def test_with_rotation_about_axis(molecule, angle, axis, get_origin):
     origin = get_origin(molecule)
     original = rotational_space_positions(molecule, axis, origin)
     new = molecule.with_rotation_about_axis(angle, axis, origin)
+    is_clone(new, molecule)
     rotated = rotational_space_positions(new, axis, origin)
     is_rotated(original, rotated, angle)
 

@@ -1,7 +1,11 @@
 import numpy as np
 import stk
 
-from ...utilities import has_same_structure, get_displacement_vector
+from ...utilities import (
+    has_same_structure,
+    get_displacement_vector,
+    is_clone,
+)
 
 
 def test_with_rotation_between_vectors(molecule, target, get_origin):
@@ -64,6 +68,7 @@ def _test_with_rotation_between_vectors(molecule, target, get_origin):
         target=target,
         origin=get_origin(molecule),
     )
+    is_clone(new, molecule)
     result = get_displacement_vector(new, 0, 1)
     assert np.allclose(
         a=stk.normalize_vector(result),

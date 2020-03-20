@@ -1,5 +1,7 @@
 import numpy as np
 
+from ....utilities import is_clone
+
 
 def test_with_structure_from_file(datadir, case_data):
     """
@@ -53,6 +55,7 @@ def _test_with_structure_from_file(molecule, path):
     """
 
     new = molecule.with_structure_from_file(path)
+    is_clone(new, molecule)
     size_diff = abs(
         molecule.get_maximum_diameter()
         - new.get_maximum_diameter()

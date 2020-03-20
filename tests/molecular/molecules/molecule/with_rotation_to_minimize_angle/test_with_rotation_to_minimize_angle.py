@@ -1,7 +1,11 @@
 import stk
 import numpy as np
 
-from ...utilities import has_same_structure, get_displacement_vector
+from ...utilities import (
+    has_same_structure,
+    get_displacement_vector,
+    is_clone,
+)
 
 
 def test_with_rotation_to_minimize_angle(molecule):
@@ -48,6 +52,7 @@ def _test_with_rotation_to_minimize_angle(molecule):
         axis=stk.normalize_vector(np.cross(start, target)),
         origin=next(molecule.get_atomic_positions((0, ))),
     )
+    is_clone(new, molecule)
 
     result = get_displacement_vector(new, 0, 1)
     assert np.allclose(

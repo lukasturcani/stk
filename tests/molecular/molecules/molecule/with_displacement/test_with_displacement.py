@@ -1,5 +1,7 @@
 import numpy as np
 
+from ...utilities import is_clone
+
 
 def test_with_displacement(molecule, displacement):
     """
@@ -20,6 +22,7 @@ def test_with_displacement(molecule, displacement):
     """
 
     new = molecule.with_displacement(displacement)
+    is_clone(new, molecule)
     assert np.allclose(
         a=molecule.get_position_matrix()+displacement,
         b=new.get_position_matrix(),
