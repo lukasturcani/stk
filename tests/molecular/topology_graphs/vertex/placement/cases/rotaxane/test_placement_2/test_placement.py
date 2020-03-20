@@ -74,6 +74,6 @@ def _test_placement(vertex1, vertex2, building_block, atom_ids):
     )
     assert np.allclose(
         a=normal1 @ normal2,
-        b=[1, 0, 0],
+        b=[-1, 0, 0],
         atol=1e-13,
     )
