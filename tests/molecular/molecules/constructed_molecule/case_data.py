@@ -1,6 +1,3 @@
-import stk
-
-
 class CaseData:
     """
     A test case.
