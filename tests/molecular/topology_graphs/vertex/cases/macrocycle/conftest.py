@@ -1,8 +1,10 @@
 import pytest
 import numpy as np
-from stk.macrocycle import vertices
+import stk
 
 from ...case_data import CaseData
+
+vertices = stk.molecular.topology_graphs.macrocycle.vertices
 
 
 @pytest.fixture(
