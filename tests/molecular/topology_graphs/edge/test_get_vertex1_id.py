@@ -1,6 +1,17 @@
 def test_get_vertex1_id(case_data):
-    _test_get_vertex1_id(case_data.edge, case_data.vertex1_id)
+    """
+    Test :meth:`.Edge.get_vertex1_id`.
 
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        A test case. Holds the edge to test and the correct id of the
+        first vertex.
 
-def _test_get_vertex1_id(edge, id):
-    assert edge.get_vertex1_id() == id
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    assert case_data.edge.get_vertex1_id() == case_data.vertex1_id

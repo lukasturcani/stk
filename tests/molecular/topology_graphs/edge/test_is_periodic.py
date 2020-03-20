@@ -1,6 +1,17 @@
 def test_is_periodic(case_data):
-    _test_is_periodic(case_data.edge, case_data.is_periodic)
+    """
+    Test :meth:`.Edge.is_periodic`.
 
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        A test case. Holds the edge to test and the truth about its
+        periodicity.
 
-def _test_is_periodic(edge, is_periodic):
-    assert edge.is_periodic() == is_periodic
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    assert case_data.edge.is_periodic() == case_data.is_periodic

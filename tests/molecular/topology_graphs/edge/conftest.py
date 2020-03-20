@@ -1,23 +1,7 @@
 import pytest
 import stk
 
-
-class CaseData:
-    def __init__(
-        self,
-        edge,
-        id,
-        vertex1_id,
-        vertex2_id,
-        periodicity,
-        is_periodic,
-    ):
-        self.edge = edge
-        self.id = id
-        self.vertex1_id = vertex1_id
-        self.vertex2_id = vertex2_id
-        self.periodicity = periodicity
-        self.is_periodic = is_periodic
+from .case_data import CaseData
 
 
 @pytest.fixture
@@ -35,6 +19,11 @@ def case_data(id, vertex1, vertex2, periodicity):
         periodicity=periodicity,
         is_periodic=any(i != 0 for i in periodicity),
     )
+
+
+@pytest.fixture
+def edge(case_data):
+    return case_data.edge
 
 
 @pytest.fixture(
