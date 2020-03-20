@@ -27,14 +27,14 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             functional_groups=(
                 stk.Bromo(
                     bromine=stk.Br(0),
-                    atom=stk.C(1),
-                    bonders=(stk.C(1), ),
+                    atom=stk.C(1, 2),
+                    bonders=(stk.C(1, 2), ),
                     deleters=(stk.Br(0), ),
                 ),
                 stk.Bromo(
                     bromine=stk.Br(3),
-                    atom=stk.C(2),
-                    bonders=(stk.C(2), ),
+                    atom=stk.C(2, 2),
+                    bonders=(stk.C(2, 2), ),
                     deleters=(stk.Br(3), ),
                 ),
             ),
@@ -59,14 +59,14 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             functional_groups=(
                 stk.Bromo(
                     bromine=stk.Br(0),
-                    atom=stk.C(1),
-                    bonders=(stk.C(1), ),
+                    atom=stk.C(1, 2),
+                    bonders=(stk.C(1, 2), ),
                     deleters=(stk.Br(0), ),
                 ),
                 stk.Bromo(
                     bromine=stk.Br(3),
-                    atom=stk.C(2),
-                    bonders=(stk.C(2), ),
+                    atom=stk.C(2, 2),
+                    bonders=(stk.C(2, 2), ),
                     deleters=(stk.Br(3), ),
                 ),
             ),
