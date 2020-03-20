@@ -42,7 +42,7 @@ def get_direction(building_block):
             alignment_tests={
                 get_direction: np.array([1, 0, 0], dtype=np.float64),
             },
-            functional_groups_edges={},
+            functional_group_edges={},
         ),
     ),
 )

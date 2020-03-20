@@ -18,7 +18,7 @@ vertices = stk.molecular.topology_graphs.host_guest.vertices
             building_block=stk.BuildingBlock('NCCN'),
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},
-            functional_groups_edges={},
+            functional_group_edges={},
         ),
     ),
 )

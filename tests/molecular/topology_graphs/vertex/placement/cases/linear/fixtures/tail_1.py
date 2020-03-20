@@ -2,7 +2,7 @@ import pytest
 import stk
 
 from .utilities import get_closest_point, get_centroid, get_edges
-from ...case_case import CaseData
+from ....case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.polymer.linear
 
