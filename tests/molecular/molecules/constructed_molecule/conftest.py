@@ -13,3 +13,8 @@ from .fixtures import *  # noqa
 )
 def case_data(request):
     return request.param
+
+
+@pytest.fixture
+def constructed_molecule(case_data):
+    return case_data.constructed_molecule

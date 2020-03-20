@@ -1,11 +1,21 @@
 import itertools as it
 
 
-def test_clone(case_data):
-    _test_clone(case_data.constructed_molecule)
+def test_clone(constructed_molecule):
+    """
+    Test :meth:`.ConstructedMolecule.clone`.
 
+    Parameters
+    ----------
+    constructed_molecule : :class:`.ConstructedMolecule`
+        The constructed molecule to test.
 
-def _test_clone(constructed_molecule):
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     clone = constructed_molecule.clone()
     is_clone(constructed_molecule, clone)
 

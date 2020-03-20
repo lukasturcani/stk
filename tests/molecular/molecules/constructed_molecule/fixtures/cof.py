@@ -159,6 +159,7 @@ class CofData:
                 ),
             ),
             lattice_size=(2, 2, 1),
+            vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=8,
             num_building_blocks={0: 8},
