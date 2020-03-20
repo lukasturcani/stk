@@ -23,6 +23,20 @@ macrocycle_ids = max(
 )
 
 
+def get_plane_normal(building_block):
+    macrocycle = max(
+        rdkit.GetSymmSSSR(building_block.to_rdkit_mol()),
+        key=len,
+    )
+    normal = building_block.get_plane_normal(macrocycle)
+    if np.allclose(normal, [1, 0, 0], atol=1e-13):
+        return np.array([1, 0, 0], dtype=np.float64)
+    elif np.allclose(normal, [-1, 0, 0], atol=1e-13):
+        return np.array([-1, 0, 0], dtype=np.float64)
+
+    return normal
+
+
 @pytest.fixture(
     params=(
         CaseData(
@@ -33,7 +47,10 @@ macrocycle_ids = max(
             ),
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},
-            functional_group_edges={},
+            functional_group_edges={
+                get_plane_normal:
+                    np.array([-1, 0, 0], dtype=np.float64),
+            },
             position_ids=macrocycle_ids,
         ),
         CaseData(
@@ -43,7 +60,10 @@ macrocycle_ids = max(
                 molecule=macrocycle,
             ),
             position=np.array([1, 2, 3], dtype=np.float64),
-            alignment_tests={},
+            alignment_tests={
+                get_plane_normal:
+                    np.array([1, 0, 0], dtype=np.float64),
+            },
             functional_group_edges={},
             position_ids=macrocycle_ids,
         ),
