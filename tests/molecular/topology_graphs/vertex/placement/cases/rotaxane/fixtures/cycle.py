@@ -66,8 +66,6 @@ def get_plane_normal(building_block):
             ),
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={
-                # If correctly aligned, get_plane_normal returns the
-                # same vector, regardless of flip status.
                 get_plane_normal:
                     np.array([-1, 0, 0], dtype=np.float64),
             },
