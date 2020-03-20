@@ -288,7 +288,30 @@ class TopologyGraph:
 
         """
 
-        return self.clone._with_building_blocks(building_block_map)
+        return self.clone()._with_building_blocks(building_block_map)
+
+    def clone(self):
+        """
+        Return a clone.
+
+        Returns
+        -------
+        :class:`.TopologyGraph`
+            The clone. Has the same type as the original topology
+            graph.
+
+        """
+
+        clone = self.__class__.__new__(self.__class__)
+        clone._scale = self._scale
+        clone._building_block_vertices = dict(
+            self._building_block_vertices
+        )
+        clone._edges = self._edges
+        clone._reaction_factory = self._reaction_factory
+        clone._implementation = self._implementation
+        clone._edge_groups = self._edge_groups
+        return clone
 
     def get_building_blocks(self):
         """
