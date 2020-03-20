@@ -61,7 +61,7 @@ def _test_placement(
         The building block which is placed by `vertex`.
 
     position : :class:`numpy.ndarray`
-        The centroid of `position_ids` atoms of `building_block` after
+        The correct centroid of atoms in `position_ids` after
         placement.
 
     alignment_tests : :class:`dict`
