@@ -1,4 +1,5 @@
 import pytest
+import rdkit.Chem.AllChem as rdkit
 import numpy as np
 import stk
 
@@ -16,6 +17,10 @@ macrocycle = stk.ConstructedMolecule(
         num_repeating_units=5,
     ),
 )
+macrocycle_ids = max(
+    rdkit.GetSymmSSSR(macrocycle.to_rdkit_mol()),
+    key=len,
+)
 
 
 @pytest.fixture(
@@ -29,6 +34,7 @@ macrocycle = stk.ConstructedMolecule(
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},
             functional_group_edges={},
+            position_ids=macrocycle_ids,
         ),
         CaseData(
             vertex=vertices._CycleVertex(0, (1, 2, 3), False),
@@ -39,6 +45,7 @@ macrocycle = stk.ConstructedMolecule(
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},
             functional_group_edges={},
+            position_ids=macrocycle_ids,
         ),
     ),
 )

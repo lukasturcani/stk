@@ -30,6 +30,7 @@ def test_placement(case_data):
         position=case_data.position,
         alignment_tests=case_data.alignment_tests,
         functional_group_edges=case_data.functional_group_edges,
+        position_ids=case_data.position_ids,
     )
 
 
@@ -40,6 +41,7 @@ def _test_placement(
     position,
     alignment_tests,
     functional_group_edges,
+    position_ids,
 ):
     """
     Test placement methods.
@@ -59,7 +61,7 @@ def _test_placement(
         The building block which is placed by `vertex`.
 
     position : :class:`numpy.ndarray`
-        The centroid of *placer* atoms of `building_block` after
+        The centroid of `position_ids` atoms of `building_block` after
         placement.
 
     alignment_tests : :class:`dict`
@@ -80,6 +82,10 @@ def _test_placement(
     functional_group_edges : :class:`dict`
         The correct mapping of functional group id to edge id.
 
+    position_ids : :class:`tuple` of :class:`int`
+        The ids of atoms which are used to determine if the building
+        block was positioned correctly.
+
     Returns
     -------
     None : :class:`NoneType`
@@ -94,7 +100,7 @@ def _test_placement(
         position_matrix=position_matrix,
     )
     assert np.allclose(
-        a=building_block.get_centroid(building_block.get_placer_ids()),
+        a=building_block.get_centroid(position_ids),
         b=position,
         atol=1e-14,
     )

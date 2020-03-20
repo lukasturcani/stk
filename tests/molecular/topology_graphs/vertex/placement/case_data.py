@@ -14,8 +14,8 @@ class CaseData:
         The building block to be placed by :attr:`.vertex`.
 
     position : :class:`numpy.ndarray`
-        The centroid of *placer* atoms of :attr:`.building_block`
-        after placement.
+        The centroid of :attr:`.position_ids` atoms of
+        :attr:`.building_block` after placement.
 
     alignment_tests : :class:`dict`
         Maps a :class:`callable` to a :class:`numpy.ndarray`.
@@ -35,6 +35,10 @@ class CaseData:
     functional_group_edges : :class:`dict`
         The correct mapping of functional group id to edge id.
 
+    position_ids : :class:`tuple` of :class:`int`
+        The ids of atoms which are used to determine if the building
+        block was positioned correctly.
+
     """
 
     def __init__(
@@ -45,6 +49,7 @@ class CaseData:
         position,
         alignment_tests,
         functional_group_edges,
+        position_ids=None,
     ):
         """
         Initialize a :class:`.CaseData` instance.
@@ -61,8 +66,8 @@ class CaseData:
             The building block to be placed by `vertex`.
 
         position : :class:`numpy.ndarray`
-            The centroid of *placer* atoms of `building_block` after
-            placement.
+            The centroid of `position_ids` atoms of `building_block`
+            after placement.
 
         alignment_tests : :class:`dict`
             Maps a :class:`callable` to a :class:`numpy.ndarray`.
@@ -84,7 +89,15 @@ class CaseData:
         functional_group_edges : :class:`dict`
             The correct mapping of functional group id to edge id.
 
+        position_ids : :class:`tuple` of :class:`int`, optional
+            The ids of atoms which are used to determine if the
+            building block was positioned correctly. If ``None``, the
+            placer ids will be used.
+
         """
+
+        if position_ids is None:
+            position_ids = tuple(building_block.get_placer_ids())
 
         self.vertex = vertex
         self.edges = edges
@@ -92,6 +105,7 @@ class CaseData:
         self.position = position
         self.alignment_tests = alignment_tests
         self.functional_group_edges = functional_group_edges
+        self.position_ids = position_ids
 
     def __str__(self):
         return (
