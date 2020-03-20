@@ -19,9 +19,10 @@ def get_closest_point(points, point):
     return min(points, key=partial(euclidean, point))
 
 
-def get_edges(vertex):
-    vertex2 = stk.Vertex(1, vertex.get_position() + [-10, 0, 0])
-    vertex3 = stk.Vertex(2, vertex.get_position() + [10, 0, 0])
+def get_edges(vertex, angle):
+    position1, position2 = get_points(vertex.get_position(), angle)
+    vertex2 = stk.Vertex(1, position1)
+    vertex3 = stk.Vertex(2, position2)
     yield stk.Edge(0, vertex, vertex2)
     yield stk.Edge(1, vertex, vertex3)
 
