@@ -59,11 +59,11 @@ def _test_placement(vertex1, vertex2, building_block, atom_ids):
 
     """
 
-    position_matrix1 = vertex1.place_building_block(building_block)
+    position_matrix1 = vertex1.place_building_block(building_block, ())
     building_block1 = building_block.with_position_matrix(
         position_matrix=position_matrix1,
     )
-    position_matrix2 = vertex2.place_building_block(building_block)
+    position_matrix2 = vertex2.place_building_block(building_block, ())
     building_block2 = building_block.with_position_matrix(
         position_matrix=position_matrix2,
     )
