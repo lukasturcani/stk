@@ -62,10 +62,11 @@ class _CycleVertex(Vertex):
     def place_building_block(self, building_block, edges):
         rdkit_mol = building_block.to_rdkit_mol()
         macrocycle = max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
-        return building_block.with_centroid(
+        building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=macrocycle,
-        ).with_rotation_between_vectors(
+        )
+        return building_block.with_rotation_between_vectors(
             start=building_block.get_plane_normal(macrocycle),
             target=[-1 if self._flip else 1, 0, 0],
             origin=self._position
