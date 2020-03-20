@@ -63,5 +63,3 @@ def id(request):
 @pytest.fixture(params=(True, False))
 def flip(request):
     return request.param
-
-
