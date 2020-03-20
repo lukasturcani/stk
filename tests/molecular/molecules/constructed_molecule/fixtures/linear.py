@@ -94,6 +94,7 @@ class LinearData:
             num_repeating_units=2,
             num_new_atoms=0,
             num_new_bonds=3,
+            num_building_blocks={0: 2, 1: 2},
         ),
     ),
 )

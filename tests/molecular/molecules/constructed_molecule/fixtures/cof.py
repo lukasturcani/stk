@@ -106,6 +106,7 @@ class CofData:
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=20,
+            num_building_blocks={0: 12, 1: 8},
         ),
         CofData(
             topology_graph=stk.cof.Honeycomb,
@@ -125,6 +126,7 @@ class CofData:
             vertex_alignments={0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
             num_new_atoms=0,
             num_new_bonds=20,
+            num_building_blocks={0: 12, 1: 8},
         ),
         CofData(
             topology_graph=stk.cof.Honeycomb,
@@ -144,6 +146,7 @@ class CofData:
             vertex_alignments={0: 2, 1: 2},
             num_new_atoms=0,
             num_new_bonds=20,
+            num_building_blocks={0: 12, 1: 8},
         ),
         CofData(
             topology_graph=stk.cof.LinkerlessHoneycomb,
@@ -158,6 +161,7 @@ class CofData:
             lattice_size=(2, 2, 1),
             num_new_atoms=0,
             num_new_bonds=8,
+            num_building_blocks={0: 8},
         ),
         CofData(
             topology_graph=stk.cof.Hexagonal,
@@ -181,6 +185,7 @@ class CofData:
             vertex_alignments={0: 5},
             num_new_atoms=0,
             num_new_bonds=81,
+            num_building_blocks={0: 44, 1: 16},
         ),
         CofData(
             topology_graph=stk.cof.Kagome,
@@ -201,6 +206,7 @@ class CofData:
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=41,
+            num_building_blocks={0: 20, 1: 12},
         ),
         CofData(
             topology_graph=stk.cof.Square,
@@ -218,6 +224,7 @@ class CofData:
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=12,
+            num_building_blocks={0: 8, 1: 4},
         ),
     ),
 )
