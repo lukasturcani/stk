@@ -1,5 +1,7 @@
 import numpy as np
 
+from ...utilities import is_clone
+
 
 def test_with_centroid(molecule, get_atom_ids, centroid):
     """
@@ -58,12 +60,13 @@ def _test_with_centroid(molecule, get_atom_ids, centroid):
 
     """
 
-    molecule = molecule.with_centroid(
+    new = molecule.with_centroid(
         position=centroid,
         atom_ids=get_atom_ids(molecule),
     )
+    is_clone(new, molecule)
     assert np.allclose(
         a=centroid,
-        b=molecule.get_centroid(atom_ids=get_atom_ids(molecule)),
+        b=new.get_centroid(atom_ids=get_atom_ids(molecule)),
         atol=1e-14,
     )
