@@ -186,7 +186,7 @@ class CofData:
             vertex_alignments={0: 5},
             num_new_atoms=0,
             num_new_bonds=81,
-            num_building_blocks={0: 44, 1: 16},
+            num_building_blocks={0: 48, 1: 16},
         ),
         CofData(
             topology_graph=stk.cof.Kagome,
@@ -207,7 +207,7 @@ class CofData:
             vertex_alignments=None,
             num_new_atoms=0,
             num_new_bonds=41,
-            num_building_blocks={0: 20, 1: 12},
+            num_building_blocks={0: 24, 1: 12},
         ),
         CofData(
             topology_graph=stk.cof.Square,
@@ -238,6 +238,7 @@ def cof_data(request):
     return request.param
 
 
+@pytest.fixture
 def cof(cof_data):
     """
     A :class:`.CaseData` instance.

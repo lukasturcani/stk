@@ -44,6 +44,6 @@ def _test_get_num_building_block(
 
     for building_block in constructed_molecule.get_building_blocks():
         assert (
-            constructed_molecule.get_num_building_block[building_block]
+            constructed_molecule.get_num_building_block(building_block)
             == num_building_blocks[building_block]
         )
