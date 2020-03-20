@@ -22,9 +22,10 @@ def test_placement(case_data):
     """
 
     _test_placement(
-        case_data.vertex1,
-        case_data.vertex2,
-        case_data.building_block,
+        vertex1=case_data.vertex1,
+        vertex2=case_data.vertex2,
+        building_block=case_data.building_block,
+        atom_ids=case_data.atom_ids,
     )
 
 
