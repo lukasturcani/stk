@@ -22,7 +22,9 @@ def test_placement(case_data):
     """
 
     _test_placement(
-        vertex=case_data.vertex,
+        # Use a clone to ensure that the clone() method is implemented
+        # correctly.
+        vertex=case_data.vertex.clone(),
         edges=case_data.edges,
         building_block=case_data.building_block,
         position=case_data.position,
@@ -57,7 +59,8 @@ def _test_placement(
         The building block which is placed by `vertex`.
 
     position : :class:`numpy.ndarray`
-        The centroid of `building_block` after placement.
+        The centroid of *placer* atoms of `building_block` after
+        placement.
 
     alignment_tests : :class:`dict`
         Maps a :class:`callable` to a :class:`numpy.ndarray`.

@@ -72,3 +72,8 @@ def scale_data(request):
 )
 def position(request):
     return np.array(request.param, dtype=np.float64)
+
+
+@pytest.fixture
+def vertex(case_data):
+    return case_data.vertex

@@ -30,8 +30,3 @@ vertices = stk.molecular.topology_graphs.host_guest.vertices
 )
 def case_data(request):
     return request.param
-
-
-@pytest.fixture
-def vertex(case_data):
-    return case_data.vertex

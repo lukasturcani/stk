@@ -20,11 +20,6 @@ def case_data(request):
 
 
 @pytest.fixture
-def vertex(case_data):
-    return case_data.vertex
-
-
-@pytest.fixture
 def cage1(cls, position):
     return CaseData(
         vertex=cls(

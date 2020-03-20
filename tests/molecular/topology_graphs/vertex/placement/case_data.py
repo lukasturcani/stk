@@ -14,7 +14,8 @@ class CaseData:
         The building block to be placed by :attr:`.vertex`.
 
     position : :class:`numpy.ndarray`
-        The centroid of :attr:`.building_block` after placement.
+        The centroid of *placer* atoms of :attr:`.building_block`
+        after placement.
 
     alignment_tests : :class:`dict`
         Maps a :class:`callable` to a :class:`numpy.ndarray`.
@@ -60,7 +61,8 @@ class CaseData:
             The building block to be placed by `vertex`.
 
         position : :class:`numpy.ndarray`
-            The centroid of `building_block` after placement.
+            The centroid of *placer* atoms of `building_block` after
+            placement.
 
         alignment_tests : :class:`dict`
             Maps a :class:`callable` to a :class:`numpy.ndarray`.
