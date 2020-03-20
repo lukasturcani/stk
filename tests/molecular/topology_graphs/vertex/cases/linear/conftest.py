@@ -65,11 +65,3 @@ def flip(request):
     return request.param
 
 
-@pytest.fixture(
-    params=(
-        [0, 0, 0],
-        [1, 2, -20],
-    ),
-)
-def position(request):
-    return np.array(request.param, dtype=np.float64)
