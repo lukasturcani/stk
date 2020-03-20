@@ -250,6 +250,11 @@ class Cage(TopologyGraph):
             edge_groups=None,
         )
 
+    def clone(self):
+        clone = super().clone()
+        clone._vertex_alignments = dict(self._vertex_alignments)
+        return clone
+
     def _get_vertices(self, vertex_ids):
         """
         Yield vertex prototypes.

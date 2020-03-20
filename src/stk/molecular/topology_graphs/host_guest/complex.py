@@ -142,6 +142,13 @@ class Complex(TopologyGraph):
             edge_groups=(),
         )
 
+    def clone(self):
+        clone = super().clone()
+        clone._guest_start = self._guest_start
+        clone._guest_target = self._guest_target
+        clone._displacement = self._displacement
+        return clone
+
     def _run_reactions(self, state):
         return state
 

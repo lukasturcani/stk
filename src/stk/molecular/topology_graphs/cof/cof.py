@@ -232,6 +232,13 @@ class Cof(TopologyGraph):
             edge_groups=self._get_edge_groups(edges),
         )
 
+    def clone(self):
+        clone = super().clone()
+        clone._vertex_alignments = dict(self._vertex_alignments)
+        clone._lattice_size = self._lattice_size
+        clone._periodic = self._periodic
+        return clone
+
     def _get_edge_groups(self, edges):
         """
         Get the edge groups for the COF.

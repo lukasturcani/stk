@@ -277,6 +277,13 @@ class Macrocycle(TopologyGraph):
             edge_groups=None,
         )
 
+    def clone(self):
+        clone = super().clone()
+        clone._repeating_unit = self._repeating_unit
+        clone._num_repeating_units = self._num_repeating_units
+        clone._orientations = self._orientations
+        return clone
+
     @staticmethod
     def _normalize_repeating_unit(repeating_unit):
         if isinstance(repeating_unit, tuple):
