@@ -81,6 +81,7 @@ class ConstructedMolecule(Molecule):
         clone = super().clone()
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
+        clone._topology_graph = self._topology_graph
         return clone
 
     def get_building_blocks(self):

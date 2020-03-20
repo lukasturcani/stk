@@ -1,6 +1,6 @@
 import itertools as it
 
-from ..utilities import (
+from .molecule import (
     is_equivalent_atom,
     is_equivalent_molecule,
 )
@@ -61,3 +61,8 @@ def is_equivalent_building_block(building_block1, building_block2):
         building_block2.get_core_atom_ids(),
     ):
         assert core_atom_id1 == core_atom_id2
+
+
+def is_clone_building_block(building_block1, building_block2):
+    assert building_block1 is not building_block2
+    is_equivalent_building_block(building_block1, building_block2)

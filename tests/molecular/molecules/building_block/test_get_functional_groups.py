@@ -1,6 +1,6 @@
 import itertools as it
 
-from .utilities import is_equivalent_functional_group
+from ..utilities import is_equivalent_functional_group
 
 
 def test_get_functional_groups(case_data):

@@ -1,5 +1,7 @@
 import numpy as np
 
+from ..utilities import is_clone
+
 
 def test_with_position_matrix(molecule, get_position_matrix):
     """
@@ -51,8 +53,9 @@ def _test_with_position_matrix(molecule, get_position_matrix):
     """
 
     position_matrix = get_position_matrix(molecule)
-    molecule = molecule.with_position_matrix(position_matrix)
+    new = molecule.with_position_matrix(position_matrix)
+    is_clone(new, molecule)
     assert np.all(np.equal(
         position_matrix,
-        molecule.get_position_matrix(),
+        new.get_position_matrix(),
     ))
