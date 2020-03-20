@@ -72,12 +72,20 @@ class LinearData:
 
         """
 
-        self.building_blocks = building_blocks
-        self.repeating_unit = repeating_unit
-        self.num_repeating_units = num_repeating_units
+        self.constructed_molecule = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=building_blocks,
+                repeating_unit=repeating_unit,
+                num_repeating_units=num_repeating_units,
+            ),
+        )
         self.num_new_atoms = num_new_atoms
         self.num_new_bonds = num_new_bonds
-        self.num_building_blocks = num_building_blocks
+        self.num_building_blocks = {
+            building_blocks[index]: num
+            for index, num in num_building_blocks.items()
+        }
+        self.building_blocks = building_blocks
 
 
 @pytest.fixture(
@@ -115,16 +123,9 @@ def linear(linear_data):
     """
 
     return CaseData(
-        topology_graph=stk.polymer.Linear(
-            building_blocks=linear_data.building_blocks,
-            repeating_unit=linear_data.repeating_unit,
-            num_repeating_units=linear_data.num_repeating_units,
-        ),
+        constructed_molecule=linear_data.constructed_molecule,
         num_new_atoms=linear_data.num_new_atoms,
         num_new_bonds=linear_data.num_new_bonds,
-        num_building_blocks={
-            linear_data.building_blocks[index]: num
-            for index, num in linear_data.num_building_blocks.items()
-        },
+        num_building_blocks=linear_data.num_building_blocks,
         building_blocks=linear_data.building_blocks,
     )

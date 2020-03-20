@@ -77,13 +77,20 @@ class CofData:
 
         """
 
-        self.topology_graph = topology_graph
-        self.building_blocks = building_blocks
-        self.lattice_size = lattice_size
-        self.vertex_alignments = vertex_alignments
+        self.constructed_molecule = stk.ConstructedMolecule(
+            topology_graph=topology_graph(
+                building_blocks=building_blocks,
+                lattice_size=lattice_size,
+                vertex_alignments=vertex_alignments,
+            )
+        )
         self.num_new_atoms = num_new_atoms
         self.num_new_bonds = num_new_bonds
-        self.num_building_blocks = num_building_blocks
+        self.num_building_blocks = {
+            building_blocks[index]: num
+            for index, num in num_building_blocks.items()
+        }
+        self.building_blocks = building_blocks
 
 
 @pytest.fixture(
@@ -246,16 +253,9 @@ def cof(cof_data):
     """
 
     return CaseData(
-        topology_graph=cof_data.topology_graph(
-            building_blocks=cof_data.building_blocks,
-            lattice_size=cof_data.lattice_size,
-            vertex_alignments=cof_data.vertex_alignments,
-        ),
+        constructed_molecule=cof_data.constructed_molecule,
         num_new_atoms=cof_data.num_new_atoms,
         num_new_bonds=cof_data.num_new_bonds,
-        num_building_blocks={
-            cof_data.building_blocks[index]: num
-            for index, num in cof_data.num_building_blocks.items()
-        },
+        num_building_blocks=cof_data.num_building_blocks,
         building_blocks=cof_data.building_blocks,
     )

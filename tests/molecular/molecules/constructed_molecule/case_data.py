@@ -37,7 +37,7 @@ class CaseData:
 
     def __init__(
         self,
-        topology_graph,
+        constructed_molecule,
         num_new_atoms,
         num_new_bonds,
         num_building_blocks,
@@ -48,8 +48,8 @@ class CaseData:
 
         Parameters
         ----------
-        topology_graph : :class:`.TopologyGraph`
-            The topology graph used to construct the molecule tested.
+        constructed_molecule : :class:`.ConstructedMolecule`
+            The molecule to test.
 
         num_new_atoms : :class:`int`
             The number of atoms added by the construction process,
@@ -68,9 +68,7 @@ class CaseData:
 
         """
 
-        self.constructed_molecule = stk.ConstructedMolecule(
-            topology_graph=topology_graph,
-        )
+        self.constructed_molecule = constructed_molecule
         self.num_new_atoms = num_new_atoms
         self.num_new_bonds = num_new_bonds
         self.num_building_blocks = num_building_blocks
