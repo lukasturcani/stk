@@ -3,7 +3,7 @@ import rdkit.Chem.AllChem as rdkit
 import numpy as np
 import stk
 
-from ....case_data import CaseData
+from .....case_data import CaseData
 
 vertices = stk.molecular.topology_graphs.rotaxane.vertices
 
