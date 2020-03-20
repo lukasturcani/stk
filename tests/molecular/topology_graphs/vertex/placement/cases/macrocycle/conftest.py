@@ -36,7 +36,9 @@ def building_block_2(request):
 
 @pytest.fixture(
     params=(
+        np.pi/2,
         0,
+        np.pi,
     ),
 )
 def angle(request):
