@@ -1,4 +1,5 @@
 import stk
+import numpy as np
 from functools import partial
 from scipy.spatial.distance import euclidean
 
@@ -23,3 +24,16 @@ def get_edges(vertex):
     vertex3 = stk.Vertex(2, vertex.get_position() + [10, 0, 0])
     yield stk.Edge(0, vertex, vertex2)
     yield stk.Edge(1, vertex, vertex3)
+
+
+def get_points(position, angle):
+    rotation_matrix = stk.rotation_matrix_arbitrary_axis(
+        angle=angle,
+        axis=np.array([0, 0, 1], dtype=np.float64),
+    )
+    points = rotation_matrix @ np.array([
+        [-10, 0, 0],
+        [10, 0, 0],
+    ], dtype=np.float64).T
+
+    yield from (position + point for point in points.T)

@@ -1,46 +1,20 @@
 import pytest
 import numpy as np
+from pytest_lazyfixture import lazy_fixture
 import stk
 
-from ...case_data import CaseData
-from .utilities import get_closest_point, get_fg_position, get_edges
+# Fixtures need to be visible for lazy_fixture() calls.
+from .fixtures import *  # noqa
 
 
-vertices = stk.molecular.topology_graphs.macrocycle.vertices
-
-
-@pytest.fixture
-def case_data(position, flip, building_block_2):
-
-    point1, point2 = points = (
-        position + [-10, 0, 0],
-        position + [10, 0, 0],
-    )
-
-    def get_fg0_point(building_block):
-        return get_closest_point(
-            points=points,
-            point=get_fg_position(0, building_block),
-        )
-
-    def get_fg1_point(building_block):
-        return get_closest_point(
-            points=points,
-            point=get_fg_position(1, building_block),
-        )
-
-    vertex = vertices._CycleVertex(0, position, flip, np.pi/2)
-    return CaseData(
-        vertex=vertex,
-        edges=tuple(get_edges(vertex)),
-        building_block=building_block_2,
-        position=position,
-        alignment_tests={
-            get_fg0_point: point2 if flip else point1,
-            get_fg1_point: point1 if flip else point2,
-        },
-        functional_group_edges={0: 1, 1: 0} if flip else {0: 0, 1: 1},
-    )
+@pytest.fixture(
+    params=(
+        lazy_fixture('flip'),
+        lazy_fixture('no_flip'),
+    ),
+)
+def case_data(request):
+    return request.param
 
 
 @pytest.fixture(
@@ -60,6 +34,10 @@ def building_block_2(request):
     return request.param
 
 
-@pytest.fixture(params=(True, False))
-def flip(request):
+@pytest.fixture(
+    params=(
+        0,
+    ),
+)
+def angle(request):
     return request.param
