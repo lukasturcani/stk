@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 import stk
 
 from ...case_data import CaseData
@@ -28,7 +29,7 @@ def case_data(position, flip, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._CycleVertex(0, position, flip, 0)
+    vertex = vertices._CycleVertex(0, position, flip, np.pi/2)
     return CaseData(
         vertex=vertex,
         edges=tuple(get_edges(vertex)),
