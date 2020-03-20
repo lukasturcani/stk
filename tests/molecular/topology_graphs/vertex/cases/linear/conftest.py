@@ -21,6 +21,11 @@ def case_data(request):
 
 
 @pytest.fixture
+def vertex(case_data):
+    return case_data.vertex
+
+
+@pytest.fixture
 def center(id, position, flip):
     return CaseData(
         vertex=vertices._LinearVertex(id, position, flip),

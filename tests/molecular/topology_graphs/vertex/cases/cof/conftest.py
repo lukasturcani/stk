@@ -17,6 +17,11 @@ def case_data(request):
     return request.param
 
 
+@pytest.fixture
+def vertex(case_data):
+    return case_data.vertex
+
+
 @pytest.fixture(params=(0, ))
 def aligner_edge(request):
     return request.param
