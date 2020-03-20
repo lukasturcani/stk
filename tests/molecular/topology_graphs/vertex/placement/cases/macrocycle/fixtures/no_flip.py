@@ -33,7 +33,7 @@ def no_flip(position, building_block_2, angle):
         )
 
     vertex = vertices._CycleVertex(0, position, False, angle+np.pi/2)
-    edge1, edge2 = edges = tuple(get_edges(vertex, angle+np.pi/2))
+    edge1, edge2 = edges = tuple(get_edges(vertex, angle))
 
     fg0, = building_block_2.get_functional_groups(0)
     fg0_position = building_block_2.get_centroid(fg0.get_placer_ids())
