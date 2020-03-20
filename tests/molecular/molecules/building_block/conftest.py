@@ -7,7 +7,7 @@ from pytest_lazyfixture import lazy_fixture
 from .fixtures import *  # noqa
 
 
-@pytest.fixtures(
+@pytest.fixture(
     params=(
         lazy_fixture('default_init'),
         lazy_fixture('init_from_file'),

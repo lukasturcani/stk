@@ -15,7 +15,7 @@ from ..case_data import CaseData
             placer_ids=(0, 1, 2, 3),
         ),
         CaseData(
-            building_block=stk.BuildingBlock.init_from_building_block(
+            building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
                 functional_groups=[stk.BromoFactory()],
             ),
@@ -74,7 +74,7 @@ from ..case_data import CaseData
                 functional_groups=[stk.IodoFactory()],
             ),
             functional_groups=(),
-            core_atoms_ids=(0, 1, 2, 3),
+            core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
     ),

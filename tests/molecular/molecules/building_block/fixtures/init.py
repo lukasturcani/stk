@@ -56,8 +56,8 @@ from ..case_data import CaseData
                     deleters=(stk.Br(3), ),
                 ),
             ),
-            core_atom_ids=(0, 1, 2, 3),
-            placer_ids=(0, 1, 2, 3),
+            core_atom_ids=(1, 2),
+            placer_ids=(1, 2),
         ),
         CaseData(
             building_block=stk.BuildingBlock.init(
@@ -136,4 +136,4 @@ from ..case_data import CaseData
     ),
 )
 def init(request):
-    return request.data
+    return request.param

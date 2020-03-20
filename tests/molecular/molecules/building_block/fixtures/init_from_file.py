@@ -159,7 +159,7 @@ class InitFromFileData:
             init_functional_groups=[stk.IodoFactory()],
             init_placer_ids=None,
             case_data_functional_groups=(),
-            case_data_core_atoms_ids=(0, 1, 2, 3),
+            case_data_core_atom_ids=(0, 1, 2, 3),
             case_data_placer_ids=(0, 1, 2, 3),
         ),
     ),

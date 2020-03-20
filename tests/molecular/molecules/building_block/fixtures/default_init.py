@@ -72,7 +72,7 @@ from ..case_data import CaseData
                 functional_groups=[stk.IodoFactory()],
             ),
             functional_groups=(),
-            core_atoms_ids=(0, 1, 2, 3),
+            core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
     ),

@@ -5,19 +5,23 @@ import stk
 from ..case_data import CaseData
 
 
+rdkit_molecule = rdkit.MolFromSmiles('Br[C+2][C+2]Br')
+rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
+
+
 @pytest.fixture(
     params=(
         CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
-                molecule=rdkit.MolFromSmiles('Br[C+2][C+2]Br'),
+                molecule=rdkit_molecule,
             ),
             functional_groups=(),
-            core_atoms_ids=(0, 1, 2, 3),
+            core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
         CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
-                molecule=rdkit.MolFromSmiles('Br[C+2][C+2]Br'),
+                molecule=rdkit_molecule,
                 functional_groups=[stk.BromoFactory()],
             ),
             functional_groups=(
@@ -39,7 +43,7 @@ from ..case_data import CaseData
         ),
         CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
-                molecule=rdkit.MolFromSmiles('Br[C+2][C+2]Br'),
+                molecule=rdkit_molecule,
                 placer_ids=(1, 2),
             ),
             functional_groups=(),
@@ -48,7 +52,7 @@ from ..case_data import CaseData
         ),
         CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
-                molecule=rdkit.MolFromSmiles('Br[C+2][C+2]Br'),
+                molecule=rdkit_molecule,
                 functional_groups=[stk.BromoFactory()],
                 placer_ids=(0, 3),
             ),
@@ -71,11 +75,11 @@ from ..case_data import CaseData
         ),
         CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
-                molecule=rdkit.MolFromSmiles('Br[C+2][C+2]Br'),
+                molecule=rdkit_molecule,
                 functional_groups=[stk.IodoFactory()],
             ),
             functional_groups=(),
-            core_atoms_ids=(0, 1, 2, 3),
+            core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
     ),
