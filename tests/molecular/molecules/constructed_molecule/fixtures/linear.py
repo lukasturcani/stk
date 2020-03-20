@@ -88,13 +88,7 @@ class LinearData:
         self.building_blocks = building_blocks
 
     @classmethod
-    def init_with_building_blocks(
-        cls,
-        building_blocks,
-        num_new_atoms,
-        num_new_bonds,
-        num_building_blocks,
-    ):
+    def init_with_building_blocks(cls, building_blocks):
         """
         Initialize by substituing building blocks.
 
@@ -105,17 +99,6 @@ class LinearData:
         ----------
         building_blocks : :class:`tuple` of :class:`.BuildingBlock`
             The building blocks the polymer being tested should hold.
-
-        num_new_atoms : :class:`int`
-            The number of new atoms added by the construction process.
-
-        num_new_bonds : :class:`int`
-            The number of new bonds added by the construction process.
-
-        num_building_blocks : :class:`dict`
-            For each building block in `building_blocks`, maps its
-            index to the number of times its used in the construction
-            of the polymer.
 
         """
 
@@ -148,8 +131,8 @@ class LinearData:
         obj.constructed_molecule = initial.with_building_blocks(
             building_block_map=building_block_map,
         )
-        obj.num_new_atoms = num_new_atoms
-        obj.num_new_bonds = num_new_bonds
+        obj.num_new_atoms = 0
+        obj.num_new_bonds = 5
         obj.building_blocks = building_blocks
         obj.num_building_blocks = {
             building_block2: initial.get_num_building_block(
@@ -188,9 +171,6 @@ class LinearData:
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
-            num_new_atoms=0,
-            num_new_bonds=3,
-            num_building_blocks={0: 2, 1: 2},
         ),
     ),
 )
