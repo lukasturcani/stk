@@ -1,6 +1,16 @@
 def test_get_id(case_data):
-    _test_get_id(case_data.vertex, case_data.id)
+    """
+    Test :meth:`.Vertex.get_id`.
 
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        A test case. Holds the vertex to test and the correct id.
 
-def _test_get_id(vertex, id):
-    assert vertex.get_id() == id
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    assert case_data.vertex.get_id() == case_data.id
