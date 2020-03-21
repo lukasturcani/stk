@@ -65,7 +65,9 @@ class _ConstructedMoleculeSerializer:
                     # Access to the topology graph is not part of the
                     # public interface of a ConstructedMolecule so
                     # private attribute access must be used.
-                    topology_graph=constructed_molecule._topology_graph,
+                    topology_graph=(
+                        constructed_molecule._topology_graph
+                    ),
                 ),
             'atom_infos': tuple(map(
                 self._atom_info_to_json,
@@ -78,6 +80,21 @@ class _ConstructedMoleculeSerializer:
         }
 
     def _atom_info_to_json(self, atom_info):
+        """
+        Return a JSON representation of `atom_info`.
+
+        Parameters
+        ----------
+        atom_info : :class:`.AtomInfo`
+            The atom info to serialize.
+
+        Returns
+        -------
+        :class:`dict`
+            A JSON representation of `atom_info`.
+
+        """
+
         return {
             'atom': atom_info.get_atom().get_id(),
             'building_block': self._building_block_key(
@@ -87,6 +104,23 @@ class _ConstructedMoleculeSerializer:
         }
 
     def _bond_info_to_json(self, bond_info_data):
+        """
+        Return a JSON representation of `bond_info_data`.
+
+        Parameters
+        ----------
+        bond_info_data : :class:`tuple`
+            The first element of the :class:`tuple` is the id of the
+            bond and second element of the :class:`tuple` is the
+            bond info of the bond.
+
+        Returns
+        -------
+        :class:`dict`
+            A JSON representation of `bond_info_data`.
+
+        """
+
         bond_id, bond_info = bond_info_data
         return {
             'bond': bond_id,
