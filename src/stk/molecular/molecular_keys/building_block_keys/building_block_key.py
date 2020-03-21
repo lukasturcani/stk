@@ -125,8 +125,8 @@ class BuildingBlockKey:
                     molecule_key=stk.Inchi(),
                 ),
                 # You can still keep the default building block key
-                # too. No pressure though, you can exclude it from
-                # this tuple too.
+                # too. No pressure though, excluding it from
+                # this tuple is also valid.
                 stk.BuildingBlockKey(),
             ),
         )
