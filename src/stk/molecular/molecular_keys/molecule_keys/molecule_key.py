@@ -45,7 +45,7 @@ class MoleculeKey:
 
         # Use the MoleculeKey instance.
         jsonizer = stk.MoleculeJsonizer(
-            molecule_key=get_num_atoms,
+            molecule_keys=(get_num_atoms, ),
         )
         # Get the JSON representation of a molecule.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))

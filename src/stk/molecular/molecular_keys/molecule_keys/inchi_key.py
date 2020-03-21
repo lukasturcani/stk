@@ -14,6 +14,18 @@ class InchiKey(MoleculeKey):
 
     Examples
     --------
+    You want to use the InChIKey as part of a JSON representation of a
+    molecule
+
+    .. code-block:: python
+
+        import stk
+
+        jsonizer = stk.MoleculeJsonizer(
+            molecule_keys=(stk.InchiKey(), ),
+        )
+        # Get the JSON representation, including an InChIKey.
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
     """
 
