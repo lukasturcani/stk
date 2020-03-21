@@ -5,7 +5,48 @@ Building Block Key
 """
 
 from ..molecule_keys import InchiKey
-from .functional_group_keys import FunctionalGroupKey
+from .functional_group_keys import (
+    AlcoholKey,
+    AldehydeKey,
+    AlkeneKey,
+    AlkyneKey,
+    AmideKey,
+    BoronicAcidKey,
+    BromoKey,
+    CarboxylicAcidKey,
+    DibromoKey,
+    DifluoroKey,
+    DiolKey,
+    FluoroKey,
+    GenericFunctionalGroupKey,
+    IodoKey,
+    PrimaryAminoKey,
+    RingAmineKey,
+    SecondaryAminoKey,
+    ThioAcidKey,
+    ThiolKey,
+)
+from ...functional_groups import (
+    Alcohol,
+    Aldehyde,
+    Alkene,
+    Alkyne,
+    Amide,
+    BoronicAcid,
+    Bromo,
+    CarboxylicAcid,
+    Dibromo,
+    Difluoro,
+    Diol,
+    Fluoro,
+    GenericFunctionalGroup,
+    Iodo,
+    PrimaryAmino,
+    RingAmine,
+    SecondaryAmino,
+    ThioAcid,
+    Thiol,
+)
 
 
 class BuildingBlockKey:
@@ -15,7 +56,7 @@ class BuildingBlockKey:
     Notes
     -----
     You might notice that the public methods of this abstract base
-    class are implemented. This is purely for convenience of users.
+    class are implemented. This is purely for the convenience of users.
     The implemented public methods are simply default implementations,
     which can be safely ignored or overridden, when implementing
     subclasses. However, the default implementation works without
@@ -67,13 +108,18 @@ class BuildingBlockKey:
         # holds the default building block key.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
+    You want to use a different functional group key for some
+    :class:`.FunctionalGroup` subclass.
+
+    . code-block:: python
+
     """
 
     def __init__(
         self,
         name='BuildingBlockKey',
         molecule_key=InchiKey(),
-        functional_group_key=FunctionalGroupKey(),
+        functional_group_keys=None,
     ):
         """
         Initialize a :class:`.BuildingBlockKey` instance.
@@ -87,16 +133,22 @@ class BuildingBlockKey:
             Used to generate the part of key responsible for the
             molecular component of a :class:`.BuildingBlock`.
 
-        functional_group_key : :class:`.FunctionalGroupKey`, optional
-            Used to generate the part of the key responsible for
-            identifying the functional groups of a
-            :class:`.BuildingBlock`.
+        functional_group_keys : :class:`dict`, optional
+            Map a :class:`FunctionalGroup` subclass to the
+            functional group key, which should be used to get the
+            key for its instances. For a list of built-in
+            functional group keys, see :mod:`.functional_group_keys`.
 
         """
 
+        if functional_group_keys is None:
+            functional_group_keys = (
+                self.get_default_functional_group_keys()
+            )
+
         self._name = name
         self._molecule_key = molecule_key
-        self._functional_group_key = functional_group_key
+        self._functional_group_keys = functional_group_keys
 
     def get_name(self):
         """
@@ -140,3 +192,31 @@ class BuildingBlockKey:
             f'{functional_group_keys}-'
             f'{placer_ids}'
         )
+
+    @staticmethod
+    def get_default_functional_group_keys():
+        """
+
+        """
+
+        return {
+            Alcohol: AlcoholKey(),
+            Aldehyde: AldehydeKey(),
+            Alkene: AlkeneKey(),
+            Alkyne: AlkyneKey(),
+            Amide: AmideKey(),
+            BoronicAcid: BoronicAcidKey(),
+            Bromo: BromoKey(),
+            CarboxylicAcid: CarboxylicAcidKey(),
+            Dibromo: DibromoKey(),
+            Difluoro: DifluoroKey(),
+            Diol: DiolKey(),
+            Fluoro: FluoroKey(),
+            GenericFunctionalGroup: GenericFunctionalGroupKey(),
+            Iodo: IodoKey(),
+            PrimaryAmino: PrimaryAminoKey(),
+            RingAmine: RingAmineKey(),
+            SecondaryAmino: SecondaryAminoKey(),
+            ThioAcid: ThioAcidKey(),
+            Thiol: ThiolKey(),
+        }
