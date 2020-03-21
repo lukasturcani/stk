@@ -1,3 +1,9 @@
+"""
+JSON Molecule Serializer
+========================
+
+"""
+
 from stk.molecular import (
     Molecule,
     BuildingBlock,
@@ -7,7 +13,7 @@ from .utilities import (
     molecule_to_json,
     _BuildingBlockSerializer,
     _ConstructedMoleculeSerializer,
-    molecule_key,
+    get_inchi_key,
     building_block_key,
 )
 from ....molecule_serializer import MoleculeSerializer
@@ -69,11 +75,11 @@ class JsonMoleculeSerializer(MoleculeSerializer):
         return {
             Molecule: molecule_to_json,
             BuildingBlock: _BuildingBlockSerializer(
-                molecule_key=molecule_key,
+                molecule_key=get_inchi_key,
                 functional_group_serializer=...,
             ),
             ConstructedMolecule: _ConstructedMoleculeSerializer(
-                molecule_key=molecule_key,
+                molecule_key=get_inchi_key,
                 building_block_key=building_block_key,
                 topology_graph_serializer=...,
             ),
