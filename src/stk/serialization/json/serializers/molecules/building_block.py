@@ -1,5 +1,5 @@
 from .utilities import molecule_to_json
-from ..functional_group import FunctionalGroupSerializer
+from ..functional_groups import FunctionalGroupSerializer
 
 
 class _BuildingBlockSerializer:
@@ -29,7 +29,7 @@ class _BuildingBlockSerializer:
 
         """
 
-        return super().__init__()
+        self._functional_group_serializer = functional_group_serializer
 
     def serialize(self, molecule):
         """
