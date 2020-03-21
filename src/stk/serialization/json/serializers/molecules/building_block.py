@@ -1,7 +1,3 @@
-from .utilities import molecule_to_json
-from ..functional_groups import FunctionalGroupSerializer
-
-
 class _BuildingBlockSerializer:
     """
     Serializes :class:`.BuildingBlock` instances into JSON.
@@ -14,15 +10,17 @@ class _BuildingBlockSerializer:
 
     """
 
-    def __init__(
-        self,
-        functional_group_serializer=FunctionalGroupSerializer(),
-    ):
+    def __init__(self, molecule_key, functional_group_serializer):
         """
         Initialize a :class:`._BuildingBlockSerializer` instance.
 
         Parameters
         ----------
+        molecule_key : :class:`callable`
+            Takes a single parameter, `molecule`, and returns
+            a key used for referencing that molecule. The parameter
+            requires a :class:`.Molecule` instance.
+
         functional_group_serializer : \
                 :class:`.FunctionalGroupSerializer`
             Used to serialize the functional groups of the serialized
@@ -30,16 +28,17 @@ class _BuildingBlockSerializer:
 
         """
 
+        self._molecule_key = molecule_key
         self._functional_group_serializer = functional_group_serializer
 
-    def serialize(self, molecule):
+    def serialize(self, building_block):
         """
         Serialize `molecule`.
 
         Parameters
         -----------
-        molecule : :class:`.BuildingBlock`
-            The molecule to serialize.
+        building_block : :class:`.BuildingBlock`
+            The building block to serialize.
 
         Returns
         -------
@@ -49,12 +48,12 @@ class _BuildingBlockSerializer:
         """
 
         return {
-            'molecule': molecule_to_json(molecule),
+            'molecule': self._molecule_key(building_block),
             'functional_groups': tuple(map(
                 self._functional_group_serializer.serialize,
-                molecule.get_functional_groups(),
+                building_block.get_functional_groups(),
             )),
-            'placer_ids': tuple(molecule.get_placer_ids()),
+            'placer_ids': tuple(building_block.get_placer_ids()),
         }
 
     def __str__(self):
