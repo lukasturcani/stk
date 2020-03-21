@@ -1,5 +1,5 @@
+from stk.molecule_keys import InchiKey
 from .utilities import atom_to_json, bond_to_json
-from ..keys import InchiKey
 
 
 class MoleculeJsonizer:

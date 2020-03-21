@@ -4,9 +4,8 @@ InChIKey
 
 """
 
-import rdkit.Chem.AllChem as rdkit
-
-from .molecule_key import MoleculeKey
+from .molecule_keys import MoleculeKey
+from .utilities import get_inchi_key
 
 
 class InchiKey(MoleculeKey):
@@ -19,26 +18,4 @@ class InchiKey(MoleculeKey):
 
         """
 
-        super().__init__(
-            name='InChIKey',
-            key=self._get_inchi_key,
-        )
-
-    @staticmethod
-    def _get_inchi_key(molecule):
-        """
-        Get the InChIKey of `molecule`.
-
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            The molecule whose InChIKey is needed.
-
-        Returns
-        -------
-        :class:`str`
-            The InChIKey.
-
-        """
-
-        return rdkit.MolToInchiKey(molecule.to_rdkit_mol())
+        super().__init__('InChIKey', get_inchi_key)

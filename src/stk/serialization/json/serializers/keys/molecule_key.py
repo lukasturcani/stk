@@ -1,5 +1,23 @@
+"""
+Molecule Key
+============
+
+"""
+
+
 class MoleculeKey:
     """
+    An abstract base class for molecular keys.
+
+    Notes
+    -----
+    You might notice that the public methods of this abstract base
+    class are implemented. This is purely for convenience when
+    implementing subclasses. The implemented public methods are
+    simply default implementations, which can be safely ignored or
+    overridden, when implementing subclasses.
+
+
 
     """
 
