@@ -31,7 +31,7 @@ class _BuildingBlockSerializer:
         self._molecule_key = molecule_key
         self._functional_group_serializer = functional_group_serializer
 
-    def serialize(self, molecule):
+    def __call__(self, molecule):
         """
         Serialize `molecule`.
 

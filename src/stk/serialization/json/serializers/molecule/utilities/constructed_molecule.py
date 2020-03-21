@@ -42,9 +42,9 @@ class _ConstructedMoleculeSerializer:
         self._building_block_key = building_block_key
         self._topology_graph_serializer = topology_graph_serializer
 
-    def serialize(self, molecule):
+    def __call__(self, molecule):
         """
-        Serialize : :class:`molecule`.
+        Serialize `molecule`.
 
         Parameters
         ----------
