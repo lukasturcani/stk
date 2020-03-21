@@ -110,6 +110,31 @@ class BuildingBlockKey:
         # holds the default building block key.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
+    You want to use an InChI instead of an InChIKey in the building
+    block key
+
+    .. code-block:: python
+
+        import stk
+        jsonizer = stk.BuildingBlockJsonizer(
+            building_block_keys=(
+                stk.BuildingBlockKey(
+                    # If you change the nature of the key, its a good
+                    # idea to change its name to reflect that change.
+                    name='InChIBuildingBlockKey',
+                    molecule_key=stk.Inchi(),
+                ),
+                # You can still keep the default building block key
+                # too. No pressure though, you can exclude it from
+                # this tuple too.
+                stk.BuildingBlockKey(),
+            ),
+        )
+        # Create a JSON representation of a building block, which
+        # holds two building block keys, one featuring an InChI and
+        # one featuring an InChIKey.
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+
     You want to use a different functional group key for some
     :class:`.FunctionalGroup` subclass.
 
