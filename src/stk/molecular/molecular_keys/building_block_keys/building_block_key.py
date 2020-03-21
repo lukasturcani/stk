@@ -4,6 +4,9 @@ Building Block Key
 
 """
 
+from ..molecule_keys import InchiKey
+from .functional_group_keys import FunctionalGroupKey
+
 
 class BuildingBlockKey:
     """
