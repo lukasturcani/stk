@@ -1,12 +1,13 @@
-class _ConstructedMoleculeSerializer:
+class ConstructedMoleculeToJson:
     """
     Serializes :class:`.ConstructedMolecule` instances into JSON.
 
     Notes
     -----
-    This class is an implementation detail of
-    :class:`.MoleculeSerializer`, use that class directly for your
-    serialization needs.
+    This class is meant to be used solely with a
+    :class:`.JsonMoleculeSerializer`. Use
+    :class:`.JsonMoleculeSerializer` directly for your serialization
+    needs.
 
     """
 
@@ -32,7 +33,7 @@ class _ConstructedMoleculeSerializer:
             parameter requires a :class:`.BuildingBlock` instance.
 
         topology_graph_serializer : \
-                :class:`.TopologyGraphSerializer`
+                :class:`.JsonTopologyGraphSerializer`
             Used to serialize the topology graph of the serialized
             constructed molecules.
 

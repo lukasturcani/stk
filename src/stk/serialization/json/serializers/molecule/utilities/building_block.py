@@ -1,12 +1,13 @@
-class _BuildingBlockSerializer:
+class BuildingBlockToJson:
     """
     Serializes :class:`.BuildingBlock` instances into JSON.
 
     Notes
     -----
-    This class is an implementation detail of
-    :class:`.MoleculeSerializer`, use that class directly for your
-    serialization needs.
+    This class is meant to be used solely with a
+    :class:`.JsonMoleculeSerializer`. Use
+    :class:`.JsonMoleculeSerializer` directly for your serialization
+    needs.
 
     """
 
@@ -22,7 +23,7 @@ class _BuildingBlockSerializer:
             requires a :class:`.Molecule` instance.
 
         functional_group_serializer : \
-                :class:`.FunctionalGroupSerializer`
+                :class:`.JsonFunctionalGroupSerializer`
             Used to serialize the functional groups of the serialized
             building blocks.
 

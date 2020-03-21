@@ -9,18 +9,22 @@ from stk.molecular import (
     BuildingBlock,
     ConstructedMolecule,
 )
+from ..functional_group import FunctionalGroupJsonizer
+from ..topology_graph import TopologyGraphJsonizer
 from .utilities import (
-    molecule_to_json,
-    _BuildingBlockSerializer,
-    _ConstructedMoleculeSerializer,
+    MoleculeJsonizer,
+    BuildingBlockJsonizer,
+    ConstructedMoleculeJsonizer,
     get_inchi_key,
-    building_block_key,
+    GetBuildingBlockKey,
+    GetConstructedMoleculeKey,
 )
 from ....molecule_serializer import MoleculeSerializer
 
 
 class JsonMoleculeSerializer(MoleculeSerializer):
     """
+    Serializes :class:`.Molecule` instances into JSON.
 
     Examples
     --------
@@ -33,33 +37,33 @@ class JsonMoleculeSerializer(MoleculeSerializer):
 
     """
 
-    def __init__(self, serializers=None):
+    def __init__(self, jsonizers=None):
         """
         Initialize a :class:`.JsonMoleculeSerializer` instance.
 
         Parameters
         ----------
-        serializers : :class:`dict`, optional
+        jsonizers : :class:`dict`, optional
             Maps :class:`.Molecule` and each of its subclasses to the
             :class:`callable`, which should be used to create
             the JSON representation for that class.
 
         """
 
-        if serializers is None:
-            serializers = self.get_default_serializers()
+        if jsonizers is None:
+            jsonizers = self.get_default_jsonizers()
 
-        self._serializers = serializers
+        self._jsonizers = jsonizers
 
     def serialize(self, molecule):
         return {
-            cls.__name__: serializer.serialize(molecule)
-            for cls, serializer in self._serializers.items()
+            cls.__name__: jsonizer.to_json(molecule)
+            for cls, jsonizer in self._jsonizers.items()
             if isinstance(molecule, cls)
         }
 
-    @classmethod
-    def get_default_serializers(self):
+    @staticmethod
+    def get_default_serializers():
         """
         Return the default serializers.
 
@@ -73,14 +77,18 @@ class JsonMoleculeSerializer(MoleculeSerializer):
         """
 
         return {
-            Molecule: molecule_to_json,
-            BuildingBlock: _BuildingBlockSerializer(
+            Molecule: MoleculeJsonizer(
                 molecule_key=get_inchi_key,
-                functional_group_serializer=...,
             ),
-            ConstructedMolecule: _ConstructedMoleculeSerializer(
+            BuildingBlock: BuildingBlockJsonizer(
                 molecule_key=get_inchi_key,
-                building_block_key=building_block_key,
-                topology_graph_serializer=...,
+                building_block_key=GetBuildingBlockKey(),
+                functional_group_jsonizer=FunctionalGroupJsonizer(),
+            ),
+            ConstructedMolecule: ConstructedMoleculeJsonizer(
+                molecule_key=get_inchi_key,
+                building_block_key=GetBuildingBlockKey(),
+                constructed_molecule_key=GetConstructedMoleculeKey(),
+                topology_graph_jsonizer=TopologyGraphJsonizer(),
             ),
         }
