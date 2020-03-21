@@ -1,0 +1,2 @@
+class AldehydeKey:
+    pass

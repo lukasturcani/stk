@@ -1,0 +1,2 @@
+class ThioacidKey:
+    pass

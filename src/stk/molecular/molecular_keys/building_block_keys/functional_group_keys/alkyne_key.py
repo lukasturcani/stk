@@ -1,0 +1,2 @@
+class AlkyneKey:
+    pass

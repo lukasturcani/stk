@@ -1,1 +1,1 @@
-from .serializer import JsonMoleculeSerializer
+from .molecule import MoleculeJsonizer

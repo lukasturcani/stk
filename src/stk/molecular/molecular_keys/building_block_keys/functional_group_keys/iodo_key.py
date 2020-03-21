@@ -1,0 +1,2 @@
+class IodoKey:
+    pass

@@ -1,0 +1,2 @@
+class DibromoKey:
+    pass

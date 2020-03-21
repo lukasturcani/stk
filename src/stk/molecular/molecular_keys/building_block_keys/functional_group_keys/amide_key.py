@@ -1,0 +1,2 @@
+class AmideKey:
+    pass

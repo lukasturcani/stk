@@ -1,4 +1,4 @@
-class BuildingBlockToJson:
+class BuildingBlockJsonizer:
     """
     Serializes :class:`.BuildingBlock` instances into JSON.
 
