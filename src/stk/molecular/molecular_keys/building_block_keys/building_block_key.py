@@ -24,7 +24,7 @@ from .functional_group_keys import (
     PrimaryAminoKey,
     RingAmineKey,
     SecondaryAminoKey,
-    ThioAcidKey,
+    ThioacidKey,
     ThiolKey,
 )
 from ...functional_groups import (
@@ -46,7 +46,7 @@ from ...functional_groups import (
     PrimaryAmino,
     RingAmine,
     SecondaryAmino,
-    ThioAcid,
+    Thioacid,
     Thiol,
 )
 
@@ -313,6 +313,6 @@ class BuildingBlockKey:
             PrimaryAmino: PrimaryAminoKey(),
             RingAmine: RingAmineKey(),
             SecondaryAmino: SecondaryAminoKey(),
-            ThioAcid: ThioAcidKey(),
+            Thioacid: ThioacidKey(),
             Thiol: ThiolKey(),
         }

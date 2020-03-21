@@ -48,5 +48,5 @@ from .iodo_key import IodoKey
 from .primary_amino_key import PrimaryAminoKey
 from .ring_amine_key import RingAmineKey
 from .secondary_amino_key import SecondaryAminoKey
-from .thio_acid_key import ThioAcidKey
+from .thioacid_key import ThioacidKey
 from .thiol_key import ThiolKey
