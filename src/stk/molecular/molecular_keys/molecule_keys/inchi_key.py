@@ -36,3 +36,9 @@ class InchiKey(MoleculeKey):
         """
 
         super().__init__('InChIKey', get_inchi_key)
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return 'InchiKey()'

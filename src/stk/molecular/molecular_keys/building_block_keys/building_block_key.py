@@ -15,10 +15,12 @@ class BuildingBlockKey:
     Notes
     -----
     You might notice that the public methods of this abstract base
-    class are implemented. This is purely for convenience when
-    implementing subclasses. The implemented public methods are
-    simply default implementations, which can be safely ignored or
-    overridden, when implementing subclasses.
+    class are implemented. This is purely for convenience of users.
+    The implemented public methods are simply default implementations,
+    which can be safely ignored or overridden, when implementing
+    subclasses. However, the default implementation works without
+    need for any further subclassing, and can be used directly, if it
+    suits your needs.
 
     Examples
     --------
@@ -69,6 +71,7 @@ class BuildingBlockKey:
 
     def __init__(
         self,
+        name='BuildingBlockKey',
         molecule_key=InchiKey(),
         functional_group_key=FunctionalGroupKey(),
     ):
@@ -77,9 +80,21 @@ class BuildingBlockKey:
 
         Parameters
         ----------
+        name : :class:`str`, optional
+            The name of the key.
+
+        molecule_key : :class:`.MoleculeKey`, optional
+            Used to generate the part of key responsible for the
+            molecular component of a :class:`.BuildingBlock`.
+
+        functional_group_key : :class:`.FunctionalGroupKey`, optional
+            Used to generate the part of the key responsible for
+            identifying the functional groups of a
+            :class:`.BuildingBlock`.
 
         """
 
+        self._name = name
         self._molecule_key = molecule_key
         self._functional_group_key = functional_group_key
 
@@ -94,7 +109,7 @@ class BuildingBlockKey:
 
         """
 
-        return 'BuildingBlockKey'
+        return self._name
 
     def get_key(self, building_block):
         """
@@ -113,7 +128,7 @@ class BuildingBlockKey:
         """
 
         functional_group_keys = '-'.join(
-            self._functional_group_key(functional_group)
+            self._functional_group_key.get_key(functional_group)
             for functional_group
             in building_block.get_functional_groups()
         )
@@ -121,7 +136,7 @@ class BuildingBlockKey:
             str(id_) for id_ in building_block.get_placer_ids()
         )
         return (
-            f'{self._molecule_key(building_block)}-'
+            f'{self._molecule_key.get_key(building_block)}-'
             f'{functional_group_keys}-'
             f'{placer_ids}'
         )

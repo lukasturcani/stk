@@ -36,3 +36,9 @@ class Inchi(MoleculeKey):
         """
 
         super().__init__('InChI', get_inchi)
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return 'Inchi()'
