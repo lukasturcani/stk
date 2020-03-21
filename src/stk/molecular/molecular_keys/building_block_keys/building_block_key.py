@@ -18,6 +18,7 @@ from .functional_group_keys import (
     DifluoroKey,
     DiolKey,
     FluoroKey,
+    FunctionalGroupKey,
     GenericFunctionalGroupKey,
     IodoKey,
     PrimaryAminoKey,
@@ -39,6 +40,7 @@ from ...functional_groups import (
     Difluoro,
     Diol,
     Fluoro,
+    FunctionalGroup,
     GenericFunctionalGroup,
     Iodo,
     PrimaryAmino,
@@ -180,9 +182,8 @@ class BuildingBlockKey:
         """
 
         functional_group_keys = '-'.join(
-            self._functional_group_key.get_key(functional_group)
-            for functional_group
-            in building_block.get_functional_groups()
+            self._functional_group_keys[type(fg)].get_key(fg)
+            for fg in building_block.get_functional_groups()
         )
         placer_ids = ''.join(
             str(id_) for id_ in building_block.get_placer_ids()
@@ -212,6 +213,7 @@ class BuildingBlockKey:
             Difluoro: DifluoroKey(),
             Diol: DiolKey(),
             Fluoro: FluoroKey(),
+            FunctionalGroup: FunctionalGroupKey(),
             GenericFunctionalGroup: GenericFunctionalGroupKey(),
             Iodo: IodoKey(),
             PrimaryAmino: PrimaryAminoKey(),
