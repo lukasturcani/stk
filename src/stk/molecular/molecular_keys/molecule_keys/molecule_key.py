@@ -24,6 +24,32 @@ class MoleculeKey:
     --------
     *Subclass Implementation*
 
+    The source code of any of the subclasses, listed in
+    :mod:`.molecule_key`, can serve as good examples.
+
+    *Usage*
+
+    Apart from using the subclasses provided, a :class:`.MoleculeKey`
+    can be used directly , if you don't feel like writing a
+    subclass
+
+    .. code-block:: python
+
+        import stk
+
+        # Create a MoleculeKey instance with a custom key method.
+        get_num_atoms = stk.MoleculeKey(
+            name='num_atoms',
+            key=lambda molecule: molecule.get_num_atoms(),
+        )
+
+        # Use the MoleculeKey instance.
+        jsonizer = stk.MoleculeJsonizer(
+            molecule_key=get_num_atoms,
+        )
+        # Get the JSON representation of a molecule.
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+
     """
 
     def __init__(self, name, key):
