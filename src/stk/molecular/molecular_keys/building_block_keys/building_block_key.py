@@ -55,22 +55,25 @@ class BuildingBlockKey:
 
         import stk
 
-        num_functional_groups = stk.BuildingBlockKey(
-            name='num_functional_groups',
-            key=lambda building_block:
-                building_block.get_num_functional_groups(),
-        )
         jsonizer = stk.BuildingBlockJsonizer(
-            building_block_keys=(num_functional_groups, ),
+            building_block_keys=(stk.BuildingBlockKey(), ),
         )
         # Create a JSON representation of a building block, which
-        # holds the number of functional groups.
+        # holds the default building block key.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
     """
 
-    def __init__(self, molecule_key, functional_group_key):
+    def __init__(
+        self,
+        molecule_key=InchiKey(),
+        functional_group_key=FunctionalGroupKey(),
+    ):
         """
+        Initialize a :class:`.BuildingBlockKey` instance.
+
+        Parameters
+        ----------
 
         """
 
@@ -79,12 +82,30 @@ class BuildingBlockKey:
 
     def get_name(self):
         """
+        Get the name of the key.
+
+        Returns
+        -------
+        :class:`str`
+            The name of the key.
+
         """
 
-        return self._name
+        return 'BuildingBlockKey'
 
     def get_key(self, building_block):
         """
+        Get the key of `building_block`.
+
+        Parameters
+        ----------
+        building_block : :class:`.BuildingBlock`
+            The building block for which a key is wanted.
+
+        Returns
+        -------
+        :class:`object`
+            The key of `building_block`.
 
         """
 
