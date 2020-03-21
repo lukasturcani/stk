@@ -1,3 +1,3 @@
-from .functional_groups import *
-from .molecules import *
-from .topology_graphs import *
+from .functional_group import *
+from .molecule import *
+from .topology_graph import *
