@@ -42,13 +42,13 @@ class _ConstructedMoleculeSerializer:
         self._building_block_key = building_block_key
         self._topology_graph_serializer = topology_graph_serializer
 
-    def serialize(self, constructed_molecule):
+    def serialize(self, molecule):
         """
         Serialize : :class:`molecule`.
 
         Parameters
         ----------
-        constructed_molecule : :class:`.ConstructedMolecule`
+        molecule : :class:`.ConstructedMolecule`
             The constructed molecule to serialize.
 
         Returns
@@ -59,23 +59,21 @@ class _ConstructedMoleculeSerializer:
         """
 
         return {
-            'Molecule': self._molecule_key(constructed_molecule),
+            'Molecule': self._molecule_key(molecule),
             'topology_graph':
                 self._topology_graph_serializer.serialize(
                     # Access to the topology graph is not part of the
                     # public interface of a ConstructedMolecule so
                     # private attribute access must be used.
-                    topology_graph=(
-                        constructed_molecule._topology_graph
-                    ),
+                    topology_graph=molecule._topology_graph,
                 ),
             'atom_infos': tuple(map(
                 self._atom_info_to_json,
-                constructed_molecule.get_atom_infos(),
+                molecule.get_atom_infos(),
             )),
             'bond_infos': tuple(map(
                 self._bond_info_to_json,
-                enumerate(constructed_molecule.get_bond_infos()),
+                enumerate(molecule.get_bond_infos()),
             )),
         }
 
@@ -97,7 +95,7 @@ class _ConstructedMoleculeSerializer:
 
         return {
             'atom': atom_info.get_atom().get_id(),
-            'building_block': self._building_block_key(
+            'BuildingBlock': self._building_block_key(
                 building_block=atom_info.get_building_block(),
             ),
             'building_block_id': atom_info.get_building_block_id(),
@@ -124,7 +122,7 @@ class _ConstructedMoleculeSerializer:
         bond_id, bond_info = bond_info_data
         return {
             'bond': bond_id,
-            'building_block': self._building_block_key(
+            'BuildingBlock': self._building_block_key(
                 building_block=bond_info.get_building_block(),
             ),
             'building_block_id': bond_info.get_building_block_id(),

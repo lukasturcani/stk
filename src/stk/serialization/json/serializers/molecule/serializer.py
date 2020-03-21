@@ -6,6 +6,10 @@ from stk.molecular import (
 from .molecule import _MoleculeSerializer
 from .building_block import _BuildingBlockSerializer
 from .constructed_molecule import _ConstructedMoleculeSerializer
+from .utilities import (
+    molecule_key,
+    building_block_key,
+)
 from ....molecule_serializer import MoleculeSerializer
 
 
@@ -25,6 +29,11 @@ class JsonMoleculeSerializer(MoleculeSerializer):
 
     def __init__(self, serializers=None):
         """
+        Initialize a :class:`.JsonMoleculeSerializer` instance.
+
+        Parameters
+        ----------
+        serializers : :class:`dict`
 
         """
 
@@ -43,18 +52,26 @@ class JsonMoleculeSerializer(MoleculeSerializer):
     @classmethod
     def get_default_serializers(self):
         """
+        Return the default serializers.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps :class:`.Molecule` and each of its subclasses to the
+            default serializer, which should be used to create the JSON
+            representation for that class.
 
         """
 
         return {
             Molecule: _MoleculeSerializer(),
             BuildingBlock: _BuildingBlockSerializer(
-                molecule_key=...,
+                molecule_key=molecule_key,
                 functional_group_serializer=...,
             ),
             ConstructedMolecule: _ConstructedMoleculeSerializer(
-                molecule_key=...,
-                building_block_key=...,
+                molecule_key=molecule_key,
+                building_block_key=building_block_key,
                 topology_graph_serializer=...,
             ),
         }

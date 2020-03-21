@@ -31,13 +31,13 @@ class _BuildingBlockSerializer:
         self._molecule_key = molecule_key
         self._functional_group_serializer = functional_group_serializer
 
-    def serialize(self, building_block):
+    def serialize(self, molecule):
         """
         Serialize `molecule`.
 
         Parameters
         -----------
-        building_block : :class:`.BuildingBlock`
+        molecule : :class:`.BuildingBlock`
             The building block to serialize.
 
         Returns
@@ -48,12 +48,12 @@ class _BuildingBlockSerializer:
         """
 
         return {
-            'Molecule': self._molecule_key(building_block),
+            'Molecule': self._molecule_key(molecule),
             'functional_groups': tuple(map(
                 self._functional_group_serializer.serialize,
-                building_block.get_functional_groups(),
+                molecule.get_functional_groups(),
             )),
-            'placer_ids': tuple(building_block.get_placer_ids()),
+            'placer_ids': tuple(molecule.get_placer_ids()),
         }
 
     def __str__(self):
