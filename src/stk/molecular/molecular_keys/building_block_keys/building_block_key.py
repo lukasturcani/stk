@@ -224,6 +224,8 @@ class BuildingBlockKey:
             functional group key, which should be used to get the
             key for its instances. For a list of built-in
             functional group keys, see :mod:`.functional_group_keys`.
+            The default mapping is returned by
+            :meth:`.get_default_functional_group_keys`.
 
         """
 
@@ -281,6 +283,14 @@ class BuildingBlockKey:
     @staticmethod
     def get_default_functional_group_keys():
         """
+        Get the default functional group key for each functional group.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps a :class:`.FunctionalGroup` subclass to the
+            :mod:`functional_group_key <.functional_group_keys>` that
+            should be used with it.
 
         """
 

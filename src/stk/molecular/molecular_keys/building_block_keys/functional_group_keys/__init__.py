@@ -23,6 +23,11 @@ Functional Group Keys
 #. :class:`.ThioAcidKey`
 #. :class:`.ThiolKey`
 
+Note that the functional group keys are not related by inheritance.
+You cannot use a :class:`.FunctionalGroupKey` in places where
+a :class:`.BromoKey` is required, for example. See
+:mod:`.molecule_keys` for a discussion on why this is.
+
 """
 
 from .alcohol_key import AlcoholKey
