@@ -48,7 +48,7 @@ class _BuildingBlockSerializer:
         """
 
         return {
-            'molecule': self._molecule_key(building_block),
+            'Molecule': self._molecule_key(building_block),
             'functional_groups': tuple(map(
                 self._functional_group_serializer.serialize,
                 building_block.get_functional_groups(),

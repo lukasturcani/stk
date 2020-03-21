@@ -59,7 +59,7 @@ class _ConstructedMoleculeSerializer:
         """
 
         return {
-            'molecule': self._molecule_key(constructed_molecule),
+            'Molecule': self._molecule_key(constructed_molecule),
             'topology_graph':
                 self._topology_graph_serializer.serialize(
                     # Access to the topology graph is not part of the
