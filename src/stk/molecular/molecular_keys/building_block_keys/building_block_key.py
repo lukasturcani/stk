@@ -136,9 +136,68 @@ class BuildingBlockKey:
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
     You want to use a different functional group key for some
-    :class:`.FunctionalGroup` subclass.
+    :class:`.FunctionalGroup` subclass
 
     . code-block:: python
+
+        import stk
+
+        # Define the alternate functional group key you want to use.
+        # In this case, the bromo key is given by the id of
+        # the bromine atom.
+        class MyBromoKey:
+            def get_key(self, bromo):
+                return f'BromoKey({bromo.get_bromine().get_id()}'
+
+        # Get the default mapping.
+        functional_group_keys = (
+            stk.BuildingBlockKey.get_default_functional_group_keys()
+        )
+
+        # Update the mapping.
+        functional_group_keys[stk.Bromo] = MyBromoKey()
+
+        # Use the updated mapping.
+        building_block_key = stk.BuildingBlockKey(
+            functional_group_keys=functional_group_keys,
+        )
+
+        # Use building_block_key as normal.
+        jsonizer = stk.BuildingBlockJsonizer(
+            building_block_keys=(building_block_key, ),
+        )
+        json = jsonizer.to_json(
+            building_block=stk.BuildingBlock(
+                smiles='BrCC',
+                functional_groups=[stk.BromoFactory()],
+            ),
+        )
+
+    If you want to use a key for a new :class:`.FunctionalGroup` the
+    process is essentially the same the one described above
+
+    .. code-block:: python
+
+        # First, define your your new FunctionalGroup subclass.
+
+        # Define your functional group subclass
+        class MyFunctionalGroup(stk.FunctionalGroup):
+            # Your implementation goes here.
+
+        # Define the functional group key for your subclass
+        class MyFunctionalGroupKey:
+            def get_key(self, my_functional_group):
+                # Get the key of my_functional_group somehow.
+
+        # Update the mapping.
+        functional_group_keys[MyFunctionalGroup] = (
+            MyFunctionalGroupKey()
+        )
+
+        # Use the updated mapping.
+        building_block_key = stk.BuildingBlockKey(
+            functional_group_keys=functional_group_keys,
+        )
 
     """
 
@@ -207,7 +266,7 @@ class BuildingBlockKey:
         """
 
         functional_group_keys = '-'.join(
-            self._functional_group_keys[type(fg)].get_key(fg)
+            str(self._functional_group_keys[type(fg)].get_key(fg))
             for fg in building_block.get_functional_groups()
         )
         placer_ids = ''.join(
