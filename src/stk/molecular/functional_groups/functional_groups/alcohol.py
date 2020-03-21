@@ -22,8 +22,7 @@ class Alcohol(GenericFunctionalGroup):
 
         Parameters
         ----------
-        oxygen : \
-                :class:`.O`
+        oxygen : :class:`.O`
             The oxygen atom.
 
         hydrogen : :class:`.H`
