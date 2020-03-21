@@ -23,7 +23,8 @@ class _BuildingBlockSerializer:
 
         Parameters
         ----------
-        functional_group_serializer : :class:`.FunctionalGroupSerializer`
+        functional_group_serializer : \
+                :class:`.FunctionalGroupSerializer`
             Used to serialize the functional groups of the serialized
             building blocks.
 
