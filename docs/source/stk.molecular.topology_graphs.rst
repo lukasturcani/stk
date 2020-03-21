@@ -13,6 +13,7 @@ Subpackages
    stk.molecular.topology_graphs.polymer
    stk.molecular.topology_graphs.rotaxane
    stk.molecular.topology_graphs.topology_graph
+   stk.molecular.topology_graphs.utilities
 
 Module contents
 ---------------

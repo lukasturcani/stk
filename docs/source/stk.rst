@@ -8,6 +8,7 @@ Subpackages
 
    stk.calculators
    stk.molecular
+   stk.serialization
    stk.utilities
 
 Submodules
