@@ -120,7 +120,7 @@ class BuildingBlockKey:
             building_block_keys=(
                 stk.BuildingBlockKey(
                     # If you change the nature of the key, its a good
-                    # idea to change its name to reflect that change.
+                    # idea to change its name to reflect that.
                     name='InChIBuildingBlockKey',
                     molecule_key=stk.Inchi(),
                 ),
