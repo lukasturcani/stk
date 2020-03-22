@@ -22,7 +22,7 @@ class AlkyneKeyMaker:
         """
         Get the key of `alkyne`.
 
-        Parmaeters
+        Parameters
         ----------
         alkyne : :class:`.Alkyne`
             The alkyne for which is a key is needed.
