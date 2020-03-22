@@ -1,31 +1,31 @@
 """
-Building Block Key
-==================
+Building Block Key Maker
+========================
 
 """
 
-from ..molecule_keys import InchiKey
-from .functional_group_keys import (
-    AlcoholKey,
-    AldehydeKey,
-    AlkeneKey,
-    AlkyneKey,
-    AmideKey,
-    BoronicAcidKey,
-    BromoKey,
-    CarboxylicAcidKey,
-    DibromoKey,
-    DifluoroKey,
-    DiolKey,
-    FluoroKey,
-    FunctionalGroupKey,
-    GenericFunctionalGroupKey,
-    IodoKey,
-    PrimaryAminoKey,
-    RingAmineKey,
-    SecondaryAminoKey,
-    ThioacidKey,
-    ThiolKey,
+from ..molecule_key_makers import InchiKey
+from .functional_group_key_makers import (
+    AlcoholKeyMaker,
+    AldehydeKeyMaker,
+    AlkeneKeyMaker,
+    AlkyneKeyMaker,
+    AmideKeyMaker,
+    BoronicAcidKeyMaker,
+    BromoKeyMaker,
+    CarboxylicAcidKeyMaker,
+    DibromoKeyMaker,
+    DifluoroKeyMaker,
+    DiolKeyMaker,
+    FluoroKeyMaker,
+    FunctionalGroupKeyMaker,
+    GenericFunctionalGroupKeyMaker,
+    IodoKeyMaker,
+    PrimaryAminoKeyMaker,
+    RingAmineKeyMaker,
+    SecondaryAminoKeyMaker,
+    ThioacidKeyMaker,
+    ThiolKeyMaker,
 )
 from ...functional_groups import (
     Alcohol,
@@ -51,7 +51,7 @@ from ...functional_groups import (
 )
 
 
-class BuildingBlockKey:
+class BuildingBlockKeyMaker:
     """
     An abstract base class for :class:`.BuildingBlock` keys.
 
