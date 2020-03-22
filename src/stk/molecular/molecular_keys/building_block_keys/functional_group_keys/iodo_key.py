@@ -7,7 +7,7 @@ Iodo Key
 
 class IodoKey:
     """
-    Generates keys for :class:`.IodoKey` instances.
+    Generates keys for :class:`.Iodo` instances.
 
     """
 

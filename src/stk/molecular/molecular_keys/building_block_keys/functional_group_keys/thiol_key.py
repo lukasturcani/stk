@@ -7,7 +7,7 @@ Thiol Key
 
 class ThiolKey:
     """
-    Generates keys for :class:`.ThiolKey` instances.
+    Generates keys for :class:`.Thiol` instances.
 
     """
 

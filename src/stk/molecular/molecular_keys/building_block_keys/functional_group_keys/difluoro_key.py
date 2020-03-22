@@ -7,7 +7,7 @@ Difluoro Key
 
 class DifluoroKey:
     """
-    Generates keys for :class:`.DifluoroKey` instances.
+    Generates keys for :class:`.Difluoro` instances.
 
     """
 

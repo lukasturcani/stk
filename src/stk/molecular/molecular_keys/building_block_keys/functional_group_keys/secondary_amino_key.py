@@ -7,7 +7,7 @@ Secondary Amino Key
 
 class SecondaryAminoKey:
     """
-    Generates keys for :class:`.SecondaryAminoKey` instances.
+    Generates keys for :class:`.SecondaryAmino` instances.
 
     """
 

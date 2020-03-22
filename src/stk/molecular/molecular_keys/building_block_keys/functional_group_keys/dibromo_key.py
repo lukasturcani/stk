@@ -7,7 +7,7 @@ Dibromo Key
 
 class DibromoKey:
     """
-    Generates keys for :class:`.DibromoKey` instances.
+    Generates keys for :class:`.Dibromo` instances.
 
     """
 

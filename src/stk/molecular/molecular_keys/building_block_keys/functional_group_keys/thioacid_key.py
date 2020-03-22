@@ -7,7 +7,7 @@ Thioacid Key
 
 class ThioacidKey:
     """
-    Generates keys for :class:`.ThioacidKey` instances.
+    Generates keys for :class:`.Thioacid` instances.
 
     """
 

@@ -7,7 +7,7 @@ Boronic Acid Key
 
 class BoronicAcidKey:
     """
-    Generates keys for :class:`.BoronicAcidKey` instances.
+    Generates keys for :class:`.BoronicAcid` instances.
 
     """
 
@@ -37,6 +37,7 @@ class BoronicAcidKey:
         """
 
         return (
+            'boronic_acid',
             boronic_acid.get_boron().get_id(),
             boronic_acid.get_oxygen1().get_id(),
             boronic_acid.get_hydrogen1().get_id(),

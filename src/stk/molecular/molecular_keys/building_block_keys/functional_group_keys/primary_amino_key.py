@@ -7,7 +7,7 @@ Primary Amino Key
 
 class PrimaryAminoKey:
     """
-    Generates keys for :class:`.PrimaryAminoKey` instances.
+    Generates keys for :class:`.PrimaryAmino` instances.
 
     """
 

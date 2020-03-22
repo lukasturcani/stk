@@ -7,7 +7,7 @@ Amide Key
 
 class AmideKey:
     """
-    Generates keys for :class:`.AmideKey` instances.
+    Generates keys for :class:`.Amide` instances.
 
     """
 
@@ -37,6 +37,7 @@ class AmideKey:
         """
 
         return (
+            'amide',
             amide.get_carbon().get_id(),
             amide.get_oxygen().get_id(),
             amide.get_nitrogen().get_id(),

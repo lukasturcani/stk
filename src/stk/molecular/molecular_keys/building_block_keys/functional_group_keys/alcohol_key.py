@@ -37,6 +37,7 @@ class AlcoholKey:
         """
 
         return (
+            'alcohol',
             alcohol.get_oxygen().get_id(),
             alcohol.get_hydrogen().get_id(),
             alcohol.get_atom().get_id(),

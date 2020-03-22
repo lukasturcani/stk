@@ -7,7 +7,7 @@ Ring Amine Key
 
 class RingAmineKey:
     """
-    Generates keys for :class:`.RingAmineKey` instances.
+    Generates keys for :class:`.RingAmine` instances.
 
     """
 

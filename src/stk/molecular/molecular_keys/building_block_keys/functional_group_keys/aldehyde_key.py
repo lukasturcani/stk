@@ -37,6 +37,7 @@ class AldehydeKey:
         """
 
         return (
+            'aldehyde',
             aldehyde.get_carbon().get_id(),
             aldehyde.get_oxygen().get_id(),
             aldehyde.get_hydrogen().get_id(),

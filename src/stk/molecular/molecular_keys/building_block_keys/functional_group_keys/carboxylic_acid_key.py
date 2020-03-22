@@ -7,7 +7,7 @@ Carboxylic Acid Key
 
 class CarboxylicAcidKey:
     """
-    Generates keys for :class:`.CarboxylicAcidKey` instances.
+    Generates keys for :class:`.CarboxylicAcid` instances.
 
     """
 
@@ -37,6 +37,7 @@ class CarboxylicAcidKey:
         """
 
         return (
+            'carboxylic_acid',
             carboxylic_acid.get_carbon().get_id(),
             carboxylic_acid.get_oxygen1().get_id(),
             carboxylic_acid.get_oxygen2().get_id(),

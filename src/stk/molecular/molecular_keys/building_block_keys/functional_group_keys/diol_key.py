@@ -7,7 +7,7 @@ Diol Key
 
 class DiolKey:
     """
-    Generates keys for :class:`.DiolKey` instances.
+    Generates keys for :class:`.Diol` instances.
 
     """
 

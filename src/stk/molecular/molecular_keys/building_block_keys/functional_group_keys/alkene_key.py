@@ -37,6 +37,7 @@ class AlkeneKey:
         """
 
         return (
+            'alkene',
             alkene.get_carbon1().get_id(),
             alkene.get_atom1().get_id(),
             alkene.get_atom2().get_id(),

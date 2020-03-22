@@ -7,7 +7,7 @@ Fluoro Key
 
 class FluoroKey:
     """
-    Generates keys for :class:`.FluoroKey` instances.
+    Generates keys for :class:`.Fluoro` instances.
 
     """
 

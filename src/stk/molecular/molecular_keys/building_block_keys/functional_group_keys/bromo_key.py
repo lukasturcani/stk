@@ -7,7 +7,7 @@ Bromo Key
 
 class BromoKey:
     """
-    Generates keys for :class:`.BromoKey` instances.
+    Generates keys for :class:`.Bromo` instances.
 
     """
 
@@ -37,6 +37,7 @@ class BromoKey:
         """
 
         return (
+            'bromo',
             bromo.get_bromine().get_id(),
             bromo.get_atom().get_id(),
             tuple(sorted(bromo.get_bonder_ids())),
