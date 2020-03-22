@@ -86,6 +86,6 @@ on a :class:`.BuildingBlock` and not a plain :class:`.Molecule`.
 
 """
 
-from .molecule_key_makers import *
-from .building_block_key_makers import *
-from .constructed_molecule_key_makers import *
+from .molecule import *
+from .building_block import *
+from .constructed_molecule import *
