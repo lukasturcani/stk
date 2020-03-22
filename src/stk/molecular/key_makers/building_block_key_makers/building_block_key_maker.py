@@ -308,7 +308,7 @@ class BuildingBlockKeyMaker:
             str(id_) for id_ in sorted(building_block.get_placer_ids())
         )
         return (
-            f'{self._molecule_key.get_key(building_block)}-'
+            f'{self._molecule_key_maker.get_key(building_block)}-'
             f'{functional_group_keys}-'
             f'{placer_ids}'
         )
