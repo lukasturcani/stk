@@ -1,6 +1,6 @@
 """
-Molecule Key
-============
+Molecule Key Maker
+==================
 
 #. :class:`.Inchi`
 #. :class:`.InchiKey`
@@ -8,9 +8,9 @@ Molecule Key
 """
 
 
-class MoleculeKey:
+class MoleculeKeyMaker:
     """
-    An abstract base class for :class:`.Molecule` keys.
+    An abstract base class for making :class:`.Molecule` keys.
 
     Notes
     -----
@@ -25,43 +25,44 @@ class MoleculeKey:
     *Subclass Implementation*
 
     The source code of any of the subclasses, listed in
-    :mod:`.molecule_key`, can serve as good examples.
+    :mod:`.molecule_key_maker`, can serve as good examples.
 
     *Usage*
 
-    Apart from using the subclasses provided, a :class:`.MoleculeKey`
-    can be used directly , if you don't feel like writing a
-    subclass
+    Apart from using the subclasses provided, a
+    :class:`.MoleculeKeyMaker` can be used directly , if you don't
+    feel like writing a subclass
 
     .. code-block:: python
 
         import stk
 
-        # Create a MoleculeKey instance with a custom key method.
-        get_num_atoms = stk.MoleculeKey(
+        # Create a MoleculeKeyMaker instance with a custom get_key
+        # method.
+        get_num_atoms = stk.MoleculeKeyMaker(
             name='num_atoms',
-            key=lambda molecule: molecule.get_num_atoms(),
+            get_key=lambda molecule: molecule.get_num_atoms(),
         )
 
-        # Use the MoleculeKey instance.
+        # Use the MoleculeKeyMaker instance.
         jsonizer = stk.MoleculeJsonizer(
-            molecule_keys=(get_num_atoms, ),
+            molecule_key_makers=(get_num_atoms, ),
         )
         # Get the JSON representation of a molecule.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
     """
 
-    def __init__(self, name, key):
+    def __init__(self, name, get_key):
         """
-        Initialize a :class:`.MoleculeKey` instance.
+        Initialize a :class:`.MoleculeKeyMaker` instance.
 
         Parameters
         ----------
         name : :class:`str`
             The name of the key.
 
-        key : :class:`callable`
+        get_key : :class:`callable`
             Takes a single parameter, `molecule`, and returns the
             key to use for that molecule. The value passed to the
             parameter must be a :class:`.Molecule` instance.
@@ -69,7 +70,7 @@ class MoleculeKey:
         """
 
         self._name = name
-        self._key = key
+        self._get_key = get_key
 
     def get_name(self):
         """
@@ -100,7 +101,7 @@ class MoleculeKey:
 
         """
 
-        return self._key(molecule)
+        return self._get_key(molecule)
 
     def __str__(self):
         return repr(self)
@@ -108,6 +109,6 @@ class MoleculeKey:
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('
-            f'{self._name}, {self._key!r}'
+            f'{self._name}, {self._get_key!r}'
             ')'
         )
