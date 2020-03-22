@@ -1,6 +1,3 @@
-stk.serialization.json.serializers.building\_block.building\_block module
-=========================================================================
-
 .. automodule:: stk.serialization.json.serializers.building_block.building_block
    :members:
    :undoc-members:

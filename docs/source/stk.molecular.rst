@@ -1,6 +1,11 @@
 stk.molecular package
 =====================
 
+.. automodule:: stk.molecular
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -13,11 +18,3 @@ Subpackages
    stk.molecular.molecules
    stk.molecular.reactions
    stk.molecular.topology_graphs
-
-Module contents
----------------
-
-.. automodule:: stk.molecular
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,6 +1,11 @@
 stk.molecular.bonds package
 ===========================
 
+.. automodule:: stk.molecular.bonds
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -8,11 +13,3 @@ Submodules
 
    stk.molecular.bonds.bond
    stk.molecular.bonds.bond_info
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.bonds
-   :members:
-   :undoc-members:
-   :show-inheritance:

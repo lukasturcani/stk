@@ -1,6 +1,11 @@
 stk.molecular.molecules package
 ===============================
 
+.. automodule:: stk.molecular.molecules
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -15,11 +20,3 @@ Submodules
 
    stk.molecular.molecules.building_block
    stk.molecular.molecules.constructed_molecule
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.molecules
-   :members:
-   :undoc-members:
-   :show-inheritance:

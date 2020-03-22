@@ -1,6 +1,11 @@
 stk.molecular.topology\_graphs.cof package
 ==========================================
 
+.. automodule:: stk.molecular.topology_graphs.cof
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -14,11 +19,3 @@ Submodules
    stk.molecular.topology_graphs.cof.linkerless_honeycomb
    stk.molecular.topology_graphs.cof.square
    stk.molecular.topology_graphs.cof.vertices
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.topology_graphs.cof
-   :members:
-   :undoc-members:
-   :show-inheritance:

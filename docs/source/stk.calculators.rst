@@ -1,6 +1,11 @@
 stk.calculators package
 =======================
 
+.. automodule:: stk.calculators
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -18,11 +23,3 @@ Submodules
 
    stk.calculators.base_calculators
    stk.calculators.compound
-
-Module contents
----------------
-
-.. automodule:: stk.calculators
-   :members:
-   :undoc-members:
-   :show-inheritance:

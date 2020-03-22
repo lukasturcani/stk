@@ -1,6 +1,11 @@
 stk.molecular.molecular\_keys.building\_block\_keys.functional\_group\_keys package
 ===================================================================================
 
+.. automodule:: stk.molecular.molecular_keys.building_block_keys.functional_group_keys
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -26,11 +31,3 @@ Submodules
    stk.molecular.molecular_keys.building_block_keys.functional_group_keys.secondary_amino_key
    stk.molecular.molecular_keys.building_block_keys.functional_group_keys.thioacid_key
    stk.molecular.molecular_keys.building_block_keys.functional_group_keys.thiol_key
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.molecular_keys.building_block_keys.functional_group_keys
-   :members:
-   :undoc-members:
-   :show-inheritance:

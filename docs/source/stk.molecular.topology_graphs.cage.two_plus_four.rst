@@ -1,6 +1,11 @@
 stk.molecular.topology\_graphs.cage.two\_plus\_four package
 ===========================================================
 
+.. automodule:: stk.molecular.topology_graphs.cage.two_plus_four
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -13,11 +18,3 @@ Submodules
    stk.molecular.topology_graphs.cage.two_plus_four.ten_plus_twenty
    stk.molecular.topology_graphs.cage.two_plus_four.three_plus_six
    stk.molecular.topology_graphs.cage.two_plus_four.two_plus_four
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.topology_graphs.cage.two_plus_four
-   :members:
-   :undoc-members:
-   :show-inheritance:

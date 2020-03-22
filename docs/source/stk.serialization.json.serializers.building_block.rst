@@ -1,6 +1,11 @@
 stk.serialization.json.serializers.building\_block package
 ==========================================================
 
+.. automodule:: stk.serialization.json.serializers.building_block
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -14,11 +19,3 @@ Submodules
 .. toctree::
 
    stk.serialization.json.serializers.building_block.building_block
-
-Module contents
----------------
-
-.. automodule:: stk.serialization.json.serializers.building_block
-   :members:
-   :undoc-members:
-   :show-inheritance:

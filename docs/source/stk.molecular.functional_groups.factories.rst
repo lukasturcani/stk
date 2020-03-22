@@ -1,6 +1,11 @@
 stk.molecular.functional\_groups.factories package
 ==================================================
 
+.. automodule:: stk.molecular.functional_groups.factories
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -26,11 +31,3 @@ Submodules
    stk.molecular.functional_groups.factories.thioacid_factory
    stk.molecular.functional_groups.factories.thiol_factory
    stk.molecular.functional_groups.factories.utilities
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.functional_groups.factories
-   :members:
-   :undoc-members:
-   :show-inheritance:

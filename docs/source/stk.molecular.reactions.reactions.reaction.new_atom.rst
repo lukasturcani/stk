@@ -1,6 +1,3 @@
-stk.molecular.reactions.reactions.reaction.new\_atom module
-===========================================================
-
 .. automodule:: stk.molecular.reactions.reactions.reaction.new_atom
    :members:
    :undoc-members:

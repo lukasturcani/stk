@@ -1,6 +1,11 @@
 stk.molecular.reactions.reactions.reaction package
 ==================================================
 
+.. automodule:: stk.molecular.reactions.reactions.reaction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -9,11 +14,3 @@ Submodules
    stk.molecular.reactions.reactions.reaction.new_atom
    stk.molecular.reactions.reactions.reaction.reaction
    stk.molecular.reactions.reactions.reaction.reaction_result
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.reactions.reactions.reaction
-   :members:
-   :undoc-members:
-   :show-inheritance:

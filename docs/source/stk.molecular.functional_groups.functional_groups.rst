@@ -1,6 +1,11 @@
 stk.molecular.functional\_groups.functional\_groups package
 ===========================================================
 
+.. automodule:: stk.molecular.functional_groups.functional_groups
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -26,11 +31,3 @@ Submodules
    stk.molecular.functional_groups.functional_groups.secondary_amino
    stk.molecular.functional_groups.functional_groups.thioacid
    stk.molecular.functional_groups.functional_groups.thiol
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.functional_groups.functional_groups
-   :members:
-   :undoc-members:
-   :show-inheritance:

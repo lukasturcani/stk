@@ -1,6 +1,11 @@
 stk.molecular.topology\_graphs.topology\_graph package
 ======================================================
 
+.. automodule:: stk.molecular.topology_graphs.topology_graph
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -18,11 +23,3 @@ Submodules
    stk.molecular.topology_graphs.topology_graph.edge
    stk.molecular.topology_graphs.topology_graph.edge_group
    stk.molecular.topology_graphs.topology_graph.vertex
-
-Module contents
----------------
-
-.. automodule:: stk.molecular.topology_graphs.topology_graph
-   :members:
-   :undoc-members:
-   :show-inheritance:
