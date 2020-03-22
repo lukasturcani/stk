@@ -5,7 +5,7 @@ Building Block Key Maker
 """
 
 from ..molecule import InchiKey
-from .functional_group_key_makers import (
+from .functional_group import (
     AlcoholKeyMaker,
     AldehydeKeyMaker,
     AlkeneKeyMaker,

@@ -4,7 +4,7 @@ Constructed Molecule Key Maker
 
 """
 
-from .topology_graph_key_makers import (
+from .topology_graph import (
     CageKeyMaker,
     CofKeyMaker,
     LinearPolymerKeyMaker,
