@@ -176,7 +176,6 @@ class ConstructedMoleculeKey:
         self,
         name='ConstructedMoleculeKey',
         molecule_key=InchiKey(),
-        building_block_key=BuildingBlockKey(),
         topology_graph_keys=None,
     ):
         """
@@ -185,12 +184,34 @@ class ConstructedMoleculeKey:
         Parameters
         ----------
         name : :class:`str`, optional
+            The name of the key.
 
         molecule_key : :class:`.MoleculeKey`, optional
-
-        building_block_key : :class:`.BuildingBlockKey`, optional
+            Used to generate the part of the key responsible for the
+            molecular component of :class:`.ConstructedMolecule`.
 
         topology_graph_keys : :class:`dict`, optional
+            Maps a :class:`.TopologyGraph` subclass to the
+            topolgoy graph key, which should be used to get key for
+            its instances. For a list of built-in topology graph
+            keys, see :mod:`.topology_graph_keys`. If ``None``,
+            the built-in keys will be used.
+
+            This parameter will only update the default mapping.
+            Providing an empty ``{}``, will mean that all the
+            defaults are kept. Providing
+
+            .. code-block:: python
+
+                constructed_molecule_key = stk.ConstructedMOleculeKey(
+                    topology_graph_keys={
+                        stk.polymer.Linear: CustomLinearKey(),
+                    },
+                )
+
+            will keep all the defaults, with the exception of
+            :class:`.polymer.Linear`, which will use
+            :class:`.CustomLinearKey` instead of the default.
 
         """
 
@@ -199,7 +220,6 @@ class ConstructedMoleculeKey:
 
         self._name = name
         self._molecule_key = molecule_key
-        self._building_block_key = building_block_key
         self._topology_graph_keys = (
             self._get_default_topology_graph_keys()
         )

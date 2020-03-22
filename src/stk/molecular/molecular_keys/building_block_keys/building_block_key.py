@@ -217,7 +217,7 @@ class BuildingBlockKey:
             molecular component of a :class:`.BuildingBlock`.
 
         functional_group_keys : :class:`dict`, optional
-            Map a :class:`FunctionalGroup` subclass to the
+            Maps a :class:`.FunctionalGroup` subclass to the
             functional group key, which should be used to get the
             key for its instances. For a list of built-in
             functional group keys, see :mod:`.functional_group_keys`.
