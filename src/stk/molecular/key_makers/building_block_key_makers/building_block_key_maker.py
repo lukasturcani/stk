@@ -53,7 +53,7 @@ from ...functional_groups import (
 
 class BuildingBlockKeyMaker:
     """
-    An abstract base class for :class:`.BuildingBlock` keys.
+    An abstract base class for :class:`.BuildingBlock` key makers.
 
     Notes
     -----
@@ -76,7 +76,7 @@ class BuildingBlockKeyMaker:
         import stk
 
 
-        class NumFunctionalGroups(stk.BuildingBlockKey):
+        class NumFunctionalGroups(stk.BuildingBlockKeyMaker):
             def __init__(self):
                 return
 
@@ -92,7 +92,7 @@ class BuildingBlockKeyMaker:
         # A usage example of the new subclass.
 
         jsonizer = stk.BuildingBlockJsonizer(
-            building_block_keys=(NumFunctionalGroups(), ),
+            building_block_key_makers=(NumFunctionalGroups(), ),
         )
         # Create a JSON representation of a building block, which
         # holds the number of functional groups.
@@ -100,7 +100,7 @@ class BuildingBlockKeyMaker:
 
     *Usage*
 
-    Because :class:`.BuildingBlockKey` comes with a default
+    Because :class:`.BuildingBlockKeyMaker` comes with a default
     implementation, it can be used directly, instead of having to
     make a subclass
 
@@ -109,30 +109,30 @@ class BuildingBlockKeyMaker:
         import stk
 
         jsonizer = stk.BuildingBlockJsonizer(
-            building_block_keys=(stk.BuildingBlockKey(), ),
+            building_block_key_makers=(stk.BuildingBlockKeyMaker(), ),
         )
         # Create a JSON representation of a building block, which
         # holds the default building block key.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
     You want to use an InChI instead of an InChIKey in the building
-    block key
+    block key maker
 
     .. code-block:: python
 
         import stk
         jsonizer = stk.BuildingBlockJsonizer(
-            building_block_keys=(
-                stk.BuildingBlockKey(
+            building_block_key_makers=(
+                stk.BuildingBlockKeyMaker(
                     # If you change the nature of the key, its a good
                     # idea to change its name to reflect that.
                     name='InChIBuildingBlockKey',
-                    molecule_key=stk.Inchi(),
+                    molecule_key_maker=stk.Inchi(),
                 ),
                 # You can still keep the default building block key
-                # too. No pressure though, excluding it from
+                # maker too. No pressure though, excluding it from
                 # this tuple is also valid.
-                stk.BuildingBlockKey(),
+                stk.BuildingBlockKeyMaker(),
             ),
         )
         # Create a JSON representation of a building block, which
@@ -140,31 +140,31 @@ class BuildingBlockKeyMaker:
         # one featuring an InChIKey.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-    You want to use a different functional group key for some
+    You want to use a different functional group key maker for some
     :class:`.FunctionalGroup` subclass
 
     .. code-block:: python
 
         import stk
 
-        # Define the alternate functional group key you want to use.
-        # In this case, the bromo key is given by the id of
+        # Define the alternate functional group key maker you want to
+        # use. In this case, the bromo key is given by the id of
         # the bromine atom.
-        class MyBromoKey:
+        class MyBromoKeyMaker:
             def get_key(self, bromo):
                 return f'BromoKey({bromo.get_bromine().get_id()}'
 
 
-        building_block_key = stk.BuildingBlockKey(
-            # Use the alternate key instead of the default.
-            functional_group_keys={
-                stk.Bromo: MyBromoKey(),
+        building_block_key_maker = stk.BuildingBlockKeyMaker(
+            # Use the alternate key maker instead of the default.
+            functional_group_key_makers={
+                stk.Bromo: MyBromoKeyMaker(),
             },
         )
 
-        # Use building_block_key as normal.
+        # Use building_block_key_maker as normal.
         jsonizer = stk.BuildingBlockJsonizer(
-            building_block_keys=(building_block_key, ),
+            building_block_key_makers=(building_block_key_maker, ),
         )
         json = jsonizer.to_json(
             building_block=stk.BuildingBlock(
@@ -173,8 +173,8 @@ class BuildingBlockKeyMaker:
             ),
         )
 
-    If you want to use a key for a new :class:`.FunctionalGroup` the
-    process is essentially the same the one described above
+    If you want to use a key maker for a new :class:`.FunctionalGroup`
+    the process is essentially the same the one described above
 
     .. code-block:: python
 
@@ -183,16 +183,16 @@ class BuildingBlockKeyMaker:
             # Your implementation goes here.
 
 
-        # Define the functional group key for your subclass
-        class MyFunctionalGroupKey:
+        # Define the functional group key maker for your subclass
+        class MyFunctionalGroupKeyMaker:
             def get_key(self, my_functional_group):
                 # Get the key of my_functional_group somehow.
 
 
-        building_block_key = stk.BuildingBlockKey(
-            # Use the new key.
-            functional_group_keys={
-                MyFunctionalGroup: MyFunctionalGroupKey(),
+        building_block_key_maker = stk.BuildingBlockKeyMaker(
+            # Use the new key maker.
+            functional_group_key_makers={
+                MyFunctionalGroup: MyFunctionalGroupKeyMaker(),
             },
         )
 
@@ -201,27 +201,28 @@ class BuildingBlockKeyMaker:
     def __init__(
         self,
         name='BuildingBlockKey',
-        molecule_key=InchiKey(),
-        functional_group_keys=None,
+        molecule_key_maker=InchiKey(),
+        functional_group_key_makers=None,
     ):
         """
-        Initialize a :class:`.BuildingBlockKey` instance.
+        Initialize a :class:`.BuildingBlockKeyMaker` instance.
 
         Parameters
         ----------
         name : :class:`str`, optional
-            The name of the key.
+            The name of the key made by the maker.
 
-        molecule_key : :class:`.MoleculeKey`, optional
+        molecule_key_maker : :class:`.MoleculeKeyMaker`, optional
             Used to generate the part of key responsible for the
             molecular component of a :class:`.BuildingBlock`.
 
-        functional_group_keys : :class:`dict`, optional
+        functional_group_key_makers : :class:`dict`, optional
             Maps a :class:`.FunctionalGroup` subclass to the
-            functional group key, which should be used to get the
+            functional group key maker, which should be used to get the
             key for its instances. For a list of built-in
-            functional group keys, see :mod:`.functional_group_keys`.
-            If ``None``, the built-in keys will be used.
+            functional group key makers, see
+            :mod:`.functional_group_key_makers`.
+            If ``None``, the built-in key makers will be used.
 
             This parameter will only update the default mapping.
             Providing an empty ``{}``, will mean that all the defaults
@@ -229,29 +230,33 @@ class BuildingBlockKeyMaker:
 
             .. code-block:: python
 
-                building_block_key = stk.BuildingBlockKey(
-                    functional_group_keys={
-                        stk.Bromo: CustomBromoKey(),
+                building_block_key_maker = stk.BuildingBlockKeyMaker(
+                    functional_group_key_makers={
+                        stk.Bromo: CustomBromoKeyMaker(),
                     }
                 )
 
             will keep all the defaults, with the exception of
-            :class:`.Bromo`, which will use :class:`.CustomBromoKey`
-            instead of the default.
+            :class:`.Bromo`, which will use
+            :class:`.CustomBromoKeyMaker` instead of the default.
 
         """
 
-        if functional_group_keys is None:
-            functional_group_keys = {}
+        if functional_group_key_makers is None:
+            functional_group_key_makers = {}
 
         self._name = name
-        self._molecule_key = molecule_key
-        self._functional_group_keys = (
-            self._get_default_functional_group_keys()
+        self._molecule_key_maker = molecule_key_maker
+        self._functional_group_key_makers = (
+            self._get_default_functional_group_key_makers()
         )
-        self._functional_group_keys.update(functional_group_keys)
+        self._functional_group_key_makers.update(
+            functional_group_key_makers
+        )
         # Used for __repr__().
-        self._input_functional_group_keys = functional_group_keys
+        self._input_functional_group_key_makers = (
+            functional_group_key_makers
+        )
 
     def get_name(self):
         """
@@ -291,9 +296,13 @@ class BuildingBlockKeyMaker:
             building_block.get_functional_groups(),
             key=atom_ids,
         )
+        key_makers = map(
+            self._functional_group_key_makers.get,
+            map(type, functional_groups),
+        )
         functional_group_keys = '-'.join(
-            str(self._functional_group_keys[type(fg)].get_key(fg))
-            for fg in functional_groups
+            str(key_maker.get_key(fg))
+            for key_maker, fg in zip(key_makers, functional_groups)
         )
         placer_ids = ''.join(
             str(id_) for id_ in sorted(building_block.get_placer_ids())
@@ -313,62 +322,61 @@ class BuildingBlockKeyMaker:
             if self._name == 'BuildingBlockKey'
             else f'name={self._name!r}'
         )
-        molecule_key = (
+        molecule_key_maker = (
             ''
-            if isinstance(self._molecule_key, InchiKey)
-            else f'molecule_key={self._molecule_key!r}'
+            if isinstance(self._molecule_key_maker, InchiKey)
+            else f'molecule_key_maker={self._molecule_key_maker!r}'
         )
-        functional_group_keys = (
+        functional_group_key_makers = (
             ''
-            if not self._input_functional_group_keys
+            if not self._input_functional_group_key_makers
             else (
-                'functional_group_keys='
-                f'{self._input_functional_group_keys!r}'
+                'functional_group_key_makers='
+                f'{self._input_functional_group_key_makers!r}'
             )
         )
         return (
             f'{self.__class__.__name__}('
             f'{name}'
-            f'{", " if molecule_key else ""}'
-            f'{molecule_key}'
-            f'{", " if functional_group_keys else ""}'
-            f'{functional_group_keys}'
+            f'{", " if molecule_key_maker else ""}'
+            f'{molecule_key_maker}'
+            f'{", " if functional_group_key_makers else ""}'
+            f'{functional_group_key_makers}'
             ')'
         )
 
     @staticmethod
-    def _get_default_functional_group_keys():
+    def _get_default_functional_group_key_makers():
         """
-        Get the default functional group key for each functional group.
+        Get the default functional group key makers.
 
         Returns
         -------
         :class:`dict`
             Maps a :class:`.FunctionalGroup` subclass to the
-            :mod:`functional_group_key <.functional_group_keys>` that
-            should be used with it.
+            functional group key maker that should be used with it.
 
         """
 
         return {
-            Alcohol: AlcoholKey(),
-            Aldehyde: AldehydeKey(),
-            Alkene: AlkeneKey(),
-            Alkyne: AlkyneKey(),
-            Amide: AmideKey(),
-            BoronicAcid: BoronicAcidKey(),
-            Bromo: BromoKey(),
-            CarboxylicAcid: CarboxylicAcidKey(),
-            Dibromo: DibromoKey(),
-            Difluoro: DifluoroKey(),
-            Diol: DiolKey(),
-            Fluoro: FluoroKey(),
-            FunctionalGroup: FunctionalGroupKey(),
-            GenericFunctionalGroup: GenericFunctionalGroupKey(),
-            Iodo: IodoKey(),
-            PrimaryAmino: PrimaryAminoKey(),
-            RingAmine: RingAmineKey(),
-            SecondaryAmino: SecondaryAminoKey(),
-            Thioacid: ThioacidKey(),
-            Thiol: ThiolKey(),
+            Alcohol: AlcoholKeyMaker(),
+            Aldehyde: AldehydeKeyMaker(),
+            Alkene: AlkeneKeyMaker(),
+            Alkyne: AlkyneKeyMaker(),
+            Amide: AmideKeyMaker(),
+            BoronicAcid: BoronicAcidKeyMaker(),
+            Bromo: BromoKeyMaker(),
+            CarboxylicAcid: CarboxylicAcidKeyMaker(),
+            Dibromo: DibromoKeyMaker(),
+            Difluoro: DifluoroKeyMaker(),
+            Diol: DiolKeyMaker(),
+            Fluoro: FluoroKeyMaker(),
+            FunctionalGroup: FunctionalGroupKeyMaker(),
+            GenericFunctionalGroup: GenericFunctionalGroupKeyMaker(),
+            Iodo: IodoKeyMaker(),
+            PrimaryAmino: PrimaryAminoKeyMaker(),
+            RingAmine: RingAmineKeyMaker(),
+            SecondaryAmino: SecondaryAminoKeyMaker(),
+            Thioacid: ThioacidKeyMaker(),
+            Thiol: ThiolKeyMaker(),
         }
