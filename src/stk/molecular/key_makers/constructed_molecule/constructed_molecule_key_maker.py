@@ -12,7 +12,7 @@ from .topology_graph_key_makers import (
     NRotaxaneKeyMaker,
     MacrocycleKeyMaker,
 )
-from ..molecule_key_makers import InchiKey
+from ..molecule import InchiKey
 from ...topology_graphs.cage import (
     EightPlusSixteen,
     EightPlusTwelve,
