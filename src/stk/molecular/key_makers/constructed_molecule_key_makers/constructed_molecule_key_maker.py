@@ -1,18 +1,18 @@
 """
-Constructed Molecule Key
-========================
+Constructed Molecule Key Maker
+==============================
 
 """
 
-from .topology_graph_keys import (
-    CageKey,
-    CofKey,
-    LinearPolymerKey,
-    HostGuestComplexKey,
-    NRotaxaneKey,
-    MacrocycleKey,
+from .topology_graph_key_makers import (
+    CageKeyMaker,
+    CofKeyMaker,
+    LinearPolymerKeyMaker,
+    HostGuestComplexKeyMaker,
+    NRotaxaneKeyMaker,
+    MacrocycleKeyMaker,
 )
-from ..molecule_keys import InchiKey
+from ..molecule_key_makers import InchiKey
 from ...topology_graphs.cage import (
     EightPlusSixteen,
     EightPlusTwelve,
@@ -46,9 +46,9 @@ from ..topology_graphs.rotaxane import NRotaxane
 from ..topology_graphs.macrocycle import Macrocycle
 
 
-class ConstructedMoleculeKey:
+class ConstructedMoleculeKeyMaker:
     """
-    An abstract base class for :class:`.ConstructedMolecule` keys.
+    Abstract base class for making :class:`.ConstructedMolecule` keys.
 
     Notes
     -----
@@ -71,7 +71,7 @@ class ConstructedMoleculeKey:
         import stk
 
 
-        class NumBuildingBlocks(stk.ConstructedMoleculeKey):
+        class NumBuildingBlocks(stk.ConstructedMoleculeKeyMaker):
             def __init__(self):
                 return
 
@@ -90,7 +90,7 @@ class ConstructedMoleculeKey:
         # A usage example of the new subclass.
 
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_keys=(NumBuildingBlocks(), ),
+            constructed_molecule_key_makers=(NumBuildingBlocks(), ),
         )
 
         # Make a constructed molecule, which you want to convert to a
@@ -113,7 +113,7 @@ class ConstructedMoleculeKey:
 
     *Usage*
 
-    Because :class:`.ConstructedMoleculeKey` comes with a default
+    Because :class:`.ConstructedMoleculeKeyMaker` comes with a default
     implementation, it can be used directly, instead of having to
     make a subclass
 
@@ -122,7 +122,9 @@ class ConstructedMoleculeKey:
         import stk
 
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_keys=(stk.ConstructedMoleculeKey(), ),
+            constructed_molecule_key_makers=(
+                stk.ConstructedMoleculeKeyMaker(),
+            ),
         )
         # Create a JSON representation of a constructed molecule, which
         # holds the default constructed molecule key.
@@ -134,17 +136,17 @@ class ConstructedMoleculeKey:
     .. code-block:: python
 
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_keys=(
-                stk.ConstructedMoleculeKey(
+            constructed_molecule_key_makers=(
+                stk.ConstructedMoleculeKeyMaker(
                     # If you change the nature of the key, its a good
                     # idea to change its name to reflect that.
                     name='InChIConstructedMoleculeKey',
-                    molecule_key=stk.Inchi(),
+                    molecule_key_maker=stk.Inchi(),
                 ),
                 # You can still keep the default constructed molecule
-                # key too. No pressure though, excluding it from
+                # key maker too. No pressure though, excluding it from
                 # this tuple is also valid.
-                stk.ConstructedMoleculeKey(),
+                stk.ConstructedMoleculeKeyMaker(),
             ),
         )
         # Create a JSON representation of a constructed molecule, which
@@ -152,41 +154,39 @@ class ConstructedMoleculeKey:
         # InChI and one featuring an InChIKey.
         json = jsonizer.to_json(polymer)
 
-    You want to use a different topology graph key for some
+    You want to use a different topology graph key maker for some
     :class:`.TopologyGraph` subclass
 
     .. code-block:: python
 
         import stk
 
-        # Define the alternate topology graph key you want to use.
-        # In this case, the polymer key is given by the number of
+        # Define the alternate topology graph key maker you want to
+        # use. In this case, the polymer key is given by the number of
         # building blocks.
-        class LinearKey:
+        class LinearKeyMaker:
             def get_key(self, linear):
                 building_blocks = (
                     linear.get_building_blocks()
                 )
                 return sum(1 for _ in building_blocks)
 
-        constructed_molecule_key = stk.ConstructedMoleculeKey(
-            # Use an alternate topology graph key for
+        key_maker = stk.ConstructedMoleculeKeyMaker(
+            # Use an alternate topology graph key maker for
             # stk.polymer.Linear instances.
-            topology_graph_keys={
-                stk.polymer.Linear: LinearKey(),
+            topology_graph_key_makers={
+                stk.polymer.Linear: LinearKeyMaker(),
             }
         )
 
-        # Use the constructed_molecule_key as normal.
+        # Use the key_maker as normal.
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_keys=(
-                constructed_molecule_key,
-            ),
+            constructed_molecule_key_makers=(key_maker, ),
         )
         json = jsonizer.to_json(polymer)
 
-    If you want to use a key for a new :class:`.TopologyGraph` the
-    process is essentially the same as the one described above
+    If you want to use a key maker for a new :class:`.TopologyGraph`
+    the process is essentially the same as the one described above
 
     .. code-block:: python
 
@@ -195,16 +195,16 @@ class ConstructedMoleculeKey:
             # Your implementation goes here
 
 
-        # Define the topology graph key for your subclass
-        class MyTopologyGraphKey:
+        # Define the topology graph key maker for your subclass
+        class MyTopologyGraphKeyMaker:
             def get_key(self, my_topology_graph):
                 # Get the key for my_topology_graph somehow.
 
 
-        constructed_molecule_key = stk.ConstructedMoleculeKey(
-            # use the new key.
-            topology_graph_keys={
-                MyTopologyGraph: MyTopologyGraphKey(),
+        key_maker = stk.ConstructedMoleculeKeyMaker(
+            # use the new key maker.
+            topology_graph_key_makers={
+                MyTopologyGraph: MyTopologyGraphKeyMaker(),
             },
         )
 
@@ -213,27 +213,27 @@ class ConstructedMoleculeKey:
     def __init__(
         self,
         name='ConstructedMoleculeKey',
-        molecule_key=InchiKey(),
-        topology_graph_keys=None,
+        molecule_key_maker=InchiKey(),
+        topology_graph_key_makers=None,
     ):
         """
-        Initialize a :class:`.ConstructedMoleculeKey` instance.
+        Initialize a :class:`.ConstructedMoleculeKeyMaker` instance.
 
         Parameters
         ----------
         name : :class:`str`, optional
-            The name of the key.
+            The name of the key made by the maker.
 
-        molecule_key : :class:`.MoleculeKey`, optional
+        molecule_key_maker : :class:`.MoleculeKeyMaker`, optional
             Used to generate the part of the key responsible for the
             molecular component of :class:`.ConstructedMolecule`.
 
-        topology_graph_keys : :class:`dict`, optional
+        topology_graph_key_makers : :class:`dict`, optional
             Maps a :class:`.TopologyGraph` subclass to the
-            topology graph key, which should be used to get key for
-            its instances. For a list of built-in topology graph
-            keys, see :mod:`.topology_graph_keys`. If ``None``,
-            the built-in keys will be used.
+            topology graph key maker, which should be used to get key
+            for its instances. For a list of built-in topology graph
+            key makers, see :mod:`.topology_graph_key_makers`. If
+            ``None``, the built-in key makers will be used.
 
             This parameter will only update the default mapping.
             Providing an empty ``{}``, will mean that all the
@@ -241,29 +241,33 @@ class ConstructedMoleculeKey:
 
             .. code-block:: python
 
-                constructed_molecule_key = stk.ConstructedMOleculeKey(
-                    topology_graph_keys={
-                        stk.polymer.Linear: CustomLinearKey(),
+                key_maker = stk.ConstructedMoleculeKeyMaker(
+                    topology_graph_key_makers={
+                        stk.polymer.Linear: CustomLinearKeyMaker(),
                     },
                 )
 
             will keep all the defaults, with the exception of
             :class:`.polymer.Linear`, which will use
-            :class:`.CustomLinearKey` instead of the default.
+            :class:`.CustomLinearKeyMaker` instead of the default.
 
         """
 
-        if topology_graph_keys is None:
-            topology_graph_keys = {}
+        if topology_graph_key_makers is None:
+            topology_graph_key_makers = {}
 
         self._name = name
-        self._molecule_key = molecule_key
-        self._topology_graph_keys = (
-            self._get_default_topology_graph_keys()
+        self._molecule_key_maker = molecule_key_maker
+        self._topology_graph_key_makers = (
+            self._get_default_topology_graph_key_makers()
         )
-        self._topology_graph_key.update(topology_graph_keys)
+        self._topology_graph_key_makers.update(
+            topology_graph_key_makers
+        )
         # Used for __repr__().
-        self._input_topology_graph_keys = topology_graph_keys
+        self._input_topology_graph_key_makers = (
+            topology_graph_key_makers
+        )
 
     def get_name(self):
         """
@@ -297,48 +301,52 @@ class ConstructedMoleculeKey:
         # graph is not part of the public interface of a constructed
         # molecule.
         topology_graph = constructed_molecule._topology_graph
-        key = type(self._topology_graph_keys[topology_graph])
-        return key.get_key(topology_graph)
+        key_maker = (
+            self._topology_graph_key_makers[type(topology_graph)]
+        )
+        return key_maker.get_key(topology_graph)
 
     @staticmethod
     def _get_default_topology_graph_keys():
         """
-        Get the default topology graph key for each topology graph.
+        Get the default topology graph key makers.
 
         Returns
         -------
         :class:`dict`
+            Maps a :class:`.TopologyGrpah` subclass to the
+            topology graph key maker that should be used with it.
 
         """
 
         return {
-            EightPlusSixteen: CageKey(),
-            EightPlusTwelve: CageKey(),
-            FivePlusTen: CageKey(),
-            FourPlusEight: CageKey(),
-            FourPlusFour: CageKey(),
-            FourPlusSix: CageKey(),
-            FourPlusSix2: CageKey(),
-            OnePlusOne: CageKey(),
-            SixPlusEight: CageKey(),
-            SixPlusNine: CageKey(),
-            SixPlusTwelve: CageKey(),
-            TenPlusTwenty: CageKey(),
-            ThreePlusSix: CageKey(),
-            TwelvePlusThirty: CageKey(),
-            TwentyPlusThirty: CageKey(),
-            TwoPlusFour: CageKey(),
-            TwoPlusThree: CageKey(),
-            TwoPlusTwo: CageKey(),
-            Hexagonal: CofKey(),
-            Honeycomb: CofKey(),
-            Kagome: CofKey(),
-            LinkerlessHoneycomb: CofKey(),
-            Square: CofKey(),
-            Linear: LinearPolymerKey(),
-            Complex: HostGuestComplexKey(),
-            NRotaxane: NRotaxaneKey(),
-            Macrocycle: MacrocycleKey(),
+            EightPlusSixteen: CageKeyMaker(),
+            EightPlusTwelve: CageKeyMaker(),
+            FivePlusTen: CageKeyMaker(),
+            FourPlusEight: CageKeyMaker(),
+            FourPlusFour: CageKeyMaker(),
+            FourPlusSix: CageKeyMaker(),
+            FourPlusSix2: CageKeyMaker(),
+            OnePlusOne: CageKeyMaker(),
+            SixPlusEight: CageKeyMaker(),
+            SixPlusNine: CageKeyMaker(),
+            SixPlusTwelve: CageKeyMaker(),
+            TenPlusTwenty: CageKeyMaker(),
+            ThreePlusSix: CageKeyMaker(),
+            TwelvePlusThirty: CageKeyMaker(),
+            TwentyPlusThirty: CageKeyMaker(),
+            TwoPlusFour: CageKeyMaker(),
+            TwoPlusThree: CageKeyMaker(),
+            TwoPlusTwo: CageKeyMaker(),
+            Hexagonal: CofKeyMaker(),
+            Honeycomb: CofKeyMaker(),
+            Kagome: CofKeyMaker(),
+            LinkerlessHoneycomb: CofKeyMaker(),
+            Square: CofKeyMaker(),
+            Linear: LinearPolymerKeyMaker(),
+            Complex: HostGuestComplexKeyMaker(),
+            NRotaxane: NRotaxaneKeyMaker(),
+            Macrocycle: MacrocycleKeyMaker(),
         }
 
     def __str__(self):
