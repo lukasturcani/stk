@@ -7,7 +7,7 @@ Molecular Keys
 #. :class:`.MoleculeKey`
 
 Molecular keys are used by :mod:`stk` to provide some identity metric
-for different molecules. Each class molecular key provides a different
+for different molecules. Each molecular key provides a different
 metric for identity. There are 3 abstract base classes from which a
 molecular key can be subclassed. However, each molecular key will
 subclass at most 1 of them.
