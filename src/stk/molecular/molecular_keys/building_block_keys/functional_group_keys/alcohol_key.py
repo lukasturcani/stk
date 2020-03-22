@@ -11,6 +11,7 @@ class AlcoholKey:
 
     """
 
+    # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
         Initialize an :class:`.AlcoholKey` instance.
