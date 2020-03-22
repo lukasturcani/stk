@@ -37,6 +37,7 @@ class DiolKey:
         """
 
         return (
+            'diol',
             diol.get_atom1().get_id(),
             diol.get_oxygen1().get_id(),
             diol.get_hydrogen1().get_id(),
