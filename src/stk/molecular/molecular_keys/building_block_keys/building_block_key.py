@@ -138,7 +138,7 @@ class BuildingBlockKey:
     You want to use a different functional group key for some
     :class:`.FunctionalGroup` subclass
 
-    . code-block:: python
+    .. code-block:: python
 
         import stk
 
