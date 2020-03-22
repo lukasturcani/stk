@@ -53,7 +53,7 @@ from ...functional_groups import (
 
 class BuildingBlockKey:
     """
-    An abstract base class for building block keys.
+    An abstract base class for :class:`.BuildingBlock` keys.
 
     Notes
     -----
@@ -286,6 +286,17 @@ class BuildingBlockKey:
             f'{self._molecule_key.get_key(building_block)}-'
             f'{functional_group_keys}-'
             f'{placer_ids}'
+        )
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._name}, {self._molecule_key!r}, '
+            f'{self._functional_group_keys!r}'
+            ')'
         )
 
     @staticmethod

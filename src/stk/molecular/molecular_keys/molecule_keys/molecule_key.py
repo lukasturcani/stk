@@ -10,7 +10,7 @@ Molecule Key
 
 class MoleculeKey:
     """
-    An abstract base class for molecular keys.
+    An abstract base class for :class:`.Molecule` keys.
 
     Notes
     -----
@@ -101,3 +101,13 @@ class MoleculeKey:
         """
 
         return self._key(molecule)
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._name}, {self._key!r}'
+            ')'
+        )
