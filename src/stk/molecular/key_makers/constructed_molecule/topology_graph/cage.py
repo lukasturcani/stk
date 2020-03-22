@@ -50,8 +50,12 @@ class CageKeyMaker:
             building_block.with_canonical_atom_ordering()
             for building_block in cage.get_building_blocks()
         )
+        # Cage does not provide a public interface to for these
+        # attributes, so private ones must be used.
+
         key = (
             cage.__class__.__name__,
+            vertex_alignments,
             tuple(sorted(map(
                 self._building_block_key_maker.get_key,
                 building_blocks,
