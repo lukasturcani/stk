@@ -26,28 +26,28 @@ Functional Group Key Makers
 Note that the functional group key makers are not related by
 inheritance. For example, you cannot use a
 :class:`.FunctionalGroupKey` in places where a :class:`.BromoKey` is
-required. See :mod:`.molecule_key_makers` for a discussion on why this
+required. See :mod:`.molecule_makers` for a discussion on why this
 is.
 
 """
 
-from .alcohol_key import AlcoholKeyMaker
-from .aldehyde_key import AldehydeKeyMaker
-from .alkene_key import AlkeneKeyMaker
-from .alkyne_key import AlkyneKeyMaker
-from .amide_key import AmideKeyMaker
-from .boronic_acid_key import BoronicAcidKeyMaker
-from .bromo_key import BromoKeyMaker
-from .carboxylic_acid_key import CarboxylicAcidKeyMaker
-from .dibromo_key import DibromoKeyMaker
-from .difluoro_key import DifluoroKeyMaker
-from .diol_key import DiolKeyMaker
-from .fluoro_key import FluoroKeyMaker
-from .functional_group_key import FunctionalGroupKeyMaker
-from .generic_functional_group_key import GenericFunctionalGroupKeyMaker
-from .iodo_key import IodoKeyMaker
-from .primary_amino_key import PrimaryAminoKeyMaker
-from .ring_amine_key import RingAmineKeyMaker
-from .secondary_amino_key import SecondaryAminoKeyMaker
-from .thioacid_key import ThioacidKeyMaker
-from .thiol_key import ThiolKeyMaker
+from .alcohol import AlcoholKeyMaker
+from .aldehyde import AldehydeKeyMaker
+from .alkene import AlkeneKeyMaker
+from .alkyne import AlkyneKeyMaker
+from .amide import AmideKeyMaker
+from .boronic_acid import BoronicAcidKeyMaker
+from .bromo import BromoKeyMaker
+from .carboxylic_acid import CarboxylicAcidKeyMaker
+from .dibromo import DibromoKeyMaker
+from .difluoro import DifluoroKeyMaker
+from .diol import DiolKeyMaker
+from .fluoro import FluoroKeyMaker
+from .functional_group import FunctionalGroupKeyMaker
+from .generic_functional_group import GenericFunctionalGroupKeyMaker
+from .iodo import IodoKeyMaker
+from .primary_amino import PrimaryAminoKeyMaker
+from .ring_amine import RingAmineKeyMaker
+from .secondary_amino import SecondaryAminoKeyMaker
+from .thioacid import ThioacidKeyMaker
+from .thiol import ThiolKeyMaker
