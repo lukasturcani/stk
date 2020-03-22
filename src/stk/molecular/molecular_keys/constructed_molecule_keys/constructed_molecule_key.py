@@ -32,7 +32,7 @@ class ConstructedMoleculeKey:
 
         building_block_key : :class:`.BuildingBlockKey`, optional
 
-        topology_grap_keys : :class:`dict`, optional
+        topology_graph_keys : :class:`dict`, optional
 
         """
 
