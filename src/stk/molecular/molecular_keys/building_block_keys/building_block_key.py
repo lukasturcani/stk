@@ -282,6 +282,8 @@ class BuildingBlockKey:
 
         """
 
+        building_block = building_block.with_canonical_atom_ordering()
+
         def atom_ids(functional_group):
             return sorted(functional_group.get_atom_ids())
 

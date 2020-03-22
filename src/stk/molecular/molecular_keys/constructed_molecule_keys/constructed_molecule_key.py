@@ -4,7 +4,46 @@ Constructed Molecule Key
 
 """
 
+from .topology_graph_keys import (
+    CageKey,
+    CofKey,
+    LinearPolymerKey,
+    HostGuestComplexKey,
+    NRotaxaneKey,
+    MacrocycleKey,
+)
 from ..molecule_keys import InchiKey
+from ...topology_graphs.cage import (
+    EightPlusSixteen,
+    EightPlusTwelve,
+    FivePlusTen,
+    FourPlusEight,
+    FourPlusFour,
+    FourPlusSix,
+    FourPlusSix2,
+    OnePlusOne,
+    SixPlusEight,
+    SixPlusNine,
+    SixPlusTwelve,
+    TenPlusTwenty,
+    ThreePlusSix,
+    TwelvePlusThirty,
+    TwentyPlusThirty,
+    TwoPlusFour,
+    TwoPlusThree,
+    TwoPlusTwo,
+)
+from ..topology_graphs.cof import (
+    Hexagonal,
+    Honeycomb,
+    Kagome,
+    LinkerlessHoneycomb,
+    Square,
+)
+from ..topology_graphs.polymer import Linear
+from ..topology_graphs.host_guest import Complex
+from ..topology_graphs.rotaxane import NRotaxane
+from ..topology_graphs.macrocycle import Macrocycle
 
 
 class ConstructedMoleculeKey:
@@ -254,8 +293,12 @@ class ConstructedMoleculeKey:
 
         """
 
-        return (
-        )
+        # Use private attribute access because accessing the topology
+        # graph is not part of the public interface of a constructed
+        # molecule.
+        topology_graph = constructed_molecule._topology_graph
+        key = type(self._topology_graph_keys[topology_graph])
+        return key.get_key(topology_graph)
 
     @staticmethod
     def _get_default_topology_graph_keys():
@@ -269,7 +312,33 @@ class ConstructedMoleculeKey:
         """
 
         return {
-            stk.
+            EightPlusSixteen: CageKey(),
+            EightPlusTwelve: CageKey(),
+            FivePlusTen: CageKey(),
+            FourPlusEight: CageKey(),
+            FourPlusFour: CageKey(),
+            FourPlusSix: CageKey(),
+            FourPlusSix2: CageKey(),
+            OnePlusOne: CageKey(),
+            SixPlusEight: CageKey(),
+            SixPlusNine: CageKey(),
+            SixPlusTwelve: CageKey(),
+            TenPlusTwenty: CageKey(),
+            ThreePlusSix: CageKey(),
+            TwelvePlusThirty: CageKey(),
+            TwentyPlusThirty: CageKey(),
+            TwoPlusFour: CageKey(),
+            TwoPlusThree: CageKey(),
+            TwoPlusTwo: CageKey(),
+            Hexagonal: CofKey(),
+            Honeycomb: CofKey(),
+            Kagome: CofKey(),
+            LinkerlessHoneycomb: CofKey(),
+            Square: CofKey(),
+            Linear: LinearPolymerKey(),
+            Complex: HostGuestComplexKey(),
+            NRotaxane: NRotaxaneKey(),
+            Macrocycle: MacrocycleKey(),
         }
 
     def __str__(self):
