@@ -11,7 +11,7 @@ Subpackages
 
 .. toctree::
 
-   stk.molecular.key_makers.building_block.functional_group_key_makers
+   stk.molecular.key_makers.building_block.functional_group
 
 Submodules
 ----------

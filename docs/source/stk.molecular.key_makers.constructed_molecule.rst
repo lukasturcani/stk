@@ -11,7 +11,7 @@ Subpackages
 
 .. toctree::
 
-   stk.molecular.key_makers.constructed_molecule.topology_graph_key_makers
+   stk.molecular.key_makers.constructed_molecule.topology_graph
 
 Submodules
 ----------
