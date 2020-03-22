@@ -245,6 +245,8 @@ class BuildingBlockKey:
             self._get_default_functional_group_keys()
         )
         self._functional_group_keys.update(functional_group_keys)
+        # Used for __repr__().
+        self._input_functional_group_keys = functional_group_keys
 
     def get_name(self):
         """
@@ -292,10 +294,29 @@ class BuildingBlockKey:
         return repr(self)
 
     def __repr__(self):
+        name = (
+            ''
+            if self._name == 'BuildingBlockKey'
+            else f'name={self._name!r}'
+        )
+        molecule_key = (
+            ''
+            if isinstance(self._molecule_key, InchiKey)
+            else f'molecule_key={repr(self._molecule_key)}'
+        )
+        functional_group_keys = (
+            ''
+            if not self._input_functional_group_keys
+            else (
+                'functional_group_keys='
+                f'{self._input_functional_group_keys!r}'
+            )
+        )
         return (
             f'{self.__class__.__name__}('
-            f'{self._name}, {self._molecule_key!r}, '
-            f'{self._functional_group_keys!r}'
+            f'{name}, '
+            f'{molecule_key}, '
+            f'{functional_group_keys}'
             ')'
         )
 
