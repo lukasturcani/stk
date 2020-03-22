@@ -1,4 +1,0 @@
-.. automodule:: stk.molecular.molecular_keys.building_block_keys.functional_group_keys.generic_functional_group_key
-   :members:
-   :undoc-members:
-   :show-inheritance:
