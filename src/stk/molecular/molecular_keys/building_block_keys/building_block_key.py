@@ -69,20 +69,25 @@ class BuildingBlockKey:
     --------
     *Subclass Implementation*
 
-    There's just two methods two simple methods to implement.
+    There's just two simple methods to implement.
 
     .. code-block:: python
 
         import stk
 
+
         class NumFunctionalGroups(stk.BuildingBlockKey):
+            def __init__(self):
+                return
+
             def name(self):
-                # What string this is completely up to you. It does
+                # What string this is is completely up to you. It does
                 # not have to be related to the class name.
                 return 'num_functional_groups'
 
             def get_key(self, building_block):
                 return building_block.get_num_functional_groups()
+
 
         # A usage example of the new subclass.
 
@@ -185,7 +190,7 @@ class BuildingBlockKey:
 
 
         building_block_key = stk.BuildingBlockKey(
-            # Use the updated mapping.
+            # Use the new key.
             functional_group_keys={
                 MyFunctionalGroup: MyFunctionalGroupKey(),
             },

@@ -12,6 +12,164 @@ class ConstructedMoleculeKey:
     """
     An abstract base class for :class:`.ConstructedMolecule` keys.
 
+    Notes
+    -----
+    You might notice that the public methods of this abstract base
+    class are implemented. This is purely for the convenience of users.
+    The implemented public methods are simply default implementations,
+    which can be safely ignored or overridden, when implementing
+    subclasses. However, the default implementation works without
+    need for any further subclassing, and can be used directly, if it
+    suits your needs.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    There's just two simple methods to implement.
+
+    .. code-block:: python
+
+        import stk
+
+
+        class NumBuildingBlocks(stk.ConstructedMoleculeKey):
+            def __init__(self):
+                return
+
+            def name(self):
+                # What string this is is completely up to you. It does
+                # not have to be related to the class name.
+                return 'num_building_blocks'
+
+            def get_key(self, constructed_molecule):
+                building_blocks = (
+                    constructed_molecule.get_building_blocks()
+                )
+                return sum(1 for _ in building_blocks)
+
+
+        # A usage example of the new subclass.
+
+        jsonizer = stk.ConstructedMoleculeJsonizer(
+            constructed_molecule_keys=(NumBuildingBlocks(), ),
+        )
+
+        # Make a constructed molecule, which you want to convert to a
+        # JSON format.
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+        polymer_topology_graph = stk.polymer.Linear(
+            building_blocks=(building_block, ),
+            repeating_unit='A',
+            num_repeating_units=12,
+        )
+        polymer = stk.ConstructedMolecule(polymer_topology_graph)
+
+        # Create a JSON representation of a constructed molecule, which
+        # holds the number of building blocks.
+        json = jsonizer.to_json(polymer)
+
+    *Usage*
+
+    Because :class:`.ConstructedMoleculeKey` comes with a default
+    implementation, it can be used directly, instead of having to
+    make a subclass
+
+    .. code-block:: python
+
+        import stk
+
+        jsonizer = stk.ConstructedMoleculeJsonizer(
+            constructed_molecule_keys=(stk.ConstructedMoleculeKey(), ),
+        )
+        # Create a JSON representation of a constructed molecule, which
+        # holds the default constructed molecule key.
+        json = jsonizer.to_json(polymer)
+
+    You want to use an InChI instead of an InChIKey in the
+    constructed molecule key
+
+    .. code-block:: python
+
+        jsonizer = stk.ConstructedMoleculeJsonizer(
+            constructed_molecule_keys=(
+                stk.ConstructedMoleculeKey(
+                    # If you change the nature of the key, its a good
+                    # idea to change its name to reflect that.
+                    name='InChIConstructedMoleculeKey',
+                    molecule_key=stk.Inchi(),
+                ),
+                # You can still keep the default constructed molecule
+                # key too. No pressure though, excluding it from
+                # this tuple is also valid.
+                stk.ConstructedMoleculeKey(),
+            ),
+        )
+        # Create a JSON representation of a constructed molecule, which
+        # holds two constructed molecule keys, one featuring an
+        # InChI and one featuring an InChIKey.
+        json = jsonizer.to_json(polymer)
+
+    You want to use a different topology graph key for some
+    :class:`.TopologyGraph` subclass
+
+    .. code-block:: python
+
+        import stk
+
+        # Define the alternate topology graph key you want to use.
+        # In this case, the polymer key is given by the number of
+        # building blocks.
+        class LinearKey:
+            def get_key(self, linear):
+                building_blocks = (
+                    linear.get_building_blocks()
+                )
+                return sum(1 for _ in building_blocks)
+
+        constructed_molecule_key = stk.ConstructedMoleculeKey(
+            # Use an alternate topology graph key for
+            # stk.polymer.Linear instances.
+            topology_graph_keys={
+                stk.polymer.Linear: LinearKey(),
+            }
+        )
+
+        # Use the constructed_molecule_key as normal.
+        jsonizer = stk.ConstructedMoleculeJsonizer(
+            constructed_molecule_keys=(
+                constructed_molecule_key,
+            ),
+        )
+        json = jsonizer.to_json(polymer)
+
+    If you want to use a key for a new :class:`.TopologyGraph` the
+    process is essentially the same as the one described above
+
+    .. code-block:: python
+
+        # Define your TopologyGraph subclass
+        class MyTopologyGraph(stk.TopologyGraph):
+            # Your implementation goes here
+
+
+        # Define the topology graph key for your subclass
+        class MyTopologyGraphKey:
+            def get_key(self, my_topology_graph):
+                # Get the key for my_topology_graph somehow.
+
+
+        constructed_molecule_key = stk.ConstructedMoleculeKey(
+            # use the new key.
+            topology_graph_keys={
+                MyTopologyGraph: MyTopologyGraphKey(),
+            },
+        )
+
     """
 
     def __init__(
