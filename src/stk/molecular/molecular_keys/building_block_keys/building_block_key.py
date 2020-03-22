@@ -149,17 +149,12 @@ class BuildingBlockKey:
             def get_key(self, bromo):
                 return f'BromoKey({bromo.get_bromine().get_id()}'
 
-        # Get the default mapping.
-        functional_group_keys = (
-            stk.BuildingBlockKey.get_default_functional_group_keys()
-        )
 
-        # Update the mapping.
-        functional_group_keys[stk.Bromo] = MyBromoKey()
-
-        # Use the updated mapping.
         building_block_key = stk.BuildingBlockKey(
-            functional_group_keys=functional_group_keys,
+            # Use the alternate key instead of the default.
+            functional_group_keys={
+                stk.Bromo: MyBromoKey(),
+            },
         )
 
         # Use building_block_key as normal.
@@ -182,19 +177,18 @@ class BuildingBlockKey:
         class MyFunctionalGroup(stk.FunctionalGroup):
             # Your implementation goes here.
 
+
         # Define the functional group key for your subclass
         class MyFunctionalGroupKey:
             def get_key(self, my_functional_group):
                 # Get the key of my_functional_group somehow.
 
-        # Update the mapping.
-        functional_group_keys[MyFunctionalGroup] = (
-            MyFunctionalGroupKey()
-        )
 
-        # Use the updated mapping.
         building_block_key = stk.BuildingBlockKey(
-            functional_group_keys=functional_group_keys,
+            # Use the updated mapping.
+            functional_group_keys={
+                MyFunctionalGroup: MyFunctionalGroupKey(),
+            },
         )
 
     """
@@ -222,19 +216,35 @@ class BuildingBlockKey:
             functional group key, which should be used to get the
             key for its instances. For a list of built-in
             functional group keys, see :mod:`.functional_group_keys`.
-            The default mapping is returned by
-            :meth:`.get_default_functional_group_keys`.
+            If ``None``, the built-in keys will be used.
+
+            This parameter will only update the default mapping.
+            Providing an empty ``{}``, will mean that all the defaults
+            are kept. Providing
+
+            .. code-block:: python
+
+                building_block_key = stk.BuildingBlockKey(
+                    functional_group_keys={
+                        stk.Bromo: CustomBromoKey(),
+                    }
+                )
+
+            will keep all the defaults, with the exception of
+            :class:`.Bromo`, which will use :class:`.CustomBromoKey`
+            instead of the default.
 
         """
 
         if functional_group_keys is None:
-            functional_group_keys = (
-                self.get_default_functional_group_keys()
-            )
+            functional_group_keys = {}
 
         self._name = name
         self._molecule_key = molecule_key
-        self._functional_group_keys = functional_group_keys
+        self._functional_group_keys = (
+            self._get_default_functional_group_keys()
+        )
+        self._functional_group_keys.update(functional_group_keys)
 
     def get_name(self):
         """
@@ -279,7 +289,7 @@ class BuildingBlockKey:
         )
 
     @staticmethod
-    def get_default_functional_group_keys():
+    def _get_default_functional_group_keys():
         """
         Get the default functional group key for each functional group.
 
