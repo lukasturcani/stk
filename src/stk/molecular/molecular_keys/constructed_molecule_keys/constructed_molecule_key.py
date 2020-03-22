@@ -5,7 +5,6 @@ Constructed Molecule Key
 """
 
 from ..molecule_keys import InchiKey
-from ..building_block_keys import BuildingBlockKey
 
 
 class ConstructedMoleculeKey:
@@ -192,7 +191,7 @@ class ConstructedMoleculeKey:
 
         topology_graph_keys : :class:`dict`, optional
             Maps a :class:`.TopologyGraph` subclass to the
-            topolgoy graph key, which should be used to get key for
+            topology graph key, which should be used to get key for
             its instances. For a list of built-in topology graph
             keys, see :mod:`.topology_graph_keys`. If ``None``,
             the built-in keys will be used.
@@ -224,6 +223,8 @@ class ConstructedMoleculeKey:
             self._get_default_topology_graph_keys()
         )
         self._topology_graph_key.update(topology_graph_keys)
+        # Used for __repr__().
+        self._input_topology_graph_keys = topology_graph_keys
 
     def get_name(self):
         """
@@ -268,6 +269,7 @@ class ConstructedMoleculeKey:
         """
 
         return {
+            stk.
         }
 
     def __str__(self):

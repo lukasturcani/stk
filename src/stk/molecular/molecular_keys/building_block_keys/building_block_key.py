@@ -282,12 +282,19 @@ class BuildingBlockKey:
 
         """
 
+        def atom_ids(functional_group):
+            return sorted(functional_group.get_atom_ids())
+
+        functional_groups = sorted(
+            building_block.get_functional_groups(),
+            key=atom_ids,
+        )
         functional_group_keys = '-'.join(
             str(self._functional_group_keys[type(fg)].get_key(fg))
-            for fg in building_block.get_functional_groups()
+            for fg in functional_groups
         )
         placer_ids = ''.join(
-            str(id_) for id_ in building_block.get_placer_ids()
+            str(id_) for id_ in sorted(building_block.get_placer_ids())
         )
         return (
             f'{self._molecule_key.get_key(building_block)}-'
