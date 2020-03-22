@@ -1,2 +1,2 @@
-class MacrocyleKeyMaker:
+class MacrocycleKeyMaker:
     pass

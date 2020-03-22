@@ -1,2 +1,2 @@
-class NRotaxaneKeymMaker:
+class NRotaxaneKeyMaker:
     pass

@@ -33,17 +33,17 @@ from ...topology_graphs.cage import (
     TwoPlusThree,
     TwoPlusTwo,
 )
-from ..topology_graphs.cof import (
+from ...topology_graphs.cof import (
     Hexagonal,
     Honeycomb,
     Kagome,
     LinkerlessHoneycomb,
     Square,
 )
-from ..topology_graphs.polymer import Linear
-from ..topology_graphs.host_guest import Complex
-from ..topology_graphs.rotaxane import NRotaxane
-from ..topology_graphs.macrocycle import Macrocycle
+from ...topology_graphs.polymer import Linear
+from ...topology_graphs.host_guest import Complex
+from ...topology_graphs.rotaxane import NRotaxane
+from ...topology_graphs.macrocycle import Macrocycle
 
 
 class ConstructedMoleculeKeyMaker:
