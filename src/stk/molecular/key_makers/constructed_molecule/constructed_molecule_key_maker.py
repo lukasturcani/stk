@@ -353,5 +353,30 @@ class ConstructedMoleculeKeyMaker:
         return repr(self)
 
     def __repr__(self):
-        return (
+        name = (
+            ''
+            if self._name == 'ConstructedMoleculeKey'
+            else f'name={self._name!r}'
         )
+        molecule_key_maker = (
+            ''
+            if isinstance(self._molecule_key_maker, InchiKey)
+            else f'molecule_key_maker={self._molecule_key_maker!r}'
+        )
+        topology_graph_key_makers = (
+            ''
+            if not self._input_topology_graph_key_makers
+            else (
+                'topology_graph_key_makers='
+                f'{self._input_topology_graph_key_makers!r}'
+            )
+        )
+        parameters = (
+            name,
+            molecule_key_maker,
+            topology_graph_key_makers,
+        )
+        parameters = ', '.join(
+            parameter for parameter in parameters if parameter
+        )
+        return f'{self.__class__.__name__}({parameters})'

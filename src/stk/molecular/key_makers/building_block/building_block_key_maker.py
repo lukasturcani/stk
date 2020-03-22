@@ -335,15 +335,15 @@ class BuildingBlockKeyMaker:
                 f'{self._input_functional_group_key_makers!r}'
             )
         )
-        return (
-            f'{self.__class__.__name__}('
-            f'{name}'
-            f'{", " if molecule_key_maker else ""}'
-            f'{molecule_key_maker}'
-            f'{", " if functional_group_key_makers else ""}'
-            f'{functional_group_key_makers}'
-            ')'
+        parameters = (
+            name,
+            molecule_key_maker,
+            functional_group_key_makers,
         )
+        parameters = ', '.join(
+            parameter for parameter in parameters if parameter
+        )
+        return f'{self.__class__.__name__}({parameters})'
 
     @staticmethod
     def _get_default_functional_group_key_makers():

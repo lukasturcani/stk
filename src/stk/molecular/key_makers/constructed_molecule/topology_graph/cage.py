@@ -7,6 +7,7 @@ Cage Key Maker
 
 class CageKeyMaker:
     """
+    Makes keys for :class:`.Cage` instances.
 
     """
 
