@@ -178,8 +178,6 @@ class BuildingBlockKey:
 
     .. code-block:: python
 
-        # First, define your your new FunctionalGroup subclass.
-
         # Define your functional group subclass
         class MyFunctionalGroup(stk.FunctionalGroup):
             # Your implementation goes here.
