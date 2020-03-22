@@ -1,11 +1,11 @@
 """
-Thioacid Key
-============
+Thioacid Key Maker
+==================
 
 """
 
 
-class ThioacidKey:
+class ThioacidKeyMaker:
     """
     Generates keys for :class:`.Thioacid` instances.
 
@@ -14,7 +14,7 @@ class ThioacidKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.ThioacidKey` instance.
+        Initialize a :class:`.ThioacidKeyMaker` instance.
 
         """
 

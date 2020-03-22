@@ -1,11 +1,11 @@
 """
-Secondary Amino Key
-===================
+Secondary Amino Key Maker
+=========================
 
 """
 
 
-class SecondaryAminoKey:
+class SecondaryAminoKeyMaker:
     """
     Generates keys for :class:`.SecondaryAmino` instances.
 

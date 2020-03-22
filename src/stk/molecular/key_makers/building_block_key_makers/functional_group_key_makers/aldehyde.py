@@ -1,11 +1,11 @@
 """
-Aldehyde Key
-============
+Aldehyde Key Maker
+==================
 
 """
 
 
-class AldehydeKey:
+class AldehydeKeyMaker:
     """
     Generates keys for :class:`.Aldehyde` instances.
 
@@ -14,7 +14,7 @@ class AldehydeKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.AldehydeKey` instance.
+        Initialize a :class:`.AldehydeKeyMaker` instance.
 
         """
 

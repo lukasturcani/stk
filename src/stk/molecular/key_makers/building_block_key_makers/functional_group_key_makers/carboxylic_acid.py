@@ -1,11 +1,11 @@
 """
-Carboxylic Acid Key
-===================
+Carboxylic Acid Key Maker
+=========================
 
 """
 
 
-class CarboxylicAcidKey:
+class CarboxylicAcidKeyMaker:
     """
     Generates keys for :class:`.CarboxylicAcid` instances.
 
@@ -14,7 +14,7 @@ class CarboxylicAcidKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.CarboxylicAcidKey` instance.
+        Initialize a :class:`.CarboxylicAcidKeyMaker` instance.
 
         """
 

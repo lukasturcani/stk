@@ -1,11 +1,11 @@
 """
-Fluoro Key
-==========
+Fluoro Key Maker
+================
 
 """
 
 
-class FluoroKey:
+class FluoroKeyMaker:
     """
     Generates keys for :class:`.Fluoro` instances.
 
@@ -14,7 +14,7 @@ class FluoroKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.FluoroKey` instance.
+        Initialize a :class:`.FluoroKeyMaker` instance.
 
         """
 

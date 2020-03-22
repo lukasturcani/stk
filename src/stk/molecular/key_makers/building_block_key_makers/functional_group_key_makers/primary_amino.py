@@ -1,11 +1,11 @@
 """
-Primary Amino Key
-=================
+Primary Amino Key Maker
+=======================
 
 """
 
 
-class PrimaryAminoKey:
+class PrimaryAminoKeyMaker:
     """
     Generates keys for :class:`.PrimaryAmino` instances.
 
@@ -14,7 +14,7 @@ class PrimaryAminoKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.PrimaryAminoKey` instance.
+        Initialize a :class:`.PrimaryAminoKeyMaker` instance.
 
         """
 

@@ -1,11 +1,11 @@
 """
-Ring Amine Key
-==============
+Ring Amine Key Maker
+====================
 
 """
 
 
-class RingAmineKey:
+class RingAmineKeyMaker:
     """
     Generates keys for :class:`.RingAmine` instances.
 
@@ -14,7 +14,7 @@ class RingAmineKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.RingAmineKey` instance.
+        Initialize a :class:`.RingAmineKeyMaker` instance.
 
         """
 

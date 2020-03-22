@@ -1,11 +1,11 @@
 """
-Iodo Key
-========
+Iodo Key Maker
+==============
 
 """
 
 
-class IodoKey:
+class IodoKeyMaker:
     """
     Generates keys for :class:`.Iodo` instances.
 
@@ -14,7 +14,7 @@ class IodoKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.IodoKey` instance.
+        Initialize a :class:`.IodoKeyMaker` instance.
 
         """
 

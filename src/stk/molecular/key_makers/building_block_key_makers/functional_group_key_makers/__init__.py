@@ -1,52 +1,53 @@
 """
-Functional Group Keys
-=====================
+Functional Group Key Makers
+============================
 
-#. :class:`.AlcoholKey`
-#. :class:`.AldehydeKey`
-#. :class:`.AlkeneKey`
-#. :class:`.AlkyneKey`
-#. :class:`.AmideKey`
-#. :class:`.BoronicAcidKey`
-#. :class:`.BromoKey`
-#. :class:`.CarboxylicAcidKey`
-#. :class:`.DibromoKey`
-#. :class:`.DifluoroKey`
-#. :class:`.DiolKey`
-#. :class:`.FluoroKey`
-#. :class:`.FunctionalGroupKey`
-#. :class:`.GenericFunctionalGroupKey`
-#. :class:`.IodoKey`
-#. :class:`.PrimaryAminoKey`
-#. :class:`.RingAmineKey`
-#. :class:`.SecondaryAminoKey`
-#. :class:`.ThioAcidKey`
-#. :class:`.ThiolKey`
+#. :class:`.AlcoholKeyMaker`
+#. :class:`.AldehydeKeyMaker`
+#. :class:`.AlkeneKeyMaker`
+#. :class:`.AlkyneKeyMaker`
+#. :class:`.AmideKeyMaker`
+#. :class:`.BoronicAcidKeyMaker`
+#. :class:`.BromoKeyMaker`
+#. :class:`.CarboxylicAcidKeyMaker`
+#. :class:`.DibromoKeyMaker`
+#. :class:`.DifluoroKeyMaker`
+#. :class:`.DiolKeyMaker`
+#. :class:`.FluoroKeyMaker`
+#. :class:`.FunctionalGroupKeyMaker`
+#. :class:`.GenericFunctionalGroupKeyMaker`
+#. :class:`.IodoKeyMaker`
+#. :class:`.PrimaryAminoKeyMaker`
+#. :class:`.RingAmineKeyMaker`
+#. :class:`.SecondaryAminoKeyMaker`
+#. :class:`.ThioAcidKeyMaker`
+#. :class:`.ThiolKeyMaker`
 
-Note that the functional group keys are not related by inheritance.
-For example, you cannot use a :class:`.FunctionalGroupKey` in places
-where a :class:`.BromoKey` is required. See
-:mod:`.molecule_keys` for a discussion on why this is.
+Note that the functional group key makers are not related by
+inheritance. For example, you cannot use a
+:class:`.FunctionalGroupKey` in places where a :class:`.BromoKey` is
+required. See :mod:`.molecule_key_makers` for a discussion on why this
+is.
 
 """
 
-from .alcohol_key import AlcoholKey
-from .aldehyde_key import AldehydeKey
-from .alkene_key import AlkeneKey
-from .alkyne_key import AlkyneKey
-from .amide_key import AmideKey
-from .boronic_acid_key import BoronicAcidKey
-from .bromo_key import BromoKey
-from .carboxylic_acid_key import CarboxylicAcidKey
-from .dibromo_key import DibromoKey
-from .difluoro_key import DifluoroKey
-from .diol_key import DiolKey
-from .fluoro_key import FluoroKey
-from .functional_group_key import FunctionalGroupKey
-from .generic_functional_group_key import GenericFunctionalGroupKey
-from .iodo_key import IodoKey
-from .primary_amino_key import PrimaryAminoKey
-from .ring_amine_key import RingAmineKey
-from .secondary_amino_key import SecondaryAminoKey
-from .thioacid_key import ThioacidKey
-from .thiol_key import ThiolKey
+from .alcohol_key import AlcoholKeyMaker
+from .aldehyde_key import AldehydeKeyMaker
+from .alkene_key import AlkeneKeyMaker
+from .alkyne_key import AlkyneKeyMaker
+from .amide_key import AmideKeyMaker
+from .boronic_acid_key import BoronicAcidKeyMaker
+from .bromo_key import BromoKeyMaker
+from .carboxylic_acid_key import CarboxylicAcidKeyMaker
+from .dibromo_key import DibromoKeyMaker
+from .difluoro_key import DifluoroKeyMaker
+from .diol_key import DiolKeyMaker
+from .fluoro_key import FluoroKeyMaker
+from .functional_group_key import FunctionalGroupKeyMaker
+from .generic_functional_group_key import GenericFunctionalGroupKeyMaker
+from .iodo_key import IodoKeyMaker
+from .primary_amino_key import PrimaryAminoKeyMaker
+from .ring_amine_key import RingAmineKeyMaker
+from .secondary_amino_key import SecondaryAminoKeyMaker
+from .thioacid_key import ThioacidKeyMaker
+from .thiol_key import ThiolKeyMaker

@@ -1,11 +1,11 @@
 """
-Amide Key
-=========
+Amide Key Maker
+===============
 
 """
 
 
-class AmideKey:
+class AmideKeyMaker:
     """
     Generates keys for :class:`.Amide` instances.
 
@@ -14,7 +14,7 @@ class AmideKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize an :class:`.AmideKey` instance.
+        Initialize an :class:`.AmideKeyMaker` instance.
 
         """
 

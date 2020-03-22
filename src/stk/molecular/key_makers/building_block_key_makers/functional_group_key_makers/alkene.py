@@ -1,11 +1,11 @@
 """
-Alkene Key
-==========
+Alkene Key Maker
+================
 
 """
 
 
-class AlkeneKey:
+class AlkeneKeyMaker:
     """
     Generates keys for :class:`.Alkene` instances.
 
@@ -14,7 +14,7 @@ class AlkeneKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize an :class:`.AlkeneKey` instance.
+        Initialize an :class:`.AlkeneKeyMaker` instance.
 
         """
 

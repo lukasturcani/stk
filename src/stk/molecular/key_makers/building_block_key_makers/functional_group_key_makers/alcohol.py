@@ -1,11 +1,11 @@
 """
-Alcohol Key
-===========
+Alcohol Key Maker
+=================
 
 """
 
 
-class AlcoholKey:
+class AlcoholKeyMaker:
     """
     Generates keys for :class:`.Alcohol` instances.
 
@@ -14,7 +14,7 @@ class AlcoholKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize an :class:`.AlcoholKey` instance.
+        Initialize an :class:`.AlcoholKeyMaker` instance.
 
         """
 

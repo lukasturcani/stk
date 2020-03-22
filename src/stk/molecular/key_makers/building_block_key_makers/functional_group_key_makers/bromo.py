@@ -1,11 +1,11 @@
 """
-Bromo Key
-=========
+Bromo Key Maker
+===============
 
 """
 
 
-class BromoKey:
+class BromoKeyMaker:
     """
     Generates keys for :class:`.Bromo` instances.
 
@@ -14,7 +14,7 @@ class BromoKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.BromoKey` instance.
+        Initialize a :class:`.BromoKeyMaker` instance.
 
         """
 

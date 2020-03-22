@@ -1,11 +1,11 @@
 """
-Generic Functional Group Key
-============================
+Generic Functional Group Key Maker
+==================================
 
 """
 
 
-class GenericFunctionalGroupKey:
+class GenericFunctionalGroupKeyMaker:
     """
     Generates keys for :class:`.GenericFunctionalGroup` instances.
 
@@ -14,7 +14,7 @@ class GenericFunctionalGroupKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.GenericFunctionalGroupKey` instance.
+        Initialize a :class:`.GenericFunctionalGroupKeyMaker` instance.
 
         """
 

@@ -1,11 +1,11 @@
 """
-Boronic Acid Key
-================
+Boronic Acid Key Maker
+======================
 
 """
 
 
-class BoronicAcidKey:
+class BoronicAcidKeyMaker:
     """
     Generates keys for :class:`.BoronicAcid` instances.
 
@@ -14,7 +14,7 @@ class BoronicAcidKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.BoronicAcidKey` instance.
+        Initialize a :class:`.BoronicAcidKeyMaker` instance.
 
         """
 

@@ -1,11 +1,11 @@
 """
-Diol Key
-========
+Diol Key Maker
+==============
 
 """
 
 
-class DiolKey:
+class DiolKeyMaker:
     """
     Generates keys for :class:`.Diol` instances.
 
@@ -14,7 +14,7 @@ class DiolKey:
     # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
-        Initialize a :class:`.DiolKey` instance.
+        Initialize a :class:`.DiolKeyMaker` instance.
 
         """
 
