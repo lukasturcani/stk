@@ -302,7 +302,7 @@ class BuildingBlockKey:
         molecule_key = (
             ''
             if isinstance(self._molecule_key, InchiKey)
-            else f'molecule_key={repr(self._molecule_key)}'
+            else f'molecule_key={self._molecule_key!r}'
         )
         functional_group_keys = (
             ''
@@ -314,8 +314,10 @@ class BuildingBlockKey:
         )
         return (
             f'{self.__class__.__name__}('
-            f'{name}, '
-            f'{molecule_key}, '
+            f'{name}'
+            f'{", " if molecule_key else ""}'
+            f'{molecule_key}'
+            f'{", " if functional_group_keys else ""}'
             f'{functional_group_keys}'
             ')'
         )

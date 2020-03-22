@@ -22,7 +22,7 @@ class ConstructedMoleculeKey:
         topology_graph_keys=None,
     ):
         """
-        Initialize a :class:`.ConstrcutedMoleculeKey` instance.
+        Initialize a :class:`.ConstructedMoleculeKey` instance.
 
         Parameters
         ----------
@@ -91,3 +91,10 @@ class ConstructedMoleculeKey:
 
         return {
         }
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return (
+        )
