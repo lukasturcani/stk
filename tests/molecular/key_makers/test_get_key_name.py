@@ -13,4 +13,4 @@ def test_get_key_name(case_data):
 
     """
 
-    assert case_data.get_key_name() == case_data.key_name
+    assert case_data.key_maker.get_key_name() == case_data.key_name
