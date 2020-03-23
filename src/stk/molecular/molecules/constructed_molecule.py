@@ -79,15 +79,12 @@ class ConstructedMolecule(Molecule):
                 topology_graph.get_num_building_block(building_block)
             for building_block in topology_graph.get_building_blocks()
         }
-        # Used for __repr__().
-        self._topology_graph_repr = repr(topology_graph)
 
     def clone(self):
         clone = super().clone()
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
         clone._num_building_blocks = dict(self._num_building_blocks)
-        clone._topology_graph_repr = self._topology_graph_repr
         return clone
 
     def get_building_blocks(self):
@@ -167,11 +164,3 @@ class ConstructedMolecule(Molecule):
         """
 
         yield from self._bond_infos
-
-    def __str__(self):
-        return (
-            f'{self.__class__.__name__}({self._topology_graph_repr})'
-        )
-
-    def __repr__(self):
-        return str(self)
