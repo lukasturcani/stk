@@ -65,7 +65,7 @@ def is_equivalent_atom_info(info1, info2):
     is_equivalent_atom(info1.get_atom(), info2.get_atom())
     assert info1.get_building_block() is info2.get_building_block()
     assert (
-        info1.get_building_block_id() is info2.get_building_block_id()
+        info1.get_building_block_id() == info2.get_building_block_id()
     )
 
 
@@ -73,5 +73,5 @@ def is_equivalent_bond_info(info1, info2):
     is_equivalent_bond(info1.get_bond(), info2.get_bond())
     assert info1.get_building_block() is info2.get_building_block()
     assert (
-        info1.get_building_block_id() is info2.get_building_block_id()
+        info1.get_building_block_id() == info2.get_building_block_id()
     )

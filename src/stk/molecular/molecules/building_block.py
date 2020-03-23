@@ -583,6 +583,25 @@ class BuildingBlock(Molecule):
 
         return self.clone()._with_functional_groups(functional_groups)
 
+    def _with_canonical_atom_ordering(self):
+        atom_map = {
+            atom.get_id(): atom.with_id(new_id)
+            for new_id, atom in zip(
+                rdkit.CanonicalRankAtoms(self.to_rdkit_mol()),
+                self._atoms,
+            )
+        }
+        super()._with_canonical_atom_ordering()
+        self._functional_groups = tuple(
+            functional_group.with_atoms(atom_map)
+            for functional_group in self._functional_groups
+        )
+        self._placer_ids = tuple(
+            atom_map[placer_id].get_id()
+            for placer_id in self._placer_ids
+        )
+        return self
+
     def get_num_functional_groups(self):
         """
         Return the number of functional groups.
