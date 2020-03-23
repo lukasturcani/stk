@@ -41,7 +41,8 @@ class TopologyGraph:
     implementation details of these default implementations.
 
     Many classes, such as :class:`.Vertex`, :class:`.Edge`,
-    :class:`.EdgeGroup` and :class:`.ConstructionState`, exist as
+    :class:`.EdgeGroup`, :class:`.ConstructionState` and even
+    :class:`.BuildingBlock, exist as
     implementation details of this default :class:`.TopologyGraph`
     implementation. You could ignore all of them, and define a new
     :meth:`.construct` method from scratch. In fact, your topology
@@ -325,7 +326,7 @@ class TopologyGraph:
 
         Yields
         ------
-        :class:`.BuildingBlock`
+        :class:`.Molecule`
             A building block of the topology graph.
 
         """
@@ -354,7 +355,7 @@ class TopologyGraph:
 
         Parameters
         ----------
-        building_block : :class:`.BuildingBlock`
+        building_block : :class:`.Molecule`
             The building block whose frequency in the topology graph
             is desired.
 
