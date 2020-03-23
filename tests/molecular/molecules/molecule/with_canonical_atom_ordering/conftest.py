@@ -11,6 +11,7 @@ from .case_data import CaseData
             molecule=stk.BuildingBlock(
                 smiles='Br[C+2][N+]Cl',
                 functional_groups=[stk.BromoFactory()],
+                placer_ids=(0, ),
             ),
             result=stk.BuildingBlock.init(
                 atoms=(
@@ -34,7 +35,7 @@ from .case_data import CaseData
                         deleters=(stk.Br(1), ),
                     ),
                 ),
-                placer_ids=(2, ),
+                placer_ids=(1, ),
             )
         ),
     ),

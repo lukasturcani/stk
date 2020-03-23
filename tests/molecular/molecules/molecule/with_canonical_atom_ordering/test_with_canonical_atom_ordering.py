@@ -1,4 +1,4 @@
-from ..utilities import is_clone
+from ...utilities import is_clone
 
 
 def test_with_canonical_atom_ordering(case_data):
