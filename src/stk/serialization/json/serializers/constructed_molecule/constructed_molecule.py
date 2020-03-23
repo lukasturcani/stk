@@ -1,4 +1,8 @@
-from stk.molecular import InchiKey, ConstructedMoleculeKeyMaker
+from stk.molecular import (
+    MoleculeKeyMaker,
+    InchiKey,
+    ConstructedMoleculeKeyMaker,
+)
 
 
 class ConstructedMoleculeJsonizer:
@@ -43,10 +47,12 @@ class ConstructedMoleculeJsonizer:
     JSON representation of ``polymer``. This is not the case. It
     only holds the information that is exclusive to
     :class:`.ConstructedMolecule`, and only holds references to the
-    information which is relevant to a :class:`.Molecule`. If
-    you want get a JSON representation of the information relevant
+    information which is relevant to a :class:`.Molecule`.
+
+    If you want get a JSON representation of the information relevant
     to a :class:`.Molecule`, like the atoms and bonds, you have
-    to use a :class:`.MoleculeJsonizer` too
+    to use a :class:`.MoleculeJsonizer` in addition to the
+    :class:`.ConstructedMoleculeJsonizer`
 
     .. code-block:: python
 
@@ -57,14 +63,18 @@ class ConstructedMoleculeJsonizer:
 
     The reason for this, is that it allows the building of
     JSON databases, like MongoDB, in a sensible way. This means
-    information relevant to the Molecule class is held in a separate
-    collection to the extra data carried by a
+    information relevant to the :class:`.Molecule` class is held in a
+    separate collection to the extra data carried by a
     :class:`.ConstructedMolecule`, which is held in its own
     collection.
 
     Here the purpose of the `key_makers` parameter becomes apparent.
     The keys made by the `key_makers` can be used to reference the
-    relevant molecular data across collections.
+    relevant molecular data across collections. For example, instead of
+    holding the building blocks of a :class:`.ConstructedMolecule`
+    directly, the JSON representation merely uses `key_makers` to
+    create the keys, which can be used to find them in the separate
+    collection.
 
     """
 
@@ -110,6 +120,7 @@ class ConstructedMoleculeJsonizer:
             return {
                 key_maker.get_key_name(): key_maker.get_key(molecule)
                 for key_maker in self._key_makers
+                if isinstance(key_maker, MoleculeKeyMaker)
             }
 
         building_block_indices = {
@@ -137,7 +148,7 @@ class ConstructedMoleculeJsonizer:
                 'building_block_id': bond_info.get_building_block_id(),
             }
 
-        return {
+        json = {
             'building_blocks': tuple(map(
                 get_keys,
                 molecule.get_building_blocks(),
@@ -156,3 +167,8 @@ class ConstructedMoleculeJsonizer:
                 in enumerate(molecule.get_building_blocks())
             },
         }
+        for key_maker in self._key_makers:
+            json[key_maker.get_key_name()] = (
+                key_maker.get_key(molecule)
+            )
+        return json
