@@ -12,8 +12,55 @@ class MoleculeJsonizer:
     """
     Creates JSON representations of :class:`.Molecule` instances.
 
+    See Also
+    --------
+    :class:`.ConstructedMoleculeJsonizer`
+
     Examples
     --------
+    You want to create a JSON representation of a molecule
+
+    .. code-block:: python
+
+        import stk
+
+        json = stk.MoleculeJsonizer().to_json(stk.BuildingBlock('NCCN')
+
+    The apart from atoms and bonds, the JSON representation holds
+    additional fields, one for each
+    :class:`.MoleculeKeyMaker` provided to the initializer
+
+    .. code-block:: python
+
+        import stk
+
+        jsonizer = stk.MoleculeJsonizer(
+            key_makers=(
+                stk.Inchi(),
+                stk.InchiKey()
+            ),
+        )
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+
+    In this case, ``json`` will have the form
+
+    .. code-block:: python
+
+        {
+            # A tuple of JSON atom representations.
+            'atoms': (...),
+
+            # A tuple of JSON bond representations.
+            'bonds': (...),
+
+            'InChI': 'The InChI of the molecule',
+            'InChIKey': 'The InChIKey of the molecule',
+        }
+
+    For every :class:`.MoleculeKeyMaker` provided to `key_makers`,
+    a new key will be added to the JSON representation, with its name
+    given by :meth:`.MoleculeKeyMaker.get_key_name` and the value
+    given by :meth:`.MoleculeKeyMaker.get_key`.
 
     """
 
