@@ -8,6 +8,8 @@ import logging
 import rdkit.Chem.AllChem as rdkit
 
 from .molecule import Molecule
+from ..atoms import AtomInfo
+from ..bonds import BondInfo
 
 logger = logging.getLogger(__name__)
 
@@ -215,12 +217,33 @@ class ConstructedMolecule(Molecule):
         yield from self._bond_infos
 
     def _with_canonical_atom_ordering(self):
+        new_ids = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
+        id_map = {
+            new_id: atom.get_id()
+            for new_id, atom in zip(new_ids, self._atoms)
+        }
         atom_map = {
             atom.get_id(): atom.with_id(new_id)
-            for new_id, atom in zip(
-                rdkit.CanonicalRankAtoms(self.to_rdkit_mol()),
-                self._atoms,
-            )
+            for new_id, atom in zip(new_ids, self._atoms)
         }
         super()._with_canonical_atom_ordering()
+        atom_infos = self._atom_infos
+
+        def get_atom_info(atom):
+            info = atom_infos[id_map[atom.get_id()]]
+            return AtomInfo(
+                atom=atom,
+                building_block=info.get_building_block(),
+                building_block_id=info.get_building_block_id(),
+            )
+
+        def get_bond_info(info):
+            return BondInfo(
+                bond=info.get_bond().with_atoms(atom_map),
+                building_block=info.get_building_block(),
+                building_block_id=info.get_building_block_id(),
+            )
+
+        self._atom_infos = tuple(map(get_atom_info, self._atoms))
+        self._bond_infos = tuple(map(get_bond_info, self._bonds))
         return self
