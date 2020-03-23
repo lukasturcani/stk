@@ -20,7 +20,7 @@ class ConstructedMolecule(Molecule):
     *Initialization*
 
     A :class:`.ConstructedMolecule` is initialized from a
-    :class:`.TopologyGraph`, which is initialized from some
+    :class:`.TopologyGraph`, which is typically initialized from some
     :class:`.BuildingBlock` instances.
 
     .. code-block:: python
@@ -106,7 +106,7 @@ class ConstructedMolecule(Molecule):
 
         Yields
         ------
-        :class:`.BuildingBlock`
+        :class:`.Molecule`
             A building block of the constructed molecule.
 
         """
@@ -119,7 +119,7 @@ class ConstructedMolecule(Molecule):
 
         Parameters
         ----------
-        building_block : :class:`.BuildingBlock`
+        building_block : :class:`.Molecule`
             The building block whose frequency in the constructed
             molecule is desired.
 
