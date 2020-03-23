@@ -4,7 +4,7 @@ Constructed Molecule Key Maker
 
 """
 
-from ..molecule import InchiKey
+from .molecule import InchiKey
 
 
 class ConstructedMoleculeKeyMaker:
@@ -41,17 +41,15 @@ class ConstructedMoleculeKeyMaker:
                 # not have to be related to the class name.
                 return 'num_building_blocks'
 
-            def get_key(self, constructed_molecule):
-                building_blocks = tuple(
-                    constructed_molecule.get_building_blocks()
-                )
+            def get_key(self, molecule):
+                building_blocks = tuple(molecule.get_building_blocks())
                 return len(building_blocks)
 
 
         # A usage example of the new subclass.
 
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_key_makers=(NumBuildingBlocks(), ),
+            key_makers=(NumBuildingBlocks(), ),
         )
 
         # Make a constructed molecule, which you want to convert to a
@@ -83,7 +81,7 @@ class ConstructedMoleculeKeyMaker:
         import stk
 
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_key_makers=(
+            key_makers=(
                 stk.ConstructedMoleculeKeyMaker(),
             ),
         )
@@ -97,7 +95,7 @@ class ConstructedMoleculeKeyMaker:
     .. code-block:: python
 
         jsonizer = stk.ConstructedMoleculeJsonizer(
-            constructed_molecule_key_makers=(
+            key_makers=(
                 stk.ConstructedMoleculeKeyMaker(
                     # If you change the nature of the key, its a good
                     # idea to change its name to reflect that.
@@ -152,13 +150,13 @@ class ConstructedMoleculeKeyMaker:
 
         return self._key_name
 
-    def get_key(self, constructed_molecule):
+    def get_key(self, molecule):
         """
-        Get the key of `constructed_molecule`.
+        Get the key of `molecule`.
 
         Parameters
         ----------
-        constructed_molecule : :class:`.ConstructedMolecule`
+        molecule : :class:`.ConstructedMolecule`
             The constructed molecule for which a key is wanted.
 
         Returns
@@ -167,19 +165,17 @@ class ConstructedMoleculeKeyMaker:
 
         """
 
-        molecule = self._molecule_key_maker.get_key(
-            molecule=constructed_molecule,
-        )
+        molecule_key = self._molecule_key_maker.get_key(molecule)
         building_blocks = tuple(map(
             self._molecule_key_maker.get_key,
-            constructed_molecule.get_building_blocks(),
+            molecule.get_building_blocks(),
         ))
         num_building_blocks = tuple(map(
-            constructed_molecule.get_num_building_block,
-            constructed_molecule.get_building_blocks(),
+            molecule.get_num_building_block,
+            molecule.get_building_blocks(),
         ))
         return str((
-            molecule,
+            molecule_key,
             building_blocks,
             num_building_blocks,
         ))

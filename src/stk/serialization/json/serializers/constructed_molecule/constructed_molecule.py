@@ -1,49 +1,35 @@
-class ConstructedMoleculeToJson:
+from stk.molecular import InchiKey, ConstructedMoleculeKeyMaker
+
+
+class ConstructedMoleculeJsonizer:
     """
     Serializes :class:`.ConstructedMolecule` instances into JSON.
-
-    Notes
-    -----
-    This class is meant to be used solely with a
-    :class:`.JsonMoleculeSerializer`. Use
-    :class:`.JsonMoleculeSerializer` directly for your serialization
-    needs.
 
     """
 
     def __init__(
         self,
-        molecule_key,
-        building_block_key,
-        topology_graph_serializer,
+        key_makers=(
+            InchiKey(),
+            ConstructedMoleculeKeyMaker(),
+        ),
     ):
         """
-        Initializes a :class:`._ConstructedMoleculeSerializer`.
+        Initializes a :class:`.ConstructedMoleculeJsonizer`.
 
         Parameters
         ----------
-        molecule_key : :class:`callable`
-            Takes a single parameter, `molecule`, and returns
-            a key used for referencing that molecule. The parameter
-            requires a :class:`.Molecule` instance.
-
-        building_block_key : :class:`callable`
-            Takes a single parameter, `building_block`, and returns
-            a key used for referencing that building block. The
-            parameter requires a :class:`.BuildingBlock` instance.
-
-        topology_graph_serializer : \
-                :class:`.JsonTopologyGraphSerializer`
-            Used to serialize the topology graph of the serialized
-            constructed molecules.
+        key_makers : :class:`tuple` of \
+                :class:`.MoleculeKeyMaker` and \
+                :class:`.ConstructedMoleculeKeyMaker`
+            Used to make the keys of molecules, which should be
+            included in their JSON representations.
 
         """
 
-        self._molecule_key = molecule_key
-        self._building_block_key = building_block_key
-        self._topology_graph_serializer = topology_graph_serializer
+        self._key_makers = key_makers
 
-    def __call__(self, molecule):
+    def to_json(self, molecule):
         """
         Serialize `molecule`.
 
@@ -59,15 +45,17 @@ class ConstructedMoleculeToJson:
 
         """
 
+        def get_keys(building_block):
+            return {
+                key_maker.get_key_name(): key_maker.get_key(molecule)
+                for key_maker in self._key_makers
+            }
+
         return {
-            'Molecule': self._molecule_key(molecule),
-            'topology_graph':
-                self._topology_graph_serializer.serialize(
-                    # Access to the topology graph is not part of the
-                    # public interface of a ConstructedMolecule so
-                    # private attribute access must be used.
-                    topology_graph=molecule._topology_graph,
-                ),
+            'building_blocks': tuple(map(
+                get_keys,
+                molecule.get_building_blocks(),
+            )),
             'atom_infos': tuple(map(
                 self._atom_info_to_json,
                 molecule.get_atom_infos(),
@@ -76,6 +64,11 @@ class ConstructedMoleculeToJson:
                 self._bond_info_to_json,
                 enumerate(molecule.get_bond_infos()),
             )),
+            'num_building_blocks': {
+                index: molecule.get_num_building_block(building_block)
+                for index, building_block
+                in enumerate(molecule.get_building_blocks())
+            },
         }
 
     def _atom_info_to_json(self, atom_info):

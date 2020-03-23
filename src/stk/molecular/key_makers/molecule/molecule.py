@@ -25,7 +25,8 @@ class MoleculeKeyMaker:
     *Subclass Implementation*
 
     The source code of any of the subclasses, listed in
-    :mod:`.molecule_key_maker`, can serve as good examples.
+    :mod:`molecule key maker <~.key_makers.molecule.molecule>`, can
+    serve as good examples.
 
     *Usage*
 
@@ -46,7 +47,7 @@ class MoleculeKeyMaker:
 
         # Use the MoleculeKeyMaker instance.
         jsonizer = stk.MoleculeJsonizer(
-            molecule_key_makers=(get_num_atoms, ),
+            key_makers=(get_num_atoms, ),
         )
         # Get the JSON representation of a molecule.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))

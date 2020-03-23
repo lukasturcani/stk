@@ -4,7 +4,7 @@ InChI
 
 """
 
-from .molecule_key_maker import MoleculeKeyMaker
+from .molecule import MoleculeKeyMaker
 from .utilities import get_inchi
 
 
@@ -22,7 +22,7 @@ class Inchi(MoleculeKeyMaker):
         import stk
 
         jsonizer = stk.MoleculeJsonizer(
-            molecule_key_makers=(stk.Inchi(), ),
+            key_makers=(stk.Inchi(), ),
         )
         # Get the JSON representation, including an InChI.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
