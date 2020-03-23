@@ -5,6 +5,7 @@ Constructed Molecule
 """
 
 import logging
+import rdkit.Chem.AllChem as rdkit
 
 from .molecule import Molecule
 
@@ -212,3 +213,14 @@ class ConstructedMolecule(Molecule):
         """
 
         yield from self._bond_infos
+
+    def _with_canonical_atom_ordering(self):
+        atom_map = {
+            atom.get_id(): atom.with_id(new_id)
+            for new_id, atom in zip(
+                rdkit.CanonicalRankAtoms(self.to_rdkit_mol()),
+                self._atoms,
+            )
+        }
+        super()._with_canonical_atom_ordering()
+        return self

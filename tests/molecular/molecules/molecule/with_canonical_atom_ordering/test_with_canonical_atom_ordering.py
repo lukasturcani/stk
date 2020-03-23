@@ -5,6 +5,21 @@ from ...utilities import is_clone
 
 
 def test_with_canonical_atom_ordering(case_data):
+    """
+    Test :meth:`.Molecule.with_canonical_atom_ordering`.
+
+    Parameters
+    ----------
+    case_data : :class:`.CaseData`
+        A test case. Holds the molecule to test and the expected
+        result.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     _test_with_canonical_atom_ordering(
         molecule=case_data.molecule,
         result=case_data.result,
@@ -12,6 +27,23 @@ def test_with_canonical_atom_ordering(case_data):
 
 
 def _test_with_canonical_atom_ordering(molecule, result):
+    """
+    Test :meth:`.Molecule.with_canonical_atom_ordering`.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule to test.
+
+    result : :class:`.Molecule`
+        The molecule with canonical ordering.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     ordered = molecule.with_canonical_atom_ordering()
     is_clone(ordered, result)
     order = rdkit.CanonicalRankAtoms(molecule.to_rdkit_mol())
