@@ -202,6 +202,13 @@ def get_atom_ids(request):
             molecule=stk.BuildingBlock('C(N)CN'),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
         ),
+        CaseData(
+            molecule=(
+                stk.BuildingBlock('C(N)CN')
+                .with_canonical_atom_ordering()
+            ),
+            smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+        ),
     ),
 )
 def building_block(request):
