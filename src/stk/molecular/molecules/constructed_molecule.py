@@ -77,7 +77,7 @@ class ConstructedMolecule(Molecule):
         self._num_building_blocks = {
             building_block:
                 topology_graph.get_num_building_block(building_block)
-            for building_block in self._building_blocks
+            for building_block in topology_graph.get_building_blocks()
         }
         # Used for __repr__().
         self._topology_graph_repr = repr(topology_graph)
