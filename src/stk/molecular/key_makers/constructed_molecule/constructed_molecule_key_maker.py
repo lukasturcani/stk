@@ -36,7 +36,7 @@ class ConstructedMoleculeKeyMaker:
             def __init__(self):
                 return
 
-            def name(self):
+            def key_name(self):
                 # What string this is is completely up to you. It does
                 # not have to be related to the class name.
                 return 'num_building_blocks'
@@ -101,7 +101,7 @@ class ConstructedMoleculeKeyMaker:
                 stk.ConstructedMoleculeKeyMaker(
                     # If you change the nature of the key, its a good
                     # idea to change its name to reflect that.
-                    name='InChIConstructedMoleculeKey',
+                    key_name='InChIConstructedMoleculeKey',
                     molecule_key_maker=stk.Inchi(),
                 ),
                 # You can still keep the default constructed molecule
@@ -119,7 +119,7 @@ class ConstructedMoleculeKeyMaker:
 
     def __init__(
         self,
-        name='ConstructedMoleculeKey',
+        key_name='ConstructedMoleculeKey',
         molecule_key_maker=InchiKey(),
     ):
         """
@@ -127,7 +127,7 @@ class ConstructedMoleculeKeyMaker:
 
         Parameters
         ----------
-        name : :class:`str`, optional
+        key_name : :class:`str`, optional
             The name of the key made by the maker.
 
         molecule_key_maker : :class:`.MoleculeKeyMaker`, optional
@@ -136,10 +136,10 @@ class ConstructedMoleculeKeyMaker:
 
         """
 
-        self._name = name
+        self._key_name = key_name
         self._molecule_key_maker = molecule_key_maker
 
-    def get_name(self):
+    def get_key_name(self):
         """
         Get the name of the key.
 
@@ -150,7 +150,7 @@ class ConstructedMoleculeKeyMaker:
 
         """
 
-        return self._name
+        return self._key_name
 
     def get_key(self, constructed_molecule):
         """
@@ -173,10 +173,10 @@ class ConstructedMoleculeKeyMaker:
         return repr(self)
 
     def __repr__(self):
-        name = (
+        key_name = (
             ''
-            if self._name == 'ConstructedMoleculeKey'
-            else f'name={self._name!r}'
+            if self._key_name == 'ConstructedMoleculeKey'
+            else f'key_name={self._key_name!r}'
         )
         molecule_key_maker = (
             ''
@@ -185,6 +185,7 @@ class ConstructedMoleculeKeyMaker:
         )
         parameters = ', '.join(
             parameter
-            for parameter in (name, molecule_key_maker) if parameter
+            for parameter in (key_name, molecule_key_maker)
+            if parameter
         )
         return f'{self.__class__.__name__}({parameters})'

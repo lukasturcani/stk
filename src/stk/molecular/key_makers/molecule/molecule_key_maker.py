@@ -40,7 +40,7 @@ class MoleculeKeyMaker:
         # Create a MoleculeKeyMaker instance with a custom get_key
         # method.
         get_num_atoms = stk.MoleculeKeyMaker(
-            name='num_atoms',
+            key_name='num_atoms',
             get_key=lambda molecule: molecule.get_num_atoms(),
         )
 
@@ -53,13 +53,13 @@ class MoleculeKeyMaker:
 
     """
 
-    def __init__(self, name, get_key):
+    def __init__(self, key_name, get_key):
         """
         Initialize a :class:`.MoleculeKeyMaker` instance.
 
         Parameters
         ----------
-        name : :class:`str`
+        key_name : :class:`str`
             The name of the key.
 
         get_key : :class:`callable`
@@ -69,10 +69,10 @@ class MoleculeKeyMaker:
 
         """
 
-        self._name = name
+        self._key_name = key_name
         self._get_key = get_key
 
-    def get_name(self):
+    def get_key_name(self):
         """
         Get the name of the key.
 
@@ -83,7 +83,7 @@ class MoleculeKeyMaker:
 
         """
 
-        return self._name
+        return self._key_name
 
     def get_key(self, molecule):
         """
@@ -109,6 +109,6 @@ class MoleculeKeyMaker:
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('
-            f'{self._name!r}, {self._get_key!r}'
+            f'{self._key_name!r}, {self._get_key!r}'
             ')'
         )
