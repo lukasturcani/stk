@@ -25,7 +25,7 @@ class MoleculeKeyMaker:
     *Subclass Implementation*
 
     The source code of any of the subclasses, listed in
-    :mod:`molecule key maker <~.key_makers.molecule.molecule>`, can
+    :mod:`molecule_key_maker <.key_makers.molecule.molecule>`, can
     serve as good examples.
 
     *Usage*
