@@ -1,3 +1,9 @@
+"""
+Constructed Molecule JSONizer
+=============================
+
+"""
+
 from stk.molecular import (
     MoleculeKeyMaker,
     InchiKey,
