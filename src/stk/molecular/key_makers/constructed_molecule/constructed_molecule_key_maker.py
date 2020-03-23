@@ -5,7 +5,6 @@ Constructed Molecule Key Maker
 """
 
 from ..molecule import InchiKey
-from ..building_block import BuildingBlockKeyMaker
 
 
 class ConstructedMoleculeKeyMaker:
@@ -122,7 +121,6 @@ class ConstructedMoleculeKeyMaker:
         self,
         name='ConstructedMoleculeKey',
         molecule_key_maker=InchiKey(),
-        building_block_key_maker=BuildingBlockKeyMaker(),
     ):
         """
         Initialize a :class:`.ConstructedMoleculeKeyMaker` instance.
@@ -140,10 +138,6 @@ class ConstructedMoleculeKeyMaker:
 
         self._name = name
         self._molecule_key_maker = molecule_key_maker
-        self._building_block_key_maker = building_block_key_maker
-        self._topology_graph_key_makers = (
-            self._get_default_topology_graph_key_makers()
-        )
 
     def get_name(self):
         """
@@ -173,14 +167,7 @@ class ConstructedMoleculeKeyMaker:
 
         """
 
-        # Use private attribute access because accessing the topology
-        # graph is not part of the public interface of a constructed
-        # molecule.
-        topology_graph = constructed_molecule._topology_graph
-        key_maker = (
-            self._topology_graph_key_makers[type(topology_graph)]
-        )
-        return key_maker.get_key(topology_graph)
+        ...
 
     def __str__(self):
         return repr(self)
@@ -196,23 +183,8 @@ class ConstructedMoleculeKeyMaker:
             if isinstance(self._molecule_key_maker, InchiKey)
             else f'molecule_key_maker={self._molecule_key_maker!r}'
         )
-        building_block_key_maker = (
-            ''
-            if isinstance(
-                self._building_block_key_maker,
-                BuildingBlockKeyMaker,
-            )
-            else (
-                f'building_block_key_maker='
-                f'{self._building_block_key_maker!r}'
-            )
-        )
-        parameters = (
-            name,
-            molecule_key_maker,
-            building_block_key_maker,
-        )
         parameters = ', '.join(
-            parameter for parameter in parameters if parameter
+            parameter
+            for parameter in (name, molecule_key_maker) if parameter
         )
         return f'{self.__class__.__name__}({parameters})'
