@@ -5,6 +5,7 @@ Constructed Molecule Key Maker
 """
 
 from ..molecule import InchiKey
+from ..building_block import BuildingBlockKeyMaker
 
 
 class ConstructedMoleculeKeyMaker:
@@ -121,6 +122,7 @@ class ConstructedMoleculeKeyMaker:
         self,
         name='ConstructedMoleculeKey',
         molecule_key_maker=InchiKey(),
+        building_block_key_maker=BuildingBlockKeyMaker(),
     ):
         """
         Initialize a :class:`.ConstructedMoleculeKeyMaker` instance.
@@ -138,6 +140,7 @@ class ConstructedMoleculeKeyMaker:
 
         self._name = name
         self._molecule_key_maker = molecule_key_maker
+        self._building_block_key_maker = building_block_key_maker
         self._topology_graph_key_makers = (
             self._get_default_topology_graph_key_makers()
         )
@@ -193,9 +196,21 @@ class ConstructedMoleculeKeyMaker:
             if isinstance(self._molecule_key_maker, InchiKey)
             else f'molecule_key_maker={self._molecule_key_maker!r}'
         )
+        building_block_key_maker = (
+            ''
+            if isinstance(
+                self._building_block_key_maker,
+                BuildingBlockKeyMaker,
+            )
+            else (
+                f'building_block_key_maker='
+                f'{self._building_block_key_maker!r}'
+            )
+        )
         parameters = (
             name,
             molecule_key_maker,
+            building_block_key_maker,
         )
         parameters = ', '.join(
             parameter for parameter in parameters if parameter
