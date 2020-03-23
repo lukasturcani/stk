@@ -1,2 +1,0 @@
-class LinearPolymerKeyMaker:
-    pass

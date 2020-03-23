@@ -1,2 +1,0 @@
-class NRotaxaneKeyMaker:
-    pass
