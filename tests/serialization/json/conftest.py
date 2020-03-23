@@ -57,10 +57,8 @@ from .case_data import CaseData
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='NCCN',
-                            functional_groups=[
-                                stk.PrimaryAminoFactory()
-                            ],
+                            smiles='Br[C+2][C+2]Br',
+                            functional_groups=[stk.BromoFactory()],
                         ),
                     ),
                     repeating_unit='A',
@@ -68,13 +66,12 @@ from .case_data import CaseData
                 ),
             ),
             json={
-                'InChI':
-                    'InChI=1S/C4H14N4/c5-1-3-7-8-4-2-6/h7-8H,1-6H2',
-                'InChIKey': 'KCEQCQJHUVIRJO-UHFFFAOYSA-N',
+                'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
+                'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
                 'building_blocks': (
                     {
-                        'InChI': 'InChI=1S/C2H8N2/c3-1-2-4/h1-4H2',
-                        'InChIKey': 'KCEQCQJHUVIRJO-UHFFFAOYSA-N',
+                        'InChI': 'InChI=1S/C2Br2/c3-1-2-4/q+4',
+                        'InChIKey': 'UWAHASCVLDBPQQ-UHFFFAOYSA-N',
                     },
                 ),
                 'num_building_blocks': {0: 2},
@@ -89,16 +86,16 @@ from .case_data import CaseData
                 'bond_infos': (
                     {'building_block': 0, 'building_block_id': 0},
                     {'building_block': 0, 'building_block_id': 0},
+                    {'building_block': 0, 'building_block_id': 1},
+                    {'building_block': 0, 'building_block_id': 1},
                     {
                         'building_block': None,
                         'building_block_id': None,
                     },
-                    {'building_block': 0, 'building_block_id': 0},
-                    {'building_block': 0, 'building_block_id': 0},
                 ),
                 'ConstructedMoleculeKey': str((
-                    'KCEQCQJHUVIRJO-UHFFFAOYSA-N',
-                    ('PIICEJLVQHRZGT-UHFFFAOYSA-N', ),
+                    'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
+                    ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
                     (2, ),
                 )),
             },

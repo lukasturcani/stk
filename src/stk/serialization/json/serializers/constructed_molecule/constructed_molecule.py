@@ -124,7 +124,8 @@ class ConstructedMoleculeJsonizer:
 
         def get_keys(building_block):
             return {
-                key_maker.get_key_name(): key_maker.get_key(molecule)
+                key_maker.get_key_name():
+                    key_maker.get_key(building_block)
                 for key_maker in self._key_makers
                 if isinstance(key_maker, MoleculeKeyMaker)
             }
@@ -134,6 +135,7 @@ class ConstructedMoleculeJsonizer:
             for index, building_block
             in enumerate(molecule.get_building_blocks())
         }
+        building_block_indices[None] = None
 
         def atom_info_to_json(atom_info):
             return {
