@@ -13,5 +13,5 @@ Submodules
 
    stk.molecular.key_makers.molecule.inchi
    stk.molecular.key_makers.molecule.inchi_key
-   stk.molecular.key_makers.molecule.molecule_key_maker
+   stk.molecular.key_makers.molecule.molecule
    stk.molecular.key_makers.molecule.utilities

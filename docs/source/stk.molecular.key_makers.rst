@@ -11,6 +11,11 @@ Subpackages
 
 .. toctree::
 
-   stk.molecular.key_makers.building_block
-   stk.molecular.key_makers.constructed_molecule
    stk.molecular.key_makers.molecule
+
+Submodules
+----------
+
+.. toctree::
+
+   stk.molecular.key_makers.constructed_molecule

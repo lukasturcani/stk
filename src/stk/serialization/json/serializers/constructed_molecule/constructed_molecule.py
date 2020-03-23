@@ -15,8 +15,8 @@ class ConstructedMoleculeJsonizer:
     :class:`.MoleculeJsonizer`, since this class almost always used
     together with it, and not as a replacement for it.
 
-    You want get a JSON representation of a
-    :class:`.ConstructedMolecule`
+    Now, if you want get a JSON representation of a
+    :class:`.ConstructedMolecule` you can do something like
 
     .. code-block:: python
 
@@ -61,6 +61,10 @@ class ConstructedMoleculeJsonizer:
     collection to the extra data carried by a
     :class:`.ConstructedMolecule`, which is held in its own
     collection.
+
+    Here the purpose of the `key_makers` parameter becomes apparent.
+    The keys made by the `key_makers` can be used to reference the
+    relevant molecular data across collections.
 
     """
 

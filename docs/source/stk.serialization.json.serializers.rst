@@ -11,6 +11,5 @@ Subpackages
 
 .. toctree::
 
-   stk.serialization.json.serializers.building_block
    stk.serialization.json.serializers.constructed_molecule
    stk.serialization.json.serializers.molecule

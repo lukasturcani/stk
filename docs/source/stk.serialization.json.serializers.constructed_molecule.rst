@@ -6,13 +6,6 @@ stk.serialization.json.serializers.constructed\_molecule package
    :undoc-members:
    :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-   stk.serialization.json.serializers.constructed_molecule.topology_graph
-
 Submodules
 ----------
 
