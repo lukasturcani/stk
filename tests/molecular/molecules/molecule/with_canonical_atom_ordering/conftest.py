@@ -91,14 +91,14 @@ bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
                         building_block_id=0,
                     ),
                     stk.BondInfo(
-                        bond=stk.Bond(stk.S(3), stk.O(1, 1), 1),
-                        building_block=bb2,
-                        building_block_id=1,
-                    ),
-                    stk.BondInfo(
                         bond=stk.Bond(stk.N(2, 1), stk.S(3), 1),
                         building_block=None,
                         building_block_id=None,
+                    ),
+                    stk.BondInfo(
+                        bond=stk.Bond(stk.S(3), stk.O(1, 1), 1),
+                        building_block=bb2,
+                        building_block_id=1,
                     ),
                 ),
                 num_building_blocks={
