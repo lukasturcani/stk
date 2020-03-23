@@ -39,7 +39,10 @@ def is_equivalent_constructed_molecule(
         constructed_molecule1.get_building_blocks(),
         constructed_molecule2.get_building_blocks(),
     ):
-        assert building_block1 is building_block2
+        is_equivalent_molecule(
+            building_block1,
+            building_block2,
+        )
 
     for building_block in constructed_molecule1.get_building_blocks():
         num1 = constructed_molecule1.get_num_building_block(
@@ -63,7 +66,13 @@ def are_equivalent_bond_infos(infos1, infos2):
 
 def is_equivalent_atom_info(info1, info2):
     is_equivalent_atom(info1.get_atom(), info2.get_atom())
-    assert info1.get_building_block() is info2.get_building_block()
+    if info1.get_building_block() is None:
+        assert info2.get_building_block() is None
+    else:
+        is_equivalent_molecule(
+            info1.get_building_block(),
+            info2.get_building_block(),
+        )
     assert (
         info1.get_building_block_id() == info2.get_building_block_id()
     )
@@ -71,7 +80,13 @@ def is_equivalent_atom_info(info1, info2):
 
 def is_equivalent_bond_info(info1, info2):
     is_equivalent_bond(info1.get_bond(), info2.get_bond())
-    assert info1.get_building_block() is info2.get_building_block()
+    if info1.get_building_block() is None:
+        assert info2.get_building_block() is None
+    else:
+        is_equivalent_molecule(
+            info1.get_building_block(),
+            info2.get_building_block(),
+        )
     assert (
         info1.get_building_block_id() == info2.get_building_block_id()
     )

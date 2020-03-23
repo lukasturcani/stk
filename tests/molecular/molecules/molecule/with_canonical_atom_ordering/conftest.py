@@ -4,6 +4,9 @@ import stk
 
 from .case_data import CaseData
 
+bb1 = stk.BuildingBlock('[C+2][N+]Br', [stk.BromoFactory()])
+bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
+
 
 @pytest.fixture(
     params=(
@@ -40,8 +43,68 @@ from .case_data import CaseData
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(bb1, bb2),
+                    repeating_unit='AB',
+                    num_repeating_units=1,
+                ),
             ),
             result=stk.ConstructedMolecule.init(
+                atoms=(
+                    stk.C(0, 2),
+                    stk.O(1, 1),
+                    stk.N(2, 1),
+                    stk.S(3),
+                ),
+                bonds=(
+                    stk.Bond(stk.C(0, 2), stk.N(2, 1), 1),
+                    stk.Bond(stk.S(3), stk.O(1, 1), 1),
+                    stk.Bond(stk.N(2, 1), stk.S(3), 1),
+                ),
+                position_matrix=np.array([]),
+                atom_infos=(
+                    stk.AtomInfo(
+                        atom=stk.C(0, 2),
+                        building_block=bb1,
+                        building_block_id=0,
+                    ),
+                    stk.AtomInfo(
+                        atom=stk.O(1, 1),
+                        building_block=bb2,
+                        building_block_id=1,
+                    ),
+                    stk.AtomInfo(
+                        atom=stk.N(2, 1),
+                        building_block=bb1,
+                        building_block_id=0,
+                    ),
+                    stk.AtomInfo(
+                        atom=stk.S(3),
+                        building_block=bb2,
+                        building_block_id=1,
+                    ),
+                ),
+                bond_infos=(
+                    stk.BondInfo(
+                        bond=stk.Bond(stk.C(0, 2), stk.N(2, 1), 1),
+                        building_block=bb1,
+                        building_block_id=0,
+                    ),
+                    stk.BondInfo(
+                        bond=stk.Bond(stk.N(2, 1), stk.S(3), 1),
+                        building_block=None,
+                        building_block_id=None,
+                    ),
+                    stk.BondInfo(
+                        bond=stk.Bond(stk.S(3), stk.O(1, 1), 1),
+                        building_block=bb2,
+                        building_block_id=1,
+                    ),
+                ),
+                num_building_blocks={
+                    bb1: 1,
+                    bb2: 1,
+                },
             ),
         ),
     ),
