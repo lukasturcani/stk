@@ -50,7 +50,7 @@ from .case_data import CaseData
                 key_makers=(
                     stk.Inchi(),
                     stk.InchiKey(),
-                    stk.ConstructedMoleculeKey(),
+                    stk.ConstructedMoleculeKeyMaker(),
                 ),
             ),
             molecule=stk.ConstructedMolecule(
