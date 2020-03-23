@@ -38,6 +38,12 @@ from .case_data import CaseData
                 placer_ids=(1, ),
             )
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+            ),
+            result=stk.ConstructedMolecule.init(
+            ),
+        ),
     ),
 )
 def case_data(request):

@@ -80,6 +80,54 @@ class ConstructedMolecule(Molecule):
             for building_block in topology_graph.get_building_blocks()
         }
 
+    @classmethod
+    def init(
+        cls,
+        atoms,
+        bonds,
+        position_matrix,
+        atom_infos,
+        bond_infos,
+        num_building_blocks,
+    ):
+        """
+        Initialize a :class:`.ConstructedMolecule` from its components.
+
+        Parameters
+        ----------
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms of the molecule.
+
+        bond : :class:`tuple` of :class:`.Bond`
+            The bonds of the molecule.
+
+        position_matrix : :class:`numpy.ndarray`
+            A ``(n, 3)`` position matrix of the molecule.
+
+        atom_infos : :class:`tuple` of :class:`.AtomInfo`
+            The atom infos of the molecule.
+
+        bond_infos : :class:`tuple` of :class:`.BondInfo`
+            The bond infos of the molecule.
+
+        num_building_blocks : :class:`dict`
+            Maps each building block of the constructed molecule to
+            the number of times it is present in it.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The constructed molecule.
+
+        """
+
+        molecule = cls.__new__(cls)
+        Molecule.__init__(molecule, atoms, bonds, position_matrix)
+        molecule._atom_infos = atom_infos
+        molecule._bond_infos = bond_infos
+        molecule._num_building_blocks = dict(num_building_blocks)
+        return molecule
+
     def clone(self):
         clone = super().clone()
         clone._atom_infos = self._atom_infos
