@@ -22,7 +22,7 @@ class ConstructedMoleculeJsonizer:
     Examples
     --------
     It is first necessary to read the docstring of
-    :class:`.MoleculeJsonizer`, since this class almost always used
+    :class:`.MoleculeJsonizer`, since this class is almost always used
     together with it, and not as a replacement for it.
 
     Now, if you want get a JSON representation of a
