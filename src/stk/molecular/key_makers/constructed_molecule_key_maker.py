@@ -167,7 +167,22 @@ class ConstructedMoleculeKeyMaker:
 
         """
 
-        ...
+        molecule = self._molecule_key_maker.get_key(
+            molecule=constructed_molecule,
+        )
+        building_blocks = tuple(map(
+            self._molecule_key_maker.get_key,
+            constructed_molecule.get_building_blocks(),
+        ))
+        num_building_blocks = tuple(map(
+            constructed_molecule.get_num_building_block,
+            constructed_molecule.get_building_blocks(),
+        ))
+        return str((
+            molecule,
+            building_blocks,
+            num_building_blocks,
+        ))
 
     def __str__(self):
         return repr(self)
