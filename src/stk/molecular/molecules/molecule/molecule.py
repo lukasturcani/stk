@@ -766,6 +766,48 @@ class Molecule:
             '.coord': updaters._with_structure_from_turbomole,
         }[extension](self.clone(), path)
 
+    def with_canonical_atom_ordering(self):
+        """
+        Return a clone, with canonically ordered atoms.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The clone. Has the same type as the original molecule.
+
+        """
+
+        return self.clone()._with_canonical_atom_ordering()
+
+    def _with_canonical_atom_ordering(self):
+        """
+        Modify the molecule.
+
+        """
+
+        atom_map = {
+            atom.get_id(): atom.with_id(new_id)
+            for new_id, atom in zip(
+                rdkit.CanonicalRankAtoms(self.to_rdkit_mol()),
+                self._atoms,
+            )
+        }
+        self._atoms = tuple(sorted(
+            atom_map.values(),
+            key=lambda atom: atom.get_id()
+        ))
+        self._bonds = tuple(
+            bond.with_atoms(atom_map) for bond in self._bonds
+        )
+        old_ids = {
+            atom.get_id(): old_id for old_id, atom in atom_map.items()
+        }
+        self._position_matrix = np.array(np.array([
+            self._position_matrix.T[old_ids[new_id]]
+            for new_id in range(len(self._atoms))
+        ]).T)
+        return self
+
     def write(self, path, atom_ids=None):
         """
         Write the structure to a file.
