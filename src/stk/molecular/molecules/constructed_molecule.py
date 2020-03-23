@@ -74,9 +74,6 @@ class ConstructedMolecule(Molecule):
         )
         self._atom_infos = construction_result.get_atom_infos()
         self._bond_infos = construction_result.get_bond_infos()
-        self._building_blocks = tuple(
-            topology_graph.get_building_blocks()
-        )
         self._num_building_blocks = {
             building_block:
                 topology_graph.get_num_building_block(building_block)
@@ -89,7 +86,6 @@ class ConstructedMolecule(Molecule):
         clone = super().clone()
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
-        clone._building_blocks = self._building_blocks
         clone._num_building_blocks = dict(self._num_building_blocks)
         clone._topology_graph_repr = self._topology_graph_repr
         return clone
@@ -111,7 +107,7 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        yield from self._building_blocks
+        yield from self._num_building_blocks
 
     def get_num_building_block(self, building_block):
         """

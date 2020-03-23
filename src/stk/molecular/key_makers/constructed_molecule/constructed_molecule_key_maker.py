@@ -4,46 +4,7 @@ Constructed Molecule Key Maker
 
 """
 
-from .topology_graph import (
-    CageKeyMaker,
-    CofKeyMaker,
-    LinearPolymerKeyMaker,
-    HostGuestComplexKeyMaker,
-    NRotaxaneKeyMaker,
-    MacrocycleKeyMaker,
-)
 from ..molecule import InchiKey
-from ...topology_graphs.cage import (
-    EightPlusSixteen,
-    EightPlusTwelve,
-    FivePlusTen,
-    FourPlusEight,
-    FourPlusFour,
-    FourPlusSix,
-    FourPlusSix2,
-    OnePlusOne,
-    SixPlusEight,
-    SixPlusNine,
-    SixPlusTwelve,
-    TenPlusTwenty,
-    ThreePlusSix,
-    TwelvePlusThirty,
-    TwentyPlusThirty,
-    TwoPlusFour,
-    TwoPlusThree,
-    TwoPlusTwo,
-)
-from ...topology_graphs.cof import (
-    Hexagonal,
-    Honeycomb,
-    Kagome,
-    LinkerlessHoneycomb,
-    Square,
-)
-from ...topology_graphs.polymer import Linear
-from ...topology_graphs.host_guest import Complex
-from ...topology_graphs.rotaxane import NRotaxane
-from ...topology_graphs.macrocycle import Macrocycle
 
 
 class ConstructedMoleculeKeyMaker:
@@ -81,10 +42,10 @@ class ConstructedMoleculeKeyMaker:
                 return 'num_building_blocks'
 
             def get_key(self, constructed_molecule):
-                building_blocks = (
+                building_blocks = tuple(
                     constructed_molecule.get_building_blocks()
                 )
-                return sum(1 for _ in building_blocks)
+                return len(building_blocks)
 
 
         # A usage example of the new subclass.
