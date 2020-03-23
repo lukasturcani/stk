@@ -10,14 +10,62 @@ from .case_data import CaseData
 from .fixtures import *  # noqa
 
 
-@pytest.fixture
-def molecule(case_data):
+@pytest.fixture(
+    params=[
+        stk.BuildingBlock.init(
+            atoms=(stk.C(0, 4), ),
+            bonds=(),
+            position_matrix=np.array([[0.0, 0.0, 0.0]]),
+            functional_groups=(),
+        ),
+        stk.BuildingBlock.init(
+            atoms=(stk.C(0, 3), stk.H(1)),
+            bonds=(stk.Bond(stk.C(0, 3), stk.H(1), 1), ),
+            position_matrix=np.array([
+                [0.39382080513175644, 0.0, 0.0],
+                [-0.39382080513175644, 0.0, 0.0],
+            ]),
+            functional_groups=(),
+        ),
+        stk.BuildingBlock.init(
+            atoms=(stk.C(0, 2), stk.H(1), stk.H(2)),
+            bonds=(
+                stk.Bond(stk.C(0, 2), stk.H(1), 1),
+                stk.Bond(stk.C(0, 2), stk.H(2), 1),
+            ),
+            position_matrix=np.array([
+                [-0.002271396061231665, 0.034037398527897535, -0.0],
+                [-1.0494595365731274, -0.017073891221884126, -0.0],
+                [1.0517309326343591, -0.016963507306017023, 0.0],
+            ]),
+            functional_groups=(),
+        ),
+        stk.BuildingBlock('NCCN'),
+        stk.BuildingBlock('N[C+][C+2]N'),
+        stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
+        stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=2,
+            ),
+        ),
+    ],
+    scope='function',
+)
+def molecule(request):
     """
     A :class:`.Molecule` instance.
 
     """
 
-    return case_data.molecule
+    return request.param.clone()
 
 
 def get_random_position_matrix(molecule):
@@ -160,43 +208,6 @@ def get_atom_ids(request):
                 .with_canonical_atom_ordering()
             ),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
-        ),
-        CaseData(
-            molecule=stk.BuildingBlock.init(
-                atoms=(stk.C(0, 4), ),
-                bonds=(),
-                position_matrix=np.array([[0.0, 0.0, 0.0]]),
-                functional_groups=(),
-            ),
-            smiles='[C+4]',
-        ),
-        CaseData(
-            molecule=stk.BuildingBlock.init(
-                atoms=(stk.C(0, 3), stk.H(1)),
-                bonds=(stk.Bond(stk.C(0, 3), stk.H(1), 1), ),
-                position_matrix=np.array([
-                    [0.39382080513175644, 0.0, 0.0],
-                    [-0.39382080513175644, 0.0, 0.0],
-                ]),
-                functional_groups=(),
-            ),
-            smiles='[C+3][H]',
-        ),
-        CaseData(
-            molecule=stk.BuildingBlock.init(
-                atoms=(stk.C(0, 2), stk.H(1), stk.H(2)),
-                bonds=(
-                    stk.Bond(stk.C(0, 2), stk.H(1), 1),
-                    stk.Bond(stk.C(0, 2), stk.H(2), 1),
-                ),
-                position_matrix=np.array([
-                    [-0.00227135, 0.034037535, -0.0],
-                    [-1.049459574, -0.0170726, -0.0],
-                    [1.05173093291, -0.01697023, 0.0],
-                ]),
-                functional_groups=(),
-            ),
-            smiles='[C+2]([H])[H]',
         ),
     ),
 )
