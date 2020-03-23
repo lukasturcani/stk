@@ -27,6 +27,29 @@ from .case_data import CaseData
             key_name='NumAtoms',
             key=12,
         ),
+        CaseData(
+            key_maker=stk.ConstructedMoleculeKeyMaker(),
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='NCCN',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory()
+                            ],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ),
+            key_name='ConstructedMoleculeKey',
+            key=str((
+                'KCEQCQJHUVIRJO-UHFFFAOYSA-N',
+                ('PIICEJLVQHRZGT-UHFFFAOYSA-N', ),
+                (2, ),
+            )),
+        ),
     ),
 )
 def case_data(request):
