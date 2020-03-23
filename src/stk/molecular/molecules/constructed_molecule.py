@@ -36,8 +36,8 @@ class ConstructedMolecule(Molecule):
         cage1 = stk.ConstructedMolecule(tetrahedron)
 
     A :class:`ConstructedMolecule` may be used to construct other
-    :class:`ConstructedMolecule` instances, though you have to convert
-    it to a :class:`.BuildingBlock` first
+    :class:`ConstructedMolecule` instances, though you will probably
+    have to convert it to a :class:`.BuildingBlock` first
 
     .. code-block:: python
 
