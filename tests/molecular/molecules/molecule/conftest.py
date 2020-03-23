@@ -180,7 +180,7 @@ def get_atom_ids(request):
                 ]),
                 functional_groups=(),
             ),
-            smiles='[H][C+3]',
+            smiles='[C+3][H]',
         ),
         CaseData(
             molecule=stk.BuildingBlock.init(
@@ -196,7 +196,7 @@ def get_atom_ids(request):
                 ]),
                 functional_groups=(),
             ),
-            smiles='[H][C+2][H]',
+            smiles='[C+2]([H])[H]',
         ),
     ),
 )
