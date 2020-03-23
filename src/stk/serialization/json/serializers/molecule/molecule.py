@@ -24,7 +24,8 @@ class MoleculeJsonizer:
 
         import stk
 
-        json = stk.MoleculeJsonizer().to_json(stk.BuildingBlock('NCCN')
+        jsonizer = stk.MoleculeJsonizer()
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
     The apart from atoms and bonds, the JSON representation holds
     additional fields, one for each
