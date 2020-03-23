@@ -44,7 +44,7 @@ class LinearData:
         num_building_blocks,
     ):
         """
-        Initiailze a :class:`.LinearData` instance.
+        Initialize a :class:`.LinearData` instance.
 
         Parameters
         ----------
@@ -87,65 +87,6 @@ class LinearData:
         }
         self.building_blocks = building_blocks
 
-    @classmethod
-    def init_with_building_blocks(cls, building_blocks):
-        """
-        Initialize by substituing building blocks.
-
-        Initializes a case by running
-        :meth:`.ConstructedMolecule.with_building_blocks`.
-
-        Parameters
-        ----------
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            The building blocks the polymer being tested should hold.
-
-        """
-
-        initial = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCNC#CBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles='Br[C+]=NCNC#CBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                repeating_unit='AB',
-                num_repeating_units=3,
-            )
-        )
-        building_block_map = {
-            building_block1: building_block2
-            for building_block1, building_block2
-            in zip(
-                initial.get_building_blocks(),
-                building_blocks,
-            )
-        }
-
-        obj = cls.__new__(cls)
-        obj.constructed_molecule = initial.with_building_blocks(
-            building_block_map=building_block_map,
-        )
-        obj.num_new_atoms = 0
-        obj.num_new_bonds = 5
-        obj.building_blocks = building_blocks
-        obj.num_building_blocks = {
-            building_block2: initial.get_num_building_block(
-                building_block=building_block1,
-            )
-            for building_block1, building_block2
-            in zip(
-                initial.get_building_blocks(),
-                building_blocks,
-            )
-        }
-        return obj
-
 
 @pytest.fixture(
     params=(
@@ -162,15 +103,6 @@ class LinearData:
             num_new_atoms=0,
             num_new_bonds=3,
             num_building_blocks={0: 2, 1: 2},
-        ),
-        LinearData.init_with_building_blocks(
-            building_blocks=(
-                stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
-                stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-            ),
         ),
     ),
 )
