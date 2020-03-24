@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..utilities import is_equivalent_molecule
+from tests.utilities import is_equivalent_molecule
 
 
 def test_from_json(case_data):

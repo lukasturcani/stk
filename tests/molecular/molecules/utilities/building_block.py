@@ -1,6 +1,6 @@
 import itertools as it
 
-from .molecule import (
+from tests.utilities import (
     is_equivalent_atom,
     is_equivalent_molecule,
 )
