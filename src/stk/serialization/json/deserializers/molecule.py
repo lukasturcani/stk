@@ -21,13 +21,12 @@ class MoleculeDejsonizer:
 
         atoms = tuple(
             to_atom(atom_id, atom_json)
-            for atom_id, atom_json in enumerate(json['atoms'])
+            for atom_id, atom_json in enumerate(json['a'])
         )
         return Molecule(
             atoms=atoms,
             bonds=tuple(
-                to_bond(atoms, bond_json)
-                for bond_json in json['bonds']
+                to_bond(atoms, bond_json) for bond_json in json['b']
             ),
             position_matrix=position_matrix,
         )
