@@ -100,8 +100,8 @@ class MoleculeJsonizer:
         """
 
         json = {
-            'atoms': tuple(map(atom_to_json, molecule.get_atoms())),
-            'bonds': tuple(map(bond_to_json, molecule.get_bonds())),
+            'a': tuple(map(atom_to_json, molecule.get_atoms())),
+            'b': tuple(map(bond_to_json, molecule.get_bonds())),
         }
         for key_maker in self._key_makers:
             json[key_maker.get_key_name()] = (

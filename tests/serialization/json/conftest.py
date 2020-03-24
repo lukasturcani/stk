@@ -15,31 +15,16 @@ from .case_data import CaseData
             ),
             molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
             json={
-                'atoms': (
-                    {'atomic_number': 35, 'charge': 0},
-                    {'atomic_number': 6, 'charge': 2},
-                    {'atomic_number': 6, 'charge': 2},
-                    {'atomic_number': 35, 'charge': 0},
+                'a': (
+                    (35, 0),
+                    (6, 2),
+                    (6, 2),
+                    (35, 0),
                 ),
-                'bonds': (
-                    {
-                        'atom1': 0,
-                        'atom2': 1,
-                        'order': 1,
-                        'periodicity': (0, 0, 0),
-                    },
-                    {
-                        'atom1': 1,
-                        'atom2': 2,
-                        'order': 1,
-                        'periodicity': (0, 0, 0),
-                    },
-                    {
-                        'atom1': 2,
-                        'atom2': 3,
-                        'order': 1,
-                        'periodicity': (0, 0, 0),
-                    },
+                'b': (
+                    (0, 1, 1, (0, 0, 0)),
+                    (1, 2, 1, (0, 0, 0)),
+                    (2, 3, 1, (0, 0, 0)),
                 ),
                 'InChI': 'InChI=1S/C2Br2/c3-1-2-4/q+4',
                 'InChIKey': 'UWAHASCVLDBPQQ-UHFFFAOYSA-N',
@@ -68,30 +53,27 @@ from .case_data import CaseData
             json={
                 'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                 'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                'building_blocks': (
+                'BB': (
                     {
                         'InChI': 'InChI=1S/C2Br2/c3-1-2-4/q+4',
                         'InChIKey': 'UWAHASCVLDBPQQ-UHFFFAOYSA-N',
                     },
                 ),
-                'num_building_blocks': {0: 2},
-                'atom_infos': (
-                    {'building_block': 0, 'building_block_id': 0},
-                    {'building_block': 0, 'building_block_id': 0},
-                    {'building_block': 0, 'building_block_id': 0},
-                    {'building_block': 0, 'building_block_id': 1},
-                    {'building_block': 0, 'building_block_id': 1},
-                    {'building_block': 0, 'building_block_id': 1},
+                'nBB': (2, ),
+                'aI': (
+                    (0, 0),
+                    (0, 0),
+                    (0, 0),
+                    (0, 1),
+                    (0, 1),
+                    (0, 1),
                 ),
-                'bond_infos': (
-                    {'building_block': 0, 'building_block_id': 0},
-                    {'building_block': 0, 'building_block_id': 0},
-                    {'building_block': 0, 'building_block_id': 1},
-                    {'building_block': 0, 'building_block_id': 1},
-                    {
-                        'building_block': None,
-                        'building_block_id': None,
-                    },
+                'bI': (
+                    (0, 0),
+                    (0, 0),
+                    (0, 1),
+                    (0, 1),
+                    (None, None),
                 ),
                 'ConstructedMoleculeKey': str((
                     'CXAFVTYJXQJZSL-UHFFFAOYSA-N',

@@ -138,35 +138,31 @@ class ConstructedMoleculeJsonizer:
         building_block_indices[None] = None
 
         def atom_info_to_json(atom_info):
-            return {
-                'building_block': building_block_indices[
-                    atom_info.get_building_block()
-                ],
-                'building_block_id': atom_info.get_building_block_id(),
-            }
+            return (
+                building_block_indices[atom_info.get_building_block()],
+                atom_info.get_building_block_id(),
+            )
 
         def bond_info_to_json(bond_info):
-            return {
-                'building_block': building_block_indices[
-                    bond_info.get_building_block()
-                ],
-                'building_block_id': bond_info.get_building_block_id(),
-            }
+            return (
+                building_block_indices[bond_info.get_building_block()],
+                bond_info.get_building_block_id(),
+            )
 
         json = {
-            'building_blocks': tuple(map(
+            'BB': tuple(map(
                 get_keys,
                 molecule.get_building_blocks(),
             )),
-            'atom_infos': tuple(map(
+            'aI': tuple(map(
                 atom_info_to_json,
                 molecule.get_atom_infos(),
             )),
-            'bond_infos': tuple(map(
+            'bI': tuple(map(
                 bond_info_to_json,
                 molecule.get_bond_infos(),
             )),
-            'num_building_blocks': tuple(map(
+            'nBB': tuple(map(
                 molecule.get_num_building_block,
                 molecule.get_building_blocks(),
             )),

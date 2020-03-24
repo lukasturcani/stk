@@ -14,10 +14,10 @@ def atom_to_json(atom):
 
     """
 
-    return {
-        'atomic_number': atom.get_atomic_number(),
-        'charge': atom.get_charge(),
-    }
+    return (
+        atom.get_atomic_number(),
+        atom.get_charge(),
+    )
 
 
 def bond_to_json(bond):
@@ -36,9 +36,9 @@ def bond_to_json(bond):
 
     """
 
-    return {
-        'atom1': bond.get_atom1().get_id(),
-        'atom2': bond.get_atom2().get_id(),
-        'order': bond.get_order(),
-        'periodicity': bond.get_periodicity(),
-    }
+    return (
+        bond.get_atom1().get_id(),
+        bond.get_atom2().get_id(),
+        bond.get_order(),
+        bond.get_periodicity(),
+    )
