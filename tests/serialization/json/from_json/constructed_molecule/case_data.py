@@ -4,6 +4,9 @@ class CaseData:
 
     Attributes
     ----------
+    dejsonizer : :class:`.ConstructedMoleculeDejsonizer`
+        The dejsonizer to test.
+
     molecule_json : :class:`dict`
         A JSON of the molecular information of the constructed
         molecule.
@@ -25,6 +28,7 @@ class CaseData:
 
     def __init__(
         self,
+        dejsonizer,
         molecule_json,
         constructed_molecule_json,
         position_matrix,
@@ -36,6 +40,9 @@ class CaseData:
 
         Parameters
         ----------
+        dejsonizer : :class:`.ConstructedMoleculeDejsonizer`
+            The dejsonizer to test.
+
         molecule_json : :class:`dict`
             A JSON of the molecular information of the constructed
             molecule.
@@ -55,6 +62,7 @@ class CaseData:
 
         """
 
+        self.dejsonizer = dejsonizer
         self.molecule_json = molecule_json
         self.constructed_molecule_json = constructed_molecule_json
         self.position_matrix = position_matrix
