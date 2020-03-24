@@ -1,6 +1,4 @@
-import stk
-
-AtomInfo = stk.molecular.atom_info.AtomInfo
+from stk import AtomInfo
 
 
 def check_atom_infos(old_state, new_state, building_blocks):

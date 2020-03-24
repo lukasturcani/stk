@@ -1,6 +1,4 @@
-import stk
-
-BondInfo = stk.molecular.bond_info.BondInfo
+from stk import BondInfo
 
 
 def check_bond_infos(old_state, new_state, building_blocks):

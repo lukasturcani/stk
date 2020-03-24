@@ -6,7 +6,7 @@ from pytest_lazyfixture import lazy_fixture
 from ...case_data import CaseData
 
 
-vertices = stk.molecular.topology_graphs.polymer.linear
+vertices = stk.polymer.vertices
 
 
 @pytest.fixture(

@@ -19,7 +19,7 @@ from .check_vertices import check_vertices
 
 
 PlacementResult = (
-    stk.molecular.topology_graphs.implementations
+    stk.topology_graphs.implementations
     .utilities._PlacementResult
 )
 

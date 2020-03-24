@@ -9,7 +9,7 @@ from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
-vertices = stk.molecular.topology_graphs.cof.vertices
+vertices = stk.cof.vertices
 
 
 @pytest.fixture(

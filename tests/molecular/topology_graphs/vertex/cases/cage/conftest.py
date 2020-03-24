@@ -6,7 +6,7 @@ import stk
 from ...case_data import CaseData
 
 
-vertices = stk.molecular.topology_graphs.cage.vertices
+vertices = stk.cage.vertices
 
 
 @pytest.fixture(

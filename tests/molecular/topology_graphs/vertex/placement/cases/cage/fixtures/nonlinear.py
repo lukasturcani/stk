@@ -2,12 +2,12 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 import numpy as np
 import stk
-import stk.molecular.topology_graphs.cage.vertices as vertices
 from functools import partial
 from scipy.spatial.distance import euclidean
 
-
 from ....case_data import CaseData
+
+vertices = stk.cage.vertices
 
 
 @pytest.fixture(

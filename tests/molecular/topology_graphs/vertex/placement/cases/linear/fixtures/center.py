@@ -5,7 +5,7 @@ from ....case_data import CaseData
 from .utilities import get_closest_point, get_fg_position, get_edges
 
 
-vertices = stk.molecular.topology_graphs.polymer.linear
+vertices = stk.polymer.linear
 
 
 @pytest.fixture

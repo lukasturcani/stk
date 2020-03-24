@@ -11,7 +11,7 @@ from .utilities import (
 )
 
 
-vertices = stk.molecular.topology_graphs.macrocycle.vertices
+vertices = stk.macrocycle.vertices
 
 
 @pytest.fixture
