@@ -37,17 +37,16 @@ class ConstructedMoleculeDejsonizer:
             (building_block, num)
             for building_block, num in zip(
                 building_blocks,
-                constructed_molecule_json['num_building_blocks'],
+                constructed_molecule_json['nBB'],
             )
         )
         atoms = tuple(
             to_atom(atom_id, atom_json)
-            for atom_id, atom_json
-            in enumerate(constructed_molecule_json['atoms'])
+            for atom_id, atom_json in enumerate(molecule_json['a'])
         )
         bonds = tuple(
             to_bond(atoms, bond_json)
-            for bond_json in constructed_molecule_json['bonds']
+            for bond_json in molecule_json['b']
         )
         return ConstructedMolecule.init(
             atoms=atoms,
@@ -60,7 +59,7 @@ class ConstructedMoleculeDejsonizer:
                     json=atom_info_json,
                 )
                 for atom_id, atom_info_json
-                in enumerate(constructed_molecule_json['atom_infos'])
+                in enumerate(constructed_molecule_json['aI'])
             ),
             bond_infos=tuple(
                 to_bond_info(
@@ -69,7 +68,7 @@ class ConstructedMoleculeDejsonizer:
                     json=bond_info_json,
                 )
                 for bond_id, bond_info_json
-                in enumerate(constructed_molecule_json['bond_infos'])
+                in enumerate(constructed_molecule_json['bI'])
             ),
             num_building_blocks=num_building_blocks,
         )
