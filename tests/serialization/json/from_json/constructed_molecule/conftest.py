@@ -21,9 +21,9 @@ from .case_data import CaseData
                 'b': (
                     (0, 1, 1, (0, 0, 0)),
                     (1, 2, 1, (0, 0, 0)),
-                    (2, 3, 1, (0, 0, 0)),
                     (3, 4, 1, (0, 0, 0)),
                     (4, 5, 1, (0, 0, 0)),
+                    (2, 3, 1, (0, 0, 0)),
                 ),
                 'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                 'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
@@ -80,7 +80,14 @@ from .case_data import CaseData
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
-            ),
+            ).with_position_matrix(np.array([
+                [1, 0, 0],
+                [2, 0, 0],
+                [3, 0, 0],
+                [4, 0, 0],
+                [5, 0, 0],
+                [6, 0, 0],
+            ], dtype=np.float64)),
         ),
     ),
 )

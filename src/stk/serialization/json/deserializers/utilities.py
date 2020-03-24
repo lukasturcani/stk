@@ -17,7 +17,11 @@ def to_bond(atoms, json):
 def to_atom_info(building_blocks, atom, json):
     return AtomInfo(
         atom=atom,
-        building_block=building_blocks[json[0]],
+        building_block=(
+            building_blocks[json[0]]
+            if json[0] is not None
+            else None
+        ),
         building_block_id=json[1],
     )
 
@@ -25,6 +29,10 @@ def to_atom_info(building_blocks, atom, json):
 def to_bond_info(building_blocks, bond, json):
     return BondInfo(
         bond=bond,
-        building_block=building_blocks[json[0]],
+        building_block=(
+            building_blocks[json[0]]
+            if json[0] is not None
+            else None
+        ),
         building_block_id=json[1],
     )

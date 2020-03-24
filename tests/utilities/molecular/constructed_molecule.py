@@ -33,12 +33,15 @@ def is_equivalent_constructed_molecule(
             building_block2,
         )
 
-    for building_block in constructed_molecule1.get_building_blocks():
+    for building_block1, building_block2 in zip(
+        constructed_molecule1.get_building_blocks(),
+        constructed_molecule2.get_building_blocks(),
+    ):
         num1 = constructed_molecule1.get_num_building_block(
-            building_block=building_block,
+            building_block=building_block1,
         )
         num2 = constructed_molecule2.get_num_building_block(
-            building_block=building_block,
+            building_block=building_block2,
         )
         assert num1 == num2
 

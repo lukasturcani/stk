@@ -20,7 +20,7 @@ def test_from_json(case_data):
     """
 
     _test_from_json(
-        djsonizer=case_data.dejsonizer,
+        dejsonizer=case_data.dejsonizer,
         molecule_json=case_data.molecule_json,
         constructed_molecule_json=case_data.constructed_molecule_json,
         position_matrix=case_data.position_matrix,
