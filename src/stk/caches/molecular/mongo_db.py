@@ -4,7 +4,7 @@ MongoDB Molecular Cache
 
 """
 
-from stk.molecular import ConstructedMolecule
+from stk.molecular import ConstructedMolecule, InchiKey
 from stk.serialization import (
     MoleculeJsonizer,
     ConstructedMoleculeJsonizer,
@@ -29,6 +29,8 @@ class MongoDbMolecularCache(MolecularCache):
         database='stk',
         molecule_collection='molecules',
         constructed_molecule_collection='constructed_molecules',
+        position_matrix_collection='position_matrices',
+        key_makers=(InchiKey(), ),
         molecule_jsonizer=MoleculeJsonizer(),
         constructed_molecule_jsonizer=ConstructedMoleculeJsonizer(),
         molecule_dejsonizer=MoleculeDejsonizer(),
@@ -71,6 +73,9 @@ class MongoDbMolecularCache(MolecularCache):
         self._constructed_molecule_collection = database[
             constructed_molecule_collection
         ]
+        self._position_matrix_collection = database[
+            position_matrix_collection
+        ]
         self._molecule_jsonizer = molecule_jsonizer
         self._constructed_molecule_jsonizer = (
             constructed_molecule_jsonizer
@@ -81,6 +86,20 @@ class MongoDbMolecularCache(MolecularCache):
         )
 
     def put(self, molecule):
+        molecule = molecule.with_canonical_atom_ordering()
+
+        position_matrix_json = {
+            'position_matrix':
+                molecule.get_position_matrix().tolist(),
+        }
+        for key_maker in self._key_makers:
+            position_matrix_json[key_maker.get_key_name()] = (
+                key_maker.get_key(molecule)
+            )
+        self._position_matrix_collection.insert_one(
+            document=position_matrix_json,
+        )
+
         json = self._molecule_jsonizer.to_json(molecule)
         self._molecule_collection.insert_one(json)
 
