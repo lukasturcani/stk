@@ -11,11 +11,35 @@ from .utilities import to_atom, to_bond
 
 class MoleculeDejsonizer:
     """
+    Creates :class:`.Molecule` instances from JSON representations.
 
     """
 
+    # Keep this empty __init__() method for the docstring.
+    def __init__(self):
+        """
+        Initialize a :class`.MoleculeDejsonizer`.
+
+        """
+
+        return
+
     def from_json(self, json, position_matrix):
         """
+        Get a :class:`.Molecule` from a JSON.
+
+        Parameters
+        ----------
+        json : :class:`dict`
+            A JSON representation of a molecule.
+
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the created molecule.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule held in `json`.
 
         """
 

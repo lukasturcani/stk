@@ -6,33 +6,57 @@ Constructed Molecule DeJSONizer
 
 from stk.molecular import ConstructedMolecule
 
-from .molecule import MoleculeDejsonizer
 from .utilities import to_atom, to_bond, to_atom_info, to_bond_info
 
 
 class ConstructedMoleculeDejsonizer:
     """
+    Creates :class:`.ConstructedMolecule` instances from JSONs.
 
     """
+
+    # Keep the empty __init__() method for the docstring.
+    def __init__(self):
+        """
+        Initialize a :class:`.ConstructedMoleculeDejsonizer` instance.
+
+        """
+
+        return
 
     def from_json(
         self,
         molecule_json,
-        building_block_jsons,
         constructed_molecule_json,
-        building_block_position_matrices,
         position_matrix,
+        building_blocks,
     ):
+        """
+        Get a :class:`.ConstructedMolecule` from a JSON.
 
-        dejsonizer = MoleculeDejsonizer()
-        building_blocks = tuple(
-            dejsonizer.from_json(json, position_matrix)
-            for json, position_matrix
-            in zip(
-                building_block_jsons,
-                building_block_position_matrices,
-            )
-        )
+        Parameters
+        ----------
+        molecule_json : :class:`dict`
+            A JSON of the molecular information of the constructed
+            molecule.
+
+        constructed_molecule_json : :class:`dict`
+            A JSON of the constructed molecule information of the
+            constructed molecule.
+
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the constructed molecule.
+
+        building_blocks : :class:`tuple` of :class:`.Molecule`
+            The building blocks of the constructed molecule.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The constructed molecule.
+
+        """
+
         num_building_blocks = (
             (building_block, num)
             for building_block, num in zip(
