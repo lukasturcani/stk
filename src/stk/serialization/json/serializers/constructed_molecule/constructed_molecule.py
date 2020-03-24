@@ -166,11 +166,10 @@ class ConstructedMoleculeJsonizer:
                 bond_info_to_json,
                 molecule.get_bond_infos(),
             )),
-            'num_building_blocks': {
-                index: molecule.get_num_building_block(building_block)
-                for index, building_block
-                in enumerate(molecule.get_building_blocks())
-            },
+            'num_building_blocks': tuple(map(
+                molecule.get_num_building_block,
+                molecule.get_building_blocks(),
+            )),
         }
         for key_maker in self._key_makers:
             json[key_maker.get_key_name()] = (
