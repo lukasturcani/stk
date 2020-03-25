@@ -57,6 +57,8 @@ class ConstructedMoleculeDejsonizer:
 
         building_blocks : :class:`tuple` of :class:`.Molecule`
             The building blocks of the constructed molecule.
+            Their order should be equal to their order in
+            :meth:`.ConstructedMolecule.get_building_blocks`.
 
         Returns
         -------
