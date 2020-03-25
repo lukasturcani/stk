@@ -4,6 +4,7 @@ Constructed Molecule DeJSONizer
 
 """
 
+import numpy as np
 from stk.molecular import ConstructedMolecule
 
 from .utilities import to_atom, to_bond, to_atom_info, to_bond_info
@@ -13,13 +14,17 @@ class ConstructedMoleculeDejsonizer:
     """
     Abstract base class for creating constructed molecules from JSONs.
 
+    See Also
+    --------
+    :class:`.MoleculeDejsonizer`
+
     Notes
     -----
-    You might notice that the public method of this abstract base class
-    is implemented. This is just a default implementation, which can
-    be safely ignored or overridden when implementing subclasses.
-    However, the default implementation can be used directly,
-    if it suits your needs.
+    You might notice that the public methods of this abstract base
+    class are implemented. These are just default implementations,
+    which can be safely ignored or overridden, when implementing
+    subclasses. However, the default implementation can be used
+    directly, if it suits your needs.
 
     """
 
@@ -32,28 +37,14 @@ class ConstructedMoleculeDejsonizer:
 
         return
 
-    def from_json(
-        self,
-        molecule_json,
-        constructed_molecule_json,
-        position_matrix,
-        building_blocks,
-    ):
+    def from_json(self, json, building_blocks):
         """
         Get a :class:`.ConstructedMolecule` from a JSON.
 
         Parameters
         ----------
-        molecule_json : :class:`dict`
-            A JSON of the molecular information of the constructed
-            molecule.
-
-        constructed_molecule_json : :class:`dict`
-            A JSON of the constructed molecule information of the
-            constructed molecule.
-
-        position_matrix : :class:`numpy.ndarray`
-            The position matrix of the constructed molecule.
+        json : :class:`dict`
+            A JSON of the constructed molecule.
 
         building_blocks : :class:`tuple` of :class:`.Molecule`
             The building blocks of the constructed molecule.
@@ -71,21 +62,21 @@ class ConstructedMoleculeDejsonizer:
             (building_block, num)
             for building_block, num in zip(
                 building_blocks,
-                constructed_molecule_json['nBB'],
+                json['constructedMolecule']['nBB'],
             )
         )
         atoms = tuple(
             to_atom(atom_id, atom_json)
-            for atom_id, atom_json in enumerate(molecule_json['a'])
+            for atom_id, atom_json in enumerate(json['molecule']['a'])
         )
         bonds = tuple(
             to_bond(atoms, bond_json)
-            for bond_json in molecule_json['b']
+            for bond_json in json['molecule']['b']
         )
         return ConstructedMolecule.init(
             atoms=atoms,
             bonds=bonds,
-            position_matrix=position_matrix,
+            position_matrix=np.array(json['matrix_json']['matrix']),
             atom_infos=tuple(
                 to_atom_info(
                     building_blocks=building_blocks,
@@ -93,7 +84,7 @@ class ConstructedMoleculeDejsonizer:
                     json=atom_info_json,
                 )
                 for atom_id, atom_info_json
-                in enumerate(constructed_molecule_json['aI'])
+                in enumerate(json['constructedMolecule']['aI'])
             ),
             bond_infos=tuple(
                 to_bond_info(
@@ -102,7 +93,7 @@ class ConstructedMoleculeDejsonizer:
                     json=bond_info_json,
                 )
                 for bond_id, bond_info_json
-                in enumerate(constructed_molecule_json['bI'])
+                in enumerate(json['constructedMolecule']['bI'])
             ),
             num_building_blocks=num_building_blocks,
         )

@@ -149,12 +149,13 @@ class ConstructedMoleculeJsonizer:
         for key_maker in self._key_makers:
             key_name = key_maker.get_key_name()
             key = key_maker.get_key(molecule)
-            molecule_json['m'][key_name] = key
+            molecule_json['molecule'][key_name] = key
+            molecule_json['matrix_json'][key_name] = key
             constructed_molecule_json[key_name] = key
         return {
-            'm': molecule_json['m'],
-            'cM': constructed_molecule_json,
-            'p': molecule_json['p'],
+            'molecule': molecule_json['molecule'],
+            'constructedMolecule': constructed_molecule_json,
+            'matrix_json': molecule_json['matrix_json'],
         }
 
     def __str__(self):

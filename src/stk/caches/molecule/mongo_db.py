@@ -190,7 +190,6 @@ class MongoDbMoleculeCache(MoleculeCache):
         database='stk',
         molecule_collection='molecules',
         position_matrix_collection='position_matrices',
-        key_makers=(InchiKey(), ),
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
     ):
@@ -214,11 +213,6 @@ class MongoDbMoleculeCache(MoleculeCache):
             matrices of the molecules put into and retrieved from
             the cache.
 
-        key_makers : :class:`tuple` of :class:`.MoleculeKeyMaker`
-            Used to make the keys for molecules, which are used to
-            reference the position matrices in the
-            `position_matrix_collection`.
-
         jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
             stored in the database.
@@ -232,7 +226,6 @@ class MongoDbMoleculeCache(MoleculeCache):
         database = mongo_client[database]
         self._molecules = database[molecule_collection]
         self._position_matrices = database[position_matrix_collection]
-        self._key_makers = key_makers
         self._jsonizer = jsonizer
         self._dejsonizer = dejsonizer
 
