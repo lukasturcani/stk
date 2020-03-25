@@ -96,3 +96,9 @@ class ConstructedMoleculeDejsonizer:
             ),
             num_building_blocks=num_building_blocks,
         )
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}()'
