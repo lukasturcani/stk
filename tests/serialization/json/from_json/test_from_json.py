@@ -22,7 +22,6 @@ def test_from_json(case_data):
     _test_from_json(
         dejsonizer=case_data.dejsonizer,
         json=case_data.json,
-        position_matrix=case_data.position_matrix,
         molecule=case_data.molecule,
     )
 
@@ -30,7 +29,6 @@ def test_from_json(case_data):
 def _test_from_json(
     dejsonizer,
     json,
-    position_matrix,
     molecule,
 ):
     """
@@ -44,9 +42,6 @@ def _test_from_json(
     json : :class:`dict`
         The JSON to test.
 
-    position_matrix : :class:`list`
-        The position matrix of the dejsonized molecule.
-
     molecule : :class:`.Molecule`
         The correct dejsonized molecule.
 
@@ -56,7 +51,7 @@ def _test_from_json(
 
     """
 
-    result = dejsonizer.from_json(json, position_matrix)
+    result = dejsonizer.from_json(json)
     is_equivalent_molecule(result, molecule)
     assert np.all(np.equal(
         molecule.get_position_matrix(),

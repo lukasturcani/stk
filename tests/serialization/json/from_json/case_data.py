@@ -10,15 +10,12 @@ class CaseData:
     json : :class:`dict`
         The JSON to test.
 
-    position_matrix : :class:`list`
-        The position matrix of the dejsonized molecule.
-
     molecule : :class:`.Molecule`
         The correct dejsonized molecule.
 
     """
 
-    def __init__(self, dejsonizer, json, position_matrix, molecule):
+    def __init__(self, dejsonizer, json, molecule):
         """
         Initialize a :class:`.CaseData` instance.
 
@@ -30,9 +27,6 @@ class CaseData:
         json : :class:`dict`
             The JSON to test.
 
-        position_matrix : :class:`list`
-            The position matrix of the dejsonized molecule.
-
         molecule : :class:`.Molecule`
             The correct dejsonized molecule.
 
@@ -40,5 +34,4 @@ class CaseData:
 
         self.dejsonizer = dejsonizer
         self.json = json
-        self.position_matrix = position_matrix
         self.molecule = molecule
