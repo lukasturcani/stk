@@ -81,7 +81,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
             return default
 
         constructed_molecule_json = (
-            self.constructed_molecules.find_one(key)
+            self._constructed_molecules.find_one(key)
         )
         if constructed_molecule_json is None and default is None:
             raise KeyError(
