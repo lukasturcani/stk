@@ -42,7 +42,7 @@ class MongoDbMoleculeCache(MoleculeCache):
         # MongoDB, but you can connect to a remote DB too with
         # MongoClient - read the documentation for pymongo to see how
         # to do that.
-        client = pymong.MongoClient()
+        client = pymongo.MongoClient()
         db = stk.MongoDbMoleculeCache(client)
 
         # Create a molecule.
