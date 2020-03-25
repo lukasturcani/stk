@@ -65,9 +65,9 @@ class MongoDbMoleculeCache(MoleculeCache):
     ordering, which allows position matrices to be used across
     different atom id orderings.
 
-    By default, the database stores the InChIKey of molecules only.
-    However, additional keys can be added to the JSON stored in the
-    database by using a different :class:`.MoleculeJsonizer`
+    By default, the only molecular key the database stores, is the
+    InChIKey. However, additional keys can be added to the JSON stored
+    in the database by using a different :class:`.MoleculeJsonizer`
 
     .. code-block:: python
 
