@@ -173,6 +173,8 @@ class MongoDbMoleculeCache(MoleculeCache):
         # Or the number of bonds and atoms.
         retrieved = db.get({'NumAtoms': 2, 'NumBonds': 1})
 
+    In fact, you can use any valid MongoDB query to get your molecule.
+
     """
 
     def __init__(
