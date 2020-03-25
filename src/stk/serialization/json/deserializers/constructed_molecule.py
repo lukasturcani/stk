@@ -8,6 +8,7 @@ import numpy as np
 from stk.molecular import ConstructedMolecule
 
 from .utilities import to_atom, to_bond, to_atom_info, to_bond_info
+from .molecule import MoleculeDejsonizer
 
 
 class ConstructedMoleculeDejsonizer:
@@ -28,16 +29,15 @@ class ConstructedMoleculeDejsonizer:
 
     """
 
-    # Keep the empty __init__() method for the docstring.
     def __init__(self):
         """
         Initialize a :class:`.ConstructedMoleculeDejsonizer` instance.
 
         """
 
-        return
+        self._dejsonizer = MoleculeDejsonizer()
 
-    def from_json(self, json, building_blocks):
+    def from_json(self, json):
         """
         Get a :class:`.ConstructedMolecule` from a JSON.
 
@@ -46,17 +46,17 @@ class ConstructedMoleculeDejsonizer:
         json : :class:`dict`
             A JSON of the constructed molecule.
 
-        building_blocks : :class:`tuple` of :class:`.Molecule`
-            The building blocks of the constructed molecule.
-            Their order should be equal to their order in
-            :meth:`.ConstructedMolecule.get_building_blocks`.
-
         Returns
         -------
         :class:`.ConstructedMolecule`
             The constructed molecule.
 
         """
+
+        building_blocks = tuple(map(
+            self._dejsonizer.from_json,
+            json['buildingBlocks'],
+        ))
 
         num_building_blocks = (
             (building_block, num)

@@ -220,7 +220,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
                 document=building_block_json['matrix'],
             )
 
-    def get(self, key, default=None, building_blocks=None):
+    def get(self, key, default=None):
         molecule_json = self._molecules.find_one(key)
         if molecule_json is None and default is None:
             raise KeyError(
@@ -246,6 +246,15 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
                 'molecule': molecule_json,
                 'constructedMolecule': constructed_molecule_json,
                 'matrix': self._position_matrices.find_one(key),
+                'buildingBlocks': tuple(map(
+                    self._get_building_block,
+                    constructed_molecule_json['BB'],
+                ))
             },
-            building_blocks=building_blocks,
         )
+
+    def _get_building_block(self, key):
+        return {
+            'molecule': self._molecules.find_one(key),
+            'matrix': self._position_matrices.find_one(key),
+        }

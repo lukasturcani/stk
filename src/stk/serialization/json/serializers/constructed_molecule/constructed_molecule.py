@@ -78,7 +78,7 @@ class ConstructedMoleculeJsonizer:
 
         """
 
-        self._molecule_jsonizer = MoleculeJsonizer(key_makers=())
+        self._jsonizer = MoleculeJsonizer(key_makers=())
         self._key_makers = key_makers
 
     def to_json(self, molecule):
@@ -124,7 +124,7 @@ class ConstructedMoleculeJsonizer:
                 bond_info.get_building_block_id(),
             )
 
-        molecule_json = self._molecule_jsonizer.to_json(molecule)
+        molecule_json = self._jsonizer.to_json(molecule)
         constructed_molecule_json = {
             'BB': tuple(map(
                 get_keys,
@@ -143,10 +143,6 @@ class ConstructedMoleculeJsonizer:
                 molecule.get_building_blocks(),
             )),
         }
-        building_block_jsons = tuple(map(
-            self._molecule_jsonizer.to_json,
-            molecule.get_building_blocks(),
-        ))
         for key_maker in self._key_makers:
             key_name = key_maker.get_key_name()
             key = key_maker.get_key(molecule)
@@ -154,6 +150,19 @@ class ConstructedMoleculeJsonizer:
             molecule_json['matrix'][key_name] = key
             constructed_molecule_json[key_name] = key
 
+        building_block_jsons = tuple(map(
+            self._jsonizer.to_json,
+            molecule.get_building_blocks(),
+        ))
+
+        def is_molecule_key_maker(key_maker):
+            return isinstance(key_maker, MoleculeKeyMaker)
+
+        for key_maker in filter(
+            is_molecule_key_maker,
+            self._key_makers,
+        ):
+            key_name = key_maker.get_key_name()
             for building_block, json in zip(
                 molecule.get_building_blocks(),
                 building_block_jsons,
