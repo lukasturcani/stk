@@ -51,7 +51,7 @@ class MoleculeJsonizer:
         )
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-    In this case, ``json`` will have the form
+    In this case, ``json`` will look something like
 
     .. code-block:: python
 
@@ -85,10 +85,9 @@ class MoleculeJsonizer:
         key_makers : :class:`tuple` of \
                 :class:`.MoleculeKeyMaker`
             Used to make the keys of molecules, which should be
-            included in their JSON representations. Keys allows
-            molecular data to be reference itself when split across
+            included in their JSON representations. Keys allow
+            molecular data to reference itself when split across
             multiple JSONs.
-
 
         """
 

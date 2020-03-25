@@ -118,10 +118,10 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     .. code-block:: python
 
-        # Create your own key. This one is called "SMILES" and the
-        # value is the SMILES of the molecule.
         import rdkit.Chem.AllChem as rdkit
 
+        # Create your own key. This one is called "SMILES" and the
+        # value is the SMILES of the molecule.
         class Smiles(stk.MoleculeKeyMaker):
             def __init__(self):
                 return
