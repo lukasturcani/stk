@@ -1,4 +1,5 @@
 import stk
+import numpy as np
 import pytest
 
 from .case_data import CaseData
@@ -15,12 +16,12 @@ from .case_data import CaseData
             ),
             molecule=stk.BuildingBlock(
                 smiles='Br[C+2][C+2]Br',
-            ).with_position_matrix([
+            ).with_position_matrix(np.array([
                 [0, 0, 0],
                 [1, 1, 1],
                 [2, 2, 2],
                 [3, 3, 3],
-            ]),
+            ], dtype=np.float64)),
             json={
                 'molecule': {
                     'a': (
@@ -63,24 +64,24 @@ from .case_data import CaseData
                         stk.BuildingBlock(
                             smiles='Br[C+2][C+2]Br',
                             functional_groups=[stk.BromoFactory()],
-                        ).with_position_matrix([
+                        ).with_position_matrix(np.array([
                             [0, 0, 0],
                             [1, 1, 1],
                             [2, 2, 2],
                             [3, 3, 3],
-                        ]),
+                        ], dtype=np.float64)),
                     ),
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
-            ).with_position_matrix([
+            ).with_position_matrix(np.array([
                 [0, 0, 0],
                 [1, 1, 1],
                 [2, 2, 2],
                 [3, 3, 3],
                 [4, 4, 4],
                 [5, 5, 5],
-            ]),
+            ], dtype=np.float64)),
             json={
                 'molecule': {
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
@@ -140,6 +141,11 @@ from .case_data import CaseData
                 'matrix': {
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                     'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
+                    'ConstructedMoleculeKey': str((
+                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
+                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
+                        (2, ),
+                    )),
                     'm': [
                         [0., 0., 0.],
                         [1., 1., 1.],
