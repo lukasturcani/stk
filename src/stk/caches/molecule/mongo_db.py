@@ -17,6 +17,15 @@ class MongoDbMoleculeCache(MoleculeCache):
     """
     Uses MongoDB to store and retrieve molecules.
 
+    See Also
+    --------
+    :class:`.MongoDbConstructedMoleculeCache`
+        You can store :class:`.ConstructedMolecule` instances with
+        this class, however you can only retrieve them as
+        :class:`.Molecule` instances. If you want to store and
+        retrieve :class:`.ConstructedMolecule` instances, you should
+        use :class:`.MongoDbConstructedMoleculeCache`.
+
     Examples
     --------
     Before using this class, make sure you have :mod:`pymongo` and
