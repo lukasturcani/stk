@@ -72,8 +72,8 @@ class ConstructedMoleculeJsonizer:
                 :class:`.MoleculeKeyMaker` and \
                 :class:`.ConstructedMoleculeKeyMaker`
             Used to make the keys of molecules, which should be
-            included in their JSON representations. Keys allows
-            molecular data to be reference itself when split across
+            included in their JSON representations. Keys allow
+            molecular data to reference itself when split across
             multiple JSONs.
 
         """
