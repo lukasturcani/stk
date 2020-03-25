@@ -112,7 +112,7 @@ class MoleculeJsonizer:
             'b': tuple(map(bond_to_json, molecule.get_bonds())),
         }
         position_matrix_json = {
-            'matrix': molecule.get_position_matrix().tolist(),
+            'm': molecule.get_position_matrix().tolist(),
         }
         for key_maker in self._key_makers:
             key_name = key_maker.get_key_name()

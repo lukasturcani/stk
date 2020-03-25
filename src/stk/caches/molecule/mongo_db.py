@@ -4,8 +4,6 @@ MongoDB Molecule Cache
 
 """
 
-import numpy as np
-from stk.molecular import InchiKey
 from stk.serialization import (
     MoleculeJsonizer,
     MoleculeDejsonizer,
@@ -232,18 +230,9 @@ class MongoDbMoleculeCache(MoleculeCache):
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
 
-        position_matrix_json = {
-            'position_matrix':
-                molecule.get_position_matrix().tolist(),
-        }
-        for key_maker in self._key_makers:
-            position_matrix_json[key_maker.get_key_name()] = (
-                key_maker.get_key(molecule)
-            )
-        self._position_matrices.insert_one(position_matrix_json)
-
         json = self._jsonizer.to_json(molecule)
-        self._molecules.insert_one(json)
+        self._molecules.insert_one(json['molecule'])
+        self._position_matrices.insert_one(json['matrix_json'])
 
     def get(self, key, default=None):
         json = self._molecules.find_one(key)
@@ -255,8 +244,7 @@ class MongoDbMoleculeCache(MoleculeCache):
         elif json is None:
             return default
 
-        position_matrix = np.array(
-            self._position_matrices.find_one(key)['position_matrix'],
-            dtype=np.float64,
-        )
-        return self._dejsonizer.from_json(json, position_matrix)
+        return self._dejsonizer.from_json({
+            'molecule': json,
+            'matrix_json': self._position_matrices.find_one(key),
+        })

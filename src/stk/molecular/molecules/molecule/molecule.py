@@ -54,7 +54,10 @@ class Molecule:
         self._bonds = bonds
         # Take the transpose because it will make some matrix
         # multiplications faster.
-        self._position_matrix = np.array(position_matrix.T)
+        self._position_matrix = np.array(
+            position_matrix.T,
+            dtype=np.float64,
+        )
 
     def _with_displacement(self, displacement):
         """

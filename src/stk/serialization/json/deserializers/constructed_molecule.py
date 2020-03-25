@@ -76,7 +76,7 @@ class ConstructedMoleculeDejsonizer:
         return ConstructedMolecule.init(
             atoms=atoms,
             bonds=bonds,
-            position_matrix=np.array(json['matrix_json']['matrix']),
+            position_matrix=np.array(json['matrix_json']['m']),
             atom_infos=tuple(
                 to_atom_info(
                     building_blocks=building_blocks,
