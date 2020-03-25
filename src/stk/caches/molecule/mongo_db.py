@@ -19,6 +19,13 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     Examples
     --------
+    Before using this class, make sure you have :mod:`pymongo` and
+    that its working properly. I recommend reading at least the basic
+    documentation of :mod:`pymongo` before using this class. Those
+    docs can be found here__.
+
+    __ https://api.mongodb.com/python/current/
+
     *Usage*
 
     You want to store and retrieve a molecule from the database
