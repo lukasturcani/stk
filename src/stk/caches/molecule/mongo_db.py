@@ -134,7 +134,7 @@ class MongoDbMoleculeCache(MoleculeCache):
 
         molecule = stk.BuildingBlock('BrBr')
 
-        # Place the JSON of you molecule into the database. In this
+        # Place the JSON of your molecule into the database. In this
         # case the JSON will include a key called "NumAtoms" and
         # the value will be the number of atoms in the molecule.
         db.put(molecule)
@@ -142,6 +142,36 @@ class MongoDbMoleculeCache(MoleculeCache):
         # You can now find your molecule by putting in the number of
         # atoms.
         retrieved = db.get({'NumAtoms': 2})
+
+    Often, it is unnecessary to create a whole subclass for a your
+    custom key
+
+    .. code-block:: python
+
+        num_bonds = stk.MoleculeKey(
+            key_name='NumBonds',
+            get_key=lambda molecule: molecule.get_num_bonds(),
+        )
+
+        db = stk.MongoDbMoleculeCache(
+            mongo_client=client,
+            jsonizer=stk.MoleculeJsonizer(
+                # Include a "NumAtoms" key and a "NumBonds" key.
+                key_makers=(stk.InchiKey(), NumAtoms(), num_bonds),
+            ),
+        )
+
+        # Place a JSON of your molecule into the database. In this
+        # example, the JSON will include the keys "NumAtoms" and
+        # "NumBond", and their respective values for your molecule.
+        db.put(molecule)
+
+        # You can now find your molecule by putting in the number
+        # of bonds
+        retrieved = db.get({'NumBonds': 1})
+
+        # Or the number of bonds and atoms.
+        retrieved = db.get({'NumAtoms': 2, 'NumBonds': 1})
 
     """
 
