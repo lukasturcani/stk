@@ -148,7 +148,7 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     .. code-block:: python
 
-        num_bonds = stk.MoleculeKey(
+        num_bonds = stk.MoleculeKeyMaker(
             key_name='NumBonds',
             get_key=lambda molecule: molecule.get_num_bonds(),
         )
