@@ -11,6 +11,7 @@ Subpackages
 
 .. toctree::
 
+   stk.caches
    stk.calculators
    stk.molecular
    stk.serialization
