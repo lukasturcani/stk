@@ -4,6 +4,7 @@ MongoDB Molecular Cache
 
 """
 
+import numpy as np
 from stk.molecular import ConstructedMolecule, InchiKey
 from stk.serialization import (
     MoleculeJsonizer,
@@ -37,6 +38,7 @@ class MongoDbMolecularCache(MolecularCache):
         constructed_molecule_dejsonizer=(
             ConstructedMoleculeDejsonizer()
         ),
+        building_block_cache=None,
     ):
         """
         Initialize a :class:`.MongoDbMolecularCache` instance.
@@ -69,13 +71,11 @@ class MongoDbMolecularCache(MolecularCache):
         """
 
         database = mongo_client[database]
-        self._molecule_collection = database[molecule_collection]
-        self._constructed_molecule_collection = database[
+        self._molecules = database[molecule_collection]
+        self._constructed_molecules = database[
             constructed_molecule_collection
         ]
-        self._position_matrix_collection = database[
-            position_matrix_collection
-        ]
+        self._position_matrices = database[position_matrix_collection]
         self._molecule_jsonizer = molecule_jsonizer
         self._constructed_molecule_jsonizer = (
             constructed_molecule_jsonizer
@@ -84,6 +84,9 @@ class MongoDbMolecularCache(MolecularCache):
         self._constructed_molecule_dejsonizer = (
             constructed_molecule_dejsonizer
         )
+        if building_block_cache is None:
+            building_block_cache = self
+        self._building_block_cache = building_block_cache
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
@@ -96,21 +99,19 @@ class MongoDbMolecularCache(MolecularCache):
             position_matrix_json[key_maker.get_key_name()] = (
                 key_maker.get_key(molecule)
             )
-        self._position_matrix_collection.insert_one(
-            document=position_matrix_json,
-        )
+        self._position_matrices.insert_one(position_matrix_json)
 
         json = self._molecule_jsonizer.to_json(molecule)
-        self._molecule_collection.insert_one(json)
+        self._molecules.insert_one(json)
 
         if not isinstance(molecule, ConstructedMolecule):
             return
 
         json = self._constructed_molecule_jsonizer.to_json(molecule)
-        self._constructed_molecule_collection.insert_one(json)
+        self._constructed_molecules.insert_one(json)
 
     def get(self, key, default=None):
-        molecule_json = self._molecule_collection.find_one(key)
+        molecule_json = self._molecules.find_one(key)
         if molecule_json is None and default is None:
             raise KeyError(
                 'No molecule found in the database with a key of: '
@@ -119,16 +120,27 @@ class MongoDbMolecularCache(MolecularCache):
         elif molecule_json is None:
             return default
 
+        position_matrix = np.array(
+            self._position_matrices.find_one(key),
+            dtype=np.float64,
+        )
+
         constructed_molecule_json = (
-            self._constructed_molecule_collection.find_one(key)
+            self._constructed_molecules.find_one(key)
         )
         if constructed_molecule_json is None:
-            return self._molecule_dejsonizer.from_json(molecule_json)
+            return self._molecule_dejsonizer.from_json(
+                json=molecule_json,
+                position_matrix=position_matrix,
+            )
 
-        building_blocks = constructed_molecule_json['building_blocks']
-        building_block_jsons = self._molecule_collection.find(
-            {'$or': building_blocks}
+        building_block_jsons = self._molecules.find(
+            {'$or': constructed_molecule_json['BB']}
         )
+        building_block_matrices = self._position_matrices.find(
+
+        )
+
         return self._constructed_molecule_dejsonizer.from_json(
             molecule_json=molecule_json,
             building_block_jsons=building_block_jsons,
