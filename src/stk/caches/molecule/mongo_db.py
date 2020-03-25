@@ -21,9 +21,9 @@ class MongoDbMoleculeCache(MoleculeCache):
     --------
     :class:`.MongoDbConstructedMoleculeCache`
         You can store :class:`.ConstructedMolecule` instances with
-        this class, however you can only retrieve them
-        as :class:`.Molecule` instances. If you want to store and
-        retrieve :class:`.ConstructedMolecule` instances, you should
+        this class, however you can only retrieve them \
+        as :class:`.Molecule` instances. If you want to store and \
+        retrieve :class:`.ConstructedMolecule` instances, you should \
         use :class:`.MongoDbConstructedMoleculeCache`.
 
     Examples
