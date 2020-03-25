@@ -19,6 +19,85 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     Examples
     --------
+    *Usage*
+
+    You want to store and retrieve a molecule from the database
+
+    .. code-block:: python
+
+        import stk
+        # pymongo does not come with stk, you have to install it
+        # explicitly with "pip install pymongo".
+        import pymongo
+
+        # Connect to a MongoDB. This example connects to a local
+        # MongoDB, but you can connect to a remote DB too with
+        # MongoClient - read the documentation for pymongo to see how
+        # to do that.
+        client = pymong.MongoClient()
+        db = stk.MongoDbMoleculeCache(client)
+
+        # Create a molecule.
+        molecule = stk.BuildingBlock('NCCN')
+
+        # Place it into the database.
+        db.put(molecule)
+
+        # Retrieve it from the database.
+        key_maker = stk.InchiKey()
+        retrieved = db.get({
+            key_maker.get_key_name(): key_maker.get_key(molecule)
+        })
+
+    Note that the molecule retrieved from that database can have
+    a different atom ordering than the one put into it. So while the
+    molecule will have the same structure, the order of the atoms
+    may be different to the molecule placed into the database. This
+    is because the database gives the molecules a canonical atom
+    ordering, which allows position matrices to be used across
+    different atom id orderings.
+
+    By default, the database stores the InChIKey of molecules only.
+    However, additional keys can be added to the JSON stored in the
+    database by using a different :class:`.MoleculeJsonizer`
+
+    .. code-block:: python
+
+        db = stk.MongoDbMoleculeCache(
+            mongo_client=client,
+            jsonzier=stk.MoleculeJsonizer(
+                # Store the InChI and the InChI key of molecules in
+                # their JSON representation.
+                key_makers=(stk.Inchi(), stk.InchiKey()),
+            )
+        )
+        # Places the JSON of the molecule into the database. In this
+        # case, the JSON includes both the InChI and the InChIKey.
+        db.put(molecule)
+
+        # You can now use the InChI or the InChI key to retrieve the
+        # molecule from the database.
+        key_maker = stk.Inchi()
+        retrieved = db.get({
+            key_maker.get_key_name(): key_maker.get_key(molecule),
+        })
+
+    Obviously, most of the time, you won't have the molecule you are
+    trying to retrieve from the database. Maybe you only have the
+    SMILES of the molecule. You can still retrieve it.
+
+    .. code-block:: python
+
+        import rdkit.Chem.AllChem as rdkit
+
+        key_maker = stk.Inchi()
+        retrieved = db.get(
+            key_maker.get_key_name():
+                rdkit.MolToInchi(rdkit.MolFromSmiles('NCCN'))
+        )
+
+    As long as you have the name of the key, and the expected value
+    of the key you can retrieve your molecule from the database.
 
     """
 
@@ -29,8 +108,8 @@ class MongoDbMoleculeCache(MoleculeCache):
         molecule_collection='molecules',
         position_matrix_collection='position_matrices',
         key_makers=(InchiKey(), ),
-        molecule_jsonizer=MoleculeJsonizer(),
-        molecule_dejsonizer=MoleculeDejsonizer(),
+        jsonizer=MoleculeJsonizer(),
+        dejsonizer=MoleculeDejsonizer(),
     ):
         """
         Initialize a :class:`.MongoDbMolecularCache` instance.
@@ -57,11 +136,11 @@ class MongoDbMoleculeCache(MoleculeCache):
             reference the position matrices in the
             `position_matrix_collection`.
 
-        molecule_jsonizer : :class:`.MoleculeJsonizer`
+        jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
             stored in the database.
 
-        molecule_dejsonizer : :class:`.MoleculeDejsonizer`
+        dejsonizer : :class:`.MoleculeDejsonizer`
             Used to create :class:`.Molecule` instances from their
             JSON representations.
 
@@ -71,8 +150,8 @@ class MongoDbMoleculeCache(MoleculeCache):
         self._molecules = database[molecule_collection]
         self._position_matrices = database[position_matrix_collection]
         self._key_makers = key_makers
-        self._molecule_jsonizer = molecule_jsonizer
-        self._molecule_dejsonizer = molecule_dejsonizer
+        self._jsonizer = jsonizer
+        self._dejsonizer = dejsonizer
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
@@ -87,24 +166,21 @@ class MongoDbMoleculeCache(MoleculeCache):
             )
         self._position_matrices.insert_one(position_matrix_json)
 
-        json = self._molecule_jsonizer.to_json(molecule)
+        json = self._jsonizer.to_json(molecule)
         self._molecules.insert_one(json)
 
     def get(self, key, default=None):
-        molecule_json = self._molecules.find_one(key)
-        if molecule_json is None and default is None:
+        json = self._molecules.find_one(key)
+        if json is None and default is None:
             raise KeyError(
                 'No molecule found in the database with a key of: '
                 f'{key}'
             )
-        elif molecule_json is None:
+        elif json is None:
             return default
 
         position_matrix = np.array(
             self._position_matrices.find_one(key)['position_matrix'],
             dtype=np.float64,
         )
-        return self._molecule_dejsonizer.from_json(
-                json=molecule_json,
-                position_matrix=position_matrix,
-            )
+        return self._dejsonizer.from_json(json, position_matrix)
