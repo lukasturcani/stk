@@ -65,7 +65,7 @@ class MongoDbMoleculeCache(MoleculeCache):
 
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
-            jsonzier=stk.MoleculeJsonizer(
+            jsonizer=stk.MoleculeJsonizer(
                 # Store the InChI and the InChI key of molecules in
                 # their JSON representation.
                 key_makers=(stk.Inchi(), stk.InchiKey()),
