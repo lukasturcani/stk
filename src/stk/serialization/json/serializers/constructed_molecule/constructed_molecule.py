@@ -13,7 +13,7 @@ from stk.molecular import (
 
 class ConstructedMoleculeJsonizer:
     """
-    Serializes :class:`.ConstructedMolecule` instances into JSON.
+    Abstract base class for creating JSONs of constructed molecules.
 
     See Also
     --------
