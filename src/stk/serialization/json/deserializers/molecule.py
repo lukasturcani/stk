@@ -63,7 +63,7 @@ class MoleculeDejsonizer:
                 to_bond(atoms, bond_json)
                 for bond_json in json['molecule']['b']
             ),
-            position_matrix=np.array(json['matrix_json']['m']),
+            position_matrix=np.array(json['matrix']['m']),
         )
 
     def __str__(self):

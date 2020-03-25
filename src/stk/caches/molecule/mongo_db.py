@@ -78,15 +78,13 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     .. code-block:: python
 
-        key_makers = (stk.Inchi(), stk.InchiKey())
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
             # Store the InChI and the InChIKey of molecules in
             # the JSON representation.
-            jsonizer=stk.MoleculeJsonizer(key_makers),
-            # Make sure the position matrices stored in the database
-            # can be referenced by the same keys as the molecules.
-            key_makers=key_makers,
+            jsonizer=stk.MoleculeJsonizer(
+                key_makers=(stk.Inchi(), stk.InchiKey()),
+            )
         )
         # Places the JSON of the molecule into the database. In this
         # case, the JSON includes both the InChI and the InChIKey.
@@ -134,24 +132,23 @@ class MongoDbMoleculeCache(MoleculeCache):
             def get_key(self, molecule):
                 return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
-        # Include your own custom key maker in the JSON representation.
-        key_makers = (stk.Inchi(), stk.InchiKey(), Smiles())
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(key_makers),
-            # Make sure the position_matrices stored in the database
-            # can be referenced by the same keys as the molecules.
-            key_makers=key_makers,
+            jsonizer=stk.MoleculeJsonizer(
+                # Include your own custom key maker in the JSON
+                # representation.
+                key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
+            ),
         )
 
         molecule = stk.BuildingBlock('BrBr')
 
         # Place the JSON of your molecule into the database. In this
         # case the JSON will include a key called "SMILES" and
-        # the value will be the SMILES in the molecule.
+        # the value will be the SMILES of the molecule.
         db.put(molecule)
 
-        # You can now find your molecule by putting in the SMILES.
+        # You can now find your molecule by using SMILES as the key.
         retrieved = db.get({'SMILES': 'BrBr'})
 
     Often, it is unnecessary to create a whole subclass for a your
@@ -164,12 +161,11 @@ class MongoDbMoleculeCache(MoleculeCache):
             get_key=lambda molecule:
                 rdkit.MolToSmiles(molecule.to_rdkit_mol()),
         )
-
-        key_makers = (stk.InchiKey(), smiles)
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(key_makers),
-            key_makers=key_makers,
+            jsonizer=stk.MoleculeJsonizer(
+            key_makers=(stk.InchiKey(), smiles),
+            ),
         )
 
     Note that the key you use to get the molecule back from the
@@ -229,10 +225,9 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
-
         json = self._jsonizer.to_json(molecule)
         self._molecules.insert_one(json['molecule'])
-        self._position_matrices.insert_one(json['matrix_json'])
+        self._position_matrices.insert_one(json['matrix'])
 
     def get(self, key, default=None):
         json = self._molecules.find_one(key)
@@ -246,5 +241,5 @@ class MongoDbMoleculeCache(MoleculeCache):
 
         return self._dejsonizer.from_json({
             'molecule': json,
-            'matrix_json': self._position_matrices.find_one(key),
+            'matrix': self._position_matrices.find_one(key),
         })
