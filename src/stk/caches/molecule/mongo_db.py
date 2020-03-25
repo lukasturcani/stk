@@ -107,6 +107,42 @@ class MongoDbMoleculeCache(MoleculeCache):
     As long as you have the name of the key, and the expected value
     of the key you can retrieve your molecule from the database.
 
+    Note that you can create your own keys and add them to the database
+
+    .. code-block:: python
+
+        # Create your own key. This one is called NumAtoms and its
+        # value is the number of atoms in the molecule.
+        class NumAtoms(stk.MoleculeKeyMaker):
+            def __init__(self):
+                return
+
+            def get_key_name(self):
+                return 'NumAtoms'
+
+            def get_key(self, molecule):
+                return molecule.get_num_atoms()
+
+        db = stk.MongoDbMoleculeCache(
+            mongo_client=client,
+            jsonizer=stk.MoleculeJsonizer(
+                # Include your own custom key maker in the JSON
+                # representation.
+                key_makers=(stk.Inchi(), stk.InchiKey(), NumAtoms())
+            ),
+        )
+
+        molecule = stk.BuildingBlock('BrBr')
+
+        # Place the JSON of you molecule into the database. In this
+        # case the JSON will include a key called "NumAtoms" and
+        # the value will be the number of atoms in the molecule.
+        db.put(molecule)
+
+        # You can now find your molecule by putting in the number of
+        # atoms.
+        retrieved = db.get({'NumAtoms': 2})
+
     """
 
     def __init__(
