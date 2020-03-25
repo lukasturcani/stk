@@ -20,7 +20,8 @@ class MongoDbMoleculeCache(MoleculeCache):
     Examples
     --------
     Before using this class, make sure you have :mod:`pymongo` and
-    that its working properly. I recommend reading at least the basic
+    that its working properly. I recommend reading at least the
+    introductory and installation
     documentation of :mod:`pymongo` before using this class. Those
     docs can be found here__.
 
