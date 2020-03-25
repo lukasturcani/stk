@@ -105,7 +105,7 @@ class MongoDbMoleculeCache(MoleculeCache):
         )
 
     As long as you have the name of the key, and the expected value
-    of the key you can retrieve your molecule from the database.
+    of the key, you can retrieve your molecule from the database.
 
     Note that you can create your own keys and add them to the database
 
