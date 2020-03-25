@@ -85,7 +85,10 @@ class MoleculeJsonizer:
         key_makers : :class:`tuple` of \
                 :class:`.MoleculeKeyMaker`
             Used to make the keys of molecules, which should be
-            included in their JSON representations.
+            included in their JSON representations. Keys allows
+            molecular data to be reference itself when split across
+            multiple JSONs.
+
 
         """
 

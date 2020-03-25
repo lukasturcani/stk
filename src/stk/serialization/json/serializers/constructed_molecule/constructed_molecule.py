@@ -54,11 +54,6 @@ class ConstructedMoleculeJsonizer:
         # Get the JSON.
         json = jsonizer.to_json(polymer)
 
-    Note that the JSON representation does not include the building
-    blocks of the constructed molecule. Instead the building blocks
-    are only referenced via the keys provided in the `key_makers`
-    parameter.
-
     """
 
     def __init__(
@@ -77,7 +72,9 @@ class ConstructedMoleculeJsonizer:
                 :class:`.MoleculeKeyMaker` and \
                 :class:`.ConstructedMoleculeKeyMaker`
             Used to make the keys of molecules, which should be
-            included in their JSON representations.
+            included in their JSON representations. Keys allows
+            molecular data to be reference itself when split across
+            multiple JSONs.
 
         """
 
@@ -146,16 +143,30 @@ class ConstructedMoleculeJsonizer:
                 molecule.get_building_blocks(),
             )),
         }
+        building_block_jsons = tuple(map(
+            self._molecule_jsonizer.to_json,
+            molecule.get_building_blocks(),
+        ))
         for key_maker in self._key_makers:
             key_name = key_maker.get_key_name()
             key = key_maker.get_key(molecule)
             molecule_json['molecule'][key_name] = key
             molecule_json['matrix'][key_name] = key
             constructed_molecule_json[key_name] = key
+
+            for building_block, json in zip(
+                molecule.get_building_blocks(),
+                building_block_jsons,
+            ):
+                key = key_maker.get_key(building_block)
+                json['molecule'][key_name] = key
+                json['matrix'][key_name] = key
+
         return {
             'molecule': molecule_json['molecule'],
             'constructedMolecule': constructed_molecule_json,
             'matrix': molecule_json['matrix'],
+            'buildingBlocks': building_block_jsons,
         }
 
     def __str__(self):
