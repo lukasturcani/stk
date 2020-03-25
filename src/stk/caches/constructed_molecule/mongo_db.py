@@ -194,6 +194,37 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         dejsonizer=ConstructedMoleculeDejsonizer(),
     ):
         """
+        Initialize a :class:`.MongoDbConstructedMoleculeCache`.
+
+        Parameters
+        ----------
+        mongo_client : :class:`pymongo.MongoClient`
+            The database client.
+
+        database : :class:`str`
+            The name of the database to use.
+
+        molecule_collection : :class:`str`
+            The name of the collection which stores molecular
+            information.
+
+        constructed_molecule_collection : :class:`str`
+            The name of the collection which stored constructed
+            molecule information, that does not belong in the
+            `molecule_collection`.
+
+        position_matrix_collection : :class:`str`
+            The name of the collection which stores the position
+            matrices of the molecules put into and retrieved from
+            the cache.
+
+        jsonizer : :class:`.ConstructedMoleculeJsonizer`
+            Used to create the JSON representations of molecules
+            stored in the database.
+
+        dejsonizer : :class:`.ConstructedMoleculeDejsonizer`
+            Used to create :class:`.Molecule` instances from their
+            JSON representations.
 
         """
 
