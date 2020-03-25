@@ -1,6 +1,6 @@
 """
-MongoDB Molecular Cache
-=======================
+MongoDB Molecule Cache
+======================
 
 """
 

@@ -19,6 +19,14 @@ class ConstructedMoleculeJsonizer:
     --------
     :class:`.MoleculeJsonizer`
 
+    Notes
+    -----
+    You might notice that the public method of this abstract base class
+    is implemented. This is just a default implementation, which can
+    be safely ignored or overridden when implementing subclasses.
+    However, the default implementation can be used directly,
+    if it suits your needs.
+
     Examples
     --------
     It is first necessary to read the docstring of

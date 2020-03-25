@@ -10,11 +10,19 @@ from .utilities import atom_to_json, bond_to_json
 
 class MoleculeJsonizer:
     """
-    Creates JSON representations of :class:`.Molecule` instances.
+    Abstract base class for creating JSONs of molecules.
 
     See Also
     --------
     :class:`.ConstructedMoleculeJsonizer`
+
+    Notes
+    -----
+    You might notice that the public method of this abstract base class
+    is implemented. This is just a default implementation, which can
+    be safely ignored or overridden when implementing subclasses.
+    However, the default implementation can be used directly,
+    if it suits your needs.
 
     Examples
     --------
