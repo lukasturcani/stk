@@ -21,7 +21,7 @@ class MongoDbMoleculeCache(MoleculeCache):
     --------
     :class:`.MongoDbConstructedMoleculeCache`
         You can store :class:`.ConstructedMolecule` instances with \
-        :class:`MongoDbMoleculeCache`, however you can only retrieve \
+        :class:`.MongoDbMoleculeCache`, however you can only retrieve \
         them as :class:`.Molecule` instances. If you want to store \
         and retrieve :class:`.ConstructedMolecule` instances, you \
         should use :class:`.MongoDbConstructedMoleculeCache`.
@@ -80,19 +80,21 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     .. code-block:: python
 
+        key_makers = (stk.Inchi(), stk.InchiKey())
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(
-                # Store the InChI and the InChI key of molecules in
-                # their JSON representation.
-                key_makers=(stk.Inchi(), stk.InchiKey()),
-            )
+            # Store the InChI and the InChIKey of molecules in
+            # the JSON representation.
+            jsonizer=stk.MoleculeJsonizer(key_makers),
+            # Make sure the position matrices stored in the database
+            # can be referenced by the same keys as the molecules.
+            key_makers=key_makers,
         )
         # Places the JSON of the molecule into the database. In this
         # case, the JSON includes both the InChI and the InChIKey.
         db.put(molecule)
 
-        # You can now use the InChI or the InChI key to retrieve the
+        # You can now use the InChI or the InChIKey to retrieve the
         # molecule from the database.
         key_maker = stk.Inchi()
         retrieved = db.get({
@@ -120,69 +122,65 @@ class MongoDbMoleculeCache(MoleculeCache):
 
     .. code-block:: python
 
-        # Create your own key. This one is called NumAtoms and its
-        # value is the number of atoms in the molecule.
-        class NumAtoms(stk.MoleculeKeyMaker):
+        # Create your own key. This one is called "SMILES" and the
+        # value is the SMILES of the molecule.
+        import rdkit.Chem.AllChem as rdkit
+
+        class Smiles(stk.MoleculeKeyMaker):
             def __init__(self):
                 return
 
             def get_key_name(self):
-                return 'NumAtoms'
+                return 'SMILES'
 
             def get_key(self, molecule):
-                return molecule.get_num_atoms()
+                return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
+        # Include your own custom key maker in the JSON representation.
+        key_makers = (stk.Inchi(), stk.InchiKey(), Smiles())
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(
-                # Include your own custom key maker in the JSON
-                # representation.
-                key_makers=(stk.Inchi(), stk.InchiKey(), NumAtoms())
-            ),
+            jsonizer=stk.MoleculeJsonizer(key_makers),
+            # Make sure the position_matrices stored in the database
+            # can be referenced by the same keys as the molecules.
+            key_makers=key_makers,
         )
 
         molecule = stk.BuildingBlock('BrBr')
 
         # Place the JSON of your molecule into the database. In this
-        # case the JSON will include a key called "NumAtoms" and
-        # the value will be the number of atoms in the molecule.
+        # case the JSON will include a key called "SMILES" and
+        # the value will be the SMILES in the molecule.
         db.put(molecule)
 
-        # You can now find your molecule by putting in the number of
-        # atoms.
-        retrieved = db.get({'NumAtoms': 2})
+        # You can now find your molecule by putting in the SMILES.
+        retrieved = db.get({'SMILES': 'BrBr'})
 
     Often, it is unnecessary to create a whole subclass for a your
     custom key
 
     .. code-block:: python
 
-        num_bonds = stk.MoleculeKeyMaker(
-            key_name='NumBonds',
-            get_key=lambda molecule: molecule.get_num_bonds(),
+        smiles = stk.MoleculeKeyMaker(
+            key_name='SMILES',
+            get_key=lambda molecule:
+                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
         )
 
+        key_makers = (stk.InchiKey(), smiles)
         db = stk.MongoDbMoleculeCache(
             mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(
-                # Include a "NumAtoms" key and a "NumBonds" key.
-                key_makers=(stk.InchiKey(), NumAtoms(), num_bonds),
-            ),
+            jsonizer=stk.MoleculeJsonizer(key_makers),
+            key_makers=key_makers,
         )
 
-        # Place a JSON of your molecule into the database. In this
-        # example, the JSON will include the keys "NumAtoms" and
-        # "NumBond", and their respective values for your molecule.
-        db.put(molecule)
-
-        # You can now find your molecule by putting in the number
-        # of bonds
-        retrieved = db.get({'NumBonds': 1})
-
-        # Or the number of bonds and atoms.
-        retrieved = db.get({'NumAtoms': 2, 'NumBonds': 1})
-
-    In fact, you can use any valid MongoDB query to get your molecule.
+    Note that the key you use to get the molecule back from the
+    database should be unique. In other words, there should always just
+    be one molecule which has that key in the database. Using a key
+    that is matched by multiple molecules will likely cause your data
+    to be jumbled. For example, you might return the atoms of one
+    of the molecules matched by the key but holding the position matrix
+    of the second molecule matched by the key.
 
     """
 
