@@ -18,11 +18,11 @@ class MoleculeJsonizer:
 
     Notes
     -----
-    You might notice that the public method of this abstract base class
-    is implemented. This is just a default implementation, which can
-    be safely ignored or overridden when implementing subclasses.
-    However, the default implementation can be used directly,
-    if it suits your needs.
+    You might notice that the public methods of this abstract base
+    class are implemented. These are just default implementations,
+    which can be safely ignored or overridden, when implementing
+    subclasses. However, the default implementation can be used
+    directly, if it suits your needs.
 
     Examples
     --------
@@ -35,8 +35,8 @@ class MoleculeJsonizer:
         jsonizer = stk.MoleculeJsonizer()
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-    The apart from atoms and bonds, the JSON representation holds
-    additional fields, one for each
+    Apart from atoms, bonds and the position matrix, the JSON
+    representation holds additional fields, one for each
     :class:`.MoleculeKeyMaker` provided to the initializer
 
     .. code-block:: python
@@ -46,7 +46,7 @@ class MoleculeJsonizer:
         jsonizer = stk.MoleculeJsonizer(
             key_makers=(
                 stk.Inchi(),
-                stk.InchiKey()
+                stk.InchiKey(),
             ),
         )
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
@@ -115,7 +115,10 @@ class MoleculeJsonizer:
             json[key_maker.get_key_name()] = (
                 key_maker.get_key(molecule)
             )
-        return json
+        return {
+            'm': json,
+            'p': molecule.get_position_matrix().tolist(),
+        }
 
     def __str__(self):
         return repr(self)

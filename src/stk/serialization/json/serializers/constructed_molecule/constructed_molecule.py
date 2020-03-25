@@ -9,6 +9,7 @@ from stk.molecular import (
     InchiKey,
     ConstructedMoleculeKeyMaker,
 )
+from ..molecule import MoleculeJsonizer
 
 
 class ConstructedMoleculeJsonizer:
@@ -21,20 +22,16 @@ class ConstructedMoleculeJsonizer:
 
     Notes
     -----
-    You might notice that the public method of this abstract base class
-    is implemented. This is just a default implementation, which can
-    be safely ignored or overridden when implementing subclasses.
-    However, the default implementation can be used directly,
-    if it suits your needs.
+    You might notice that the public methods of this abstract base
+    class are implemented. These are just default implementations,
+    which can be safely ignored or overridden, when implementing
+    subclasses. However, the default implementation can be used
+    directly, if it suits your needs.
 
     Examples
     --------
-    It is first necessary to read the docstring of
-    :class:`.MoleculeJsonizer`, since this class is almost always used
-    together with it, and not as a replacement for it.
-
-    Now, if you want get a JSON representation of a
-    :class:`.ConstructedMolecule` you can do something like
+    You want get a JSON representation of a
+    :class:`.ConstructedMolecule`
 
     .. code-block:: python
 
@@ -57,38 +54,10 @@ class ConstructedMoleculeJsonizer:
         # Get the JSON.
         json = jsonizer.to_json(polymer)
 
-    At this point, you might think that ``json`` holds the entire
-    JSON representation of ``polymer``. This is not the case. It
-    only holds the information that is exclusive to
-    :class:`.ConstructedMolecule`, and only holds references to the
-    information which is relevant to a :class:`.Molecule`.
-
-    If you want get a JSON representation of the information relevant
-    to a :class:`.Molecule`, like the atoms and bonds, you have
-    to use a :class:`.MoleculeJsonizer` in addition to the
-    :class:`.ConstructedMoleculeJsonizer`
-
-    .. code-block:: python
-
-        molecule_jsonizer = stk.MoleculeJsonizer()
-        # Holds JSON representation of information relevant to
-        # Molecule objects.
-        molecule_json = molecule_jsonizer.to_json(polymer)
-
-    The reason for this, is that it allows the building of
-    JSON databases, like MongoDB, in a sensible way. This means
-    information relevant to the :class:`.Molecule` class is held in a
-    separate collection to the extra data carried by a
-    :class:`.ConstructedMolecule`, which is held in its own
-    collection.
-
-    Here the purpose of the `key_makers` parameter becomes apparent.
-    The keys made by the `key_makers` can be used to reference the
-    relevant molecular data across collections. For example, instead of
-    holding the building blocks of a :class:`.ConstructedMolecule`
-    directly, the JSON representation merely uses `key_makers` to
-    create the keys, which can be used to find them in the separate
-    collection.
+    Note that the JSON representation does not include the building
+    blocks of the constructed molecule. Instead the building blocks
+    are only referenced via the keys provided in the `key_makers`
+    parameter.
 
     """
 
@@ -112,6 +81,7 @@ class ConstructedMoleculeJsonizer:
 
         """
 
+        self._molecule_jsonizer = MoleculeJsonizer(key_makers=())
         self._key_makers = key_makers
 
     def to_json(self, molecule):
@@ -157,7 +127,8 @@ class ConstructedMoleculeJsonizer:
                 bond_info.get_building_block_id(),
             )
 
-        json = {
+        molecule_json = self._molecule_jsonizer.to_json(molecule)
+        constructed_molecule_json = {
             'BB': tuple(map(
                 get_keys,
                 molecule.get_building_blocks(),
@@ -176,10 +147,15 @@ class ConstructedMoleculeJsonizer:
             )),
         }
         for key_maker in self._key_makers:
-            json[key_maker.get_key_name()] = (
-                key_maker.get_key(molecule)
-            )
-        return json
+            key_name = key_maker.get_key_name()
+            key = key_maker.get_key(molecule)
+            molecule_json['m'][key_name] = key
+            constructed_molecule_json[key_name] = key
+        return {
+            'm': molecule_json['m'],
+            'cM': constructed_molecule_json,
+            'p': molecule_json['p'],
+        }
 
     def __str__(self):
         return repr(self)
