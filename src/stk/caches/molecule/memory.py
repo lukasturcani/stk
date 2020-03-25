@@ -1,7 +1,7 @@
-from . molecular_cache import MolecularCache
+from . molecule import MoleculeCache
 
 
-class MemoryMolecularCache(MolecularCache):
+class MemoryMoleculeCache(MoleculeCache):
     """
 
     """

@@ -844,3 +844,12 @@ class Molecule:
             '.pdb': writers._write_pdb_file,
         }[extension](self, path, atom_ids)
         return self
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}({self._atoms!r}, '
+            f'{self._bonds!r}, {self._position_matrix!r})'
+        )

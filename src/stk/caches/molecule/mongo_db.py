@@ -5,17 +5,15 @@ MongoDB Molecular Cache
 """
 
 import numpy as np
-from stk.molecular import ConstructedMolecule, InchiKey
+from stk.molecular import InchiKey
 from stk.serialization import (
     MoleculeJsonizer,
-    ConstructedMoleculeJsonizer,
     MoleculeDejsonizer,
-    ConstructedMoleculeDejsonizer,
 )
-from .molecular_cache import MolecularCache
+from . molecule import MoleculeCache
 
 
-class MongoDbMolecularCache(MolecularCache):
+class MongoDbMoleculeCache(MoleculeCache):
     """
     Uses MongoDB to store and retrieve molecules.
 
@@ -29,16 +27,10 @@ class MongoDbMolecularCache(MolecularCache):
         mongo_client,
         database='stk',
         molecule_collection='molecules',
-        constructed_molecule_collection='constructed_molecules',
         position_matrix_collection='position_matrices',
         key_makers=(InchiKey(), ),
         molecule_jsonizer=MoleculeJsonizer(),
-        constructed_molecule_jsonizer=ConstructedMoleculeJsonizer(),
         molecule_dejsonizer=MoleculeDejsonizer(),
-        constructed_molecule_dejsonizer=(
-            ConstructedMoleculeDejsonizer()
-        ),
-        building_block_cache=None,
     ):
         """
         Initialize a :class:`.MongoDbMolecularCache` instance.
@@ -55,38 +47,32 @@ class MongoDbMolecularCache(MolecularCache):
             The name of the collection which stores molecular
             information.
 
-        constructed_molecule_collection : :class:`str`
-            The name of the collection which stores additional
-            constructed molecule information.
+        position_matrix_collection : :class:`str`
+            The name of the collection which stores the position
+            matrices of the molecules put into and retrieved from
+            the cache.
+
+        key_makers : :class:`tuple` of :class:`.MoleculeKeyMaker`
+            Used to make the keys for molecules, which are used to
+            reference the position matrices in the
+            `position_matrix_collection`.
 
         molecule_jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
             stored in the database.
 
-        constructed_molecule_jsonizer : \
-                :class:`.ConstructedMoleculeJsonizer`
-            Used to create the JSON representations of constructed
-            molecule data stored in the database.
+        molecule_dejsonizer : :class:`.MoleculeDejsonizer`
+            Used to create :class:`.Molecule` instances from their
+            JSON representations.
 
         """
 
         database = mongo_client[database]
         self._molecules = database[molecule_collection]
-        self._constructed_molecules = database[
-            constructed_molecule_collection
-        ]
         self._position_matrices = database[position_matrix_collection]
+        self._key_makers = key_makers
         self._molecule_jsonizer = molecule_jsonizer
-        self._constructed_molecule_jsonizer = (
-            constructed_molecule_jsonizer
-        )
         self._molecule_dejsonizer = molecule_dejsonizer
-        self._constructed_molecule_dejsonizer = (
-            constructed_molecule_dejsonizer
-        )
-        if building_block_cache is None:
-            building_block_cache = self
-        self._building_block_cache = building_block_cache
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
@@ -104,12 +90,6 @@ class MongoDbMolecularCache(MolecularCache):
         json = self._molecule_jsonizer.to_json(molecule)
         self._molecules.insert_one(json)
 
-        if not isinstance(molecule, ConstructedMolecule):
-            return
-
-        json = self._constructed_molecule_jsonizer.to_json(molecule)
-        self._constructed_molecules.insert_one(json)
-
     def get(self, key, default=None):
         molecule_json = self._molecules.find_one(key)
         if molecule_json is None and default is None:
@@ -121,28 +101,10 @@ class MongoDbMolecularCache(MolecularCache):
             return default
 
         position_matrix = np.array(
-            self._position_matrices.find_one(key),
+            self._position_matrices.find_one(key)['position_matrix'],
             dtype=np.float64,
         )
-
-        constructed_molecule_json = (
-            self._constructed_molecules.find_one(key)
-        )
-        if constructed_molecule_json is None:
-            return self._molecule_dejsonizer.from_json(
+        return self._molecule_dejsonizer.from_json(
                 json=molecule_json,
                 position_matrix=position_matrix,
             )
-
-        building_block_jsons = self._molecules.find(
-            {'$or': constructed_molecule_json['BB']}
-        )
-        building_block_matrices = self._position_matrices.find(
-
-        )
-
-        return self._constructed_molecule_dejsonizer.from_json(
-            molecule_json=molecule_json,
-            building_block_jsons=building_block_jsons,
-            constructed_molecule_json=constructed_molecule_json
-        )

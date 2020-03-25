@@ -1,23 +1,24 @@
 """
-Molecular Cache
+Molecule Cache
 ===============
 
-#. :class:`.MemoryMolecularCache`
-#. :class:`.MongoDbMolecularCache`
+#. :class:`.MemoryMoleculeCache`
+#. :class:`.MongoDbMoleculeCache`
 
 """
 
 
-class MolecularCache:
+class MoleculeCache:
     """
-    An abstract base class for storing and retrieving molecules.
+    An abstract base class for caching molecules.
 
     Examples
     --------
     *Subclass Implementation*
 
     The source code of the subclasses, listed in
-    :mod:`.molecular_cache`, can serve as good examples.
+    :mod:`molecule_cache <~.caches.molecule.molecule>`, can serve as
+    good examples.
 
     """
 
