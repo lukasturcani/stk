@@ -34,7 +34,43 @@ class MongoDbMoleculeValueCache(ValueCache):
 
     __ https://api.mongodb.com/python/current/
 
-    You want
+    You want to store property values in a database.
+
+    .. code-block:: python
+
+        import stk
+        # pymongo does not come with stk, you have to install it
+        # explicitly with "pip install pymongo".
+        import pymongo
+
+        # Connect to a MongoDB. This example connects to a local
+        # MongoDB, but you can connect to a remote DB too with
+        # MongoClient() - read the documentation for pymongo to see how
+        # to do that.
+        client = pymongo.MongoClient()
+        db = stk.MongoDbMoleculeValueCache(
+            mongo_client=client,
+            collection='atom_counts',
+        )
+
+        molecule = stk.BuildingBlock('BrCCBr')
+        # Add the value to the database.
+        db.put(molecule, molecule.get_num_atoms())
+        # Retrieve the value from the database.
+        num_atoms = db.get(molecule)
+
+        # Works with constructed molecules too.
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2',
+            ),
+        )
+        db.put(polymer, polymer.get_num_atoms())
+        num_polymer_atoms = db.get(polymer)
 
     """
 
@@ -85,8 +121,9 @@ class MongoDbMoleculeValueCache(ValueCache):
             json[key_maker.get_key_name()] = (
                 key_maker.get_key(molecule)
             )
-
-        return self._put(json)
+        # lru_cache requires that the parameters to the cached function
+        # are hashable objects.
+        return self._put(HashableDict(json))
 
     def _put(self, json):
         self._values.insert_one(json)
@@ -98,6 +135,8 @@ class MongoDbMoleculeValueCache(ValueCache):
                 for key_maker in self._key_makers
             ],
         }
+        # lru_cache requires that the parameters to the cached function
+        # are hashable objects.
         return self._get(HashableDict(key))
 
     def _get(self, key):
