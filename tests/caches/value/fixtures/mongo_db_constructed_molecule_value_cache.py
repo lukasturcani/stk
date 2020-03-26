@@ -9,7 +9,7 @@ from ...utilities import MockMongoClient
     params=(
         CaseData(
             cache=stk.MongoDbConstructedMoleculeValueCache(
-                client=MockMongoClient(),
+                mongo_client=MockMongoClient(),
                 collection='values',
             ),
             molecule=stk.ConstructedMolecule(
