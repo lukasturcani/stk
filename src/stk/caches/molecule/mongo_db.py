@@ -4,11 +4,14 @@ MongoDB Molecule Cache
 
 """
 
+from functools import lru_cache
+
 from stk.serialization import (
     MoleculeJsonizer,
     MoleculeDejsonizer,
 )
-from . molecule import MoleculeCache
+from .molecule import MoleculeCache
+from ..utilities import HashableDict
 
 
 class MongoDbMoleculeCache(MoleculeCache):
@@ -186,6 +189,7 @@ class MongoDbMoleculeCache(MoleculeCache):
         position_matrix_collection='position_matrices',
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
+        lru_cache_size=128,
     ):
         """
         Initialize a :class:`.MongoDbMolecularCache` instance.
@@ -215,6 +219,12 @@ class MongoDbMoleculeCache(MoleculeCache):
             Used to create :class:`.Molecule` instances from their
             JSON representations.
 
+        lru_cache_size : :class:`int`, optional
+            A RAM-based least recently used cache is used to avoid
+            reading and writing to the database repeatedly. This sets
+            the number of molecules which fit into the LRU cache. If
+            ``None``, the cache size will be unlimited.
+
         """
 
         database = mongo_client[database]
@@ -223,21 +233,43 @@ class MongoDbMoleculeCache(MoleculeCache):
         self._jsonizer = jsonizer
         self._dejsonizer = dejsonizer
 
+        self._get = lru_cache(maxsize=lru_cache_size)(self._get)
+        self.put = lru_cache(maxsize=lru_cache_size)(self.put)
+
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
         json = self._jsonizer.to_json(molecule)
         self._molecules.insert_one(json['molecule'])
         self._position_matrices.insert_one(json['matrix'])
 
-    def get(self, key, default=None):
+    def get(self, key):
+        # lru_cache requires that the parameters to the cached function
+        # are hashable objects.
+        return self._get(HashableDict(key))
+
+    def _get(self, key):
+        """
+        Get the molecule with `key` from the cache.
+
+        Parameters
+        ----------
+        key : :class:`.HashableDict`
+            The key of a a molecule, which is to be returned from the
+            cache.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The molecule held in the cache under `key`.
+
+        """
+
         json = self._molecules.find_one(key)
-        if json is None and default is None:
+        if json is None:
             raise KeyError(
                 'No molecule found in the database with a key of: '
                 f'{key}'
             )
-        elif json is None:
-            return default
 
         return self._dejsonizer.from_json({
             'molecule': json,
