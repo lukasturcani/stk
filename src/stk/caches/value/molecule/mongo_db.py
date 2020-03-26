@@ -18,11 +18,12 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
     See Also
     --------
     :class:`.MongoDbConstructedMoleculeValueCache`
-        If you need to use :class:`.ConstructedMoleculeKeyMaker` \
-        instead of, or in addition to, :class:`.MoleculeKeyMaker`. \
-        If you only need to use :class:`.MoleculeKeyMaker`, use this \
-        class, even if you are storing values associated with a \
-        :class:`.ConstructedMolecule`.
+        If you do not need to use any \
+        :class:`.ConstructedMoleculeKeyMaker`, but only \
+        :class:`.MoleculeKeyMaker`, use a \
+        :class:`.MongoDbMoleculeValueCache`. \
+        This is the case, even if you are storing values associated \
+        with a :class:`.ConstructedMolecule`.
 
     Examples
     --------

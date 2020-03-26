@@ -38,10 +38,10 @@ class RamMoleculeValueCache(MoleculeValueCache):
     See Also
     --------
     :class:`.RamConstructedMoleculeValueCache`
-        If you need to use :class:`.ConstructedMoleculeKeyMaker` \
-        instead of :class:`.MoleculeKeyMaker`. \
-        If you only need to use :class:`.MoleculeKeyMaker`, use this \
-        class, even if you are storing values associated with a \
+        If you only need to use :class:`.MoleculeKeyMaker`, use a
+        :class:`.RamMoleculeValueCache` instead of \
+        :class:`.RamConstructedMoleculeValueCache`, \
+        even if you are storing values associated with a \
         :class:`.ConstructedMolecule`.
 
     Examples
