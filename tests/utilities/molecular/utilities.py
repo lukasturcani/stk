@@ -5,6 +5,8 @@ from .constructed_molecule import is_equivalent_constructed_molecule
 
 
 def is_equivalent(molecule1, molecule2):
+    assert molecule1.__class__ is molecule2.__class__
+
     is_constructed_molecule1 = isinstance(
         molecule1,
         stk.ConstructedMolecule,
