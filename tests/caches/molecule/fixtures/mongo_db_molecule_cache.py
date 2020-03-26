@@ -2,7 +2,7 @@ import pytest
 import stk
 import rdkit.Chem.AllChem as rdkit
 
-from .utilities import MockMongoClient
+from ...utilities import MockMongoClient
 from ..case_data import CaseData
 
 
