@@ -43,4 +43,7 @@ def _test_cache(cache, molecule, key):
 
     cache.put(molecule)
     retrieved = cache.get(key)
-    is_equivalent(molecule.with_canonical_atom_ordering(), retrieved)
+    is_equivalent(
+        molecule1=molecule.with_canonical_atom_ordering(),
+        molecule2=retrieved.with_canonical_atom_ordering(),
+    )
