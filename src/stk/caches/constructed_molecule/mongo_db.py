@@ -116,10 +116,8 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
 
         import rdkit.Chem.AllChem as rdkit
 
-        key_maker = stk.Inchi()
         retrieved = db.get(
-            key_maker.get_key_name():
-                rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCCCBr'))
+            'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCCCBr'))
         )
 
     As long as you have the name of the key, and the expected value
