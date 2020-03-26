@@ -2,8 +2,8 @@
 Molecule Value Cache
 ====================
 
-#. :class:`.MongoDbValueCache`
-#. :class:`.RamValueCache`
+#. :class:`.MongoDbMoleculeValueCache`
+#. :class:`.RamMoleculeValueCache`
 
 """
 
