@@ -59,6 +59,19 @@ class RamMoleculeValueCache(MoleculeValueCache):
         # Retrieve the value from the cache.
         num_atoms = ram_cache.get(molecule)
 
+        # Works with constructed molecules too.
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2',
+            ),
+        )
+        ram_cache.put(polymer, polymer.get_num_atoms())
+        num_polymer_atoms = ram_cache.get(polymer)
+
     """
 
     def __init__(self, key_maker=InchiKey()):
