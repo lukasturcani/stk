@@ -52,9 +52,12 @@ class RamMoleculeValueCache(MoleculeValueCache):
 
         import stk
 
-        jkjkjkjjkjkjjkjk
-
-
+        molecule = stk.BuildingBlock('BrCCBr')
+        ram_cache = stk.RamMoleculeValueCache()
+        # Place a value into the cache.
+        ram_cache.put(molecule, molecule.get_num_atoms())
+        # Retrieve the value from the cache.
+        num_atoms = ram_cache.get(molecule)
 
     """
 
