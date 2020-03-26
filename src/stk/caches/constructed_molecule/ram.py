@@ -5,7 +5,7 @@ RAM Constructed Molecule Cache
 """
 
 from stk.molecular import InchiKey
-from .molecule import ConstructedMoleculeCache
+from .constructed_molecule import ConstructedMoleculeCache
 
 
 class RamConstructedMoleculeCache(ConstructedMoleculeCache):
@@ -35,6 +35,61 @@ class RamConstructedMoleculeCache(ConstructedMoleculeCache):
     RAM cache the entire time :class:`.MongoDbConstructedMoleculeCache`
     is in use, or if :class:`.MongoDbConstructedMoleculeCache` never
     overflows its fixed RAM size.
+
+    See Also
+    --------
+    :class:`.RamMoleculeCache`
+
+    Examples
+    --------
+    You want to store and retrive molecules from the cache
+
+    .. code-block:: python
+
+        import stk
+
+        ram_cache = stk.RamConstructedMoleculeCache()
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2,
+            ),
+        )
+        # Place into the cache.
+        ram_cache.put(polymer)
+
+        import rdkit.Chem.AllChem as rdkit
+        # Get back the molecule from the cache using its key.
+        retrieved = cache.get(
+            key=rdkit.InchiKeyFromMol(rdkit.MolFromSmiles('BrCCCCBr')),
+        )
+
+    You want to use a different key to store molecules, maybe
+    a custom one.
+
+    .. code-block:: python
+
+        # Create your custom key, this one is called SMILES and
+        # it returns the SMILES of molecules.
+        smiles = stk.MoleculeKeyMaker(
+            key_name='SMILES',
+            get_key=lambda molecule:
+                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
+        )
+
+        # Make the cache store molecules using SMILES as the key.
+        ram_cache = stk.RamConstructedMoleculeCache(smiles)
+
+        # Place into the cache.
+        ram_cache.put(polymer)
+
+        # Retrieve from the cache.
+        retrieved = ram_cache.get(
+            key='[H]C([H])(Br)C([H])([H])C([H])([H])C([H])([H])Br',
+        )
 
     """
 

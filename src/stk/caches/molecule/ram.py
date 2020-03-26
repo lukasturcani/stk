@@ -33,6 +33,52 @@ class RamMoleculeCache(MoleculeCache):
     the entire time :class:`.MongoDbMoleculeCache` is in use, or if
     :class:`.MongoDbMoleculeCache` never overflows its fixed RAM size.
 
+    See Also
+    --------
+    :class:`.RamConstructedMoleculeCache`
+
+
+    Examples
+    --------
+    You want to store and retrive molecules from the cache
+
+    .. code-block:: python
+
+        import stk
+
+        ram_cache = stk.RamMoleculeCache()
+        molecule = stk.BuildingBlock('BrCCBr')
+        # Place into the cache.
+        ram_cache.put(molecule)
+
+        import rdkit.Chem.AllChem as rdkit
+        # Get back the molecule from the cache using its key.
+        retrieved = cache.get(
+            key=rdkit.InchiKeyFromMol(rdkit.MolFromSmiles('BrCCBr')),
+        )
+
+    You want to use a different key to store molecules, maybe
+    a custom one.
+
+    .. code-block:: python
+
+        # Create your custom key, this one is called SMILES and
+        # it returns the SMILES of molecules.
+        smiles = stk.MoleculeKeyMaker(
+            key_name='SMILES',
+            get_key=lambda molecule:
+                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
+        )
+
+        # Make the cache store molecules using SMILES as the key.
+        ram_cache = stk.RamMoleculeCache(smiles)
+
+        # Place into the cache.
+        ram_cache.put(stk.BuildingBlock('BrCCBr'))
+
+        # Retrieve from the cache.
+        retrieved = ram_cache.get('[H]C([H])(Br)C([H])([H])Br')
+
     """
 
     def __init__(self, key_maker=InchiKey()):
