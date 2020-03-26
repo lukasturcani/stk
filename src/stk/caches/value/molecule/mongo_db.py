@@ -100,7 +100,8 @@ class MongoDbMoleculeValueCache(ValueCache):
 
         key_makers : :class:`tuple` of :class:`MoleculeKeyMaker`
             Used to make the keys of molecules, which the values
-            are associated with.
+            are associated with. If two molecules have the same
+            key, they will return the same value from the cache.
 
         lru_cache_size : :class:`int`, optional
             A RAM-based least recently used cache is used to avoid
