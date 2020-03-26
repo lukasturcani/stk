@@ -130,10 +130,13 @@ class MongoDbConstructedMoleculeValueCache(
 
     def get(self, molecule):
         key = {
-            '$or': [
-                {key_maker.get_key_name(): key_maker.get_key(molecule)}
+            '$or': tuple(
+                HashableDict((
+                    key_maker.get_key_name(),
+                    key_maker.get_key(molecule),
+                ))
                 for key_maker in self._key_makers
-            ],
+            ),
         }
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.

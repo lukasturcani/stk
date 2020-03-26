@@ -237,6 +237,11 @@ class MongoDbMoleculeCache(MoleculeCache):
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
         json = self._jsonizer.to_json(molecule)
+        # lru_cache requires that the parameters to the cached function
+        # are hashable objects.
+        json['matrix']['m'] = tuple(
+            tuple(row) for row in json['matrix']['m']
+        )
         return self._put(HashableDict(json))
 
     def _put(self, json):
