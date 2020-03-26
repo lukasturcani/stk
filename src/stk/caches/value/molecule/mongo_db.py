@@ -20,7 +20,7 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
     :class:`.MongoDbConstructedMoleculeValueCache`
         If you need to use :class:`.ConstructedMoleculeKeyMaker` \
         instead of, or in addition to, :class:`.MoleculeKeyMaker`. \
-        If you only need to use :class:`.MoleculeKeyMaker` use this \
+        If you only need to use :class:`.MoleculeKeyMaker`, use this \
         class, even if you are storing values associated with a \
         :class:`.ConstructedMolecule`.
 
