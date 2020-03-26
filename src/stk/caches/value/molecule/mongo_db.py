@@ -83,7 +83,7 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
         lru_cache_size=128,
     ):
         """
-        Initialize a :class:`.MongDbValueCache` instance.
+        Initialize a :class:`.MongoDbMoleculeValueCache` instance.
 
         Parameters
         ----------
