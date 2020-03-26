@@ -25,7 +25,7 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
         :class:`.ConstructedMolecule`.
 
     Examples
-    -------
+    --------
     Before using this class, make sure you have :mod:`pymongo` and
     that its working properly. I recommend reading at least the
     introductory and installation

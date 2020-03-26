@@ -20,9 +20,15 @@ class MongoDbConstructedMoleculeValueCache(
     See Also
     --------
     :class:`.MongoDbMoleculeValueCache`
+        If you do not need to use any \
+        :class:`.ConstructedMoleculeKeyMaker`, but only \
+        :class:`.MoleculeKeyMaker`, use a \
+        :class:`.MongoDbMoleculeValueCache`. \
+        This is the case, even if you are storing values associated \
+        with a :class:`.ConstructedMolecule`.
 
     Examples
-    -------
+    --------
     Before using this class, make sure you have :mod:`pymongo` and
     that its working properly. I recommend reading at least the
     introductory and installation
