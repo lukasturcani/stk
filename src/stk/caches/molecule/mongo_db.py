@@ -232,11 +232,14 @@ class MongoDbMoleculeCache(MoleculeCache):
         self._dejsonizer = dejsonizer
 
         self._get = lru_cache(maxsize=lru_cache_size)(self._get)
-        self.put = lru_cache(maxsize=lru_cache_size)(self.put)
+        self._put = lru_cache(maxsize=lru_cache_size)(self._put)
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
         json = self._jsonizer.to_json(molecule)
+        return self._put(HashableDict(json))
+
+    def _put(self, json):
         self._molecules.insert_one(json['molecule'])
         self._position_matrices.insert_one(json['matrix'])
 
