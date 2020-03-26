@@ -78,8 +78,8 @@ a :class:`.Molecule` will get passed to the :meth:`get_key` method
 of :class:`MyKeyMaker`. Once this happens,
 :meth:`~.ConstructedMolecule.get_building_blocks` will be called.
 However, a :class:`.Molecule` instance is not guaranteed to have this
-method. If a plain :class:`.Molecule` instance was used, or a
-was used, a runtime error will occur, because such as method does not
+method. If a plain :class:`.Molecule` instance was used,
+a runtime error will occur, because such as method does not
 exist on plain :class:`.Molecule` objects.
 
 Therefore, you cannot give a :class:`.ConstructedMoleculeKeyMaker`
