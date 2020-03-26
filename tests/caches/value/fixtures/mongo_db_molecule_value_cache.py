@@ -11,6 +11,16 @@ from ...utilities import MockMongoClient
             cache=stk.MongoDbMoleculeValueCache(
                 mongo_client=MockMongoClient(),
                 collection='values',
+                lru_cache_size=0,
+            ),
+            molecule=stk.BuildingBlock('BrCCBr'),
+            value=12,
+        ),
+        CaseData(
+            cache=stk.MongoDbMoleculeValueCache(
+                mongo_client=MockMongoClient(),
+                collection='values',
+                lru_cache_size=128,
             ),
             molecule=stk.BuildingBlock('BrCCBr'),
             value=12,
