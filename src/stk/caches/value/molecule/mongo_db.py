@@ -1,17 +1,17 @@
 """
-MongoDB Value Cache
-===================
+MongoDB Molecule Value Cache
+============================
 
 """
 
 from functools import lru_cache
 
 from stk.molecular import InchiKey
-from .value_cache import ValueCache
+from .molecule import MoleculeValueCache
 from ...utilities import HashableDict
 
 
-class MongoDbMoleculeValueCache(ValueCache):
+class MongoDbMoleculeValueCache(MoleculeValueCache):
     """
     Use MongoDB to store and retrieve molecular property values.
 
@@ -98,7 +98,7 @@ class MongoDbMoleculeValueCache(ValueCache):
             The name of the MongoDB database used for storing the
             property values.
 
-        key_makers : :class:`tuple` of :class:`MoleculeKeyMaker`
+        key_makers : :class:`tuple` of :class:`.MoleculeKeyMaker`
             Used to make the keys of molecules, which the values
             are associated with. If two molecules have the same
             key, they will return the same value from the cache.
