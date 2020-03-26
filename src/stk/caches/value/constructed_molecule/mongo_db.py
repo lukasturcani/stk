@@ -129,15 +129,14 @@ class MongoDbConstructedMoleculeValueCache(
         self._values.insert_one(json)
 
     def get(self, molecule):
-        key = {
-            '$or': tuple(
-                HashableDict((
-                    key_maker.get_key_name(),
-                    key_maker.get_key(molecule),
-                ))
-                for key_maker in self._key_makers
-            ),
-        }
+
+        def make_dict(key_maker):
+            return HashableDict({
+                key_maker.get_key_name():
+                key_maker.get_key(molecule)
+            })
+
+        key = {'$or': tuple(map(make_dict, self._key_makers))}
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
         return self._get(HashableDict(key))
