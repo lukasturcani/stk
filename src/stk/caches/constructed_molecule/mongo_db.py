@@ -302,7 +302,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
                 f'{key}'
             )
 
-        return self._molecule_dejsonizer.from_json(
+        return self._dejsonizer.from_json(
             json={
                 'molecule': molecule_json,
                 'constructedMolecule': constructed_molecule_json,

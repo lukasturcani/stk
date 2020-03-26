@@ -59,12 +59,7 @@ from ..case_data import CaseData
                     num_repeating_units=2,
                 ),
             ),
-            key={
-                'SMILES':
-                    rdkit.MolToInchiKey(rdkit.MolFromSmiles(
-                        SMILES='Br[C+2][C+2][C+2][C+2]Br'
-                    )),
-            },
+            key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
         ),
     ),
 )
