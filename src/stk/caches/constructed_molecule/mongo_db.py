@@ -256,10 +256,15 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         json['matrix']['m'] = tuple(
             tuple(row) for row in json['matrix']['m']
         )
+        json['matrix'] = HashableDict(json['matrix'])
         json['molecule'] = HashableDict(json['molecule'])
         json['constructedMolecule'] = HashableDict(
             json['constructedMolecule']
         )
+        json['constructedMolecule']['BB'] = tuple(map(
+            HashableDict,
+            json['constructedMolecule']['BB'],
+        ))
 
         def make_hashable(json):
             json['matrix']['m'] = tuple(

@@ -24,5 +24,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def ram_db_constructed_molecule_value_cache(request):
+def ram_constructed_molecule_value_cache(request):
     return request.param
