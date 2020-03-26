@@ -14,7 +14,7 @@ class RamConstructedMoleculeValueCache(ConstructedMoleculeValueCache):
     Cache molecular property values in RAM.
 
     Most of the time you are better off using
-    :class:`.MongDbConstructedMoleculeValueCache`. The
+    :class:`.MongoDbConstructedMoleculeValueCache`. The
     :class:`.MongoDbConstructedMoleculeValueCache`
     includes a RAM based cache to prevent repeated reading and writing
     to disk, but the cache has a fixed size, so it will not grow
