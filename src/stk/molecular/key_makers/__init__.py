@@ -18,7 +18,7 @@ example, a :class:`.ConstructedMoleculeKeyMaker` IS NOT A
 :class:`.Molecule`. This means you cannot use
 :class:`.ConstructedMoleculeKeyMaker` where a
 :class:`.MoleculeKeyMaker` is required. However a
-:class:`.MoleculeKeyMaker` IS A class:`.ConstructedMoleculeKeyMaker`.
+:class:`.MoleculeKeyMaker` IS A :class:`.ConstructedMoleculeKeyMaker`.
 This means that you can use a :class:`.MoleculeKeyMaker` where a
 :class:`.ConstructedMoleculeKeyMaker` is required.
 
