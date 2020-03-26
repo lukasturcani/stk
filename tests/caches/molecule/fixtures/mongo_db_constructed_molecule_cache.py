@@ -38,7 +38,7 @@ from ..case_data import CaseData
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
-                            smiles='SMILES',
+                            key_name='SMILES',
                             get_key=lambda molecule: rdkit.MolToSmiles(
                                 mol=molecule.to_rdkit_mol(),
                             )
