@@ -246,11 +246,16 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         self._dejsonizer = dejsonizer
 
         self._get = lru_cache(maxsize=lru_cache_size)(self._get)
-        self.put = lru_cache(maxsize=lru_cache_size)(self.put)
+        self._put = lru_cache(maxsize=lru_cache_size)(self._put)
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
         json = self._jsonizer.to_json(molecule)
+        # lru_cache requires that the parameters to the cached function
+        # are hashable objects.
+        return self._put(HashableDict(json))
+
+    def _put(self, json):
         self._position_matrices.insert_one(json['matrix'])
         self._molecules.insert_one(json['molecule'])
         self._constructed_molecules.insert_one(

@@ -7,12 +7,16 @@ Constructed Molecule Cache
 
 """
 
-from ..molecule import MoleculeCache
 
-
-class ConstructedMoleculeCache(MoleculeCache):
+class ConstructedMoleculeCache:
     """
     Abstract base class for caching constructed molecules.
+
+    See Also
+    --------
+    :class:`.MoleculeCache`
+        If you need to store and retrieve :class:`.Molecule`
+        instances.
 
     Examples
     --------
