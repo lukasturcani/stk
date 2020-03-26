@@ -39,6 +39,8 @@ class RamConstructedMoleculeCache(ConstructedMoleculeCache):
     See Also
     --------
     :class:`.RamMoleculeCache`
+        For storing and retrieving :class:`.Molecule` instances in
+        RAM.
 
     Examples
     --------
