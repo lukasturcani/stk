@@ -7,8 +7,10 @@ Molecule Value Cache
 
 """
 
+from ..constructed_molecule import ConstructedMoleculeValueCache
 
-class MoleculeValueCache:
+
+class MoleculeValueCache(ConstructedMoleculeValueCache):
     """
     Abstract base class for caching of molecular property values.
 
