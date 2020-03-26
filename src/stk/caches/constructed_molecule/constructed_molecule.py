@@ -7,8 +7,10 @@ Constructed Molecule Cache
 
 """
 
+from ..molecule import MoleculeCache
 
-class ConstructedMoleculeCache:
+
+class ConstructedMoleculeCache(MoleculeCache):
     """
     Abstract base class for caching constructed molecules.
 
@@ -40,7 +42,7 @@ class ConstructedMoleculeCache:
 
         raise NotImplementedError()
 
-    def get(self, key, building_blocks, default=None):
+    def get(self, key):
         """
         Get the molecule with `key` from the cache.
 
@@ -50,17 +52,6 @@ class ConstructedMoleculeCache:
             The key of a molecule, which is to be returned from the
             cache.
 
-        building_blocks : :class:`tuple` of :class:`.Molecule`
-            The building blocks of the returned
-            :class:`.ConstructedMolecule`. Their order should be equal
-            their order in
-            :meth:`.ConstructedMolecule.get_building_blocks`.
-
-        default : :class:`.ConstructedMolecule`, optional
-            If `key` is not found in the cache, return this molecule
-            instead. If ``None``, an error will be raised if `key`
-            is not found in the cache.
-
         Returns
         -------
         :class:`.ConstructedMolecule`
@@ -69,8 +60,7 @@ class ConstructedMoleculeCache:
         Raises
         ------
         :class:`KeyError`
-            If `key` is not found in the cache and `default` is
-            ``None``.
+            If `key` is not found in the cache.
 
         """
 

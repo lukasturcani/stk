@@ -2,7 +2,9 @@
 Molecule Cache
 ===============
 
+#. :class:`.ConstructedMoleculeCache`
 #. :class:`.MemoryMoleculeCache`
+#. :class:`.MongoDbConstructedMoleculeCache`
 #. :class:`.MongoDbMoleculeCache`
 
 """
@@ -39,7 +41,7 @@ class MoleculeCache:
 
         raise NotImplementedError()
 
-    def get(self, key, default=None):
+    def get(self, key):
         """
         Get the molecule with `key` from the cache.
 
@@ -49,11 +51,6 @@ class MoleculeCache:
             The key of a molecule, which is to be returned from the
             cache.
 
-        default : :class:`.Molecule`, optional
-            If `key` is not found in the cache, return this molecule
-            instead. If ``None``, an error will be raised if `key`
-            is not found in the cache.
-
         Returns
         -------
         :class:`.Molecule`
@@ -62,8 +59,7 @@ class MoleculeCache:
         Raises
         ------
         :class:`KeyError`
-            If `key` is not found in the cache and `default` is
-            ``None``.
+            If `key` is not found in the cache.
 
         """
 
