@@ -1,4 +1,4 @@
-.. automodule:: stk.caches.molecule.memory
+.. automodule:: stk.caches.molecule.ram
    :members:
    :undoc-members:
    :show-inheritance:

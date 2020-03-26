@@ -1,4 +1,4 @@
-.. automodule:: stk.caches.value.mongo_db
+.. automodule:: stk.caches.utilities
    :members:
    :undoc-members:
    :show-inheritance:

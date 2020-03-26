@@ -6,11 +6,10 @@ stk.caches.value package
    :undoc-members:
    :show-inheritance:
 
-Submodules
-----------
+Subpackages
+-----------
 
 .. toctree::
 
-   stk.caches.value.memory
-   stk.caches.value.mongo_db
-   stk.caches.value.value_cache
+   stk.caches.value.constructed_molecule
+   stk.caches.value.molecule

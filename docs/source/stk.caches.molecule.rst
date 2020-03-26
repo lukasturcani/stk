@@ -11,6 +11,6 @@ Submodules
 
 .. toctree::
 
-   stk.caches.molecule.memory
    stk.caches.molecule.molecule
    stk.caches.molecule.mongo_db
+   stk.caches.molecule.ram
