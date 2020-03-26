@@ -36,7 +36,7 @@ as long as they follow the guideline on molecular key maker usage
 provided above.
 
 The reason the abstract base classes have their relationship reversed
-they define completely different methods. When you look at the
+is they define completely different methods. When you look at the
 abstract base classes initially, you may think they all define the
 same method, namely :meth:`get_key`. However, this is
 extremely misleading. Looking at the type signatures of each of these
