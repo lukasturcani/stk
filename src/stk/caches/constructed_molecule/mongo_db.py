@@ -270,6 +270,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
             json['matrix']['m'] = tuple(
                 tuple(row) for row in json['matrix']['m']
             )
+            json['marix'] = HashableDict(json['matrix'])
             json['molecule'] = HashableDict(json['molecule'])
             return json
 
