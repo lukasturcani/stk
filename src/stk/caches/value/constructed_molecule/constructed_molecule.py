@@ -25,7 +25,7 @@ class ConstructedMoleculeValueCache:
     --------
     *Subclass Implementation*
 
-    The source of of any of the subclasses, listed in
+    The source of any of the subclasses, listed in
     :mod:`constructed_molecule_value_cache \
     <.caches.value.constructed_molecule.constructed_molecule>`,
     can serve as good examples.
