@@ -36,11 +36,15 @@ class RamMoleculeCache(MoleculeCache):
     See Also
     --------
     :class:`.RamConstructedMoleculeCache`
-
+        You can store :class:`.ConstructedMolecule` instances with \
+        :class:`.RamMoleculeCache`, however you can only retrieve \
+        them as :class:`.Molecule` instances. If you want to store \
+        and retrieve :class:`.ConstructedMolecule` instances, you \
+        should use :class:`.RamConstructedMoleculeCache`.
 
     Examples
     --------
-    You want to store and retrive molecules from the cache
+    You want to store and retrieve molecules from the cache
 
     .. code-block:: python
 

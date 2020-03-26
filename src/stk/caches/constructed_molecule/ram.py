@@ -42,7 +42,7 @@ class RamConstructedMoleculeCache(ConstructedMoleculeCache):
 
     Examples
     --------
-    You want to store and retrive molecules from the cache
+    You want to store and retrieve molecules from the cache
 
     .. code-block:: python
 
