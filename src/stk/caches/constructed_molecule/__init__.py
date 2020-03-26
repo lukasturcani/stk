@@ -1,3 +1,3 @@
 from .constructed_molecule import *
-from .memory import *
-from .mongo_db import *
+from .ram import *
+from .mongo_db import MongoDbConstructedMoleculeCache

@@ -1,3 +1,3 @@
-from .memory import *
-from .mongo_db import *
+from .ram import *
+from .mongo_db import MongoDbMoleculeCache
 from .molecule import *
