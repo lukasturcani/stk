@@ -26,6 +26,7 @@ class MockMongoCollection:
             if self._is_match(document, key):
                 return document
 
+    @staticmethod
     def _is_match(document, key):
         for key_ in key:
             if key_ not in document:

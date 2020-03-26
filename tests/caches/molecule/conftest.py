@@ -6,8 +6,10 @@ from .fixtures import *  # noqa
 
 
 @pytest.fixture(
-    lazy_fixture('mongo_db_molecule_cache'),
-    lazy_fixture('mongo_db_constructed_molecule_cache'),
+    params=(
+        lazy_fixture('mongo_db_molecule_cache'),
+        lazy_fixture('mongo_db_constructed_molecule_cache'),
+    ),
 )
 def case_data(request):
     return request.param

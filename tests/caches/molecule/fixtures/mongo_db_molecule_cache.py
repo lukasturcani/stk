@@ -10,18 +10,18 @@ from ..case_data import CaseData
     params=(
         CaseData(
             cache=stk.MongoDbMoleculeCache(
-                client=MockMongoClient(),
+                mongo_client=MockMongoClient(),
                 lru_cache_size=0,
             ),
             molecule=stk.BuildingBlock('BrCCBr'),
             key={
-                'InChI':
-                    rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCBr'))
+                'InChIKey':
+                    rdkit.MolToInchiKey(rdkit.MolFromSmiles('BrCCBr'))
             },
         ),
         CaseData(
             cache=stk.MongoDbMoleculeCache(
-                client=MockMongoClient(),
+                mongo_client=MockMongoClient(),
                 lru_cache_size=0,
                 jsonizer=stk.MoleculeJsonizer(
                     key_makers=(
@@ -35,8 +35,8 @@ from ..case_data import CaseData
                     ),
                 ),
             ),
-            molecule=stk.BuildingBlock('BrCCBr'),
-            key={'SMILES': 'BrCCBr'},
+            molecule=stk.BuildingBlock('BrBr'),
+            key={'SMILES': 'BrBr'},
         ),
     ),
 )
