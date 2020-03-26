@@ -2,7 +2,10 @@
 Molecule Cache
 ===============
 
+#. :class:`.ConstructedMoleculeCache`
+#. :class:`.RamConstructedMoleculeCache`
 #. :class:`.RamMoleculeCache`
+#. :class:`.MongoDbConstructedMoleculeCache`
 #. :class:`.MongoDbMoleculeCache`
 
 """
