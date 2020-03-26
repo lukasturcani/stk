@@ -38,6 +38,25 @@ from ..case_data import CaseData
             molecule=stk.BuildingBlock('BrBr'),
             key={'SMILES': 'BrBr'},
         ),
+        CaseData(
+            cache=stk.MongoDbMoleculeCache(
+                mongo_client=MockMongoClient(),
+                lru_cache_size=128,
+                jsonizer=stk.MoleculeJsonizer(
+                    key_makers=(
+                        stk.MoleculeKeyMaker(
+                            key_name='SMILES',
+                            get_key=lambda molecule:
+                                rdkit.MolToSmiles(
+                                    molecule.to_rdkit_mol()
+                                )
+                        ),
+                    ),
+                ),
+            ),
+            molecule=stk.BuildingBlock('BrBr'),
+            key={'SMILES': 'BrBr'},
+        ),
     ),
 )
 def mongo_db_molecule_cache(request):
