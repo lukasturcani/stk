@@ -38,7 +38,11 @@ class ConstructedMoleculeKeyMaker:
     --------
     *Subclass Implementation*
 
-    There's just two simple methods to implement.
+    The source code of any of the subclasses, list in
+    :mod:`constructed_molecule_key_makers \
+    <.key_makers.constructed_molecule>` can serve as good examples.
+
+    However, there's just two simple methods to implement.
 
     .. code-block:: python
 
