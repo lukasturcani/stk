@@ -150,4 +150,4 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
                 'No molecule found in the database with a key of: '
                 f'{key}'
             )
-        return value
+        return value['v']

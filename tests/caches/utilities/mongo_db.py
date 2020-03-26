@@ -22,9 +22,15 @@ class MockMongoCollection:
         self._documents.append(document)
 
     def find_one(self, key):
-        for document in self._documents:
-            if self._is_match(document, key):
-                return document
+        if '$or' in key:
+            keys = key['$or']
+        else:
+            keys = (key, )
+
+        for key in keys:
+            for document in self._documents:
+                if self._is_match(document, key):
+                    return document
 
     @staticmethod
     def _is_match(document, key):
