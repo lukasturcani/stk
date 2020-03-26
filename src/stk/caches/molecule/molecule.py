@@ -2,10 +2,7 @@
 Molecule Cache
 ===============
 
-#. :class:`.ConstructedMoleculeCache`
-#. :class:`.RamConstructedMoleculeCache`
 #. :class:`.RamMoleculeCache`
-#. :class:`.MongoDbConstructedMoleculeCache`
 #. :class:`.MongoDbMoleculeCache`
 
 """
@@ -14,6 +11,15 @@ Molecule Cache
 class MoleculeCache:
     """
     An abstract base class for caching molecules.
+
+    See Also
+    --------
+    :class:`.ConstructedMoleculeCache`
+        If you need to store and retrieve
+        :class:`.ConstructedMolecule` instances. You can put \
+        :class:`.ConstructedMolecule` instances into a \
+        :class:`.MoleculeCache`, however, you will only be able to \
+        retrieve them as plain :class:`.Molecule` instances.
 
     Examples
     --------
