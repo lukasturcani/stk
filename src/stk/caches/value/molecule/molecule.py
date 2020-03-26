@@ -20,6 +20,14 @@ class MoleculeValueCache(ConstructedMoleculeValueCache):
     :class:`.MoleculeValueCache` you cannot use a
     :class:`.ConstructedMoleculeValueCache` in its place.
 
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source of of any of the subclasses, listed in
+    :mod:`molecule_value_cache <.caches.value.molecule.molecule>`,
+    can serve as good examples.
+
     """
 
     def put(self, molecule, value):
