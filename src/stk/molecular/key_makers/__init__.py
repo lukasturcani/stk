@@ -8,32 +8,34 @@ Molecular Key Makers
 Molecular key makers are used by :mod:`stk` to provide some identity
 metric for different molecules. Each molecular key maker provides a
 different metric for identity. There are 2 abstract base classes from
-which a molecular key maker can be subclassed. However, each molecular
-key will maker subclass at most 1 of them.
+which a molecular key maker can be subclassed.
 
 A very important thing to note, is that the abstract base classes of
-molecular key makers are not related by inheritance. For example,
-a :class:`.ConstructedMoleculeKeyMaker` IS NOT A
+molecular key makers have their inheritance relationship reversed. For
+example, a :class:`.ConstructedMoleculeKeyMaker` IS NOT A
 :class:`.MoleculeKeyMaker`, despite the fact that a
 :class:`.ConstructedMolecule` IS A
 :class:`.Molecule`. This means you cannot use
 :class:`.ConstructedMoleculeKeyMaker` where a
-:class:`.MoleculeKeyMaker` is required.
+:class:`.MoleculeKeyMaker` is required. However a
+:class:`.MoleculeKeyMaker` IS A class:`.ConstructedMoleculeKeyMaker`.
+This means that you can use a :class:`.MoleculeKeyMaker` where a
+:class:`.ConstructedMoleculeKeyMaker` is required.
 
 More information about each type of molecular key maker can be seen in
 the documentation of each of the abstract base classes.
 
-Why Are the Abstract Base Classes Not Related by Inheritance?
--------------------------------------------------------------
+Why is the Inheritance Relationship Reversed?
+---------------------------------------------
 
-This section details the reasoning behind the lack of inheritance
+This section details the reasoning behind the reversed
 relationship between the molecular key makers, which may appear
 counter-intuitive at first. This is purely a discussion of the
 implementation, and users of :mod:`stk` can safely ignore this section,
 as long as they follow the guideline on molecular key maker usage
 provided above.
 
-The reason the abstract base classes are not related is because
+The reason the abstract base classes have their relationship reversed
 they define completely different methods. When you look at the
 abstract base classes initially, you may think they all define the
 same method, namely :meth:`get_key`. However, this is
@@ -88,6 +90,16 @@ will pass a :class:`.Molecule`, which is not also a
 error if the :class:`.ConstructedMoleculeKeyMaker` makes use of methods
 found on a :class:`.ConstructedMolecule` and not a plain
 :class:`.Molecule`.
+
+However, the opposite is not true. Because any
+:class:`.MoleculeKeyMaker` will accept any :class:`.Molecule`,
+including a :class:`.ConstructedMolecule`, you can pass a
+:class:`.MoleculeKeyMaker` where a
+:class:`.ConstructedMoleculeKeyMaker` is required, because even if you
+do pass a :class:`.ConstructedMolecule` instance to a
+:class:`.MoleculeKeyMaker`, that is guaranteed to be safe. As a result,
+a :class:`.MoleculeKeyMaker` is a type of
+:class:`.ConstructedMoleculeKeyMaker`
 
 """
 

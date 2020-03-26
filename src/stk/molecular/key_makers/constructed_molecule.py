@@ -2,6 +2,11 @@
 Constructed Molecule Key Maker
 ==============================
 
+#. :class:`.ConstructedMoleculeKeyMaker`
+#. :class:`.Inchi`
+#. :class:`.InchiKey`
+#. :class:`.MoleculeKeyMaker`
+
 """
 
 from .molecule import InchiKey
@@ -10,6 +15,9 @@ from .molecule import InchiKey
 class ConstructedMoleculeKeyMaker:
     """
     Abstract base class for making :class:`.ConstructedMolecule` keys.
+
+    Note that every :class:`.MoleculeKeyMaker` is also a valid
+    :class:`.ConstructedMoleculeKeyMaker`.
 
     Notes
     -----

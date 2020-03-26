@@ -7,8 +7,10 @@ Molecule Key Maker
 
 """
 
+from ..constructed_molecule import ConstructedMoleculeKeyMaker
 
-class MoleculeKeyMaker:
+
+class MoleculeKeyMaker(ConstructedMoleculeKeyMaker):
     """
     An abstract base class for making :class:`.Molecule` keys.
 
