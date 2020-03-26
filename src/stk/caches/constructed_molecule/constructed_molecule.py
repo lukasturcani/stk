@@ -2,7 +2,7 @@
 Constructed Molecule Cache
 ==========================
 
-#. :class:`.MemoryConstructedMoleculeCache`
+#. :class:`.RamConstructedMoleculeCache`
 #. :class:`.MongoDbConstructedMoleculeCache`
 
 """
