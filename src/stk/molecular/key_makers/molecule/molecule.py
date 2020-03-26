@@ -14,6 +14,14 @@ class MoleculeKeyMaker(ConstructedMoleculeKeyMaker):
     """
     An abstract base class for making :class:`.Molecule` keys.
 
+    Note that every :class:`.MoleculeKeyMaker` is also a valid
+    :class:`.ConstructedMoleculeKeyMaker`, which means a
+    :class:`.MoleculeKeyMaker` can be used anywhere a
+    :class:`ConstructedMoleculeKeyMaker` is required. However, the
+    reverse is not true.
+    A :class:`.ConstructedMoleculeKeyMaker` cannot be used
+    where a :class:`.MoleculeKeyMaker` is required.
+
     Notes
     -----
     You might notice that the public methods of this abstract base

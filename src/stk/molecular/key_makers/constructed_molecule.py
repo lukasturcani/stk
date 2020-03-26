@@ -17,7 +17,12 @@ class ConstructedMoleculeKeyMaker:
     Abstract base class for making :class:`.ConstructedMolecule` keys.
 
     Note that every :class:`.MoleculeKeyMaker` is also a valid
-    :class:`.ConstructedMoleculeKeyMaker`.
+    :class:`.ConstructedMoleculeKeyMaker`, which means a
+    :class:`.MoleculeKeyMaker` can be used anywhere a
+    :class:`ConstructedMoleculeKeyMaker` is required. However, the
+    reverse is not true.
+    A :class:`.ConstructedMoleculeKeyMaker` cannot be used
+    where a :class:`.MoleculeKeyMaker` is required.
 
     Notes
     -----
