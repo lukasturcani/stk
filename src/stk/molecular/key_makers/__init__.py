@@ -64,10 +64,8 @@ has, and uses that as a key
         def get_key_name(self):
             return 'MyConstructedMoleculeKeyMaker'
 
-        def get_key(self, constructed_molecule):
-            building_blocks = tuple(
-                constructed_molecule.get_building_blocks()
-            )
+        def get_key(self, molecule):
+            building_blocks = tuple(molecule.get_building_blocks())
             return len(building_blocks)
 
 Already, it should be obvious why a
