@@ -1,4 +1,4 @@
-from tests.utilities import is_equivalent_molecule
+from tests.utilities import is_equivalent_constructed_molecule
 
 
 def test_cache(case_data):
@@ -47,7 +47,7 @@ def _test_cache(cache, molecule, key):
 
     cache.put(molecule)
     retrieved = cache.get(key)
-    is_equivalent_molecule(
-        molecule1=molecule.with_canonical_atom_ordering(),
-        molecule2=retrieved.with_canonical_atom_ordering(),
+    is_equivalent_constructed_molecule(
+        molecule.with_canonical_atom_ordering(),
+        retrieved.with_canonical_atom_ordering(),
     )
