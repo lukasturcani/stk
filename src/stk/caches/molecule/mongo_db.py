@@ -242,6 +242,7 @@ class MongoDbMoleculeCache(MoleculeCache):
         json['matrix']['m'] = tuple(
             tuple(row) for row in json['matrix']['m']
         )
+        json['molecule'] = HashableDict(json['molecule'])
         return self._put(HashableDict(json))
 
     def _put(self, json):
