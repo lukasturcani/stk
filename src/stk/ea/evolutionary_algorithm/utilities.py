@@ -1,6 +1,8 @@
 import os
 import logging
 
+from stk.molecular import Inchi
+
 
 def get_logger():
     # Define the formatter for logging messages.
@@ -31,3 +33,22 @@ def get_logger():
     rootlogger.addHandler(errorhandler)
     rootlogger.addHandler(streamhandler)
     return logging.getLogger(__name__)
+
+
+def get_inchi(record):
+    """
+    Get the InChI of a :class:`.MoleculeRecord`.
+
+    Parameters
+    ----------
+    record : :class:`.MoleculeRecord`
+        Holds a molecule.
+
+    Returns
+    -------
+    :class:`str`
+        The InChI of the molecule in `record`.
+
+    """
+
+    return Inchi().get_key(record.get_molecule())

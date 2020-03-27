@@ -16,7 +16,29 @@ class EvolutionaryAlgorithm:
 
     Notes
     -----
+    You might notice that the public methods of this abstract base
+    class are implemented. This is purely for convenience, so that
+    there is a default evolutionary algorithm implementation that
+    users can use. However, feel free to override the default
+    implementation when implementing subclasses.
 
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source code of this class can work as a good example. There
+    is only one method that a subclass of
+    :class:`.EvolutionaryAlgorithm` needs to implement,
+    :meth:`.get_generations`, which yields :class:`.Generation`
+    instances. These correspond to the generations of your
+    evolutionary algorithm implementation.
+
+
+    *Usage*
+
+    There are multiple tutorials on how to use the default
+    implementation of the evolutionary algorithm, which can be
+    seen :ref:`here <>`
 
     """
 
