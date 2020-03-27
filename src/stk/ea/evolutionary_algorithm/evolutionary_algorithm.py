@@ -4,11 +4,11 @@ Evolutionary Algorithm
 
 """
 
+import itertools as it
 
 from ..fitness_normalizers import NullFitnessNormalizer
-from .utilities import get_logger
-
-
+from .utilities import get_logger, get_inchi
+from .implementations import Serial, Parallel
 
 
 class EvolutionaryAlgorithm:
@@ -32,7 +32,9 @@ class EvolutionaryAlgorithm:
         crossover_selector,
         terminator,
         fitness_normalizer=NullFitnessNormalizer(),
+        duplicate_key=get_inchi,
         logger=get_logger(),
+        num_processes=1,
     ):
         """
         Initialize a :class:`EvolutionaryAlgorithm` instance.
@@ -42,7 +44,7 @@ class EvolutionaryAlgorithm:
 
         """
 
-        self._population = initial_population
+        self._initial_population = initial_population
         self._fitness_calculator = fitness_calculator
         self._fitness_normalizer = fitness_normalizer
         self._mutator = mutator
@@ -52,6 +54,11 @@ class EvolutionaryAlgorithm:
         self._crossover_selector = crossover_selector
         self._terminator = terminator
         self._logger = logger
+        self._implementation = (
+            Serial()
+            if num_processes == 1
+            else Parallel(num_processes)
+        )
 
     def get_generations(self):
         """
@@ -64,7 +71,38 @@ class EvolutionaryAlgorithm:
 
         """
 
-        self._logger.info(
-            'Calculating the fitness of population members.'
-        )
+        yield from self._implementation.get_generations(self)
 
+        logger = self._logger
+        population = self._initial_population
+        generation = 0
+        while not self._terminator.terminate(population):
+            generation += 1
+
+            logger.info(f'Starting generation {generation}.')
+            logger.debug(f'Population size is {len(population)}.')
+
+            self._logger.info('Calculating fitness values.')
+            population = tuple(self._with_fitness_values(population))
+
+            logger.info('Doing crossovers.')
+            crossover_parents = self._crossover_selector.select(
+                population=population,
+            )
+            crossover_records = it.starmap(
+                self._crosser.cross,
+                crossover_parents,
+            )
+            offspring = (
+                offspring
+                for offspring_batch in crossover_records
+                for offspring in offspring_batch
+            )
+
+    def _with_fitness_values(self, population):
+        fitness_values = map(
+            self._fitness_calculator,
+            (record.get_molecule() for record in population),
+        )
+        for record, fitness_value in zip(population, fitness_values):
+            yield record.with_fitness_value(fitness_value)

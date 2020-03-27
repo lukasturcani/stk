@@ -1,1 +1,1 @@
-from .evolutionary_algorithm import *
+from .evolutionary_algorithm import EvolutionaryAlgorithm
