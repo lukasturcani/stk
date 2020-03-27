@@ -92,7 +92,7 @@ class EvolutionaryAlgorithm:
             Takes a :class:`.MoleculeRecord` and returns some value.
             If two molecules return the same value, they are considered
             duplicates, and one of them will be removed from the
-            population. By default :class:`.get_inchi` will be used.
+            population. By default :func:`.get_inchi` will be used.
 
         logger : :class:`logging.Logger`, optional
             The logger the EA should use.
