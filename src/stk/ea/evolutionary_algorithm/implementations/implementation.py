@@ -5,6 +5,11 @@ from ...generation import Generation
 
 
 class Implementation:
+    """
+    An implementation of the default evolutionary algorithm.
+
+    """
+
     def __init__(
         self,
         initial_population,
@@ -58,13 +63,14 @@ class Implementation:
             generation += 1
 
             self._logger.info(f'Starting generation {generation}.')
-            self._logger.debug(f'Population size is {len(population)}.')
+            self._logger.debug(
+                f'Population size is {len(population)}.'
+            )
 
             self._logger.info('Doing crossovers.')
-            crossover_records = tuple(map(
-                self._crosser.cross,
-                self._crossover_selector.select(population),
-            ))
+            crossover_records = tuple(
+                self._get_crossover_records(population)
+            )
 
             self._logger.info('Doing mutations.')
             mutation_records = tuple(map(
@@ -75,9 +81,8 @@ class Implementation:
             self._logger.info('Calculating fitness values.')
 
             offspring = (
-                record
-                for crossover_record in crossover_records
-                for record in crossover_record.get_molecule_records()
+                record.get_molecule_record()
+                for record in crossover_records
             )
             mutants = (
                 record.get_molecule_record()
@@ -105,6 +110,10 @@ class Implementation:
                 mutation_records=mutation_records,
                 crossover_records=crossover_records,
             )
+
+    def _get_crossover_records(self, population):
+        for batch in self._crossover_selector.select(population):
+            yield from self._crosser.cross(batch)
 
     def _with_fitness_values(self, map_, population):
         no_fitness = (

@@ -67,10 +67,12 @@ class EvolutionaryAlgorithm:
         fitness_calculator : :class:`.FitnessCalculator`
             Calculates fitness values.
 
-        mutator : :class:`.Mutator`
+        mutator : :class:`.Mutator` or \
+                :class:`.ConstructedMoleculeMutator`
             Carries out mutation operations.
 
-        crosser : :class:`.Crosser`
+        crosser : :class:`.MoleculeCrosser` or \
+                :class:`.ConstructedMoleculeCrosser`
             Carries out crossover operations.
 
         generation_selector : :class:`.Selector`

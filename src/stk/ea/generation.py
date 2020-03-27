@@ -7,7 +7,13 @@ Generation
 
 class Generation:
     """
-    A generation of the :class:`.EvolutionaryAlgorithm`.
+    An abstract base class for EA generations.
+
+    Notes
+    -----
+    You might notice that the public methods of this abstract base
+    class are implemented. This is just a default implementation, which
+    you can ignore or override when implementing subclasses.
 
     """
 
