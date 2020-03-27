@@ -2,7 +2,7 @@
 Constructed Molecule Database
 =============================
 
-#. :class:`.MongoDbConstructedMoleculeDatabase`
+#. :class:`.ConstructedMoleculeMongoDb`
 
 """
 
