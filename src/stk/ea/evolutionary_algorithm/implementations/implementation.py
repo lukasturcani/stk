@@ -108,7 +108,7 @@ class Implementation:
             )
 
     def _with_fitness_values(self, map_, population):
-        no_fitness = map(
+        no_fitness = (
             record for record in population
             if record.get_fitness_value() is None
         )
