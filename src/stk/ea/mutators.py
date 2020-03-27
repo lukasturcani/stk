@@ -34,7 +34,7 @@ import logging
 import numpy as np
 
 
-from ...utilities import dice_similarity
+from ..utilities import dice_similarity
 from ..base_calculators import EAOperation, _EAOperation
 
 

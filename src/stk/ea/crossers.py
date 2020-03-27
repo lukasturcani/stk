@@ -34,7 +34,7 @@ from collections import defaultdict
 from ..base_calculators import EAOperation, _EAOperation
 
 
-from ...utilities import dedupe
+from ..utilities import dedupe
 
 
 logger = logging.getLogger(__name__)

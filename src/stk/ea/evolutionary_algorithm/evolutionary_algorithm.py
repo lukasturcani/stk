@@ -33,7 +33,6 @@ class EvolutionaryAlgorithm:
     instances. These correspond to the generations of your
     evolutionary algorithm implementation.
 
-
     *Usage*
 
     There are multiple tutorials on how to use the default
