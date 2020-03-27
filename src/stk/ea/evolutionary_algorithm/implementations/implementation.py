@@ -91,8 +91,7 @@ class Implementation:
                     key=self._duplicate_key,
                 ),
             )
-            population = self._with_normalized_fitness_values(
-            )
+            population = self._fitness_normalizer.normalize(population)
 
             population = tuple(
                 molecule_record
