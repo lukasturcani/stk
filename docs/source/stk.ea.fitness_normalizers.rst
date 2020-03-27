@@ -1,4 +1,4 @@
-.. automodule:: stk.caches.molecule.molecule
+.. automodule:: stk.ea.fitness_normalizers
    :members:
    :undoc-members:
    :show-inheritance:

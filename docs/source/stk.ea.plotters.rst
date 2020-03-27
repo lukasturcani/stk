@@ -1,4 +1,4 @@
-.. automodule:: stk.caches.utilities
+.. automodule:: stk.ea.plotters
    :members:
    :undoc-members:
    :show-inheritance:

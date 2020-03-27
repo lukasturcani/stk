@@ -1,4 +1,4 @@
-.. automodule:: stk.calculators.base_calculators
+.. automodule:: stk.base_calculators
    :members:
    :undoc-members:
    :show-inheritance:

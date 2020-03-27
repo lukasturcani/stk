@@ -11,8 +11,8 @@ Subpackages
 
 .. toctree::
 
-   stk.caches
-   stk.calculators
+   stk.databases
+   stk.ea
    stk.molecular
    stk.serialization
    stk.utilities
@@ -22,5 +22,7 @@ Submodules
 
 .. toctree::
 
+   stk.base_calculators
+   stk.compound
    stk.ea
    stk.populations

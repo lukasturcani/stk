@@ -1,4 +1,4 @@
-.. automodule:: stk.calculators.compound
+.. automodule:: stk.ea.mutators
    :members:
    :undoc-members:
    :show-inheritance:

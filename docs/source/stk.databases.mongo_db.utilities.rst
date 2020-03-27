@@ -1,4 +1,4 @@
-.. automodule:: stk.calculators.energy.mopac
+.. automodule:: stk.databases.mongo_db.utilities
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,4 +1,4 @@
-.. automodule:: stk.calculators.ea.plotters
+.. automodule:: stk.databases.molecule
    :members:
    :undoc-members:
    :show-inheritance:
