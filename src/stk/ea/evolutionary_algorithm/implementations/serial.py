@@ -1,7 +1,15 @@
+from stk.utilities import dedupe
+from ...generation import Generation
+
 import itertools as it
 
 
 class Serial:
+    """
+    A serial implementation of the default evolutionary algorithm.
+
+    """
+
     def __init__(
         self,
         initial_population,
@@ -16,6 +24,11 @@ class Serial:
         duplicate_key,
         logger,
     ):
+        """
+        Initialize a :class:`.Serial` instance.
+
+        """
+
         self._initial_population = initial_population
         self._fitness_calculator = fitness_calculator
         self._fitness_normalizer = fitness_normalizer
@@ -28,36 +41,81 @@ class Serial:
         self._logger = logger
 
     def get_generations(self):
+
+        def get_mutation_record(batch):
+            return self._mutator.mutate(batch[0])
+
         logger = self._logger
         population = self._initial_population
         generation = 0
+
+        self._logger.info(
+            'Calculating fitness values of initial population.'
+        )
+        population = tuple(self._with_fitness_values(population))
+        yield Generation(
+            id=generation,
+            molecule_records=population,
+            mutation_records=(),
+            crossover_records=(),
+        )
+
         while not self._terminator.terminate(population):
             generation += 1
 
             logger.info(f'Starting generation {generation}.')
             logger.debug(f'Population size is {len(population)}.')
 
-            self._logger.info('Calculating fitness values.')
-            population = tuple(self._with_fitness_values(population))
-
             logger.info('Doing crossovers.')
-            crossover_parents = self._crossover_selector.select(
-                population=population,
-            )
-            crossover_records = it.starmap(
+            crossover_records = tuple(map(
                 self._crosser.cross,
-                crossover_parents,
-            )
+                self._crossover_selector.select(population),
+            ))
+
+            logger.info('Doing mutations.')
+            mutation_records = tuple(map(
+                get_mutation_record,
+                self._mutation_selector.select(population),
+            ))
+
+            logger.info('Calculating fitness values.')
+
             offspring = (
-                offspring
-                for offspring_batch in crossover_records
-                for offspring in offspring_batch
+                record
+                for crossover_record in crossover_records
+                for record in crossover_record.get_molecule_records()
+            )
+            mutants = (
+                record.get_molecule_record()
+                for record in mutation_records
+            )
+
+            population = self._with_fitness_values(dedupe(
+                iterable=it.chain(population, offspring, mutants),
+                key=self._duplicate_key,
+            ))
+
+            population = tuple(
+                molecule_record
+                for molecule_record,
+                in self._generation_selector.select(population)
+            )
+
+            yield Generation(
+                id=generation,
+                molecule_records=population,
+                mutation_records=mutation_records,
+                crossover_records=crossover_records,
             )
 
     def _with_fitness_values(self, population):
-        fitness_values = map(
-            self._fitness_calculator,
-            (record.get_molecule() for record in population),
-        )
-        for record, fitness_value in zip(population, fitness_values):
-            yield record.with_fitness_value(fitness_value)
+        fitness_calculator = self._fitness_calculator
+
+        for record in population:
+            if record.get_fitness_value() is None:
+                fitness_value = fitness_calculator.get_fitness_value(
+                    molecule=record.get_molecule(),
+                )
+                yield record.with_fitness_value(fitness_value)
+            else:
+                yield record
