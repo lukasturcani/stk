@@ -7,8 +7,7 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('mongo_db_constructed_molecule_cache'),
-        lazy_fixture('ram_constructed_molecule_cache'),
+        lazy_fixture('molecule_mongo_db'),
     ),
 )
 def case_data(request):

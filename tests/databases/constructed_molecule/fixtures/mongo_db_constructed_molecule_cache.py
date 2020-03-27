@@ -9,7 +9,7 @@ from ..case_data import CaseData
 @pytest.fixture(
     params=(
         CaseData(
-            cache=stk.MongoDbConstructedMoleculeCache(
+            database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 lru_cache_size=0,
             ),
@@ -33,7 +33,7 @@ from ..case_data import CaseData
             },
         ),
         CaseData(
-            cache=stk.MongoDbConstructedMoleculeCache(
+            database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 lru_cache_size=128,
             ),
@@ -57,7 +57,7 @@ from ..case_data import CaseData
             },
         ),
         CaseData(
-            cache=stk.MongoDbConstructedMoleculeCache(
+            database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
@@ -86,7 +86,7 @@ from ..case_data import CaseData
             key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
         ),
         CaseData(
-            cache=stk.MongoDbConstructedMoleculeCache(
+            database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
@@ -116,5 +116,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def mongo_db_constructed_molecule_cache(request):
+def constructed_molecule_mongo_db(request):
     return request.param

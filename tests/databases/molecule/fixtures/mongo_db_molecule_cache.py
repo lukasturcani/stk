@@ -9,7 +9,7 @@ from ..case_data import CaseData
 @pytest.fixture(
     params=(
         CaseData(
-            cache=stk.MongoDbMoleculeCache(
+            database=stk.MoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 lru_cache_size=0,
             ),
@@ -20,7 +20,7 @@ from ..case_data import CaseData
             },
         ),
         CaseData(
-            cache=stk.MongoDbMoleculeCache(
+            database=stk.MoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 lru_cache_size=0,
                 jsonizer=stk.MoleculeJsonizer(
@@ -39,7 +39,7 @@ from ..case_data import CaseData
             key={'SMILES': 'BrBr'},
         ),
         CaseData(
-            cache=stk.MongoDbMoleculeCache(
+            database=stk.MoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 lru_cache_size=128,
                 jsonizer=stk.MoleculeJsonizer(
@@ -59,5 +59,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def mongo_db_molecule_cache(request):
+def molecule_mongo_db(request):
     return request.param
