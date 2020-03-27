@@ -7,8 +7,8 @@ Molecule Value MongDB
 from functools import lru_cache
 
 from stk.molecular import InchiKey
+from ..utilities import HashableDict
 from ...value import MoleculeValueDatabase
-from ...utilities import HashableDict
 
 
 class MoleculeValueMongoDb(MoleculeValueDatabase):

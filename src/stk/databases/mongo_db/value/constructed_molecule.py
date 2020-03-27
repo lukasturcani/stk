@@ -7,8 +7,8 @@ Constructed Molecule Value MongoDB
 from functools import lru_cache
 
 from stk.molecular import InchiKey
+from ..utilities import HashableDict
 from ...value import ConstructedMoleculeValueDatabase
-from ...utilities import HashableDict
 
 
 class ConstructedMoleculeValueMongoDb(

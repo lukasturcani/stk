@@ -6,7 +6,7 @@ Molecule Value Database
 
 """
 
-from ..constructed_molecule import ConstructedMoleculeValueDatabase
+from .constructed_molecule import ConstructedMoleculeValueDatabase
 
 
 class MoleculeValueDatabase(ConstructedMoleculeValueDatabase):
