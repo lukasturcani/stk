@@ -54,13 +54,52 @@ class EvolutionaryAlgorithm:
         fitness_normalizer=NullFitnessNormalizer(),
         duplicate_key=get_inchi,
         logger=get_logger(),
-        num_processes=1,
+        num_processes=None,
     ):
         """
         Initialize a :class:`EvolutionaryAlgorithm` instance.
 
         Parameters
         ----------
+        initial_population : :class:`tuple` of :class:`.MoleculeRecord`
+            The initial population the EA should use.
+
+        fitness_calculator : :class:`.FitnessCalculator`
+            Calculates fitness values.
+
+        mutator : :class:`.Mutator`
+            Carries out mutation operations.
+
+        crosser : :class:`.Crosser`
+            Carries out crossover operations.
+
+        generation_selector : :class:`.Selector`
+            Selects the next generation.
+
+        mutation_selector : :class:`.Selector`
+            Selects molecules for mutation.
+
+        crossover_selector : :class:`.Selector`
+            Selects molecules for crossover.
+
+        terminator : :class:`.Terminator`
+            Decides when the EA should stop.
+
+        fitness_normalizer : :class:`.FitnessNormalizer`
+            Normalizes fitness values.
+
+        duplicate_key : :class:`callable`, optional
+            Takes a :class:`.MoleculeRecord` and returns some value.
+            If two molecules return the same value, they are considered
+            duplicates, and one of them will be removed from the
+            population. By default :class:`.get_inchi` will be used.
+
+        logger : :class:`logging.Logger`, optional
+            The logger the EA should use.
+
+        num_processes : :class:`int`, optional
+            The number of parallel processes the EA should create.
+            If ``None``, all available cores will be used.
 
         """
 
