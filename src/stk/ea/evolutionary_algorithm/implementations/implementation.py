@@ -118,7 +118,7 @@ class Implementation:
     def _with_fitness_values(self, map_, population):
         no_fitness = (
             record for record in population
-            if record.get_fitness_value() is None
+            if record.get_fitness_value(normalized=False) is None
         )
         molecules = (record.get_molecule() for record in no_fitness)
         fitness_values = map_(
@@ -127,7 +127,10 @@ class Implementation:
         )
         yield from (
             record for record in population
-            if record.get_fitness_value() is not None
+            if record.get_fitness_value(normalized=False) is not None
         )
         for record, fitness_value in zip(no_fitness, fitness_values):
-            yield record.with_fitness_value(fitness_value)
+            yield record.with_fitness_value(
+                fitness_value=fitness_value,
+                normalized=False,
+            )
