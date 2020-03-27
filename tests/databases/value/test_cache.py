@@ -1,11 +1,11 @@
-def test_cache(case_data):
+def test_database(case_data):
     """
-    Test a cache.
+    Test a database.
 
     Parameters
     ----------
     case_data : :class:`.CaseData`
-        A test case. Holds the cache to test and the value to put
+        A test case. Holds the database to test and the value to put
         into it.
 
     Returns
@@ -14,28 +14,28 @@ def test_cache(case_data):
 
     """
 
-    _test_cache(
-        cache=case_data.cache,
+    _test_database(
+        database=case_data.database,
         molecule=case_data.molecule,
         value=case_data.value,
     )
 
 
-def _test_cache(cache, molecule, value):
+def _test_database(database, molecule, value):
     """
-    Test a cache.
+    Test a database.
 
     Parameters
     ----------
-    cache : class:`.MoleculeValueCache` or \
-            :class:`.ConstructedMoleculeValueCache`
-        The cache to test.
+    database : class:`.MoleculeValueDatabase` or \
+            :class:`.ConstructedMoleculeValueDatabase`
+        The database to test.
 
     molecule : :class:`.Molecule`
         The molecule to test.
 
     value : :class:`object`
-        The value to put into the cache.
+        The value to put into the database.
 
     Returns
     -------
@@ -43,5 +43,5 @@ def _test_cache(cache, molecule, value):
 
     """
 
-    cache.put(molecule, value)
-    assert cache.get(molecule) == value
+    database.put(molecule, value)
+    assert database.get(molecule) == value

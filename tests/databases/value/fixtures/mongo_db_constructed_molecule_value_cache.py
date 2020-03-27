@@ -8,7 +8,7 @@ from ...utilities import MockMongoClient
 @pytest.fixture(
     params=(
         CaseData(
-            cache=stk.MongoDbConstructedMoleculeValueCache(
+            database=stk.ConstructedMoleculeValueMongoDb(
                 mongo_client=MockMongoClient(),
                 collection='values',
                 lru_cache_size=128,
@@ -28,7 +28,7 @@ from ...utilities import MockMongoClient
             value=12,
         ),
         CaseData(
-            cache=stk.MongoDbConstructedMoleculeValueCache(
+            database=stk.ConstructedMoleculeValueMongoDb(
                 mongo_client=MockMongoClient(),
                 collection='values',
                 lru_cache_size=0,
@@ -49,5 +49,5 @@ from ...utilities import MockMongoClient
         ),
     ),
 )
-def mongo_db_constructed_molecule_value_cache(request):
+def constructed_molecule_value_mongo_db(request):
     return request.param
