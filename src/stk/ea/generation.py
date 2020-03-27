@@ -18,10 +18,33 @@ class Generation:
         mutation_records,
         crossover_records,
     ):
+        """
+        Initialize a :class:`.Generation` instance.
+
+        Parameters
+        ----------
+        id : :class:`int`
+            The id of the generation.
+
+        molecule_records : :class:`iterable` of \
+                :class:`.MoleculeRecord`
+            The records of molecules in the generation.
+
+        mutation_records : :class:`iterable` of \
+                :class:`.MutationRecord`
+            The records of mutations done during the generation.
+
+        crossover_records : :class:`iterable` of \
+                :class:`.CrossoverRecord`
+            The records of crossover operations done during the
+            generation.
+
+        """
+
         self._id = id
-        self._molecule_records = molecule_records
-        self._mutation_records = mutation_records
-        self._crossover_records = crossover_records
+        self._molecule_records = tuple(molecule_records)
+        self._mutation_records = tuple(mutation_records)
+        self._crossover_records = tuple(crossover_records)
 
     def get_id(self):
         """
