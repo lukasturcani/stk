@@ -18,7 +18,6 @@ class Implementation:
         fitness_normalizer,
         duplicate_key,
         logger,
-        map,
     ):
         """
         Initialize an :class:`.Implementation` instance.
@@ -36,9 +35,8 @@ class Implementation:
         self._fitness_normalizer = fitness_normalizer
         self._duplicate_key = duplicate_key
         self._logger = logger
-        self._map = map
 
-    def _get_generations(self):
+    def _get_generations(self, map_):
         def get_mutation_record(batch):
             return self._mutator.mutate(batch[0])
 
@@ -48,7 +46,7 @@ class Implementation:
         self._logger.info(
             'Calculating fitness values of initial population.'
         )
-        population = tuple(self._with_fitness_values(population))
+        population = tuple(self._with_fitness_values(map_, population))
         yield Generation(
             id=generation,
             molecule_records=population,
@@ -86,10 +84,13 @@ class Implementation:
                 for record in mutation_records
             )
 
-            population = self._with_fitness_values(dedupe(
-                iterable=it.chain(population, offspring, mutants),
-                key=self._duplicate_key,
-            ))
+            population = self._with_fitness_values(
+                map_=map_,
+                population=dedupe(
+                    iterable=it.chain(population, offspring, mutants),
+                    key=self._duplicate_key,
+                ),
+            )
             population = self._with_normalized_fitness_values(
             )
 
@@ -106,13 +107,13 @@ class Implementation:
                 crossover_records=crossover_records,
             )
 
-    def _with_fitness_values(self, population):
+    def _with_fitness_values(self, map_, population):
         no_fitness = (
             record for record in population
             if record.get_fitness_value() is None
         )
         molecules = (record.get_molecule() for record in no_fitness)
-        fitness_values = self._map(
+        fitness_values = map_(
             self._fitness_calculator.get_fitness_value,
             molecules,
         )
