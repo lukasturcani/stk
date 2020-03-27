@@ -1,4 +1,4 @@
-from .crossers import *
+from .crossover import *
 from .fitness_calculators import *
 from .mutators import *
 from .fitness_normalizers import *
