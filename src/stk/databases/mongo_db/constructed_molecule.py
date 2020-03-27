@@ -10,7 +10,7 @@ from stk.serialization import (
     ConstructedMoleculeJsonizer,
     ConstructedMoleculeDejsonizer,
 )
-from .constructed_molecule import ConstructedMoleculeDatabase
+from ..constructed_molecule import ConstructedMoleculeDatabase
 from .utilities import HashableDict
 
 

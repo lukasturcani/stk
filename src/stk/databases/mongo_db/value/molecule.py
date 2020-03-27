@@ -1,27 +1,27 @@
 """
-MongoDB Molecule Value Cache
-============================
+Molecule Value MongDB
+=====================
 
 """
 
 from functools import lru_cache
 
 from stk.molecular import InchiKey
-from .molecule import MoleculeValueCache
+from ...value import MoleculeValueDatabase
 from ...utilities import HashableDict
 
 
-class MongoDbMoleculeValueCache(MoleculeValueCache):
+class MoleculeValueMongoDb(MoleculeValueDatabase):
     """
     Use MongoDB to store and retrieve molecular property values.
 
     See Also
     --------
-    :class:`.MongoDbConstructedMoleculeValueCache`
+    :class:`.ConstructedMoleculeValueMongoDb`
         If you do not need to use any \
         :class:`.ConstructedMoleculeKeyMaker`, but only \
         :class:`.MoleculeKeyMaker`, use a \
-        :class:`.MongoDbMoleculeValueCache`. \
+        :class:`.MoleculeValueMongoDb`. \
         This is the case, even if you are storing values associated \
         with a :class:`.ConstructedMolecule`.
 
@@ -49,7 +49,7 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
         # MongoClient() - read the documentation for pymongo to see how
         # to do that.
         client = pymongo.MongoClient()
-        db = stk.MongoDbMoleculeValueCache(
+        db = stk.MoleculeValueMongoDb(
             mongo_client=client,
             collection='atom_counts',
         )
@@ -84,7 +84,7 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
         lru_cache_size=128,
     ):
         """
-        Initialize a :class:`.MongoDbMoleculeValueCache` instance.
+        Initialize a :class:`.MoleculeValueMongoDb` instance.
 
         Parameters
         ----------
@@ -102,7 +102,7 @@ class MongoDbMoleculeValueCache(MoleculeValueCache):
         key_makers : :class:`tuple` of :class:`.MoleculeKeyMaker`
             Used to make the keys of molecules, which the values
             are associated with. If two molecules have the same
-            key, they will return the same value from the cache.
+            key, they will return the same value from the database.
 
         lru_cache_size : :class:`int`, optional
             A RAM-based least recently used cache is used to avoid

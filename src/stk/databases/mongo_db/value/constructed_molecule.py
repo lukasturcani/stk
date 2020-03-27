@@ -1,29 +1,29 @@
 """
-MongoDB Constructed Molecule Value Cache
-========================================
+Constructed Molecule Value MongoDB
+==================================
 
 """
 
 from functools import lru_cache
 
 from stk.molecular import InchiKey
-from .constructed_molecule import ConstructedMoleculeValueCache
+from ...value import ConstructedMoleculeValueDatabase
 from ...utilities import HashableDict
 
 
-class MongoDbConstructedMoleculeValueCache(
-    ConstructedMoleculeValueCache,
+class ConstructedMoleculeValueMongoDb(
+    ConstructedMoleculeValueDatabase,
 ):
     """
     Use MongoDB to store and retrieve molecular property values.
 
     See Also
     --------
-    :class:`.MongoDbMoleculeValueCache`
+    :class:`.MoleculeValueMongoDb`
         If you do not need to use any \
         :class:`.ConstructedMoleculeKeyMaker`, but only \
         :class:`.MoleculeKeyMaker`, use a \
-        :class:`.MongoDbMoleculeValueCache`. \
+        :class:`.MoleculeValueMongoDb`. \
         This is the case, even if you are storing values associated \
         with a :class:`.ConstructedMolecule`.
 
@@ -51,7 +51,7 @@ class MongoDbConstructedMoleculeValueCache(
         # MongoClient() - read the documentation for pymongo to see how
         # to do that.
         client = pymongo.MongoClient()
-        db = stk.MongoDbConstructedMoleculeValueCache(
+        db = stk.ConstructedMoleculeValueMongoDb(
             mongo_client=client,
             collection='atom_counts',
         )
@@ -81,7 +81,7 @@ class MongoDbConstructedMoleculeValueCache(
         lru_cache_size=128,
     ):
         """
-        Initialize a :class:`.MongoDbConstructedMoleculeValueCache`.
+        Initialize a :class:`.ConstructedMoleculeValueMongoDb`.
 
         Parameters
         ----------
@@ -100,7 +100,7 @@ class MongoDbConstructedMoleculeValueCache(
                 :class:`.ConstructedMoleculeKeyMaker`
             Used to make the keys of molecules, which the values
             are associated with. If two molecules have the same
-            key, they will return the same value from the cache.
+            key, they will return the same value from the database.
 
         lru_cache_size : :class:`int`, optional
             A RAM-based least recently used cache is used to avoid
