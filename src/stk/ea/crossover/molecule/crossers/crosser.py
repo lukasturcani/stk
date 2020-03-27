@@ -25,7 +25,7 @@ class MoleculeCrosser:
 
         Yields
         -------
-        :class:`.CrossoverRecord`
+        :class:`.MoleculeCrossoverRecord`
             A record of a crossover operation.
 
         """
@@ -44,7 +44,7 @@ class MoleculeCrosser:
 
         Yields
         -------
-        :class:`.CrossoverRecord`
+        :class:`.MoleculeCrossoverRecord`
             A record of a crossover operation.
 
         """
