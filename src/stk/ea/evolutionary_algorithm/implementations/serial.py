@@ -40,7 +40,7 @@ class Serial:
 
     def get_generations(self):
         yield from get_generations(
-            intial_population=self._initial_population,
+            initial_population=self._initial_population,
             fitness_calculator=self._fitness_calculator,
             mutator=self._mutator,
             crosser=self._crosser,
