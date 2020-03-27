@@ -5,9 +5,6 @@ Evolutionary Algorithm
 """
 
 
-import logging
-import os
-
 from ..fitness_normalizers import NullFitnessNormalizer
 from .utilities import get_logger
 
@@ -54,6 +51,7 @@ class EvolutionaryAlgorithm:
         self._mutation_selector = mutation_selector
         self._crossover_selector = crossover_selector
         self._terminator = terminator
+        self._logger = logger
 
     def get_generations(self):
         """
@@ -66,37 +64,7 @@ class EvolutionaryAlgorithm:
 
         """
 
+        self._logger.info(
+            'Calculating the fitness of population members.'
+        )
 
-
-
-# Define the formatter for logging messages.
-try:
-    f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
-except OSError:
-    # When testing os.get_terminal_size() will fail because stdout is
-    # not connected to a terminal.
-    f = '\n' + '='*100 + '\n\n'
-formatter = logging.Formatter(
-    fmt=f+('%(asctime)s - %(levelname)s - %(name)s - %(message)s'),
-    datefmt='%H:%M:%S'
-)
-
-# Define logging handlers.
-errorhandler = logging.FileHandler(
-    'output/scratch/errors.log',
-    delay=True
-)
-errorhandler.setLevel(logging.ERROR)
-
-streamhandler = logging.StreamHandler()
-
-errorhandler.setFormatter(formatter)
-streamhandler.setFormatter(formatter)
-
-# Get the loggers.
-rootlogger = logging.getLogger()
-rootlogger.addHandler(errorhandler)
-rootlogger.addHandler(streamhandler)
-
-
-logger = logging.getLogger(__name__)
