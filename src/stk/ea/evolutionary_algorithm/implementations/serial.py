@@ -39,7 +39,7 @@ class Serial:
         self._logger = logger
 
     def get_generations(self):
-        yield from get_generations(
+        yield from self._get_generations(
             initial_population=self._initial_population,
             fitness_calculator=self._fitness_calculator,
             mutator=self._mutator,
@@ -51,5 +51,4 @@ class Serial:
             fitness_normalizer=self._fitness_normalizer,
             duplicate_key=self._duplicate_key,
             logger=self._logger,
-            map=map,
         )
