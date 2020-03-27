@@ -5,19 +5,50 @@ from ...generation import Generation
 
 
 class Implementation:
-    def get_generations(self):
-        def get_mutation_record(batch):
-            return mutator.mutate(batch[0])
+    def __init__(
+        self,
+        initial_population,
+        fitness_calculator,
+        mutator,
+        crosser,
+        generation_selector,
+        mutation_selector,
+        crossover_selector,
+        terminator,
+        fitness_normalizer,
+        duplicate_key,
+        logger,
+        map,
+    ):
+        """
+        Initialize an :class:`.Implementation` instance.
 
-        population = initial_population
+        """
+
+        self._initial_population = initial_population
+        self._fitness_calculator = fitness_calculator
+        self._mutator = mutator
+        self._crosser = crosser
+        self._generation_selector = generation_selector
+        self._mutation_selector = mutation_selector
+        self._crossover_selector = crossover_selector
+        self._terminator = terminator
+        self._fitness_normalizer = fitness_normalizer
+        self._duplicate_key = duplicate_key
+        self._logger = logger
+        self._map = map
+
+    def _get_generations(self):
+        def get_mutation_record(batch):
+            return self._mutator.mutate(batch[0])
+
+        population = self._initial_population
         generation = 0
 
-        logger.info(
+        self._logger.info(
             'Calculating fitness values of initial population.'
         )
-        population = tuple(
-            with_fitness_values(fitness_calculator, population)
-        )
+        population = tuple(self._with_fitness_values(population))
         yield Generation(
             id=generation,
             molecule_records=population,
@@ -25,25 +56,25 @@ class Implementation:
             crossover_records=(),
         )
 
-        while not terminator.terminate(population):
+        while not self._terminator.terminate(population):
             generation += 1
 
-            logger.info(f'Starting generation {generation}.')
-            logger.debug(f'Population size is {len(population)}.')
+            self._logger.info(f'Starting generation {generation}.')
+            self._logger.debug(f'Population size is {len(population)}.')
 
-            logger.info('Doing crossovers.')
+            self._logger.info('Doing crossovers.')
             crossover_records = tuple(map(
-                crosser.cross,
-                crossover_selector.select(population),
+                self._crosser.cross,
+                self._crossover_selector.select(population),
             ))
 
-            logger.info('Doing mutations.')
+            self._logger.info('Doing mutations.')
             mutation_records = tuple(map(
                 get_mutation_record,
-                mutation_selector.select(population),
+                self._mutation_selector.select(population),
             ))
 
-            logger.info('Calculating fitness values.')
+            self._logger.info('Calculating fitness values.')
 
             offspring = (
                 record
@@ -55,20 +86,17 @@ class Implementation:
                 for record in mutation_records
             )
 
-            population = with_fitness_values(
-                fitness_calculator=fitness_calculator,
-                population=dedupe(
-                    iterable=it.chain(population, offspring, mutants),
-                    key=duplicate_key,
-                ),
-            )
-            population = with_normalized_fitness_values(
+            population = self._with_fitness_values(dedupe(
+                iterable=it.chain(population, offspring, mutants),
+                key=self._duplicate_key,
+            ))
+            population = self._with_normalized_fitness_values(
             )
 
             population = tuple(
                 molecule_record
                 for molecule_record,
-                in generation_selector.select(population)
+                in self._generation_selector.select(population)
             )
 
             yield Generation(
@@ -78,13 +106,19 @@ class Implementation:
                 crossover_records=crossover_records,
             )
 
-
-    def with_fitness_values(fitness_calculator, population):
+    def _with_fitness_values(self, population):
+        no_fitness = (
+            record for record in population
+            if record.get_fitness_value() is None
+        )
+        molecules = (record.get_molecule() for record in no_fitness)
+        fitness_values = self._map(
+            self._fitness_calculator.get_fitness_value,
+            molecules,
+        )
         for record in population:
-            if record.get_fitness_value() is None:
-                fitness_value = fitness_calculator.get_fitness_value(
-                    molecule=record.get_molecule(),
-                )
-                yield record.with_fitness_value(fitness_value)
-            else:
+            if record.get_fitness_value() is not None:
                 yield record
+
+        for record, fitness_value in zip(no_fitness, fitness_values):
+            yield record.with_fitness_value(fitness_value)
