@@ -1,6 +1,6 @@
 """
-MongoDB Constructed Molecule Cache
-==================================
+Constructed Molecule MongoDB
+============================
 
 """
 
@@ -10,20 +10,20 @@ from stk.serialization import (
     ConstructedMoleculeJsonizer,
     ConstructedMoleculeDejsonizer,
 )
-from .constructed_molecule import ConstructedMoleculeCache
-from ..utilities import HashableDict
+from .constructed_molecule import ConstructedMoleculeDatabase
+from .utilities import HashableDict
 
 
-class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
+class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     """
     Uses MongoDB to store and retrieve constructed molecules.
 
     See Also
     --------
-    :class:`.MongoDbMoleculeCache`
+    :class:`.MoleculeMongoDb`
         If you need to store and retrieve molecules, which are not
         :class:`.ConstructedMolecule` instances, use a \
-        :class:`.MongoDbMoleculeCache`.
+        :class:`.MoleculeMongoDb`.
 
     Examples
     --------
@@ -52,7 +52,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         # MongoClient() - read the documentation for pymongo to see how
         # to do that.
         client = pymongo.MongoClient()
-        db = stk.MongoDbConstructedMoleculeCache(client)
+        db = stk.ConstructedMoleculeMongoDb(client)
 
         # Create a molecule.
         polymer = stk.ConstructedMolecule(
@@ -89,7 +89,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
 
     .. code-block:: python
 
-        db = stk.MongoDbConstructedMoleculeCache(
+        db = stk.ConstructedMoleculeMongoDb(
             mongo_client=client,
             # Store the InChI and the InChIKey of molecules in
             # the JSON representation.
@@ -141,7 +141,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
             def get_key(self, molecule):
                 return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
-        db = stk.MongoDbConstructedMoleculeCache(
+        db = stk.ConstructedMoleculeMongoDb(
             mongo_client=client,
             jsonizer=stk.ConstructedMoleculeJsonizer(
                 # Include your own custom key maker in the JSON
@@ -168,7 +168,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
             get_key=lambda molecule:
                 rdkit.MolToSmiles(molecule.to_rdkit_mol()),
         )
-        db = stk.MongoDbConstructedMoleculeCache(
+        db = stk.ConstructedMoleculeMongoDb(
             mongo_client=client,
             jsonizer=stk.ConstructedMoleculeJsonizer(
             key_makers=(stk.InchiKey(), smiles),
@@ -196,7 +196,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         lru_cache_size=128,
     ):
         """
-        Initialize a :class:`.MongoDbConstructedMoleculeCache`.
+        Initialize a :class:`.ConstructedMoleculeMongoDb`.
 
         Parameters
         ----------
@@ -218,7 +218,7 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         position_matrix_collection : :class:`str`
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
-            the cache.
+            the database.
 
         jsonizer : :class:`.ConstructedMoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -304,13 +304,13 @@ class MongoDbConstructedMoleculeCache(ConstructedMoleculeCache):
         Parameters
         ----------
         key : :class:`.HashableDict`
-            The key of a a molecule, which is to be returned from the
-            cache.
+            The key of a molecule, which is to be returned from the
+            database.
 
         Returns
         -------
         :class:`.Molecule`
-            The molecule held in the cache under `key`.
+            The molecule held in the database under `key`.
 
         """
 
