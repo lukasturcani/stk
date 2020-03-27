@@ -1,7 +1,6 @@
 from .utilities import get_generations
 
 
-
 class Serial:
     """
     A serial implementation of the default evolutionary algorithm.
@@ -54,4 +53,3 @@ class Serial:
             logger=self._logger,
             map=map,
         )
-
