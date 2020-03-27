@@ -116,9 +116,9 @@ class Implementation:
             self._fitness_calculator.get_fitness_value,
             molecules,
         )
-        for record in population:
-            if record.get_fitness_value() is not None:
-                yield record
-
+        yield from (
+            record for record in population
+            if record.get_fitness_value() is not None
+        )
         for record, fitness_value in zip(no_fitness, fitness_values):
             yield record.with_fitness_value(fitness_value)
