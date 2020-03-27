@@ -5,3 +5,5 @@ from .fitness_normalizers import *
 from .plotters import *
 from .selectors import *
 from .terminators import *
+from .generation import *
+from .evolutionary_algorithm import *
