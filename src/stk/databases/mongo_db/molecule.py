@@ -278,8 +278,14 @@ class MoleculeMongoDb(MoleculeDatabase):
                 'No molecule found in the database with a key of: '
                 f'{key}'
             )
+        position_matrix = self._position_matrices.find_one(key)
+        if position_matrix is None:
+            raise KeyError(
+                'No molecule found in the database with a key of: '
+                f'{key}'
+            )
 
         return self._dejsonizer.from_json({
             'molecule': json,
-            'matrix': self._position_matrices.find_one(key),
+            'matrix':  position_matrix,
         })
