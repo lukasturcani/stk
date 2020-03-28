@@ -330,11 +330,18 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 f'{key}'
             )
 
+        position_matrix = self._position_matrices.find_one(key)
+        if position_matrix is None:
+            raise KeyError(
+                'No position matrix found in the database with a key '
+                f'of: {key}'
+            )
+
         return self._dejsonizer.from_json(
             json={
                 'molecule': molecule_json,
                 'constructedMolecule': constructed_molecule_json,
-                'matrix': self._position_matrices.find_one(key),
+                'matrix': position_matrix,
                 'buildingBlocks': tuple(map(
                     self._get_building_block,
                     constructed_molecule_json['BB'],
