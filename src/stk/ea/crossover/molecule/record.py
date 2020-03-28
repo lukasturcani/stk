@@ -1,23 +1,36 @@
 """
-Crossover Record
-================
+Molecule Crossover Record
+=========================
 
 """
 
 
-class CrossoverRecord:
+class MoleculeCrossoverRecord:
     """
-    Holds a record of a crossover operation.
+    Holds a record of a crossover operation on molecules.
 
     """
 
     def __init__(self, molecule_record, crosser_name):
+        """
+        Initialize a :class:`.MoleculeCrossoverRecord` instance.
+
+        Parameters
+        ----------
+        molecule_record : :class:`.MoleculeRecord`
+            The molecule produced by the crossover operation.
+
+        crosser_name : :class:`str`
+            The name of the crosser which carried out the crossover.
+
+        """
+
         self._molecule_record = molecule_record
         self._crosser_name = crosser_name
 
     def get_molecule_record(self):
         """
-        Get the :class:`.MoleculeRecord` produced by the operation.
+        Get the :class:`.MoleculeRecord` produced by the crossover.
 
         Returns
         -------
@@ -30,7 +43,7 @@ class CrossoverRecord:
 
     def get_crosser_name(self):
         """
-        Get the name of the crosser which created this record.
+        Get the name of the crosser which carried out the crossover.
 
         Returns
         -------

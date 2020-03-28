@@ -12,6 +12,11 @@ class MoleculeCrosser:
     Crossers take multiple molecules and recombine them to make
     new, offspring, molecules.
 
+    Note that despite appearances, :class:`.MoleculeCrosser` and
+    :class:`.ConstructedMoleculeCrosser` are not interchangeable, you
+    cannot use one where the other is required, unless explicitly
+    allowed.
+
     """
 
     def cross(self, molecules):
