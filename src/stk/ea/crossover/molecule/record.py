@@ -7,7 +7,7 @@ Molecule Crossover Record
 
 class MoleculeCrossoverRecord:
     """
-    Holds a record of a crossover operation on molecules.
+    A record of a crossover operation on molecules.
 
     """
 

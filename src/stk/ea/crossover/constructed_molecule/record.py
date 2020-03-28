@@ -10,7 +10,7 @@ from ..molecule import MoleculeCrossoverRecord
 
 class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
     """
-    Holds a record of a crossover operation on constructed molecules.
+    A record of a crossover operation on constructed molecules.
 
     """
 
