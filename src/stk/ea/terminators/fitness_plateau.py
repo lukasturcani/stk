@@ -1,3 +1,5 @@
+from .terminator import Terminator
+
 
 class FitnessPlateau(Terminator):
     """

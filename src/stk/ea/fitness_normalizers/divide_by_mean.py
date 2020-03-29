@@ -1,5 +1,7 @@
+from .fitness_normalizer import FitnessNormalizer
 
-class DivideByMean(_FilteringNormalizer, FitnessNormalizer):
+
+class DivideByMean(FitnessNormalizer):
     """
     Divides fitness values by the population mean.
 

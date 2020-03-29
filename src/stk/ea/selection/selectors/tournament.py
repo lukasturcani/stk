@@ -1,5 +1,7 @@
+from .selector import Selector
 
-class Tournament(_BatchingSelector, Selector):
+
+class Tournament(Selector):
     """
     Yields batches of molecules through tournament selection.
 

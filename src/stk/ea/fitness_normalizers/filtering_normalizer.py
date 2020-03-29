@@ -1,5 +1,7 @@
+from .fitness_normalizer import FitnessNormalizer
 
-class _FilteringNormalizer(FitnessNormalizer):
+
+class FilteringNormalizer(FitnessNormalizer):
     """
     Implements some of the :class:`.FitnessNormalizer` interface.
 

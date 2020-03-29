@@ -1,5 +1,7 @@
+from .selector import Selector
 
-class AboveAverage(_BatchingSelector, Selector):
+
+class AboveAverage(Selector):
     """
     Yields above average batches of molecules.
 

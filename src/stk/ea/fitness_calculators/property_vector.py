@@ -1,5 +1,7 @@
+from .fitness_calculator import FitnessCalculator
 
-class PropertyVector(_MoleculeCalculator, FitnessCalculator):
+
+class PropertyVector(FitnessCalculator):
     """
     Calculates a set of properties of a molecule.
 

@@ -1,3 +1,5 @@
+from .terminator import Terminator
+
 
 class NumGenerations(Terminator):
     """
@@ -34,5 +36,3 @@ class NumGenerations(Terminator):
         """
 
         return len(progress.subpopulations) >= self._num_generations
-
-

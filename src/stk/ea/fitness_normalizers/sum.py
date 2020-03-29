@@ -1,5 +1,7 @@
+from .fitness_normalizer import FitnessNormalizer
 
-class Sum(_FilteringNormalizer, FitnessNormalizer):
+
+class Sum(FitnessNormalizer):
     """
     Sums the values in a :class:`list`.
 
@@ -42,5 +44,3 @@ class Sum(_FilteringNormalizer, FitnessNormalizer):
     def _get_normalized_values(self, filtered, fitness_values):
         for mol in filtered:
             yield mol, sum(fitness_values[mol])
-
-

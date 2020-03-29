@@ -1,3 +1,5 @@
+from .fitness_normalizer import FitnessNormalizer
+
 
 class NullFitnessNormalizer(FitnessNormalizer):
     """
@@ -7,5 +9,3 @@ class NullFitnessNormalizer(FitnessNormalizer):
 
     def _normalize(self, population):
         return population.get_fitness_values()
-
-

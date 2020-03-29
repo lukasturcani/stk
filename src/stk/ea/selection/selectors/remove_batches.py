@@ -1,3 +1,5 @@
+from .selector import Selector
+
 
 class RemoveBatches(Selector):
     """

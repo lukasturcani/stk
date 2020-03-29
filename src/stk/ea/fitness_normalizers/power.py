@@ -1,5 +1,7 @@
+from .fitness_normalizer import FitnessNormalizer
 
-class Power(_FilteringNormalizer, FitnessNormalizer):
+
+class Power(FitnessNormalizer):
     """
     Raises fitness values to some power.
 

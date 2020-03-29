@@ -1,5 +1,7 @@
+from .fitness_normalizer import FitnessNormalizer
 
-class ShiftUp(_FilteringNormalizer, FitnessNormalizer):
+
+class ShiftUp(FitnessNormalizer):
     """
     Shifts negative fitness values to be positive.
 

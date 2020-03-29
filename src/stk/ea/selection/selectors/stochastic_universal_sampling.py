@@ -1,5 +1,7 @@
+from .selector import Selector
 
-class StochasticUniversalSampling(_BatchingSelector, Selector):
+
+class StochasticUniversalSampling(Selector):
     """
     Yields batches of molecules through stochastic universal sampling.
 

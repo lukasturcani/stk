@@ -1,4 +1,7 @@
-class FitnessFunction(_MoleculeCalculator, FitnessCalculator):
+from .fitness_calculator import FitnessCalculator
+
+
+class FitnessFunction(FitnessCalculator):
     """
     Takes a function and uses it as a calculator.
 

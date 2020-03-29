@@ -1,3 +1,5 @@
+from .fitness_normalizer import FitnessNormalizer
+
 
 class ReplaceFitness(FitnessNormalizer):
     """

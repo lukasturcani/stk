@@ -1,3 +1,5 @@
+from .terminator import Terminator
+
 
 class MoleculePresent(Terminator):
     """
@@ -52,5 +54,3 @@ class MoleculePresent(Terminator):
     @staticmethod
     def _is_same_molecule(mol1, mol2):
         return rdkit.MolToInchi(mol1) == rdkit.MolToInchi(mol2)
-
-

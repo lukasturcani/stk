@@ -1,7 +1,10 @@
+import matplotlib.pyplot as plt
+
 
 plt.switch_backend('agg')
 
-class SelectionPlotter(Plotter):
+
+class SelectionPlotter:
     """
     Plots which molecules a :class:`.Selector` selects.
 

@@ -1,3 +1,5 @@
+from .terminator import Terminator
+
 
 class AnyTerminator(Terminator):
     """
@@ -40,5 +42,3 @@ class AnyTerminator(Terminator):
             Terminator.terminate(progress)
             for Terminator in self._Terminators
         )
-
-

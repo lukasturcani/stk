@@ -1,5 +1,4 @@
-
-class FitnessNormalizer(Calculator):
+class FitnessNormalizer:
     """
     Abstract base class for fitness normalizers.
 

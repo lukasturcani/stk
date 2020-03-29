@@ -1,5 +1,4 @@
-
-class ProgressPlotter(Plotter):
+class ProgressPlotter:
     """
     Plots how a property changes during a GA run.
 

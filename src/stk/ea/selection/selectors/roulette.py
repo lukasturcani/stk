@@ -1,5 +1,7 @@
+from .selector import Selector
 
-class Roulette(_BatchingSelector, Selector):
+
+class Roulette(Selector):
     """
     Uses roulette selection to select batches of molecules.
 

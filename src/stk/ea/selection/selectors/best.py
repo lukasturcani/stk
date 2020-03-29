@@ -1,5 +1,7 @@
+from .selector import Selector
 
-class Best(_BatchingSelector, Selector):
+
+class Best(Selector):
     """
     Selects batches of molecules, highest fitness value first.
 

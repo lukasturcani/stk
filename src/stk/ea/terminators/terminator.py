@@ -1,4 +1,3 @@
-
 class Terminator:
     """
     Checks if the exit criterion for the EA has been satisfied.
@@ -23,5 +22,3 @@ class Terminator:
         """
 
         raise NotImplementedError()
-
-

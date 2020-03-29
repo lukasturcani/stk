@@ -1,5 +1,7 @@
+from .selector import Selector
 
-class Worst(_BatchingSelector, Selector):
+
+class Worst(Selector):
     """
     Selects batches of molecules, lowest fitness value first.
 

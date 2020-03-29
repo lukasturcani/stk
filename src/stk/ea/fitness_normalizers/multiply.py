@@ -1,5 +1,7 @@
+from .fitness_normalizer import FitnessNormalizer
 
-class Multiply(_FilteringNormalizer, FitnessNormalizer):
+
+class Multiply(FitnessNormalizer):
     """
     Multiplies the fitness values by some coefficient.
 
