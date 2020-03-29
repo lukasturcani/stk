@@ -14,7 +14,12 @@ class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
 
     """
 
-    def __init__(self, molecule_record, crosser_name):
+    def __init__(
+        self,
+        molecule_record,
+        topology_graph,
+        crosser_name,
+    ):
         """
         Initialize a :class:`.ConstructedMoleculeCrossoverRecord`.
 
@@ -29,6 +34,7 @@ class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
         """
 
         super().__init__(molecule_record, crosser_name)
+        self._topology_graph = topology_graph
 
     def get_molecule_record(self):
         """
@@ -42,3 +48,10 @@ class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
         """
 
         yield from self._molecule_record
+
+    def get_topology_graph(self):
+        """
+
+        """
+
+        return self._topology_graph

@@ -29,15 +29,16 @@ class ConstructedMoleculeCrosser:
 
     """
 
-    def cross(self, molecules):
+    def cross(self, records):
         """
-        Cross `molecules`.
+        Cross `records`.
 
         Parameters
         ----------
-        molecules : :class:`iterable` of \
+        records : :class:`iterable` of \
                 :class:`.ConstructedMoleculeRecord`
-            The molecules on which a crossover operation is performed.
+            The molecule records on which a crossover operation is
+            performed.
 
         Yields
         -------
@@ -49,15 +50,16 @@ class ConstructedMoleculeCrosser:
         # Can be used to decorate _cross in the future.
         yield from self._cross()
 
-    def _cross(self, molecules):
+    def _cross(self, records):
         """
         Cross `molecules`.
 
         Parameters
         ----------
-        molecules : :class:`iterable` of \
+        records : :class:`iterable` of \
                 :class:`.ConstructedMoleculeRecord`
-            The molecules on which a crossover operation is performed.
+            The molecule records on which a crossover operation is
+            performed.
 
         Yields
         -------

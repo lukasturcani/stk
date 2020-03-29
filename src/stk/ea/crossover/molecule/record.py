@@ -2,12 +2,19 @@
 Molecule Crossover Record
 =========================
 
+#. :class:`.MoleculeCrossoverRecord`
+#. :class:`.ConstructedMoleculeCrossoverRecord`
+
 """
 
 
 class MoleculeCrossoverRecord:
     """
-    A record of a crossover operation on molecules.
+    Abstract base class for a record of a crossover operation.
+
+    Notes
+    -----
+
 
     """
 
