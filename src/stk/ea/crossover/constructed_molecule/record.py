@@ -54,4 +54,4 @@ class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
 
         """
 
-        yield from self._molecule_record
+        return self._molecule_record
