@@ -1,5 +1,7 @@
+from .mutator import Mutator
 
-class SimilarBuildingBlock(_EAOperation, Mutator):
+
+class SimilarBuildingBlock(Mutator):
     """
     Substitutes similar building blocks.
 

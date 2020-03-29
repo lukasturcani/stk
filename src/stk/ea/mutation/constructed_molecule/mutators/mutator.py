@@ -1,5 +1,4 @@
-
-class Mutator(EAOperation):
+class Mutator:
     """
     Creates mutants.
 

@@ -1,5 +1,7 @@
+from .mutator import Mutator
 
-class RandomBuildingBlock(_EAOperation, Mutator):
+
+class RandomBuildingBlock(Mutator):
     """
     Substitutes random building blocks.
 

@@ -1,5 +1,7 @@
+from .mutator import Mutator
 
-class RandomTopologyGraph(_EAOperation, Mutator):
+
+class RandomTopologyGraph(Mutator):
     """
     Changes topology graphs at random.
 
