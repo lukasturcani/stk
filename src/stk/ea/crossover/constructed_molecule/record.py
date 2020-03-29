@@ -2,6 +2,8 @@
 Constructed Molecule Crossover Record
 =====================================
 
+#. :class:`.ConstructedMoleculeCrossoverRecord`
+
 """
 
 
@@ -10,7 +12,10 @@ from ..molecule import MoleculeCrossoverRecord
 
 class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
     """
-    A record of a crossover operation on constructed molecules.
+    Abstract base class for a record of a crossover operation.
+
+    Notes
+    -----
 
     """
 

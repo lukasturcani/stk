@@ -104,7 +104,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
         # Create the molecule records which will be crossed.
 
         bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFacotry()])
+        bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
         graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
         polymer1  = stk.ConstructedMolecule(graph1)
         record1 = stk.ConstructedMoleculeRecord(polymer1, graph1)

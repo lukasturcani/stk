@@ -23,8 +23,9 @@ class ConstructedMoleculeCrosser:
     --------
     *Subclass Implementation*
 
-    The source code of any of the classes listed in :mod:`.crosser`
-    can serve as good examples.
+    You only need to implement :meth:`._cross`. The source code of any
+    of the classes listed in :mod:`.crosser` can serve as good
+    examples.
 
     """
 
