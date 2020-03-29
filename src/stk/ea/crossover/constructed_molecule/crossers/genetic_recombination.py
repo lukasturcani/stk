@@ -60,7 +60,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
 
     .. code-block:: python
 
-        def determine_gene(building_block):
+        def get_gene(building_block):
             fg, = building_block.get_functional_groups(0)
             return fg.__class__
 
@@ -74,7 +74,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
 
     .. code-block:: python
 
-        def determine_gene(building_block):
+        def get_gene(building_block):
             return building_block.get_num_functional_groups()
 
     Now we can see that we end up with the gene called
@@ -85,7 +85,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
     To produce offspring molecules, this class categorizes
     each building block of the parent molecules into genes using
     the `get_gene` parameter. Then, to generate a single offspring, it
-    picks a random building block for every gene. The picked
+    picks a building block for every gene. The picked
     building blocks are used to construct the offspring. The
     topology graph of the offspring is one of the parent's.
     For obvious reasons, this approach works with any number of
@@ -93,56 +93,46 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
 
     Examples
     --------
-    **
+    *Crossing Constructed Molecules*
+
     Note that any number of parents can be used for the crossover
 
     .. code-block:: python
 
         import stk
 
-        # Create the molecules which will be crossed.
-        bb1 = stk.BuildingBlock('NCCN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CCCCC=O', ['aldehyde'])
-        polymer1  = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
-        )
+        # Create the molecule records which will be crossed.
 
-        bb3 = stk.BuildingBlock('NCCCN', ['amine'])
-        bb4 = stk.BuildingBlock('O=C[Si]CCC=O', ['aldehyde'])
-        polymer2  = stk.ConstructedMolecule(
-            building_blocks=[bb3, bb4],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
-        )
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFacotry()])
+        graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
+        polymer1  = stk.ConstructedMolecule(graph1)
+        record1 = stk.ConstructedMoleculeRecord(polymer1, graph1)
 
-        bb5 = stk.BuildingBlock('NC[Si]CN', ['amine'])
-        bb6 = stk.BuildingBlock('O=CCNNCCC=O', ['aldehyde'])
-        polymer3  = stk.ConstructedMolecule(
-            building_blocks=[bb5, bb6],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
+        bb3 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
+        bb4 = stk.BuildingBlock(
+            smiles='O=C[Si]CCC=O',
+            functional_groups=[stk.AldehydeFactory()],
         )
+        graph2 = stk.polymer.Linear((bb3, bb4), 'AB', 2)
+        polymer2  = stk.ConstructedMolecule(graph2)
+        record2 = stk.ConstructedMoleculeRecord(polymer2, graph2)
 
         # Create the crosser.
+
+        def get_functional_group_type(building_block):
+            fg, = building_block.get_functional_groups(0)
+            return fg.__class__
+
         recombination = stk.GeneticRecombination(
-            key=lambda mol: mol.func_groups[0].fg_type.name
+            get_gene=get_functional_group_type,
         )
 
         # Get the offspring molecules.
-        cohort1 = list(
-            recombination.cross(polymer1, polymer2, polymer3)
-        )
 
-        # Get a second set of offspring molecules.
-        cohort2 = list(
-            recombination.cross(polymer1, polymer2, polymer3)
-        )
-
-        # Make a third set of offspring molecules by crossing two of
-        # the offspring molecules.
-        offspring1, offspring2, *rest = cohort1
-        cohort3 = list(
-            recombination.cross(offspring1, offspring2)
-        )
+        cohort1 = tuple(recombination.cross(
+            records=(record1, record2),
+        ))
 
     """
 
@@ -169,12 +159,18 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
 
         input_database : :class:`.ConstructedMoleculeDatabase`, \
                 optional
+            If provided, offspring molecules will be returned from
+            this database, if they are present in it.
 
         output_database : :class:`.ConstructedMoleculeDatabase`, \
                 optional
+            If provided, offspring molecules will be placed into this
+            database.
 
         database_key : :class:`callable`, optional
-
+            Take a single parameter, a :class:`.TopologyGraph`, and
+            returns the key used to lookup the corresponding
+            :class:`.ConstructedMolecule` in the `input_database`.
 
         """
 
