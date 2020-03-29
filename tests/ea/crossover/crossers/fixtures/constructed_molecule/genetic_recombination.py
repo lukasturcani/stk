@@ -6,11 +6,11 @@ from ...case_data import CaseData
 
 bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-graph1 = stk.FourPlusSix((bb1, bb2))
+graph1 = stk.cage.FourPlusSix((bb1, bb2))
 
 bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
 bb4 = stk.BuildingBlock('BrCC(CNCCBr)CBr', [stk.BromoFactory()])
-graph2 = stk.EightPlusTwelve((bb3, bb4))
+graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
 
 
 @pytest.fixture(

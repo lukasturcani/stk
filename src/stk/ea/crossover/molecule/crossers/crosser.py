@@ -45,7 +45,7 @@ class MoleculeCrosser:
         """
 
         # Can be used to decorate _cross in the future.
-        yield from self._cross()
+        yield from self._cross(records)
 
     def _cross(self, records):
         """
