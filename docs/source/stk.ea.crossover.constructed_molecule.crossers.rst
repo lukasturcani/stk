@@ -6,16 +6,10 @@ stk.ea.crossover.constructed\_molecule.crossers package
    :undoc-members:
    :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-   stk.ea.crossover.constructed_molecule.crossers.genetic_recombination
-
 Submodules
 ----------
 
 .. toctree::
 
    stk.ea.crossover.constructed_molecule.crossers.crosser
+   stk.ea.crossover.constructed_molecule.crossers.genetic_recombination
