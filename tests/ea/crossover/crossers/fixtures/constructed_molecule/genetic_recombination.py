@@ -9,7 +9,7 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 graph1 = stk.cage.FourPlusSix((bb1, bb2))
 
 bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
-bb4 = stk.BuildingBlock('BrCC(CNCCBr)CBr', [stk.BromoFactory()])
+bb4 = stk.BuildingBlock('BrCC(CNCBr)CBr', [stk.BromoFactory()])
 graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
 
 
