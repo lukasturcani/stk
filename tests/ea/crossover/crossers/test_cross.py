@@ -57,7 +57,7 @@ def _test_cross(crosser, records, crossover_records):
         assert (
             record1.get_crosser_name() == record2.get_crosser_name()
         )
-        assert is_equivalent(
+        is_equivalent(
             record1.get_molecule_record().get_molecule(),
             record2.get_molecule_record().get_molecule(),
         )
