@@ -140,9 +140,6 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
         self,
         get_gene,
         name='GeneticRecombination',
-        input_database=None,
-        output_database=None,
-        database_key=get_constructed_molecule_key,
     ):
         """
         Initialize a :class:`GeneticRecombination` instance.
@@ -157,30 +154,10 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
         name : :class:`str`, optional
             A name to identify the crosser instance.
 
-        input_database : :class:`.ConstructedMoleculeDatabase`, \
-                optional
-            If provided, offspring molecules will be returned from
-            this database, if they are present in it.
-
-        output_database : :class:`.ConstructedMoleculeDatabase`, \
-                optional
-            If provided, offspring molecules will be placed into this
-            database.
-
-        database_key : :class:`callable`, optional
-            Take a single parameter, a :class:`.TopologyGraph`, and
-            returns the key used to lookup the corresponding
-            :class:`.ConstructedMolecule` in the `input_database`.
-            By default, :func:`.get_constructed_molecule_key` will be
-            used.
-
         """
 
         self._get_gene = get_gene
         self._name = name
-        self._input_database = input_database
-        self._output_database = output_database
-        self._database_key = database_key
 
     def _cross(self, records):
         topology_graphs = (
@@ -205,15 +182,10 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
                     in topology_graph.get_building_blocks()
                 },
             )
-            molecule = self._get_molecule(topology_graph),
             molecule_record = ConstructedMoleculeRecord(
-                molecule=molecule,
+                molecule=ConstructedMolecule(topology_graph),
                 topology_graph=topology_graph,
             )
-
-            if self._output_database is not None:
-                self._output_database.put(molecule)
-
             yield ConstructedMoleculeCrossoverRecord(
                 molecule_record=molecule_record,
                 crosser_name=self._name,
@@ -233,15 +205,3 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
             for allele in topology_graph.get_building_blocks():
                 genes[self._get_gene(allele)].append(allele)
         return it.product(*genes.values())
-
-    def _get_molecule(self, topology_graph):
-        if self._input_database is None:
-            return ConstructedMolecule(topology_graph)
-
-        else:
-            try:
-                return self._input_database.get(
-                    key=self._database_key(topology_graph),
-                )
-            except KeyError:
-                return ConstructedMolecule(topology_graph)
