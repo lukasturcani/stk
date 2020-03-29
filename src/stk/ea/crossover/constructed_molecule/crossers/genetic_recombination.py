@@ -4,7 +4,14 @@ Genetic Recombination
 
 """
 
+import itertools as it
+from collections import defaultdict
+
+from stk.molecular import ConstructedMolecule
 from .constructed_molecule import ConstructedMoleculeCrosser
+from ..record import ConstructedMoleculeCrossoverRecord
+from ....molecule_records import ConstructedMoleculeRecord
+from .utilities import get_constructed_molecule_key
 
 
 class GeneticRecombination(ConstructedMoleculeCrosser):
@@ -27,17 +34,26 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
     hair, the offspring will either have black or red hair,
     depending on which allele they inherit.
 
-    In ``stk`` molecules, each building block represents an allele.
-    The question is, which gene is each building block an allele
-    of? To answer that, let's first construct a couple of
-    building block molecules
+    In an :mod:`.stk` :class:`.ConstructedMolecule`, each building
+    block represents an allele. The question is, which gene is each
+    building block an allele of? To answer that, let's first construct
+    a couple of building block molecules
 
     .. code-block:: python
 
-        bb1 = stk.BuildingBlock('NCC(N)CN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CCC=O', ['aldehyde'])
-        bb3 = stk.BuildingBlock('O=CCNC(C=O)C=O', ['aldehyde'])
-        bb4 = stk.BuildingBlock('NCOCN', ['amine'])
+        bb1 = stk.BuildingBlock(
+            smiles='NCC(N)CN',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+        bb3 = stk.BuildingBlock(
+            smiles='O=CCNC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb4 = stk.BuildingBlock(
+            smiles='NCOCN',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
 
     We can define a function which analyzes a building block
     molecule and returns the gene it belongs to, for example
@@ -45,29 +61,30 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
     .. code-block:: python
 
         def determine_gene(building_block):
-            return building_block.func_groups[0].fg_type.name
+            fg, = building_block.get_functional_groups(0)
+            return fg.__class__
 
-    Here, we can see that the gene to which each building block
-    molecule belongs is given by the functional group name.
-    Therefore there is an ``'amine'`` gene which has two alleles
-    ``bb1`` and ``bb4`` and there is an ``'aldehyde'`` gene which
-    has two alleles ``bb2`` and ``bb3``.
+    Here, we can see that the gene, to which each building block
+    molecule belongs, is given by the class of its first functional
+    group. Therefore there is an :class:`.PrimaryAmino` gene,
+    which has two alleles ``bb1`` and ``bb4``, and there is an
+    :class:`.Aldehyde` gene, which has two alleles ``bb2`` and ``bb3``.
 
     Alternatively, we could have defined a function such as
 
     .. code-block:: python
 
         def determine_gene(building_block):
-            return len(building_block.func_groups)
+            return building_block.get_num_functional_groups()
 
     Now we can see that we end up with the gene called
-    ``3`` which has two alleles ``bb1`` and ``bb3``
-    and a second gene called ``2`` which has the alleles ``bb2`` and
+    ``3``, which has two alleles ``bb1`` and ``bb3``,
+    and a second gene called ``2``, which has the alleles ``bb2`` and
     ``bb4``.
 
     To produce offspring molecules, this class categorizes
     each building block of the parent molecules into genes using
-    the `key` parameter. Then, to generate a single offspring, it
+    the `get_gene` parameter. Then, to generate a single offspring, it
     picks a random building block for every gene. The picked
     building blocks are used to construct the offspring. The
     topology graph of the offspring is one of the parent's.
@@ -76,6 +93,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
 
     Examples
     --------
+    **
     Note that any number of parents can be used for the crossover
 
     .. code-block:: python
@@ -130,92 +148,102 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
 
     def __init__(
         self,
-        key,
-        random_yield_order=True,
-        random_seed=None,
-        use_cache=False
+        get_gene,
+        name='GeneticRecombination',
+        input_database=None,
+        output_database=None,
+        database_key=get_constructed_molecule_key,
     ):
         """
         Initialize a :class:`GeneticRecombination` instance.
 
         Parameters
         ----------
-        key : :class:`callable`
-            A :class:`callable`, which takes a :class:`.Molecule`
-            object and returns its gene or category. To produce an
-            offspring, one of the building blocks from each category is
-            picked at random.
+        get_gene : :class:`callable`
+            A :class:`callable`, which takes a :class:`.BuildingBlock`
+            object and returns its gene. To produce an offspring, one
+            of the building blocks from each gene is picked at random.
 
-        random_seed : :class:`int`, optional
-            The random seed to use.
+        name : :class:`str`, optional
+            A name to identify the crosser instance.
 
-        use_cache : :class:`bool`, optional
-            Toggles use of the molecular cache.
+        input_database : :class:`.ConstructedMoleculeDatabase`, \
+                optional
 
-        """
+        output_database : :class:`.ConstructedMoleculeDatabase`, \
+                optional
 
-        self._key = key
-        self._generator = np.random.RandomState(random_seed)
-        super().__init__(use_cache=use_cache)
+        database_key : :class:`callable`, optional
 
-    def _cross(self, *mols):
-        """
-        Cross `mols`.
-
-        Parameters
-        ----------
-        *mols : :class:`.ConstructedMolecule`
-            The molecules to crossed.
-
-        Yields
-        ------
-        :class:`.ConstructedMolecule`
-            The generated offspring.
 
         """
 
-        cls = mols[0].__class__
+        self._get_gene = get_gene
+        self._name = name
+        self._input_database = input_database
+        self._output_database = output_database
+        self._database_key = database_key
 
-        # Use a dict here to prevent the same structure for being
-        # used in the same gene twice.
-        genes = defaultdict(dict)
-        for mol in mols:
-            for allele in mol.building_block_vertices:
-                gene = genes[self._key(allele)]
-                if allele.get_identity_key() not in gene:
-                    gene[allele.get_identity_key()] = allele
+    def _cross(self, records):
+        topology_graphs = (
+            record.get_topology_graph() for record in records
+        )
+        for topology_graph, alleles in it.product(
+            topology_graphs,
+            self._get_alleles(records),
+        ):
 
-        genes = {
-            gene: self._generator.permutation(list(alleles.values()))
-            for gene, alleles in genes.items()
-        }
-        tops = dedupe((mol.topology_graph for mol in mols), key=repr)
-        product = list(it.product(*genes.values(), tops))
-        self._generator.shuffle(product)
+            def get_replacement(building_block):
+                gene = self._get_gene(building_block)
+                return next(
+                    allele for allele in alleles
+                    if self._get_gene(allele) == gene
+                )
 
-        parents = {
-            (
-                *tuple(sorted(
-                    bb.get_identity_key()
-                    for bb in mol.building_block_vertices
-                )),
-                repr(mol.topology_graph)
+            topology_graph = topology_graph.with_building_blocks(
+                building_block_map={
+                    building_block: get_replacement(building_block)
+                    for building_block
+                    in topology_graph.get_building_blocks()
+                },
             )
-            for mol in mols
-        }
-        for *building_blocks, top in product:
-            # Do not yield the parents.
-            mol = (
-                *tuple(sorted(
-                    bb.get_identity_key() for bb in building_blocks
-                )),
-                repr(top)
+            molecule = self._get_molecule(topology_graph),
+            molecule_record = ConstructedMoleculeRecord(
+                molecule=molecule,
+                topology_graph=topology_graph,
             )
-            if mol in parents:
-                continue
 
-            yield cls(
-                building_blocks=building_blocks,
-                topology_graph=top,
-                use_cache=self._use_cache
+            if self._output_database is not None:
+                self._output_database.put(molecule)
+
+            yield ConstructedMoleculeCrossoverRecord(
+                molecule_record=molecule_record,
+                crosser_name=self._name,
             )
+
+    def _get_alleles(self, records):
+        """
+        Yield every possible combination of alleles.
+
+        """
+
+        genes = defaultdict(list)
+        topology_graphs = (
+            record.get_topology_graph() for record in records
+        )
+        for topology_graph in topology_graphs:
+            for allele in topology_graph.get_building_blocks():
+                genes[self._get_gene(allele)].append(allele)
+        return it.product(*genes.values())
+
+    def _get_molecule(self, topology_graph):
+        if self._input_database is None:
+            return ConstructedMolecule(topology_graph)
+
+        else:
+            try:
+                return self._input_database.get(
+                    key=self._database_key(topology_graph),
+                )
+            except KeyError:
+                return ConstructedMolecule(topology_graph)

@@ -20,7 +20,7 @@ class ConstructedMoleculeRecord(MoleculeRecord):
 
     """
 
-    def __init__(self, molecule):
+    def __init__(self, molecule, topology_graph):
         """
         Initialize a :class:`.ConstructedMoleculeRecord` instance.
 
@@ -32,6 +32,7 @@ class ConstructedMoleculeRecord(MoleculeRecord):
         """
 
         super().__init__(molecule)
+        self._topology_graph = topology_graph
 
     def get_molecule(self):
         """
@@ -45,3 +46,10 @@ class ConstructedMoleculeRecord(MoleculeRecord):
         """
 
         return self._molecule
+
+    def get_topology_graph(self):
+        """
+
+        """
+
+        return self._topology_graph

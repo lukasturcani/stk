@@ -3,7 +3,6 @@ Constructed Molecule Crosser
 ============================
 
 #. :class:`.GeneticRecombination`
-#. :class:`.Jumble`
 
 """
 
