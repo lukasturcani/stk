@@ -41,6 +41,17 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
                     molecule_record=stk.ConstructedMoleculeRecord(
                         molecule=stk.ConstructedMolecule(
                             topology_graph=graph1.with_building_blocks(
+                                building_block_map={bb1: bb3},
+                            ),
+                        ),
+                        topology_graph=graph1,
+                    ),
+                    crosser_name='GeneticRecombination',
+                ),
+                stk.ConstructedMoleculeCrossoverRecord(
+                    molecule_record=stk.ConstructedMoleculeRecord(
+                        molecule=stk.ConstructedMolecule(
+                            topology_graph=graph1.with_building_blocks(
                                 building_block_map={bb2: bb4},
                             ),
                         ),
@@ -51,8 +62,47 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
                 stk.ConstructedMoleculeCrossoverRecord(
                     molecule_record=stk.ConstructedMoleculeRecord(
                         molecule=stk.ConstructedMolecule(
+                            topology_graph=graph1.with_building_blocks(
+                                building_block_map={
+                                    bb1: bb3,
+                                    bb2: bb4,
+                                },
+                            )
+                        ),
+                        topology_graph=graph1,
+                    ),
+                    crosser_name='GeneticRecombination',
+                ),
+                stk.ConstructedMoleculeCrossoverRecord(
+                    molecule_record=stk.ConstructedMoleculeRecord(
+                        molecule=stk.ConstructedMolecule(
+                            topology_graph=graph2.with_building_blocks(
+                                building_block_map={
+                                    bb3: bb1,
+                                    bb4: bb2,
+                                },
+                            )
+                        ),
+                        topology_graph=graph2,
+                    ),
+                    crosser_name='GeneticRecombination',
+                ),
+                stk.ConstructedMoleculeCrossoverRecord(
+                    molecule_record=stk.ConstructedMoleculeRecord(
+                        molecule=stk.ConstructedMolecule(
                             topology_graph=graph2.with_building_blocks(
                                 building_block_map={bb4: bb2},
+                            )
+                        ),
+                        topology_graph=graph2,
+                    ),
+                    crosser_name='GeneticRecombination',
+                ),
+                stk.ConstructedMoleculeCrossoverRecord(
+                    molecule_record=stk.ConstructedMoleculeRecord(
+                        molecule=stk.ConstructedMolecule(
+                            topology_graph=graph2.with_building_blocks(
+                                building_block_map={bb3: bb1},
                             )
                         ),
                         topology_graph=graph2,
