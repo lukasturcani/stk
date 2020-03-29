@@ -49,6 +49,12 @@ class ConstructedMoleculeRecord(MoleculeRecord):
 
     def get_topology_graph(self):
         """
+        Get the topology graph of the constructed molecule.
+
+        Returns
+        -------
+        :class:`.TopologyGraph`
+            The topology graph.
 
         """
 

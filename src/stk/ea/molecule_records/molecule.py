@@ -108,7 +108,8 @@ class MoleculeRecord:
 
         normalized : :class:`bool`, optional
             Toggles if the normalized or unnormalized fitness value is
-            being set.
+            being set. If ``False``, both the normalized and
+            unnormalized fitness values with be set to `fitness_value`.
 
         Returns
         -------
@@ -123,8 +124,7 @@ class MoleculeRecord:
         )
 
     def _with_fitness_value(self, fitness_value, normalized):
-        if normalized:
-            self._normalized_fitness_value = fitness_value
-        else:
+        if not normalized:
             self._fitness_value = fitness_value
+        self._normalized_fitness_value = fitness_value
         return self
