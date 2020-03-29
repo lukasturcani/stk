@@ -8,7 +8,7 @@ import itertools as it
 from collections import defaultdict
 
 from stk.molecular import ConstructedMolecule
-from .constructed_molecule import ConstructedMoleculeCrosser
+from .crosser import ConstructedMoleculeCrosser
 from ..record import ConstructedMoleculeCrossoverRecord
 from ....molecule_records import ConstructedMoleculeRecord
 from .utilities import get_constructed_molecule_key
