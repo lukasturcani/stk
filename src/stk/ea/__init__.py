@@ -3,7 +3,7 @@ from .fitness_calculators import *
 from .mutation import *
 from .fitness_normalizers import *
 from .plotters import *
-from .selectors import *
+from .selection import *
 from .terminators import *
 from .generation import *
 from .evolutionary_algorithm import *
