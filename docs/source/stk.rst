@@ -24,5 +24,4 @@ Submodules
 
    stk.base_calculators
    stk.compound
-   stk.ea
    stk.populations

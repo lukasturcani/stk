@@ -6,15 +6,24 @@ stk.ea package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+
+   stk.ea.crossover
+   stk.ea.evolutionary_algorithm
+   stk.ea.fitness_calculators
+   stk.ea.fitness_normalizers
+   stk.ea.molecule_records
+   stk.ea.mutation
+   stk.ea.plotters
+   stk.ea.selection
+   stk.ea.terminators
+
 Submodules
 ----------
 
 .. toctree::
 
-   stk.ea.crossers
-   stk.ea.fitness_calculators
-   stk.ea.fitness_normalizers
-   stk.ea.mutators
-   stk.ea.plotters
-   stk.ea.selectors
-   stk.ea.terminators
+   stk.ea.generation

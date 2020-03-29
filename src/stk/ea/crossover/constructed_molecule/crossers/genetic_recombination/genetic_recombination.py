@@ -171,6 +171,8 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
             Take a single parameter, a :class:`.TopologyGraph`, and
             returns the key used to lookup the corresponding
             :class:`.ConstructedMolecule` in the `input_database`.
+            By default, :func:`.get_constructed_molecule_key` will be
+            used.
 
         """
 
