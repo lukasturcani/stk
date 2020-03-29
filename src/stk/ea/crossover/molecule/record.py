@@ -14,7 +14,10 @@ class MoleculeCrossoverRecord:
 
     Notes
     -----
-
+    You might notice that the public methods of this abstract base
+    class are implemented. This is just a default implementation, which
+    can be used directly by users and subclasses, but can also be
+    freely replaced during subclass implementation, if need be.
 
     """
 
