@@ -55,7 +55,6 @@ from .case_data import CaseData
                 key_makers=(
                     stk.Inchi(),
                     stk.InchiKey(),
-                    stk.ConstructedMoleculeKeyMaker(),
                 ),
             ),
             molecule=stk.ConstructedMolecule(
@@ -86,11 +85,6 @@ from .case_data import CaseData
                 'molecule': {
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                     'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                    'ConstructedMoleculeKey': str((
-                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
-                        (2, ),
-                    )),
                     'a': (
                         (35, 0),
                         (6, 2),
@@ -132,20 +126,10 @@ from .case_data import CaseData
                         (0, 1),
                         (None, None),
                     ),
-                    'ConstructedMoleculeKey': str((
-                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
-                        (2, ),
-                    )),
                 },
                 'matrix': {
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                     'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                    'ConstructedMoleculeKey': str((
-                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
-                        (2, ),
-                    )),
                     'm': [
                         [0., 0., 0.],
                         [1., 1., 1.],

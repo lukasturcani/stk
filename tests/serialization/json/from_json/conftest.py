@@ -66,11 +66,6 @@ from .case_data import CaseData
                     ),
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                     'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                    'ConstructedMoleculeKey': str((
-                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
-                        (2, ),
-                    )),
                 },
                 'constructedMolecule': {
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
@@ -97,11 +92,6 @@ from .case_data import CaseData
                         (0, 1),
                         (None, None),
                     ),
-                    'ConstructedMoleculeKey': str((
-                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
-                        (2, ),
-                    )),
                 },
                 'matrix': {
                     'm': [
@@ -114,11 +104,6 @@ from .case_data import CaseData
                     ],
                     'InChI': 'InChI=1S/C4Br2/c5-3-1-2-4-6/q+8',
                     'InChIKey': 'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                    'ConstructedMoleculeKey': str((
-                        'CXAFVTYJXQJZSL-UHFFFAOYSA-N',
-                        ('UWAHASCVLDBPQQ-UHFFFAOYSA-N', ),
-                        (2, ),
-                    )),
                 },
                 'buildingBlocks': (
                     {
