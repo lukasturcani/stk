@@ -1,6 +1,6 @@
 """
-Random Topolgy Graph
-====================
+Random Topology Graph
+=====================
 
 """
 
@@ -42,13 +42,10 @@ class RandomTopologyGraph(ConstructedMoleculeMutator):
         random_topology = stk.RandomTopologyGraph(topology_graphs)
 
         # Mutate a molecule.
-        mutant1 = random_topology.mutate(cage)
+        mutation_record1 = random_topology.mutate(cage)
 
         # Mutate the molecule a second time.
-        mutant2 = random_topology.mutate(cage)
-
-        # Mutate a mutant.
-        mutant3 = random_topology.mutate(mutant1)
+        mutation_record2 = random_topology.mutate(cage)
 
     """
 
@@ -81,7 +78,15 @@ class RandomTopologyGraph(ConstructedMoleculeMutator):
 
     def _mutate(self, record):
         topology_graph = self._generator.choice(self._topology_graphs)
+        replacement = topology_graph.with_building_blocks({
+            building_block1: building_block2
+            for building_block1, building_block2
+            in zip(
+                topology_graph.get_building_blocks(),
+                record.get_topology_graph().get_building_blocks(),
+            )
+        })
         return ConstructedMoleculeMutationRecord(
-            molecule_record=ConstructedMoleculeRecord(topology_graph),
+            molecule_record=ConstructedMoleculeRecord(replacement),
             mutator_name=self._name,
         )
