@@ -8,12 +8,12 @@ import numpy as np
 
 
 from stk.molecular import ConstructedMolecule
-from .mutator import Mutator
+from .mutator import ConstructedMoleculeMutator
 from ..record import ConstructedMoleculeMutationRecord
 from ....molecule_records import ConstructedMoleculeRecord
 
 
-class RandomBuildingBlock(Mutator):
+class RandomBuildingBlock(ConstructedMoleculeMutator):
     """
     Substitutes random building blocks.
 

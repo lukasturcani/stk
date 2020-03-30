@@ -49,4 +49,4 @@ class ConstructedMoleculeMutationRecord(MoleculeMutationRecord):
 
         """
 
-        super().get_molecule_record()
+        return super().get_molecule_record()

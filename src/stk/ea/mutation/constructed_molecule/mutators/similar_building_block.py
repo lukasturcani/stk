@@ -1,7 +1,7 @@
-from .mutator import Mutator
+from .mutator import ConstructedMoleculeMutator
 
 
-class SimilarBuildingBlock(Mutator):
+class SimilarBuildingBlock(ConstructedMoleculeMutator):
     """
     Substitutes similar building blocks.
 

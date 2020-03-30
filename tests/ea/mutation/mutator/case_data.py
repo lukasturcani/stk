@@ -38,6 +38,6 @@ class CaseData:
 
         """
 
-        self._mutator = mutator
-        self._record = record
-        self._mutation_record = mutation_record
+        self.mutator = mutator
+        self.record = record
+        self.mutation_record = mutation_record

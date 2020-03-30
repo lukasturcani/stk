@@ -1,7 +1,7 @@
-from .mutator import Mutator
+from .mutator import ConstructedMoleculeMutator
 
 
-class RandomTopologyGraph(Mutator):
+class RandomTopologyGraph(ConstructedMoleculeMutator):
     """
     Changes topology graphs at random.
 

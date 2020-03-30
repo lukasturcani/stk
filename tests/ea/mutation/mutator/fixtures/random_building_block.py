@@ -32,6 +32,7 @@ graph2 = stk.polymer.Linear((bb2, ), 'A', 2)
                     molecule=graph2,
                     topology_graph=graph2,
                 ),
+                mutator_name='RandomBuildingBlock',
             ),
         ),
     ),
