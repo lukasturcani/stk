@@ -7,7 +7,6 @@ Genetic Recombination
 import itertools as it
 from collections import defaultdict
 
-from stk.molecular import ConstructedMolecule
 from .crosser import ConstructedMoleculeCrosser
 from ..record import ConstructedMoleculeCrossoverRecord
 from ....molecule_records import ConstructedMoleculeRecord
@@ -181,12 +180,10 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
                     in topology_graph.get_building_blocks()
                 },
             )
-            molecule_record = ConstructedMoleculeRecord(
-                molecule=ConstructedMolecule(topology_graph),
-                topology_graph=topology_graph,
-            )
             yield ConstructedMoleculeCrossoverRecord(
-                molecule_record=molecule_record,
+                molecule_record=ConstructedMoleculeRecord(
+                    topology_graph=topology_graph,
+                ),
                 crosser_name=self._name,
             )
 

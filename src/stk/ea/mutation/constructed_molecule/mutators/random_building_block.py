@@ -7,7 +7,6 @@ Random Building Block
 import numpy as np
 
 
-from stk.molecular import ConstructedMolecule
 from .mutator import ConstructedMoleculeMutator
 from ..record import ConstructedMoleculeMutationRecord
 from ....molecule_records import ConstructedMoleculeRecord
@@ -126,9 +125,6 @@ class RandomBuildingBlock(ConstructedMoleculeMutator):
             replaced_building_block: replacement,
         })
         return ConstructedMoleculeMutationRecord(
-            molecule_record=ConstructedMoleculeRecord(
-                molecule=ConstructedMolecule(graph),
-                topology_graph=graph,
-            ),
+            molecule_record=ConstructedMoleculeRecord(graph),
             mutator_name=self._name,
         )
