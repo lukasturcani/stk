@@ -5,7 +5,10 @@ Similar Building Block
 """
 
 import numpy as np
+from functools import partial
 
+from stk.molecular import Inchi
+from stk.utilities import dice_similarity
 from .mutator import ConstructedMoleculeMutator
 from ..record import ConstructedMoleculeMutationRecord
 from ....molecule_records import ConstructedMoleculeRecord
@@ -17,6 +20,8 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
 
     This mutator takes a :class:`.ConstructedMolecule` and substitutes
     the building blocks with the most similar one from a given set.
+    Repeated mutations on the same molecule will substituted the next
+    most similar molecule from the set.
 
     Examples
     --------
@@ -72,7 +77,8 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
         self,
         building_blocks,
         is_replaceable,
-        name='RandomBuildingBlock',
+        key_maker=Inchi(),
+        name='SimilarBuildingBlock',
         random_seed=None,
     ):
         """
@@ -91,6 +97,10 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
             Building blocks which returned ``True`` are liable for
             substitution by one of the molecules in `building_blocks`.
 
+        key_maker : :class:`.MoleculeKeyMaker`, optional
+            Molecules which return the same key, will iterate through
+            the same set of similar molecules.
+
         name : :class:`str`, optional
             A name to help identify the mutator instance.
 
@@ -101,81 +111,77 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
 
         self._building_blocks = building_blocks
         self._is_replaceable = is_replaceable
+        self._key_maker = key_maker
         self._name = name
         self._generator = np.random.RandomState(random_seed)
+        self._similar_building_blocks = {}
 
-    def _mutate(self, mol):
-        """
-        Return a mutant of `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.ConstructedMolecule`
-            The molecule to be mutated.
-
-        Returns
-        -------
-        mol : :class:`.ConstructedMolecule`
-            The mutant.
-
-        """
-
-        if mol not in self._similar_bbs:
-            # Maps the mol to a dict. The dict maps each
-            # building block of the mol to an iterator.
+    def _mutate(self, record):
+        key = self._key_maker.get_key(record.get_molecule())
+        if key not in self._similar_building_blocks:
+            # Maps the key to a dict. The dict maps each
+            # building block to an iterator.
             # The iterators yield the next most similar molecules in
             # `building_blocks` to the building block.
-            self._similar_bbs[mol] = {}
+            self._similar_building_blocks[key] = {}
+
+        similar_building_blocks = self._similar_building_blocks[key]
 
         # Choose the building block which undergoes mutation.
-        valid_bbs = [
-            bb for bb in mol.building_block_vertices if self._key(bb)
-        ]
-        chosen_bb = self._generator.choice(valid_bbs)
+        replaceable_building_blocks = tuple(filter(
+            self._is_replaceable,
+            record.get_molecule().get_building_blocks(),
+        ))
+        replaced_building_block = self._generator.choice(
+            a=replaceable_building_blocks,
+        )
 
         # If the building block has not been chosen before, create an
         # iterator yielding similar molecules from `building_blocks`
         # for it.
-        if chosen_bb not in self._similar_bbs[mol]:
-            self._similar_bbs[mol][chosen_bb] = iter(sorted(
+        replaced_key = self._key_maker.get_key(replaced_building_block)
+        if replaced_key not in similar_building_blocks:
+            similar_building_blocks[replaced_key] = iter(sorted(
                 self._building_blocks,
-                key=lambda m: dice_similarity(m, chosen_bb),
-                reverse=True
+                key=partial(dice_similarity, replaced_building_block),
+                reverse=True,
             ))
 
         try:
-            new_bb = next(self._similar_bbs[mol][chosen_bb])
+            replacement = next(similar_building_blocks[replaced_key])
         except StopIteration:
-            self._similar_bbs[mol][chosen_bb] = iter(sorted(
+            similar_building_blocks[replaced_key] = iter(sorted(
                 self._building_blocks,
-                key=lambda m: dice_similarity(m, chosen_bb),
-                reverse=True
+                key=partial(dice_similarity, replaced_building_block),
+                reverse=True,
             ))
-            new_bb = next(self._similar_bbs[mol][chosen_bb])
+            replacement = next(similar_building_blocks[replaced_key])
 
-        # If the most similar molecule in `mols` is itself, then take
-        # the next most similar one.
-        if new_bb is chosen_bb:
+        # If the most similar molecule in `building_blocks` is itself,
+        # then take the next most similar one.
+        if self._key_maker.get_key(replacement) == replaced_key:
             try:
-                new_bb = next(self._similar_bbs[mol][chosen_bb])
+                replacement = next(
+                    similar_building_blocks[replaced_key]
+                )
             except StopIteration:
-                self._similar_bbs[mol][chosen_bb] = iter(sorted(
+                similar_building_blocks[replaced_key] = iter(sorted(
                     self._building_blocks,
-                    key=lambda m: dice_similarity(m, chosen_bb),
-                    reverse=True
+                    key=partial(
+                        dice_similarity,
+                        replaced_building_block,
+                    ),
+                    reverse=True,
                 ))
-                new_bb = next(self._similar_bbs[mol][chosen_bb])
+                replacement = next(
+                    similar_building_blocks[replaced_key]
+                )
 
         # Build the new ConstructedMolecule.
-        new_bbs = [
-            bb for bb in mol.building_block_vertices
-            if bb is not chosen_bb
-        ]
-        new_bbs.append(new_bb)
-        return mol.__class__(
-            building_blocks=new_bbs,
-            topology_graph=mol.topology_graph,
-            use_cache=self._use_cache
+        graph = record.get_topology_graph().with_building_blocks({
+            replaced_building_block: replacement,
+        })
+        return ConstructedMoleculeMutationRecord(
+            molecule_record=ConstructedMoleculeRecord(graph),
+            mutator_name=self._name,
         )
-
-
