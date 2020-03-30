@@ -1,6 +1,6 @@
 """
-Molecule Value MongDB
-=====================
+Value MongDB
+============
 
 """
 
@@ -8,22 +8,12 @@ from functools import lru_cache
 
 from stk.molecular import InchiKey
 from ..utilities import HashableDict
-from ...value import MoleculeValueDatabase
+from ...value import ValueDatabase
 
 
-class MoleculeValueMongoDb(MoleculeValueDatabase):
+class ValueMongoDb(ValueDatabase):
     """
     Use MongoDB to store and retrieve molecular property values.
-
-    See Also
-    --------
-    :class:`.ConstructedMoleculeValueMongoDb`
-        If you do not need to use any \
-        :class:`.ConstructedMoleculeKeyMaker`, but only \
-        :class:`.MoleculeKeyMaker`, use a \
-        :class:`.MoleculeValueMongoDb`. \
-        This is the case, even if you are storing values associated \
-        with a :class:`.ConstructedMolecule`.
 
     Examples
     --------
@@ -34,6 +24,8 @@ class MoleculeValueMongoDb(MoleculeValueDatabase):
     docs can be found here__.
 
     __ https://api.mongodb.com/python/current/
+
+    *Storing Molecular Properties in a Database*
 
     You want to store property values in a database.
 
@@ -49,7 +41,7 @@ class MoleculeValueMongoDb(MoleculeValueDatabase):
         # MongoClient() - read the documentation for pymongo to see how
         # to do that.
         client = pymongo.MongoClient()
-        db = stk.MoleculeValueMongoDb(
+        db = stk.ValueMongoDb(
             mongo_client=client,
             collection='atom_counts',
         )
