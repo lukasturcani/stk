@@ -62,13 +62,10 @@ class RandomBuildingBlock(ConstructedMoleculeMutator):
         )
 
         # Mutate a molecule.
-        mutant1 = random_bb.mutate(polymer)
+        mutation_record1 = random_bb.mutate(polymer)
 
         # Mutate the molecule a second time.
-        mutant2 = random_bb.mutate(polymer)
-
-        # Mutate a mutant.
-        mutant3 = random_bb.mutate(mutant1)
+        mutation_record2 = random_bb.mutate(polymer)
 
     """
 
