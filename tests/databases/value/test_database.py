@@ -27,8 +27,7 @@ def _test_database(database, molecule, value):
 
     Parameters
     ----------
-    database : class:`.MoleculeValueDatabase` or \
-            :class:`.ConstructedMoleculeValueDatabase`
+    database : class:`.ValueDatabase`
         The database to test.
 
     molecule : :class:`.Molecule`
