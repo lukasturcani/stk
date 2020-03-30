@@ -6,6 +6,7 @@ class CaseData:
     ----------
     mutator : :class:`.MoleculeMutator` or \
             :class:`.ConstructedMoleculeMutator`
+        The mutator to test.
 
     record : :class:`.MoleculeRecord` or \
             :class:`.ConstructedMoleculeRecord`
@@ -25,6 +26,7 @@ class CaseData:
         ----------
         mutator : :class:`.MoleculeMutator` or \
                 :class:`.ConstructedMoleculeMutator`
+            The mutator to test.
 
         record : :class:`.MoleculeRecord` or \
                 :class:`.ConstructedMoleculeRecord`
