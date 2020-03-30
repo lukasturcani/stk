@@ -1,30 +1,22 @@
 """
-Molecule Value Database
-=======================
+Value Database
+==============
 
-#. :class:`.MoleculeValueMongoDb`
+#. :class:`.ValueMongoDb`
 
 """
 
-from .constructed_molecule import ConstructedMoleculeValueDatabase
 
-
-class MoleculeValueDatabase(ConstructedMoleculeValueDatabase):
+class ValueDatabase:
     """
     Abstract base class for storing of molecular property values.
-
-    Note that a :class:`.MoleculeValueDatabase` can be used anywhere a
-    :class:`.ConstructedMoleculeValueDatabase` is required. However,
-    the opposite is not true. If something requires a
-    :class:`.MoleculeValueDatabase` you cannot use a
-    :class:`.ConstructedMoleculeValueDatabase` in its place.
 
     Examples
     --------
     *Subclass Implementation*
 
     The source of any of the subclasses, listed in
-    :mod:`molecule_value_database <.databases.value.molecule>`,
+    :mod:`molecule_value_database <.databases.value>`,
     can serve as good examples.
 
     """
