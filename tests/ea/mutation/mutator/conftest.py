@@ -8,6 +8,7 @@ from .fixtures import *  # noqa
 @pytest.fixture(
     params=(
         lazy_fixture('random_building_block'),
+        lazy_fixture('random_topology_graph'),
     ),
 )
 def case_data(request):

@@ -168,8 +168,8 @@ class Cage(TopologyGraph):
 
         Parameters
         ----------
-        building_blocks : :class:`tuple` or :class:`dict`
-            Can be a :class:`tuple` of :class:`.BuildingBlock`
+        building_blocks : :class:`iterable` or :class:`dict`
+            Can be a :class:`iterable` of :class:`.BuildingBlock`
             instances, which should be placed on the topology graph.
 
             Can also be a :class:`dict` which maps the
