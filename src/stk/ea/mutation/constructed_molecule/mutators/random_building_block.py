@@ -105,7 +105,7 @@ class RandomBuildingBlock(ConstructedMoleculeMutator):
         self._name = name
         self._generator = np.random.RandomState(random_seed)
 
-    def _mutate(self, record):
+    def mutate(self, record):
         # Choose the building block which undergoes mutation.
         replaceable_building_blocks = tuple(filter(
             self._is_replaceable,

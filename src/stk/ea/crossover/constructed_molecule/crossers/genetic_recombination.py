@@ -157,7 +157,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
         self._get_gene = get_gene
         self._name = name
 
-    def _cross(self, records):
+    def cross(self, records):
         topology_graphs = (
             record.get_topology_graph() for record in records
         )

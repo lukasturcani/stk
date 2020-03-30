@@ -116,7 +116,7 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
         self._generator = np.random.RandomState(random_seed)
         self._similar_building_blocks = {}
 
-    def _mutate(self, record):
+    def mutate(self, record):
         key = self._key_maker.get_key(record.get_molecule())
         if key not in self._similar_building_blocks:
             # Maps the key to a dict. The dict maps each

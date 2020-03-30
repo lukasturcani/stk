@@ -82,7 +82,7 @@ class RandomTopologyGraph(ConstructedMoleculeMutator):
         self._name = name
         self._generator = np.random.RandomState(random_seed)
 
-    def _mutate(self, record):
+    def mutate(self, record):
         replacement_func = self._generator.choice(
             a=self._replacement_funcs,
         )

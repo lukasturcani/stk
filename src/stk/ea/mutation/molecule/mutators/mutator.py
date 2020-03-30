@@ -40,23 +40,4 @@ class ConstructedMoleculeMutator:
 
         """
 
-        # Can be used to decorate _mutate in the future.
-        return self._mutate(record)
-
-    def _mutate(self, mol):
-        """
-        Return a mutant of `record`.
-
-        Parameters
-        ----------
-        record : :class:`.MoleculeRecord`
-            The molecule to be mutated.
-
-        Returns
-        -------
-        :class:`.MoleculeMutationRecord`
-            A record of the mutation.
-
-        """
-
         raise NotImplementedError()
