@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ...case_data import CaseData
+from ..case_data import CaseData
 
 
 def get_eight_plus_twelve(graph):
@@ -15,7 +15,7 @@ def get_eight_plus_twelve(graph):
                 replacement_funcs=(get_eight_plus_twelve, ),
             ),
             record=stk.ConstructedMoleculeRecord(
-                topology_graph=stk.FourPlusSix(
+                topology_graph=stk.cage.FourPlusSix(
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles='BrCCBr',
@@ -30,7 +30,7 @@ def get_eight_plus_twelve(graph):
             ),
             mutation_record=stk.ConstructedMoleculeMutationRecord(
                 molecule_record=stk.ConstructedMoleculeRecord(
-                    topology_graph=stk.EightPlusTwelve(
+                    topology_graph=stk.cage.EightPlusTwelve(
                         building_blocks=(
                             stk.BuildingBlock(
                                 smiles='BrCCBr',
