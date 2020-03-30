@@ -53,13 +53,13 @@ class RandomBuildingBlock(Mutator):
 
         # Create the mutator.
 
-        def get_functional_group_type(building_block):
+        def has_primary_amino_group(building_block):
             fg, = building_block.get_functional_groups(0)
-            return fg.__class__
+            return fg.__class__ is stk.PrimaryAmino
 
         random_bb = stk.RandomBuildingBlock(
             building_blocks=building_blocks,
-            get_key=get_functional_group_type,
+            is_replaceable=has_primary_amino_group,
         )
 
         # Mutate a molecule.
