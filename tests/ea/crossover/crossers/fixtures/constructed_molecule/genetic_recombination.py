@@ -20,12 +20,8 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
                 get_gene=stk.BuildingBlock.get_num_functional_groups,
             ),
             records=(
-                stk.ConstructedMoleculeRecord(
-                    topology_graph=graph1,
-                ),
-                stk.ConstructedMoleculeRecord(
-                    topology_graph=graph2,
-                )
+                stk.ConstructedMoleculeRecord(graph1),
+                stk.ConstructedMoleculeRecord(graph2),
             ),
             crossover_records=(
                 stk.ConstructedMoleculeCrossoverRecord(
@@ -89,7 +85,9 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
                     crosser_name='GeneticRecombination',
                 ),
                 stk.ConstructedMoleculeCrossoverRecord(
-                    topology_graph=graph2,
+                    molecule_record=stk.ConstructedMoleculeRecord(
+                        topology_graph=graph2,
+                    ),
                     crosser_name='GeneticRecombination',
                 )
             ),
