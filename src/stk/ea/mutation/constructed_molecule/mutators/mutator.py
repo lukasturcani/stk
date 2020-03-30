@@ -1,47 +1,65 @@
-class Mutator:
+"""
+Constructed Molecule Mutator
+============================
+
+#. :class:`.RandomBuildingBlock`
+#. :class:`.RandomTopologyGraph`
+#. :class:`.SimilarBuildingBlock`
+
+"""
+
+
+class ConstructedMoleculeMutator:
     """
-    Creates mutants.
+    Abstract base class for molecule mutators.
+
+    Note that despite appearances, :class:`.MoleculeMutator` and
+    :class:`.ConstructedMoleculeMutator` are not interchangeable, you
+    cannot use one where the other is required, unless explicitly
+    allowed.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    You only need to implement :meth:`._mutate`. The source code of any
+    of the classes listed in :mod:`.mutator` can serve as good
+    examples.
 
     """
 
-    def mutate(self, mol):
+    def mutate(self, record):
         """
-        Return a mutant of `mol`.
+        Return a mutant of `record`.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
+        record : :class:`.ConstructedMoleculeRecord`
             The molecule to be mutated.
 
         Returns
         -------
-        mol : :class:`.Molecule`
-            The mutant.
+        :class:`.ConstructedMoleculeMutationRecord`
+            A record of the mutation.
 
         """
 
         # Can be used to decorate _mutate in the future.
-        return self._mutate(mol)
+        return self._mutate(record)
 
     def _mutate(self, mol):
         """
-        Return a mutant of `mol`.
+        Return a mutant of `record`.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
+        record : :class:`.ConstructedMoleculeRecord`
             The molecule to be mutated.
 
         Returns
         -------
-        mol : :class:`.Molecule`
-            The mutant.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-            This is a virtual method which must be implemented by
-            a subclass.
+        :class:`.ConstructedMoleculeMutationRecord`
+            A record of the mutation.
 
         """
 

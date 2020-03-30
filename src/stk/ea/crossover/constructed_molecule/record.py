@@ -54,4 +54,4 @@ class ConstructedMoleculeCrossoverRecord(MoleculeCrossoverRecord):
 
         """
 
-        return self._molecule_record
+        return super().get_molecule_record()
