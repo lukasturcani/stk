@@ -7,7 +7,6 @@ Constructed Molecule JSONizer
 from stk.molecular import (
     MoleculeKeyMaker,
     InchiKey,
-    ConstructedMoleculeKeyMaker,
 )
 from ..molecule import MoleculeJsonizer
 
@@ -58,19 +57,14 @@ class ConstructedMoleculeJsonizer:
 
     def __init__(
         self,
-        key_makers=(
-            InchiKey(),
-            ConstructedMoleculeKeyMaker(),
-        ),
+        key_makers=(InchiKey(), ),
     ):
         """
         Initializes a :class:`.ConstructedMoleculeJsonizer`.
 
         Parameters
         ----------
-        key_makers : :class:`tuple` of \
-                :class:`.MoleculeKeyMaker` and \
-                :class:`.ConstructedMoleculeKeyMaker`
+        key_makers : :class:`tuple` of :class:`.MoleculeKeyMaker`
             Used to make the keys of molecules, which should be
             included in their JSON representations. Keys allow
             molecular data to reference itself when split across
