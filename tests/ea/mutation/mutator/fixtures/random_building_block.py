@@ -29,7 +29,7 @@ graph2 = stk.polymer.Linear((bb2, ), 'A', 2)
             ),
             mutation_record=stk.ConstructedMoleculeMutationRecord(
                 molecule_record=stk.ConstructedMoleculeRecord(
-                    molecule=graph2,
+                    molecule=stk.ConstructedMolecule(graph2),
                     topology_graph=graph2,
                 ),
                 mutator_name='RandomBuildingBlock',
