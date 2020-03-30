@@ -1,4 +1,14 @@
+"""
+Similar Building Block
+======================
+
+"""
+
+import numpy as np
+
 from .mutator import ConstructedMoleculeMutator
+from ..record import ConstructedMoleculeMutationRecord
+from ....molecule_records import ConstructedMoleculeRecord
 
 
 class SimilarBuildingBlock(ConstructedMoleculeMutator):
@@ -10,84 +20,89 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
 
     Examples
     --------
+    *Constructed Molecule Mutation*
+
     .. code-block:: python
 
         import stk
 
         # Create a molecule which is to be mutated.
-        bb1 = stk.BuildingBlock('NCCN', ['amine'])
-        bb2 = stk.BuildingBlock('O=CCC=O', ['aldehyde'])
-        polymer = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=3)
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+        polymer = stk.ConstructedMoleculeRecord(
+            topology_graph=stk.polymer.Linear((bb1, bb2), 'AB', 3),
         )
 
         # Create molecules used to substitute building blocks.
-        building_blocks = [
-            stk.BuildingBlock('NC[Si]CCN', ['amine']),
-            stk.BuildingBlock('NCCCCCCCN', ['amine']),
-            stk.BuildingBlock('NC1CCCCC1N', ['amine'])
-        ]
+        building_blocks = (
+            stk.BuildingBlock(
+                smiles='NC[Si]CCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            ),
+            stk.BuildingBlock(
+                smiles='NCCCCCCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            ),
+            stk.BuildingBlock(
+                smiles='NC1CCCCC1N',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            ),
+        )
 
         # Create the mutator.
+
+        def has_primary_amino_group(building_block):
+            fg, = building_block.get_functional_groups(0)
+            return fg.__class__ is stk.PrimaryAmino
+
         similar_bb = stk.SimilarBuildingBlock(
             building_blocks=building_blocks,
-            key=lambda mol: mol.func_groups[0].fg_type.name == 'amine'
+            is_replaceable=has_primary_amino_group,
         )
 
         # Mutate a molecule.
-        mutant1 = random_bb.mutate(polymer)
+        mutation_record1 = random_bb.mutate(polymer)
 
         # Mutate the molecule a second time.
-        mutant2 = random_bb.mutate(polymer)
-
-        # Mutate a mutant.
-        mutant3 = random_bb.mutate(mutant1)
+        mutation_record2 = random_bb.mutate(polymer)
 
     """
 
     def __init__(
         self,
         building_blocks,
-        key,
-        duplicate_building_blocks,
+        is_replaceable,
+        name='RandomBuildingBlock',
         random_seed=None,
-        use_cache=False
     ):
         """
-        Initialize a :class:`RandomBuildingBlock` instance.
+        Initialize a :class:`.SimilarBuildingBlock` instance.
 
         Parameters
         ----------
-        building_blocks : :class:`tuple` of :class:`.Molecule`
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
             A group of molecules which are used to replace building
             blocks in molecules being mutated.
 
-        key : :class:`function`
-            A function which takes a :class:`.Molecule` and returns
-            ``True`` or ``False``. This function is applied to every
-            building block of the molecule being mutated. Building
-            blocks which returned ``True`` are liable for substition by
-            one of the molecules in :attr:`building_blocks`.
+        is_replaceable : :class:`callable`
+            A function which takes a :class:`.BuildingBlock` and
+            returns ``True`` or ``False``. This function is applied to
+            every building block in the molecule being mutated.
+            Building blocks which returned ``True`` are liable for
+            substitution by one of the molecules in `building_blocks`.
 
-        duplicate_building_blocks : :class:`bool`, optional
-            Indicates whether the building blocks used to construct the
-            mutant must all be unique.
+        name : :class:`str`, optional
+            A name to help identify the mutator instance.
 
         random_seed : :class:`bool`, optional
             The random seed to use.
 
-        use_cache : :class:`bool`, optional
-            Toggles use of the molecular cache.
-
         """
 
         self._building_blocks = building_blocks
-        self._key = key
-        self._duplicate_building_blocks = duplicate_building_blocks
-        self._similar_bbs = {}
+        self._is_replaceable = is_replaceable
+        self._name = name
         self._generator = np.random.RandomState(random_seed)
-        super().__init__(use_cache=use_cache)
 
     def _mutate(self, mol):
         """

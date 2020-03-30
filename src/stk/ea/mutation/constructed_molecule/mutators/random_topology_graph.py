@@ -29,7 +29,9 @@ class RandomTopologyGraph(ConstructedMoleculeMutator):
             smiles='O=CCC(=O)CC=O',
             functional_groups=[stk.AldehydeFactory()],
         )
-        cage = stk.ConstructedMolecule(stk.cage.FourPlusSix((bb1, bb2))
+        cage = stk.ConstructedMoleculeRecord(
+            topology_graph=stk.cage.FourPlusSix((bb1, bb2),
+        )
 
         # Create functions which replace the topology graph.
         replacement_funcs = (
