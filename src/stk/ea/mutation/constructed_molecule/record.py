@@ -6,8 +6,10 @@ Constructed Molecule Mutation Record
 
 """
 
+from ..molecule import MoleculeMutationRecord
 
-class ConstructedMoleculeMutationRecord:
+
+class ConstructedMoleculeMutationRecord(MoleculeMutationRecord):
     """
     Abstract base class for a record of a mutation operation.
 
