@@ -76,7 +76,7 @@ class ValueMongoDb(ValueDatabase):
         lru_cache_size=128,
     ):
         """
-        Initialize a :class:`.MoleculeValueMongoDb` instance.
+        Initialize a :class:`.ValueMongoDb` instance.
 
         Parameters
         ----------
