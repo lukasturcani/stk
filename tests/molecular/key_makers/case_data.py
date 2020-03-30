@@ -4,8 +4,7 @@ class CaseData:
 
     Attributes
     ----------
-    key_maker : :class:`.MoleculeKeyMaker` or \
-            :class:`.ConstructedMoleculeKeyMaker`
+    key_maker : :class:`.MoleculeKeyMaker`
         The key maker to test.
 
     molecule : :class:`.Molecule`
@@ -31,8 +30,7 @@ class CaseData:
 
         Parameters
         ----------
-        key_maker : :class:`.MoleculeKeyMaker` or \
-                :class:`.ConstructedMoleculeKeyMaker`
+        key_maker : :class:`.MoleculeKeyMaker`
             The key maker to test.
 
         molecule : :class:`.Molecule`

@@ -27,8 +27,7 @@ def _test_get_key(key_maker, molecule, key):
 
     Parameters
     ----------
-    key_maker : :class:`.MoleculeKeyMaker` or \
-            :class:`.ConstructedMoleculeKeyMaker`
+    key_maker : :class:`.MoleculeKeyMaker`
         The key maker to test.
 
     molecule : :class:`.Molecule`
