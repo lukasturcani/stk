@@ -27,5 +27,5 @@ from ...utilities import MockMongoClient
         ),
     ),
 )
-def molecule_value_mongo_db(request):
+def mongo_db(request):
     return request.param
