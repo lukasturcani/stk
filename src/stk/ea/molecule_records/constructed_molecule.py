@@ -4,6 +4,7 @@ Constructed Molecule Record
 
 """
 
+from stk.molecular import ConstructedMolecule
 from .molecule import MoleculeRecord
 
 
@@ -20,7 +21,7 @@ class ConstructedMoleculeRecord(MoleculeRecord):
 
     """
 
-    def __init__(self, molecule, topology_graph):
+    def __init__(self, topology_graph):
         """
         Initialize a :class:`.ConstructedMoleculeRecord` instance.
 
@@ -31,6 +32,7 @@ class ConstructedMoleculeRecord(MoleculeRecord):
 
         """
 
+        molecule = ConstructedMolecule(topology_graph)
         super().__init__(molecule)
         self._topology_graph = topology_graph
 

@@ -23,15 +23,9 @@ graph2 = stk.polymer.Linear((bb2, ), 'A', 2)
                 building_blocks=(bb2, ),
                 is_replaceable=has_bromo,
             ),
-            record=stk.ConstructedMoleculeRecord(
-                molecule=stk.ConstructedMolecule(graph1),
-                topology_graph=graph1,
-            ),
+            record=stk.ConstructedMoleculeRecord(graph1),
             mutation_record=stk.ConstructedMoleculeMutationRecord(
-                molecule_record=stk.ConstructedMoleculeRecord(
-                    molecule=stk.ConstructedMolecule(graph2),
-                    topology_graph=graph2,
-                ),
+                molecule_record=stk.ConstructedMoleculeRecord(graph2),
                 mutator_name='RandomBuildingBlock',
             ),
         ),
