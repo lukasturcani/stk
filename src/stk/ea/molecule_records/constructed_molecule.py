@@ -26,8 +26,8 @@ class ConstructedMoleculeRecord(MoleculeRecord):
 
         Parameters
         ----------
-        molecule : :class:`.ConstructedMolecule`
-            The molecule the record holds.
+        topology_graph : :class:`.TopologyGraph`
+            The topology graph of the :class:`.ConstructedMolecule`.
 
         """
 
