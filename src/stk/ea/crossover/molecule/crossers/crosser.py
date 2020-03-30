@@ -21,7 +21,7 @@ class MoleculeCrosser:
     --------
     *Subclass Implementation*
 
-    You only need to implement :meth:`._cross`. The source code of any
+    You only need to implement :meth:`.cross`. The source code of any
     of the classes listed in :mod:`.crosser` can serve as good
     examples.
 
@@ -34,26 +34,6 @@ class MoleculeCrosser:
         Parameters
         ----------
         records : :class:`iterable` of :class:`.MoleculeRecord`
-            The molecule records on which a crossover operation is
-            performed.
-
-        Yields
-        -------
-        :class:`.MoleculeCrossoverRecord`
-            A record of a crossover operation.
-
-        """
-
-        # Can be used to decorate _cross in the future.
-        yield from self._cross(records)
-
-    def _cross(self, records):
-        """
-        Cross `records`.
-
-        Parameters
-        ----------
-        molecules : :class:`iterable` of :class:`.MoleculeRecord`
             The molecule records on which a crossover operation is
             performed.
 

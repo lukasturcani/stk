@@ -4,19 +4,19 @@ class FitnessCalculator:
 
     """
 
-    def get_fitness(self, mol):
+    def get_fitness_value(self, molecule):
         """
-        Return the fitness value of `mol`.
+        Return the fitness value of `molecule`.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
+        molecule : :class:`.Molecule`
             The molecule whose fitness value should be calculated.
 
         Returns
         -------
         :class:`object`
-            The fitness value of `mol`.
+            The fitness value of `molecule`.
 
         """
 
@@ -24,26 +24,18 @@ class FitnessCalculator:
 
     def _get_fitness(self, mol):
         """
-        Return the fitness value of `mol`.
+        Return the fitness value of `molecule`.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
-            The molecule whose fitness should be calculated.
+        molecule : :class:`.Molecule`
+            The molecule whose fitness value should be calculated.
 
         Returns
         -------
         :class:`object`
-            The fitness value of `mol`.
-
-        Raises
-        ------
-        :class:`NotImplementedError`
-            This is a virtual method and needs to be implemented in a
-            subclass.
+            The fitness value of `molecule`.
 
         """
 
         raise NotImplementedError()
-
-
