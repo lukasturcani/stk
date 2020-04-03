@@ -67,7 +67,7 @@ class DivideByMean(FitnessNormalizer):
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`tuple`
+            Takes two parameters, first is a :class:`tuple`
             of :class:`.MoleculeRecord` instances,
             and the second is a :class:`.MoleculeRecord`. The
             :class:`callable` returns ``True`` or ``False``. Only

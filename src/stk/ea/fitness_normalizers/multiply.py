@@ -16,7 +16,7 @@ class Multiply(FitnessNormalizer):
 
     Examples
     --------
-    *Multiplying Fitness Values by a set of Coefficients*
+    *Multiplying Fitness Values by a Set of Coefficients*
 
     In this example, assume that each fitness value consists of a
     :class:`tuple` of numbers, each representing a different property
@@ -60,7 +60,7 @@ class Multiply(FitnessNormalizer):
 
         import stk
 
-        normalizer = stk.Coefficient(
+        normalizer = stk.Multiply(
             coefficient=(1, 2, 3),
             # Only normalize values which are not None.
             filter=lambda population, record:
@@ -73,26 +73,30 @@ class Multiply(FitnessNormalizer):
     def __init__(
         self,
         coefficient,
-        filter=lambda population, mol: True,
+        filter=lambda population, record: True,
     ):
         """
-        Initialize a :class:`Multiply` instance.
+        Initialize a :class:`.Multiply` instance.
 
         Parameters
         ----------
-        coefficient : :class:`float` or :class:`list` of :class:`float`
-            The coefficients each :attr:`fitness` value by. Can be
-            a single number or multiple numbers.
+        coefficient : :class:`float` or \
+                :class:`tuple` of :class:`float`
+            The coefficients each fitness value is multiplied by. Can
+            be a single number or multiple numbers.
 
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`.EAPopulation`
-            and the second is a :class:`.Molecule`, and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-            The :class:`.EAPopulation` on which :meth:`normalize` is
-            called is passed as the first argument while the second
-            argument will be passed every :class:`.Molecule` in it.
+            Takes two parameters, first is a :class:`tuple`
+            of :class:`.MoleculeRecord` instances,
+            and the second is a :class:`.MoleculeRecord`. The
+            :class:`callable` returns ``True`` or ``False``. Only
+            molecules which return ``True`` will have fitness values
+            normalized. By default, all molecules will have fitness
+            values normalized.
+            The instance passed to the `population` argument of
+            :meth:`.normalize` is passed as the first argument, while
+            the second argument will be passed every
+            :class:`.MoleculeRecord` in it, one at a time.
 
         """
 
