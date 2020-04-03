@@ -121,6 +121,19 @@ class FitnessFunction(FitnessCalculator):
             output_database=fitness_db,
         )
 
+        # Assuming that a fitness value for this molecule was not
+        # deposited into the database in a previous session, this
+        # will calculate the fitness value.
+        value1 = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
+        # This will not re-calculate the fitness value, instead,
+        # value1 will be retrieved from the database.
+        value2 = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
+
+
 
 
     """
