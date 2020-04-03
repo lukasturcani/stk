@@ -9,6 +9,7 @@ from .fixtures import *  # noqa
     params=(
         lazy_fixture('divide_by_mean'),
         lazy_fixture('multiply'),
+        lazy_fixture('null'),
     ),
 )
 def case_data(request):
