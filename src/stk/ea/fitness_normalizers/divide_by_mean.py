@@ -39,45 +39,28 @@ class DivideByMean(FitnessNormalizer):
 
     Examples
     --------
-    *Scaling Fitness Values*
+    *Selectively Normalizing Fitness Values*
+
+    Sometimes you do not want to normalize all the values in a
+    population together. For example, if a failed fitness value
+    calculation resulted in some records having a fitness value of
+    ``None``, you would want to ignore these records from the
+    normalization
 
     .. code-block:: python
 
         import stk
 
-        mean_scaler = stk.DivideByMean()
-
-        # Normalize the fitness values.
-        # Assume the fitness values are
-        # {mol1: 1, mol2: 2, mol3: 3}
-        normalized = mean_scaler.normalize(pop)
-
-        # normalized is
-        # {mol1: 0.5, mol2: 1, mol3: 1.5}
-
-
-    Scale fitness vectors
-
-    .. code-block:: python
-
-        # Create the normalizer.
-        # mean_scaler = DivideByMean()
-
-        # Normalize the fitness values.
-        # Assume the fitness values are
-        # {mol1: [1, 10, 100], mol2: [2, 20, 100], mol3: [3, 30, 100]}.
-        normalized = mean_scaler.normalize(pop)
-
-        # normalized is
-        # {
-        #     mol1: [0.5, 0.5, 0.5],
-        #     mol2: [1, 1, 1],
-        #     mol3: [1.5, 1.5, 1.5]
-        # }.
+        mean_scaler = stk.DivideByMean(
+            # Only normalize values which are not None.
+            filter=lambda population, record:
+                record.get_fitness_value() is not None
+        )
+        normalized = tuple(mean_scaler.normalize(population))
 
     """
 
-    def __init__(self, filter=lambda population, molecule: True):
+    def __init__(self, filter=lambda population, record: True):
         """
         Initialize a :class:`.DivideByMean` instance.
 
