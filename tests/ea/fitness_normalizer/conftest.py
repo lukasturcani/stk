@@ -8,6 +8,7 @@ from .fixtures import *  # noqa
 @pytest.fixture(
     params=(
         lazy_fixture('divide_by_mean'),
+        lazy_fixture('multiply'),
     ),
 )
 def case_data(request):

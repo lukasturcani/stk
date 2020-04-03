@@ -40,7 +40,7 @@ class Multiply(FitnessNormalizer):
 
         import stk
 
-        normalizer = stk.Coefficient((1, 2, 3))
+        normalizer = stk.Multiply((1, 2, 3))
         # Assuming that population holds molecule record instances
         # with the following fitness values
         # (1, 1, 1), (2, 2, 2), (3, 3, 3)
