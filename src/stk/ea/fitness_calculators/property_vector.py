@@ -19,45 +19,32 @@ class PropertyVector(FitnessCalculator):
 
         import stk
 
-        # Create the molecules which are to have fitness values
-        # evaluated.
-        mol1 = stk.BuildingBlock('NCCN', ['amine'])
-        mol2 = stk.BuildingBlock('NC[Si]CCCN', ['amine'])
-        mol3 = stk.BuildingBlock('O=CCC(C=O)CCC=O', ['aldehyde'])
+        # First, create the functions which calculate the properties
+        # of molecules.
+        def get_num_atoms(molecule):
+            return molecule.get_num_atoms()
 
-        # Create the functions which calculate the molecule properties.
-        def atom_number(mol):
-            return len(mol.atoms)
+        def get_num_bonds(molecule):
+            return molecule.get_num_bonds()
 
-        def diameter(mol):
-            return mol.maximum_diamater()
+        def get_diameter(molecule):
+            return molecule.get_maximum_diameter()
 
-        def energy(mol):
-            energy_calculator = stk.MMFFEnergy()
-            return energy_calculator.get_energy(mol)
-
-        # Create the fitness calculator.
-        fitness_calculator = PropertyVector(
-            atom_number,
-            diameter,
-            energy
+        # Next, create the fitness calculator.
+        fitness_calculator = stk.PropertyVector(
+            property_functions=(
+                get_num_atoms,
+                get_num_bonds,
+                get_diameter,
+            ),
         )
 
-        # Calculate the fitness vector of mol1. It will be a list
-        # holding the number of atoms, diameter and energy of mol1,
-        # respectively.
-        mol1_fitness = fitness_calculator.get_fitness(mol1)
-
-        # Calculate the fitness vector of mol2. It will be a list
-        # holding the number of atoms, diameter and energy of mol2,
-        # respectively.
-        mol2_fitness = fitness_calculator.get_fitness(mol2)
-
-        # Calculate the fitness vector of mol3. It will be a list
-        # holding the number of atoms, diameter and energy of mol3,
-        # respectively.
-        mol3_fitness = fitness_calculator.get_fitness(mol3)
-
+        # Calculate the fitness value of a molecule.
+        # "value" is a tuple, holding the number of atoms, number of
+        # bonds and the diameter of the molecule.
+        value = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
 
     Use on :class:`.ConstructedMolecule` objects
 
