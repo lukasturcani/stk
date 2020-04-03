@@ -97,6 +97,71 @@ class PropertyVector(FitnessCalculator):
         # You can retrieve the fitness values from the database.
         value = fitness_db.get(stk.BuildingBlock('BrCCBr'))
 
+    *Caching Fitness Values*
+
+    Usually, if you calculate the fitness value of a molecule, you
+    do not want to re-calculate it, because this may be expensive,
+    and the fitness value is going to be the
+    same anyway. By using the `input_database` parameter, together
+    with the `output_database` parameter, you can make sure you store
+    and retrieve calculated fitness values instead of repeating the
+    same calculation multiple times.
+
+    The `input_database` is checked before a calculation happens, to
+    see if the value already exists, while the `output_database` has
+    the calculated fitness value deposited into it.
+
+    .. code-block:: python
+
+        import stk
+
+        # pymongo does not come with stk, you have to install it
+        # separately with "pip install pymongo"
+        import pymongo
+
+        # You can use the same database for both the input_database
+        # and output_database parameters.
+        fitness_db = stk.ValueMongoDb(
+            # This connects to a local database - so make sure you have
+            # local MongoDB server running. You can also connect to
+            # a remote MongoDB with MongoClient(), read to pymongo
+            # docs to see how to do that.
+            mongo_client=pymongo.MongoClient(),
+            collection='fitness_values',
+        )
+
+        # Define the functions which calculate molecular properties.
+        def get_num_atoms(molecule):
+            return molecule.get_num_atoms()
+
+        def get_num_bonds(molecule):
+            return molecule.get_num_bonds()
+
+        def get_diameter(molecule):
+            return molecule.get_maximum_diameter()
+
+        # Create the fitness calculator.
+        fitness_calculator = stk.PropertyVector(
+            property_functions=(
+                get_num_atoms,
+                get_num_bonds,
+                get_diameter,
+            ),
+            input_database=fitness_db,
+            output_database=fitness_db,
+        )
+
+        # Assuming that a fitness value for this molecule was not
+        # deposited into the database in a previous session, this
+        # will calculate the fitness value.
+        value1 = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
+        # This will not re-calculate the fitness value, instead,
+        # value1 will be retrieved from the database.
+        value2 = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
 
     """
 
