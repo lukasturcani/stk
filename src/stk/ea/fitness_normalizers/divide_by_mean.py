@@ -5,6 +5,7 @@ Divide By Mean
 """
 
 import logging
+from functools import partial
 import numpy as np
 
 from .fitness_normalizer import FitnessNormalizer
@@ -18,9 +19,9 @@ class DivideByMean(FitnessNormalizer):
     Divides fitness values by the population mean.
 
     While this function can be used if the fitness value of each
-    :class:`.Molecule` in the :class:`.EAPopulation` is a single
-    number, it is most useful when the fitness values is a
-    :class:`list` of numbers. In this case, it is necessary to somehow
+    :class:`.Molecule` in the population is a single
+    number, it is most useful when the fitness value is a
+    :class:`tuple` of numbers. In this case, it is necessary to somehow
     combine the numbers so that a single fitness value is produced.
     For example, take a fitness value which is the vector holding the
     properties ``[energy, diameter, num_atoms]``. For a given molecule
@@ -38,7 +39,7 @@ class DivideByMean(FitnessNormalizer):
 
     Examples
     --------
-    Scale fitness values
+    *Scaling Fitness Values*
 
     .. code-block:: python
 
@@ -84,31 +85,38 @@ class DivideByMean(FitnessNormalizer):
         ----------
         filter : :class:`callable`, optional
             Takes a two parameters, first is a :class:`tuple`
-
-            and the second is a :class:`.Molecule`, and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-            The :class:`.EAPopulation` on which :meth:`normalize` is
-            called is passed as the first argument while the second
-            argument will be passed every :class:`.Molecule` in it.
+            of :class:`.MoleculeRecord` instances,
+            and the second is a :class:`.MoleculeRecord`. The
+            :class:`callable` returns ``True`` or ``False``. Only
+            molecules which return ``True`` will have fitness values
+            normalized. By default, all molecules will have fitness
+            values normalized.
+            The instance passed to the `population` argument of
+            :meth:`.normalize` is passed as the first argument, while
+            the second argument will be passed every
+            :class:`.MoleculeRecord` in it, one at a time.
 
         """
 
         self._filter = filter
 
-    def _get_normalized_values(self, filtered, fitness_values):
-        # filtered gets iterated through multiple times.
-        filtered = list(filtered)
+    def normalize(self, population):
+        # Keep as a tuple, as multiple iterations through filtered are
+        # required.
+        filtered = tuple(filter(
+            partial(self._filter, population),
+            population,
+        ))
         mean = np.mean(
-            a=[fitness_values[mol] for mol in filtered],
+            a=[record.get_fitness_value() for record in filtered],
             axis=0,
         )
         logger.debug(f'Means used: {mean}')
 
-        for mol in filtered:
-            # Use divide here so that both lists and arrays work
-            # properly.
-            yield mol, np.divide(fitness_values[mol], mean)
-
-
+        for record in filtered:
+            yield record.with_fitness_value(
+                fitness_value=np.divide(
+                    record.get_fitness_value(),
+                    mean,
+                )
+            )
