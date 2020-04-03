@@ -61,6 +61,6 @@ def _test_normalize(
             record1.get_fitness_value() == record2.get_fitness_value()
         )
         assert (
-            record1.get_fitness_value(False)
-            == record2.get_fitness_value(False)
+            record1.get_fitness_value(normalized=False)
+            == record2.get_fitness_value(normalized=False)
         )
