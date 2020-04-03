@@ -2,12 +2,23 @@
 Fitness Calculator
 ==================
 
+#. :class:`.FitnessFunction`
+#. :class:`.PropertyVector`
+
 """
 
 
 class FitnessCalculator:
     """
-    Calculates fitness values of molecules.
+    Abstract base class for fitness value calculators.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    You only need to implement :meth:`.get_fitness_value`. The source
+    cod of any of the classes listed in :mod:`.fitness_calculator`, can
+    serve as good examples.
 
     """
 

@@ -22,7 +22,7 @@ class ConstructedMoleculeMutator:
     --------
     *Subclass Implementation*
 
-    You only need to implement :meth:`._mutate`. The source code of any
+    You only need to implement :meth:`.mutate`. The source code of any
     of the classes listed in :mod:`.mutator` can serve as good
     examples.
 
