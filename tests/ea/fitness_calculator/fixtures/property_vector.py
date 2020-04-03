@@ -9,9 +9,11 @@ from ..case_data import CaseData
     params=(
         CaseData(
             fitness_calculator=stk.PropertyVector(
-                stk.Molecule.get_num_atoms,
-                stk.Molecule.get_num_bonds,
-                stk.Molecule.get_maximum_diameter,
+                property_functions=(
+                    stk.Molecule.get_num_atoms,
+                    stk.Molecule.get_num_bonds,
+                    stk.Molecule.get_maximum_diameter,
+                ),
             ),
             molecule=stk.BuildingBlock('BrCCBr').with_position_matrix(
                 position_matrix=np.array([
