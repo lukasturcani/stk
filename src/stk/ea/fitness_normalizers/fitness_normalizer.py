@@ -2,13 +2,14 @@ class FitnessNormalizer:
     """
     Abstract base class for fitness normalizers.
 
-    A fitness normalizer takes an :class:`EAPopulation` and
-    returns a new set of normalized fitness values for all
-    molecules in it. The primary benefit of a normalizer vs a
+    A fitness normalizer takes an :class:`iterable` of
+    :class:`.MoleculeRecord` instances and yields new
+    :class:`.MoleculeRecord` instances, with normalized fitness values.
+    The primary benefit of a normalizer vs a
     :class:`.FitnessCalculator` is that a :class:`.FitnessNormalizer`
     has access to all members in the population when it is calculating
-    the new fitness value, whereas a :class:`.FitnessCalculator` does
-    not.
+    the normalized fitness value, whereas a :class:`.FitnessCalculator`
+    does not.
 
     """
 
@@ -18,42 +19,14 @@ class FitnessNormalizer:
 
         Parameters
         ----------
-        population : :class:`.EAPopulation`
+        population : :class:`iterable` of :class:`.MoleculeRecord`
             The molecules which need to have their fitness values
             normalized.
 
-        Returns
-        -------
-        :class:`dict`
-            Maps every molecule in `population` to its normalized
-            fitness value.
-
-        """
-
-        # This method can be used to decorate _normalize in the future.
-        return self._normalize(population)
-
-    def _normalize(self, population):
-        """
-        Normalize fitness value in `population`.
-
-        Parameters
-        ----------
-        population : :class:`.EAPopulation`
-            The molecules which need to have their fitness values
-            normalized.
-
-        Returns
-        -------
-        :class:`dict`
-            Maps every molecule in `population` to its normalized
-            fitness value.
-
-        Raises
+        Yields
         ------
-        :class:`NotImplementedError`
-            This is a virtual method and needs to be implemented in a
-            subclass.
+        :class:`.MoleculeRecord`
+            A record with a normalized fitness value.
 
         """
 
