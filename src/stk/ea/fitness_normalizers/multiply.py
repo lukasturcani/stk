@@ -1,3 +1,12 @@
+"""
+Multiply
+========
+
+"""
+
+import numpy as np
+from functools import partial
+
 from .fitness_normalizer import FitnessNormalizer
 
 
@@ -82,12 +91,17 @@ class Multiply(FitnessNormalizer):
         self._coefficient = coefficient
         self._filter = filter
 
-    def _get_normalized_values(self, filtered, fitness_values):
-        # Shorter alias.
-        coeff = self._coefficient
-        for mol in filtered:
+    def normalize(self, population):
+        filtered = tuple(filter(
+            partial(self._filter, population),
+            population,
+        ))
+        for record in filtered:
             # Use np.multiply here so that both lists and arrays work
             # properly. If * is used [8]*3 will wrongly make [8, 8, 8].
-            yield mol, np.multiply(coeff, fitness_values[mol])
-
-
+            yield record.with_fitness_value(
+                fitness_value=np.multiply(
+                    self._coefficient,
+                    record.get_fitness_value(),
+                ),
+            )

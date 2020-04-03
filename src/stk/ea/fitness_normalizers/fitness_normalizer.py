@@ -3,6 +3,7 @@ Fitness Normalizer
 ==================
 
 #. :class:`.DivideByMean`
+#. :class:`.Multiply`
 
 """
 
