@@ -46,50 +46,57 @@ class PropertyVector(FitnessCalculator):
             molecule=stk.BuildingBlock('BrCCBr'),
         )
 
-    Use on :class:`.ConstructedMolecule` objects
+    *Storing Fitness Values in a Database*
+
+    Sometimes you want to store fitness values in a database, you
+    can do this by providing the `output_database` parameter.
 
     .. code-block:: python
 
-        # First create molecules whose fitness value we wish to
-        # calculate.
-        bb1 = stk.BuildingBlock('[Br]CC[Br]', ['bromine'])
-        polymer1 = stk.ConstructedMolecule(
-            building_blocks=[bb1],
-            topology_graph=stk.polymer.Linear('A', [0], n=5)
+        import stk
+        # pymongo does not come with stk, you have to install it
+        # separately with "pip install pymongo"
+        import pymongo
+
+        # Create a database which stores the fitness value of each
+        # molecule.
+        fitness_db = stk.ValueMongoDb(
+            # This connects to a local database - so make sure you have
+            # local MongoDB server running. You can also connect to
+            # a remote MongoDB with MongoClient(), read to pymongo
+            # docs to see how to do that.
+            mongo_client=pymongo.MongoClient(),
+            collection='fitness_values',
         )
 
-        bb2 = stk.BuildingBlock('[Br]CCNNCC[Br]', ['bromine'])
-        polymer2 = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2],
-            topology_graph=stk.polymer.Linear('AB', [0, 0], n=2)
-        )
+        # Define the functions which calculate molecular properties.
+        def get_num_atoms(molecule):
+            return molecule.get_num_atoms()
 
-        # Create the functions which calculate the molecule properties.
-        def atom_number(mol):
-            return len(mol.atoms)
+        def get_num_bonds(molecule):
+            return molecule.get_num_bonds()
 
-        def diameter(mol):
-            return mol.maximum_diameter()
-
-        def monomer_number(mol):
-            return sum(mol.building_block_counter.values())
+        def get_diameter(molecule):
+            return molecule.get_maximum_diameter()
 
         # Create the fitness calculator.
-        fitness_calculator = PropertyVector(
-            atom_number,
-            diameter,
-            monomer_number
+        fitness_calculator = stk.PropertyVector(
+            property_functions=(
+                get_num_atoms,
+                get_num_bonds,
+                get_diameter,
+            ),
+            output_database=fitness_db,
         )
 
-        # Calculate the fitness vector of polymer1. It will be a list
-        # holding the number of atoms, diameter and the number of
-        # monomers in polymer1, respectively.
-        polymer1_fitness = fitness_calculator.get_fitness(polymer1)
+        # Calculate fitness values.
+        value1 = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
 
-        # Calculate the fitness vector of polymer2. It will be a list
-        # holding the number of atoms, diameter and the number of
-        # monomers in polymer2, respectively.
-        polymer2_fitness = fitness_calculator.get_fitness(polymer2)
+        # You can retrieve the fitness values from the database.
+        value = fitness_db.get(stk.BuildingBlock('BrCCBr'))
+
 
     """
 
@@ -101,48 +108,35 @@ class PropertyVector(FitnessCalculator):
     ):
 
         """
-        Initialize a :class:`CageFitness` instance.
+        Initialize a :class:`.PropertyVector` instance.
 
         Parameters
         ----------
-        *property_fns : :class:`tuple` of :class:`function`
+        property_fns : :class:`tuple` of :class:`callable`
             A group of :class:`function`, each of which is used to
             calculate a single property of the molecule. Each function
             must take one parameter, `mol`, which accepts
             a :class:`.Molecule` object. This is the molecule used to
             calculate the property.
 
-        use_cache : :class:`bool`, optional
-            If ``True`` then fitness values for molecules already held
-            in the cache are not re-calculated but the value already
-            stored is used.
+        input_database : :class:`.ValueDatabase`, optional
+            A database to check before calling `fitness_function`. If a
+            fitness value exists for a molecule in the database, the
+            stored value is returned, instead of calling
+            `fitness_function`.
+
+        output_database : :class:`.ValueDatabase`, optional
+            A database into which the calculate fitness value is
+            placed.
 
         """
 
-        self._property_fns = property_fns
-        super().__init__(use_cache=use_cache)
+        self._property_functions = property_functions
+        self._input_database = input_database
+        self._output_database = output_database
 
-    def _get_fitness(self, mol):
-        """
-        Get the fitness of `mol`.
-
-        Parameters
-        ----------
-        mol : :class:`.Molecule`
-            The molecule whose property vector should be calculated.
-
-        Returns
-        -------
-        :class:`list`
-            A :class:`list` of properties of the `mol`. Will be
-            ``None`` if any of the properties fail.
-
-        """
-
-        property_vector = []
-        for property_fn in self._property_fns:
-            logger.info(
-                f'Using {property_fn.__name__} on "{mol}".'
-            )
-            property_vector.append(property_fn(mol))
-        return property_vector
+    def get_fitness_value(self, molecule):
+        return tuple(
+            property_function(molecule)
+            for property_function in self._property_functions
+        )
