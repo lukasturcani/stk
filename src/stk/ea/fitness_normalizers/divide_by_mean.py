@@ -1,4 +1,16 @@
+"""
+Divide By Mean
+==============
+
+"""
+
+import logging
+import numpy as np
+
 from .fitness_normalizer import FitnessNormalizer
+
+
+logger = logging.getLogger(__name__)
 
 
 class DivideByMean(FitnessNormalizer):
@@ -64,14 +76,15 @@ class DivideByMean(FitnessNormalizer):
 
     """
 
-    def __init__(self, filter=lambda population, mol: True):
+    def __init__(self, filter=lambda population, molecule: True):
         """
         Initialize a :class:`.DivideByMean` instance.
 
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`.EAPopulation`
+            Takes a two parameters, first is a :class:`tuple`
+
             and the second is a :class:`.Molecule`, and
             returns ``True`` or ``False``. Only molecules which
             return ``True`` will have fitness values normalized. By
@@ -91,7 +104,7 @@ class DivideByMean(FitnessNormalizer):
             a=[fitness_values[mol] for mol in filtered],
             axis=0,
         )
-        logger.debug(f'Means used in DivideByMean: {mean}')
+        logger.debug(f'Means used: {mean}')
 
         for mol in filtered:
             # Use divide here so that both lists and arrays work

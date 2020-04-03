@@ -1,8 +1,17 @@
+"""
+Fitness Normalizer
+==================
+
+#. :class:`.DivideByMean`
+
+"""
+
+
 class FitnessNormalizer:
     """
     Abstract base class for fitness normalizers.
 
-    A fitness normalizer takes an :class:`iterable` of
+    A fitness normalizer takes an :class:`tuple` of
     :class:`.MoleculeRecord` instances and yields new
     :class:`.MoleculeRecord` instances, with normalized fitness values.
     The primary benefit of a normalizer vs a
@@ -19,7 +28,7 @@ class FitnessNormalizer:
 
         Parameters
         ----------
-        population : :class:`iterable` of :class:`.MoleculeRecord`
+        population : :class:`tuple` of :class:`.MoleculeRecord`
             The molecules which need to have their fitness values
             normalized.
 

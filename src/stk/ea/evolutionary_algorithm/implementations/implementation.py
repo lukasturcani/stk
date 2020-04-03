@@ -51,8 +51,9 @@ class Implementation:
         self._logger.info(
             'Calculating fitness values of initial population.'
         )
+        population = tuple(self._with_fitness_values(map_, population))
         population = tuple(self._fitness_normalizer.normalize(
-            population=self._with_fitness_values(map_, population),
+            population=population,
         ))
         yield Generation(
             id=generation,
@@ -91,13 +92,13 @@ class Implementation:
                 for record in mutation_records
             )
 
-            population = self._with_fitness_values(
+            population = tuple(self._with_fitness_values(
                 map_=map_,
                 population=dedupe(
                     iterable=it.chain(population, offspring, mutants),
                     key=self._duplicate_key,
                 ),
-            )
+            ))
             population = tuple(
                 self._fitness_normalizer.normalize(population)
             )
