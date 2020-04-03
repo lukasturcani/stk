@@ -1,3 +1,12 @@
+"""
+Power
+=====
+
+"""
+
+import numpy as np
+from functools import partial
+
 from .fitness_normalizer import FitnessNormalizer
 
 
@@ -62,33 +71,45 @@ class Power(FitnessNormalizer):
 
     """
 
-    def __init__(self, power, filter=lambda population, mol: True):
+    def __init__(self, power, filter=lambda population, record: True):
         """
-        Initialize a :class:`Power` instance.
+        Initialize a :class:`.Power` instance.
 
         Parameters
         ----------
-        power : :class:`float` or :class:`list` of :class:`float`
-            The power to raise each :attr:`fitness` value to. Can be
-            a single number or multiple numbers.
+        power : :class:`float` or \
+                :class:`tuple` of :class:`float`
+            The power to raise each fitness value to. Can be
+            a single number or multiple numbers, depending on the
+            form of the fitness value.
 
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`.EAPopulation`
-            and the second is a :class:`.Molecule`, and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-            The :class:`.EAPopulation` on which :meth:`normalize` is
-            called is passed as the first argument while the second
-            argument will be passed every :class:`.Molecule` in it.
+            Takes two parameters, first is a :class:`tuple`
+            of :class:`.MoleculeRecord` instances,
+            and the second is a :class:`.MoleculeRecord`. The
+            :class:`callable` returns ``True`` or ``False``. Only
+            molecules which return ``True`` will have fitness values
+            normalized. By default, all molecules will have fitness
+            values normalized.
+            The instance passed to the `population` argument of
+            :meth:`.normalize` is passed as the first argument, while
+            the second argument will be passed every
+            :class:`.MoleculeRecord` in it, one at a time.
 
         """
 
         self._power = power
         self._filter = filter
 
-    def _get_normalized_values(self, filtered, fitness_values):
-        for mol in filtered:
-            yield mol, np.float_power(fitness_values[mol], self._power)
-
-
+    def normalize(self, population):
+        filtered = tuple(filter(
+            partial(self._filter, population),
+            population,
+        ))
+        for record in filtered:
+            yield record.with_fitness_value(
+                fitness_value=np.float_power(
+                    record.get_fitness_value(),
+                    self._power,
+                ),
+            )

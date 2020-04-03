@@ -83,7 +83,8 @@ class Multiply(FitnessNormalizer):
         coefficient : :class:`float` or \
                 :class:`tuple` of :class:`float`
             The coefficients each fitness value is multiplied by. Can
-            be a single number or multiple numbers.
+            be a single number or multiple numbers, depending on the
+            form of the fitness value.
 
         filter : :class:`callable`, optional
             Takes two parameters, first is a :class:`tuple`
