@@ -7,7 +7,7 @@ from ..case_data import CaseData
 @pytest.fixture(
     params=(
         CaseData(
-            fitness_normalizer=stk.Null(),
+            fitness_normalizer=stk.NullFitnessNormalizer(),
             population=(
                 stk.MoleculeRecord(
                     molecule=stk.BuildingBlock('BrCCBr'),
