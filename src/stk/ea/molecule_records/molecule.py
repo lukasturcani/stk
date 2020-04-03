@@ -94,7 +94,10 @@ class MoleculeRecord:
         clone = self.__class__.__new__(self.__class__)
         clone._molecule = self._molecule
         clone._fitness_value = self._fitness_value
-        self._normalized_fitness_value = self._normalized_fitness_value
+        clone._normalized_fitness_value = (
+            self._normalized_fitness_value
+        )
+        return clone
 
     def with_fitness_value(self, fitness_value, normalized=True):
         """

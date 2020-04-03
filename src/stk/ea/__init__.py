@@ -7,3 +7,4 @@ from .selection import *
 from .terminators import *
 from .generation import *
 from .evolutionary_algorithm import *
+from .molecule_records import *
