@@ -68,8 +68,6 @@ class Multiply(FitnessNormalizer):
         )
         normalized = tuple(normalizer.normalize(population))
 
-
-
     """
 
     def __init__(
