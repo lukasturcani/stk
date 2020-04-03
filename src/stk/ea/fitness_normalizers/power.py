@@ -15,60 +15,61 @@ class Power(FitnessNormalizer):
     Raises fitness values to some power.
 
     This works for cases where the fitness value is single
-    :class:`float` and where it is :class:`list` of :class:`float`.
+    :class:`float` and where it is :class:`float` of :class:`float`.
 
     Examples
     --------
-    Raising a fitness value by some power
+    *Raising Fitness Values by a Set of Powers*
+
+    In this example, assume that each fitness value consists of a
+    :class:`tuple` of numbers, each representing a different property
+    of the molecule, and each contributing to the final fitness value.
+    The properties can be anything, such as  energy, number of atoms
+    or diameter.
+
+    If your final fitness value depends on the combination of these
+    properties, you will probably first want to scale them with
+    :class:`.DivideByMean`. Once this is done, you may want to
+    multiply each property by some coefficient, which reflects its
+    relative importance to the final fitness value. For example
+    if you multiply the value of one property by ``1`` and another
+    by ``2``, the second will contribute twice as much to the
+    final fitness value, assuming that you get the final fitness value
+    by using the :class:`.Sum` normalizer after :class:`.Multiply`.
+
+    Giving a concrete example
 
     .. code-block:: python
 
         import stk
 
-        pop = stk.Population(...)
-        # Assume this returns {mol1: 1, mol2: 2, mol3: 3}.
-        pop.get_fitness_values()
+        normalizer = stk.Multiply((1, 2, 3))
+        # Assuming that population holds molecule record instances
+        # with the following fitness values
+        # (1, 1, 1), (2, 2, 2), (3, 3, 3)
+        # normalized will hold fitness values of
+        # (1, 2 ,3), (2, 4, 6), (3, 6, 9)
+        normalized = tuple(normalizer.normalize(population))
 
-        # Create the normalizer.
-        power = stk.Power(2)
+    *Selectively Normalizing Fitness Values*
 
-        # Normalize the fitness values.
-        normalized = power.normalize(pop)
-
-        # normalized is {mol1: 1, mol2: 4, mol3: 9}.
-
-
-    Raising vector valued fitness values by some power
-
-    .. code-block:: python
-
-        # Create the normalizer.
-        power = stk.Power(2)
-
-        # Normalize the fitness values. Assume the fitness values are
-        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
-        normalized = power.normalize(pop)
-
-        # normalized is
-        # {mol1: [1, 4, 9], mol2: [16, 25, 36], mol3: [49, 64, 81]}.
-
-
-    Raising vector valued fitness values by different powers
+    Sometimes, you only want to normalize some members of a population,
+    for example if some do not have an assigned fitness value,
+    because the fitness calculation failed for whatever reason.
+    You can use the `filter` parameter to exclude records from the
+    normalization
 
     .. code-block:: python
 
-        # Create the normalizer.
-        power = stk.Power([1, 2, 3])
+        import stk
 
-        # Normalize the fitness values. Assume the fitness values are
-        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
-
-        # Normalize the fitness values.
-        normalized = power.normalize(pop)
-
-        # normalized is
-        # {mol1: [1, 4, 27], mol2: [4, 25, 216], mol3: [7, 64, 729]}.
-
+        normalizer = stk.Multiply(
+            coefficient=(1, 2, 3),
+            # Only normalize values which are not None.
+            filter=lambda population, record:
+                record.get_fitness_value() is not None,
+        )
+        normalized = tuple(normalizer.normalize(population))
     """
 
     def __init__(self, power, filter=lambda population, record: True):
