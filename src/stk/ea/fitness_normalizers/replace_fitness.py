@@ -1,3 +1,9 @@
+"""
+Replace Fitness
+===============
+
+"""
+
 from .fitness_normalizer import FitnessNormalizer
 
 
@@ -28,7 +34,7 @@ class ReplaceFitness(FitnessNormalizer):
 
     def __init__(
         self,
-        replacement_fn,
+        get_replacement,
         filter=lambda population, mol: True,
     ):
         """
@@ -36,7 +42,7 @@ class ReplaceFitness(FitnessNormalizer):
 
         Parameters
         ----------
-        replacement_fn : :class:`callable`
+        get_replacement : :class:`callable`
             Takes a single parameter, the :class:`.Population` which
             needs to be normalized, before it is filtered, and
             returns an :class:`object` which is used as the new
@@ -55,10 +61,10 @@ class ReplaceFitness(FitnessNormalizer):
 
         """
 
-        self._replacement_fn = replacement_fn
+        self._get_replacement = get_replacement
         self._filter = filter
 
-    def _normalize(self, population):
+    def normalize(self, population):
         """
         Normalize the fitness values in `population`.
 
