@@ -19,7 +19,6 @@ class FitnessFunction(FitnessCalculator):
 
         import stk
 
-
         # First create a function to use as the fitness function. For
         # example, assume that the fitness value is given by the number
         # of atoms.

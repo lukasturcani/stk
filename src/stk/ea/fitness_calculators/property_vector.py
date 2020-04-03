@@ -1,19 +1,19 @@
+"""
+Property Vector
+===============
+
+"""
+
 from .fitness_calculator import FitnessCalculator
 
 
 class PropertyVector(FitnessCalculator):
     """
-    Calculates a set of properties of a molecule.
-
-    This :class:`FitnessCalculator` applies a series of
-    :class:`function` to a :class:`.Molecule` and appends each result
-    to a :class:`list`. The :class:`list` forms the property vector of
-    the molecule and it is returned as the fitness value of the
-    molecule.
+    Uses multiple molecular properties as a fitness value.
 
     Examples
     --------
-    Use on :class:`.BuildingBlock` objects.
+    *Calculating Fitness Values*
 
     .. code-block:: python
 
@@ -106,7 +106,13 @@ class PropertyVector(FitnessCalculator):
 
     """
 
-    def __init__(self, *property_fns, use_cache=False):
+    def __init__(
+        self,
+        property_functions,
+        input_database=None,
+        output_database=None,
+    ):
+
         """
         Initialize a :class:`CageFitness` instance.
 
