@@ -26,6 +26,26 @@ def _test_get_fitness_value(
     molecule,
     fitness_value,
 ):
+    """
+    Test :meth:`.FitnessCalculator.get_fitness_value`.
+
+    Parameters
+    ----------
+    fitness_calculator : :class:`.FitnessCalculator`
+        The fitness calculator to test.
+
+    molecule : :class:`.Molecule`
+        The molecule whose fitness is calculated.
+
+    fitness_value : :class:`object`
+        The correct fitness value.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
     assert (
         fitness_calculator.get_fitness_value(molecule) == fitness_value
     )
