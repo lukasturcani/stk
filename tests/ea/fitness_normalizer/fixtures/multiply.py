@@ -7,7 +7,8 @@ from ..case_data import CaseData
 @pytest.fixture(
     params=(
         CaseData(
-            fitness_normalizer=stk.DivideByMean(
+            fitness_normalizer=stk.Multiply(
+                coefficient=(1, 2, 3),
                 filter=lambda population, record:
                     record.get_fitness_value() is not None,
             ),
@@ -26,13 +27,13 @@ from ..case_data import CaseData
             normalized=(
                 stk.MoleculeRecord(
                     molecule=stk.BuildingBlock('BrCCBr'),
-                ).with_fitness_value((0.5, 0.5, 0.5)),
+                ).with_fitness_value((1, 20, 300)),
                 stk.MoleculeRecord(
                     molecule=stk.BuildingBlock('BrCCCBr'),
-                ).with_fitness_value((1, 1, 1)),
+                ).with_fitness_value((2, 40, 600)),
                 stk.MoleculeRecord(
                     molecule=stk.BuildingBlock('BrCCCCBr'),
-                ).with_fitness_value((1.5, 1.5, 1.5)),
+                ).with_fitness_value((3, 60, 900)),
                 stk.MoleculeRecord(stk.BuildingBlock('BrCCCCBr')),
             ),
         ),
