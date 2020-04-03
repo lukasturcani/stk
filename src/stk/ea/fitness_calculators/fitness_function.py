@@ -173,6 +173,8 @@ class FitnessFunction(FitnessCalculator):
                 fitness_value = self._input_database.get(molecule)
             except KeyError:
                 fitness_value = self._fitness_function(molecule)
+        else:
+            fitness_value = self._fitness_function(molecule)
 
         if self._output_database is not None:
             self._output_database.put(molecule, fitness_value)
