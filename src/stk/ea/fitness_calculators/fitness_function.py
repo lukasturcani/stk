@@ -133,9 +133,6 @@ class FitnessFunction(FitnessCalculator):
             molecule=stk.BuildingBlock('BrCCBr'),
         )
 
-
-
-
     """
 
     def __init__(
