@@ -1,3 +1,10 @@
+"""
+Selection Plotter
+=================
+
+"""
+
+
 import matplotlib.pyplot as plt
 
 
