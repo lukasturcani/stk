@@ -67,11 +67,11 @@ def get_generation(*fitness_values):
             plot_data=pd.DataFrame({
                 'Generation': [0]*3 + [1]*3 + [2]*3 + [3]*3 + [4]*3,
                 'Fitness Value': [
-                    2, 1, 0,
-                    30, 20, 10,
-                    60, 50, 40,
-                    60, 50, 40,
-                    90, 80, 70,
+                    2., 1., 0.,
+                    30., 20., 10.,
+                    60., 50., 40.,
+                    60., 50., 40.,
+                    90., 80., 70.,
                 ],
                 'Type': ['Max', 'Mean', 'Min']*5
             }),

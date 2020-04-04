@@ -163,14 +163,14 @@ class ProgressPlotter:
                 },
                 {
                     'Generation': generation.get_id(),
-                    self._y_label: min(properties),
-                    'Type': 'Min'
+                    self._y_label: np.mean(properties),
+                    'Type': 'Mean'
                 },
                 {
                     'Generation': generation.get_id(),
-                    self._y_label: np.mean(properties),
-                    'Type': 'Mean'
-                }
+                    self._y_label: min(properties),
+                    'Type': 'Min'
+                },
             ]
 
             df = df.append(data, ignore_index=True)
