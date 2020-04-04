@@ -46,8 +46,7 @@ class Sum(FitnessNormalizer):
 
         import stk
 
-        normalizer = stk.Multiply(
-            coefficient=(1, 2, 3),
+        normalizer = stk.Sum(
             # Only normalize values which are not None.
             filter=lambda population, record:
                 record.get_fitness_value() is not None,
