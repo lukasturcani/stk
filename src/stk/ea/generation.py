@@ -19,7 +19,6 @@ class Generation:
 
     def __init__(
         self,
-        id,
         molecule_records,
         mutation_records,
         crossover_records,
@@ -29,9 +28,6 @@ class Generation:
 
         Parameters
         ----------
-        id : :class:`int`
-            The id of the generation.
-
         molecule_records : :class:`tuple` of \
                 :class:`.MoleculeRecord`
             The records of molecules in the generation.
@@ -47,23 +43,9 @@ class Generation:
 
         """
 
-        self._id = id
         self._molecule_records = molecule_records
         self._mutation_records = mutation_records
         self._crossover_records = crossover_records
-
-    def get_id(self):
-        """
-        Get the id of the generation.
-
-        Returns
-        -------
-        :class:`int`
-            The id of the generation.
-
-        """
-
-        return self._id
 
     def get_molecule_records(self):
         """
