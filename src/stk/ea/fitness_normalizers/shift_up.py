@@ -1,3 +1,11 @@
+"""
+Shift Up
+========
+
+"""
+
+import numpy as np
+
 from .fitness_normalizer import FitnessNormalizer
 
 
@@ -6,11 +14,8 @@ class ShiftUp(FitnessNormalizer):
     Shifts negative fitness values to be positive.
 
     Assume you have a vector-valued fitness value, where each number
-    represents a different property of the molecule
-
-    .. code-block:: python
-
-        {mol1: [1, -10, 1]}
+    represents a different property of the molecule, for example,
+    ``[1, -10, 1]``
 
     One way to convert the vector-valued fitness value into a
     scalar fitness value is by summing the elements, and the result in
@@ -20,7 +25,7 @@ class ShiftUp(FitnessNormalizer):
 
     :class:`.ShiftUp` finds the minimum value of each element in the
     vector-valued fitness value across the entire population, and for
-    element where this minimum value is less than ``0``, shifts up
+    elements where this minimum value is less than ``0``, shifts up
     the element value for every molecule in the population, so that the
     minimum value in the entire population is ``1``.
 
@@ -29,23 +34,20 @@ class ShiftUp(FitnessNormalizer):
 
     .. code-block:: python
 
-        fitness_values = {
-            mol1: [1, -5, 5],
-            mol2: [3, -10, 2],
-            mol3: [2, 20, 1],
+            [1, -5, 5]
+            [3, -10, 2]
+            [2, 20, 1]
         }
 
     After normalization the fitness values will be.
 
     .. code-block:: python
 
-        normalized  = {
-            mol1: [1, 6, 5],
-            mol2: [3, 1, 2],
-            mol3: [2, 31, 1],
-        }
+            [1, 6, 5]
+            [3, 1, 2]
+            [2, 31, 1]
 
-    This :class:`.ShiftUp` also works when the fitness value is a
+    :class:`.ShiftUp` also works when the fitness value is a
     single value.
 
     Examples
@@ -64,27 +66,30 @@ class ShiftUp(FitnessNormalizer):
 
     """
 
-    def __init__(self, filter=lambda population, mol: True):
+    def __init__(self, filter=lambda population, record: True):
         """
         Initialize a :class:`.ShiftUp` instance.
 
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`.EAPopulation`
-            and the second is a :class:`.Molecule`, and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-            The :class:`.EAPopulation` on which :meth:`normalize` is
-            called is passed as the first argument while the second
-            argument will be passed every :class:`.Molecule` in it.
+            Takes two parameters, first is a :class:`tuple`
+            of :class:`.MoleculeRecord` instances,
+            and the second is a :class:`.MoleculeRecord`. The
+            :class:`callable` returns ``True`` or ``False``. Only
+            molecules which return ``True`` will have fitness values
+            normalized. By default, all molecules will have fitness
+            values normalized.
+            The instance passed to the `population` argument of
+            :meth:`.normalize` is passed as the first argument, while
+            the second argument will be passed every
+            :class:`.MoleculeRecord` in it, one at a time.
 
         """
 
         self._filter = filter
 
-    def _get_normalized_values(self, filtered, fitness_values):
+    def normalize(self, population):
         # filtered is iterated through multiple times.
         filtered = list(filtered)
 
@@ -106,5 +111,3 @@ class ShiftUp(FitnessNormalizer):
 
         for mol in filtered:
             yield mol, fitness_values[mol] + shift
-
-

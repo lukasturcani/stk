@@ -6,6 +6,7 @@ Fitness Normalizer
 #. :class:`.Multiply`
 #. :class:`.NullFitnessNormalizer`
 #. :class:`.ReplaceFitness`
+#. :class:`.ShiftUp`
 
 """
 
