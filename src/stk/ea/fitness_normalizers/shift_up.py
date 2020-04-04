@@ -52,17 +52,24 @@ class ShiftUp(FitnessNormalizer):
 
     Examples
     --------
+    *Ensuring Positive Fitness Values*
+
+    Here you final fitness value is calculated by taking a
+    :class:`.Sum` of the different components of the fitness value.
+    To ensure that the final sum is positive, each component must
+    also be positive.
+
     .. code-block:: python
 
         # Create the normalizer.
         shifter = ShiftUp()
 
-        # Normalize the fitness values. Assume the fitness values are
-        # {mol1: [1, -2, 3], mol2: [4, 5, -6], mol3: [7, 8, 9]}.
-        normalized = shifter.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values in
+        # population are (1, -2, 3), (4, 5, -6), (7, 8, 9).
+        normalized = shifter.normalize(population)
 
-        # normalized is
-        # {mol1: [1, 1, 10], mol2: [4, 8, 1], mol3: [7, 11, 16]}.
+        # Fitness values in normalized are
+        # (1, 1, 10), (4, 8, 1), (7, 11, 16).
 
     """
 
