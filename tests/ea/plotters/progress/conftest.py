@@ -29,31 +29,26 @@ def get_generation(*fitness_values):
             plotter=stk.ProgressPlotter(
                 generations=(
                     stk.Generation(
-                        id=0,
                         molecule_records=get_generation(0, 1, 2),
                         mutation_records=(),
                         crossover_records=(),
                     ),
                     stk.Generation(
-                        id=1,
                         molecule_records=get_generation(10, 20, 30),
                         mutation_records=(),
                         crossover_records=(),
                     ),
                     stk.Generation(
-                        id=2,
                         molecule_records=get_generation(40, 50, 60),
                         mutation_records=(),
                         crossover_records=(),
                     ),
                     stk.Generation(
-                        id=3,
                         molecule_records=get_generation(40, 50, 60),
                         mutation_records=(),
                         crossover_records=(),
                     ),
                     stk.Generation(
-                        id=4,
                         molecule_records=get_generation(70, 80, 90),
                         mutation_records=(),
                         crossover_records=(),

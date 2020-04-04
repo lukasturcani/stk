@@ -141,7 +141,7 @@ class ProgressPlotter:
     def _get_plot_data(self, generations):
         df = pd.DataFrame()
         self._num_generations = 0
-        for generation in generations:
+        for id_, generation in enumerate(generations):
             self._num_generations += 1
 
             filtered = filter(
@@ -157,17 +157,17 @@ class ProgressPlotter:
 
             data = [
                 {
-                    'Generation': generation.get_id(),
+                    'Generation': id_,
                     self._y_label: max(properties),
                     'Type': 'Max'
                 },
                 {
-                    'Generation': generation.get_id(),
+                    'Generation': id_,
                     self._y_label: np.mean(properties),
                     'Type': 'Mean'
                 },
                 {
-                    'Generation': generation.get_id(),
+                    'Generation': id_,
                     self._y_label: min(properties),
                     'Type': 'Min'
                 },
