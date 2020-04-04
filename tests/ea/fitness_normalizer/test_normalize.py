@@ -60,16 +60,11 @@ def _test_normalize(
             record1.get_molecule(),
             record2.get_molecule(),
         )
-        if isinstance(record1.get_fitness_value(), np.ndarray):
-            assert (
-                tuple(record1.get_fitness_value())
-                == record2.get_fitness_value()
-            )
-        else:
-            assert (
-                record1.get_fitness_value()
-                == record2.get_fitness_value()
-            )
+        fitness_value = record1.get_fitness_value()
+        if isinstance(fitness_value, np.ndarray):
+            fitness_value = tuple(fitness_value)
+
+        assert (fitness_value == record2.get_fitness_value())
         assert (
             record1.get_fitness_value(normalized=False)
             == record2.get_fitness_value(normalized=False)
