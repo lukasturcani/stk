@@ -58,7 +58,7 @@ class Implementation:
             crossover_records=(),
         )
 
-        for generation in range(num_generations-1):
+        for generation in range(1, num_generations):
             self._logger.info(f'Starting generation {generation}.')
             self._logger.debug(
                 f'Population size is {len(population)}.'
