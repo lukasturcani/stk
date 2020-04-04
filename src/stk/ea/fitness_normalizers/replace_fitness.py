@@ -4,8 +4,6 @@ Replace Fitness
 
 """
 
-from functools import partial
-
 from .fitness_normalizer import FitnessNormalizer
 
 
