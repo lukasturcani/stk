@@ -1,3 +1,16 @@
+"""
+Terminator
+==========
+
+#. :class:`.AllTerminators`
+#. :class:`.AnyTerminator`
+#. :class:`.FitnessPlateau`
+#. :class:`.MoleculePresent`
+#. :class:`.NumGenerations`
+
+"""
+
+
 class Terminator:
     """
     Checks if the exit criterion for the EA has been satisfied.
