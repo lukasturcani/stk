@@ -11,6 +11,7 @@ from .fixtures import *  # noqa
         lazy_fixture('multiply'),
         lazy_fixture('null'),
         lazy_fixture('replace_fitness'),
+        lazy_fixture('shift_up'),
     ),
 )
 def case_data(request):
