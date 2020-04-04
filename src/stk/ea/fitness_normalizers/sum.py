@@ -1,12 +1,20 @@
+"""
+Sum
+===
+
+"""
+
 from .fitness_normalizer import FitnessNormalizer
 
 
 class Sum(FitnessNormalizer):
     """
-    Sums the values in a :class:`list`.
+    Sums fitness values .
 
     Examples
     --------
+    *Combining Fitness Value Into a Single Value*
+
     .. code-block:: python
 
         # Create the normalizer.
@@ -21,26 +29,34 @@ class Sum(FitnessNormalizer):
 
     """
 
-    def __init__(self, filter=lambda population, mol: True):
+    def __init__(self, filter=lambda population, record: True):
         """
         Initialize a :class:`.Sum` instance.
 
         Parameters
         ----------
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`.EAPopulation`
-            and the second is a :class:`.Molecule`, and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values normalized. By
-            default, all molecules will have fitness values normalized.
-            The :class:`.EAPopulation` on which :meth:`normalize` is
-            called is passed as the first argument while the second
-            argument will be passed every :class:`.Molecule` in it.
+            Takes two parameters, first is a :class:`tuple`
+            of :class:`.MoleculeRecord` instances,
+            and the second is a :class:`.MoleculeRecord`. The
+            :class:`callable` returns ``True`` or ``False``. Only
+            molecules which return ``True`` will have fitness values
+            normalized. By default, all molecules will have fitness
+            values normalized.
+            The instance passed to the `population` argument of
+            :meth:`.normalize` is passed as the first argument, while
+            the second argument will be passed every
+            :class:`.MoleculeRecord` in it, one at a time.
 
         """
 
         self._filter = filter
 
-    def _get_normalized_values(self, filtered, fitness_values):
-        for mol in filtered:
-            yield mol, sum(fitness_values[mol])
+    def normalize(self, population):
+        for record in population:
+            if self._filter(population, record):
+                yield record.with_fitness_value(
+                    fitness_value=sum(record.get_fitness_value()),
+                )
+            else:
+                yield record
