@@ -13,7 +13,7 @@ from ..case_data import CaseData
                         record.get_fitness_value()
                         for record in population
                         if record.get_fitness_value() is not None
-                    ),
+                    )/2,
                 filter=lambda population, record:
                     record.get_fitness_value() is None,
             ),
