@@ -5,6 +5,7 @@ Shift Up
 """
 
 import numpy as np
+from functools import partial
 
 from .fitness_normalizer import FitnessNormalizer
 
@@ -97,11 +98,14 @@ class ShiftUp(FitnessNormalizer):
         self._filter = filter
 
     def normalize(self, population):
-        # filtered is iterated through multiple times.
-        filtered = list(filtered)
-
+        filtered = filter(
+            partial(self._filter, population),
+            population,
+        )
         # Get all the fitness arrays in a matrix.
-        fmat = np.array([fitness_values[mol] for mol in filtered])
+        fmat = np.array([
+            record.get_fitness_value() for record in filtered
+        ])
 
         # Get the minimum value of each element across the population.
         # keepdims ensures that np.min returns a 1-D array, because
@@ -116,5 +120,10 @@ class ShiftUp(FitnessNormalizer):
             if min_ <= 0:
                 shift[i] = 1 - min_
 
-        for mol in filtered:
-            yield mol, fitness_values[mol] + shift
+        for record in population:
+            if self._filter(population, record):
+                yield record.with_fitness_value(
+                    fitness_value=record.get_fitness_value() + shift,
+                )
+            else:
+                yield record
