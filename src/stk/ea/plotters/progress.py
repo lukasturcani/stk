@@ -176,24 +176,18 @@ class ProgressPlotter:
             df = df.append(data, ignore_index=True)
         return df
 
-    def write_csv(self, path):
+    def get_plot_data(self):
         """
-        Write the plot data to a csv file.
-
-        Parameters
-        ----------
-        path : :class:`str`
-            The path into which the plot is written.
+        Get the plot data.
 
         Returns
         -------
-        :class:`.ProgressPlotter`
-            The plotter is returned.
+        :class:`pandas.DataFrame`
+            A data frame holding the plot data.
 
         """
 
-        self._plot_data.to_csv(path)
-        return self
+        return self._plot_data.copy()
 
     def write(self, path, dpi=500):
         """
