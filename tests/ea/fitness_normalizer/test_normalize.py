@@ -1,4 +1,5 @@
 import itertools as it
+import numpy as np
 
 from tests.utilities import is_equivalent
 
@@ -52,14 +53,23 @@ def _test_normalize(
     """
 
     for record1, record2 in it.zip_longest(
+        fitness_normalizer.normalize(population),
+        normalized,
     ):
         is_equivalent(
             record1.get_molecule(),
             record2.get_molecule(),
         )
-        assert (
-            record1.get_fitness_value() == record2.get_fitness_value()
-        )
+        if isinstance(record1.get_fitness_value(), np.ndarray):
+            assert (
+                tuple(record1.get_fitness_value())
+                == record2.get_fitness_value()
+            )
+        else:
+            assert (
+                record1.get_fitness_value()
+                == record2.get_fitness_value()
+            )
         assert (
             record1.get_fitness_value(normalized=False)
             == record2.get_fitness_value(normalized=False)
