@@ -19,7 +19,6 @@ class Implementation:
         generation_selector,
         mutation_selector,
         crossover_selector,
-        terminator,
         fitness_normalizer,
         duplicate_key,
         logger,
@@ -36,17 +35,15 @@ class Implementation:
         self._generation_selector = generation_selector
         self._mutation_selector = mutation_selector
         self._crossover_selector = crossover_selector
-        self._terminator = terminator
         self._fitness_normalizer = fitness_normalizer
         self._duplicate_key = duplicate_key
         self._logger = logger
 
-    def _get_generations(self, map_):
+    def _get_generations(self, num_generations, map_):
         def get_mutation_record(batch):
             return self._mutator.mutate(batch[0])
 
         population = self._initial_population
-        generation = 0
 
         self._logger.info(
             'Calculating fitness values of initial population.'
@@ -56,15 +53,12 @@ class Implementation:
             population=population,
         ))
         yield Generation(
-            id=generation,
             molecule_records=population,
             mutation_records=(),
             crossover_records=(),
         )
 
-        while not self._terminator.terminate(population):
-            generation += 1
-
+        for generation in range(num_generations):
             self._logger.info(f'Starting generation {generation}.')
             self._logger.debug(
                 f'Population size is {len(population)}.'
@@ -110,7 +104,6 @@ class Implementation:
             )
 
             yield Generation(
-                id=generation,
                 molecule_records=population,
                 mutation_records=mutation_records,
                 crossover_records=crossover_records,
