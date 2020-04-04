@@ -84,22 +84,23 @@ class DivideByMean(FitnessNormalizer):
         self._filter = filter
 
     def normalize(self, population):
-        # Keep as a tuple, as multiple iterations through filtered are
-        # required.
-        filtered = tuple(filter(
+        filtered = filter(
             partial(self._filter, population),
             population,
-        ))
+        )
         mean = np.mean(
             a=[record.get_fitness_value() for record in filtered],
             axis=0,
         )
         logger.debug(f'Means used: {mean}')
 
-        for record in filtered:
-            yield record.with_fitness_value(
-                fitness_value=np.divide(
-                    record.get_fitness_value(),
-                    mean,
+        for record in population:
+            if self._filter(population, record):
+                yield record.with_fitness_value(
+                    fitness_value=np.divide(
+                        record.get_fitness_value(),
+                        mean,
+                    )
                 )
-            )
+            else:
+                yield record
