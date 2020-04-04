@@ -5,6 +5,7 @@ Fitness Normalizer
 #. :class:`.DivideByMean`
 #. :class:`.Multiply`
 #. :class:`.NullFitnessNormalizer`
+#. :class:`.ReplaceFitness`
 
 """
 

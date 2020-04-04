@@ -4,6 +4,8 @@ Replace Fitness
 
 """
 
+from functools import partial
+
 from .fitness_normalizer import FitnessNormalizer
 
 
@@ -13,21 +15,31 @@ class ReplaceFitness(FitnessNormalizer):
 
     Examples
     --------
-    Replace all fitness values which are ``None`` with the half the
-    minimum fitness value in the population
+    *Giving a Fitness Value to Failed Calculations*
+
+    You want to replace fitness values which are ``None`` with
+    half the minimum fitness value in the population. A fitness value
+    may be ``None`` because the fitness calculation failed for some
+    reason.
 
     .. code-block:: python
 
         import stk
 
+        def get_minimum_fitness_value(population):
+            return min(
+                record.get_fitness_value() for record in population
+                if record.get_fitness_value() is not None
+            )
+
         replacer = stk.ReplaceFitness(
-            replacement_fn=lambda population:
-                min(
-                    f for _, f in population.get_fitness_values()
-                    if f is not None
-                ) / 2,
-            filter=lambda population, mol:
-                population.get_fitness_values()[mol] is None,
+            # The replacement is half the minimum fitness value in the
+            # population.
+            get_replacement=lambda population:
+                get_minimum_fitness_value(population) / 2,
+            # Only replace fitness values which are None.
+            filter=lambda population, record:
+                record.get_fitness_value() is None,
         )
 
     """
@@ -35,7 +47,7 @@ class ReplaceFitness(FitnessNormalizer):
     def __init__(
         self,
         get_replacement,
-        filter=lambda population, mol: True,
+        filter=lambda population, record: True,
     ):
         """
         Initialize a :class:`.ReplaceFitness` instance.
@@ -43,21 +55,26 @@ class ReplaceFitness(FitnessNormalizer):
         Parameters
         ----------
         get_replacement : :class:`callable`
-            Takes a single parameter, the :class:`.Population` which
-            needs to be normalized, before it is filtered, and
-            returns an :class:`object` which is used as the new
-            fitness value for all molecules which pass the
-            `filter`.
+            Takes a single parameter, a :class:`tuple` of
+            :class:`.MoleculeRecord` instances, which
+            needs to be normalized. The entire population passed to
+            :meth:`.normalize` is passed to this parameter, regardless
+            of what is passed to the `filter` parameter. The
+            :class:`callable` returns the value which is to be given
+            to the normalized records.
 
         filter : :class:`callable`, optional
-            Takes a two parameters, first is a :class:`.EAPopulation`
-            and the second is a :class:`.Molecule`, and
-            returns ``True`` or ``False``. Only molecules which
-            return ``True`` will have fitness values replaced. By
-            default, all molecules will have fitness values replaced.
-            The :class:`.EAPopulation` on which :meth:`normalize` is
-            called is passed as the first argument while the second
-            argument will be passed every :class:`.Molecule` in it.
+            Takes two parameters, first is a :class:`tuple`
+            of :class:`.MoleculeRecord` instances,
+            and the second is a :class:`.MoleculeRecord`. The
+            :class:`callable` returns ``True`` or ``False``. Only
+            molecules which return ``True`` will have fitness values
+            normalized. By default, all molecules will have fitness
+            values normalized.
+            The instance passed to the `population` argument of
+            :meth:`.normalize` is passed as the first argument, while
+            the second argument will be passed every
+            :class:`.MoleculeRecord` in it, one at a time.
 
         """
 
@@ -65,28 +82,10 @@ class ReplaceFitness(FitnessNormalizer):
         self._filter = filter
 
     def normalize(self, population):
-        """
-        Normalize the fitness values in `population`.
-
-        Parameters
-        ----------
-        population : :class:`.EAPopulation`
-            The molecules which need to have their fitness values
-            normalized.
-
-        Returns
-        -------
-        :class:`dict`
-            Maps every molecule in `population` to its normalized
-            fitness value.
-
-        """
-
-        def filter_fn(mol):
-            return self._filter(population, mol)
-
-        replacement_value = self._replacement_fn(population)
-        normalized = population.get_fitness_values()
-        for mol in filter(filter_fn, population):
-            normalized[mol] = replacement_value
-        return normalized
+        replacement = self._get_replacement(population)
+        filtered = tuple(filter(
+            partial(self._filter, population),
+            population,
+        ))
+        for record in filtered:
+            yield record.with_fitness_value(replacement)
