@@ -38,5 +38,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def shift_up(request):
+def sum(request):
     return request.param
