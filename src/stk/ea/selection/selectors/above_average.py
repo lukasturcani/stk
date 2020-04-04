@@ -1,3 +1,9 @@
+"""
+Above Average
+=============
+
+"""
+
 from .selector import Selector
 
 
