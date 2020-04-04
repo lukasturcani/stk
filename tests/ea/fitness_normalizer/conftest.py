@@ -10,6 +10,7 @@ from .fixtures import *  # noqa
         lazy_fixture('divide_by_mean'),
         lazy_fixture('multiply'),
         lazy_fixture('null'),
+        lazy_fixture('replace_fitness'),
     ),
 )
 def case_data(request):
