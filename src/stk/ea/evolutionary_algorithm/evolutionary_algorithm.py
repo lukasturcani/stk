@@ -138,6 +138,7 @@ class EvolutionaryAlgorithm:
         ----------
         num_generations : :class:`int`
             The number of generations which should be yielded.
+            Note that the initial population counts as a generation.
 
         Yields
         ------
