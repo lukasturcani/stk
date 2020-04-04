@@ -9,7 +9,7 @@ from ..case_data import CaseData
         CaseData(
             fitness_normalizer=stk.ShiftUp(
                 filter=lambda population, record:
-                    record.get_fitness_value() is None,
+                    record.get_fitness_value() is not None,
             ),
             population=(
                 stk.MoleculeRecord(
