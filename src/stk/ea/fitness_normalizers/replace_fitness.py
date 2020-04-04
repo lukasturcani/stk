@@ -83,9 +83,8 @@ class ReplaceFitness(FitnessNormalizer):
 
     def normalize(self, population):
         replacement = self._get_replacement(population)
-        filtered = tuple(filter(
-            partial(self._filter, population),
-            population,
-        ))
-        for record in filtered:
-            yield record.with_fitness_value(replacement)
+        for record in population:
+            if self._filter(population, record):
+                yield record.with_fitness_value(replacement)
+            else:
+                yield record
