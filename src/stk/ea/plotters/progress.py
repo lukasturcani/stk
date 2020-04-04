@@ -32,7 +32,7 @@ class ProgressPlotter:
         ea = stk.EvolutionaryAlgorithm(...)
 
         generations = []
-        for generation in ea.get_generations():
+        for generation in ea.get_generations(10):
             generations.append(generation)
 
         # Make the plotter which plots the fitness change across
@@ -55,7 +55,7 @@ class ProgressPlotter:
         ea = stk.EvolutionaryAlgorithm(...)
 
         generations = []
-        for generation in ea.get_generations():
+        for generation in ea.get_generations(10):
             generations.append(generation)
 
         # Make the plotter which plots the number of atoms across
@@ -82,7 +82,7 @@ class ProgressPlotter:
         ea = stk.EvolutionaryAlgorithm(...)
 
         generations = []
-        for generation in ea.get_generations():
+        for generation in ea.get_generations(10):
             generations.append(generation)
 
         # Make the plotter which plots the fitness change across
