@@ -7,5 +7,5 @@ class Serial(Implementation):
 
     """
 
-    def get_generations(self):
-        yield from self._get_generations(map)
+    def get_generations(self, num_generations):
+        yield from self._get_generations(num_generations, map)

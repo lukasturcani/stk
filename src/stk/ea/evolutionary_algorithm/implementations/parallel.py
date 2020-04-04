@@ -40,6 +40,6 @@ class Parallel(Implementation):
         )
         self._num_processes = num_processes
 
-    def get_generations(self):
+    def get_generations(self, num_generations):
         with pathos.pools.ProcessPool(self._num_processes) as pool:
-            yield from self._get_generations(pool.map)
+            yield from self._get_generations(num_generations, pool.map)

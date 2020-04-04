@@ -50,7 +50,6 @@ class EvolutionaryAlgorithm:
         generation_selector,
         mutation_selector,
         crossover_selector,
-        terminator,
         fitness_normalizer=NullFitnessNormalizer(),
         duplicate_key=get_inchi,
         logger=get_logger(),
@@ -84,9 +83,6 @@ class EvolutionaryAlgorithm:
         crossover_selector : :class:`.Selector`
             Selects molecules for crossover.
 
-        terminator : :class:`.Terminator`
-            Decides when the EA should stop.
-
         fitness_normalizer : :class:`.FitnessNormalizer`
             Normalizes fitness values.
 
@@ -114,7 +110,6 @@ class EvolutionaryAlgorithm:
                 generation_selector=generation_selector,
                 mutation_selector=mutation_selector,
                 crossover_selector=crossover_selector,
-                terminator=terminator,
                 fitness_normalizer=fitness_normalizer,
                 duplicate_key=duplicate_key,
                 logger=logger,
@@ -129,16 +124,20 @@ class EvolutionaryAlgorithm:
                 generation_selector=generation_selector,
                 mutation_selector=mutation_selector,
                 crossover_selector=crossover_selector,
-                terminator=terminator,
                 fitness_normalizer=fitness_normalizer,
                 duplicate_key=duplicate_key,
                 logger=logger,
                 num_processes=num_processes,
             )
 
-    def get_generations(self):
+    def get_generations(self, num_generations):
         """
         Yield the generations of the evolutionary algorithm.
+
+        Parameters
+        ----------
+        num_generations : :class:`int`
+            The number of generations which should be yielded.
 
         Yields
         ------
@@ -147,4 +146,6 @@ class EvolutionaryAlgorithm:
 
         """
 
-        yield from self._implementation.get_generations(self)
+        yield from self._implementation.get_generations(
+            num_generations=num_generations,
+        )
