@@ -9,23 +9,50 @@ from .fitness_normalizer import FitnessNormalizer
 
 class Sum(FitnessNormalizer):
     """
-    Sums fitness values .
+    Combines fitness value components into a single fitness value.
 
     Examples
     --------
-    *Combining Fitness Value Into a Single Value*
+    *Combining Fitness Value Components Into a Single Value*
+
+    Sometimes, your :class:`.FitnessCalculator` will return a fitness
+    value which is a :class:`tuple` of multiple numbers. Each number
+    represents a different property of the molecule, which
+    contributes to the final fitness value. This fitness normalizer
+    combines these fitness value components into a single number, by
+    taking their sum.
 
     .. code-block:: python
 
         # Create the normalizer.
         sum_normalizer = stk.Sum()
 
-        # Normalize the fitness values. Assume the fitness values are
-        # {mol1: [1, 2, 3], mol2: [4, 5, 6], mol3: [7, 8, 9]}.
-        normalized = sum_normalizer.normalize(pop)
+        # Normalize the fitness values. Assume the fitness values in
+        # population are
+        # (1, 2, 3), (4, 5, 6), (7, 8, 9).
+        normalized = tuple(sum_normalizer.normalize(pop))
 
-        # normalized is
-        # {mol1: 6, mol2: 15, mol3: 24}
+        # Fitness values in normalized are 6, 15 and 24.
+
+    *Selectively Normalizing Fitness Values*
+
+    Sometimes, you only want to normalize some members of a population,
+    for example if some do not have an assigned fitness value,
+    because the fitness calculation failed for whatever reason.
+    You can use the `filter` parameter to exclude records from the
+    normalization
+
+    .. code-block:: python
+
+        import stk
+
+        normalizer = stk.Multiply(
+            coefficient=(1, 2, 3),
+            # Only normalize values which are not None.
+            filter=lambda population, record:
+                record.get_fitness_value() is not None,
+        )
+        normalized = tuple(normalizer.normalize(population))
 
     """
 

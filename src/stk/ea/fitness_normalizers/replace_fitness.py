@@ -40,6 +40,9 @@ class ReplaceFitness(FitnessNormalizer):
                 record.get_fitness_value() is None,
         )
 
+        # Use the replacer.
+        normalized = tuple(replacer.normalize(population))
+
     """
 
     def __init__(

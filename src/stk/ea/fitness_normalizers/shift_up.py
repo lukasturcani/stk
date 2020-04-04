@@ -67,7 +67,7 @@ class ShiftUp(FitnessNormalizer):
 
         # Normalize the fitness values. Assume the fitness values in
         # population are (1, -2, 3), (4, 5, -6), (7, 8, 9).
-        normalized = shifter.normalize(population)
+        normalized = tuple(shifter.normalize(population))
 
         # Fitness values in normalized are
         # (1, 1, 10), (4, 8, 1), (7, 11, 16).
