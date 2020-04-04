@@ -12,6 +12,7 @@ from .fixtures import *  # noqa
         lazy_fixture('null'),
         lazy_fixture('replace_fitness'),
         lazy_fixture('shift_up'),
+        lazy_fixture('sum'),
     ),
 )
 def case_data(request):

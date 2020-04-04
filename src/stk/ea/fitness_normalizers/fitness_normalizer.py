@@ -7,6 +7,7 @@ Fitness Normalizer
 #. :class:`.NullFitnessNormalizer`
 #. :class:`.ReplaceFitness`
 #. :class:`.ShiftUp`
+#. :class:`.Sum`
 
 """
 
