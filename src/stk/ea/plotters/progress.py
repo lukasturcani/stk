@@ -1,156 +1,226 @@
+"""
+Progress Plotter
+================
+
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+
+plt.switch_backend('agg')
+
+
 class ProgressPlotter:
     """
-    Plots how a property changes during a GA run.
+    Plots how a property changes during an EA run.
 
-    The produced plot will show the GA generations on the x axis and
+    The produced plot will show the EA generations on the x axis and
     the min, mean and max values of an attribute on the y axis.
 
     Examples
     --------
-    Plot how fitness value changes with GA generations
+    *Plotting How Fitness Value Changes Across Generations*
 
     .. code-block:: python
 
         import stk
 
-        # progress has subpopulations where each subpopulation is a
-        # generation of a GA.
-        progress = stk.Population(...)
+        # Initialize an EA somehow.
+        ea = stk.EvolutionaryAlgorithm(...)
+
+        generations = []
+        for generation in ea.get_generations():
+            generations.append(generation)
 
         # Make the plotter which plots the fitness change across
         # generations.
-        plotter = stk.ProgressPlotter(
-            filename='fitness_plot',
-            property_fn=lambda mol: mol.fitness,
+        progress = stk.ProgressPlotter(
+            generations=generations,
+            get_property=lambda record: record.get_fitness_value(),
             y_label='Fitness'
         )
-        plotter.plot(progress)
+        progress.write('fitness_plot.png')
 
-    Plot how the number of atoms changes with GA generations
+    *Plotting How a Molecular Property Changes Across Generations*
+
+    As an example, plotting how the number of atoms changes across
+    generations
 
     .. code-block:: python
 
-        plotter = ProgressPlotter(
-            filename='atom_plot',
-            property_fn=lambda mol: len(mol.atoms),
+        # Initialize an EA somehow.
+        ea = stk.EvolutionaryAlgorithm(...)
+
+        generations = []
+        for generation in ea.get_generations():
+            generations.append(generation)
+
+        # Make the plotter which plots the number of atoms across
+        # generations.
+        progress = stk.ProgressPlotter(
+            generations=generations,
+            get_property=lambda record:
+                record.get_molecule().get_num_atoms(),
             y_label='Number of Atoms'
         )
-        plotter.plot(progress)
+        progress.write('fitness_plot.png')
+
+    *Excluding Molecules From the Plot*
+
+    Sometimes, you want to ignore some molecules from the plot you
+    make. For example, If the fitness calculation failed on a
+    molecule, you not want to include in a plot of fitness.
+
+    .. code-block:: python
+
+        import stk
+
+        # Initialize an EA somehow.
+        ea = stk.EvolutionaryAlgorithm(...)
+
+        generations = []
+        for generation in ea.get_generations():
+            generations.append(generation)
+
+        # Make the plotter which plots the fitness change across
+        # generations.
+        progress = stk.ProgressPlotter(
+            generations=generations,
+            get_property=lambda record: record.get_fitness_value(),
+            y_label='Fitness'
+            # Only plot records whose unnormalized fitness value is not
+            # None, which means the fitness calculation did not fail.
+            filter=lambda record:
+                record.get_fitness_value(normalized=False) is not None,
+        )
+        progress.write('fitness_plot.png')
 
     """
 
     def __init__(
         self,
-        filename,
-        property_fn,
+        generations,
+        get_property,
         y_label,
-        progress_fn=None,
-        filter=lambda progress, mol: True,
+        filter=lambda record: True,
     ):
         """
         Initialize a :class:`ProgressPlotter` instance.
 
         Parameters
         ----------
-        filename : :class:`str`
-            The basename of the files. This means it should not include
-            file extensions.
+        generations : :class:`iterable` of :class:`.Generation`
+            The generations of the EA, which are plotted.
 
-        property_fn : :class:`callable`
-            A :class:`callable` which takes a :class:`.EAPopulation`
-            and a :class:`.Molecule` object and returns a property
-            value of that molecule, which is used for the plot.
-            The :class:`callable` must return a valid value for each
-            :class:`.Molecule` in the population.
+        get_property : :class:`callable`
+            A :class:`callable` which takes a :class:`.MoleculeRecord`
+            and returns a property value of that molecule, which is
+            used for the plot. The :class:`callable` must return a
+            valid value for each
+            :class:`.MoleculeRecord` in `generations`.
 
         y_label : :class:`str`
             The y label for the produced graph.
 
-        progress_fn : :class:`callable`, optional
-            Takes the population passed to :meth:`plot` and excutes a
-            computation on it. This may be useful if you want to
-            apply a normalization to the fitness values in the
-            progress population, for example.
-
         filter : :class:`callable`, optional
-            Takes an :class:`.EAPopulation` and a :class:`.Molecule` as
-            input and returns ``True`` or ``False``. Only molecules
-            which return ``True`` will be plotted. Default is for all
-            molecules to be plotted.
+            Takes an :class:`.MoleculeRecord` and returns
+            ``True`` or ``False``. Only records which return ``True``
+            are included in the plot. By default, all records will be
+            plotted.
 
         """
 
-        self._filename = filename
-        self._property_fn = property_fn
+        self._get_property = get_property
         self._y_label = y_label
         self._filter = filter
-        self._progress_fn = progress_fn
+        self._plot_data = self._get_plot_data(generations)
 
-    def plot(self, progress):
-        """
-        Plot a progress plot.
-
-        Parameters
-        ----------
-        progress : :class:`.Population`
-            A :class:`.Population` where each generation of the GA is
-            a subpopulation.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        if self._progress_fn is not None:
-            self._progress_fn(progress)
-
-        def filter_fn(mol):
-            return self._filter(progress, mol)
-
-        def property_fn(mol):
-            return self._property_fn(progress, mol)
-
-        sns.set(style='darkgrid')
+    def _get_plot_data(self, generations):
         df = pd.DataFrame()
-        for i, subpop in enumerate(progress.subpopulations, 1):
-            filtered = filter(filter_fn, subpop)
-            subpop_vals = list(map(property_fn, filtered))
+        self._num_generations = 0
+        for generation in generations:
+            self._num_generations += 1
+
+            filtered = filter(
+                self._filter,
+                generation.get_molecule_records(),
+            )
+            properties = tuple(map(self._get_property, filtered))
 
             # If there are no values after filtering, don't plot
             # anything for the generation.
-            if not subpop_vals:
+            if not properties:
                 continue
 
             data = [
                 {
-                    'Generation': i,
-                    self._y_label: max(subpop_vals),
+                    'Generation': generation.get_id(),
+                    self._y_label: max(properties),
                     'Type': 'Max'
                 },
                 {
-                    'Generation': i,
-                    self._y_label: min(subpop_vals),
+                    'Generation': generation.get_id(),
+                    self._y_label: min(properties),
                     'Type': 'Min'
                 },
                 {
-                    'Generation': i,
-                    self._y_label: np.mean(subpop_vals),
+                    'Generation': generation.get_id(),
+                    self._y_label: np.mean(properties),
                     'Type': 'Mean'
                 }
             ]
 
             df = df.append(data, ignore_index=True)
+        return df
 
-        # Save the plot data.
-        df.to_csv(f'{self._filename}.csv')
+    def write_csv(self, path):
+        """
+        Write the plot data to a csv file.
 
+        Parameters
+        ----------
+        path : :class:`str`
+            The path into which the plot is written.
+
+        Returns
+        -------
+        :class:`.ProgressPlotter`
+            The plotter is returned.
+
+        """
+
+        self._plot_data.to_csv(path)
+        return self
+
+    def write(self, path, dpi=500):
+        """
+        Write a progress plot to a file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The path into which the plot is written.
+
+        dpi : :class:`int`, optional
+            The dpi of the image.
+
+        Returns
+        -------
+        :class:`.ProgressPlotter`
+            The plotter is returned.
+
+        """
+
+        sns.set(style='darkgrid')
         fig = plt.figure(figsize=[8, 4.5])
-
         palette = sns.color_palette('deep')
+
         # It's possible that all values were filtered out, and trying
         # to plot an empty dataframe would raise an exception.
-        if len(df) != 0:
+        if len(self._plot_data) != 0:
             sns.scatterplot(
                 x='Generation',
                 y=self._y_label,
@@ -160,16 +230,15 @@ class ProgressPlotter:
                     'Min': palette[0],
                     'Mean': palette[2]
                 },
-                data=df
+                data=self._plot_data,
             )
         # Set the length of the axes to account for all generations,
         # as its possible the first or last ones were not included
         # due to being filtered out.
-        plt.xlim(0, len(progress.subpopulations)+1)
+        plt.xlim(0, self._num_generations+1)
 
         plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
         plt.tight_layout()
-        fig.savefig(f'{self._filename}.png', dpi=500)
+        fig.savefig(path, dpi=dpi)
         plt.close('all')
-
-
+        return self
