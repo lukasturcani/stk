@@ -65,7 +65,7 @@ def get_generation(*fitness_values):
                     record.get_fitness_value() is not None,
             ),
             plot_data=pd.DataFrame({
-                'Generation': [0, 1, 2, 3, 4],
+                'Generation': [0]*3 + [1]*3 + [2]*3 + [3]*3 + [4]*3,
                 'Fitness Value': [
                     2, 1, 0,
                     30, 20, 10,
@@ -75,7 +75,7 @@ def get_generation(*fitness_values):
                 ],
                 'Type': ['Max', 'Mean', 'Min']*5
             }),
-        )
+        ),
     ),
 )
 def case_data(request):

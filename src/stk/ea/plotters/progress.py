@@ -229,7 +229,7 @@ class ProgressPlotter:
         # Set the length of the axes to account for all generations,
         # as its possible the first or last ones were not included
         # due to being filtered out.
-        plt.xlim(0, self._num_generations+1)
+        plt.xlim(0, self._num_generations)
 
         plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
         plt.tight_layout()
