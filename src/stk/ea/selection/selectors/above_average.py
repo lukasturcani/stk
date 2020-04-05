@@ -9,7 +9,6 @@ import itertools as it
 
 from stk.molecular import Inchi
 from .selector import Selector
-from .utilities import Batcher
 
 
 class AboveAverage(Selector):
@@ -104,7 +103,7 @@ class AboveAverage(Selector):
         """
 
         if fitness_modifier is None:
-            fitness_modifier = self._return_fitness_values
+            fitness_modifier = self._get_fitness_values
 
         self._duplicate_records = duplicate_records
         self._duplicate_batches = duplicate_batches
