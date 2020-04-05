@@ -135,11 +135,17 @@ class AboveAverage(Selector):
         # If duplicate molecules are not allowed, allow only
         # batches with no yielded molecules.
         if not self._duplicate_molecules:
-            batches = filter(yielded.has_no_yielded_molecules, batches)
+            batches = filter(
+                yielded_batches.has_no_yielded_molecules,
+                batches,
+            )
         # If duplicate batches are not allowed, allow only
         # unyielded batches.
         if not self._duplicate_batches:
-            batches = filter(yielded.is_unyielded_batch, batches)
+            batches = filter(
+                yielded_batches.is_unyielded_batch,
+                batches,
+            )
         # Limit the number of yielded batches to _num_batches.
         yield from it.islice(batches, self._num_batches)
 
