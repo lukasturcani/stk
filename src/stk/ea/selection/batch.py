@@ -50,24 +50,23 @@ class Batch:
 
     """
 
-    __slots__ = ['_mols', '_fitness', '_identity_key']
+    __slots__ = ('_records', '_fitness_value')
 
-    def __init__(self, mols, fitness_values):
+    def __init__(self, records):
         """
         Initialize a :class:`.Batch`.
 
         Parameters
         ----------
-        mols : :class:`tuple` of :class:`.Molecule`
-            The molecules which are part of the batch.
-
-        fitness_values : :class:`dict`
-            Maps each molecule in `mols` to its fitness value.
+        records : :class:`tuple` of :class:`.MoleculeRecord`
+            The molecule records which are part of the batch.
 
         """
 
-        self._mols = mols
-        self._fitness = sum(fitness_values[mol] for mol in mols)
+        self._records = records
+        self._fitness_value = sum(
+            record.get_fitness_value() for record in records
+        )
         self._identity_key = frozenset(Counter(mols).items())
 
     def get_size(self):
@@ -81,9 +80,9 @@ class Batch:
 
         """
 
-        return len(self._mols)
+        return len(self._records)
 
-    def get_fitness(self):
+    def get_fitness_value(self):
         """
         Get the fitness value of the batch.
 
@@ -94,7 +93,7 @@ class Batch:
 
         """
 
-        return self._fitness
+        return self._fitness_value
 
     def get_identity_key(self):
         """
@@ -114,27 +113,25 @@ class Batch:
         return self._identity_key
 
     def __iter__(self):
-        return iter(self._mols)
+        return iter(self._records)
 
     def __eq__(self, other):
-        return self._fitness == other._fitness
+        return self._fitness_value == other._fitness_value
 
     def __gt__(self, other):
-        return self._fitness > other._fitness
+        return self._fitness_value > other._fitness_value
 
     def __ge__(self, other):
-        return self._fitness >= other._fitness
+        return self._fitness_value >= other._fitness_value
 
     def __lt__(self, other):
-        return self._fitness < other._fitness
+        return self._fitness_value < other._fitness_value
 
     def __le__(self, other):
-        return self._fitness <= other._fitness
+        return self._fitness_value <= other._fitness_value
 
     def __repr__(self):
-        return f'Batch({", ".join(str(m) for m in self._mols)})'
+        return f'Batch({", ".join(map(str, self._records))})'
 
     def __str__(self):
         return repr(self)
-
-
