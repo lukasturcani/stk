@@ -33,7 +33,7 @@ class Selector:
     --------
     *Subclass Implementation*
 
-    The source codeof the classes listed in :mod:`.selector` can serve
+    The source code of the classes listed in :mod:`.selector` can serve
     as good examples.
 
     """
