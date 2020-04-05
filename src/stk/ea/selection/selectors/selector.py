@@ -49,7 +49,7 @@ class Selector:
 
         Parameters
         ----------
-        population : :class:`.EAPopulation`
+        population : :class:`tuple` of :class:`.MoleculeRecord`
             A collection of molecules from which batches are selected.
 
         included_batches : :class:`set`, optional

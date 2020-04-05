@@ -9,6 +9,7 @@ import itertools as it
 
 from stk.molecular import Inchi
 from .selector import Selector
+from .utilities import Batcher
 
 
 class AboveAverage(Selector):
@@ -110,8 +111,9 @@ class AboveAverage(Selector):
         self._batch_size = batch_size
         self._key_maker = key_maker
         self._fitness_modifier = fitness_modifier
+        self._batcher = Batcher()
 
-    def _select_from_batches(self, batches, yielded):
+    def select(self, population):
         mean = np.mean([batch.get_fitness() for batch in batches])
         # Yield highest fitness batches first.
         batches = sorted(batches, reverse=True)

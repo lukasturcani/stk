@@ -1,9 +1,14 @@
-from .selector import Selector
+import itertools as it
+import logging
+
+from ..batch import Batch
+
+logger = logging.getLogger(__name__)
 
 
-class _BatchingSelector(Selector):
+class Batcher:
     """
-    Implements a part of the :class:`.Selector` interface.
+    Creates batches.
 
     """
 
@@ -23,8 +28,8 @@ class _BatchingSelector(Selector):
 
         Parameters
         ----------
-        population : :class:`.EAPopulation`
-            The molecules which are to be batched.
+        population : :class:`tuple` of :class:`.MoleculeRecord`
+            The molecule records which are to be batched.
 
         fitness_values : :class:`dict`
             Maps each molecule in `population` to the fitness value
@@ -111,27 +116,3 @@ class _BatchingSelector(Selector):
                 f'{self._num_batches} batches but yielded '
                 f'{yielded.get_num()}.'
             )
-
-    def _select_from_batches(self, batches, yielded):
-        """
-        Select batches.
-
-        Parameters
-        -----------
-        batches : :class:`tuple` of :class:`.Batch`
-            The batches from which some are selected.
-
-        yielded : :class:`._YieldedData`
-            Holds information on all yielded molecules and batches,
-            updated automatically after every yield.
-
-        Yields
-        ------
-        :class:`.Batch`
-            A selected batch.
-
-        """
-
-        raise NotImplementedError()
-
-

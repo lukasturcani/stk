@@ -140,7 +140,7 @@ class Batch:
         return self._fitness_value <= other._fitness_value
 
     def __repr__(self):
-        return f'Batch({", ".join(map(str, self._records))})'
+        return f'Batch({self._fitness_value})'
 
     def __str__(self):
         return repr(self)
