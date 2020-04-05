@@ -32,6 +32,36 @@ class Selector:
     batch is the sum of all fitness values of the molecules in the
     batch. Batches may be of size 1.
 
+    Notes
+    -----
+    You might notice that some of the public methods of this abstract
+    base class are implemented. This is purely for convenience when
+    implementing subclasses. The implemented public methods are simply
+    default implementations, which can be safely ignored or overridden,
+    when implementing subclasses. Any private methods are
+    implementation details of these default implementations.
+
+    *The Default Implementation*
+
+    This section is only of use to people who want to add a new
+    :class:`.Selector` subclass, and want to make use of the default
+    implementation to make this job easier.
+
+    When using the default implementation you do not need to
+    implement :meth:`.select`, which is already provided, but instead
+    :meth:`._select_from_batches` needs to be implemented. What the
+    default implementation provides, is code, which does the batching
+    of a `population` for you, which means you only have to worry
+    about implementing the selection algorithm, which works on batches
+    directly.
+
+    The default implementation also automatically updates a
+    :class:`._YieldedData` object for you, so that you can keep track
+    of which batches have already been yielded, in case you want to
+    prevent duplicate selection of batches or molecule records. Though
+    whether you want to make use of this will depend on the nature of
+    your selection algorithm.
+
     See Also
     --------
     :class:`.Batch`
