@@ -16,53 +16,7 @@ class Batcher:
     def _return_fitness_values(population):
         return population.get_fitness_values()
 
-    def _get_batches(
-        self,
-        population,
-        fitness_values,
-        included_batches,
-        excluded_batches,
-    ):
-        """
-        Get batches molecules from `population`.
 
-        Parameters
-        ----------
-        population : :class:`tuple` of :class:`.MoleculeRecord`
-            The molecule records which are to be batched.
-
-        fitness_values : :class:`dict`
-            Maps each molecule in `population` to the fitness value
-            the selection algorithm should use.
-
-        Yields
-        ------
-        :class:`.Batch`
-            A batch of molecules from `population`.
-
-        """
-
-        for mols in it.combinations(population, self._batch_size):
-            batch = Batch(
-                mols=mols,
-                fitness_values={
-                    mol: fitness_values[mol] for mol in mols
-                }
-            )
-            is_included = self._is_included(batch, included_batches)
-            is_excluded = self._is_excluded(batch, excluded_batches)
-            if is_included and not is_excluded:
-                yield batch
-
-    def _is_included(self, batch, included_batches):
-        if included_batches is None:
-            return True
-        return batch.get_identity_key() in included_batches
-
-    def _is_excluded(self, batch, excluded_batches):
-        if excluded_batches is None:
-            return False
-        return batch.get_identity_key() in excluded_batches
 
     def _select(self, population, included_batches, excluded_batches):
         """

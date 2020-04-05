@@ -52,7 +52,7 @@ class Batch:
 
     __slots__ = ('_records', '_fitness_value', '_identity_key')
 
-    def __init__(self, records, key_maker):
+    def __init__(self, records, fitness_values, key_maker):
         """
         Initialize a :class:`.Batch`.
 
@@ -60,6 +60,10 @@ class Batch:
         ----------
         records : :class:`tuple` of :class:`.MoleculeRecord`
             The molecule records which are part of the batch.
+
+        fitness_values : :class:`dict`
+            Maps each :class:`.MoleculeRecord` in `records` to the
+            fitness value which should be used for it.
 
         key_maker : :class:`.MoleculeKeyMaker`
             Used to make keys for molecules, which are used to
@@ -70,9 +74,7 @@ class Batch:
         """
 
         self._records = records
-        self._fitness_value = sum(
-            record.get_fitness_value() for record in records
-        )
+        self._fitness_value = sum(map(fitness_values.get, records))
         molecules = (record.get_molecule() for record in records)
         self._identity_key = frozenset(
             Counter(map(key_maker.get_key, molecules)).items()

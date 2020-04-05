@@ -1,3 +1,11 @@
+"""
+Best
+====
+
+"""
+
+import itertools as it
+
 from .selector import Selector
 
 
@@ -106,5 +114,3 @@ class Best(Selector):
             batches = filter(yielded.is_unyielded_batch, batches)
 
         yield from it.islice(batches, self._num_batches)
-
-

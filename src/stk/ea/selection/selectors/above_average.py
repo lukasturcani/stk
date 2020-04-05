@@ -91,14 +91,15 @@ class AboveAverage(Selector):
 
         key_maker : :class:`.MoleculeKeyMaker`, optional
             Used to get the keys of molecules, which are used to
-            determine if two molecules are duplicates of each other.
+            determine if two molecule records are duplicates of each
+            other.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select` is called and
-            returns a :class:`dict` mapping molecules in the population
-            to the fitness values the :class:`.Selector` should use.
-            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
-            is used.
+            Takes the `population` on which :meth:`select` is called
+            and returns a :class:`dict`, which maps records in the
+            `population` to the fitness values the :class:`.Selector`
+            should use. If ``None``, the regular fitness values of the
+            records are used.
 
         """
 
@@ -109,12 +110,15 @@ class AboveAverage(Selector):
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
         self._batch_size = batch_size
-        self._key_maker = key_maker
-        self._fitness_modifier = fitness_modifier
-        self._batcher = Batcher()
+        super().__init__(
+            key_maker=key_maker,
+            fitness_modifier=fitness_modifier,
+        )
 
-    def select(self, population):
-        mean = np.mean([batch.get_fitness() for batch in batches])
+    def _select_from_batches(self, batches, yielded):
+        mean = np.mean([
+            batch.get_fitness_value() for batch in batches
+        ])
         # Yield highest fitness batches first.
         batches = sorted(batches, reverse=True)
         # Yield only batches with a fitness larger than the mean.
