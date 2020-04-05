@@ -50,9 +50,9 @@ class Batch:
 
     """
 
-    __slots__ = ('_records', '_fitness_value')
+    __slots__ = ('_records', '_fitness_value', '_identity_key')
 
-    def __init__(self, records):
+    def __init__(self, records, key_maker):
         """
         Initialize a :class:`.Batch`.
 
@@ -61,13 +61,22 @@ class Batch:
         records : :class:`tuple` of :class:`.MoleculeRecord`
             The molecule records which are part of the batch.
 
+        key_maker : :class:`.MoleculeKeyMaker`
+            Used to make keys for molecules, which are used to
+            determine the identity key of the batch. If two
+            batches have the same molecule keys, the same number of
+            times, they will have the same identity key.
+
         """
 
         self._records = records
         self._fitness_value = sum(
             record.get_fitness_value() for record in records
         )
-        self._identity_key = frozenset(Counter(mols).items())
+        molecules = (record.get_molecule() for record in records)
+        self._identity_key = frozenset(
+            Counter(map(key_maker.get_key, molecules)).items()
+        )
 
     def get_size(self):
         """
@@ -106,7 +115,7 @@ class Batch:
         -------
         :class:`object`
             A hashable object which can be used to compare if two
-            batches are the same.
+            batches have the same identity.
 
         """
 

@@ -4,6 +4,9 @@ Above Average
 
 """
 
+import numpy as np
+import itertools as it
+
 from .selector import Selector
 
 
@@ -131,5 +134,3 @@ class AboveAverage(Selector):
         if self._duplicate_batches and self._duplicate_mols:
             return int(batch.get_fitness() // mean)
         return 1
-
-
