@@ -1,5 +1,9 @@
+"""
 
-class _YieldedData:
+"""
+
+
+class YieldedBatches:
     """
     Keeps track of batches yielded by :meth:`.Selector._select`.
 
@@ -127,5 +131,3 @@ class _YieldedData:
         """
 
         return all(mol not in self._mols for mol in batch)
-
-

@@ -19,6 +19,7 @@ import logging
 import itertools as it
 
 from ..batch import Batch
+from .utilities import YieldedBatches
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ class Selector:
     directly.
 
     The default implementation also automatically updates a
-    :class:`._YieldedData` object for you, so that you can keep track
+    :class:`.YieldedBatches` object for you, so that you can keep track
     of which batches have already been yielded, in case you want to
     prevent duplicate selection of batches or molecule records. Though
     whether you want to make use of this will depend on the nature of
@@ -105,7 +106,7 @@ class Selector:
         excluded_batches=None,
     ):
         """
-        Select batches of molecules from `population`.
+        Yield batches of molecule records from `population`.
 
         Parameters
         ----------
@@ -136,7 +137,7 @@ class Selector:
             excluded_batches=excluded_batches,
         ))
 
-        yielded = _YieldedData()
+        yielded = YieldedBatches()
         for batch in self._select_from_batches(batches, yielded):
             yielded.update(batch)
             yield batch
