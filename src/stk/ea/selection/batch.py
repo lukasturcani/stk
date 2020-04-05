@@ -1,14 +1,23 @@
+"""
+Batch
+=====
+
+"""
+
+from collections import Counter
+
 
 class Batch:
     """
-    Represents a batch of molecules.
+    Represents a batch of molecule records.
 
     Batches can be compared, the comparison is based on their
     fitness values. Batches can also be iterated through, this
-    iterates through all the molecules in the batch.
+    iterates through all the records in the batch.
 
     Examples
     --------
+    *Sorting Batches by Fitness Value*
 
     Sorting batches causes them to be sorted by fitness value.
 
@@ -16,6 +25,8 @@ class Batch:
 
         batches = (Batch(...), Batch(...), Batch(...))
         sorted_batches = sorted(batches)
+
+    *Comparing Batches by Fitness Value*
 
     Comparison is also based on fitness value
 
@@ -26,14 +37,16 @@ class Batch:
         if batch1 > batch2:
             print('batch1 has a larger fitness value than batch2.')
 
-    Batches can be iterated through to get the molecules in the
+    *Iterating Through Molecule Records in a Batch*
+
+    Batches can be iterated through to get the molecule records in the
     batch
 
     .. code-block:: python
 
         batch = Batch(...)
-        for mol in batch:
-            # Do stuff with mol.
+        for record in batch:
+            # Do stuff with record.
 
     """
 
