@@ -150,6 +150,6 @@ class AboveAverage(Selector):
         yield from it.islice(batches, self._num_batches)
 
     def _get_num_duplicates(self, batch, mean):
-        if self._duplicate_batches and self._duplicate_mols:
+        if self._duplicate_batches and self._duplicate_molecules:
             return int(batch.get_fitness_value() // mean)
         return 1
