@@ -117,7 +117,7 @@ class YieldedBatches:
             for molecule in (record.get_molecule() for record in batch)
         )
 
-    def has_no_yielded_mols(self, batch):
+    def has_no_yielded_molecules(self, batch):
         """
         Check if `batch` consists only of unyielded molecules.
 
