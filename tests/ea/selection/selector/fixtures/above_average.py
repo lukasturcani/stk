@@ -23,7 +23,7 @@ from ..case_data import CaseData
                 stk.Batch(
                     records=(
                     ),
-                    fitness_values={},
+                    fitness_values=get_fitness_values(,
                     key_maker=stk.Inchi(),
                 )
             ),

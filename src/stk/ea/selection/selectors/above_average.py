@@ -114,7 +114,7 @@ class AboveAverage(Selector):
             fitness_modifier=fitness_modifier,
         )
 
-    def _select_from_batches(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded_batches):
         mean = np.mean([
             batch.get_fitness_value() for batch in batches
         ])
