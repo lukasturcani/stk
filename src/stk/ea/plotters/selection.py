@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
+from stk.molecular import InchiKey
+
 
 plt.switch_backend('agg')
 
@@ -52,11 +54,11 @@ class SelectionPlotter:
         self,
         filename,
         selector,
-        x_label='Molecule: name - fitness value',
-        record_label=lambda record:
-            f'{record.get_molecule()} - {record.get_fitness_value()}',
-        legend_label=lambda record:
-            f'',
+        x_label='Molecule: InChIKey - fitness value',
+        record_label=lambda record: (
+            f'{InchiKey().get_key(record.get_molecule())} - '
+            f'{record.get_fitness_value()}'
+        ),
         heat_map_value=lambda record: record.get_fitness_value(),
         heat_map_label='Fitness',
         order_by=lambda record: record.get_fitness_value(),
