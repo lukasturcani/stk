@@ -16,11 +16,11 @@ plt.switch_backend('agg')
 
 class SelectionPlotter:
     """
-    Plots which molecules a :class:`.Selector` selects.
+    Plots which molecule records a :class:`.Selector` selects.
 
     Examples
     --------
-    *Plotting Which Molecules Got Selected*
+    *Plotting Which Molecule Records Got Selected*
 
     .. code-block:: python
 
@@ -32,13 +32,13 @@ class SelectionPlotter:
         # Make a plotter. You do not have to assign it to a variable.
         stk.SelectionPlotter('roulette_counter', roulette)
 
-        # Select the molecules.
+        # Select the molecule records.
         selected = tuple(roulette.select(population))
 
         # There should now be a file called "roulette_counter_1.png"
-        # which shows a graph of all the selected molecules.
+        # which shows a graph of all the selected records.
 
-        # Select molecules again.
+        # Select records again.
         selected2 = tuple(roulette.select(population))
 
         # There should now be a file called "roulette_counter_2.png"
@@ -53,16 +53,16 @@ class SelectionPlotter:
         filename,
         selector,
         x_label='Molecule: name - fitness value',
-        molecule_label=lambda population, mol:
-            f'{mol} - {population.get_fitness_values()[mol]}',
-        heat_map_value=lambda population, mol:
-            population.get_fitness_values()[mol],
+        record_label=lambda record:
+            f'{record.get_molecule()} - {record.get_fitness_value()}',
+        legend_label=lambda record:
+            f'',
+        heat_map_value=lambda record: record.get_fitness_value(),
         heat_map_label='Fitness',
-        order_by=lambda population, mol:
-            population.get_fitness_values()[mol],
+        order_by=lambda record: record.get_fitness_value(),
     ):
         """
-        Initialize a :class:`SelectionPlotter` instance.
+        Initialize a :class:`.SelectionPlotter` instance.
 
         Parameters
         ----------
@@ -71,41 +71,40 @@ class SelectionPlotter:
             file extensions.
 
         selector : :class:`.Selector`
-            The :class:`.Selector` whose selection of molecules is
-            plotted.
+            The :class:`.Selector` whose selection of molecule records
+            is plotted.
 
         x_label : :class:`str`, optional
             The label use for the x axis.
 
-        molecule_label : :class:`callable`, optional
-            A :class:`callable` which takes a :class:`.EAPopulation`
-            and a :class:`.Molecule`, for each molecule which is to be
+        record_label : :class:`callable`, optional
+            A :class:`callable` which takes a :class:`.MoleculeRecord`
+            for each record, which is to be
             included on the x-axis of the counter plot. It should
             return a string, which is the label used for the
-            :class:`.Molecule` on the plot.
+            :class:`.MoleculeRecord` on the plot.
 
         heat_map_value : :class:`callable`, optional
-            A :class:`callable`, which takes a :class:`.EAPopulation`
-            and a :class:`.Molecule`, for each molecule which is to be
-            included on the x-axis, and returns a value. The value is
-            used for coloring the heat map used in the plot.
+            A :class:`callable`, which takes a :class:`.MoleculeRecord`
+            for each record, which is to be included on the x-axis, and
+            returns a value. The value is used for coloring the heat
+            map used in the plot.
 
         heat_map_label : :class:`str`, optional
             The label used for the heat map key.
 
         order_by : :class:`callable`, optional
-            A :class:`callable`, which takes a :class:`.EAPopulation`
-            and a :class:`.Molecule`, for each molecule which is to be
-            included on the x-axis, and returns a value. The value is
-            used to sort the plotted molecules along the x-axis in
-            descending order.
+            A :class:`callable`, which takes a :class:`.MoleculeRecord`
+            for each molecule, which is to be included on the x-axis,
+            and returns a value. The value is used to sort the plotted
+            records along the x-axis in descending order.
 
         """
 
         self._plots = 0
         self._filename = filename
         self._x_label = x_label
-        self._molecule_label = molecule_label
+        self._record_label = record_label
         self._order_by = order_by
         self._heat_map_value = heat_map_value
         self._heat_map_label = heat_map_label
@@ -134,7 +133,7 @@ class SelectionPlotter:
         @wraps(select)
         def inner(population, *args, **kwargs):
 
-            counter = Counter({mol: 0 for mol in population})
+            counter = Counter({record: 0 for record in population})
             for selected in select(population, *args, **kwargs):
                 counter.update(selected)
                 yield selected
@@ -148,11 +147,11 @@ class SelectionPlotter:
 
         Parameters
         ----------
-        population : :class:`.EAPopulation`
-            The population from which molecules were selected.
+        population : :class:`tuple` of :class:`.MoleculeRecord`
+            The population from which molecule records were selected.
 
         counter : :class:`collections.Counter`
-            A counter specifying which molecules were selected and how
+            A counter specifying which records were selected and how
             many times.
 
         Returns
