@@ -4,8 +4,11 @@ Selection Plotter
 
 """
 
-
+from collections import Counter
+from functools import wraps
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
 
 plt.switch_backend('agg')
@@ -17,38 +20,28 @@ class SelectionPlotter:
 
     Examples
     --------
+    *Plotting Which Molecules Got Selected*
+
     .. code-block:: python
 
         import stk
 
-        # Make a population of molecules.
-        pop = stk.Population(...)
-
         # Make a selector.
         roulette = stk.Roulette(num=10)
 
-        # Make a plotter.
+        # Make a plotter. You do not have to assign it to a variable.
         stk.SelectionPlotter('roulette_counter', roulette)
 
         # Select the molecules.
-        selected = list(roulette.select(pop))
+        selected = tuple(roulette.select(population))
 
         # There should now be a file called "roulette_counter_1.png"
         # which shows a graph of all the selected molecules.
 
-        # Make another population.
-        pop2 = stk.Population(...)
-
-        # Select molecules from this other population.
-        selected2 = list(roulette.select(pop2))
+        # Select molecules again.
+        selected2 = tuple(roulette.select(population))
 
         # There should now be a file called "roulette_counter_2.png"
-        # which shows a graph of all the selected molecules.
-
-        # Select from the original population again.
-        selected3 = list(roulette.select(pop))
-
-        # There should now be a file called "roulette_counter_3.png"
         # which shows a graph of all the selected molecules.
 
         # And so on every time you use "roulette.select()".
@@ -123,12 +116,12 @@ class SelectionPlotter:
         Decorate :meth:`.Selector.select`.
 
         This is a decorator which makes sure that every time
-        :meth:`.Selector.select` selects a :class:`.Molecule` a
+        :meth:`.Selector.select` selects a :class:`.MoleculeRecord` a
         counter keeping track of selected molecules is updated.
 
         Parameters
         ----------
-        select : :class:`function`
+        select : :class:`callable`
             The :meth:`Selector.select` method to decorate.
 
         Returns
@@ -218,24 +211,3 @@ class SelectionPlotter:
         plt.tight_layout()
         fig.savefig(f'{self._filename}_{self._plots}.png', dpi=fig.dpi)
         plt.close('all')
-
-    def plot(self, progress):
-        """
-        Does nothing.
-
-        This :class:`Plotter` creates a plot each time :attr:`selector`
-        is finished selecting molecules.
-
-        Parameters
-        ----------
-        progress : :class:`.Population`
-            A :class:`.Population` where each generation of the GA is
-            a subpopulation.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        return
