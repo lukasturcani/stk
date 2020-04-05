@@ -214,6 +214,21 @@ class Selector:
 
     def _select_from_batches(self, batches, yielded):
         """
+        Yield batches from `batches`.
+
+        Parameters
+        ----------
+        batches : :class:`tuple` of :class:`.Batches`
+            Batches from which some are selected.
+
+        yielded : :class:`.YieldedBatches`
+            Keeps track of which batches have been yielded. This
+            object automatically updates each time ``yield`` is called.
+
+        Yields
+        ------
+        :class:`.Batch`
+            A selected batch.
 
         """
 
