@@ -97,7 +97,7 @@ class SelectionPlotter:
 
         order_by : :class:`callable`, optional
             A :class:`callable`, which takes a :class:`.MoleculeRecord`
-            for each molecule, which is to be included on the x-axis,
+            for each record, which is to be included on the x-axis,
             and returns a value. The value is used to sort the plotted
             records along the x-axis in descending order.
 
@@ -118,7 +118,7 @@ class SelectionPlotter:
 
         This is a decorator which makes sure that every time
         :meth:`.Selector.select` selects a :class:`.MoleculeRecord` a
-        counter keeping track of selected molecules is updated.
+        counter keeping track of selected records is updated.
 
         Parameters
         ----------
@@ -162,27 +162,18 @@ class SelectionPlotter:
 
         """
 
-        def molecule_label(mol):
-            return self._molecule_label(population, mol)
-
-        def heat_map_value(mol):
-            return self._heat_map_value(population, mol)
-
-        def order_by(mol):
-            return self._order_by(population, mol)
-
         self._plots += 1
         sns.set(style='darkgrid')
         fig = plt.figure()
 
         df = pd.DataFrame()
-        for mol, selection_count in counter.items():
-            label = molecule_label(mol)
+        for record, selection_count in counter.items():
+            label = self._record_label(record)
             data = {
                 self._x_label: label,
                 'Number of times selected': selection_count,
-                'order': order_by(mol),
-                'heat_map': heat_map_value(mol)
+                'order': self._order_by(record),
+                'heat_map': self._heat_map_value(record)
             }
             df = df.append(data, ignore_index=True)
 
