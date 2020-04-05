@@ -122,7 +122,7 @@ class AboveAverage(Selector):
         batches = sorted(batches, reverse=True)
         # Yield only batches with a fitness larger than the mean.
         batches = it.takewhile(
-            lambda batch: batch.get_fitness() > mean,
+            lambda batch: batch.get_fitness_value() > mean,
             batches
         )
         # Yield batches which are multiple times better than the mean
@@ -151,5 +151,5 @@ class AboveAverage(Selector):
 
     def _get_num_duplicates(self, batch, mean):
         if self._duplicate_batches and self._duplicate_mols:
-            return int(batch.get_fitness() // mean)
+            return int(batch.get_fitness_value() // mean)
         return 1
