@@ -123,12 +123,18 @@ class Selector:
             The molecule records which are to be batched.
 
         fitness_values : :class:`dict`
-            Maps each molecule in `population` to the fitness value
-            the selection algorithm should use.
+            Maps each :class:`.MoleculeRecord` in `population` to the
+            fitness value which should be used for it.
 
-        included_batches
+        included_batches : :class:`set`, optional
+            The identity keys of batches which are allowed to be
+            yielded, if ``None`` all batches can be yielded. If not
+            ``None`` only batches `included_batches` will be yielded.
 
-        excluded_batches
+        excluded_batches : class:`set`, optional
+            The identity keys of batches which are not allowed to be
+            yielded. If ``None``, no batch is forbidden from being
+            yielded.
 
         Yields
         ------
@@ -137,29 +143,24 @@ class Selector:
 
         """
 
+        def is_included(batch):
+            if included_batches is None:
+                return True
+            return batch.get_identity_key() in included_batches
+
+        def is_excluded(batch):
+            if excluded_batches is None:
+                return False
+            return batch.get_identity_key() in excluded_batches
+
         for records in it.combinations(population, self._batch_size):
             batch = Batch(
                 records=records,
-                fitness_values={
-                    record: fitness_values[record]
-                    for record in records
-                },
+                fitness_values=fitness_values,
                 key_maker=self._key_maker,
             )
-            is_included = self._is_included(batch, included_batches)
-            is_excluded = self._is_excluded(batch, excluded_batches)
-            if is_included and not is_excluded:
+            if is_included(batch) and not is_excluded(batch):
                 yield batch
-
-    def _is_included(self, batch, included_batches):
-        if included_batches is None:
-            return True
-        return batch.get_identity_key() in included_batches
-
-    def _is_excluded(self, batch, excluded_batches):
-        if excluded_batches is None:
-            return False
-        return batch.get_identity_key() in excluded_batches
 
     def _select_from_batches(self, batches, yielded):
         """
