@@ -2,6 +2,17 @@
 Selector
 ========
 
+#. :class:`.AboveAverage`
+#. :class:`.Best`
+#. :class:`.FilterBatches`
+#. :class:`.FilterMoleculeRecords`
+#. :class:`.RemoveBatches`
+#. :class:`.RemoveMoleculeRecords`
+#. :class:`.Roulette`
+#. :class:`.StochasticUniversalSampling`
+#. :class:`.Tournament`
+#. :class:`.Worst`
+
 """
 
 
@@ -17,6 +28,13 @@ class Selector:
     See Also
     --------
     :class:`.Batch`
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source codeof the classes listed in :mod:`.selector` can serve
+    as good examples.
 
     """
 
