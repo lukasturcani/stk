@@ -7,6 +7,7 @@ Above Average
 import numpy as np
 import itertools as it
 
+from stk.molecular import Inchi
 from .selector import Selector
 
 
@@ -61,8 +62,9 @@ class AboveAverage(Selector):
         self,
         num_batches=None,
         batch_size=1,
-        duplicate_mols=True,
+        duplicate_records=True,
         duplicate_batches=True,
+        key_maker=Inchi(),
         fitness_modifier=None,
     ):
         """
@@ -76,14 +78,19 @@ class AboveAverage(Selector):
             whichever comes first.
 
         batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
+            The number of molecule records in each yielded
+            :class:`.Batch`.
 
-        duplicate_mols : :class:`bool`, optional
-            If ``True`` the same molecule can be yielded in more than
-            one batch.
+        duplicate_records : :class:`bool`, optional
+            If ``True`` the same molecule record can be yielded in more
+            than one batch.
 
         duplicate_batches : :class:`bool`, optional
             If ``True`` the same batch can be yielded more than once.
+
+        key_maker : :class:`.MoleculeKeyMaker`, optional
+            Used to get the keys of molecules, which are used to
+            determine if two molecules are duplicates of each other.
 
         fitness_modifier : :class:`callable`, optional
             Takes the population on which :meth:`select` is called and
@@ -97,10 +104,11 @@ class AboveAverage(Selector):
         if fitness_modifier is None:
             fitness_modifier = self._return_fitness_values
 
-        self._duplicate_mols = duplicate_mols
+        self._duplicate_records = duplicate_records
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
         self._batch_size = batch_size
+        self._key_maker = key_maker
         self._fitness_modifier = fitness_modifier
 
     def _select_from_batches(self, batches, yielded):
