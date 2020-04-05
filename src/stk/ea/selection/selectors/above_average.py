@@ -62,7 +62,7 @@ class AboveAverage(Selector):
         self,
         num_batches=None,
         batch_size=1,
-        duplicate_records=True,
+        duplicate_molecules=True,
         duplicate_batches=True,
         key_maker=Inchi(),
         fitness_modifier=None,
@@ -81,8 +81,8 @@ class AboveAverage(Selector):
             The number of molecule records in each yielded
             :class:`.Batch`.
 
-        duplicate_records : :class:`bool`, optional
-            If ``True`` the same molecule record can be yielded in more
+        duplicate_molecules : :class:`bool`, optional
+            If ``True`` the same molecule can be yielded in more
             than one batch.
 
         duplicate_batches : :class:`bool`, optional
@@ -105,7 +105,7 @@ class AboveAverage(Selector):
         if fitness_modifier is None:
             fitness_modifier = self._get_fitness_values
 
-        self._duplicate_records = duplicate_records
+        self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
         self._batch_size = batch_size
@@ -134,8 +134,8 @@ class AboveAverage(Selector):
         )
         # If duplicate molecules are not allowed, allow only
         # batches with no yielded molecules.
-        if not self._duplicate_mols:
-            batches = filter(yielded.has_no_yielded_mols, batches)
+        if not self._duplicate_molecules:
+            batches = filter(yielded.has_no_yielded_molecules, batches)
         # If duplicate batches are not allowed, allow only
         # unyielded batches.
         if not self._duplicate_batches:
