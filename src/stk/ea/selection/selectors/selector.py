@@ -137,25 +137,18 @@ class Selector:
             excluded_batches=excluded_batches,
         ))
 
-        yielded = YieldedBatches()
-        for batch in self._select_from_batches(batches, yielded):
-            yielded.update(batch)
+        yielded_batches = YieldedBatches(self._key_maker)
+        for batch in self._select_from_batches(
+            batches=batches,
+            yielded_batches=yielded_batches,
+        ):
+            yielded_batches.update(batch)
             yield batch
 
         cls_name = self.__class__.__name__
         logger.debug(
-            f'{cls_name} yielded {yielded.get_num()} batches.'
+            f'{cls_name} yielded {yielded_batches.get_num()} batches.'
         )
-
-        if (
-            self._num_batches is not None
-            and yielded.get_num() != self._num_batches
-        ):
-            logger.warning(
-                f'{cls_name} was asked to yield '
-                f'{self._num_batches} batches but yielded '
-                f'{yielded.get_num()}.'
-            )
 
     def _get_batches(
         self,
@@ -212,7 +205,7 @@ class Selector:
             if is_included(batch) and not is_excluded(batch):
                 yield batch
 
-    def _select_from_batches(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded_batches):
         """
         Yield batches from `batches`.
 
@@ -221,7 +214,7 @@ class Selector:
         batches : :class:`tuple` of :class:`.Batches`
             Batches from which some are selected.
 
-        yielded : :class:`.YieldedBatches`
+        yielded_batches : :class:`.YieldedBatches`
             Keeps track of which batches have been yielded. This
             object automatically updates each time ``yield`` is called.
 

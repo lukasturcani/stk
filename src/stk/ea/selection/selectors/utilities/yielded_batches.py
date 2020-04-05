@@ -1,26 +1,26 @@
 """
+Yielded Batches
+===============
 
 """
 
 
 class YieldedBatches:
     """
-    Keeps track of batches yielded by :meth:`.Selector._select`.
-
-    Each :meth:`.Selector._select` call should be paired with a
-    new :class:`._YieldedData` instance, which should be updated
-    each time a new batch is yielded.
+    Keeps track of batches yielded by :meth:`.Selector.select`.
 
     """
 
-    __slots__ = ['_mols', '_batches', '_num']
+    __slots__ = ('_records', '_batches', '_num', '_key_maker')
 
-    def __init__(self):
-        # Has all molecules yielded by _select().
-        self._mols = set()
+    def __init__(self, key_maker):
+        self._key_maker = key_maker
+
+        # Has all records yielded by select().
+        self._records = set()
         # Has the identity_key() of all batches yielded by select().
         self._batches = set()
-        # Counts the total number of times _select() has yielded.
+        # Counts the total number of times select() has yielded.
         self._num = 0
 
     def update(self, batch):
@@ -30,16 +30,16 @@ class YieldedBatches:
         Parameters
         ----------
         batch : :class:`.Batch`
-            A batch yielded by :meth:`.Selector._select`.
+            A batch yielded by :meth:`.Selector.select`.
 
         Returns
         -------
-        :class:`_YieldedData`
+        :class:`YieldedBatches`
             The data tracker.
 
         """
 
-        self._mols.update(batch)
+        self._records.update(map(self._key_maker.get_key, batch))
         self._batches.add(batch.get_identity_key())
         self._num += 1
         return self
