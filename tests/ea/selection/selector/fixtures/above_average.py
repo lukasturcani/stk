@@ -44,6 +44,22 @@ population1 = (
             ),
         ),
         CaseData(
+            selector=stk.AboveAverage(num_batches=2),
+            population=population1,
+            selected=(
+                stk.Batch(
+                    records=(population1[0], ),
+                    fitness_values={population1[0]: 5},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], ),
+                    fitness_values={population1[0]: 5},
+                    key_maker=stk.Inchi(),
+                ),
+            ),
+        ),
+        CaseData(
             selector=stk.AboveAverage(
                 duplicate_molecules=False,
             ),
@@ -64,6 +80,24 @@ population1 = (
         CaseData(
             selector=stk.AboveAverage(
                 duplicate_batches=False,
+            ),
+            population=population1,
+            selected=(
+                stk.Batch(
+                    records=(population1[0], ),
+                    fitness_values={population1[0]: 5},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], ),
+                    fitness_values={population1[1]: 3},
+                    key_maker=stk.Inchi(),
+                ),
+            ),
+        ),
+        CaseData(
+            selector=stk.AboveAverage(
+                batch_size=2,
             ),
             population=population1,
             selected=(
