@@ -76,6 +76,25 @@ class Selector:
     """
 
     def __init__(self, key_maker, fitness_modifier):
+        """
+        Initialize a :class:`.Selector` instance.
+
+        Parameters
+        ----------
+        key_maker : :class:`.MoleculeKeyMaker`
+            Used to get the keys of molecules, which are used to
+            determine if two molecule records are duplicates of each
+            other.
+
+        fitness_modifier : :class:`callable`, optional
+            Takes the `population` on which :meth:`.select` is called
+            and returns a :class:`dict`, which maps records in the
+            `population` to the fitness values the :class:`.Selector`
+            should use. If ``None``, the regular fitness values of the
+            records are used.
+
+        """
+
         self._key_maker = key_maker
         self._fitness_modifier = fitness_modifier
 
