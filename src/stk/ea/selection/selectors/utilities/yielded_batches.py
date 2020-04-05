@@ -11,13 +11,13 @@ class YieldedBatches:
 
     """
 
-    __slots__ = ('_records', '_batches', '_num', '_key_maker')
+    __slots__ = ('_molecules', '_batches', '_num', '_key_maker')
 
     def __init__(self, key_maker):
         self._key_maker = key_maker
 
-        # Has all records yielded by select().
-        self._records = set()
+        # Has all molecules yielded by select().
+        self._molecules = set()
         # Has the identity_key() of all batches yielded by select().
         self._batches = set()
         # Counts the total number of times select() has yielded.
@@ -39,19 +39,20 @@ class YieldedBatches:
 
         """
 
-        self._records.update(map(self._key_maker.get_key, batch))
+        molecules = (record.get_molecule() for record in batch)
+        self._molecules.update(map(self._key_maker.get_key, molecules))
         self._batches.add(batch.get_identity_key())
         self._num += 1
         return self
 
     def get_num(self):
         """
-        Get the number of times :meth:`.Selector._select` has yielded.
+        Get the number of times :meth:`.Selector.select` has yielded.
 
         Returns
         -------
         :class:`int`
-            The total number of times :meth:`.Selector._select` has
+            The total number of times :meth:`.Selector.select` has
             yielded.
 
         """
@@ -94,7 +95,7 @@ class YieldedBatches:
 
         return batch.get_identity_key() not in self._batches
 
-    def has_yielded_mols(self, batch):
+    def has_yielded_molecules(self, batch):
         """
         Check if `batch` contains any previously yielded molecules.
 
@@ -111,7 +112,10 @@ class YieldedBatches:
 
         """
 
-        return any(mol in self._mols for mol in batch)
+        return any(
+            self._key_maker.get_key(molecule) in self._molecules
+            for molecule in (record.get_molecule() for record in batch)
+        )
 
     def has_no_yielded_mols(self, batch):
         """
@@ -130,4 +134,7 @@ class YieldedBatches:
 
         """
 
-        return all(mol not in self._mols for mol in batch)
+        return all(
+            self._key_maker.get_key(molecule) not in self._molecules
+            for molecule in (record.get_molecule() for record in batch)
+        )

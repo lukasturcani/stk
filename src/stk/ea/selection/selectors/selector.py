@@ -5,9 +5,9 @@ Selector
 #. :class:`.AboveAverage`
 #. :class:`.Best`
 #. :class:`.FilterBatches`
-#. :class:`.FilterMoleculeRecords`
+#. :class:`.FilterMolecules`
 #. :class:`.RemoveBatches`
-#. :class:`.RemoveMoleculeRecords`
+#. :class:`.RemoveMolecules`
 #. :class:`.Roulette`
 #. :class:`.StochasticUniversalSampling`
 #. :class:`.Tournament`
