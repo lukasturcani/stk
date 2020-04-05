@@ -1,3 +1,7 @@
+import itertools as it
+import stk
+
+
 def test_select(case_data):
     """
     Test :meth:`.Selector.select`.
@@ -42,4 +46,17 @@ def _test_select(selector, population, selected):
 
     """
 
-    result = selector.select(population)
+    inchi = stk.Inchi()
+    for batch1, batch2 in it.zip_longest(
+        selector.select(population),
+        selected,
+    ):
+        inchis1 = frozenset(
+            inchi.get_key(record.get_molecule())
+            for record in batch1
+        )
+        inchis2 = frozenset(
+            inchi.get_key(record.get_molecule())
+            for record in batch2
+        )
+        assert inchis1 == inchis2
