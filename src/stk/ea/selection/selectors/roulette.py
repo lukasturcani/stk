@@ -1,3 +1,9 @@
+"""
+Roulette
+========
+
+"""
+
 from .selector import Selector
 
 

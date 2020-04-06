@@ -5,5 +5,7 @@ from .filter_batches import *
 from .filter_molecules import *
 from .remove_batches import *
 from .remove_molecules import *
+from .roulette import *
+from .stochastic_universal_sampling import *
 from .tournament import *
 from .worst import *
