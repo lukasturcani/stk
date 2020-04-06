@@ -7,10 +7,13 @@ from ..case_data import CaseData
 population1 = (
     stk.MoleculeRecord(
         molecule=stk.BuildingBlock('BrCBr'),
-    ).with_fitness_value(5),
+    ).with_fitness_value(10),
     stk.MoleculeRecord(
         molecule=stk.BuildingBlock('BrCNCBr'),
-    ).with_fitness_value(3),
+    ).with_fitness_value(9),
+    stk.MoleculeRecord(
+        molecule=stk.BuildingBlock('BrCNNCBr'),
+    ).with_fitness_value(2),
     stk.MoleculeRecord(
         molecule=stk.BuildingBlock('BrCCBr'),
     ).with_fitness_value(1),
@@ -28,17 +31,22 @@ population1 = (
             selected=(
                 stk.Batch(
                     records=(population1[0], ),
-                    fitness_values={population1[0]: 5},
+                    fitness_values={population1[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[0], ),
-                    fitness_values={population1[0]: 5},
+                    fitness_values={population1[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[1], ),
-                    fitness_values={population1[1]: 3},
+                    fitness_values={population1[1]: 9},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], ),
+                    fitness_values={population1[1]: 9},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -49,12 +57,12 @@ population1 = (
             selected=(
                 stk.Batch(
                     records=(population1[0], ),
-                    fitness_values={population1[0]: 5},
+                    fitness_values={population1[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[0], ),
-                    fitness_values={population1[0]: 5},
+                    fitness_values={population1[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -67,12 +75,12 @@ population1 = (
             selected=(
                 stk.Batch(
                     records=(population1[0], ),
-                    fitness_values={population1[0]: 5},
+                    fitness_values={population1[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[1], ),
-                    fitness_values={population1[1]: 3},
+                    fitness_values={population1[1]: 9},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -85,12 +93,12 @@ population1 = (
             selected=(
                 stk.Batch(
                     records=(population1[0], ),
-                    fitness_values={population1[0]: 5},
+                    fitness_values={population1[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[1], ),
-                    fitness_values={population1[1]: 3},
+                    fitness_values={population1[1]: 9},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -104,24 +112,64 @@ population1 = (
                 stk.Batch(
                     records=(population1[0], population1[1]),
                     fitness_values={
-                        population1[0]: 5,
-                        population1[1]: 3,
+                        population1[0]: 10,
+                        population1[1]: 9,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[1]),
+                    fitness_values={
+                        population1[0]: 10,
+                        population1[1]: 9,
                     },
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[0], population1[2], ),
                     fitness_values={
-                        population1[0]: 5,
-                        population1[2]: 1,
+                        population1[0]: 10,
+                        population1[2]: 2,
                     },
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[0], population1[3], ),
                     fitness_values={
-                        population1[0]: 5,
+                        population1[0]: 10,
                         population1[3]: 1,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[4], ),
+                    fitness_values={
+                        population1[0]: 10,
+                        population1[4]: 1,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], population1[2], ),
+                    fitness_values={
+                        population1[1]: 9,
+                        population1[2]: 2,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], population1[3], ),
+                    fitness_values={
+                        population1[1]: 9,
+                        population1[3]: 1,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], population1[4], ),
+                    fitness_values={
+                        population1[1]: 9,
+                        population1[4]: 1,
                     },
                     key_maker=stk.Inchi(),
                 ),
@@ -129,7 +177,7 @@ population1 = (
         ),
         CaseData(
             selector=stk.AboveAverage(
-                num_batches=2,
+                num_batches=3,
                 batch_size=2,
             ),
             population=population1,
@@ -137,16 +185,24 @@ population1 = (
                 stk.Batch(
                     records=(population1[0], population1[1]),
                     fitness_values={
-                        population1[0]: 5,
-                        population1[1]: 3,
+                        population1[0]: 10,
+                        population1[1]: 9,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[1]),
+                    fitness_values={
+                        population1[0]: 10,
+                        population1[1]: 9,
                     },
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[0], population1[2], ),
                     fitness_values={
-                        population1[0]: 5,
-                        population1[2]: 1,
+                        population1[0]: 10,
+                        population1[2]: 2,
                     },
                     key_maker=stk.Inchi(),
                 ),
@@ -162,8 +218,16 @@ population1 = (
                 stk.Batch(
                     records=(population1[0], population1[1]),
                     fitness_values={
-                        population1[0]: 5,
-                        population1[1]: 3,
+                        population1[0]: 10,
+                        population1[1]: 9,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], population1[2], ),
+                    fitness_values={
+                        population1[1]: 9,
+                        population1[2]: 2,
                     },
                     key_maker=stk.Inchi(),
                 ),
