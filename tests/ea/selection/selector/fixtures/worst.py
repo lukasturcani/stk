@@ -287,14 +287,6 @@ population2 = (
                     },
                     key_maker=stk.Inchi(),
                 ),
-                stk.Batch(
-                    records=(population1[0], population1[1]),
-                    fitness_values={
-                        population1[0]: 11,
-                        population1[1]: 10,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
             ),
         ),
         CaseData(
