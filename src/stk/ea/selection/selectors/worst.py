@@ -76,7 +76,7 @@ class Worst(Selector):
         """
 
         if fitness_modifier is None:
-            fitness_modifier = self._return_fitness_values
+            fitness_modifier = self._get_fitness_values
 
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
@@ -87,18 +87,18 @@ class Worst(Selector):
             fitness_modifier=fitness_modifier,
         )
 
-    def _select_from_batches(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded_batches):
         batches = sorted(batches)
 
         if not self._duplicate_molecules:
             batches = filter(
-                yielded.has_no_yielded_molecules,
+                yielded_batches.has_no_yielded_molecules,
                 batches,
             )
 
         if not self._duplicate_batches:
             batches = filter(
-                yielded.is_unyielded_batch,
+                yielded_batches.is_unyielded_batch,
                 batches,
             )
 

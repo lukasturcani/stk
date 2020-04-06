@@ -294,6 +294,7 @@ population2 = (
                         population1[2]: 2,
                     },
                     key_maker=stk.Inchi(),
+                ),
             ),
         ),
         CaseData(

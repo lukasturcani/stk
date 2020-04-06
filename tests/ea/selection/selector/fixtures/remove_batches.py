@@ -27,7 +27,7 @@ population1 = (
     params=(
         CaseData(
             selector=stk.RemoveBatches(
-                filter=stk.Worst(4),
+                remover=stk.Worst(4),
                 selector=stk.Best(),
             ),
             population=population1,
