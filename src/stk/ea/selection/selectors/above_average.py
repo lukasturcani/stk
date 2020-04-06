@@ -17,6 +17,8 @@ class AboveAverage(Selector):
 
     Examples
     --------
+    *Yielding Single Molecule Batches*
+
     Yielding molecules one at a time. For example, if molecules need
     to be selected for mutation or the next generation
 
@@ -24,17 +26,16 @@ class AboveAverage(Selector):
 
         import stk
 
-        # Make a population holding some molecules.
-        pop = stk.Population(...)
-
         # Make the selector.
         above_avg = stk.AboveAverage()
 
         # Select the molecules.
-        for selected, in above_avg.select(pop):
+        for selected, in above_avg.select(population):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
-            mutant = mutator.mutate(selected)
+            mutation_record = mutator.mutate(selected)
+
+    *Yielding Batches Holding Multiple Molecules*
 
     Yielding multiple molecules at once. For example, if molecules need
     to be selected for crossover.
@@ -43,18 +44,13 @@ class AboveAverage(Selector):
 
         import stk
 
-        # Make a population holding some molecules.
-        pop = stk.Population(...)
-
         # Make the selector.
         above_avg = stk.AboveAverage(batch_size=2)
 
         # Select the molecules.
-        for selected in above_avg.select(pop):
-            # selected is a tuple of length 2, holding the selected
-            # molecules. You can do stuff with the selected molecules
-            # Like apply crossover operations on them.
-            offspring = list(crosser.cross(*selected))
+        for selected in above_avg.select(population):
+            # selected holds 2 molecules.
+            crossover_records = tuple(crosser.cross(selected))
 
     """
 
