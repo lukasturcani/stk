@@ -63,7 +63,7 @@ class Worst(Selector):
 
         key_maker : :class:`.MoleculeKeyMaker`, optional
             Used to get the keys of molecules, which are used to
-            determine if two molecule records are duplicates of each
+            determine if two molecules are duplicates of each
             other.
 
         fitness_modifier : :class:`callable`, optional

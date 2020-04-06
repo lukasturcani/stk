@@ -74,6 +74,11 @@ class Tournament(Selector):
         duplicate_batches : :class:`bool`, optional
             If ``True`` the same batch can be yielded more than once.
 
+        key_maker : :class:`.MoleculeKeyMaker`, optional
+            Used to get the keys of molecules, which are used to
+            determine if two molecules are duplicates of each
+            other.
+
         fitness_modifier : :class:`callable`, optional
             Takes the `population` on which :meth:`.select` is called
             and returns a :class:`dict`, which maps records in the

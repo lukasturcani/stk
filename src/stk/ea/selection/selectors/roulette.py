@@ -4,6 +4,9 @@ Roulette
 
 """
 
+import numpy as np
+
+from stk.molecular import Inchi
 from .selector import Selector
 
 
@@ -28,6 +31,8 @@ class Roulette(Selector):
 
     Examples
     --------
+    *Yielding Single Molecule Batches*
+
     Yielding molecules one at a time. For example, if molecules need
     to be selected for mutation or the next generation
 
@@ -35,35 +40,31 @@ class Roulette(Selector):
 
         import stk
 
-        # Make a population holding some molecules.
-        pop = stk.Population(...)
-
         # Make the selector.
         roulette = stk.Roulette()
 
         # Select the molecules.
-        for selected, in roulette.select(pop):
+        for selected, in roulette.select(population):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
-            mutant = mutator.mutate(selected)
+            mutation_record = mutator.mutate(selected)
+
+    *Yielding Batches Holding Multiple Molecules*
 
     Yielding multiple molecules at once. For example, if molecules need
     to be selected for crossover
 
     .. code-block:: python
 
-        # Make a population holding some molecules.
-        pop = stk.Population(...)
-
         # Make the selector.
         roulette = stk.Roulette(batch_size=2)
 
         # Select the molecules.
-        for selected in roulette.select(pop):
+        for selected in roulette.select(population):
             # selected is a tuple of length 2, holding the selected
             # molecules. You can do stuff with the selected molecules
             # Like apply crossover operations on them.
-            offspring = list(crosser.cross(*selected))
+            crossover_records = tuple(crosser.cross(selected))
 
     """
 
@@ -71,8 +72,9 @@ class Roulette(Selector):
         self,
         num_batches=None,
         batch_size=1,
-        duplicate_mols=True,
+        duplicate_molecules=True,
         duplicate_batches=True,
+        key_maker=Inchi(),
         fitness_modifier=None,
         random_seed=None
     ):
@@ -89,19 +91,24 @@ class Roulette(Selector):
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
-        duplicate_mols : :class:`bool`, optional
+        duplicate_molecules : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
             one batch.
 
         duplicate_batches : :class:`bool`, optional
             If ``True`` the same batch can be yielded more than once.
 
+        key_maker : :class:`.MoleculeKeyMaker`, optional
+            Used to get the keys of molecules, which are used to
+            determine if two molecules are duplicates of each
+            other.
+
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select` is called and
-            returns a :class:`dict` mapping molecules in the population
-            to the fitness values the :class:`.Selector` should use.
-            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
-            is used.
+            Takes the `population` on which :meth:`.select` is called
+            and returns a :class:`dict`, which maps records in the
+            `population` to the fitness values the :class:`.Selector`
+            should use. If ``None``, the regular fitness values of the
+            records are used.
 
         random_seed : :class:`int`, optional
             The random seed to use.
@@ -112,28 +119,40 @@ class Roulette(Selector):
             num_batches = float('inf')
 
         if fitness_modifier is None:
-            fitness_modifier = self._return_fitness_values
+            fitness_modifier = self._get_fitness_values
 
         self._generator = np.random.RandomState(random_seed)
-        self._duplicate_mols = duplicate_mols
+        self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
         self._batch_size = batch_size
-        self._fitness_modifier = fitness_modifier
+        super().__init__(
+            key_maker=key_maker,
+            fitness_modifier=fitness_modifier,
+        )
 
-    def _select_from_batches(self, batches, yielded):
-        while batches and yielded.get_num() < self._num_batches:
-            total = sum(batch.get_fitness() for batch in batches)
+    def _select_from_batches(self, batches, yielded_batches):
+        while (
+            batches and yielded_batches.get_num() < self._num_batches
+        ):
+            total = sum(batch.get_fitness_value() for batch in batches)
             weights = [
-                batch.get_fitness() / total for batch in batches
+                batch.get_fitness_value() / total for batch in batches
             ]
             yield self._generator.choice(batches, p=weights)
 
-            if not self._duplicate_mols:
-                batches = filter(yielded.has_no_yielded_mols, batches)
+            if not self._duplicate_molecules:
+                batches = filter(
+                    yielded_batches.has_no_yielded_molecules,
+                    batches,
+                )
             if not self._duplicate_batches:
-                batches = filter(yielded.is_unyielded_batch, batches)
-            if not self._duplicate_mols or not self._duplicate_batches:
+                batches = filter(
+                    yielded_batches.is_unyielded_batch,
+                    batches,
+                )
+            if (
+                not self._duplicate_molecules
+                or not self._duplicate_batches
+            ):
                 batches = tuple(batches)
-
-
