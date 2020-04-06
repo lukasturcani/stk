@@ -305,11 +305,6 @@ population2 = (
                     fitness_values={population2[0]: 1},
                     key_maker=stk.Inchi(),
                 ),
-                stk.Batch(
-                    records=(population2[1], ),
-                    fitness_values={population2[1]: 0.5},
-                    key_maker=stk.Inchi(),
-                ),
             ),
         ),
     ),

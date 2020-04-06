@@ -5,5 +5,5 @@ def get_rank_fitness(population):
     )
     return {
         record: 1/rank
-        for rank, record in enumerate(population)
+        for rank, record in enumerate(population, 1)
     }
