@@ -1,3 +1,9 @@
+"""
+Filter Molecules
+================
+
+"""
+
 from .selector import Selector
 
 
@@ -44,7 +50,12 @@ class FilterMolecules(Selector):
         self._filter = filter
         self._selector = selector
 
-    def _select(self, population, included_batches, excluded_batches):
+    def select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
         valid_batches = self._filter.select(
             population=population,
             included_batches=included_batches,
@@ -61,5 +72,3 @@ class FilterMolecules(Selector):
             included_batches=included_batches,
             excluded_batches=excluded_batches,
         )
-
-
