@@ -1,3 +1,9 @@
+"""
+Remove Batches
+==============
+
+"""
+
 from .selector import Selector
 
 
@@ -7,6 +13,8 @@ class RemoveBatches(Selector):
 
     Examples
     --------
+    *Removing Batches From Selection*
+
     You want to use :class:`.Roulette` selection on all but the
     5 :class:`.Worst` batches
 
@@ -14,7 +22,6 @@ class RemoveBatches(Selector):
 
         import stk
 
-        population = stk.Population(...)
         selector = stk.RemoveBatches(
             remover=stk.Worst(5),
             selector=stk.Roulette(20),
@@ -44,7 +51,12 @@ class RemoveBatches(Selector):
         self._remover = remover
         self._selector = selector
 
-    def _select(self, population, included_batches, excluded_batches):
+    def select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
         removed_batches = {
             batch.get_identity_key()
             for batch in self._remover.select(
@@ -61,5 +73,3 @@ class RemoveBatches(Selector):
             included_batches=included_batches,
             excluded_batches=removed_batches,
         )
-
-
