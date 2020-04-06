@@ -52,7 +52,12 @@ class FilterBatches(Selector):
         self._filter = filter
         self._selector = selector
 
-    def select(self, population, included_batches, excluded_batches):
+    def select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
         allowed = {
             batch.get_identity_key()
             for batch in self._filter.select(
