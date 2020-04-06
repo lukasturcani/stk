@@ -27,7 +27,7 @@ population1 = (
     params=(
         CaseData(
             selector=stk.FilterMolecules(
-                filter=stk.Best(num_batches=3, batch_size=2),
+                filter=stk.Best(4),
                 selector=stk.Best(),
             ),
             population=population1,
