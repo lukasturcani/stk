@@ -302,12 +302,12 @@ population2 = (
             selected=(
                 stk.Batch(
                     records=(population2[0], ),
-                    fitness_values={population2[0]: 100},
+                    fitness_values={population2[0]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population2[1], ),
-                    fitness_values={population1[0]: 1},
+                    fitness_values={population2[1]: 0.5},
                     key_maker=stk.Inchi(),
                 ),
             ),
