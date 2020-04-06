@@ -13,6 +13,7 @@ from .fixtures import *  # noqa
         lazy_fixture('filter_molecules'),
         lazy_fixture('remove_batches'),
         lazy_fixture('remove_molecules'),
+        lazy_fixture('tournament'),
         lazy_fixture('worst'),
     ),
 )
