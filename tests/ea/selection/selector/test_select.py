@@ -51,11 +51,11 @@ def _test_select(selector, population, selected):
         selector.select(population),
         selected,
     ):
-        inchis1 = frozenset(
+        inchis1 = tuple(
             inchi.get_key(record.get_molecule())
             for record in batch1
         )
-        inchis2 = frozenset(
+        inchis2 = tuple(
             inchi.get_key(record.get_molecule())
             for record in batch2
         )
