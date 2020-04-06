@@ -292,5 +292,5 @@ population2 = (
         ),
     ),
 )
-def above_average(request):
+def best(request):
     return request.param
