@@ -9,6 +9,7 @@ from .fixtures import *  # noqa
     params=(
         lazy_fixture('above_average'),
         lazy_fixture('best'),
+        lazy_fixture('filter_batches'),
     ),
 )
 def case_data(request):

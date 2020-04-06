@@ -1,3 +1,9 @@
+"""
+Filter Batches
+==============
+
+"""
+
 from .selector import Selector
 
 
@@ -7,6 +13,8 @@ class FilterBatches(Selector):
 
     Examples
     --------
+    *Using a Selection Algorithm on a Subset of Batches*
+
     You only want the :class:`.Best` 10 batches to participate in
     :class:`.Roulette`
 
@@ -14,7 +22,8 @@ class FilterBatches(Selector):
 
         import stk
 
-        population = stk.Population(...)
+        # Select the 10 best batches first, and then run roulette on
+        # those.
         selector = stk.FilterBatches(
             filter=stk.Best(10),
             selector=stk.Roulette(7),
@@ -43,7 +52,7 @@ class FilterBatches(Selector):
         self._filter = filter
         self._selector = selector
 
-    def _select(self, population, included_batches, excluded_batches):
+    def select(self, population, included_batches, excluded_batches):
         allowed = {
             batch.get_identity_key()
             for batch in self._filter.select(
@@ -57,5 +66,3 @@ class FilterBatches(Selector):
             included_batches=allowed,
             excluded_batches=excluded_batches,
         )
-
-
