@@ -37,22 +37,12 @@ population2 = (
 @pytest.fixture(
     params=(
         CaseData(
-            selector=stk.Best(),
+            selector=stk.Worst(),
             population=population1,
             selected=(
                 stk.Batch(
-                    records=(population1[0], ),
-                    fitness_values={population1[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[1], ),
-                    fitness_values={population1[1]: 9},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[2], ),
-                    fitness_values={population1[2]: 2},
+                    records=(population1[4], ),
+                    fitness_values={population1[4]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
@@ -61,24 +51,34 @@ population2 = (
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[4], ),
-                    fitness_values={population1[4]: 1},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
-        ),
-        CaseData(
-            selector=stk.Best(num_batches=2),
-            population=population1,
-            selected=(
-                stk.Batch(
-                    records=(population1[0], ),
-                    fitness_values={population1[0]: 10},
+                    records=(population1[2], ),
+                    fitness_values={population1[2]: 2},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
                     records=(population1[1], ),
                     fitness_values={population1[1]: 9},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], ),
+                    fitness_values={population1[0]: 10},
+                    key_maker=stk.Inchi(),
+                ),
+            ),
+        ),
+        CaseData(
+            selector=stk.Worst(num_batches=2),
+            population=population1,
+            selected=(
+                stk.Batch(
+                    records=(population1[4], ),
+                    fitness_values={population1[4]: 1},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[3], ),
+                    fitness_values={population1[3]: 1},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -90,13 +90,13 @@ population2 = (
             population=population2,
             selected=(
                 stk.Batch(
-                    records=(population2[0], ),
-                    fitness_values={population2[0]: 100},
+                    records=(population2[2], ),
+                    fitness_values={population2[2]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population2[2], ),
-                    fitness_values={population2[2]: 1},
+                    records=(population2[0], ),
+                    fitness_values={population2[0]: 100},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -108,13 +108,13 @@ population2 = (
             population=population2,
             selected=(
                 stk.Batch(
-                    records=(population2[0], ),
-                    fitness_values={population2[0]: 100},
+                    records=(population2[2], ),
+                    fitness_values={population2[2]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population2[2], ),
-                    fitness_values={population2[2]: 1},
+                    records=(population2[0], ),
+                    fitness_values={population2[0]: 100},
                     key_maker=stk.Inchi(),
                 ),
             ),
@@ -126,57 +126,17 @@ population2 = (
             population=population1,
             selected=(
                 stk.Batch(
-                    records=(population1[0], population1[1]),
+                    records=(population1[3], population1[4], ),
                     fitness_values={
-                        population1[0]: 10,
-                        population1[1]: 9,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[0], population1[2], ),
-                    fitness_values={
-                        population1[0]: 10,
-                        population1[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[0], population1[3], ),
-                    fitness_values={
-                        population1[0]: 10,
                         population1[3]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[0], population1[4], ),
-                    fitness_values={
-                        population1[0]: 10,
                         population1[4]: 1,
                     },
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[1], population1[2], ),
+                    records=(population1[2], population1[4], ),
                     fitness_values={
-                        population1[1]: 9,
                         population1[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[1], population1[3], ),
-                    fitness_values={
-                        population1[1]: 9,
-                        population1[3]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=(population1[1], population1[4], ),
-                    fitness_values={
-                        population1[1]: 9,
                         population1[4]: 1,
                     },
                     key_maker=stk.Inchi(),
@@ -190,18 +150,58 @@ population2 = (
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[2], population1[4], ),
+                    records=(population1[1], population1[4], ),
                     fitness_values={
-                        population1[2]: 2,
+                        population1[1]: 9,
                         population1[4]: 1,
                     },
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[3], population1[4], ),
+                    records=(population1[1], population1[3], ),
                     fitness_values={
+                        population1[1]: 9,
                         population1[3]: 1,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[1], population1[2], ),
+                    fitness_values={
+                        population1[1]: 9,
+                        population1[2]: 2,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[4], ),
+                    fitness_values={
+                        population1[0]: 10,
                         population1[4]: 1,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[3], ),
+                    fitness_values={
+                        population1[0]: 10,
+                        population1[3]: 1,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[2], ),
+                    fitness_values={
+                        population1[0]: 10,
+                        population1[2]: 2,
+                    },
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(population1[0], population1[1]),
+                    fitness_values={
+                        population1[0]: 10,
+                        population1[1]: 9,
                     },
                     key_maker=stk.Inchi(),
                 ),

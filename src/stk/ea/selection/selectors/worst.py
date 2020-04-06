@@ -28,7 +28,6 @@ class Worst(Selector):
         for batch in worst.select(population):
             # Do stuff with batch.
 
-
     """
 
     def __init__(
