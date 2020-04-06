@@ -12,6 +12,7 @@ from .fixtures import *  # noqa
         lazy_fixture('filter_batches'),
         lazy_fixture('filter_molecules'),
         lazy_fixture('remove_batches'),
+        lazy_fixture('worst'),
     ),
 )
 def case_data(request):

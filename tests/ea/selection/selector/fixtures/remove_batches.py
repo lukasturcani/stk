@@ -41,5 +41,5 @@ population1 = (
         ),
     ),
 )
-def filter_batches(request):
+def remove_batches(request):
     return request.param
