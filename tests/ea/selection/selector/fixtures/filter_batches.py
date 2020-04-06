@@ -66,5 +66,6 @@ population2 = (
             ),
         ),
     ),
+)
 def filter_batches(request):
     return request.param
