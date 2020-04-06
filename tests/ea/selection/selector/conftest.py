@@ -8,6 +8,7 @@ from .fixtures import *  # noqa
 @pytest.fixture(
     params=(
         lazy_fixture('above_average'),
+        lazy_fixture('best'),
     ),
 )
 def case_data(request):
