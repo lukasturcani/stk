@@ -1,3 +1,9 @@
+"""
+Remove Molecules
+================
+
+"""
+
 from .selector import Selector
 
 
@@ -7,16 +13,17 @@ class RemoveMolecules(Selector):
 
     Examples
     --------
-    You want to prevent any of the molecules in the :class:`.Best`
-    5 batches from being selected by :class:`.Roulette`.
+    *Removing Molecules From Selection*
 
     .. code-block:: python
 
         import stk
 
-        population = stk.Population(...)
         selector = stk.RemoveMolecules(
+            # Do not select any molecules from the top 5 batches
+            # of size 3.
             remover=stk.Best(num_batches=5, batch_size=3),
+            # Select the ret of the molecules using roulette.
             selector=stk.Roulette(num_batches=20, batch_size=3),
         )
 
@@ -46,23 +53,27 @@ class RemoveMolecules(Selector):
         self._remover = remover
         self._selector = selector
 
-    def _select(self, population, included_batches, excluded_batches):
+    def select(
+        self,
+        population,
+        included_batches=None,
+        excluded_batches=None,
+    ):
         remover_batches = self._remover.select(
             population=population,
             included_batches=included_batches,
             excluded_batches=excluded_batches,
         )
-        removed = {mol for batch in remover_batches for mol in batch}
-        valid_pop = population.__class__(*(
-            mol for mol in population if mol not in removed
-        ))
-        valid_pop.set_fitness_values_from_dict(
-            fitness_values=population.get_fitness_values(),
+        removed = {
+            record
+            for batch in remover_batches
+            for record in batch
+        }
+        valid_population = tuple(
+            record for record in population if record not in removed
         )
         yield from self._selector.select(
-            population=valid_pop,
+            population=valid_population,
             included_batches=included_batches,
             excluded_batches=excluded_batches,
         )
-
-
