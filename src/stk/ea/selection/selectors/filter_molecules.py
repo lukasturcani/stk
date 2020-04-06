@@ -13,16 +13,16 @@ class FilterMolecules(Selector):
 
     Examples
     --------
-    You want to use :class:`.Roulette` on the molecules which belong
-    to the :class:`.Best` 5 batches of size 3
+    *Using a Selection Algorithm on a Subset of Batches*
 
     .. code-block:: python
 
         import stk
 
-        population = stk.Population(...)
         selector = stk.FilterMolecules(
+            # Use only molecules in the top 5 batches of size 3.
             filter=stk.Best(num_batches=5, batch_size=3),
+            # Select from those molecules using roulette selection.
             selector=stk.Roulette(num_batches=20, batch_size=3),
         )
         for batch in selector.select(population):
@@ -61,14 +61,13 @@ class FilterMolecules(Selector):
             included_batches=included_batches,
             excluded_batches=excluded_batches,
         )
-        valid_pop = population.__class__(*(
-            mol for batch in valid_batches for mol in batch
-        ))
-        valid_pop.set_fitness_values_from_dict(
-            fitness_values=population.get_fitness_values(),
+        valid_population = tuple(
+            record
+            for batch in valid_batches
+            for record in batch
         )
         yield from self._selector.select(
-            population=valid_pop,
+            population=valid_population,
             included_batches=included_batches,
             excluded_batches=excluded_batches,
         )
