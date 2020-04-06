@@ -26,8 +26,8 @@ population1 = (
 @pytest.fixture(
     params=(
         CaseData(
-            selector=stk.FilterBatches(
-                filter=stk.Best(4),
+            selector=stk.FilterMolecules(
+                filter=stk.Best(num_batches=3, batch_size=2),
                 selector=stk.Best(),
             ),
             population=population1,
@@ -56,5 +56,5 @@ population1 = (
         ),
     ),
 )
-def filter_batches(request):
+def filter_molecules(request):
     return request.param
