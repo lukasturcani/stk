@@ -83,8 +83,55 @@ Make sure you also install :mod:`rdkit`, which is a dependency::
 Overview
 --------
 
-``stk`` is a Python library which allows the construction,
-manipulation, property calculation and automatic design of molecules.
+Features
+........
+
+Molecular Construction
+    :mod:`stk`
+
+Automatic Molecular Design
+    :mod:`stk`
+
+Databases
+    :mod:`stk` provides tools for the creation of molecular databases,
+    and storage of
+
+Usable Defaults
+    A goal of :mod:`stk` is to provide simple interfaces and require
+    minimal information from users to achieve basic and common tasks,
+    but also allow essentially limitless customization and extension in
+    order to facilitate complex workflows.
+
+Extensibility and Customization
+    Every part of :mod:`stk` can be extended and customized in user
+    code, and every user-made extension is indistinguishable from
+    natively implemented features. This means users can use
+    :mod:`stk` to construct new classes of molecules, add new
+    kinds of molecular databases, add or customize evolutionary
+    algorithm operations, or the evolutionary algorithm itself, all
+    without looking at :mod:`stk` source code. All such extensions will
+    work with the rest of :mod:`stk` as though they were part of the
+    library itself.
+
+Documentation and Examples
+    Every use-case and extension or customization :mod:`stk` has
+    documentation and examples which will guide users.
+    :mod:`stk` is built around abstract base classes, which means
+    all user extensions to :mod:`stk` involve creating a new class and
+    defining, usually, a single method.
+
+
+Future Releases
+...............
+
+:mod:`stk` is under active development. Important features in the
+future will include
+
+Molecular Database Visualization
+
+
+Distributed Evolutionary Algorithms
+
 
 For quick navigation through the modules of ``stk``, use
 :ref:`modindex`.
