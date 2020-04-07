@@ -189,13 +189,15 @@ class SelectionPlotter:
         sm.set_array([])
 
         df.to_csv(f'{self._filename}_{self._plots}.csv')
-        ax = sns.scatterplot(
+        fig, ax = plt.subplots(figsize=(11.7, 8.28))
+        sns.scatterplot(
             x='Number of Times Selected',
             y=self._x_label,
             hue='heat_map',
             palette='magma_r',
             data=df,
-            s=[200 for i in range(len(counter.keys()))]
+            s=[200 for i in range(len(counter.keys()))],
+            ax=ax,
         )
         ax.get_legend().remove()
         ax.figure.colorbar(sm).set_label(self._heat_map_label)
