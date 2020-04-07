@@ -157,7 +157,7 @@ class StochasticUniversalSampling(Selector):
         yielded_batches,
     ):
 
-        total = sum(batch.get_fitness() for batch in batches)
+        total = sum(batch.get_fitness_value() for batch in batches)
         batch_positions = []
         batch_position = 0
         for batch in batches:
