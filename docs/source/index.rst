@@ -117,7 +117,7 @@ Extensibility and Customization
 
 Documentation and Examples
 ..........................
-    Every use-case and extension or customization :mod:`stk` has
+    Every use-case and extension or customization of :mod:`stk` has
     documentation and examples which will guide users.
     :mod:`stk` is built around abstract base classes, which means
     all user extensions to :mod:`stk` involve creating a new class and
