@@ -1,4 +1,4 @@
-.. automodule:: stk.ea.terminators.all_terminators
+.. automodule:: stk.molecular.key_makers.inchi
    :members:
    :undoc-members:
    :show-inheritance:

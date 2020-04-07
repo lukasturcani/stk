@@ -19,7 +19,6 @@ Subpackages
    stk.ea.mutation
    stk.ea.plotters
    stk.ea.selection
-   stk.ea.terminators
 
 Submodules
 ----------

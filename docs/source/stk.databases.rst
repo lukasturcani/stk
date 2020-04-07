@@ -12,7 +12,6 @@ Subpackages
 .. toctree::
 
    stk.databases.mongo_db
-   stk.databases.value
 
 Submodules
 ----------
@@ -21,3 +20,4 @@ Submodules
 
    stk.databases.constructed_molecule
    stk.databases.molecule
+   stk.databases.value

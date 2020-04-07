@@ -19,4 +19,3 @@ Submodules
 .. toctree::
 
    stk.ea.selection.batch
-   stk.ea.selection.yielded_data

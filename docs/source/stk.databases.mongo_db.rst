@@ -6,13 +6,6 @@ stk.databases.mongo\_db package
    :undoc-members:
    :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-   stk.databases.mongo_db.value
-
 Submodules
 ----------
 
@@ -21,3 +14,4 @@ Submodules
    stk.databases.mongo_db.constructed_molecule
    stk.databases.mongo_db.molecule
    stk.databases.mongo_db.utilities
+   stk.databases.mongo_db.value

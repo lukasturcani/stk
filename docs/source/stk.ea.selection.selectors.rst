@@ -6,13 +6,19 @@ stk.ea.selection.selectors package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+
+   stk.ea.selection.selectors.utilities
+
 Submodules
 ----------
 
 .. toctree::
 
    stk.ea.selection.selectors.above_average
-   stk.ea.selection.selectors.batching_selector
    stk.ea.selection.selectors.best
    stk.ea.selection.selectors.filter_batches
    stk.ea.selection.selectors.filter_molecules

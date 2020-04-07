@@ -6,16 +6,12 @@ stk.molecular.key\_makers package
    :undoc-members:
    :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-   stk.molecular.key_makers.molecule
-
 Submodules
 ----------
 
 .. toctree::
 
-   stk.molecular.key_makers.constructed_molecule
+   stk.molecular.key_makers.inchi
+   stk.molecular.key_makers.inchi_key
+   stk.molecular.key_makers.molecule
+   stk.molecular.key_makers.utilities
