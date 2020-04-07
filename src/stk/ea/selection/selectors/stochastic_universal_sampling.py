@@ -30,6 +30,8 @@ class StochasticUniversalSampling(Selector):
 
     Examples
     --------
+    *Yielding Single Molecule Batches*
+
     Yielding molecules one at a time. For example, if molecules need
     to be selected for mutation or the next generation.
 
@@ -37,25 +39,23 @@ class StochasticUniversalSampling(Selector):
 
         import stk
 
-        # Make a population holding some molecules.
-        pop = stk.Population(...)
-
         # Make the selector.
         stochastic_sampling = stk.StochasticUniversalSampling(5)
 
         # Select the molecules.
-        for selected, in stochastic_sampling.select(pop):
+        for selected, in stochastic_sampling.select(population):
             # Do stuff with each selected molecule, like apply a
             # mutation to it to generate a mutant.
-            mutant = mutator.mutate(selected)
+            mutation_record = mutator.mutate(selected)
     """
 
     def __init__(
         self,
         num_batches=None,
         batch_size=1,
-        duplicate_mols=True,
+        duplicate_molecules=True,
         duplicate_batches=True,
+        key_maker=Inchi(),
         fitness_modifier=None,
         random_seed=None,
     ):
@@ -72,19 +72,24 @@ class StochasticUniversalSampling(Selector):
         batch_size : :class:`int`, optional
             The number of molecules yielded at once.
 
-        duplicate_mols : :class:`bool`, optional
+        duplicate_molecules : :class:`bool`, optional
             If ``True`` the same molecule can be yielded in more than
             one batch.
 
         duplicate_batches : :class:`bool`, optional
             If ``True`` the same batch can be yielded more than once.
 
+        key_maker : :class:`.MoleculeKeyMaker`, optional
+            Used to get the keys of molecules, which are used to
+            determine if two molecules are duplicates of each
+            other.
+
         fitness_modifier : :class:`callable`, optional
-            Takes the population on which :meth:`select` is called and
-            returns a :class:`dict` mapping molecules in the population
-            to the fitness values the :class:`.Selector` should use.
-            If ``None`` then :meth:`.EAPopulation.get_fitness_values`
-            is used.
+            Takes the `population` on which :meth:`.select` is called
+            and returns a :class:`dict`, which maps records in the
+            `population` to the fitness values the :class:`.Selector`
+            should use. If ``None``, the regular fitness values of the
+            records are used.
 
         random_seed : :class:`int`, optional
             The random seed to use.
@@ -92,16 +97,19 @@ class StochasticUniversalSampling(Selector):
         """
 
         if fitness_modifier is None:
-            fitness_modifier = self._return_fitness_values
+            fitness_modifier = self._get_fitness_values
 
         self._generator = np.random.RandomState(random_seed)
-        self._duplicate_mols = duplicate_mols
+        self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
         self._batch_size = batch_size
-        self._fitness_modifier = fitness_modifier
+        super().__init__(
+            key_maker=key_maker,
+            fitness_modifier=fitness_modifier,
+        )
 
-    def _select_from_batches(self, batches, yielded):
+    def _select_from_batches(self, batches, yielded_batches):
         batches = sorted(batches, reverse=True)
 
         # SUS may need to run multiple rounds if duplicate_mols or
@@ -114,23 +122,28 @@ class StochasticUniversalSampling(Selector):
         # previous rounds. This will repeat until the desired number
         # of batches has been yielded, or there are no more valid
         # batches.
-        while batches and yielded.get_num() < self._num_batches:
+        while (
+            batches
+            and yielded_batches.get_num() < self._num_batches
+        ):
             yield from self._select_with_stochastic_universal_sampling(
                 batches=batches,
-                yielded=yielded,
+                yielded_batches=yielded_batches,
             )
 
-            if yielded.get_num() < self._num_batches:
-                if not self._duplicate_mols:
-                    batches = (
-                        filter(yielded.has_no_yielded_mols, batches)
+            if yielded_batches.get_num() < self._num_batches:
+                if not self._duplicate_molecules:
+                    batches = filter(
+                        yielded_batches.has_no_yielded_molecules,
+                        batches,
                     )
                 if not self._duplicate_batches:
-                    batches = (
-                        filter(yielded.is_unyielded_batch, batches)
+                    batches = filter(
+                        yielded_batches.is_unyielded_batch,
+                        batches,
                     )
                 if (
-                    not self._duplicate_mols
+                    not self._duplicate_molecules
                     or not self._duplicate_batches
                 ):
                     batches = tuple(batches)
@@ -138,18 +151,18 @@ class StochasticUniversalSampling(Selector):
     def _select_with_stochastic_universal_sampling(
         self,
         batches,
-        yielded,
+        yielded_batches,
     ):
 
         total = sum(batch.get_fitness() for batch in batches)
         batch_positions = []
         batch_position = 0
         for batch in batches:
-            batch_position += batch.get_fitness()/total
+            batch_position += batch.get_fitness_value()/total
             batch_positions.append(batch_position)
 
         num_batches = min(
-            self._num_batches - yielded.get_num(),
+            self._num_batches - yielded_batches.get_num(),
             len(batches)
         )
         pointer_distance = 1/num_batches
@@ -167,14 +180,14 @@ class StochasticUniversalSampling(Selector):
             batch = batches[batch_index]
 
             if (
-                not self._duplicate_mols
-                and yielded.has_yielded_mols(batch)
+                not self._duplicate_molecules
+                and yielded_batches.has_yielded_molecules(batch)
             ):
                 continue
 
             if (
                 not self._duplicate_batches
-                and yielded.is_yielded_batch(batch)
+                and yielded_batches.is_yielded_batch(batch)
             ):
                 continue
 
