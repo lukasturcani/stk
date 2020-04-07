@@ -99,6 +99,9 @@ class StochasticUniversalSampling(Selector):
         if fitness_modifier is None:
             fitness_modifier = self._get_fitness_values
 
+        if num_batches is None:
+            num_batches = float('inf')
+
         self._generator = np.random.RandomState(random_seed)
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
