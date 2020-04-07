@@ -85,9 +85,8 @@ class AboveAverage(Selector):
             If ``True`` the same batch can be yielded more than once.
 
         key_maker : :class:`.MoleculeKeyMaker`, optional
-            Used to get the keys of molecules, which are used to
-            determine if two molecules are duplicates of each
-            other.
+            Used to get the keys of molecules. If two molecules have
+            the same key, they are considered duplicates.
 
         fitness_modifier : :class:`callable`, optional
             Takes the `population` on which :meth:`.select` is called
