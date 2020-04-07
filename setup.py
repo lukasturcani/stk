@@ -21,7 +21,6 @@ setup(
     install_requires=(
         'scipy',
         'matplotlib',
-        'psutil',
         'pandas',
         'pathos',
         'seaborn',
