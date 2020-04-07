@@ -6,6 +6,9 @@ def test_select(case_data):
     """
     Test :meth:`.Selector.select`.
 
+    This test checks that the correct batches have been yielded and
+    in the correct order.
+
     Parameters
     ----------
     case_data : :class:`.CaseData`
