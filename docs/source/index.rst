@@ -100,7 +100,7 @@ Usable Defaults
 ...............
     A goal of :mod:`stk` is to provide simple interfaces and require
     minimal information from users to achieve basic and common tasks,
-    but also allow essentially limitless customization and extension in
+    but also allow essentially extensive customization and extension in
     order to facilitate complex workflows.
 
 Extensibility and Customization
