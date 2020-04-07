@@ -54,7 +54,7 @@ class SelectionPlotter:
         self,
         filename,
         selector,
-        x_label='Molecule: InChIKey - fitness value',
+        x_label='Molecule: InChIKey - Fitness Value',
         record_label=lambda record: (
             f'{InchiKey().get_key(record.get_molecule())} - '
             f'{record.get_fitness_value()}'
@@ -171,14 +171,14 @@ class SelectionPlotter:
             label = self._record_label(record)
             data = {
                 self._x_label: label,
-                'Number of times selected': selection_count,
+                'Number of Times Selected': selection_count,
                 'order': self._order_by(record),
                 'heat_map': self._heat_map_value(record)
             }
             df = df.append(data, ignore_index=True)
 
         df = df.sort_values(
-            ['Number of times selected', 'order'],
+            ['Number of Times Selected', 'order'],
             ascending=[False, False]
         )
         norm = plt.Normalize(
@@ -190,8 +190,8 @@ class SelectionPlotter:
 
         df.to_csv(f'{self._filename}_{self._plots}.csv')
         ax = sns.scatterplot(
-            x=self._x_label,
-            y='Number of times selected',
+            x='Number of Times Selected',
+            y=self._x_label,
             hue='heat_map',
             palette='magma_r',
             data=df,
@@ -199,7 +199,6 @@ class SelectionPlotter:
         )
         ax.get_legend().remove()
         ax.figure.colorbar(sm).set_label(self._heat_map_label)
-        plt.xticks(rotation=90)
         plt.tight_layout()
         fig.savefig(f'{self._filename}_{self._plots}.png', dpi=fig.dpi)
         plt.close('all')
