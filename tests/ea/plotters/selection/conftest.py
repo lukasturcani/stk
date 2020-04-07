@@ -24,6 +24,21 @@ from .case_data import CaseData
                 stk.MoleculeRecord(
                     molecule=stk.BuildingBlock('BrCCCBr'),
                 ).with_fitness_value(1),
+                stk.MoleculeRecord(
+                    molecule=stk.BuildingBlock('ClCBr'),
+                ).with_fitness_value(100),
+                stk.MoleculeRecord(
+                    molecule=stk.BuildingBlock('ClCNCBr'),
+                ).with_fitness_value(9),
+                stk.MoleculeRecord(
+                    molecule=stk.BuildingBlock('ClCNNCBr'),
+                ).with_fitness_value(5),
+                stk.MoleculeRecord(
+                    molecule=stk.BuildingBlock('ClCCBr'),
+                ).with_fitness_value(3),
+                stk.MoleculeRecord(
+                    molecule=stk.BuildingBlock('ClCCCBr'),
+                ).with_fitness_value(1),
             ),
         ),
     ),
