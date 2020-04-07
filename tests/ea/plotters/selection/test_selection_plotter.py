@@ -49,4 +49,4 @@ def _test_selection_plotter(selector, population, filename):
     """
 
     stk.SelectionPlotter(filename, selector)
-    selector.select(population)
+    tuple(selector.select(population))
