@@ -87,10 +87,12 @@ constructed with the following code
         # Because there are multiple building blocks with the same
         # number of functional groups, they need to be explicitly
         # placed on vertices, as there are multiple valid combinations.
+        # The numbers specify the ids of the vertex on which each
+        # building block is placed.
         building_blocks={
             bb1: 0,
             bb2: range(1, 4),
-            bb3: (4, 5),
+            bb3: 4,
             bb4: range(5, 10),
         },
     )
@@ -115,7 +117,7 @@ edge to align with, the building block will be rotated
         building_blocks={
             bb1: 0,
             bb2: range(1, 4),
-            bb3: (4, 5),
+            bb3: 4,
             bb4: range(5, 10),
         },
         # Vertex 0 gets aligned to the third edge it's connected to.
@@ -159,7 +161,7 @@ structural isomers of a single cage in one swoop
             building_blocks={
                 bb1: 0,
                 bb2: range(1, 4),
-                bb3: (4, 5),
+                bb3: 4,
                 bb4: range(5, 10),
             },
             vertex_alignments={
