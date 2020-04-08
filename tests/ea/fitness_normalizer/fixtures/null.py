@@ -10,24 +10,24 @@ from ..case_data import CaseData
             fitness_normalizer=stk.NullFitnessNormalizer(),
             population=(
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(1),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(2),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(3),
             ),
             normalized=(
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(1),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(2),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(3),
             ),
         ),

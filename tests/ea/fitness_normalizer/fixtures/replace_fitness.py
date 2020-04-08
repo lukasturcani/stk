@@ -19,28 +19,28 @@ from ..case_data import CaseData
             ),
             population=(
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(1),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(2),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(3),
                 stk.MoleculeRecord(None),
             ),
             normalized=(
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(1),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(2),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(3),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value(0.5),
             ),
         ),

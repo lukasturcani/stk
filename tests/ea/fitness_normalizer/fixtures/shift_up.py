@@ -13,25 +13,25 @@ from ..case_data import CaseData
             ),
             population=(
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value((1, -5, 5)),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value((3, -10, 2)),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value((2, 20, 1)),
                 stk.MoleculeRecord(None),
             ),
             normalized=(
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value((1, 6, 5)),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value((3, 1, 2)),
                 stk.MoleculeRecord(
-                    graph=None,
+                    topology_graph=None,
                 ).with_fitness_value((2, 31, 1)),
                 stk.MoleculeRecord(None),
             ),
