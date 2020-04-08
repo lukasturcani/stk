@@ -36,7 +36,7 @@ population2 = (
         topology_graph=get_topology_graph(7),
     ).with_fitness_value(100),
     stk.MoleculeRecord(
-        topology_graph=get_topology_graph(8),
+        topology_graph=get_topology_graph(7),
     ).with_fitness_value(100),
     stk.MoleculeRecord(
         topology_graph=get_topology_graph(9),
