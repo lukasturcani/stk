@@ -11,6 +11,7 @@
    Introduction <introduction>
    Basic Examples <basic_examples>
    Cookbook <cookbook>
+   Module Index <index.rst>
 
 .. toctree::
    :hidden:
