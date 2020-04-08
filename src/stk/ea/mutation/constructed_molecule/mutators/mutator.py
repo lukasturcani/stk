@@ -9,14 +9,9 @@ Constructed Molecule Mutator
 """
 
 
-class ConstructedMoleculeMutator:
+class MoleculeMutator:
     """
     Abstract base class for molecule mutators.
-
-    Note that despite appearances, :class:`.MoleculeMutator` and
-    :class:`.ConstructedMoleculeMutator` are not interchangeable, you
-    cannot use one where the other is required, unless explicitly
-    allowed.
 
     Examples
     --------
@@ -34,12 +29,12 @@ class ConstructedMoleculeMutator:
 
         Parameters
         ----------
-        record : :class:`.ConstructedMoleculeRecord`
+        record : :class:`.MoleculeRecord`
             The molecule to be mutated.
 
         Returns
         -------
-        :class:`.ConstructedMoleculeMutationRecord`
+        :class:`.MutationRecord`
             A record of the mutation.
 
         """
