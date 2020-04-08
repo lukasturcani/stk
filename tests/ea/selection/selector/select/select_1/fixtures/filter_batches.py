@@ -3,22 +3,30 @@ import stk
 
 from ..case_data import CaseData
 
+topology_graph = stk.polymer.Linear(
+    building_blocks=(
+        stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+    ),
+    repeating_unit='A',
+    num_repeating_units=2,
+)
+
 
 population1 = (
     stk.MoleculeRecord(
-        molecule=stk.BuildingBlock('BrCBr'),
+        topology_graph=topology_graph,
     ).with_fitness_value(10),
     stk.MoleculeRecord(
-        molecule=stk.BuildingBlock('BrCNCBr'),
+        topology_graph=topology_graph,
     ).with_fitness_value(9),
     stk.MoleculeRecord(
-        molecule=stk.BuildingBlock('BrCNNCBr'),
+        topology_graph=topology_graph,
     ).with_fitness_value(2),
     stk.MoleculeRecord(
-        molecule=stk.BuildingBlock('BrCCBr'),
+        topology_graph=topology_graph,
     ).with_fitness_value(1),
     stk.MoleculeRecord(
-        molecule=stk.BuildingBlock('BrCCCBr'),
+        topology_graph=topology_graph,
     ).with_fitness_value(1),
 )
 
