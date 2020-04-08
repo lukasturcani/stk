@@ -134,7 +134,7 @@ Every part of :mod:`.stk` can be extended and customized in user
 code, and every user-made extension is indistinguishable from
 natively implemented features. This means users can use
 :mod:`.stk` to construct new classes of molecules, add new
-kinds of molecular databases, add or customize evolutionary
+kinds of molecular databases, and add or customize evolutionary
 algorithm operations, all
 without looking at :mod:`.stk` source code. All such extensions will
 work with the rest of :mod:`.stk` as though they were part of the
