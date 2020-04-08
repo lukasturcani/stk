@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from ...case_data import CaseData
+from ..case_data import CaseData
 
 
 bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
