@@ -25,9 +25,9 @@ bb3 = stk.BuildingBlock('BrCNNCCNCBr', [stk.BromoFactory()])
                 building_blocks=(bb2, bb3),
                 is_replaceable=has_bromo,
             ),
-            record=stk.ConstructedMoleculeRecord(graph1),
-            mutation_record=stk.ConstructedMoleculeMutationRecord(
-                molecule_record=stk.ConstructedMoleculeRecord(graph2),
+            record=stk.MoleculeRecord(graph1),
+            mutation_record=stk.MutationRecord(
+                molecule_record=stk.MoleculeRecord(graph2),
                 mutator_name='SimilarBuildingBlock',
             ),
         ),

@@ -30,16 +30,13 @@ def _test_mutate(mutator, record, mutation_record):
 
     Parameters
     ----------
-    mutator : :class:`.MoleculeMutator` or \
-            :class:`.ConstructedMoleculeMutator`
+    mutator : :class:`.MoleculeMutator`
         The mutator to test.
 
-    record : :class:`.MoleculeRecord` or \
-            :class:`.ConstructedMoleculeRecord`
+    record : :class:`.MoleculeRecord`
         The molecule to mutate.
 
-    mutation_record : :class:`.MoleculeMutationRecord` or \
-            :class:`.ConstructedMoleculeMutationRecord`
+    mutation_record : :class:`.MutationRecord`
         The correct mutation record.
 
     Returns

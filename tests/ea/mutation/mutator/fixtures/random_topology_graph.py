@@ -14,7 +14,7 @@ def get_eight_plus_twelve(graph):
             mutator=stk.RandomTopologyGraph(
                 replacement_funcs=(get_eight_plus_twelve, ),
             ),
-            record=stk.ConstructedMoleculeRecord(
+            record=stk.MoleculeRecord(
                 topology_graph=stk.cage.FourPlusSix(
                     building_blocks=(
                         stk.BuildingBlock(
@@ -28,8 +28,8 @@ def get_eight_plus_twelve(graph):
                     ),
                 ),
             ),
-            mutation_record=stk.ConstructedMoleculeMutationRecord(
-                molecule_record=stk.ConstructedMoleculeRecord(
+            mutation_record=stk.MutationRecord(
+                molecule_record=stk.MoleculeRecord(
                     topology_graph=stk.cage.EightPlusTwelve(
                         building_blocks=(
                             stk.BuildingBlock(
