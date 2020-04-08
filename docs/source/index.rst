@@ -20,7 +20,7 @@
    Constructed Molecule <stk.molecular.molecules.constructed_molecule>
    Functional Groups <stk.molecular.functional_groups.functional_groups.functional_group>
    Functional Group Factories <stk.molecular.functional_groups.factories.functional_group_factory>
-   Reactions <stk.molecular.reactions.reactions.reaction>
+   Reactions <stk.molecular.reactions.reactions.reaction.reaction>
    Reaction Factories <stk.molecular.reactions.factories.reaction_factory>
 
 .. toctree::
@@ -164,7 +164,7 @@ future will include
 Molecular Database Visualization
 ................................
 
-Currently :mod:`stk` allows users to store molecules into a database.
+Currently :mod:`stk` allows users to store molecules in a database.
 However, a current goal is to develop an app which can be used to
 visually inspect and browse the molecules in the database. This should
 help multi-member research groups, where a computational scientist
@@ -203,7 +203,7 @@ the different topology graphs. In general, you will find examples on
 how to use a class, in that classes documentation.
 Once you are comfortable with construction, you can start looking at
 how to deposit and retrieve the molecules from databases. Finally
-:mod:`stk` provides multiple examples of how to use its evolutionary
+:mod:`stk` provides multiple examples on how to use its evolutionary
 algorithm.
 
 .. _`construction overview`: construction_overview.html
