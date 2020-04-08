@@ -4,21 +4,29 @@ import pandas as pd
 
 from .case_data import CaseData
 
+topology_graph = stk.polymer.Linear(
+    building_blocks=(
+        stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+    ),
+    repeating_unit='A',
+    num_repeating_units=2,
+)
+
 
 def get_generation(*fitness_values):
     v1, v2, v3, *_ = fitness_values
     return (
         stk.MoleculeRecord(
-            molecule=stk.BuildingBlock('BrBr'),
+            topology_graph=topology_graph,
         ).with_fitness_value(v1),
         stk.MoleculeRecord(
-            molecule=stk.BuildingBlock('BrCBr'),
+            topology_graph=topology_graph,
         ).with_fitness_value(v2),
         stk.MoleculeRecord(
-            molecule=stk.BuildingBlock('BrCCBr'),
+            topology_graph=topology_graph,
         ).with_fitness_value(v3),
         stk.MoleculeRecord(
-            molecule=stk.BuildingBlock('BrCCCBr'),
+            topology_graph=topology_graph,
         )
     )
 
