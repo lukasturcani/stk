@@ -11,7 +11,6 @@
    Introduction <introduction>
    Basic Examples <basic_examples>
    Cookbook <cookbook>
-   Module Index <modules>
 
 .. toctree::
    :hidden:
@@ -162,9 +161,11 @@ Future Releases
 future will include
 
 Molecular Database Visualization
+................................
 
 
 Distributed Evolutionary Algorithms
+...................................
 
 
 The key idea behind ``stk`` is that the construction of a molecule can
@@ -351,46 +352,20 @@ single operation, which can be executed in parallel. This allows
 advantage of multiple cores even during the construction of a single
 molecule.
 
-Property Calculation
---------------------
-
-``stk`` provides a number calculators to carry out property
-calculations. When these are not sufficient, ``stk`` molecules can
-be converted to and from :mod:`rdkit` molecules, which provides
-additional property calculation and cheminformatics facilities.
-
-Working With Multiple Molecules
--------------------------------
-
-It is often the case that the construction and property calculation
-needs to be performed on molecules in bulk and in parallel. For this,
-``stk`` provides the :class:`.Population`, which is a specialized
-container providing these facilities.
-
-Automatic Molecular Design
---------------------------
-
-To perform automatic design, ``stk`` includes an evolutionary
-algorithm, which can make use of the construction facilities in
-``stk`` but is not required to.
-
 What Next?
 ----------
 
+Something you might like to do first, is look at the
+`construction overview`,
 A good thing to look at are some `basic examples`_, which will allow
-you to get a feel for ``stk``. Further examples of molecular
+you to get a feel for :mod:`stk`. After that, examples of molecular
 construction can be seen by looking at the different topology graphs.
-The documentation of the various topology graph classes in ``stk``
-also contains usage
-examples. More advanced examples can be seen in the `cookbook`_ and
-if you want to experiment with automated molecular design you can look
-into how to write an input file for the evolutionary algorithm. If
-``stk`` does not have a topology graph for a molecule you would like to
-construct, you can always implement a new one yourself. Alternatively,
-if you would like to request an extension to
-``stk``, or you have any other question about ``stk``, feel free to
-message me on your favourite platform or file an issue on GitHub.
-
+The documentation of the various topology graph classes in :mod:`stk`
+also contains usage examples. In general, you will find examples
+on how to use a class, in that classes documentation.
+Once you are comfortable with construction, you can start looking at
+how to deposit and retrieve the molecules from a databases. Finally
+:mod:`stk` provides multiple examples of how to use its evolutionary
+algorithm.
 
 .. _`basic examples`: basic_examples.html
-.. _`cookbook`: cookbook.html
