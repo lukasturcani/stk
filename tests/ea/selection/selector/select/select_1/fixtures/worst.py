@@ -19,16 +19,16 @@ population1 = (
         topology_graph=get_topology_graph(2),
     ).with_fitness_value(11),
     stk.MoleculeRecord(
-        topology_graph=get_topology_graph(2),
+        topology_graph=get_topology_graph(3),
     ).with_fitness_value(10),
     stk.MoleculeRecord(
-        topology_graph=get_topology_graph(3),
+        topology_graph=get_topology_graph(4),
     ).with_fitness_value(9),
     stk.MoleculeRecord(
-        topology_graph=get_topology_graph(4),
+        topology_graph=get_topology_graph(5),
     ).with_fitness_value(2),
     stk.MoleculeRecord(
-        topology_graph=get_topology_graph(5),
+        topology_graph=get_topology_graph(6),
     ).with_fitness_value(1),
 )
 population2 = (
