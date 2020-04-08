@@ -44,7 +44,7 @@ constructed molecule, the bonds formed during construction often have
 unrealistic lengths. This means that constructed molecules will need to
 undergo structure optimization. There is no single correct way to go
 about this, because the appropriate methodology for structure
-optimization will depend various factors, such as the nature of the
+optimization will depend on various factors, such as the nature of the
 constructed molecule, the desired accuracy, and time constraints.
 In addition, there are countless options already available,
 be it Python libraries such as :mod:`rdkit` or :mod:`ase`, or
@@ -52,7 +52,7 @@ some sort of computational chemistry software. Since
 :mod:`stk` cannot hope to provide a good solution to this problem,
 it does try to make it easy for you to convert an
 :mod:`stk` :class:`.Molecule` into whatever format you need to make
-use of this other software. This means you can access atoms and
+use of other software. This means you can access atoms and
 bonds with :meth:`.Molecule.get_atoms` and :meth:`.Molecule.get_bonds`,
 you can convert any :mod:`stk` :class:`.Molecule` into an
 :mod:`rdkit` molecule with :meth:`.Molecule.to_rdkit_mol` or you
@@ -69,108 +69,10 @@ placement of a building block, it is extremely easy to construct
 different structural isomers of the constructed molecule. The vertex
 can be told to perform different transformations on the building block,
 so that its orientation in the constructed molecule changes. For the
-end user, selecting the transformation and therefore structural isomer
-is relatively easy. Take the example of an organic cage, which can be
-constructed with the following code
-
-
-.. code-block:: python
-
-    # Create the building blocks.
-    bb1 = stk.BuildingBlock('O=CC(C=O)C(Cl)C=O', [stk.AldehydeFactory()])
-    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', [stk.AldehydeFactory()])
-    bb3 = stk.BuildingBlock('NCC(Cl)N', [stk.PrimaryAminoFactory()])
-    bb4 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-
-    # Create the topology graph.
-    tetrahedron = stk.cage.FourPlusSix(
-        # Because there are multiple building blocks with the same
-        # number of functional groups, they need to be explicitly
-        # placed on vertices, as there are multiple valid combinations.
-        # The numbers specify the ids of the vertex on which each
-        # building block is placed.
-        building_blocks={
-            bb1: 0,
-            bb2: range(1, 4),
-            bb3: 4,
-            bb4: range(5, 10),
-        },
-    )
-
-    # Create the molecule.
-    cage = stk.ConstructedMolecule(tetrahedron)
-    # You can write the molecule to a file if you want to view it.
-    cage.write('cage.mol')
-
-and looks like this
-
-.. figure:: https://i.imgur.com/MAFrzAl.png
-
-
-You can see that the green atoms on adjacent building blocks
-point toward the different edges. However, by specifying a different
-edge to align with, the building block will be rotated
-
-.. code-block:: python
-
-    isomer_graph = stk.cage.FourPlusSix(
-        building_blocks={
-            bb1: 0,
-            bb2: range(1, 4),
-            bb3: 4,
-            bb4: range(5, 10),
-        },
-        # Vertex 0 gets aligned to the third edge it's connected to.
-        vertex_alignments={0: 1},
-    )
-    isomer = stk.ConstructedMolecule(isomer_graph)
-    isomer.write('cage_isomer.mol')
-
-.. figure:: https://i.imgur.com/cg9n69u.png
-
-
-The same thing can be done to any other building block on the cage to
-perform a rotation on it. You can also write a loop, to create all the
-structural isomers of a single cage in one swoop
-
-.. code-block:: python
-
-    import itertools as it
-
-    # For each vertex, holds the possible edge alignment values.
-    alignments = (
-        range(3),
-        range(3),
-        range(3),
-        range(3),
-        range(2),
-        range(2),
-        range(2),
-        range(2),
-        range(2),
-        range(2),
-    )
-
-    # Create 5184 structural isomers.
-
-    isomers = []
-
-    # Get all combinations of alignments.
-    for aligners in it.product(*alignments):
-        tetrahedron = stk.cage.FourPlusSix(
-            building_blocks={
-                bb1: 0,
-                bb2: range(1, 4),
-                bb3: 4,
-                bb4: range(5, 10),
-            },
-            vertex_alignments={
-                vertex_id: edge
-                for vertex_id, edge in enumerate(aligners)
-            }
-        )
-        isomers.append(stk.ConstructedMolecule(tetrahedron))
-
+end user, selecting the transformation from a set of
+predefined ones is easy. Also, since the transformation is restricted
+to a single building block on a single vertex, it easy for developers
+to define.
 
 The second major benefit of the topology graph is that the vertices and
 edges can hold additional state useful for the construction of a
