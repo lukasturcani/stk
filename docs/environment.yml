@@ -3,7 +3,6 @@ channels:
 dependencies:
     - pip
     - pip:
-        - sphinx==3.0.0
         - sphinx_rtd_theme
         - numpydoc
         - -e ..
