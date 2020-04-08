@@ -1,9 +1,8 @@
 """
-Molecule Crossover Record
-=========================
+Crossover Record
+=================
 
-#. :class:`.MoleculeCrossoverRecord`
-#. :class:`.ConstructedMoleculeCrossoverRecord`
+#. :class:`.CrossoverRecord`
 
 """
 
