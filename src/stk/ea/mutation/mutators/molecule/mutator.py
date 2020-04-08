@@ -1,6 +1,6 @@
 """
-Constructed Molecule Mutator
-============================
+Molecule Mutator
+================
 
 #. :class:`.RandomBuildingBlock`
 #. :class:`.RandomTopologyGraph`

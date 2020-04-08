@@ -11,5 +11,5 @@ Subpackages
 
 .. toctree::
 
-   stk.ea.mutation.constructed_molecule
-   stk.ea.mutation.molecule
+   stk.ea.mutation.mutators
+   stk.ea.mutation.records

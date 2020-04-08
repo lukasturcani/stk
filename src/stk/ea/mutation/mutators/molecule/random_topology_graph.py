@@ -6,12 +6,12 @@ Random Topology Graph
 
 import numpy as np
 
-from .mutator import ConstructedMoleculeMutator
-from ..record import ConstructedMoleculeMutationRecord
-from ....molecule_records import ConstructedMoleculeRecord
+from .mutator import MoleculeMutator
+from ...records import MutationRecord
+from ....molecule_records import MoleculeRecord
 
 
-class RandomTopologyGraph(ConstructedMoleculeMutator):
+class RandomTopologyGraph(MoleculeMutator):
     """
     Changes topology graphs at random.
 
@@ -87,7 +87,7 @@ class RandomTopologyGraph(ConstructedMoleculeMutator):
             a=self._replacement_funcs,
         )
         replacement = replacement_func(record.get_topology_graph())
-        return ConstructedMoleculeMutationRecord(
-            molecule_record=ConstructedMoleculeRecord(replacement),
+        return MutationRecord(
+            molecule_record=MoleculeRecord(replacement),
             mutator_name=self._name,
         )

@@ -8,7 +8,7 @@ import numpy as np
 
 
 from .mutator import MoleculeMutator
-from ..record import MutationRecord
+from ...records import MutationRecord
 from ....molecule_records import MoleculeRecord
 
 

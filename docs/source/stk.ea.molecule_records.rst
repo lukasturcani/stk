@@ -11,5 +11,4 @@ Submodules
 
 .. toctree::
 
-   stk.ea.molecule_records.constructed_molecule
    stk.ea.molecule_records.molecule

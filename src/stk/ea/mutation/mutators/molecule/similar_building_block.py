@@ -9,12 +9,12 @@ from functools import partial
 
 from stk.molecular import Inchi
 from stk.utilities import dice_similarity
-from .mutator import ConstructedMoleculeMutator
-from ..record import ConstructedMoleculeMutationRecord
-from ....molecule_records import ConstructedMoleculeRecord
+from .mutator import MoleculeMutator
+from ...records import MutationRecord
+from ....molecule_records import MoleculeRecord
 
 
-class SimilarBuildingBlock(ConstructedMoleculeMutator):
+class SimilarBuildingBlock(MoleculeMutator):
     """
     Substitutes similar building blocks.
 
@@ -181,7 +181,7 @@ class SimilarBuildingBlock(ConstructedMoleculeMutator):
         graph = record.get_topology_graph().with_building_blocks({
             replaced_building_block: replacement,
         })
-        return ConstructedMoleculeMutationRecord(
-            molecule_record=ConstructedMoleculeRecord(graph),
+        return MutationRecord(
+            molecule_record=MoleculeRecord(graph),
             mutator_name=self._name,
         )
