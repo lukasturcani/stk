@@ -101,6 +101,11 @@ no matter how simple or complex, in case something they want to build
 is not built-in. :mod:`stk` also makes it to specify which isomer of a
 given structure should be built.
 
+Here is a preview of some of the more complex structures
+:mod:`stk` can construct
+
+.. image:: https://i.imgur.com/HI5cciM.png
+
 Automatic Molecular Design
 ..........................
 
@@ -161,12 +166,6 @@ Molecular Database Visualization
 
 Distributed Evolutionary Algorithms
 
-
-Among other things, ``stk`` allows you to construct molecules like this
-
-.. image:: https://i.imgur.com/HI5cciM.png
-
-and many others.
 
 The key idea behind ``stk`` is that the construction of a molecule can
 be broken down into two fundamental pieces of information, its
