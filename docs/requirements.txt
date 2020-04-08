@@ -1,5 +1,5 @@
 sphinx==3.0
 sphinx_rtd_theme
 numpydoc
--e ..
+-e .
 --install-option="--no-deps"
