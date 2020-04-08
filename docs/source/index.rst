@@ -71,7 +71,7 @@ GitHub: https://www.github.com/lukasturcani/stk
 Installation
 ------------
 
-To get ``stk``, you can install it with pip::
+To get :mod:`stk`, you can install it with pip::
 
     $ pip install stk
 
