@@ -10,24 +10,24 @@ from ..case_data import CaseData
             fitness_normalizer=stk.DivideByMean(),
             population=(
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCBr'),
+                    graph=None,
                 ).with_fitness_value(1),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCBr'),
+                    graph=None,
                 ).with_fitness_value(2),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCCBr'),
+                    graph=None,
                 ).with_fitness_value(3),
             ),
             normalized=(
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCBr'),
+                    graph=None,
                 ).with_fitness_value(0.5),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCBr'),
+                    graph=None,
                 ).with_fitness_value(1),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCCBr'),
+                    graph=None,
                 ).with_fitness_value(1.5),
             ),
         ),
@@ -38,27 +38,27 @@ from ..case_data import CaseData
             ),
             population=(
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCBr'),
+                    graph=None,
                 ).with_fitness_value((1, 10, 100)),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCBr'),
+                    graph=None,
                 ).with_fitness_value((2, 20, 200)),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCCBr'),
+                    graph=None,
                 ).with_fitness_value((3, 30, 300)),
-                stk.MoleculeRecord(stk.BuildingBlock('BrCCCCBr')),
+                stk.MoleculeRecord(None),
             ),
             normalized=(
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCBr'),
+                    graph=None,
                 ).with_fitness_value((0.5, 0.5, 0.5)),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCBr'),
+                    graph=None,
                 ).with_fitness_value((1, 1, 1)),
                 stk.MoleculeRecord(
-                    molecule=stk.BuildingBlock('BrCCCCBr'),
+                    graph=None,
                 ).with_fitness_value((1.5, 1.5, 1.5)),
-                stk.MoleculeRecord(stk.BuildingBlock('BrCCCCBr')),
+                stk.MoleculeRecord(None),
             ),
         ),
     ),
