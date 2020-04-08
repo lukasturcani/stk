@@ -8,9 +8,8 @@
    :caption: stk
    :maxdepth: 2
 
-   Introduction <introduction>
+   Construction Overview <construction_overview>
    Basic Examples <basic_examples>
-   Cookbook <cookbook>
 
 .. toctree::
    :hidden:
@@ -356,16 +355,17 @@ What Next?
 ----------
 
 Something you might like to do first, is look at the
-`construction overview`,
-A good thing to look at are some `basic examples`_, which will allow
-you to get a feel for :mod:`stk`. After that, examples of molecular
-construction can be seen by looking at the different topology graphs.
-The documentation of the various topology graph classes in :mod:`stk`
-also contains usage examples. In general, you will find examples
-on how to use a class, in that classes documentation.
+`construction overview`_, which can give you a picture of how
+:mod:`stk` goes about constructing molecules. Next, the
+`basic examples`_, will allow
+you to get a feel for how to use :mod:`stk`. After that, examples of
+molecular construction can be seen by looking at the documentation of
+the different topology graphs. In general, you will find examples on
+how to use a class, in that classes documentation.
 Once you are comfortable with construction, you can start looking at
-how to deposit and retrieve the molecules from a databases. Finally
+how to deposit and retrieve the molecules from databases. Finally
 :mod:`stk` provides multiple examples of how to use its evolutionary
 algorithm.
 
+.. _`construction overview`: construction_overview.html
 .. _`basic examples`: basic_examples.html
