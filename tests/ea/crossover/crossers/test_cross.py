@@ -30,18 +30,13 @@ def _test_cross(crosser, records, crossover_records):
 
     Parameters
     ----------
-    crosser : :class:`.MoleculeCrosser` or \
-            :class:`.ConstructedMoleculeCrosser`
+    crosser : :class:`.MoleculeCrosser`
         The crosser to test.
 
-    records : :class:`tuple` of :class:`.MoleculeRecord` or \
-            :class:`tuple` of :class:`.ConstructedMoleculeRecord`
+    records : :class:`tuple` of :class:`.MoleculeRecord`
         The molecules to cross.
 
-    crossover_records : :class:`tuple` of \
-            :class:`MoleculeCrossoverRecord` or \
-            :class:`tuple` of \
-            :class:`.ConstructedMoleculeCrossoverRecord`
+    crossover_records : :class:`tuple` of :class:`.CrossoverRecord`
         The correct offspring.
 
     Returns
