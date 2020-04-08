@@ -11,5 +11,5 @@ Subpackages
 
 .. toctree::
 
-   stk.ea.crossover.constructed_molecule
-   stk.ea.crossover.molecule
+   stk.ea.crossover.crossers
+   stk.ea.crossover.records
