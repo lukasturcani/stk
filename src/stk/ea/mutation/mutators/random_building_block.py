@@ -7,12 +7,12 @@ Random Building Block
 import numpy as np
 
 
-from .mutator import ConstructedMoleculeMutator
-from ..record import ConstructedMoleculeMutationRecord
-from ....molecule_records import ConstructedMoleculeRecord
+from .mutator import MoleculeMutator
+from ..record import MutationRecord
+from ....molecule_records import MoleculeRecord
 
 
-class RandomBuildingBlock(ConstructedMoleculeMutator):
+class RandomBuildingBlock(MoleculeMutator):
     """
     Substitutes random building blocks.
 
@@ -121,7 +121,7 @@ class RandomBuildingBlock(ConstructedMoleculeMutator):
         graph = record.get_topology_graph().with_building_blocks({
             replaced_building_block: replacement,
         })
-        return ConstructedMoleculeMutationRecord(
-            molecule_record=ConstructedMoleculeRecord(graph),
+        return MutationRecord(
+            molecule_record=MoleculeRecord(graph),
             mutator_name=self._name,
         )
