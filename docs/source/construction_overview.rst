@@ -83,12 +83,12 @@ covalent organic frameworks. With the topology graph this is trivial
 to implement, simply label some of the edges a periodic and they
 will construct periodic bonds instead of regular ones.
 
-The third benefit of the topology graph is that it allows users to
+Thirdly, the topology graph allows users to
 easily modify the construction of molecules by placing different
 building blocks on different vertices.
 
-The fourth benefit of the topology graph is that the construction of
-a molecule is broken down into independent steps. Each vertex
+Finally, the topology graph breaks down the construction of
+a molecule into independent steps. Each vertex
 represents a single, independent operation on a building block while
 each edge represents a single, independent operation on a collection
 of building blocks. As a result, each vertex and edge represents a
