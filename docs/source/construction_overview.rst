@@ -88,7 +88,7 @@ easily modify the construction of molecules by placing different
 building blocks on different vertices.
 
 The fourth benefit of the topology graph is that the construction of
-a molecule is broken down into a independent steps. Each vertex
+a molecule is broken down into independent steps. Each vertex
 represents a single, independent operation on a building block while
 each edge represents a single, independent operation on a collection
 of building blocks. As a result, each vertex and edge represents a
