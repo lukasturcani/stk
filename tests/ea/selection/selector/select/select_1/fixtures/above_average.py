@@ -4,38 +4,40 @@ import stk
 from .utilities import get_rank_fitness
 from ..case_data import CaseData
 
-topology_graph = stk.polymer.Linear(
-    building_blocks=(
-        stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-    ),
-    repeating_unit='A',
-    num_repeating_units=2,
-)
+
+def get_topology_graph(num_repeating_units):
+    return stk.polymer.Linear(
+        building_blocks=(
+            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+        ),
+        repeating_unit='A',
+        num_repeating_units=num_repeating_units,
+    )
 
 
 population1 = (
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(2),
     ).with_fitness_value(10),
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(3),
     ).with_fitness_value(9),
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(4),
     ).with_fitness_value(2),
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(5),
     ).with_fitness_value(1),
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(6),
     ).with_fitness_value(1),
 )
 population2 = (
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(7),
     ).with_fitness_value(100),
     stk.MoleculeRecord(
-        topology_graph=topology_graph,
+        topology_graph=get_topology_graph(8),
     ).with_fitness_value(1),
 )
 
