@@ -30,7 +30,7 @@ class RandomBuildingBlock(MoleculeMutator):
         # Create a molecule which is to be mutated.
         bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
         bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-        polymer = stk.ConstructedMoleculeRecord(
+        polymer = stk.MoleculeRecord(
             topology_graph=stk.polymer.Linear((bb1, bb2), 'AB', 3),
         )
 

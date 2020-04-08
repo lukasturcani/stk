@@ -7,7 +7,7 @@ Crossover Record
 """
 
 
-class MoleculeCrossoverRecord:
+class CrossoverRecord:
     """
     Abstract base class for a record of a crossover operation.
 
@@ -22,7 +22,7 @@ class MoleculeCrossoverRecord:
 
     def __init__(self, molecule_record, crosser_name):
         """
-        Initialize a :class:`.MoleculeCrossoverRecord` instance.
+        Initialize a :class:`.CrossoverRecord` instance.
 
         Parameters
         ----------

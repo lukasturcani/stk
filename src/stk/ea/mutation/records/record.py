@@ -22,7 +22,7 @@ class MutationRecord:
 
     def __init__(self, molecule_record, mutator_name):
         """
-        Initialize a :class:`.MoleculeMutationRecord` instance.
+        Initialize a :class:`.MutationRecord` instance.
 
         Parameters
         ----------

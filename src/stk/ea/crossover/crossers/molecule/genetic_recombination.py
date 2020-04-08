@@ -7,12 +7,12 @@ Genetic Recombination
 import itertools as it
 from collections import defaultdict
 
-from .crosser import ConstructedMoleculeCrosser
-from ..record import ConstructedMoleculeCrossoverRecord
-from ....molecule_records import ConstructedMoleculeRecord
+from .crosser import MoleculeCrosser
+from ...records import CrossoverRecord
+from ....molecule_records import MoleculeRecord
 
 
-class GeneticRecombination(ConstructedMoleculeCrosser):
+class GeneticRecombination(MoleculeCrosser):
     """
     Recombine building blocks using biological systems as a model.
 
@@ -105,7 +105,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
         bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
         graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
         polymer1  = stk.ConstructedMolecule(graph1)
-        record1 = stk.ConstructedMoleculeRecord(polymer1, graph1)
+        record1 = stk.MoleculeRecord(polymer1, graph1)
 
         bb3 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
         bb4 = stk.BuildingBlock(
@@ -114,7 +114,7 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
         )
         graph2 = stk.polymer.Linear((bb3, bb4), 'AB', 2)
         polymer2  = stk.ConstructedMolecule(graph2)
-        record2 = stk.ConstructedMoleculeRecord(polymer2, graph2)
+        record2 = stk.MoleculeRecord(polymer2, graph2)
 
         # Create the crosser.
 
@@ -180,8 +180,8 @@ class GeneticRecombination(ConstructedMoleculeCrosser):
                     in topology_graph.get_building_blocks()
                 },
             )
-            yield ConstructedMoleculeCrossoverRecord(
-                molecule_record=ConstructedMoleculeRecord(
+            yield CrossoverRecord(
+                molecule_record=MoleculeRecord(
                     topology_graph=topology_graph,
                 ),
                 crosser_name=self._name,
