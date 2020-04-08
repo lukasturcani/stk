@@ -29,7 +29,7 @@
    :maxdepth: 2
 
    Polymer <stk.molecular.topology_graphs.polymer>
-   Organic Cage <stk.molecular.topology_graphs.cage>
+   Organic Cage <stk.molecular.topology_graphs.cage.cage>
    Covalent Organic Framework <stk.molecular.topology_graphs.cof>
    Host Guest Complex <stk.molecular.topology_graphs.host_guest>
    Macrocycle <stk.molecular.topology_graphs.macrocycle>
