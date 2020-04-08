@@ -117,14 +117,14 @@ and storage of molecular property values. :mod:`stk` comes with
 support for the creation of MongoDB databases, which can be used to
 store molecules constructed by users, or discovered by the
 evolutionary algorithm. In addition, property values calculated for
-those molecules can also be stored and retrieved in the database.
+those molecules can also be stored and retrieved from the database.
 
 Usable Defaults
 ...............
 
 A goal of :mod:`.stk` is to provide simple interfaces and require
 minimal information from users to achieve basic and common tasks,
-but also allow essentially extensive customization and extension in
+but also allow extensive customization and extension in
 order to facilitate complex workflows.
 
 Extensibility and Customization
