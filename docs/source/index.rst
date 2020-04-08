@@ -11,7 +11,7 @@
    Introduction <introduction>
    Basic Examples <basic_examples>
    Cookbook <cookbook>
-   Module Index <index.rst>
+   Module Index <index>
 
 .. toctree::
    :hidden:
@@ -35,6 +35,15 @@
    Macrocycle <stk.molecular.topology_graphs.macrocycle>
    Rotaxane <stk.molecular.topology_graphs.rotaxane>
    Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph>
+
+.. toctree::
+   :hidden:
+   :caption: Molecular Databases
+   :maxdepth: 2
+
+    Molecule MongoDB <stk.databases.mongo_db.molecule>
+    Constructed Molecule MongoDB <stk.databases.mongo_db.constructed_molecule>
+    Value MongoDB <stk.databases.mongo_db.value>
 
 .. toctree::
    :hidden:
@@ -83,18 +92,32 @@ Overview
 Molecular Construction
 ......................
 
-:mod:`.stk`
+:mod:`.stk` provides tools for constructing a variety of molecular
+structures, including organic cages, covalent organic frameworks,
+polymers and macrocycles, among others. While additional molecular
+structures are always being added, :mod:`stk` provides tools which
+allow users to easily specify new kinds of molecular structures,
+no matter how simple or complex, in case something they want to build
+is not built-in. :mod:`stk` also makes it to specify which isomer of a
+given structure should be built.
 
 Automatic Molecular Design
 ..........................
 
-:mod:`.stk`
+:mod:`.stk` provides an evolutionary algorithm, which can be used for
+discovery of new molecules, which have properties desired by the user.
+This evolutionary algorithm works with any molecule :mod:`stk` can
+construct, even those defined by users.
 
 Databases
 .........
 
 :mod:`.stk` provides tools for the creation of molecular databases,
-and storage of
+and storage of molecular property values. :mod:`stk` comes with
+support for the creation of MongoDB databases, which can be used to
+store molecules constructed by users, or discovered by the
+evolutionary algorithm. In addition, property values calculated for
+those molecules can also be stored and retrieved in the database.
 
 Usable Defaults
 ...............
