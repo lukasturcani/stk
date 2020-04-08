@@ -11,7 +11,7 @@
    Introduction <introduction>
    Basic Examples <basic_examples>
    Cookbook <cookbook>
-   Module Index <index>
+   Module Index <modules>
 
 .. toctree::
    :hidden:
@@ -130,7 +130,7 @@ Usable Defaults
 A goal of :mod:`.stk` is to provide simple interfaces and require
 minimal information from users to achieve basic and common tasks,
 but also allow extensive customization and extension in
-order to facilitate complex workflows.
+order to fulfill complex requirements.
 
 Extensibility and Customization
 ...............................
