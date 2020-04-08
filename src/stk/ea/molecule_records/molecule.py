@@ -2,7 +2,11 @@
 Molecule Record
 ===============
 
+#. :class:`.MoleculeRecord`
+
 """
+
+from stk.molecular import ConstructedMolecule
 
 
 class MoleculeRecord:
@@ -18,18 +22,19 @@ class MoleculeRecord:
 
     """
 
-    def __init__(self, molecule):
+    def __init__(self, topology_graph):
         """
         Initialize a :class:`.MoleculeRecord` instance.
 
         Parameters
         ----------
-        molecule : :class:`.Molecule`
-            The molecule the record holds.
+        topology_graph : :class:`.TopologyGraph`
+            The topology graph of a :class:`.ConstructedMolecule`.
 
         """
 
-        self._molecule = molecule
+        self._molecule = ConstructedMolecule(topology_graph)
+        self._topology_graph = topology_graph
         self._fitness_value = None
         self._normalized_fitness_value = None
 
@@ -39,12 +44,25 @@ class MoleculeRecord:
 
         Returns
         -------
-        :class:`.Molecule`
+        :class:`.ConstructedMolecule`
             The molecule held by the record.
 
         """
 
         return self._molecule
+
+    def get_topology_graph(self):
+        """
+        Get the topology graph of the molecule.
+
+        Returns
+        -------
+        :class:`.TopologyGraph`
+            The topology graph.
+
+        """
+
+        return self._topology_graph
 
     def get_fitness_value(self, normalized=True):
         """
@@ -93,6 +111,7 @@ class MoleculeRecord:
 
         clone = self.__class__.__new__(self.__class__)
         clone._molecule = self._molecule
+        clone._topology_graph = self._topology_graph
         clone._fitness_value = self._fitness_value
         clone._normalized_fitness_value = (
             self._normalized_fitness_value

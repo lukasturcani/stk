@@ -1,15 +1,13 @@
 """
-Constructed Molecule Mutation Record
-====================================
+Molecule Mutation Record
+========================
 
-#. :class:`.ConstructedMoleculeMutationRecord`
+#. :class:`.MutationRecord`
 
 """
 
-from ..molecule import MoleculeMutationRecord
 
-
-class ConstructedMoleculeMutationRecord(MoleculeMutationRecord):
+class MutationRecord:
     """
     Abstract base class for a record of a mutation operation.
 
@@ -24,11 +22,11 @@ class ConstructedMoleculeMutationRecord(MoleculeMutationRecord):
 
     def __init__(self, molecule_record, mutator_name):
         """
-        Initialize a :class:`.ConstructedMoleculeMutationRecord`.
+        Initialize a :class:`.MoleculeMutationRecord` instance.
 
         Parameters
         ----------
-        molecule_record : :class:`.ConstructedMoleculeRecord`
+        molecule_record : :class:`.MoleculeRecord`
             The molecule produced by the mutation operation.
 
         mutator_name : :class:`str`
@@ -36,17 +34,31 @@ class ConstructedMoleculeMutationRecord(MoleculeMutationRecord):
 
         """
 
-        super().__init__(molecule_record, mutator_name)
+        self._molecule_record = molecule_record
+        self._mutator_name = mutator_name
 
     def get_molecule_record(self):
         """
-        Get the molecule record produced by the mutation.
+        Get the :class:`.MoleculeRecord` produced by the mutation.
 
         Returns
         -------
-        :class:`.ConstructedMoleculeRecord`
+        :class:`.MoleculeRecord`
             The molecule record.
 
         """
 
-        return super().get_molecule_record()
+        return self._molecule_record
+
+    def get_mutator_name(self):
+        """
+        Get the name of the mutator which carried out the mutation.
+
+        Returns
+        -------
+        :class:`str`
+            The name of the mutator.
+
+        """
+
+        return self._mutator_name
