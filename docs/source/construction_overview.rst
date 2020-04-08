@@ -121,7 +121,7 @@ edge to align with, the building block will be rotated
             bb4: range(5, 10),
         },
         # Vertex 0 gets aligned to the third edge it's connected to.
-        vertex_alignments={0: 2},
+        vertex_alignments={0: 1},
     )
     isomer = stk.ConstructedMolecule(isomer_graph)
     isomer.write('cage_isomer.mol')
