@@ -1,6 +1,5 @@
 from .utilities import *
 from .molecular import *
-from .populations import *
 from .serialization import *
 from .databases import *
 from .ea import *
