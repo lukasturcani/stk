@@ -411,7 +411,7 @@ These values will also be accessible in a later session
 
     bb = stk.BuildingBlock('BrCCCCBr')
     bb_energy = energy_db.get(bb)
-    bb_atom_count = energy_db.get(bb)
+    bb_atom_count = atom_count_db.get(bb)
 
 Specifying Functional Groups Individually
 =========================================
