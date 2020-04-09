@@ -124,7 +124,7 @@ lets :mod:`stk` know which atoms the user intends to transform during
 construction.
 
 There are many different types of
-:class:`~.functional_groups.functional_group` present
+:mod:`~.functional_groups.functional_group` present
 in :mod:`stk`, for example, :class:`.Bromo`, :class:`.Alcohol` or
 :class:`.Aldehyde`. When a user creates a :class:`.BuildingBlock`,
 they can specify multiple functional groups at at time using
@@ -165,8 +165,8 @@ a mix of factories
 
 Based on the specific functional groups found on an
 edge of the :class:`.TopologyGraph`, :mod:`stk` will select an
-appropriate :class:`.Reaction` to join them. You can also force
-:mod:`stk` to use a different :class:`.Reaction` of your choosing,
-which is covered in the `basic examples`_.
+appropriate :mod:`reaction.reaction` to join them. You can also force
+:mod:`stk` to use a different :mod:`.reaction.reaction` of your
+choosing, which is covered in the `basic examples`_.
 
 .. _`basic examples`: basic_examples.html
