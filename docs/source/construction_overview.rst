@@ -165,8 +165,8 @@ a mix of factories
 
 Based on the specific functional groups found on an
 edge of the :class:`.TopologyGraph`, :mod:`stk` will select an
-appropriate :mod:`reaction.reaction` to join them. You can also force
-:mod:`stk` to use a different :mod:`.reaction.reaction` of your
+appropriate :mod:`~.reaction.reaction` to join them. You can also force
+:mod:`stk` to use a different :mod:`~.reaction.reaction` of your
 choosing, which is covered in the `basic examples`_.
 
 .. _`basic examples`: basic_examples.html
