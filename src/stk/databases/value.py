@@ -2,7 +2,11 @@
 Value Database
 ==============
 
-#. :class:`.ValueMongoDb`
+.. toctree::
+    :hidden:
+    :maxdepth: 2
+
+    Value MongoDB <stk.databases.mongo_db.value>
 
 """
 
