@@ -2,7 +2,12 @@
 Reaction Factory
 ================
 
-#. :class:`.GenericReactionFactory`
+.. toctree::
+    :maxdepth: 2
+
+    Generic Reaction Factory <\
+stk.molecular.reactions.factories.generic_reaction_factory\
+>
 
 """
 
