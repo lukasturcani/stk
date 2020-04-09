@@ -135,7 +135,7 @@ Here, ``bb`` will have two :class:`.CarboxylicAcid` functional groups.
 In each, the deleter atoms will be the oxygen and hydrogen atom of
 the ``OH`` group, and the bonder atom will be the carbon atom.
 
-Now, the second way you might want to modify a carobxylic acid group
+Now, the second way you might want to modify a carobxylic acid group,
 is to only delete the hydrogen atom of the ``OH`` group during
 construction, and add a bond to the oxygen atom of the
 ``OH`` group. This means the hydrogen atom is the deleter atom and
