@@ -20,7 +20,51 @@ strings and loading them from molecule structure files.
 
 
 Look at the documentation of :class:`.BuildingBlock` to see other
-available initialization methods.
+available initialization methods. They are easy to find, as they all
+begin with :mod:`init`.
+
+Specifying Multiple Functional Groups
+=====================================
+
+When you create a :class:`.BuildingBlock`, you need also specify
+which atoms are modified during construction of a
+:class:`.ConstructedMolecule`. This is achieved by providing the
+:class:`.BuildingBlock` with
+:mod:`~.functional_groups.functional_group` instances. To save you
+the pain of creating function groups one by one, you can use a
+:mod:`~.functional_group_factory`. If you have a building block
+with bromo groups, and you want the bromo groups to be modified
+during construction, you would use a :class:`.BromoFactory`
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+The ``bb`` in the example above, would have two :class:`.Bromo`
+functional groups. Similarly, if you have a building block with
+aldehyde groups
+
+
+.. code-block:: python
+
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactor()])
+
+In this example, ``bb2`` will have two :class:`.Aldehyde` functional
+groups. Finally, if you have both aldehdye and bromo groups on a
+molecule, and you want both to be modified during construction,
+you would use both of the factories
+
+.. code-block:: python
+
+    bb3 = stk.BuildingBlock(
+        smiles='O=CCCBr',
+        functional_groups=[stk.AldehydeFacotry(), stk.BromoFactory()],
+    )
+
+In the example above, ``b3`` has one :class:`.Bromo` and one
+:class:`.Aldehyde` functional group.
 
 
 Constructing Molecules
