@@ -115,12 +115,12 @@ added during construction, and which atoms are deleted during
 construction. You might like to customize this in the functional groups
 created by a :mod:`~.functional_group_factory`.
 
-Take, for example, a :class:`.CarboxylicAcid` functional group. This
-group, ``C(=O)O``. There are two likely ways you would like to modify
-this group during construction. In the first way, you want to add a
-bond to the carbon atom, and delete the ``OH`` group, which is treated
-as a leaving group. This is what :class:`.CarboxylicAcidFactory`
-will do by default
+Take, for example, a :class:`.CarboxylicAcid` functional group. There
+are two likely ways you would like to modify
+this group, ``C(=O)O``, during construction. In the first way, you want
+to add a bond to the carbon atom, and delete the ``OH`` group, which is
+treated as a leaving group. This is what
+:class:`.CarboxylicAcidFactory` will do by default
 
 .. code-block:: python
 
