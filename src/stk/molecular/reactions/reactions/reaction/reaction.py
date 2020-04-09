@@ -2,10 +2,21 @@
 Reaction
 ========
 
-#. :class:`.OneOneReaction`
-#. :class:`.OneTwoReaction`
-#. :class:`.RingAmineReaction`
-#. :class:`.TwoTwoReaction`
+.. toctree::
+    :maxdepth: 2
+
+    One One Reaction <\
+stk.molecular.reactions.reactions.one_one_reaction\
+>
+    One Two Reaction <\
+stk.molecular.reactions.reactions.one_two_reaction\
+>
+    Ring Amine Reaction <\
+stk.molecular.reactions.reactions.ring_amine_reaction\
+>
+    Two Two Reaction <\
+stk.molecular.reactions.reactions.two_two_reaction\
+>
 
 """
 
