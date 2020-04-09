@@ -27,8 +27,14 @@ else, take for example the construction of a linear polymer
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear(
             building_blocks=(
-                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                stk.BuildingBlock(
+                    smiles='Brc1cc(Br)ccc1',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='Brc1cc(Br)cnc1Br',
+                    functional_groups=[stk.BromoFactory()],
+                ),
             ),
             repeating_unit='ABBBA',
             num_repeating_units=2
