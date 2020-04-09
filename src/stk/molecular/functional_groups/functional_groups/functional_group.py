@@ -2,7 +2,7 @@
 Functional Group
 ================
 
-.. toctree:
+.. toctree::
     :hidden:
     :maxdepth: 2
 
