@@ -320,7 +320,7 @@ Storing Values
 
 Unlike the previous example, you can deposit values for both
 a :class:`.BuildingBlock` and a :class:`.ConstructedMolecule` in the
-same database. First lets create one
+same database. First, lets create one
 
 .. code-block:: python
 
