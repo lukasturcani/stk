@@ -208,7 +208,7 @@ can be found here__.
 
 __ https://api.mongodb.com/python/current/
 
-You can also use a remote MongoDb, in which case you do not have to
+You can also use a remote MongoDB, in which case you do not have to
 install it locally, but you will still need to install
 :mod:`pymongo`.
 
