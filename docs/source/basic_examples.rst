@@ -132,7 +132,7 @@ treated as a leaving group. This is what
     )
 
 Here, ``bb`` will have two :class:`.CarboxylicAcid` functional groups.
-In each the deleter atoms will be the oxygen and hydrogen atom of
+In each, the deleter atoms will be the oxygen and hydrogen atom of
 the ``OH`` group, and the bonder atom will be the carbon atom.
 
 Now, the second way you might want to modify a carobxylic acid group
@@ -150,10 +150,12 @@ instances of this kind
         functional_groups=[
             stk.CarboxylicAcidFactory(
                 # Atom number 3 corresponds to the oxygen atom in a
-                # carboxylic acid group.
+                # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
+                # THE MOLECULE.
                 bonders=(3, ),
                 # Atom number 4 corresponds to the hydrogen atom in a
-                # carboxylic acid group.
+                # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
+                # THE MOLECULE.
                 deleters=(4, ),
             ),
         ],
