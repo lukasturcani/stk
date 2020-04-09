@@ -108,7 +108,7 @@ Building Blocks
 
 Building blocks in :mod:`stk` are molecules, or molecular fragments,
 which are placed on the nodes of the :class:`.TopologyGraph`. After
-building blocks are placed on a nodes the nodes, they are connected to
+building blocks are placed the nodes, they are connected to
 each other through a :class:`.Reaction`. :mod:`stk` support multiple
 reactions and users can add their own. Reactions can add or remove
 atoms and bonds between building blocks, which are connected by
