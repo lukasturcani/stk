@@ -9,67 +9,41 @@ Functional Group
     Aldehyde <\
 stk.molecular.functional_groups.functional_groups.aldehyde\
 >
+    Alkene <stk.molecular.functional_groups.functional_groups.alkene>
+    Alkyne <stk.molecular.functional_groups.functional_groups.alkyne>
+    Amide <stk.molecular.functional_groups.functional_groups.amide>
+    Boronic Acid <\
+stk.molecular.functional_groups.functional_groups.boronic_acid\
+>
+    Bromo <stk.molecular.functional_groups.functional_groups.bromo>
+    Carboxylic Acid <\
+stk.molecular.functional_groups.functional_groups.carboxylic_acid\
+>
+    Dibromo <stk.molecular.functional_groups.functional_groups.dibromo>
+    Difluoro <\
+stk.molecular.functional_groups.functional_groups.difluoro\
+>
+    Diol <stk.molecular.functional_groups.functional_groups.diol>
+    Fluoro <stk.molecular.functional_groups.functional_groups.fluoro>
+    Generic Functional Group <\
+stk.molecular.functional_groups.functional_groups.\
+generic_functional_group\
+>
+    Iodo <stk.molecular.functional_groups.functional_groups.iodo>
+    Primary Amino <\
+stk.molecular.functional_groups.functional_groups.primary_amino\
+>
+    Ring Amine <\
+stk.molecular.functional_groups.functional_groups.ring_amine\
+>
+    Secondary Amino <\
+stk.molecular.functional_groups.functional_groups.secondary_amino\
+>
+    Thioacid <\
+stk.molecular.functional_groups.functional_groups.thioacid\
+>
+    Thiol <stk.molecular.functional_groups.functional_groups.thiol>
 
-
-:class:`.Alcohol`
------------------
-
-:class:`.Aldehyde`
-------------------
-
-:class:`.Alkene`
-----------------
-
-:class:`.Alkyne`
-----------------
-
-:class:`.Amide`
----------------
-
-:class:`.BoronicAcid`
----------------------
-
-:class:`.Bromo`
----------------
-
-:class:`.CarboxylicAcid`
-------------------------
-
-:class:`.Dibromo`
------------------
-
-:class:`.Difluoro`
-------------------
-
-:class:`.Diol`
---------------
-
-:class:`.Fluoro`
-----------------
-
-:class:`.GenericFunctionalGroup`
---------------------------------
-
-:class:`.Iodo`
---------------
-
-:class:`.PrimaryAmino`
-----------------------
-
-:class:`.RingAmine`
--------------------
-
-:class:`.SecondaryAmino`
-------------------------
-
-:class:`.Thioacid`
-------------------
-
-:class:`.Thiol`
----------------
-
-
------
 
 Functional groups define which atoms of a :class:`.BuildingBlock` are
 modified during :class:`.ConstructedMolecule` construction, and which
