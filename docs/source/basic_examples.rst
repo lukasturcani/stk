@@ -241,6 +241,10 @@ for example, a :class:`.BuildingBlock`
     # into permanent storage.
     db.put(bb)
 
+Note that :mod:`stk` databases do not have a staging area. The
+moment you call :meth:`~.MoleculeDatabase.put`, the molecule is
+committed to the database.
+
 To retrieve a molecule from the database, by default, you would
 provide the InChIKey. To first thing you might want to do is write a
 function which turns the SMILES of a molecule into the InChIKey
@@ -366,6 +370,10 @@ Now we can deposit the energy value in the database
     # Note that as soon as put() is called, the value is placed into
     # permanent storage.
     energy_db.put(bb, get_energy(bb))
+
+Note that :mod:`stk` databases do not have a staging area. The
+moment you call :meth:`~.ValueDatabase.put`, the value is
+committed to the database.
 
 And we can retrieve it
 
