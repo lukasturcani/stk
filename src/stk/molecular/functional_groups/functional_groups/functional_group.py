@@ -2,25 +2,65 @@
 Functional Group
 ================
 
-#. :class:`.Alcohol`
-#. :class:`.Aldehyde`
-#. :class:`.Alkene`
-#. :class:`.Alkyne`
-#. :class:`.Amide`
-#. :class:`.BoronicAcid`
-#. :class:`.Bromo`
-#. :class:`.CarboxylicAcid`
-#. :class:`.Dibromo`
-#. :class:`.Difluoro`
-#. :class:`.Diol`
-#. :class:`.Fluoro`
-#. :class:`.GenericFunctionalGroup`
-#. :class:`.Iodo`
-#. :class:`.PrimaryAmino`
-#. :class:`.RingAmine`
-#. :class:`.SecondaryAmino`
-#. :class:`.Thioacid`
-#. :class:`.Thiol`
+:class:`.Alcohol`
+-----------------
+
+:class:`.Aldehyde`
+------------------
+
+:class:`.Alkene`
+----------------
+
+:class:`.Alkyne`
+----------------
+
+:class:`.Amide`
+---------------
+
+:class:`.BoronicAcid`
+---------------------
+
+:class:`.Bromo`
+---------------
+
+:class:`.CarboxylicAcid`
+------------------------
+
+:class:`.Dibromo`
+-----------------
+
+:class:`.Difluoro`
+------------------
+
+:class:`.Diol`
+--------------
+
+:class:`.Fluoro`
+----------------
+
+:class:`.GenericFunctionalGroup`
+--------------------------------
+
+:class:`.Iodo`
+--------------
+
+:class:`.PrimaryAmino`
+----------------------
+
+:class:`.RingAmine`
+-------------------
+
+:class:`.SecondaryAmino`
+------------------------
+
+:class:`.Thioacid`
+------------------
+
+:class:`.Thiol`
+---------------
+
+
+-----
 
 Functional groups define which atoms of a :class:`.BuildingBlock` are
 modified during :class:`.ConstructedMolecule` construction, and which
