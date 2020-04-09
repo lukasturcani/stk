@@ -41,9 +41,9 @@
    :caption: Molecular Databases
    :maxdepth: 2
 
-    Molecule MongoDB <stk.databases.mongo_db.molecule>
-    Constructed Molecule MongoDB <stk.databases.mongo_db.constructed_molecule>
-    Value MongoDB <stk.databases.mongo_db.value>
+    Molecule <stk.databases.molecule>
+    Constructed Molecule <stk.databases.constructed_molecule>
+    Value <stk.databases.value>
 
 .. toctree::
    :hidden:
