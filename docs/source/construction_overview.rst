@@ -1,6 +1,9 @@
 Construction Overview
 =====================
 
+Introduction
+------------
+
 The key idea behind :mod:`stk` is that the construction of a molecule can
 be broken down into two fundamental pieces of information, its
 building blocks and its topology graph. The building blocks of a
@@ -63,6 +66,9 @@ can write it to a file with :meth:`.Molecule.write`.
 
     The general construction workflow of ``stk``.
 
+Topology Graph
+--------------
+
 The abstraction provided by the topology graph has a number of
 powerful benefits. Firstly, because every vertex is responsible for the
 placement of a building block, it is extremely easy to construct
@@ -96,3 +102,68 @@ single operation, which can be executed in parallel. This allows
 :mod:`stk` to scale efficiently to large topology graphs and take
 advantage of multiple cores even during the construction of a single
 molecule.
+
+Building Blocks
+---------------
+
+Building blocks in :mod:`stk` are molecules, or molecular fragments,
+which are placed on the nodes of the :class:`.TopologyGraph`. After
+building blocks are placed on a nodes the nodes, they are connected to
+each other through a :class:`.Reaction`. :mod:`stk` support multiple
+reactions and users can add their own. Reactions can add or remove
+atoms and bonds between building blocks, which are connected by
+edges in the topology graph.
+
+When it comes to reactions, an important question, which must be
+addressed, is, which atoms of a :class:`.BuildingBlock` are modified
+by a :class:`.Reaction`? In :mod:`stk`, the answer to this is a
+:class:`.FunctionalGroup`. When a user of :mod:`stk` creates a
+:class:`.BuildingBlock`, they also specify which functional groups
+are present in the :class:`.BuildingBlock`. This lets :mod:`stk` know
+which atoms the user intends to transform during construction.
+
+There are many different types of :class:`.FunctionalGroup` present
+in :mod:`stk`, for example, :class:`.Bromo`, :class:`.Alcohol` or
+:class:`.Aldehyde`. When a user creates a :class:`.BuildingBlock`,
+they can specify multiple functional groups at at time using
+a :class:`.FunctionalGroupFactory`. A :class:`.FunctionalGroupFactory`
+finds all the functional groups of a specific type, and adds them
+to the :class:`.BuildingBlock`. For example, if we want to create
+a :class:`.BuildingBlock`, and you want to react its bromo groups
+during construction, you can use a :class:`.BromoFactory`.
+
+.. code-block:: python
+
+    import stk
+
+    building_block = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+
+In the example above, `building_block` will have two
+:class:`.Bromo` functional groups. When ``building_block`` is used
+for construction, it is the atoms held by the :class:`.Bromo`
+groups, which will be modified. If we have a building block with
+aldehyde functional groups, we could have used an
+:class:`.AldehydeFactory`.
+
+.. code-block:: python
+
+    building_block2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()]
+
+Finally, if we had a mix of functional groups, we could have used
+a mix of factories
+
+.. code-block:: python
+
+    building_block2 = stk.BuildingBlock(
+        smiles='O=CCCBr',
+        functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
+    )
+
+
+Based on which classes of :class:`.FunctionalGroup` is found on an
+edge of the :class:`.TopologyGraph`, :mod:`stk` will select an
+appropriate :class:`.Reaction` to join them. You can also force
+:mod:`stk` to use a different :class:`.Reaction` of your choosing,
+which is covered in the `basic examples`_.
+
+.. _`basic examples`: basic_examples.html
