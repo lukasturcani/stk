@@ -238,29 +238,41 @@ for example, a :class:`.BuildingBlock`
     bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
     db.put(bb)
 
-
-To restore it, by default, you would use the InChIKey
+To retrieve a molecule from the database, by default, you would
+provide the InChIKey. To first thing you might want to do is write a
+function which turns the SMILES of a molecule into the InChIKey
 
 .. code-block:: python
 
     import rdkit.Chem.AllChem as rdkit
 
-    restored = db.get({
-        'InChIKey': rdkit.MolToInchiKey(rdkit.MolFromSmiles('BrCCBr')),
+    def get_inchi_key(smiles):
+        return rdkit.MolToInchiKey(rdkit.MolFromSmiles(smiles))
+
+Now we can load the molecule from the database, by providing the
+SMILES of the molecule
+
+.. code-block:: python
+
+    import rdkit.Chem.AllChem as rdkit
+
+    loaded = db.get({
+        'InChIKey': get_inchi_key('BrCCBr'),
     })
 
-However, you can customize it. For example, the documentation of
+However, this step can be customized. For example, the documentation of
 :class:`.MoleculeMongoDb`, shows how you can use SMILES to retrieve
-your molecules.
+your molecules, without needing to write a function like
+:func:`get_inchi_key`.
 
-The ``restored`` molecule is only a :class:`.Molecule` instance,
+The ``loaded`` molecule is only a :class:`.Molecule` instance,
 and not a :class:`.BuildingBlock` instance, which means that it lacks
 functional groups. You can restore your functional groups however
 
 .. code-block:: python
 
-    restored_bb = stk.BuildingBlock.init_from_molecule(
-        molecule=restored,
+    loaded_bb = stk.BuildingBlock.init_from_molecule(
+        molecule=loaded,
         functional_groups=[stk.BromoFactory()],
     )
 
@@ -281,13 +293,11 @@ and restore them in the same way
 
 .. code-block:: python
 
-    restored = db.get({
-        'InChIKey': rdkit.MolToInchiKey(rdkit.MolFromSmiles(
-            'BrCCCCBr'
-        )),
+    loaded = db.get({
+        'InChIKey': get_inchi_key('BrCCCCBr'),
     })
 
-However, once again, ``restored`` will only be a :class:`.Molecule`
+However, once again, ``loaded`` will only be a :class:`.Molecule`
 instance, and not a :class:`.ConstructedMolecule` instance.
 
 If you want to store and retrieve :class:`.ConstructedMolecule`
@@ -297,13 +307,11 @@ instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
 
     constructed_db = stk.ConstructedMoleculeMongoDb(client)
     constructed_db.put(polymer)
-    restored_polymer = constructed_db.get({
-        'InChIKey': rdkit.MolToInchiKey(rdkit.MolFromSmiles(
-            'BrCCCCBr'
-        )),
+    loaded_polymer = constructed_db.get({
+        'InChIKey': get_inchi_key('BrCCCCBr'),
     })
 
-Unlike ``restored``, ``restored_polymer`` is a
+Unlike ``loaded``, ``loaded_polymer`` is a
 :class:`.ConstructedMolecule` instance.
 
 Placing and Retrieving Molecular Property Values From a Database
