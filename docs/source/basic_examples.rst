@@ -253,7 +253,7 @@ However, you can customize it. For example, the documentation of
 :class:`.MoleculeMongoDb`, shows how you can use SMILES to retrieve
 your molecules.
 
-The ``restored`` molecule is only a :class:`.Molecule` instance
+The ``restored`` molecule is only a :class:`.Molecule` instance,
 and not a :class:`.BuildingBlock` instance, which means that it lacks
 functional groups. You can restore your functional groups however
 
