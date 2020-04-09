@@ -149,7 +149,7 @@ instances of this kind
         smiles='O=C(O)CCC(=O)O',
         functional_groups=[
             stk.CarboxylicAcidFactory(
-                # Atom number 3 corresponds to the oxygen atom in a
+                # Atom number 3 corresponds to the OH oxygen atom in a
                 # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
                 # THE MOLECULE.
                 bonders=(3, ),
@@ -162,7 +162,7 @@ instances of this kind
     )
 
 Here, ``bb2`` will also have two :class:`.CarboxylicAcid` functional
-groups. In each, the deleter atom will be the hydrogeon of the
+groups. In each, the deleter atom will be the hydrogen of the
 ``OH`` group and the bonder atom will be the oxygen atom of the
 ``OH`` group.
 
