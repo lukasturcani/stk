@@ -375,7 +375,8 @@ Note that :mod:`stk` databases do not have a staging area. The
 moment you call :meth:`~.ValueDatabase.put`, the value is
 committed to the database.
 
-And we can retrieve it
+To retrieve a value from the database, you provide the molecule,
+whose value you are interested in
 
 .. code-block:: python
 
