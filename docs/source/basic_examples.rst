@@ -172,7 +172,7 @@ This works with any :class:`.Molecule`, including both the
 
     bb = stk.BuildingBlock(
         smiles='ICCBr',
-        functional_groups=[stk.BromoFactory()],
+        functional_groups=[stk.BromoFactory(), stk.IodoFactory()],
     )
     bb.write('bb.mol')
 
