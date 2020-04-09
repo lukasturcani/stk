@@ -37,7 +37,7 @@ else, take for example the construction of a linear polymer
     # You can write the molecule to a file if you want to view it.
     polymer.write('polymer.mol')
 
-which will produce
+which will produce:
 
 .. image:: https://i.imgur.com/XmKRRun.png
 
@@ -86,7 +86,7 @@ molecule. An example of this is in the construction of different
 structural isomers, but another can be seen in the construction of
 periodic systems. For example, :mod:`stk` allows you to construct
 covalent organic frameworks. With the topology graph this is trivial
-to implement, simply label some of the edges a periodic and they
+to implement, simply label some of the edges as periodic and they
 will construct periodic bonds instead of regular ones.
 
 Thirdly, the topology graph allows users to

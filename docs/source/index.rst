@@ -159,7 +159,7 @@ Future Releases
 ---------------
 
 :mod:`.stk` is under active development. Important features in the
-future will include
+future will include:
 
 Molecular Database Visualization
 ................................

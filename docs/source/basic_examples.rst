@@ -26,7 +26,7 @@ begin with :mod:`init`.
 Specifying Multiple Functional Groups
 =====================================
 
-When you create a :class:`.BuildingBlock`, you need also specify
+When you create a :class:`.BuildingBlock`, you also need to specify
 which atoms are modified during construction of a
 :class:`.ConstructedMolecule`. This is achieved by providing the
 :class:`.BuildingBlock` with
