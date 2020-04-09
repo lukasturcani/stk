@@ -362,7 +362,7 @@ to calculate the energy of a molecule.
         ff = rdkit.UFFGetMoleculeForceField(rdkit_molecule)
         return ff.CalcEnergy()
 
-Now we can deposit the energy value in the database
+Now we can deposit the energy value into the database
 
 .. code-block:: python
 
