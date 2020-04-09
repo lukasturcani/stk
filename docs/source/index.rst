@@ -196,7 +196,7 @@ What Next?
 Something you might like to do first, is look at the
 `construction overview`_, which can give you a picture of how
 :mod:`stk` goes about constructing molecules. It will also introduce
-you the basic concepts and types found within :mod:`stk`. Next, the
+you to the basic concepts and types found within :mod:`stk`. Next, the
 `basic examples`_, will allow
 you to get a feel for how to use :mod:`stk`. After that, examples of
 molecular construction can be seen by looking at the documentation of
