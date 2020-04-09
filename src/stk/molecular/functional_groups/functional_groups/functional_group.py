@@ -2,27 +2,46 @@
 Functional Group
 ================
 
-.. toctree:
+.. toctree::
     :maxdepth: 2
 
     Alcohol <stk.molecular.functional_groups.functional_groups.alcohol>
-    Aldehyde <stk.molecular.functional_groups.functional_groups.aldehyde>
+    Aldehyde <\
+stk.molecular.functional_groups.functional_groups.aldehyde\
+>
     Alkene <stk.molecular.functional_groups.functional_groups.alkene>
     Alkyne <stk.molecular.functional_groups.functional_groups.alkyne>
     Amide <stk.molecular.functional_groups.functional_groups.amide>
-    Boronic Acid <stk.molecular.functional_groups.functional_groups.boronic_acid>
+    Boronic Acid <\
+stk.molecular.functional_groups.functional_groups.boronic_acid\
+>
     Bromo <stk.molecular.functional_groups.functional_groups.bromo>
-    Carboxylic Acid <stk.molecular.functional_groups.functional_groups.carboxylic_acid>
+    Carboxylic Acid <\
+stk.molecular.functional_groups.functional_groups.carboxylic_acid\
+>
     Dibromo <stk.molecular.functional_groups.functional_groups.dibromo>
-    Difluoro <stk.molecular.functional_groups.functional_groups.difluoro>
+    Difluoro <\
+stk.molecular.functional_groups.functional_groups.difluoro\
+>
     Diol <stk.molecular.functional_groups.functional_groups.diol>
     Fluoro <stk.molecular.functional_groups.functional_groups.fluoro>
-    Generic Functional Group <stk.molecular.functional_groups.functional_groups.generic_functional_group>
+    Generic Functional Group <\
+stk.molecular.functional_groups.functional_groups.\
+generic_functional_group\
+>
     Iodo <stk.molecular.functional_groups.functional_groups.iodo>
-    Primary Amino <stk.molecular.functional_groups.functional_groups.primary_amino>
-    Ring Amine <stk.molecular.functional_groups.functional_groups.ring_amine>
-    Secondary Amino <stk.molecular.functional_groups.functional_groups.secondary_amino>
-    Thioacid <stk.molecular.functional_groups.functional_groups.thioacid>
+    Primary Amino <\
+stk.molecular.functional_groups.functional_groups.primary_amino\
+>
+    Ring Amine <\
+stk.molecular.functional_groups.functional_groups.ring_amine\
+>
+    Secondary Amino <\
+stk.molecular.functional_groups.functional_groups.secondary_amino\
+>
+    Thioacid <\
+stk.molecular.functional_groups.functional_groups.thioacid\
+>
     Thiol <stk.molecular.functional_groups.functional_groups.thiol>
 
 
