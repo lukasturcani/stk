@@ -186,63 +186,125 @@ and the :class:`.ConstructedMolecule`
     )
     polymer.write('polymer.mol')
 
-You can see what file formats are supported in by reading the
+You can see what file formats are supported by reading the
 documentation for :meth:`~.Molecule.write`.
 
 Placing and Retrieving Molecules From a Database
 ================================================
 
-A powerful but dangerous feature of ``stk`` use the molecular cache.
-Every constructor for a :class:`.BuildingBlock` or a
-:class:`.ConstructedMolecule` has a *use_cache* option. If
-this is set to ``True`` and an identical molecule has already been
-loaded or constructed by ``stk``, then ``stk`` will not create a
-new instance but return the existing one from memory. In the case of
-:class:`.BuildingBlock` it can mean that the memory footprint is
-dramatically reduced, while in the case of
-:class:`.ConstructedMolecule` it means that expensive constructions do
-not have to be repeated.
+Requirements
+------------
+
+:mod:`stk` allows you to place molecules into a
+:class:`.MoleculeDatabase`. Out-of-the-box, :mod:`stk` comes
+with support for a :class:`.MoleculeMongoDb`. In order to use it
+locally, you have to install MongoDb on your computer. You will
+then also have to install :mod:`pymongo` with::
+
+    $ pip install pymongo
+
+Documentation for making sure your local MongoDb is working properly
+can be found here__.
+
+__ https://api.mongodb.com/python/current/
+
+You can also use a remote MongoDb, in which case you do not have to
+install it locally, but you will still need to install
+:mod:`pymongo`.
+
+Molecules and Building Blocks
+-----------------------------
+
+To place molecules into the database, first create the database
 
 .. code-block:: python
 
     import stk
+    import pymongo
 
-    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
-    # bb and bb2 are separate instances because when bb was created it
-    # was not added to the cache.
-    bb2 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
-    # bb2 and bb3 are different names for the same object, as
-    # both bb2 and bb3 had use_cache set to True.
-    bb3 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
-    # bb4 is a completely new instance.
-    bb4 = stk.BuildingBlock('BrCCBr', ['bromine'])
 
+    # Connect to a MongoDB. This example connects to a local
+    # MongoDB, but you can connect to a remote DB too with
+    # MongoClient() - read the documentation for pymongo to see how
+    # to do that.
+    client = pymongo.MongoClient()
+    db = stk.MoleculeMongoDb(client)
+
+You then create and place a molecule into the database,
+for example, a :class:`.BuildingBlock`
+
+.. code-block:: python
+
+    molecule = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+    db.put(molecule)
+
+
+To restore it, by default, you would use the :class:`.InchiKey`
+
+.. code-block:: python
+
+    import rdkit.Chem.AllChem as rdkit
+
+    restored = db.get({
+        'InChIKey': rdkit.MolToInchiKey(rdkit.MolFromSmiles('BrCCBr')),
+    })
+
+However, you can customize it. For example, the documentation of
+:class:`.MoleculeMongoDb`, shows how you can use SMILES to retrieve
+your molecules.
+
+The ``restored`` molecule is only a :class:`.Molecule` instance
+and not a :class:`.BuildingBlock` instance, which means that it lacks
+functional groups. You restore your functional groups however
+
+.. code-block:: python
+
+    restored_bb = stk.BuildingBlock.init_from_molecule(
+        molecule=restored,
+        functional_groups=[stk.BromoFactory()],
+    )
+
+Placing Constructed Molecules Into the Database
+-----------------------------------------------
+
+You can use the same database for placing
+:class:`.ConstructedMolecule` instances
+
+.. code-block:: python
 
     polymer = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5)
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 2),
     )
-    # polymer2 is a separate instance.
-    polymer2 = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5),
-        use_cache=True
-    )
-    # polymer2 and polymer3 are different names for the same object as
-    # both polymer2 and polymer3 had use_cache set to True.
-    # No construction was carried out when making polymer3, it was
-    # returned directly from memory.
-    polymer3 = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5),
-        use_cache=True
-    )
-    # polymer4 is a completely new instance, construction was
-    # done from scratch.
-    polymer4 = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5)
-    )
+    db.put(polymer)
+
+and restore them in the same way
+
+.. code-block:: python
+
+    restored = db.get({
+        'InChIKey': rdkit.MolToInchiKey(rdkit.MolFromSmiles(
+            'BrCCCCBr'
+        )),
+    })
+
+However, once again, ``restored`` will only be a :class:`.Molecule`
+instance, and not a :class:`.ConstructedMolecule` instance.
+
+If you want to store and retrieve :class:`.ConstructedMolecule`
+instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
+
+.. code-block:: python
+
+    constructed_db = stk.ConstructedMoleculeMongoDb(client)
+    constructed_db.put(polymer)
+    restored_polymer = constructed_db.get({
+        'InChIKey': rdkit.MolToInchiKey(rdkit.MolFromSmiles(
+            'BrCCCCBr'
+        )),
+    })
+
+Unlike ``restored``, ``restored_polymer`` is a
+:class:`.ConstructedMolecule` instance.
 
 Placing and Retrieving Molecular Property Values From a Database
 ================================================================
