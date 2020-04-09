@@ -524,7 +524,7 @@ molecule!!
 Extending stk
 =============
 
-There are a lot of way to extend :mod:`stk`, for example by adding
+There are a lot of ways to extend :mod:`stk`, for example by adding
 new functional groups, topology graphs, mutation operations and so on.
 However, because every part of :mod:`stk` is built around an abstract
 base class, all you need to do is find the appropriate abstract base
