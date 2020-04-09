@@ -239,7 +239,7 @@ for example, a :class:`.BuildingBlock`
     db.put(bb)
 
 
-To restore it, by default, you would use the :class:`.InchiKey`
+To restore it, by default, you would use the InChIKey
 
 .. code-block:: python
 
