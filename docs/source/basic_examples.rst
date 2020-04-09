@@ -256,8 +256,6 @@ SMILES of the molecule
 
 .. code-block:: python
 
-    import rdkit.Chem.AllChem as rdkit
-
     loaded = db.get({
         'InChIKey': get_inchi_key('BrCCBr'),
     })
