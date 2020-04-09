@@ -32,7 +32,7 @@ else, take for example the construction of a linear polymer
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Brc1cc(Br)cnc1Br',
+                    smiles='Brc1cc(Br)cnc1',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
