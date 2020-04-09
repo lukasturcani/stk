@@ -112,6 +112,141 @@ Read the documentation for each kind of :class:`.TopologyGraph`, for
 more examples on how to initialize it, and to see what optional
 parameters you have available.
 
+Using RDKit to Optimize Molecular Structures
+============================================
+
+Molecules used by :mod:`stk` can be structure optimized both before and
+after construction. One easy way to do is, is with the
+:mod:`rdkit` library. You can optimize any :mod:`stk`
+:class:`.Molecule`, such as a :class:`.BuildingBlock`
+
+.. code-block:: python
+
+    import stk
+    import rdkit.Chem.AllChem as rdkit
+
+    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+
+    # Optimize with the MMFF force field.
+
+    rdkit_bb = bb.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_bb)
+    rdkit.MMFFOptimizeMolecule(rdkit_bb)
+
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    bb = bb.with_position_matrix(
+        position_matrix=rdkit_bb.GetConformer().GetPositions(),
+    )
+
+or a :class:`.ConstructedMolecule`
+
+.. code-block:: python
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
+    )
+
+    # Optimize with the MMFF force field.
+
+    rdkit_polymer = polymer.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_polymer)
+    rdkit.MMFFOptimizeMolecule(rdkit_polymer)
+
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    polymer = polymer.with_position_matrix(
+        position_matrix=rdkit_polymer.GetConformer().GetPositions(),
+    )
+
+Writing Molecular Files
+=======================
+
+The simplest way to save molecules is to write them to a file.
+This works with any :class:`.Molecule`, including both the
+:class:`.BuildingBlock`
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock(
+        smiles='ICCBr',
+        functional_groups=[stk.BromoFactory(), ],
+    )
+    bb.write('bb.mol')
+
+
+and the :class:`.ConstructedMolecule`
+
+.. code-block:: python
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 10),
+    )
+    polymer.write('polymer.mol')
+
+You can see what file formats are supported in by reading the
+documentation for :meth:`~.Molecule.write`.
+
+Placing and Retrieving Molecules From a Database
+================================================
+
+A powerful but dangerous feature of ``stk`` use the molecular cache.
+Every constructor for a :class:`.BuildingBlock` or a
+:class:`.ConstructedMolecule` has a *use_cache* option. If
+this is set to ``True`` and an identical molecule has already been
+loaded or constructed by ``stk``, then ``stk`` will not create a
+new instance but return the existing one from memory. In the case of
+:class:`.BuildingBlock` it can mean that the memory footprint is
+dramatically reduced, while in the case of
+:class:`.ConstructedMolecule` it means that expensive constructions do
+not have to be repeated.
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
+    # bb and bb2 are separate instances because when bb was created it
+    # was not added to the cache.
+    bb2 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
+    # bb2 and bb3 are different names for the same object, as
+    # both bb2 and bb3 had use_cache set to True.
+    bb3 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
+    # bb4 is a completely new instance.
+    bb4 = stk.BuildingBlock('BrCCBr', ['bromine'])
+
+
+    polymer = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5)
+    )
+    # polymer2 is a separate instance.
+    polymer2 = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5),
+        use_cache=True
+    )
+    # polymer2 and polymer3 are different names for the same object as
+    # both polymer2 and polymer3 had use_cache set to True.
+    # No construction was carried out when making polymer3, it was
+    # returned directly from memory.
+    polymer3 = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5),
+        use_cache=True
+    )
+    # polymer4 is a completely new instance, construction was
+    # done from scratch.
+    polymer4 = stk.ConstructedMolecule(
+        building_blocks=[bb],
+        topology_graph=stk.polymer.Linear('A', 5)
+    )
+
+Placing and Retrieving Molecular Property Values From a Database
+================================================================
+
 Specifying Functional Groups Individually
 =========================================
 
@@ -219,256 +354,6 @@ to which atom in the functional group. The same is true for any
 other :mod:`~.functional_group_factory`. Note that the number you
 provide to the factory, is not the id of the atom found in the
 molecule!!
-
-Using RDKit to Optimize Molecular Structures
-============================================
-
-Molecules used by :mod:`stk` can be structure optimized both before and
-after construction. One easy way to do is, is with the
-:mod:`rdkit` library. You can optimize any :mod:`stk`
-:class:`.Molecule`, such as a :class:`.BuildingBlock`
-
-.. code-block:: python
-
-    import stk
-    import rdkit.Chem.AllChem as rdkit
-
-    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-
-    # Optimize with the MMFF force field.
-
-    rdkit_bb = bb.to_rdkit_mol()
-    rdkit.SanitizeMol(rdkit_bb)
-    rdkit.MMFFOptimizeMolecule(rdkit_bb)
-
-    # stk molecules are immutable. with_position_matrix returns a
-    # a clone, holding the new position matrix.
-    bb = bb.with_position_matrix(
-        position_matrix=rdkit_bb.GetConformer().GetPositions(),
-    )
-
-or a :class:`.ConstructedMolecule`
-
-.. code-block:: python
-
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
-    )
-
-    # Optimize with the MMFF force field.
-
-    rdkit_polymer = polymer.to_rdkit_mol()
-    rdkit.SanitizeMol(rdkit_polymer)
-    rdkit.MMFFOptimizeMolecule(rdkit_polymer)
-
-    # stk molecules are immutable. with_position_matrix returns a
-    # a clone, holding the new position matrix.
-    polymer = polymer.with_position_matrix(
-        position_matrix=rdkit_polymer.GetConformer().GetPositions(),
-    )
-
-Calculating Molecular Energy
-============================
-
-The energy of molecules can be calculated with `energy calculators`_.
-
-.. _`energy calculators`: stk.calculators.energy.energy_calculators.html
-
-All energy calculators define the :meth:`~.EnergyCalculator.get_energy`
-method, which is used to calculate the energy
-
-.. code-block:: python
-
-    import stk
-
-    mmff = stk.MMFFEnergy()
-    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
-    bb_energy = mmff.get_energy(bb)
-
-    polymer = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 15)
-    )
-    polymer_energy = mmff.get_energy(polymer)
-
-Much like optimizers, energy calculators support a *use_cache*
-option. If this is turned on the energy calculator will not
-calculate the energy of a molecule twice. Instead, if the same
-molecule is passed a second time, the previous value will be returned
-from memory
-
-.. code-block:: python
-
-    mmff = stk.MMFF()
-    caching_mmff = stk.MMFFEnergy(use_cache=True)
-    bb_energy = caching_mmff.get_energy(bb)
-    mmff.optimize(bb)
-    # bb_energy2 is equal to bb_energy even though the structure
-    # changed, since the old value was returned from memory.
-    bb_energy2 = caching_mmff.get_energy(bb)
-
-
-Converting between :mod:`rdkit` Molecules
-=========================================
-
-:mod:`rdkit` is a popular and powerful cheminformatics library which
-provides many useful tools for molecular analysis. To take advantage
-of it ``stk`` can convert its molecules into those of :mod:`rdkit`
-
-.. code-block:: python
-
-    import stk
-
-    bb = stk.BuildingBlock('ICCBr', ['bromine', 'iodine'])
-    bb_rdkit = bb.to_rdkit_mol()
-
-    polymer = stk.ConstructedMolecule(
-        bulding_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 10)
-    )
-    polymer_rdkit = polymer.to_rdkit_mol()
-
-``stk`` also allows you to update the structure of molecules from
-:mod:`rdkit` molecules
-
-.. code-block:: python
-
-    # Update structure of bb to match structure of bb_rdkit.
-    bb.update_from_rdkit_mol(bb_rdkit)
-    # Update structure of polymer to match structure of polymer_rdkit.
-    polymer.update_from_rdkit_mol(polymer_rdkit)
-
-
-Finally, ``stk`` allows initialization of new building blocks from
-:mod:`rdkit` molecules directly
-
-.. code-block:: python
-
-    bb2 = stk.BuildingBlock.init_from_rdkit_mol(bb_rdkit)
-
-
-Writing Molecular Files
-=======================
-
-The simplest way to save molecules is to write them to a file
-
-.. code-block:: python
-
-    import stk
-
-    bb = stk.BuildingBlock('ICCBr', ['bromine', 'iodine'])
-    bb.write('bb.mol')
-
-    polymer = stk.ConstructedMolecule(
-        bulding_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 10)
-    )
-    polymer.write('polymer.mol')
-
-However, writing to regular chemical file format is lossy. This is
-because :class:`.BuildingBlock` and :class:`.ConstructedMolecule`
-contain data that is not held by these files. :class:`.BuildingBlock`
-holds information about which functional groups are to be used
-during construction and :class:`.ConstructedMolecule` holds information
-about which building blocks molecules and topology graph were used to
-construct it. While a :class:`.BuildingBlock` can be initialized from
-chemical file formats a :class:`.ConstructedMolecule` cannot, as there
-is no way to recover the information regarding building blocks and
-the topology graph.
-
-If you wish to be able to fully recover :class:`.BuildingBlock` and
-:class:`.ConstructedMolecule` instances, you can write them as
-JSON files
-
-.. code-block:: python
-
-    bb.dump('bb.dump')
-    polymer.dump('polymer.dump')
-
-These can then be loaded in a later session
-
-.. code-block:: python
-
-    recovered_bb = stk.Molecule.load('bb.dump')
-    recovered_polymer = stk.Molecule.load('polymer.dump')
-
-Using the :meth:`.Molecule.load` method means you do not have to know
-if the molecule in the file was a :class:`.BuildingBlock` or a
-:class:`.ConstructedMolecule`, the correct class be determined
-for you automatically.
-
-You can write and dump molecules in bulk with a :class:`.Population`
-
-.. code-block:: python
-
-    pop = stk.Population(bb, polymer)
-    pop.write('my_pop')
-    pop.dump('population.dump')
-
-and load it too
-
-.. code-block:: python
-
-    recovered_pop = stk.Population.load('population.dump')
-
-
-Placing and Retrieving Molecules From a Database
-================================================
-
-A powerful but dangerous feature of ``stk`` use the molecular cache.
-Every constructor for a :class:`.BuildingBlock` or a
-:class:`.ConstructedMolecule` has a *use_cache* option. If
-this is set to ``True`` and an identical molecule has already been
-loaded or constructed by ``stk``, then ``stk`` will not create a
-new instance but return the existing one from memory. In the case of
-:class:`.BuildingBlock` it can mean that the memory footprint is
-dramatically reduced, while in the case of
-:class:`.ConstructedMolecule` it means that expensive constructions do
-not have to be repeated.
-
-.. code-block:: python
-
-    import stk
-
-    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
-    # bb and bb2 are separate instances because when bb was created it
-    # was not added to the cache.
-    bb2 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
-    # bb2 and bb3 are different names for the same object, as
-    # both bb2 and bb3 had use_cache set to True.
-    bb3 = stk.BuildingBlock('BrCCBr', ['bromine'], use_cache=True)
-    # bb4 is a completely new instance.
-    bb4 = stk.BuildingBlock('BrCCBr', ['bromine'])
-
-
-    polymer = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5)
-    )
-    # polymer2 is a separate instance.
-    polymer2 = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5),
-        use_cache=True
-    )
-    # polymer2 and polymer3 are different names for the same object as
-    # both polymer2 and polymer3 had use_cache set to True.
-    # No construction was carried out when making polymer3, it was
-    # returned directly from memory.
-    polymer3 = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5),
-        use_cache=True
-    )
-    # polymer4 is a completely new instance, construction was
-    # done from scratch.
-    polymer4 = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 5)
-    )
-
-Placing and Retrieving Molecular Property Values From a Database
-================================================================
 
 Extending stk
 =============
