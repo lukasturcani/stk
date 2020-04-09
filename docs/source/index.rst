@@ -10,7 +10,6 @@
 
    Construction Overview <construction_overview>
    Basic Examples <basic_examples>
-   Module Index <stk>
 
 .. toctree::
    :hidden:
