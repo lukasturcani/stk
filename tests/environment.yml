@@ -54,7 +54,6 @@ dependencies:
   - pip=20.0.2=py37_1
   - pixman=0.38.0=h7b6447c_0
   - pluggy=0.13.1=py37_0
-  - psutil=5.7.0=py37h7b6447c_0
   - py=1.8.1=py_0
   - py-boost=1.67.0=py37h04863e7_4
   - pyparsing=2.4.6=py_0
