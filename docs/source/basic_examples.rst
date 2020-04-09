@@ -204,7 +204,7 @@ then also have to install :mod:`pymongo` with::
     $ pip install pymongo
 
 Documentation for making sure your local MongoDB is working properly
-can be found here__.
+can be found here__. (Believe me, this is easy to do and worth it.)
 
 __ https://api.mongodb.com/python/current/
 
