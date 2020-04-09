@@ -42,17 +42,16 @@ during construction, you would use a :class:`.BromoFactory`
 
     bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
 
-The ``bb`` in the example above, would have two :class:`.Bromo`
+The ``bb``, in the example above, would have two :class:`.Bromo`
 functional groups. Similarly, if you have a building block with
 aldehyde groups
 
-
 .. code-block:: python
 
-    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactor()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
 
 In this example, ``bb2`` will have two :class:`.Aldehyde` functional
-groups. Finally, if you have both aldehdye and bromo groups on a
+groups. Finally, if you have both aldehyde and bromo groups on a
 molecule, and you want both to be modified during construction,
 you would use both of the factories
 
@@ -60,12 +59,119 @@ you would use both of the factories
 
     bb3 = stk.BuildingBlock(
         smiles='O=CCCBr',
-        functional_groups=[stk.AldehydeFacotry(), stk.BromoFactory()],
+        functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
     )
 
-In the example above, ``b3`` has one :class:`.Bromo` and one
+In the example above, ``bb3`` has one :class:`.Bromo` and one
 :class:`.Aldehyde` functional group.
 
+
+Specifying Functional Groups Individually
+=========================================
+
+If you want to be more precise about which functional groups get
+created, you can provide them directly to the :class:`.BuildingBlock`.
+For example, if you have multiple bromo groups on a molecule, but
+you only want to use one during construction
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock(
+        smiles='BrCCCBr',
+        functional_groups=[
+            stk.Bromo(
+                bromine=stk.Br(0),
+                atom=stk.C(1),
+                # bonders are atoms which have bonds added during
+                # construction.
+                bonders=(stk.C(1), ),
+                # deleters are atoms which are deleted during
+                # construction.
+                deleters=(stk.Br(0), ),
+            ),
+        ],
+    )
+
+When creating a :class:`.Bromo` functional group, you have to
+specify things like which atoms of the group you want to remove
+during construction, and which ones you want to have bonds
+added during construction. These are specified by the
+`deleters` and `bonders` parameters, respectively. You can add
+as many functional groups to :class:`.BuildingBlock` as you like
+in this way, and you can mix different types of
+:mod:`~.functional_groups.functional_group`. You can even mix
+a :mod:`~.functional_groups.functional_group` instances with
+:mod:`~.functional_group_factory` instances.
+
+
+Changing Bonder and Deleter Atoms in Functional Group Factories
+===============================================================
+
+In the previous example, you saw that during creation of a
+:class:`.Bromo` instance, you can specify which atoms have bonds
+added during construction, and which atoms are deleted during
+construction. You might like to customize this in the functional groups
+created by a :mod:`~.functional_group_factory`.
+
+Take, for example, a :class:`.CarboxylicAcid` functional group. This
+group, ``C(=O)O``. There are two likely ways you would like to modify
+this group during construction. In the first way, you want to add a
+bond to the carbon atom, and delete the ``OH`` group, which is treated
+as a leaving group. This is what :class:`.CarboxylicAcidFactory`
+will do by default
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock(
+        smiles='O=C(O)CCC(=O)O',
+        functional_groups=[stk.CarboxylicAcidFactory()],
+    )
+
+Here, ``bb`` will have two :class:`.CarboxylicAcid` functional groups.
+In each the deleter atoms will be the oxygen and hydrogen atom of
+the ``OH`` group, and the bonder atom will be the carbon atom.
+
+Now, the second way you might want to modify a carobxylic acid group
+is to only delete the hydrogen atom of the ``OH`` group during
+construction, and add a bond to the oxygen atom of the
+``OH`` group. This means the hydrogen atom is the deleter atom and
+the oxygen atom is the bonder atom. You can tell the
+:class:`.CarboxylicAcidFactory` to create :class:`.CarboxylicAcid`
+instances of this kind
+
+.. code-block:: python
+
+    bb2 = stk.BuildingBlock(
+        smiles='O=C(O)CCC(=O)O',
+        functional_groups=[
+            stk.CarboxylicAcidFactory(
+                # Atom number 3 corresponds to the oxygen atom in a
+                # carboxylic acid group.
+                bonders=(3, ),
+                # Atom number 4 corresponds to the hydrogen atom in a
+                # carboxylic acid group.
+                deleters=(4, ),
+            ),
+        ],
+    )
+
+Here, ``bb2`` will also have two :class:`.CarboxylicAcid` functional
+groups. In each, the deleter atom will be the hydrogeon of the
+``OH`` group and the bonder atom will be the oxygen atom of the
+``OH`` group.
+
+You might be wondering: "How do I know which number to use for
+which atom in the functional group, so that I can specify the correct
+atoms to be the bonders or deleters?" The docstring of
+:class:`.CarboxylicAcidFactory` will tell you which number corresponds
+to which atom in the functional group. The same is true for any
+other :mod:`~.functional_group_factory`. Note that the number you
+provide to the factory, is not the id of the atom found in the
+molecule!!
 
 Constructing Molecules
 ======================
