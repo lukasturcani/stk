@@ -264,8 +264,8 @@ functional groups. You restore your functional groups however
         functional_groups=[stk.BromoFactory()],
     )
 
-Placing Constructed Molecules Into the Database
------------------------------------------------
+Constructed Molecules
+---------------------
 
 You can use the same database for placing
 :class:`.ConstructedMolecule` instances
