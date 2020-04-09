@@ -64,25 +64,6 @@ stk.molecular.functional_groups.factories.thioacid_factory\
 stk.molecular.functional_groups.factories.thiol_factory\
 >
 
-#. :class:`.AlcoholFactory`
-#. :class:`.AldehydeFactory`
-#. :class:`.AmideFactory`
-#. :class:`.BoronicAcidFactory`
-#. :class:`.BromoFactory`
-#. :class:`.CarboxylicAcidFactory`
-#. :class:`.DibromoFactory`
-#. :class:`.DifluoroFactory`
-#. :class:`.DiolFactory`
-#. :class:`.FluoroFactory`
-#. :class:`.IodoFactory`
-#. :class:`.PrimaryAminoFactory`
-#. :class:`.RingAmineFactory`
-#. :class:`.SecondaryAminoFactory`
-#. :class:`.TerminalAlkeneFactory`
-#. :class:`.TerminalAlkyneFactory`
-#. :class:`.ThioacidFactory`
-#. :class:`.ThiolFactory`
-
 """
 
 
