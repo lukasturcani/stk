@@ -395,7 +395,7 @@ into the database, for example
     atom_count_db.put(polymer, polymer.get_num_atoms())
 
 
-These values will also be accessible in a later sesssion
+These values will also be accessible in a later session
 
 .. code-block:: python
 
