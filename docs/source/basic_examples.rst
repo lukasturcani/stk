@@ -255,7 +255,7 @@ your molecules.
 
 The ``restored`` molecule is only a :class:`.Molecule` instance
 and not a :class:`.BuildingBlock` instance, which means that it lacks
-functional groups. You restore your functional groups however
+functional groups. You can restore your functional groups however
 
 .. code-block:: python
 
