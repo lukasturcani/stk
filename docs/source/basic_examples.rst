@@ -325,6 +325,7 @@ same database. First lets create one
 .. code-block:: python
 
     import stk
+    import pymongo
 
     # Connect to a MongoDB. This example connects to a local
     # MongoDB, but you can connect to a remote DB too with
