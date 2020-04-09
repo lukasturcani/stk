@@ -309,6 +309,109 @@ Unlike ``restored``, ``restored_polymer`` is a
 Placing and Retrieving Molecular Property Values From a Database
 ================================================================
 
+Requirements
+------------
+
+Using a :class:`.ValueMongoDb` has the same requirements as the
+previous example.
+
+Storing Values
+--------------
+
+Unlike the previous example, you can deposit values for both
+a :class:`.BuildingBlock` and a :class:`.ConstructedMolecule` in the
+same database. First lets create one
+
+.. code-block:: python
+
+    import stk
+
+    # Connect to a MongoDB. This example connects to a local
+    # MongoDB, but you can connect to a remote DB too with
+    # MongoClient() - read the documentation for pymongo to see how
+    # to do that.
+    client = pymongo.MongoClient()
+
+    # You have to choose name for your collection.
+    energy_db = stk.ValueMongoDb(client, 'energy')
+
+Here, ``energy_db`` will store energy values. Lets create a function
+to calculate the energy of a molecule.
+
+.. code-block:: python
+
+    import rdkit.Chem.AllChem as rdkit
+
+    def get_energy(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        ff = rdkit.UFFGetMoleculeForceField(rdkit_molecule)
+        return ff.CalcEnergy()
+
+Now we can deposit the energy value in the database
+
+.. code-block:: python
+
+    bb = stk.BuildingBlock('BrCCCCBr')
+    energy_db.put(bb, get_energy(bb))
+
+And we can retrieve it
+
+.. code-block:: python
+
+    energy = energy_db.get(bb)
+
+
+If we make the same molecule in some other way, for example we
+can make ``BrCCCCBr`` as a constructed molecule
+
+.. code-block:: python
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(
+                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            ),
+            repeating_unit='A',
+            num_repeating_units=2,
+        ),
+    )
+
+we can still retrieve the value
+
+.. code-block:: python
+
+    # You get the correct energy out, because polymer and bb are
+    # actually the same molecule.
+    bb_energy = energy_db.get(polymer)
+
+
+You can also you a :class:`.ConstructedMolecule` to deposit values
+into the database, for example
+
+.. code-block:: python
+
+    atom_count_db = stk.ValueMongoDb(client, 'atom_counts')
+    atom_count_db.put(polymer, polymer.get_num_atoms())
+
+
+These values will also be accessible in a later sesssion
+
+.. code-block:: python
+
+    # Assume this a new Python session.
+    import stk
+    import pymongo
+
+
+    client = pymongo.MongoClient()
+    energy_db = stk.ValueMongoDb(client, 'energy')
+    atom_count_db = stk.ValueMongoDb(client, 'atom_counts')
+
+    bb = stk.BuildingBlock('BrCCCCBr')
+    bb_energy = energy_db.get(bb)
+    bb_atom_count = energy.get(bb)
+
 Specifying Functional Groups Individually
 =========================================
 
