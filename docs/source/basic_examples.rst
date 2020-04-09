@@ -82,6 +82,7 @@ you only want to use one during construction
         smiles='BrCCCBr',
         functional_groups=[
             stk.Bromo(
+                # The number is the atom's id.
                 bromine=stk.Br(0),
                 atom=stk.C(1),
                 # bonders are atoms which have bonds added during
