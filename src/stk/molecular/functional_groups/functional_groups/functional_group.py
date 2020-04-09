@@ -2,6 +2,14 @@
 Functional Group
 ================
 
+.. toctree:
+    :hidden:
+    :maxdepth: 2
+
+    Alcohol <stk.molecular.functional_groups.functional_groups.alcohol>
+    Aldehyde <stk.molecular.functional_groups.functional_groups.aldehyde>
+
+
 :class:`.Alcohol`
 -----------------
 
