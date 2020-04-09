@@ -20,11 +20,9 @@
    Constructed Molecule\
       <stk.molecular.molecules.constructed_molecule>
    Functional Groups\
-      <stk.molecular.functional_groups.\
-       functional_groups.functional_group>
+      <stk.molecular.functional_groups.functional_groups.functional_group>
    Functional Group Factories\
-      <stk.molecular.functional_groups.factories.\
-       functional_group_factory>
+      <stk.molecular.functional_groups.factories.functional_group_factory>
    Reactions <stk.molecular.reactions.reactions.reaction.reaction>
    Reaction Factories\
       <stk.molecular.reactions.factories.reaction_factory>
