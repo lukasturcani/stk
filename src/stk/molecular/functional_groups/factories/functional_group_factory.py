@@ -35,10 +35,6 @@ stk.molecular.functional_groups.factories.diol_factory\
     Fluoro Factory <\
 stk.molecular.functional_groups.factories.fluoro_factory\
 >
-    Generic Functional Group Factory <\
-stk.molecular.functional_groups.factories.\
-generic_functional_group_factory\
->
     Iodo Factory <\
 stk.molecular.functional_groups.factories.iodo_factory\
 >
