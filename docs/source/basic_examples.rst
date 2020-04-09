@@ -236,6 +236,8 @@ for example, a :class:`.BuildingBlock`
 .. code-block:: python
 
     bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+    # Note that as soon as put() is called, the molecule is placed
+    # into permanent storage.
     db.put(bb)
 
 To retrieve a molecule from the database, by default, you would
@@ -362,6 +364,8 @@ Now we can deposit the energy value in the database
 .. code-block:: python
 
     bb = stk.BuildingBlock('BrCCCCBr')
+    # Note that as soon as put() is called, the value is placed into
+    # permanent storage.
     energy_db.put(bb, get_energy(bb))
 
 And we can retrieve it
