@@ -109,26 +109,29 @@ Building Blocks
 Building blocks in :mod:`stk` are molecules, or molecular fragments,
 which are placed on the nodes of the :class:`.TopologyGraph`. After
 building blocks are placed the nodes, they are connected to
-each other through a :class:`.Reaction`. :mod:`stk` support multiple
-reactions and users can add their own. Reactions can add or remove
-atoms and bonds between building blocks, which are connected by
+each other through a :mod:`~.reaction.reaction`. :mod:`stk` supports
+multiple reactions and users can define their own. Reactions can add or
+remove atoms and bonds between building blocks, which are connected by
 edges in the topology graph.
 
 When it comes to reactions, an important question, which must be
 addressed, is, which atoms of a :class:`.BuildingBlock` are modified
-by a :class:`.Reaction`? In :mod:`stk`, the answer to this is a
-:class:`.FunctionalGroup`. When a user of :mod:`stk` creates a
-:class:`.BuildingBlock`, they also specify which functional groups
-are present in the :class:`.BuildingBlock`. This lets :mod:`stk` know
-which atoms the user intends to transform during construction.
+by a :mod:`~.reaction.reaction`? In :mod:`stk`, the answer to this is
+a :mod:`~.functional_groups.functional_group`. When a user of
+:mod:`stk` creates a :class:`.BuildingBlock`, they also specify which
+functional groups are present in the :class:`.BuildingBlock`. This
+lets :mod:`stk` know which atoms the user intends to transform during
+construction.
 
-There are many different types of :class:`.FunctionalGroup` present
+There are many different types of
+:class:`~.functional_groups.functional_group` present
 in :mod:`stk`, for example, :class:`.Bromo`, :class:`.Alcohol` or
 :class:`.Aldehyde`. When a user creates a :class:`.BuildingBlock`,
 they can specify multiple functional groups at at time using
-a :class:`.FunctionalGroupFactory`. A :class:`.FunctionalGroupFactory`
-finds all the functional groups of a specific type, and adds them
-to the :class:`.BuildingBlock`. For example, if we want to create
+a :mod:`~.functional_group_factory`. A
+:mod:`~.functional_group_factory` finds all the functional groups of a
+specific type, and adds them to the :class:`.BuildingBlock`. For
+example, if we want to create
 a :class:`.BuildingBlock`, and you want to react its bromo groups
 during construction, you can use a :class:`.BromoFactory`.
 
@@ -160,7 +163,7 @@ a mix of factories
     )
 
 
-Based on which classes of :class:`.FunctionalGroup` is found on an
+Based on the specific functional groups found on an
 edge of the :class:`.TopologyGraph`, :mod:`stk` will select an
 appropriate :class:`.Reaction` to join them. You can also force
 :mod:`stk` to use a different :class:`.Reaction` of your choosing,
