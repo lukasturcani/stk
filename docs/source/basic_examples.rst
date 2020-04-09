@@ -97,8 +97,8 @@ you only want to use one during construction
 
 When creating a :class:`.Bromo` functional group, you have to
 specify things like which atoms have bonds added during construction,
-and which ones are removed during construction. These are specified by the
-`bonders` and `deleters` parameters, respectively. You can add
+and which ones are removed during construction. These are specified by
+the `bonders` and `deleters` parameters, respectively. You can add
 as many functional groups to :class:`.BuildingBlock` as you like
 in this way, and you can mix different types of
 :mod:`~.functional_groups.functional_group`. You can even mix
