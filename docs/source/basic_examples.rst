@@ -235,8 +235,8 @@ for example, a :class:`.BuildingBlock`
 
 .. code-block:: python
 
-    molecule = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-    db.put(molecule)
+    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+    db.put(bb)
 
 
 To restore it, by default, you would use the :class:`.InchiKey`
