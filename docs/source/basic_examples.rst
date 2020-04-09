@@ -423,6 +423,15 @@ These values will also be accessible in a later session
     bb_energy = energy_db.get(bb)
     bb_atom_count = atom_count_db.get(bb)
 
+Finally, you can also store a :class:`tuple` of values in the
+database. For example,
+
+.. code-block:: python
+
+    centroid_db = stk.ValueMongoDb(client, 'centroids')
+    # Centroid is a position, and therefore a tuple of 3 floats.
+    centroid_db.put(bb, tuple(bb.get_centroid()))
+
 Specifying Functional Groups Individually
 =========================================
 
