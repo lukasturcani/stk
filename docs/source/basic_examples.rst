@@ -387,7 +387,7 @@ we can still retrieve the value
     bb_energy = energy_db.get(polymer)
 
 
-You can also you a :class:`.ConstructedMolecule` to deposit values
+You can also use a :class:`.ConstructedMolecule` to deposit values
 into the database, for example
 
 .. code-block:: python
