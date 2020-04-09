@@ -65,6 +65,52 @@ you would use both of the factories
 In the example above, ``bb3`` has one :class:`.Bromo` and one
 :class:`.Aldehyde` functional group.
 
+Constructing Molecules
+======================
+
+To construct molecules, you need to create a new
+:class:`.ConstructedMolecule`. The required input consists of
+a :class:`.TopologyGraph`, which, in turn,  requires
+:class:`.BuildingBlock` instances.
+
+.. code-block:: python
+
+    import stk
+
+    # React the amine functional groups during construction.
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    # React the aldehyde functional groups during construction.
+    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', [stk.AldehydeFactory()])
+    # Build a polymer.
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=12,
+        ),
+    )
+
+    # Build a longer polymer.
+    longer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=23,
+        ),
+    )
+
+Each topology graph requires different input parameters,
+for example, organic cage topology graphs only require the
+:class:`.BuildingBlock` instances.
+
+.. code-block:: python
+
+    cage = stk.ConstructedMolecule(stk.cage.FourPlusSix((bb1, bb2)))
+
+
+Read the documentation for each kind of :class:`.TopologyGraph`, for
+more examples on how to initialize it, and to see what optional
+parameters you have available.
 
 Specifying Functional Groups Individually
 =========================================
@@ -104,7 +150,6 @@ in this way, and you can mix different types of
 :mod:`~.functional_groups.functional_group`. You can even mix
 a :mod:`~.functional_groups.functional_group` instances with
 :mod:`~.functional_group_factory` instances.
-
 
 Changing Bonder and Deleter Atoms in Functional Group Factories
 ===============================================================
@@ -175,150 +220,52 @@ other :mod:`~.functional_group_factory`. Note that the number you
 provide to the factory, is not the id of the atom found in the
 molecule!!
 
-Constructing Molecules
-======================
+Using RDKit to Optimize Molecular Structures
+============================================
 
-To construct molecules, you need to create a new
-:class:`.ConstructedMolecule`. The required input consists of
-building block molecules and a topology graph. :class:`.BuildingBlock`
-molecules which undergo reactions during construction need to have
-the functional groups which undergo them specified
-
-.. code-block:: python
-
-    import stk
-
-    # React the amine functional group during construction.
-    bb1 = stk.BuildingBlock('NCCN', ['amine'])
-    # React the aldehyde functional group during construction.
-    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
-    # Build a bunch of cages, each has the same building blocks but
-    # different topology graphs.
-    cage = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2],
-        topology_graph=stk.cage.FourPlusSix()
-    )
-    cage2 = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2],
-        topology_graph=stk.cage.EightPlusTwelve()
-    )
-    cage3 = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2],
-        topology_graph=stk.cage.TwentyPlusThirty()
-    )
-
-Created :class:`.ConstructedMolecule` instances can be used as building
-blocks for others
-
-.. code-block:: python
-
-    guest = stk.BuildingBlock('BrBr')
-    host_guest_complex = stk.ConstructedMolecule(
-        building_blocks=[cage, guest],
-        topology_graph=stk.host_guest.Complex()
-    )
-
-Look at the documentation of the topology graph to see any requirements
-associated with building :class:`.ConstructedMolecule` instances
-with it as well as usage examples.
-
-
-Using Multiple Building Blocks
-==============================
-
-
-You can have as many different building blocks in any
-:class:`.ConstructedMolecule` as there are vertices, however you will
-often have to assign them manually. This is because there are often
-multiple equally valid ways to place the building blocks on the
-vertrices and ``stk`` has no way to figure out which one you want.
+Molecules used by :mod:`stk` can be structure optimized both before and
+after construction. One easy way to do is, is with the
+:mod:`rdkit` library. You can optimize any :mod:`stk`
+:class:`.Molecule`, such as a :class:`.BuildingBlock`
 
 .. code-block:: python
 
     import stk
+    import rdkit.Chem.AllChem as rdkit
 
-    bb1 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
-    bb2 = stk.BuildingBlock('O=CC(Cl)(C=O)C=O', ['aldehyde'])
-    bb3 = stk.BuildingBlock('NCCN', ['amine'])
-    bb4 = stk.BuildingBlock('NCC(Cl)N', ['amine'])
-    bb5 = stk.BuildingBlock('NCCCCN', ['amine'])
-
-    tetrahedron = stk.cage.FourPlusSix()
-    cage = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2, bb3, bb4, bb5],
-        topology_graph=tetrahedron,
-        building_block_vertices={
-            bb1: tetrahedron.vertices[:2],
-            bb2: tetrahedron.vertices[2:4],
-            bb3: tetrahedron.vertices[4:5],
-            bb4: tetrahedron.vertices[5:6],
-            bb5: tetrahedron.vertices[6:]
-        }
-    )
-
-
-Optimizing Molecular Structures
-===============================
-
-Molecules used by ``stk`` can be optimized both before and after
-construction. Optimization is performed by optimizers_, which implement
-the :meth:`~.Optimizer.optimize` method.
-
-.. _optimizers: stk.calculators.optimization.optimizers.html
-
-.. code-block:: python
-
-    import stk
+    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 
     # Optimize with the MMFF force field.
-    mmff = stk.MMFF()
-    bb = stk.BuildingBlock('BrCCBr', ['bromine'])
-    mmff.optimize(bb)
+
+    rdkit_bb = bb.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_bb)
+    rdkit.MMFFOptimizeMolecule(rdkit_bb)
+
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    bb = bb.with_position_matrix(
+        position_matrix=rdkit_bb.GetConformer().GetPositions(),
+    )
+
+or a :class:`.ConstructedMolecule`
+
+.. code-block:: python
 
     polymer = stk.ConstructedMolecule(
-        building_blocks=[bb],
-        topology_graph=stk.polymer.Linear('A', 15)
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
     )
-    mmff.optimize(polymer)
 
-    # Optimize with UFF.
-    uff = stk.UFF()
-    uff.optimize(bb)
-    uff.optimize(polymer)
+    # Optimize with the MMFF force field.
 
+    rdkit_polymer = polymer.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_polymer)
+    rdkit.MMFFOptimizeMolecule(rdkit_polymer)
 
-All optimizers support the *use_cache* option, which prevents a
-second optimization from being run on the same molecule twice
-
-.. code-block:: python
-
-    mmff = stk.MMFF()
-    bb = stk.BuildingBlock('CCCC')
-    # Runs an optimization.
-    mmff.optimize(bb)
-    # Run an optimization again.
-    mmff.optimize(bb)
-
-    caching_mmff = stk.MMFF(use_cache=True)
-    # Runs an optimization.
-    caching_mmff.optimize(bb)
-    # Does not run an optimization, returns immediately.
-    caching_mmff.optimize(bb)
-
-An important optimizer to take note of is the
-:class:`.OptimizerSequence`, which allows you to chain multiple
-optimizers in one go. For example, you may wish to embed a molecule
-with the ETKDG algorithm before running a UFF optimization
-
-.. code-block:: python
-
-    sequence = stk.OptimizerSequence(
-        stk.ETKDG(),
-        stk.UFF()
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    polymer = polymer.with_position_matrix(
+        position_matrix=rdkit_polymer.GetConformer().GetPositions(),
     )
-    # Embed with ETKDG then do a UFF optimization.
-    sequence.optimize(bb)
-
 
 Calculating Molecular Energy
 ============================
@@ -400,8 +347,8 @@ Finally, ``stk`` allows initialization of new building blocks from
     bb2 = stk.BuildingBlock.init_from_rdkit_mol(bb_rdkit)
 
 
-Saving Molecules
-================
+Writing Molecular Files
+=======================
 
 The simplest way to save molecules is to write them to a file
 
@@ -465,8 +412,8 @@ and load it too
     recovered_pop = stk.Population.load('population.dump')
 
 
-Caching
-=======
+Placing and Retrieving Molecules From a Database
+================================================
 
 A powerful but dangerous feature of ``stk`` use the molecular cache.
 Every constructor for a :class:`.BuildingBlock` or a
@@ -519,3 +466,18 @@ not have to be repeated.
         building_blocks=[bb],
         topology_graph=stk.polymer.Linear('A', 5)
     )
+
+Placing and Retrieving Molecular Property Values From a Database
+================================================================
+
+Extending stk
+=============
+
+There are a lot of way to extend :mod:`stk`, for example by adding
+new functional groups, topology graphs, mutation operations and so on.
+However, because every part of :mod:`stk` is built around an abstract
+base class, all you need to do is find the appropriate abstract base
+class, and create a new subclass for it. The abstract base class
+will provide documentation and examples on how to create a subclass.
+You can easily find the abstract base classes by looking at the
+sidebar.
