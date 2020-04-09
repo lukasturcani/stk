@@ -203,7 +203,7 @@ molecular construction can be seen by looking at the documentation of
 the different topology graphs. In general, you will find examples on
 how to use a class, in that classes documentation.
 Once you are comfortable with construction, you can start looking at
-how to deposit and retrieve the molecules from databases. Finally
+how to deposit and retrieve the molecules from databases. Finally,
 :mod:`stk` provides multiple examples on how to use its evolutionary
 algorithm.
 
