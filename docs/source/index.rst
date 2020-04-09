@@ -17,11 +17,17 @@
    :maxdepth: 2
 
    Building Block <stk.molecular.molecules.building_block>
-   Constructed Molecule <stk.molecular.molecules.constructed_molecule>
-   Functional Groups <stk.molecular.functional_groups.functional_groups.functional_group>
-   Functional Group Factories <stk.molecular.functional_groups.factories.functional_group_factory>
+   Constructed Molecule
+      <stk.molecular.molecules.constructed_molecule>
+   Functional Groups
+      <stk.molecular.functional_groups.
+       functional_groups.functional_group>
+   Functional Group Factories
+      <stk.molecular.functional_groups.factories.
+       functional_group_factory>
    Reactions <stk.molecular.reactions.reactions.reaction.reaction>
-   Reaction Factories <stk.molecular.reactions.factories.reaction_factory>
+   Reaction Factories
+      <stk.molecular.reactions.factories.reaction_factory>
 
 .. toctree::
    :hidden:
