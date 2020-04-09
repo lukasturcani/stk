@@ -141,7 +141,7 @@ during construction, you can use a :class:`.BromoFactory`.
 
     building_block = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 
-In the example above, `building_block` will have two
+In the example above, ``building_block`` will have two
 :class:`.Bromo` functional groups. When ``building_block`` is used
 for construction, it is the atoms held by the :class:`.Bromo`
 groups, which will be modified. If we have a building block with
