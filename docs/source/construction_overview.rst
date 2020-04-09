@@ -45,7 +45,7 @@ else, take for example the construction of a linear polymer
 
 which will produce:
 
-.. image:: https://i.imgur.com/XmKRRun.png
+.. image:: https://i.imgur.com/0fKtYB6.png
 
 
 Because the topology graph is an idealized representation of the
