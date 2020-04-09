@@ -2,7 +2,10 @@
 Molecule Database
 =================
 
-#. :class:`.MoleculeMongoDb`
+.. toctree::
+    :maxdepth: 2
+
+    Molecule MongoDB <stk.databases.mongo_db.molecule>
 
 """
 

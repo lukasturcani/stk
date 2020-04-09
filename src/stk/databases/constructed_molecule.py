@@ -2,7 +2,12 @@
 Constructed Molecule Database
 =============================
 
-#. :class:`.ConstructedMoleculeMongoDb`
+.. toctree::
+    :maxdepth: 2
+
+    Constructed Molecule MongoDB <\
+stk.databases.mongo_db.constructed_molecule\
+>
 
 """
 
