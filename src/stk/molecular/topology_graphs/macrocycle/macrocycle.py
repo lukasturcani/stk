@@ -2,8 +2,6 @@
 Macrocycle
 ==========
 
-#. :class:`.Macrocycle`
-
 """
 
 import numpy as np
