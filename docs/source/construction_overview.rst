@@ -37,7 +37,7 @@ else, take for example the construction of a linear polymer
                 ),
             ),
             repeating_unit='ABBBA',
-            num_repeating_units=2
+            num_repeating_units=2,
         )
     )
     # You can write the molecule to a file if you want to view it.
