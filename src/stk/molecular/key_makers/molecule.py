@@ -7,7 +7,6 @@ Molecule Key Maker
 
     InChI <stk.molecular.key_makers.inchi>
     InChIKey <stk.molecular.key_makers.inchi_key>
-    Molecule Key Maker <stk.molecular.key_makers.molecule>
 
 """
 

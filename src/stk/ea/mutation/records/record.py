@@ -2,11 +2,6 @@
 Molecule Mutation Record
 ========================
 
-.. toctree::
-    :maxdepth: 2
-
-    Mutation Record <stk.ea.mutation.records.record>
-
 """
 
 

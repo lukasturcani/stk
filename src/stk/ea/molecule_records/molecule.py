@@ -2,11 +2,6 @@
 Molecule Record
 ===============
 
-.. toctree::
-    :maxdepth: 2
-
-    Molecule Record <stk.ea.molecule_records.molecule>
-
 """
 
 from stk.molecular import ConstructedMolecule
