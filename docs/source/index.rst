@@ -51,8 +51,8 @@
    :maxdepth: 2
 
    Introduction <ea>
-   Fitness Calculators <stk.ea.fitness_calculators>
-   Fitness Normalizers <stk.ea.fitness_normalizers>
+   Fitness Calculators <stk.ea.fitness_calculators.fitness_calculator>
+   Fitness Normalizers <stk.ea.fitness_normalizers.fitness_normalizer>
    Selection <stk.ea.selection>
    Mutation <stk.ea.mutation.mutators.molecule.mutator>
    Crossover <stk.ea.crossover.crossers.molecule.crosser>
