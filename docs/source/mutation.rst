@@ -3,7 +3,7 @@ Mutation
 
 .. toctree::
     :caption: Molecule
-    :maxdepth: 2
+    :maxdepth: 0
 
     Molecule <stk.ea.mutation.mutators.molecule.mutator>
     Random Building Block <stk.ea.mutation.mutators.molecule.random_building_block>
