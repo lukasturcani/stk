@@ -1,5 +1,3 @@
-# Note that there is a second toctree that must be updated in
-# mutation.rst!
 """
 Molecule Mutator
 ================
