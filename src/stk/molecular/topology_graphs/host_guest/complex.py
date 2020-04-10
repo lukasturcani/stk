@@ -2,8 +2,6 @@
 Host Guest Complex
 ==================
 
-#. :class:`.Complex`
-
 """
 
 from .vertices import _HostVertex, _GuestVertex
