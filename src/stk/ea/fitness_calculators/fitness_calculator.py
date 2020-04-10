@@ -25,6 +25,11 @@ class FitnessCalculator:
 
     """
 
+    # Keep empty __init__() to override ugly default docstring.
+    def __init__(self):
+        """"""
+        return
+
     def get_fitness_value(self, molecule):
         """
         Return the fitness value of `molecule`.

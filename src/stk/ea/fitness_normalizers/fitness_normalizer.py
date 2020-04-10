@@ -30,6 +30,11 @@ class FitnessNormalizer:
 
     """
 
+    # Keep empty __init__() to override ugly default docstring.
+    def __init__(self):
+        """"""
+        return
+
     def normalize(self, population):
         """
         Normalize the fitness values in `population`.

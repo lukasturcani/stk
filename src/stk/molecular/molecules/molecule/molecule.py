@@ -2,6 +2,13 @@
 Molecule
 ========
 
+.. toctree::
+    :maxdepth: 2
+
+    Building Block <stk.molecular.molecules.building_block>
+    Constructed Molecule <stk.molecular.molecules.constructed_molecule>
+    Molecule <stk.molecular.molecules.molecule.molecule>
+
 """
 
 import os

@@ -2,6 +2,13 @@
 Evolutionary Algorithm
 ======================
 
+.. toctree::
+    :maxdepth: 2
+
+    Evolutionary Algorithm <\
+stk.ea.evolutionary_algorithm.evolutionary_algorithm\
+>
+
 """
 
 

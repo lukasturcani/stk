@@ -2,7 +2,10 @@
 Molecule Record
 ===============
 
-#. :class:`.MoleculeRecord`
+.. toctree::
+    :maxdepth: 2
+
+    Molecule Record <stk.ea.molecule_records.molecule>
 
 """
 

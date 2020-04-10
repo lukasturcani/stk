@@ -2,6 +2,11 @@
 Generation
 ==========
 
+.. toctree::
+    :maxdepth: 2
+
+    Generation <stk.ea.generation>
+
 """
 
 

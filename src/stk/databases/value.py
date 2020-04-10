@@ -24,6 +24,11 @@ class ValueDatabase:
 
     """
 
+    # Keep empty __init__() to override ugly default docstring.
+    def __init__(self):
+        """"""
+        return
+
     def put(self, molecule, value):
         """
         Put a value into the database.

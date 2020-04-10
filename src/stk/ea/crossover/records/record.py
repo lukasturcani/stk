@@ -2,7 +2,10 @@
 Crossover Record
 =================
 
-#. :class:`.CrossoverRecord`
+.. toctree::
+    :maxdepth: 2
+
+    Crossover Record <stk.ea.crossover.records.record>
 
 """
 

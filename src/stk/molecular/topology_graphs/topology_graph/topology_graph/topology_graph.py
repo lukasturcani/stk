@@ -2,13 +2,6 @@
 Topology Graph
 ==============
 
-#. :mod:`~.cage.cage`
-#. :mod:`~.cof.cof`
-#. :mod:`.host_guest.complex`
-#. :mod:`~.macrocycle.macrocycle`
-#. :mod:`.polymer`
-#. :mod:`.rotaxane`
-
 """
 
 from functools import partial

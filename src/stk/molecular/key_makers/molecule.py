@@ -7,6 +7,7 @@ Molecule Key Maker
 
     InChI <stk.molecular.key_makers.inchi>
     InChIKey <stk.molecular.key_makers.inchi_key>
+    Molecule Key Maker <stk.molecular.key_makers.molecule>
 
 """
 
@@ -15,7 +16,7 @@ class MoleculeKeyMaker:
     """
     An abstract base class for making :class:`.Molecule` keys.
 
-    Key are used in :mod:`stk` to determine if two molecules are
+    Keys are used in :mod:`stk` to determine if two molecules are
     duplicates of each other.
 
     Notes
