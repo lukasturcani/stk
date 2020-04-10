@@ -1,3 +1,9 @@
+"""
+[6+12]
+======
+
+"""
+
 from ..cage import Cage
 from ..vertices import _LinearCageVertex, _NonLinearCageVertex
 from ...topology_graph import Edge

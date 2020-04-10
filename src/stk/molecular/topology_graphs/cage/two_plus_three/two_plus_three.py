@@ -1,3 +1,9 @@
+"""
+[2+3]
+=====
+
+"""
+
 import numpy as np
 
 from ..cage import Cage
