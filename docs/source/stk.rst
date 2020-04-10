@@ -16,11 +16,3 @@ Subpackages
    stk.molecular
    stk.serialization
    stk.utilities
-
-Submodules
-----------
-
-.. toctree::
-
-   stk.base_calculators
-   stk.compound
