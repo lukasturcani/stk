@@ -1,12 +1,17 @@
 """
-COF
-===
+Covalent Organic Framework
+==========================
 
-#. :class:`.Hexagonal`
-#. :class:`.Honeycomb`
-#. :class:`.Kagome`
-#. :class:`.LinkerlessHoneycomb`
-#. :class:`.Square`
+.. toctree::
+    :maxdepth: 2
+
+    Hexagonal <stk.molecular.topology_graphs.cof.hexagonal>
+    Honeycomb <stk.molecular.topology_graphs.cof.honeycomb>
+    Kagome <stk.molecular.topology_graphs.cof.kagome>
+    Linkerless Honeycomb <\
+stk.molecular.topology_graphs.cof.linkerless_honeycomb\
+>
+    Square <stk.molecular.topology_graphs.cof.square>
 
 """
 
