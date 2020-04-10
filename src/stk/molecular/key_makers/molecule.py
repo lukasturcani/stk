@@ -15,6 +15,9 @@ class MoleculeKeyMaker:
     """
     An abstract base class for making :class:`.Molecule` keys.
 
+    Key are used in :mod:`stk` to determine if two molecules are
+    duplicates of each other.
+
     Notes
     -----
     You might notice that the public methods of this abstract base
