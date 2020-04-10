@@ -35,9 +35,8 @@ class EvolutionaryAlgorithm:
 
     *Usage*
 
-    There are multiple tutorials on how to use the default
-    implementation of the evolutionary algorithm, which can be
-    seen :ref:`here <>`
+    There are a couple of tutorials on how to use the
+    :class:`.EvolutionaryAlgorithm`, which can be found in the sidebar.
 
     """
 
@@ -88,7 +87,9 @@ class EvolutionaryAlgorithm:
             Takes a :class:`.MoleculeRecord` and returns some value.
             If two molecules return the same value, they are considered
             duplicates, and one of them will be removed from the
-            population. By default :func:`.get_inchi` will be used.
+            population. By default
+            :func:`~.evolutionary_algorithm.utilities.get_inchi` will
+            be used.
 
         logger : :class:`logging.Logger`, optional
             The logger the EA should use.
