@@ -1,5 +1,5 @@
 """
-[N]Rotaxane
+[n]Rotaxane
 ===========
 
 """

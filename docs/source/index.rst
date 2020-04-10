@@ -34,7 +34,7 @@
    Covalent Organic Framework <stk.molecular.topology_graphs.cof.cof>
    Host Guest Complex <stk.molecular.topology_graphs.host_guest.complex>
    Macrocycle <stk.molecular.topology_graphs.macrocycle.macrocycle>
-   [N]Rotaxane <stk.molecular.topology_graphs.rotaxane.nrotaxane>
+   [n]Rotaxane <stk.molecular.topology_graphs.rotaxane.nrotaxane>
    Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph>
 
 .. toctree::
