@@ -51,13 +51,12 @@
    :maxdepth: 2
 
    Introduction <ea>
-   Fitness Calculators <stk.calculators.ea.fitness_calculators>
-   Fitness Normalizers <stk.calculators.ea.fitness_normalizers>
-   Selection <stk.calculators.ea.selectors>
-   Mutation <stk.calculators.ea.mutators>
-   Crossover <stk.calculators.ea.crossers>
-   Termination <stk.calculators.ea.terminators>
-   Plotting <stk.calculators.ea.plotters>
+   Fitness Calculators <stk.ea.fitness_calculators>
+   Fitness Normalizers <stk.ea.fitness_normalizers>
+   Selection <stk.ea.selection>
+   Mutation <stk.ea.mutation.mutators>
+   Crossover <stk.ea.crossover.crossers>
+   Plotting <stk.ea.plotters>
 
 .. toctree::
    :hidden:
