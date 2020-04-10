@@ -2,8 +2,11 @@
 Molecule Key Maker
 ==================
 
-#. :class:`.Inchi`
-#. :class:`.InchiKey`
+.. toctree::
+    :maxdepth: 2
+
+    InChI <stk.molecular.key_makers.inchi>
+    InChIKey <stk.molecular.key_makers.inchi_key>
 
 """
 
