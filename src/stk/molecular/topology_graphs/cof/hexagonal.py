@@ -1,3 +1,9 @@
+"""
+Hexagonal
+=========
+
+"""
+
 import numpy as np
 
 

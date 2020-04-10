@@ -44,19 +44,19 @@ stk.molecular.topology_graphs.cage.two_plus_three.six_plus_nine\
     Six Plus Twelve <\
 stk.molecular.topology_graphs.cage.two_plus_four.six_plus_twelve\
 >
-    [8+12] <\
+    Eight Plus Twelve <\
 stk.molecular.topology_graphs.cage.two_plus_three.eight_plus_twelve\
 >
-    [8+16] <\
+    Eight Plus Sixteen <\
 stk.molecular.topology_graphs.cage.two_plus_four.eight_plus_sixteen\
 >
-    [10+20] <\
+    Ten Plus Twenty <\
 stk.molecular.topology_graphs.cage.two_plus_four.ten_plus_twenty\
 >
-    [12+30] <\
+    Twelve Plus Thirty <\
 stk.molecular.topology_graphs.cage.two_plus_five.twelve_plus_thirty\
 >
-    [20+30] <\
+    Twenty Plus Thirty <\
 stk.molecular.topology_graphs.cage.two_plus_three.twenty_plus_thirty\
 >
 

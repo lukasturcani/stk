@@ -1,3 +1,9 @@
+"""
+Square
+======
+
+"""
+
 import numpy as np
 
 

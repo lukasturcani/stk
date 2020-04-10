@@ -1,3 +1,9 @@
+"""
+Kagome
+======
+
+"""
+
 import numpy as np
 
 from .cof import Cof

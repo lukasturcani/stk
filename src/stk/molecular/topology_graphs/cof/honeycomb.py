@@ -1,3 +1,9 @@
+"""
+Honeycomb
+=========
+
+"""
+
 import numpy as np
 
 

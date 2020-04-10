@@ -1,3 +1,9 @@
+"""
+Linkerless Honeycomb
+====================
+
+"""
+
 import numpy as np
 
 from .cof import Cof
