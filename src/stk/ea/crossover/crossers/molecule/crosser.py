@@ -2,7 +2,12 @@
 Molecule Crosser
 ================
 
-#. :class:`.GeneticRecombination`
+.. toctree::
+    :maxdepth: 2
+
+    Genetic Recombination <\
+stk.ea.crossover.crossers.molecule.genetic_recombination\
+>
 
 """
 

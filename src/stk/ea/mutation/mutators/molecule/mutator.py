@@ -2,9 +2,18 @@
 Molecule Mutator
 ================
 
-#. :class:`.RandomBuildingBlock`
-#. :class:`.RandomTopologyGraph`
-#. :class:`.SimilarBuildingBlock`
+.. toctree::
+    :maxdepth: 2
+
+    Random Building Block <\
+stk.ea.mutation.mutators.molecule.random_building_block\
+>
+    Random Topology Graph <\
+stk.ea.mutation.mutators.molecule.random_topology_graph\
+>
+    Similar Building Block <\
+stk.ea.mutation.mutators.molecule.similar_building_block\
+>
 
 """
 
