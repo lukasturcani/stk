@@ -5,43 +5,43 @@ Cage
 .. toctree::
     :maxdepth: 2
 
-    [1+1] <\
+    One Plus One <\
 stk.molecular.topology_graphs.cage.three_plus_three.one_plus_one\
 >
-    [2+2] <\
+    Two Plus Two <\
 stk.molecular.topology_graphs.cage.one_plus_one.two_plus_two\
 >
-    [2+3] <\
+    Two Plus Three <\
 stk.molecular.topology_graphs.cage.two_plus_three.two_plus_three\
 >
-    [2+4] <\
+    Two Plus Four <\
 stk.molecular.topology_graphs.cage.two_plus_four.two_plus_four\
 >
-    [3+6] <\
+    Three Plus Six <\
 stk.molecular.topology_graphs.cage.two_plus_four.three_plus_six\
 >
-    [4+4] <\
+    Four Plus Four <\
 stk.molecular.topology_graphs.cage.three_plus_three.four_plus_four\
 >
-    [4+6] <\
+    Four Plus Six <\
 stk.molecular.topology_graphs.cage.two_plus_three.four_plus_six\
 >
-    [4+6] 2 <\
+    Four Plus Six 2 <\
 stk.molecular.topology_graphs.cage.two_plus_three.four_plus_six_2\
 >
-    [4+8] <\
+    Four Plus Eight <\
 stk.molecular.topology_graphs.cage.two_plus_four.four_plus_eight\
 >
-    [5+10] <\
+    Five Plus Ten <\
 stk.molecular.topology_graphs.cage.two_plus_four.five_plus_ten\
 >
-    [6+8] <\
+    Six Plus Eight <\
 stk.molecular.topology_graphs.cage.three_plus_four.six_plus_eight\
 >
-    [6+9] <\
+    Six Plus Nine <\
 stk.molecular.topology_graphs.cage.two_plus_three.six_plus_nine\
 >
-    [6+12] <\
+    Six Plus Twelve <\
 stk.molecular.topology_graphs.cage.two_plus_four.six_plus_twelve\
 >
     [8+12] <\
