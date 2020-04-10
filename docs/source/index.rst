@@ -53,7 +53,7 @@
    Introduction <ea>
    Fitness Calculators <stk.ea.fitness_calculators.fitness_calculator>
    Fitness Normalizers <stk.ea.fitness_normalizers.fitness_normalizer>
-   Selection <stk.ea.selection>
+   Selection <stk.ea.selection.selectors.selector>
    Mutation <stk.ea.mutation.mutators.molecule.mutator>
    Crossover <stk.ea.crossover.crossers.molecule.crosser>
    Plotting <stk.ea.plotters>

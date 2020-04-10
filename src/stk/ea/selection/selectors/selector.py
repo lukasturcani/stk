@@ -2,16 +2,21 @@
 Selector
 ========
 
-#. :class:`.AboveAverage`
-#. :class:`.Best`
-#. :class:`.FilterBatches`
-#. :class:`.FilterMolecules`
-#. :class:`.RemoveBatches`
-#. :class:`.RemoveMolecules`
-#. :class:`.Roulette`
-#. :class:`.StochasticUniversalSampling`
-#. :class:`.Tournament`
-#. :class:`.Worst`
+.. toctree::
+    :maxdepth: 2
+
+    Above Average <stk.ea.selection.selectors.above_average>
+    Best <stk.ea.selection.selectors.best>
+    Filter Batches <stk.ea.selection.selectors.filter_batches>
+    Filter Molecule <stk.ea.selection.selectors.filter_molecules>
+    Remove Batches <stk.ea.selection.selectors.remove_batches>
+    Remove Molecules <stk.ea.selection.selectors.remove_molecules>
+    Roulette <stk.ea.selection.selectors.roulette>
+    Stochastic Universal Sampling <\
+stk.ea.selection.selectors.stochastic_universal_sampling\
+>
+    Tournament <stk.ea.selection.selectors.tournament>
+    Worst <stk.ea.selection.selectors.worst>
 
 """
 
