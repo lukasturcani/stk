@@ -56,7 +56,7 @@
    Selection <stk.ea.selection.selectors.selector>
    Mutation <stk.ea.mutation.mutators.molecule.mutator>
    Crossover <stk.ea.crossover.crossers.molecule.crosser>
-   Plotting <stk.ea.plotters>
+   Plotting <plotters>
 
 .. toctree::
    :hidden:
