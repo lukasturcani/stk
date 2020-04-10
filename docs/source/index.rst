@@ -54,8 +54,8 @@
    Fitness Calculators <stk.ea.fitness_calculators>
    Fitness Normalizers <stk.ea.fitness_normalizers>
    Selection <stk.ea.selection>
-   Mutation <mutation>
-   Crossover <crossover>
+   Mutation <stk.ea.mutation.mutators.molecule.mutator>
+   Crossover <stk.ea.crossover.crossers.molecule.crosser>
    Plotting <stk.ea.plotters>
 
 .. toctree::
