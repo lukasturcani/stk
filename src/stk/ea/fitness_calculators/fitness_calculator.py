@@ -2,8 +2,11 @@
 Fitness Calculator
 ==================
 
-#. :class:`.FitnessFunction`
-#. :class:`.PropertyVector`
+.. toctree::
+    :maxdepth: 2
+
+    Fitness Function <stk.ea.fitness_calculators.fitness_function>
+    Property Vector <stk.ea.fitness_calculators.property_vector>
 
 """
 

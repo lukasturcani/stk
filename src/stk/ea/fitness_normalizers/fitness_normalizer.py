@@ -2,12 +2,15 @@
 Fitness Normalizer
 ==================
 
-#. :class:`.DivideByMean`
-#. :class:`.Multiply`
-#. :class:`.NullFitnessNormalizer`
-#. :class:`.ReplaceFitness`
-#. :class:`.ShiftUp`
-#. :class:`.Sum`
+.. toctree::
+    :maxdepth: 2
+
+    Divide By Mean <stk.ea.fitness_normalizers.divide_by_mean>
+    Multiply <stk.ea.fitness_normalizers.multiply>
+    Null Fitness Normalizer <stk.ea.fitness_normalizers.null>
+    Replace Fitness <stk.ea.fitness_normalizers.replace_fitness>
+    Shift Up <stk.ea.fitness_normalizers.shift_up>
+    Sum <stk.ea.fitness_normalizers.sum>
 
 """
 
