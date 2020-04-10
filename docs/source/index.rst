@@ -31,7 +31,7 @@
 
    Polymer <stk.molecular.topology_graphs.polymer>
    Organic Cage <stk.molecular.topology_graphs.cage.cage>
-   Covalent Organic Framework <stk.molecular.topology_graphs.cof>
+   Covalent Organic Framework <stk.molecular.topology_graphs.cof.cof>
    Host Guest Complex <stk.molecular.topology_graphs.host_guest>
    Macrocycle <stk.molecular.topology_graphs.macrocycle>
    Rotaxane <stk.molecular.topology_graphs.rotaxane>
