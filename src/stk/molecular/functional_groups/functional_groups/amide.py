@@ -36,7 +36,7 @@ class Amide(GenericFunctionalGroup):
             The ``[carbon]`` atom.
 
         oxygen : :class:`.O`
-            The ``[oxygen]` atom.
+            The ``[oxygen]`` atom.
 
         nitrogen : :class:`.N`
             The ``[nitrogen]`` atom.
