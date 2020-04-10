@@ -9,7 +9,7 @@ Cage
 stk.molecular.topology_graphs.cage.three_plus_three.one_plus_one\
 >
     Two Plus Two <\
-stk.molecular.topology_graphs.cage.one_plus_one.two_plus_two\
+stk.molecular.topology_graphs.cage.three_plus_three.two_plus_two\
 >
     Two Plus Three <\
 stk.molecular.topology_graphs.cage.two_plus_three.two_plus_three\
