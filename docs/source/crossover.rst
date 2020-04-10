@@ -3,6 +3,6 @@ Crossover
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
     Molecule <stk.ea.crossover.crossers.molecule.crosser>
