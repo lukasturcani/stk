@@ -2,24 +2,63 @@
 Cage
 ====
 
-#. :class:`.EightPlusSixteen`
-#. :class:`.EightPlusTwelve`
-#. :class:`.FivePlusTen`
-#. :class:`.FourPlusEight`
-#. :class:`.FourPlusFour`
-#. :class:`.FourPlusSix`
-#. :class:`.FourPlusSix2`
-#. :class:`.OnePlusOne`
-#. :class:`.SixPlusEight`
-#. :class:`.SixPlusNine`
-#. :class:`.SixPlusTwelve`
-#. :class:`.TenPlusTwenty`
-#. :class:`.ThreePlusSix`
-#. :class:`.TwelvePlusThirty`
-#. :class:`.TwentyPlusThirty`
-#. :class:`.TwoPlusFour`
-#. :class:`.TwoPlusThree`
-#. :class:`.TwoPlusTwo`
+.. toctree::
+    :maxdepth: 2
+
+    [1+1] <\
+stk.molecular.topology_graphs.cage.three_plus_three.one_plus_one\
+>
+    [2+2] <\
+stk.molecular.topology_graphs.cage.one_plus_one.two_plus_two\
+>
+    [2+3] <\
+stk.molecular.topology_graphs.cage.two_plus_three.two_plus_three\
+>
+    [2+4] <\
+stk.molecular.topology_graphs.cage.two_plus_four.two_plus_four\
+>
+    [3+6] <\
+stk.molecular.topology_graphs.cage.two_plus_four.three_plus_six\
+>
+    [4+4] <\
+stk.molecular.topology_graphs.cage.three_plus_three.four_plus_four\
+>
+    [4+6] <\
+stk.molecular.topology_graphs.cage.two_plus_three.four_plus_six\
+>
+    [4+6] 2 <\
+stk.molecular.topology_graphs.cage.two_plus_three.four_plus_six_2\
+>
+    [4+8] <\
+stk.molecular.topology_graphs.cage.two_plus_four.four_plus_eight\
+>
+    [5+10] <\
+stk.molecular.topology_graphs.cage.two_plus_four.five_plus_ten\
+>
+    [6+8] <\
+stk.molecular.topology_graphs.cage.three_plus_four.six_plus_eight\
+>
+    [6+9] <\
+stk.molecular.topology_graphs.cage.two_plus_three.six_plus_nine\
+>
+    [6+12] <\
+stk.molecular.topology_graphs.cage.two_plus_four.six_plus_twelve\
+>
+    [8+12] <\
+stk.molecular.topology_graphs.cage.two_plus_three.eight_plus_twelve\
+>
+    [8+16] <\
+stk.molecular.topology_graphs.cage.two_plus_four.eight_plus_sixteen\
+>
+    [10+20] <\
+stk.molecular.topology_graphs.cage.two_plus_four.ten_plus_twenty\
+>
+    [12+30] <\
+stk.molecular.topology_graphs.cage.two_plus_five.twelve_plus_thirty\
+>
+    [20+30] <\
+stk.molecular.topology_graphs.cage.two_plus_three.twenty_plus_thirty\
+>
 
 """
 
