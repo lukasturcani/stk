@@ -45,7 +45,7 @@ else, take for example the construction of a linear polymer
 
 which will produce:
 
-.. image:: https://i.imgur.com/5WFPVww.png
+.. image:: https://i.imgur.com/i1vz5fx.png
 
 Because the topology graph is an idealized representation of the
 constructed molecule, the bonds formed during construction often have
