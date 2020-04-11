@@ -28,15 +28,15 @@ else, take for example the construction of a linear polymer
         topology_graph=stk.polymer.Linear(
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='Brc1cc(Br)ccc1',
+                    smiles='Brc1ccc(Br)cc1',
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Brc1cc(Br)cnc1',
+                    smiles='BrC#CBr',
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
-            repeating_unit='ABBBA',
+            repeating_unit='AB',
             num_repeating_units=2,
         )
     )
@@ -45,7 +45,7 @@ else, take for example the construction of a linear polymer
 
 which will produce:
 
-.. image:: https://i.imgur.com/PE6MoWq.png
+.. image:: https://i.imgur.com/PTReoxh.png
 
 Because the topology graph is an idealized representation of the
 constructed molecule, the bonds formed during construction often have
