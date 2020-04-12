@@ -104,7 +104,7 @@ of a given structure should be built.
 Here is a preview of some of the more complex structures
 :mod:`stk` can construct
 
-.. image:: https://i.imgur.com/HI5cciM.png
+.. image:: https://i.imgur.com/PvkfoGs.jpg
 
 Automatic Molecular Design
 ..........................
