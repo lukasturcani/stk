@@ -36,8 +36,8 @@ else, take for example the construction of a linear polymer
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
-            repeating_unit='AB',
-            num_repeating_units=2,
+            repeating_unit='ABBA',
+            num_repeating_units=1,
         )
     )
     # You can write the molecule to a file if you want to view it.
@@ -45,7 +45,7 @@ else, take for example the construction of a linear polymer
 
 which will produce:
 
-.. image:: https://i.imgur.com/jQ7s8qp.png
+.. image:: https://i.imgur.com/e782BBV.png
 
 Because the topology graph is an idealized representation of the
 constructed molecule, the bonds formed during construction often have
