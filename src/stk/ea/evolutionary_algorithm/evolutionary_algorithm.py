@@ -22,6 +22,11 @@ class EvolutionaryAlgorithm:
     users can use. However, feel free to override the default
     implementation when implementing subclasses.
 
+    If you do want to use the default implementation, here is a
+    summary of the roles of the different components:
+
+    .. image:: https://i.imgur.com/hGXboaU.png
+
     Examples
     --------
     *Subclass Implementation*
