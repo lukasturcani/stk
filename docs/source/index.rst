@@ -52,6 +52,7 @@
    :maxdepth: 2
 
    Overview <stk.ea.evolutionary_algorithm.evolutionary_algorithm>
+   Basic Example <basic_ea_example>
    Fitness Calculators <stk.ea.fitness_calculators.fitness_calculator>
    Fitness Normalizers <stk.ea.fitness_normalizers.fitness_normalizer>
    Selection <stk.ea.selection.selectors.selector>
