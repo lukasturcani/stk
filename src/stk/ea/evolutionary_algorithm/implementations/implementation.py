@@ -20,7 +20,7 @@ class Implementation:
         mutation_selector,
         crossover_selector,
         fitness_normalizer,
-        duplicate_key,
+        key_maker,
         logger,
     ):
         """
@@ -36,12 +36,15 @@ class Implementation:
         self._mutation_selector = mutation_selector
         self._crossover_selector = crossover_selector
         self._fitness_normalizer = fitness_normalizer
-        self._duplicate_key = duplicate_key
+        self._key_maker = key_maker
         self._logger = logger
 
     def _get_generations(self, num_generations, map_):
         def get_mutation_record(batch):
             return self._mutator.mutate(batch[0])
+
+        def get_key(record):
+            return self._key_maker.get_key(record.get_molecule())
 
         population = self._initial_population
 
@@ -90,7 +93,7 @@ class Implementation:
                 map_=map_,
                 population=dedupe(
                     iterable=it.chain(population, offspring, mutants),
-                    key=self._duplicate_key,
+                    key=get_key,
                 ),
             ))
             population = tuple(

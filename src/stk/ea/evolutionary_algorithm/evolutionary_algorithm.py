@@ -6,7 +6,8 @@ Evolutionary Algorithm
 
 
 from ..fitness_normalizers import NullFitnessNormalizer
-from .utilities import get_logger, get_inchi
+from .utilities import get_logger
+from stk.molecular import Inchi
 from .implementations import Serial, Parallel
 
 
@@ -55,7 +56,7 @@ class EvolutionaryAlgorithm:
         mutation_selector,
         crossover_selector,
         fitness_normalizer=NullFitnessNormalizer(),
-        duplicate_key=get_inchi,
+        key_maker=Inchi(),
         logger=get_logger(),
         num_processes=None,
     ):
@@ -88,13 +89,10 @@ class EvolutionaryAlgorithm:
         fitness_normalizer : :class:`.FitnessNormalizer`
             Normalizes fitness values.
 
-        duplicate_key : :class:`callable`, optional
-            Takes a :class:`.MoleculeRecord` and returns some value.
-            If two molecules return the same value, they are considered
-            duplicates, and one of them will be removed from the
-            population. By default
-            :func:`~.evolutionary_algorithm.utilities.get_inchi` will
-            be used.
+        key_maker : :class:`.MoleculeKeyMaker`, optional
+            Used to detect duplicate molecules in the EA. If two
+            molecules in a generation return the same key, one of them
+            is removed.
 
         logger : :class:`logging.Logger`, optional
             The logger the EA should use.
@@ -115,7 +113,7 @@ class EvolutionaryAlgorithm:
                 mutation_selector=mutation_selector,
                 crossover_selector=crossover_selector,
                 fitness_normalizer=fitness_normalizer,
-                duplicate_key=duplicate_key,
+                key_maker=key_maker,
                 logger=logger,
             )
 
@@ -129,7 +127,7 @@ class EvolutionaryAlgorithm:
                 mutation_selector=mutation_selector,
                 crossover_selector=crossover_selector,
                 fitness_normalizer=fitness_normalizer,
-                duplicate_key=duplicate_key,
+                key_maker=key_maker,
                 logger=logger,
                 num_processes=num_processes,
             )

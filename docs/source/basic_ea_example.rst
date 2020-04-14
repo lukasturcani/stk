@@ -102,7 +102,7 @@ because the molecules produced by the EA are always constructed
 molecules.
 
 We won't define which :class:`.ConstructedMoleculeDatabase` we want to
-use just yet, for now all we need to know is that a
+use just yet, for now, all we need to know is that a
 :class:`.ConstructedMoleculeDatabase` guarantees the methods,
 :meth:`~.ConstructedMoleculeDatabase.put`,
 :meth:`~.ConstructedMoleculeDatabase.get` and
@@ -145,7 +145,37 @@ Already our EA loop is much nicer.
 Plotting the EA Progress
 ========================
 
-Usually
+Usually, when we run an EA, we want to be able evaluate its
+performance somehow. A very simple way to do this, is to plot how
+the fitness of the population changes with generations. You
+can use a :class:`.ProgressPlotter` to do this.
+
+The :class:`.ProgressPlotter` needs to know what generations it
+should plot, so we have to modify our loop so that it stores the
+previous generations
+
+.. code-block:: python
+
+    generations = []
+    for i, generation in enumerate(ea.get_generations(50)):
+        molecules = (
+            record.get_molecule()
+            for record in generation.get_molecule_records()
+        )
+        db.put_many(molecules)
+        generations.append(generation)
+
+Now that we have the generations, we can use a
+:class:`.ProgressPlotter` to plot them
+
+.. code-block:: python
+
+    fitness_progress = stk.ProgressPlotter(
+        generations=generations,
+        get_property=lambda record: record.get_fitness_value(),
+        y_label='Fitness Value',
+    )
+    fitness_progress.write('fitness_progress.png')
 
 
 Review
@@ -193,3 +223,55 @@ example, I will just use a couple of straight-forward ones.
 
 Defining EA Components
 ======================
+
+For most most of the EA components, it doesn't really matter what
+molecules you are trying to design, any option will do
+
+
+.. code-block:: python
+
+    ea = stk.EvolutionaryAlgorithm(
+        initial_population=...,
+        fitness_calculator=...,
+        mutator=...,
+        crosser=stk.GeneticRecombination(
+        ),
+        generation_selector=stk.AboveAverage(
+            num_batches=20,
+            duplicate_molecules=False,
+        ),
+        mutation_selector=stk.Roulette(
+            num_batches=5
+            # It's nice to get reproducible results.
+            random_seed=5,
+        ),
+        crossover_selector=stk.Roulette(
+            num_batches=3,
+            batch_size=2,
+            random_seed=8,
+        )
+        # We don't need to do a normalization in this example.
+        fitness_normalizer=stk.NullFitnessNormalizer(),
+
+    )
+
+
+
+Defining a Fitness Calculator
+-----------------------------
+
+One remaining EA component we need to define is a
+:class:`.FitnessCalculator`.
+
+
+Defining an Initial Population
+------------------------------
+
+
+Defining a Database
+-------------------
+
+
+
+Final Version
+=============
