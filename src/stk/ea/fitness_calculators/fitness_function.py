@@ -146,7 +146,8 @@ class FitnessFunction(FitnessCalculator):
         Parameters
         ----------
         fitness_function : :class:`callable`
-            Takes a single parameter, the :class:`.Molecule` whose
+            Takes a single parameter, the
+            :class:`.ConstructedMolecule` whose
             fitness needs to be calculated, and returns its
             fitness value.
 

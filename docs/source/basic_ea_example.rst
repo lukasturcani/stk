@@ -224,17 +224,76 @@ example, I will just use a couple of straight-forward ones.
 Defining EA Components
 ======================
 
-For most most of the EA components, it doesn't really matter what
-molecules you are trying to design, any option will do
+When defining EA components, there are two major questions that the
+user must answer
+
+* What molecular properties do I want to optimize?
+* What kinds of molecular structures do I want to consider?
+
+The user answers the first question by defining a
+:class:`.FitnessCalculator`. The :class:`.FitnessCalculator` returns
+a fitness value, and this is the value that the EA will optimize.
+The simplest way to define a :class:`.FitnessCalculator` is to
+first define a simple Python function, which takes a
+:class:`.ConstructedMolecule` instance, and returns the fitness
+value of that molecule.
+
+For example, in many applications it is desirable to have rigid
+molecules. One way to measure how rigid a molecule is, is to
+calculate the number of rotatable bonds it has. The more rotatable
+bonds, the less rigid the molecule. Therefore, if we want the EA to
+produce rigid molecules, our fitness function should give a high
+fitness to molecules with *few* rotatable bonds. We can therefore
+define a function which returns the inverse of the number of rotatable
+bonds in a molecule
 
 
 .. code-block:: python
 
+    import rdkit.Chem.AllChem as rdkit
+
+    def get_rigidity(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(
+            mol=rdkit_molecule,
+        )
+        # Add 1 to the denominator to prevent division by 0.
+        return 1 / (num_rotatable_bonds + 1)
+
+
+Now that we have our function, we can turn it into a
+:class:`.FitnessCalculator` by using :class:`.FitnessFunction`
+
+.. code-block:: python
+
+    fitness_calculator = stk.FitnessFunction(get_rigidity)
+
+Now we only have to answer the second question,
+*What kinds of molecular structures do I want to consider?*
+
+
+.. code-block:: python
+
+    def get_initial_population():
+
+
+
+.. code-block:: python
+
+    # It's nice to get reproducible results.
+    random_seed = 3
     ea = stk.EvolutionaryAlgorithm(
-        initial_population=...,
-        fitness_calculator=...,
-        mutator=...,
+        initial_population=tuple(get_initial_population()),
+        fitness_calculator=stk.FitnessFunction(get_rigidity),
+        mutator=stk.RandomBuildingBlock(
+            building_blocks=...,
+            # All building blocks are replaceable.
+            is_replaceable=lambda building_block: True,
+            random_seed=random_seed,
+        ),
         crosser=stk.GeneticRecombination(
+            get_gene=lambda building_block:
         ),
         generation_selector=stk.AboveAverage(
             num_batches=20,
@@ -242,13 +301,12 @@ molecules you are trying to design, any option will do
         ),
         mutation_selector=stk.Roulette(
             num_batches=5
-            # It's nice to get reproducible results.
-            random_seed=5,
+            random_seed=random_seed,
         ),
         crossover_selector=stk.Roulette(
             num_batches=3,
             batch_size=2,
-            random_seed=8,
+            random_seed=random_seed,
         )
         # We don't need to do a normalization in this example.
         fitness_normalizer=stk.NullFitnessNormalizer(),
@@ -275,3 +333,9 @@ Defining a Database
 
 Final Version
 =============
+
+
+
+Next, you can read the intermediate tutorial to see additional
+customization you can make to the EA, which allow it to be more
+powerful and more efficient.

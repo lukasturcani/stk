@@ -36,7 +36,7 @@ class FitnessCalculator:
 
         Parameters
         ----------
-        molecule : :class:`.Molecule`
+        molecule : :class:`.ConstructedMolecule`
             The molecule whose fitness value should be calculated.
 
         Returns

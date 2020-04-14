@@ -147,7 +147,7 @@ class GeneticRecombination(MoleculeCrosser):
         get_gene : :class:`callable`
             A :class:`callable`, which takes a :class:`.BuildingBlock`
             object and returns its gene. To produce an offspring, one
-            of the building blocks from each gene is picked at random.
+            of the building blocks from each gene is picked.
 
         name : :class:`str`, optional
             A name to identify the crosser instance.
