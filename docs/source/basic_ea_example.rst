@@ -12,6 +12,13 @@ You can get all the code associated with tutorial by running::
 
     $ git clone https://github.com/lukasturcani/basic_ea
 
+This tutorial relies on a Python library, which does not come
+with :mod:`stk`, called :mod:``. It used to make the library of
+building blocks, which the EA searches, in order to find the optimal
+molecules for our task. You can install it with::
+
+    $ pip install
+
 
 EA Components
 =============
@@ -247,7 +254,6 @@ fitness to molecules with *few* rotatable bonds. We can therefore
 define a function which returns the inverse of the number of rotatable
 bonds in a molecule
 
-
 .. code-block:: python
 
     import rdkit.Chem.AllChem as rdkit
@@ -272,14 +278,49 @@ Now that we have our function, we can turn it into a
 Now we only have to answer the second question,
 *What kinds of molecular structures do I want to consider?*
 
+.. code-block:: python
+
+    import numpy as np
+
+    def get_initial_population(fluoros, bromos, random_seed):
+        generator = np.random.RandomState(random_seed)
+        intial_fluoros = generator.random.choice(
+            a=fluoros,
+            size=5,
+            replace=False,
+        )
+        initial bromos = generator.random.choice(
+            a=bromos,
+            size=5,
+            replace=False,
+        )
+
+        for fluoro, bromo in it.product(
+            intial_fluoros,
+            initial_bromos,
+        ):
+            yield stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles=fluoro,
+                            functional_groups=[stk.FluoroFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles=bromo,
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='AB',
+                    num_repeating_units=1,
+                ),
+            )
 
 .. code-block:: python
 
-    def get_initial_population():
-
-
-
-.. code-block:: python
+    def get_functional_group_type(building_block):
+        functional_group, = building_block.get_functional_groups(0)
+        return functional_group.__class__
 
     # It's nice to get reproducible results.
     random_seed = 3
@@ -293,10 +334,10 @@ Now we only have to answer the second question,
             random_seed=random_seed,
         ),
         crosser=stk.GeneticRecombination(
-            get_gene=lambda building_block:
+            get_gene=get_functional_group_type,
         ),
-        generation_selector=stk.AboveAverage(
-            num_batches=20,
+        generation_selector=stk.Best(
+            num_batches=25,
             duplicate_molecules=False,
         ),
         mutation_selector=stk.Roulette(
@@ -335,7 +376,22 @@ Final Version
 =============
 
 
+This is a complete, basic EA. However, it has some obvious limitations:
 
-Next, you can read the intermediate tutorial to see additional
-customization you can make to the EA, which allow it to be more
+* Only a single :class:`.Mutator` is defined. This means that only the
+  space of bromo building blocks was explored.
+* The :class:`.RandomBuildingBlock` mutator throws away an entire
+  building block each time it performs a mutation. This means all the
+  chemical information in it is lost. We would like a mutation which
+  only *modifies* the building block, so that the new building block
+  shares a some chemical features with the old one.
+* The :class:`.FitnessCalculator` re-calculated the fitness value on
+  molecules for which it had already calculated fitness values. This
+  is OK in this example, but often a fitness calculation can be
+  expensive and repeating it would seriously degrade the performance
+  of our EA.
+
+Next, you can read the intermediate tutorial, which will address all
+of these limitations, and show you additional
+customizations you can make to the EA, which allow it to be more
 powerful and more efficient.
