@@ -191,6 +191,101 @@ class BuildingBlock(Molecule):
         )
 
     @classmethod
+    def init_from_vabene_molecule(
+        cls,
+        molecule,
+        functional_groups=(),
+        placer_ids=None,
+        random_seed=4,
+    ):
+        """
+        Initialize from a :mod:`vabene.Molecule`.
+
+        Notes
+        -----
+        The molecule is given 3D coordinates with
+        :func:`rdkit.ETKDGv2()`.
+
+        Parameters
+        ----------
+        molecule : :class:`vabene.Molecule`
+            The molecule from which to initialize.
+
+        functional_groups : :class:`iterable`, optional
+            An :class:`iterable` of :class:`.FunctionalGroup` or
+            :class:`.FunctionalGroupFactory` or both.
+            :class:`.FunctionalGroup` instances are added to the
+            building block and :class:`.FunctionalGroupFactory`
+            instances are used to create :class:`.FunctionalGroup`
+            instances the building block should hold.
+            :class:`.FunctionalGroup` instances are used to identify
+            which atoms are modified during
+            :class:`.ConstructedMolecule` construction.
+
+        placer_ids : :class:`tuple` of :class:`int`, optional
+            The ids of *placer* atoms. These are the atoms which should
+            be used for calculating the position of the building block.
+            Depending on the values passed to `placer_ids`,
+            and the functional groups in the building block, different
+            *placer* ids will be used by the building block.
+
+            #. `placer_ids` is passed to the initializer: the passed
+               *placer* ids will be used by the building block.
+
+            #. `placer_ids` is ``None`` and the building block has
+               functional groups: The *placer* ids of the functional
+               groups will be used as the *placer* ids of the building
+               block.
+
+            #. `placer_ids` is ``None`` and `functional_groups` is
+               empty. All atoms of the molecule will be used for
+               *placer* ids.
+
+        random_seed : :class:`int`, optional
+            Random seed passed to :func:`rdkit.ETKDGv2`
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+             The building block.
+
+        Raises
+        ------
+        :class:`RuntimeError`
+            If embedding the molecule fails.
+
+        """
+
+        editable = rdkit.EditableMol(rdkit.Mol())
+        for atom in molecule.get_atoms():
+            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
+            rdkit_atom.SetFormalCharge(atom.get_charge())
+            editable.AddAtom(rdkit_atom)
+
+        for bond in molecule.get_bonds():
+            editable.AddBond(
+                beginAtomIdx=bond.get_atom1_id(),
+                endAtomIdx=bond.get_atom2_id(),
+                order=rdkit.BondType(bond.get_order()),
+            )
+
+        rdkit_molecule = editable.GetMol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        rdkit_molecule = rdkit.AddHs(rdkit_molecule)
+        params = rdkit.ETKDGv2()
+        params.randomSeed = random_seed
+        if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
+            raise RuntimeError(
+                f'Embedding with seed value of {random_seed} failed.'
+            )
+        rdkit.Kekulize(rdkit_molecule)
+        return cls.init_from_rdkit_mol(
+            molecule=rdkit_molecule,
+            functional_groups=functional_groups,
+            placer_ids=placer_ids,
+        )
+
+    @classmethod
     def init(
         cls,
         atoms,
