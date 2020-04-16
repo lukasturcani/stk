@@ -13,11 +13,11 @@ You can get all the code associated with tutorial by running::
     $ git clone https://github.com/lukasturcani/basic_ea
 
 This tutorial relies on a Python library, which does not come
-with :mod:`stk`, called :mod:``. It used to make the library of
-building blocks, which the EA searches, in order to find the optimal
-molecules for our task. You can install it with::
+with :mod:`stk`, called :mod:`vabene`. It used to make our
+library of building blocks, which the EA uses, in order to find the
+optimal molecules for our task. You can install it with::
 
-    $ pip install
+    $ pip install vabene
 
 
 EA Components
