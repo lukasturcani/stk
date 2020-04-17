@@ -834,30 +834,31 @@ The final version of our code is
 
 The plot of fitness we produced looks like this:
 
-.. image:: https://i.imgur.com/eNc0f4B.png
+.. image:: https://i.imgur.com/ic7tpd9.png
 
-which, admittedly, doesn't look that great. However, since the
-fitness value is just a ratio of two numbers, it doesn't really tell
-us much. A better thing to look at is the plot for the number of
+which shows us that the EA was pretty good at improving the fitness
+value. Another thing to look at is the plot for the number of
 rotatable bonds
 
-.. image:: https://i.imgur.com/7retPh8.png
+.. image:: https://i.imgur.com/IREDYOi.png
 
 
-Clearly, our EA was able to quickly minimize the number of rotatable
+Clearly, our EA was able to minimize the number of rotatable
 bonds to a low value across all members of the population.
 
 We can also compare the molecules in the initial population
 
-.. image:: https://i.imgur.com/qEvCMk0.png
+.. image:: https://i.imgur.com/jQMh9gs.png
 
 to those in the final population
 
-.. image:: https://i.imgur.com/alBW1OS.png
+.. image:: https://i.imgur.com/SdWQaEr.png
 
-where the hydrogen atoms have been left out for clarity. Looking
-at these, the
-EA obviously managed to reduce the complexity of the molecules as well.
+where the hydrogen atoms have been left out for clarity. When
+considering that these were chosen out of a search space of 1,000,000
+randomly constructed molecular graphs, they don't look that bad, though
+you will probably want to a better measure of synthetic accessibility
+in your own EAs.
 
 Next, you can read the intermediate tutorial, which will show you
 some additional customization options for the EA.
