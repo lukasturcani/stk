@@ -63,7 +63,7 @@ class Implementation:
 
         for generation in range(1, num_generations):
             self._logger.info(f'Starting generation {generation}.')
-            self._logger.debug(
+            self._logger.info(
                 f'Population size is {len(population)}.'
             )
 
