@@ -281,6 +281,7 @@ molecular graphs, which can be used to make our building blocks
 
     import vabane as vb
     import numpy as np
+    import itertools as it
 
     def get_building_block(
         generator,
@@ -446,7 +447,7 @@ remaining ones too
                 ),
             ),
             random_seed=generator.randint(0, 1000),
-        )
+        ),
         crosser=stk.GeneticRecombination(
             get_gene=get_functional_group_type,
         ),
@@ -455,14 +456,14 @@ remaining ones too
             duplicate_molecules=False,
         ),
         mutation_selector=stk.Roulette(
-            num_batches=5
+            num_batches=5,
             random_seed=generator.randint(0, 1000),
         ),
         crossover_selector=stk.Roulette(
             num_batches=3,
             batch_size=2,
             random_seed=generator.randint(0, 1000),
-        )
+        ),
         # We don't need to do a normalization in this example.
         fitness_normalizer=stk.NullFitnessNormalizer(),
     )
@@ -513,6 +514,7 @@ The final version of our code is
     import pymongo
     import vabane as vb
     import numpy as np
+    import itertools as it
 
     def get_building_block(
         generator,
@@ -629,7 +631,7 @@ The final version of our code is
                 ),
             ),
             random_seed=generator.randint(0, 1000),
-        )
+        ),
         crosser=stk.GeneticRecombination(
             get_gene=get_functional_group_type,
         ),
@@ -638,14 +640,14 @@ The final version of our code is
             duplicate_molecules=False,
         ),
         mutation_selector=stk.Roulette(
-            num_batches=5
+            num_batches=5,
             random_seed=generator.randint(0, 1000),
         ),
         crossover_selector=stk.Roulette(
             num_batches=3,
             batch_size=2,
             random_seed=generator.randint(0, 1000),
-        )
+        ),
         # We don't need to do a normalization in this example.
         fitness_normalizer=stk.NullFitnessNormalizer(),
     )
