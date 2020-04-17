@@ -5,7 +5,6 @@ from stk.molecular import Inchi
 
 
 def get_logger():
-    return
     # Define the formatter for logging messages.
     try:
         f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
