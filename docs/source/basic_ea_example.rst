@@ -792,13 +792,15 @@ Clearly, our EA was able to quickly minimize the number of rotatable
 bonds to the lowest possible value across all members of the
 population.
 
-We can also compare 10 random molecules in our initial population
+We can also compare the first 8 molecules in our initial population
 
-.. image::
+.. image:: https://i.imgur.com/qjyOh2U.png
 
-to 10 random ones in the final population
+to the first 8 in the final population
 
-.. image::
+.. image:: https://i.imgur.com/EfJQ5PD.png
+
+where the hydrogen atoms have been left out for clarity.
 
 Next, you can read the intermediate tutorial, which will show you
 some additional customization options for the EA.
