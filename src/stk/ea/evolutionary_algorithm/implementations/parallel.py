@@ -20,7 +20,7 @@ class Parallel(Implementation):
         crossover_selector,
         terminator,
         fitness_normalizer,
-        duplicate_key,
+        key_maker,
         logger,
         num_processes,
     ):
@@ -35,7 +35,7 @@ class Parallel(Implementation):
             crossover_selector=crossover_selector,
             terminator=terminator,
             fitness_normalizer=fitness_normalizer,
-            duplicate_key=duplicate_key,
+            key_maker=key_maker,
             logger=logger,
         )
         self._num_processes = num_processes
