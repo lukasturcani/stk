@@ -117,7 +117,7 @@ class Implementation:
             yield from self._crosser.cross(batch)
 
     def _with_fitness_values(self, map_, population):
-        no_fitness = (
+        no_fitness = tuple(
             record for record in population
             if record.get_fitness_value(normalized=False) is None
         )
