@@ -850,11 +850,11 @@ population.
 
 We can also compare the molecules in the initial population
 
-.. image:: https://i.imgur.com/uF0LuGK.png
+.. image:: https://i.imgur.com/qEvCMk0.png
 
 to those in the final population
 
-.. image:: https://i.imgur.com/xj8wuVE.png
+.. image:: https://i.imgur.com/alBW1OS.png
 
 where the hydrogen atoms have been left out for clarity. Again, the
 EA obviously managed to reduce the complexity of the molecules as well.
