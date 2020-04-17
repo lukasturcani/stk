@@ -86,7 +86,7 @@ you can write each molecule in each generation to a file
 
 .. code-block:: python
 
-    # Go through 50 generations of the EA.
+    # Go through 15 generations of the EA.
     for i, generation in enumerate(ea.get_generations(15)):
         # Go through the molecules in the generation, and write them
         # to a file.
@@ -751,7 +751,7 @@ The final version of our code is
         logger.info('Starting EA.')
 
         generations = []
-        for generation in ea.get_generations(50):
+        for generation in ea.get_generations(15):
             for record in generation.get_molecule_records():
                 db.put(record.get_molecule())
             generations.append(generation)
