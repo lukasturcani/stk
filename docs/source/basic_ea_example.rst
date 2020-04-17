@@ -492,7 +492,9 @@ docs can be found here__.
 __ https://api.mongodb.com/python/current/
 
 Note that this is easy to do, and well worth the minimal effort it
-requires to setup.
+requires to setup. Obviously, if you really don't want to
+use the database, you do not have to create it, and you can remove
+references to it in your EA loop.
 
 Assuming everything is setup, we can create our database instance
 
