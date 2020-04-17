@@ -279,7 +279,7 @@ molecular graphs, which can be used to make our building blocks
 
 .. code-block:: python
 
-    import vabane as vb
+    import vabene as vb
     import numpy as np
     import itertools as it
 
@@ -512,7 +512,7 @@ The final version of our code is
     import stk
     import rdkit.Chem.AllChem as rdkit
     import pymongo
-    import vabane as vb
+    import vabene as vb
     import numpy as np
     import itertools as it
 
