@@ -603,6 +603,8 @@ The final version of our code is
 
 
     def main():
+        logging.basicConfig(level=logging.INFO)
+
         # Use a random seed to get reproducible results.
         random_seed = 4
         generator = np.random.RandomState(random_seed)
@@ -687,6 +689,8 @@ The final version of our code is
             y_label='Fitness Value',
         )
         fitness_progress.write('fitness_progress.png')
+
+        logger.info('Making rotatable bonds plot.')
 
         rotatable_bonds_progress = stk.ProgressPlotter(
             generations=generations,
