@@ -836,7 +836,7 @@ The plot of fitness we produced looks like this:
 
 .. image:: https://i.imgur.com/eNc0f4B.png
 
-which addmittedly doesn't look that great. However, since the
+which, admittedly, doesn't look that great. However, since the
 fitness value is just a ratio of two numbers, it doesn't really tell
 us much. A better thing to look at is the plot for the number of
 rotatable bonds
@@ -845,8 +845,7 @@ rotatable bonds
 
 
 Clearly, our EA was able to quickly minimize the number of rotatable
-bonds to the lowest possible value across all members of the
-population.
+bonds to a low value across all members of the population.
 
 We can also compare the molecules in the initial population
 
