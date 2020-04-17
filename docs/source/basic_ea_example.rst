@@ -358,16 +358,7 @@ building blocks
         for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
             yield stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles=fluoro,
-                            functional_groups=[stk.FluoroFactory()],
-                        ),
-                        stk.BuildingBlock(
-                            smiles=bromo,
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=(fluoro, bromo),
                     repeating_unit='AB',
                     num_repeating_units=1,
                 ),
@@ -392,12 +383,12 @@ you want to use, for example
         return functional_group.__class__
 
     def is_fluoro(building_block):
-        fg, = building_block.get_functional_groups(0)
-        return fg.__class__ is stk.Fluoro
+        functional_group, = building_block.get_functional_groups(0)
+        return functional_group.__class__ is stk.Fluoro
 
     def is_bromo(building_block):
-        fg, = building_block.get_functional_groups(0)
-        return fg.__class__ is stk.Bromo
+        functional_group, = building_block.get_functional_groups(0)
+        return functional_group.__class__ is stk.Bromo
 
     mutator = stk.RandomMutator(
         mutators=(
@@ -498,7 +489,6 @@ Final Version
 
 The final version of our code is
 
-
 .. code-block:: python
 
     import stk
@@ -550,16 +540,7 @@ The final version of our code is
         for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
             yield stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles=fluoro,
-                            functional_groups=[stk.FluoroFactory()],
-                        ),
-                        stk.BuildingBlock(
-                            smiles=bromo,
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=(fluoro, bromo),
                     repeating_unit='AB',
                     num_repeating_units=1,
                 ),
@@ -579,12 +560,12 @@ The final version of our code is
         return functional_group.__class__
 
     def is_fluoro(building_block):
-        fg, = building_block.get_functional_groups(0)
-        return fg.__class__ is stk.Fluoro
+        functional_group, = building_block.get_functional_groups(0)
+        return functional_group.__class__ is stk.Fluoro
 
     def is_bromo(building_block):
-        fg, = building_block.get_functional_groups(0)
-        return fg.__class__ is stk.Bromo
+        functional_group, = building_block.get_functional_groups(0)
+        return functional_group.__class__ is stk.Bromo
 
     # Use a random seed to get reproducible results.
     random_seed = 4
@@ -601,6 +582,7 @@ The final version of our code is
         for i in range(1000)
     )
 
+    db = stk.ConstructedMoleculeMongoDb(pymongo.MongoClient())
     ea = stk.EvolutionaryAlgorithm(
         initial_population=tuple(
             get_initial_population(fluoros, bromos)
@@ -666,6 +648,29 @@ The final version of our code is
         y_label='Fitness Value',
     )
     fitness_progress.write('fitness_progress.png')
+
+    # Lets' also add a plot of the number of rotatable bonds.
+
+    def get_num_rotatable_bonds(record):
+        molecule = record.get_molecule().to_rdkit_mol()
+        return rdkit.CalcNumRotatableBonds(molecule)
+
+    rotatable_bonds_progress = stk.ProgressPlotter(
+        generations=generations,
+        get_property=get_num_rotatable_bonds,
+        y_label='Number of Rotatable Bonds',
+    )
+    rotatable_bonds_progress.write('rotatable_bonds_progress.png')
+
+
+The plot of fitness we produced looks like this:
+
+.. image::
+
+
+and the plot of the number of rotatable bonds looks like this:
+
+.. image::
 
 
 Next, you can read the intermediate tutorial, which will show you
