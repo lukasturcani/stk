@@ -4,11 +4,14 @@ Evolutionary Algorithm
 
 """
 
+import logging
 
 from ..fitness_normalizers import NullFitnessNormalizer
-from .utilities import get_logger
 from stk.molecular import Inchi
 from .implementations import Serial, Parallel
+
+
+logger = logging.getLogger(__name__)
 
 
 class EvolutionaryAlgorithm:
@@ -57,7 +60,6 @@ class EvolutionaryAlgorithm:
         crossover_selector,
         fitness_normalizer=NullFitnessNormalizer(),
         key_maker=Inchi(),
-        logger=get_logger(),
         num_processes=None,
     ):
         """
@@ -93,9 +95,6 @@ class EvolutionaryAlgorithm:
             Used to detect duplicate molecules in the EA. If two
             molecules in a generation return the same key, one of them
             is removed.
-
-        logger : :class:`logging.Logger`, optional
-            The logger the EA should use.
 
         num_processes : :class:`int`, optional
             The number of parallel processes the EA should create.
