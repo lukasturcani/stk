@@ -780,12 +780,12 @@ The final version of our code is
 
 The plot of fitness we produced looks like this:
 
-.. image:: https://i.imgur.com/7Grpuxb.png
+.. image:: https://i.imgur.com/eNc0f4B.png
 
 
 and the plot of the number of rotatable bonds looks like this:
 
-.. image:: https://i.imgur.com/zvRgqha.png
+.. image:: https://i.imgur.com/7retPh8.png
 
 
 Clearly, our EA was able to quickly minimize the number of rotatable
@@ -794,11 +794,11 @@ population.
 
 We can also compare the first 8 molecules in our initial population
 
-.. image:: https://i.imgur.com/qjyOh2U.png
+.. image:: https://i.imgur.com/uF0LuGK.png
 
 to the first 8 in the final population
 
-.. image:: https://i.imgur.com/EfJQ5PD.png
+.. image:: https://i.imgur.com/xj8wuVE.png
 
 where the hydrogen atoms have been left out for clarity.
 
