@@ -319,10 +319,43 @@ molecular graphs, which can be used to make our building blocks
             random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
-        return stk.BuildingBlock.init_from_vabene_molecule(
-            molecule=vb.Molecule(atoms, bonds),
+        return stk.BuildingBlock.init_from_rdkit_mol(
+            molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
             functional_groups=[functional_group_factory],
         )
+
+Note that we need to define a function which converts
+:mod:`vabene` molecules into :mod:`rdkit` molecules
+
+.. code-block:: python
+
+    def vabene_to_rdkit(molecule):
+        editable = rdkit.EditableMol(rdkit.Mol())
+        for atom in molecule.get_atoms():
+            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
+            rdkit_atom.SetFormalCharge(atom.get_charge())
+            editable.AddAtom(rdkit_atom)
+
+        for bond in molecule.get_bonds():
+            editable.AddBond(
+                beginAtomIdx=bond.get_atom1_id(),
+                endAtomIdx=bond.get_atom2_id(),
+                order=rdkit.BondType(bond.get_order()),
+            )
+
+        rdkit_molecule = editable.GetMol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        rdkit_molecule = rdkit.AddHs(rdkit_molecule)
+        rdkit.Kekulize(rdkit_molecule)
+        rdkit_molecule.AddConformer(
+            conf=rdkit.Conformer(rdkit_molecule.GetNumAtoms()),
+        )
+        return rdkit_molecule
+
+Once these functions are defined, we can use :func:`get_building_block`
+to generate out building blocks
+
+.. code-block:: python
 
     # Use a random seed to get reproducible results.
     random_seed = 4
@@ -523,6 +556,30 @@ The final version of our code is
     logger = logging.getLogger(__name__)
 
 
+    def vabene_to_rdkit(molecule):
+        editable = rdkit.EditableMol(rdkit.Mol())
+        for atom in molecule.get_atoms():
+            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
+            rdkit_atom.SetFormalCharge(atom.get_charge())
+            editable.AddAtom(rdkit_atom)
+
+        for bond in molecule.get_bonds():
+            editable.AddBond(
+                beginAtomIdx=bond.get_atom1_id(),
+                endAtomIdx=bond.get_atom2_id(),
+                order=rdkit.BondType(bond.get_order()),
+            )
+
+        rdkit_molecule = editable.GetMol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        rdkit_molecule = rdkit.AddHs(rdkit_molecule)
+        rdkit.Kekulize(rdkit_molecule)
+        rdkit_molecule.AddConformer(
+            conf=rdkit.Conformer(rdkit_molecule.GetNumAtoms()),
+        )
+        return rdkit_molecule
+
+
     def get_building_block(
         generator,
         atomic_number,
@@ -559,8 +616,8 @@ The final version of our code is
             random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
-        return stk.BuildingBlock.init_from_vabene_molecule(
-            molecule=vb.Molecule(atoms, bonds),
+        return stk.BuildingBlock.init_from_rdkit_mol(
+            molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
             functional_groups=[functional_group_factory],
         )
 
