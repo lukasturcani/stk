@@ -91,10 +91,10 @@ class Implementation:
 
             population = tuple(self._with_fitness_values(
                 map_=map_,
-                population=dedupe(
+                population=tuple(dedupe(
                     iterable=it.chain(population, offspring, mutants),
                     key=get_key,
-                ),
+                )),
             ))
             population = tuple(
                 self._fitness_normalizer.normalize(population)
