@@ -516,6 +516,7 @@ The final version of our code is
     import numpy as np
     import itertools as it
 
+
     def get_building_block(
         generator,
         atomic_number,
@@ -555,6 +556,7 @@ The final version of our code is
             functional_groups=[functional_group_factory],
         )
 
+
     def get_initial_population(fluoros, bromos):
         for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
             yield stk.ConstructedMolecule(
@@ -565,6 +567,7 @@ The final version of our code is
                 ),
             )
 
+
     def get_rigidity(molecule):
         rdkit_molecule = molecule.to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_molecule)
@@ -574,109 +577,116 @@ The final version of our code is
         # Add 1 to the denominator to prevent division by 0.
         return 1 / (num_rotatable_bonds + 1)
 
+
     def get_functional_group_type(building_block):
         functional_group, = building_block.get_functional_groups(0)
         return functional_group.__class__
+
 
     def is_fluoro(building_block):
         functional_group, = building_block.get_functional_groups(0)
         return functional_group.__class__ is stk.Fluoro
 
+
     def is_bromo(building_block):
         functional_group, = building_block.get_functional_groups(0)
         return functional_group.__class__ is stk.Bromo
 
-    # Use a random seed to get reproducible results.
-    random_seed = 4
-    generator = np.random.RandomState(random_seed)
-
-    # Make 1000 fluoro building bocks.
-    fluoros = tuple(
-        get_building_block(generator, 9, stk.FluoroFactory())
-        for i in range(1000)
-    )
-    # Make 1000 bromo building blocks.
-    bromos = tuple(
-        get_building_block(generator, 35, stk.BromoFactory())
-        for i in range(1000)
-    )
-
-    db = stk.ConstructedMoleculeMongoDb(pymongo.MongoClient())
-    ea = stk.EvolutionaryAlgorithm(
-        initial_population=tuple(
-            get_initial_population(fluoros, bromos)
-        ),
-        fitness_calculator=stk.FitnessFunction(get_rigidity),
-        mutator=stk.RandomMutator(
-            mutators=(
-                stk.RandomBuildingBlock(
-                    building_blocks=fluoros,
-                    is_replaceable=is_fluoro,
-                    random_seed=generator.randint(0, 1000),
-                ),
-                stk.SimilarBuildingBlock(
-                    building_blocks=fluoros,
-                    is_replaceable=is_fluoro,
-                    random_seed=generator.randint(0, 1000),
-                ),
-                stk.RandomBuildingBlock(
-                    building_blocks=bromos,
-                    is_replaceable=is_bromo,
-                    random_seed=generator.randint(0, 1000),
-                ),
-                stk.SimilarBuildingBlock(
-                    building_blocks=bromos,
-                    is_replaceable=is_bromo,
-                    random_seed=generator.randint(0, 1000),
-                ),
-            ),
-            random_seed=generator.randint(0, 1000),
-        ),
-        crosser=stk.GeneticRecombination(
-            get_gene=get_functional_group_type,
-        ),
-        generation_selector=stk.Best(
-            num_batches=25,
-            duplicate_molecules=False,
-        ),
-        mutation_selector=stk.Roulette(
-            num_batches=5,
-            random_seed=generator.randint(0, 1000),
-        ),
-        crossover_selector=stk.Roulette(
-            num_batches=3,
-            batch_size=2,
-            random_seed=generator.randint(0, 1000),
-        ),
-        # We don't need to do a normalization in this example.
-        fitness_normalizer=stk.NullFitnessNormalizer(),
-    )
-
-    generations = []
-    for generation in ea.get_generations(50):
-        for record in generation.get_molecule_records():
-            db.put(record.get_molecule())
-        generations.append(generation)
-
-    fitness_progress = stk.ProgressPlotter(
-        generations=generations,
-        get_property=lambda record: record.get_fitness_value(),
-        y_label='Fitness Value',
-    )
-    fitness_progress.write('fitness_progress.png')
-
-    # Lets' also add a plot of the number of rotatable bonds.
 
     def get_num_rotatable_bonds(record):
         molecule = record.get_molecule().to_rdkit_mol()
         return rdkit.CalcNumRotatableBonds(molecule)
 
-    rotatable_bonds_progress = stk.ProgressPlotter(
-        generations=generations,
-        get_property=get_num_rotatable_bonds,
-        y_label='Number of Rotatable Bonds',
-    )
-    rotatable_bonds_progress.write('rotatable_bonds_progress.png')
+
+    def main():
+        # Use a random seed to get reproducible results.
+        random_seed = 4
+        generator = np.random.RandomState(random_seed)
+
+        # Make 1000 fluoro building bocks.
+        fluoros = tuple(
+            get_building_block(generator, 9, stk.FluoroFactory())
+            for i in range(1000)
+        )
+        # Make 1000 bromo building blocks.
+        bromos = tuple(
+            get_building_block(generator, 35, stk.BromoFactory())
+            for i in range(1000)
+        )
+
+        db = stk.ConstructedMoleculeMongoDb(pymongo.MongoClient())
+        ea = stk.EvolutionaryAlgorithm(
+            initial_population=tuple(
+                get_initial_population(fluoros, bromos)
+            ),
+            fitness_calculator=stk.FitnessFunction(get_rigidity),
+            mutator=stk.RandomMutator(
+                mutators=(
+                    stk.RandomBuildingBlock(
+                        building_blocks=fluoros,
+                        is_replaceable=is_fluoro,
+                        random_seed=generator.randint(0, 1000),
+                    ),
+                    stk.SimilarBuildingBlock(
+                        building_blocks=fluoros,
+                        is_replaceable=is_fluoro,
+                        random_seed=generator.randint(0, 1000),
+                    ),
+                    stk.RandomBuildingBlock(
+                        building_blocks=bromos,
+                        is_replaceable=is_bromo,
+                        random_seed=generator.randint(0, 1000),
+                    ),
+                    stk.SimilarBuildingBlock(
+                        building_blocks=bromos,
+                        is_replaceable=is_bromo,
+                        random_seed=generator.randint(0, 1000),
+                    ),
+                ),
+                random_seed=generator.randint(0, 1000),
+            ),
+            crosser=stk.GeneticRecombination(
+                get_gene=get_functional_group_type,
+            ),
+            generation_selector=stk.Best(
+                num_batches=25,
+                duplicate_molecules=False,
+            ),
+            mutation_selector=stk.Roulette(
+                num_batches=5,
+                random_seed=generator.randint(0, 1000),
+            ),
+            crossover_selector=stk.Roulette(
+                num_batches=3,
+                batch_size=2,
+                random_seed=generator.randint(0, 1000),
+            ),
+            # We don't need to do a normalization in this example.
+            fitness_normalizer=stk.NullFitnessNormalizer(),
+        )
+
+        generations = []
+        for generation in ea.get_generations(50):
+            for record in generation.get_molecule_records():
+                db.put(record.get_molecule())
+            generations.append(generation)
+
+        fitness_progress = stk.ProgressPlotter(
+            generations=generations,
+            get_property=lambda record: record.get_fitness_value(),
+            y_label='Fitness Value',
+        )
+        fitness_progress.write('fitness_progress.png')
+
+        rotatable_bonds_progress = stk.ProgressPlotter(
+            generations=generations,
+            get_property=get_num_rotatable_bonds,
+            y_label='Number of Rotatable Bonds',
+        )
+        rotatable_bonds_progress.write('rotatable_bonds_progress.png')
+
+    if __name__ == '__main__':
+        main()
 
 
 The plot of fitness we produced looks like this:
@@ -688,6 +698,14 @@ and the plot of the number of rotatable bonds looks like this:
 
 .. image::
 
+
+We can also compare the molecules in our initial population
+
+.. image::
+
+to those in the final population
+
+.. image::
 
 Next, you can read the intermediate tutorial, which will show you
 some additional customization options for the EA.
