@@ -382,7 +382,7 @@ building blocks
 
     def get_initial_population(fluoros, bromos):
         for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
-            yield stk.ConstructedMolecule(
+            yield stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(fluoro, bromo),
                     repeating_unit='AB',
@@ -624,7 +624,7 @@ The final version of our code is
 
     def get_initial_population(fluoros, bromos):
         for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
-            yield stk.ConstructedMolecule(
+            yield stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(fluoro, bromo),
                     repeating_unit='AB',
