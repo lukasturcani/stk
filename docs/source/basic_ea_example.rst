@@ -296,25 +296,27 @@ molecular graphs, which can be used to make our building blocks
         fg_separation = generator.randint(1, num_atoms-3)
 
         atom_factory = vb.RandomAtomFactory(
-                # Our building blocks will consist of a mixture of
-                # carbons, with a maximum valence of either 4 or 2.
-                atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
-                # All of our building blocks will have 2 halogen atoms,
-                # separated by a random number of carbon atoms.
-                required_atoms=(
-                    (vb.Atom(atomic_number, 0, 1), )
-                    +
-                    (vb.Atom(6, 0, 4), ) * fg_separation
-                    +
-                    (vb.Atom(atomic_number, 0, 1), )
-                ),
-                num_atoms=num_atoms,
+            # Our building blocks will consist of a mixture of
+            # carbons, with a maximum valence of either 4 or 2.
+            atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
+            # All of our building blocks will have 2 halogen atoms,
+            # separated by a random number of carbon atoms.
+            required_atoms=(
+                (vb.Atom(atomic_number, 0, 1), )
+                +
+                (vb.Atom(6, 0, 4), ) * fg_separation
+                +
+                (vb.Atom(atomic_number, 0, 1), )
+            ),
+            num_atoms=num_atoms,
+            random_seed=generator.randint(0, 1000),
         )
         atoms = tuple(atom_factory.get_atoms())
         bond_factory = vb.RandomBondFactory(
             required_bonds=tuple(
                 vb.Bond(i, i+1, 1) for i in range(fg_separation+1)
             ),
+            random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
         return stk.BuildingBlock.init_from_vabene_molecule(
@@ -534,25 +536,27 @@ The final version of our code is
         fg_separation = generator.randint(1, num_atoms-3)
 
         atom_factory = vb.RandomAtomFactory(
-                # Our building blocks will consist of a mixture of
-                # carbons, with a maximum valence of either 4 or 2.
-                atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
-                # All of our building blocks will have 2 halogen atoms,
-                # separated by a random number of carbon atoms.
-                required_atoms=(
-                    (vb.Atom(atomic_number, 0, 1), )
-                    +
-                    (vb.Atom(6, 0, 4), ) * fg_separation
-                    +
-                    (vb.Atom(atomic_number, 0, 1), )
-                ),
-                num_atoms=num_atoms,
+            # Our building blocks will consist of a mixture of
+            # carbons, with a maximum valence of either 4 or 2.
+            atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
+            # All of our building blocks will have 2 halogen atoms,
+            # separated by a random number of carbon atoms.
+            required_atoms=(
+                (vb.Atom(atomic_number, 0, 1), )
+                +
+                (vb.Atom(6, 0, 4), ) * fg_separation
+                +
+                (vb.Atom(atomic_number, 0, 1), )
+            ),
+            num_atoms=num_atoms,
+            random_seed=generator.randint(0, 1000),
         )
         atoms = tuple(atom_factory.get_atoms())
         bond_factory = vb.RandomBondFactory(
             required_bonds=tuple(
                 vb.Bond(i, i+1, 1) for i in range(fg_separation+1)
             ),
+            random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
         return stk.BuildingBlock.init_from_vabene_molecule(
