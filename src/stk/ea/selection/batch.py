@@ -126,6 +126,9 @@ class Batch:
     def __iter__(self):
         return iter(self._records)
 
+    def __getitem__(self, index):
+        return self._records[index]
+
     def __eq__(self, other):
         return self._fitness_value == other._fitness_value
 
