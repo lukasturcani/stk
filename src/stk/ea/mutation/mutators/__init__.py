@@ -1,2 +1,2 @@
 from .molecule import *
-from .compounds import *
+from .compound import *
