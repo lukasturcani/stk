@@ -11,4 +11,5 @@ Subpackages
 
 .. toctree::
 
+   stk.ea.mutation.mutators.compound
    stk.ea.mutation.mutators.molecule
