@@ -248,21 +248,45 @@ bonds in a molecule
     import rdkit.Chem.AllChem as rdkit
 
     def get_rigidity(molecule):
-        rdkit_molecule = molecule.to_rdkit_mol()
-        rdkit.SanitizeMol(rdkit_molecule)
         num_rotatable_bonds = rdkit.CalcNumRotatableBonds(
             mol=rdkit_molecule,
         )
         # Add 1 to the denominator to prevent division by 0.
         return 1 / (num_rotatable_bonds + 1)
 
+In addition to minimizing the number of rotatable bonds, we also
+want to minimize the molecular complexity, so that they look
+at least somewhat reasonable. :mod:`rdkit` provides a simple
+way to calculate complexity
+
+.. code-block:: python
+
+    from rdkit.Chem.GraphDescriptors import BertzCT
+
+    def get_complexity(molecule):
+        return BertzCT(molecule)
+
+Now that we can combine the two values into a single fitness value,
+that the EA can optimize. There are multiple way to do this, but a
+easy way is take the ratio of the value we want to maximize,
+the rigidity, with the value with want to minimize, the complexity.
+
+.. code-block:: python
+
+    def get_fitness_value(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        return (
+            get_rigidity(rdkit_molecule)
+            / get_complexity(rdkit_molecule)
+        )
 
 Now that we have our function, we can turn it into a
 :class:`.FitnessCalculator` by using :class:`.FitnessFunction`
 
 .. code-block:: python
 
-    fitness_calculator = stk.FitnessFunction(get_rigidity)
+    fitness_calculator = stk.FitnessFunction(get_fitness_value)
 
 Now we only have to answer the second question,
 *What kinds of molecular structures do I want to consider?*
@@ -296,7 +320,15 @@ molecular graphs, which can be used to make our building blocks
         fg_separation = generator.randint(1, num_atoms-3)
 
         atom_factory = vb.RandomAtomFactory(
-            atoms=(vb.Atom(6, 0, 4), ),
+            # Our building blocks will be composed from a mix of
+            # carbon atoms with maximum valance of 4, carbon atoms
+            # with a maximum valence of 3 and oxygen atoms with a
+            # maximum valence of 2.
+            atoms=(
+                vb.Atom(6, 0, 4),
+                vb.Atom(6, 0, 3),
+                vb.Atom(8, 0, 2),
+            ),
             # All of our building blocks will have 2 halogen atoms,
             # separated by a random number of carbon atoms.
             required_atoms=(
@@ -465,7 +497,7 @@ remaining ones too
         initial_population=tuple(
             get_initial_population(fluoros, bromos)
         ),
-        fitness_calculator=stk.FitnessFunction(get_rigidity),
+        fitness_calculator=stk.FitnessFunction(get_fitness_value),
         mutator=stk.RandomMutator(
             mutators=(
                 stk.RandomBuildingBlock(
@@ -554,6 +586,7 @@ The final version of our code is
 
     import stk
     import rdkit.Chem.AllChem as rdkit
+    from rdkit.Chem.GraphDescriptors import BertzCT
     import pymongo
     import vabene as vb
     import numpy as np
@@ -601,7 +634,15 @@ The final version of our code is
         fg_separation = generator.randint(1, num_atoms-3)
 
         atom_factory = vb.RandomAtomFactory(
-            atoms=(vb.Atom(6, 0, 4), ),
+            # Our building blocks will be composed from a mix of
+            # carbon atoms with maximum valance of 4, carbon atoms
+            # with a maximum valence of 3 and oxygen atoms with a
+            # maximum valence of 2.
+            atoms=(
+                vb.Atom(6, 0, 4),
+                vb.Atom(6, 0, 3),
+                vb.Atom(8, 0, 2),
+            ),
             # All of our building blocks will have 2 halogen atoms,
             # separated by a random number of carbon atoms.
             required_atoms=(
@@ -622,10 +663,13 @@ The final version of our code is
             random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
+
         building_block = stk.BuildingBlock.init_from_rdkit_mol(
             molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
             functional_groups=[functional_group_factory],
         )
+        # We can give random coordinates to the building block,
+        # because it's fast and doesn't matter in this case.
         return building_block.with_position_matrix(
             position_matrix=generator.uniform(
                 low=-100,
@@ -647,13 +691,23 @@ The final version of our code is
 
 
     def get_rigidity(molecule):
-        rdkit_molecule = molecule.to_rdkit_mol()
-        rdkit.SanitizeMol(rdkit_molecule)
         num_rotatable_bonds = rdkit.CalcNumRotatableBonds(
             mol=rdkit_molecule,
         )
         # Add 1 to the denominator to prevent division by 0.
         return 1 / (num_rotatable_bonds + 1)
+
+    def get_complexity(molecule):
+        return BertzCT(molecule)
+
+
+    def get_fitness_value(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        return (
+            get_rigidity(rdkit_molecule)
+            / get_complexity(rdkit_molecule)
+        )
 
 
     def get_functional_group_type(building_block):
@@ -702,7 +756,7 @@ The final version of our code is
             initial_population=tuple(
                 get_initial_population(fluoros, bromos)
             ),
-            fitness_calculator=stk.FitnessFunction(get_rigidity),
+            fitness_calculator=stk.FitnessFunction(get_fitness_value),
             mutator=stk.RandomMutator(
                 mutators=(
                     stk.RandomBuildingBlock(
@@ -782,8 +836,10 @@ The plot of fitness we produced looks like this:
 
 .. image:: https://i.imgur.com/eNc0f4B.png
 
-
-and the plot of the number of rotatable bonds looks like this:
+which addmittedly doesn't look that great. However, since the
+fitness value is just a ratio of two numbers, it doesn't really tell
+us much. A better thing to look at is the plot for the number of
+rotatable bonds
 
 .. image:: https://i.imgur.com/7retPh8.png
 
@@ -792,15 +848,16 @@ Clearly, our EA was able to quickly minimize the number of rotatable
 bonds to the lowest possible value across all members of the
 population.
 
-We can also compare the first 8 molecules in our initial population
+We can also compare the molecules in the initial population
 
 .. image:: https://i.imgur.com/uF0LuGK.png
 
-to the first 8 in the final population
+to those in the final population
 
 .. image:: https://i.imgur.com/xj8wuVE.png
 
-where the hydrogen atoms have been left out for clarity.
+where the hydrogen atoms have been left out for clarity. Again, the
+EA obviously managed to reduce the complexity of the molecules as well.
 
 Next, you can read the intermediate tutorial, which will show you
 some additional customization options for the EA.
