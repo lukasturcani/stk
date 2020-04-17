@@ -792,11 +792,11 @@ Clearly, our EA was able to quickly minimize the number of rotatable
 bonds to the lowest possible value across all members of the
 population.
 
-We can also compare the molecules in our initial population
+We can also compare 10 random molecules in our initial population
 
 .. image::
 
-to those in the final population
+to 10 random ones in the final population
 
 .. image::
 
