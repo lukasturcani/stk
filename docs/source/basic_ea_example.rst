@@ -515,6 +515,10 @@ The final version of our code is
     import vabene as vb
     import numpy as np
     import itertools as it
+    import logging
+
+
+    logger = logging.getLogger(__name__)
 
 
     def get_building_block(
@@ -603,6 +607,8 @@ The final version of our code is
         random_seed = 4
         generator = np.random.RandomState(random_seed)
 
+        logger.info('Making building blocks.')
+
         # Make 1000 fluoro building bocks.
         fluoros = tuple(
             get_building_block(generator, 9, stk.FluoroFactory())
@@ -665,11 +671,15 @@ The final version of our code is
             fitness_normalizer=stk.NullFitnessNormalizer(),
         )
 
+        logger.info('Starting EA.')
+
         generations = []
         for generation in ea.get_generations(50):
             for record in generation.get_molecule_records():
                 db.put(record.get_molecule())
             generations.append(generation)
+
+        logger.info('Making fitness plot.')
 
         fitness_progress = stk.ProgressPlotter(
             generations=generations,
