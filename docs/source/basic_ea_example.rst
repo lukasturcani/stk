@@ -111,13 +111,11 @@ molecules.
 
 We won't define which :class:`.ConstructedMoleculeDatabase` we want to
 use just yet, for now, all we need to know is that a
-:class:`.ConstructedMoleculeDatabase` guarantees the methods,
-:meth:`~.ConstructedMoleculeDatabase.put`,
-:meth:`~.ConstructedMoleculeDatabase.get` and
-:meth:`~.ConstructedMoleculeDatabase.put_many`,
+:class:`.ConstructedMoleculeDatabase` guarantees the methods
+:meth:`~.ConstructedMoleculeDatabase.put` and
+:meth:`~.ConstructedMoleculeDatabase.get`.
 When using
-:meth:`~.ConstructedMoleculeDatabase.put`, or
-:meth:`~.ConstructedMoleculeDatabase.put_many`,
+:meth:`~.ConstructedMoleculeDatabase.put`,
 the molecules are immediately deposited into the database, there is no
 staging area.
 
@@ -139,11 +137,8 @@ writing a bunch of files
 
     # Go through 50 generations of the EA.
     for generation in ea.get_generations(50):
-        molecules = (
-            record.get_molecule()
-            for record in generation.get_molecule_records()
-        )
-        db.put_many(molecules)
+        for record in generation.get_molecule_records():
+            db.put(record.get_molecule())
 
 
 Already our EA loop is much nicer.
@@ -165,11 +160,8 @@ previous generations
 
     generations = []
     for generation in ea.get_generations(50):
-        molecules = (
-            record.get_molecule()
-            for record in generation.get_molecule_records()
-        )
-        db.put_many(molecules)
+        for record in generation.get_molecule_records():
+            db.put(record.get_molecule())
         generations.append(generation)
 
 Now that we have the generations, we can use a
@@ -209,11 +201,8 @@ Ok, we now have a half-decent EA loop, so let's review it.
     # Go through 50 generations of the EA.
     generations = []
     for generation in ea.get_generations(50):
-        molecules = (
-            record.get_molecule()
-            for record in generation.get_molecule_records()
-        )
-        db.put_many(molecules)
+        for record in generation.get_molecule_records():
+            db.put(record.get_molecule())
         generations.append(generation)
 
     fitness_progress = stk.ProgressPlotter(
@@ -663,11 +652,8 @@ The final version of our code is
 
     generations = []
     for generation in ea.get_generations(50):
-        molecules = (
-            record.get_molecule()
-            for record in generation.get_molecule_records()
-        )
-        db.put_many(molecules)
+        for record in generation.get_molecule_records():
+            db.put(record.get_molecule())
         generations.append(generation)
 
     fitness_progress = stk.ProgressPlotter(
