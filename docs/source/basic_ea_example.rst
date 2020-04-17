@@ -75,8 +75,8 @@ Python script, such as
         fitness_normalizer=...,
     )
 
-    # Go through 50 generations of the EA.
-    for i, generation in enumerate(ea.get_generations(50)):
+    # Go through 15 generations of the EA.
+    for i, generation in enumerate(ea.get_generations(15)):
 
         # The generation object gives you access to the molecules
         # found in the generation.
@@ -87,7 +87,7 @@ you can write each molecule in each generation to a file
 .. code-block:: python
 
     # Go through 50 generations of the EA.
-    for i, generation in enumerate(ea.get_generations(50)):
+    for i, generation in enumerate(ea.get_generations(15)):
         # Go through the molecules in the generation, and write them
         # to a file.
         for molecule_id, molecule_record in enumerate(
@@ -135,8 +135,8 @@ writing a bunch of files
 
 .. code-block:: python
 
-    # Go through 50 generations of the EA.
-    for generation in ea.get_generations(50):
+    # Go through 15 generations of the EA.
+    for generation in ea.get_generations(15):
         for record in generation.get_molecule_records():
             db.put(record.get_molecule())
 
@@ -159,7 +159,7 @@ previous generations
 .. code-block:: python
 
     generations = []
-    for generation in ea.get_generations(50):
+    for generation in ea.get_generations(15):
         for record in generation.get_molecule_records():
             db.put(record.get_molecule())
         generations.append(generation)
@@ -198,9 +198,9 @@ Ok, we now have a half-decent EA loop, so let's review it.
         fitness_normalizer=...,
     )
 
-    # Go through 50 generations of the EA.
+    # Go through 15 generations of the EA.
     generations = []
-    for generation in ea.get_generations(50):
+    for generation in ea.get_generations(15):
         for record in generation.get_molecule_records():
             db.put(record.get_molecule())
         generations.append(generation)
@@ -290,15 +290,13 @@ molecular graphs, which can be used to make our building blocks
     ):
         # The number of atoms, excluding hydrogen, in our building
         # block.
-        num_atoms = generator.randint(10, 25)
+        num_atoms = generator.randint(7, 15)
         # The distance between the bromine or fluorine atoms in our
         # building block.
         fg_separation = generator.randint(1, num_atoms-3)
 
         atom_factory = vb.RandomAtomFactory(
-            # Our building blocks will consist of a mixture of
-            # carbons, with a maximum valence of either 4 or 2.
-            atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
+            atoms=(vb.Atom(6, 0, 4), ),
             # All of our building blocks will have 2 halogen atoms,
             # separated by a random number of carbon atoms.
             required_atoms=(
@@ -319,9 +317,19 @@ molecular graphs, which can be used to make our building blocks
             random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
-        return stk.BuildingBlock.init_from_rdkit_mol(
+
+        building_block = stk.BuildingBlock.init_from_rdkit_mol(
             molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
             functional_groups=[functional_group_factory],
+        )
+        # We can give random coordinates to the building block,
+        # because it's fast and doesn't matter in this case.
+        return building_block.with_position_matrix(
+            position_matrix=generator.uniform(
+                low=-100,
+                high=100,
+                size=(building_block.get_num_atoms(), 3),
+            ),
         )
 
 Note that we need to define a function which converts
@@ -587,15 +595,13 @@ The final version of our code is
     ):
         # The number of atoms, excluding hydrogen, in our building
         # block.
-        num_atoms = generator.randint(10, 25)
+        num_atoms = generator.randint(7, 15)
         # The distance between the bromine or fluorine atoms in our
         # building block.
         fg_separation = generator.randint(1, num_atoms-3)
 
         atom_factory = vb.RandomAtomFactory(
-            # Our building blocks will consist of a mixture of
-            # carbons, with a maximum valence of either 4 or 2.
-            atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
+            atoms=(vb.Atom(6, 0, 4), ),
             # All of our building blocks will have 2 halogen atoms,
             # separated by a random number of carbon atoms.
             required_atoms=(
@@ -616,9 +622,16 @@ The final version of our code is
             random_seed=generator.randint(0, 1000),
         )
         bonds = bond_factory.get_bonds(atoms)
-        return stk.BuildingBlock.init_from_rdkit_mol(
+        building_block = stk.BuildingBlock.init_from_rdkit_mol(
             molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
             functional_groups=[functional_group_factory],
+        )
+        return building_block.with_position_matrix(
+            position_matrix=generator.uniform(
+                low=-100,
+                high=100,
+                size=(building_block.get_num_atoms(), 3),
+            ),
         )
 
 
@@ -660,6 +673,7 @@ The final version of our code is
 
     def get_num_rotatable_bonds(record):
         molecule = record.get_molecule().to_rdkit_mol()
+        rdkit.SanitizeMol(molecule)
         return rdkit.CalcNumRotatableBonds(molecule)
 
 
