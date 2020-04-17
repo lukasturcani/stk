@@ -13,7 +13,7 @@ You can get all the code associated with tutorial by running::
     $ git clone https://github.com/lukasturcani/basic_ea
 
 This tutorial relies on a Python library, which does not come
-with :mod:`stk`, called :mod:`vabene`. It used to make our
+with :mod:`stk`, called :mod:`vabene`. It used to make a
 library of building blocks, which the EA uses, in order to find the
 optimal molecules for our task. You can install it with::
 
@@ -120,7 +120,6 @@ When using
 the molecules are immediately deposited into the database, there is no
 staging area.
 
-
 So let's first assume we have defined some kind of
 :class:`.ConstructedMoleculeDatabase`
 
@@ -138,7 +137,7 @@ writing a bunch of files
 .. code-block:: python
 
     # Go through 50 generations of the EA.
-    for i, generation in enumerate(ea.get_generations(50)):
+    for generation in ea.get_generations(50):
         molecules = (
             record.get_molecule()
             for record in generation.get_molecule_records()
@@ -164,7 +163,7 @@ previous generations
 .. code-block:: python
 
     generations = []
-    for i, generation in enumerate(ea.get_generations(50)):
+    for generation in ea.get_generations(50):
         molecules = (
             record.get_molecule()
             for record in generation.get_molecule_records()
@@ -208,7 +207,7 @@ Ok, we now have a half-decent EA loop, so let's review it.
 
     # Go through 50 generations of the EA.
     generations = []
-    for i, generation in enumerate(ea.get_generations(50)):
+    for generation in ea.get_generations(50):
         molecules = (
             record.get_molecule()
             for record in generation.get_molecule_records()
@@ -278,27 +277,85 @@ Now that we have our function, we can turn it into a
 Now we only have to answer the second question,
 *What kinds of molecular structures do I want to consider?*
 
+The user answers this question by defining an initial population of
+molecules the EA should use, as well as the mutation and crossover
+operations. These operations will determine which molecules the EA
+can construct.
+
+Lets begin by defining an initial population. The first thing we will
+need is a set of building blocks, with which we can build our
+molecules. We can use the :mod:`vabene` library to create random
+molecular graphs, which can be used to make our building blocks
+
 .. code-block:: python
 
+    import vabane as vb
     import numpy as np
 
-    def get_initial_population(fluoros, bromos, random_seed):
-        generator = np.random.RandomState(random_seed)
-        intial_fluoros = generator.random.choice(
-            a=fluoros,
-            size=5,
-            replace=False,
+    def get_building_block(
+        generator,
+        atomic_number,
+        functional_group_factory,
+    ):
+        # The number of atoms, excluding hydrogen, in our building
+        # block.
+        num_atoms = generator.randint(10, 25)
+        # The distance between the bromine or fluorine atoms in our
+        # building block.
+        fg_separation = generator.randint(1, num_atoms-3)
+
+        atom_factory = vb.RandomAtomFactory(
+                # Our building blocks will consist of a mixture of
+                # carbons, with a maximum valence of either 4 or 2.
+                atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
+                # All of our building blocks will have 2 halogen atoms,
+                # separated by a random number of carbon atoms.
+                required_atoms=(
+                    (vb.Atom(atomic_number, 0, 1), )
+                    +
+                    (vb.Atom(6, 0, 4), ) * fg_separation
+                    +
+                    (vb.Atom(atomic_number, 0, 1), )
+                ),
+                num_atoms=num_atoms,
         )
-        initial bromos = generator.random.choice(
-            a=bromos,
-            size=5,
-            replace=False,
+        atoms = tuple(atom_factory.get_atoms())
+        bond_factory = vb.RandomBondFactory(
+            required_bonds=tuple(
+                vb.Bond(i, i+1, 1) for i in range(fg_separation+1)
+            ),
+        )
+        bonds = bond_factory.get_bonds(atoms)
+        return stk.BuildingBlock.init_from_vabene_molecule(
+            molecule=vb.Molecule(atoms, bonds),
+            functional_groups=[functional_group_factory],
         )
 
-        for fluoro, bromo in it.product(
-            intial_fluoros,
-            initial_bromos,
-        ):
+    # Use a random seed to get reproducible results.
+    random_seed = 4
+    generator = np.random.RandomState(random_seed)
+
+    # Make 1000 fluoro building bocks.
+    fluoros = tuple(
+        get_building_block(generator, 9, stk.FluoroFactory())
+        for i in range(1000)
+    )
+    # Make 1000 bromo building blocks.
+    bromos = tuple(
+        get_building_block(generator, 35, stk.BromoFactory())
+        for i in range(1000)
+    )
+
+
+In this example, the EA will create ``AB`` dimers, using the
+:class:`.Linear`  topology graph. The initial population of 25 such
+dimers can be made by taking the first 5 ``bromo`` and ``fluoro``
+building blocks
+
+.. code-block:: python
+
+    def get_initial_population(fluoros, bromos):
+        for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
             yield stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
@@ -316,23 +373,99 @@ Now we only have to answer the second question,
                 ),
             )
 
+    initial_population = tuple(get_initial_population(fluoros, bromos)
+
+Next, we can define our mutation operations. There are a multiple
+options, as you can see in the sidebar. One thing that you might
+notice immediately, is that there are multiple :class:`.Mutator`
+types you would like to use during the EA, but the
+:class:`.EvolutionaryAlgorithm` only takes a single
+:class:`.Mutator`. To get around this, we can use a compound
+:class:`.Mutator`, such as the :class:`.RandomMutator`. When you create
+a :class:`.RandomMutator`, you define it in terms of other mutators
+you want to use, for example
+
 .. code-block:: python
 
     def get_functional_group_type(building_block):
         functional_group, = building_block.get_functional_groups(0)
         return functional_group.__class__
 
-    # It's nice to get reproducible results.
-    random_seed = 3
-    ea = stk.EvolutionaryAlgorithm(
-        initial_population=tuple(get_initial_population()),
-        fitness_calculator=stk.FitnessFunction(get_rigidity),
-        mutator=stk.RandomBuildingBlock(
-            building_blocks=...,
-            # All building blocks are replaceable.
-            is_replaceable=lambda building_block: True,
-            random_seed=random_seed,
+    def is_fluoro(building_block):
+        fg, = building_block.get_functional_groups(0)
+        return fg.__class__ is stk.Fluoro
+
+    def is_bromo(building_block):
+        fg, = building_block.get_functional_groups(0)
+        return fg.__class__ is stk.Bromo
+
+    mutator = stk.RandomMutator(
+        mutators=(
+            stk.RandomBuildingBlock(
+                building_blocks=fluoros,
+                is_replaceable=is_fluoro,
+                random_seed=generator.randint(0, 1000),
+            ),
+            stk.SimilarBuildingBlock(
+                building_blocks=fluoros,
+                is_replaceable=is_fluoro,
+                random_seed=generator.randint(0, 1000),
+            ),
+            stk.RandomBuildingBlock(
+                building_blocks=bromos,
+                is_replaceable=is_bromo,
+                random_seed=generator.randint(0, 1000),
+            ),
+            stk.SimilarBuildingBlock(
+                building_blocks=bromos,
+                is_replaceable=is_bromo,
+                random_seed=generator.randint(0, 1000),
+            ),
         ),
+        random_seed=generator.randint(0, 1000),
+    )
+
+When :meth:`~.Mutator.mutate` is called on a :class:`.RandomMutator`,
+it randomly selects one of the mutators you gave it during
+initialization, and asks it to perform the mutation operation on its
+behalf. In this way, all of the mutators you provided it will get used
+during the EA.
+
+Now we can put all of these components together, and fill in the
+remaining ones too
+
+.. code-block:: python
+
+    ea = stk.EvolutionaryAlgorithm(
+        initial_population=tuple(
+            get_initial_population(fluoros, bromos)
+        ),
+        fitness_calculator=stk.FitnessFunction(get_rigidity),
+        mutator=stk.RandomMutator(
+            mutators=(
+                stk.RandomBuildingBlock(
+                    building_blocks=fluoros,
+                    is_replaceable=is_fluoro,
+                    random_seed=generator.randint(0, 1000),
+                ),
+                stk.SimilarBuildingBlock(
+                    building_blocks=fluoros,
+                    is_replaceable=is_fluoro,
+                    random_seed=generator.randint(0, 1000),
+                ),
+                stk.RandomBuildingBlock(
+                    building_blocks=bromos,
+                    is_replaceable=is_bromo,
+                    random_seed=generator.randint(0, 1000),
+                ),
+                stk.SimilarBuildingBlock(
+                    building_blocks=bromos,
+                    is_replaceable=is_bromo,
+                    random_seed=generator.randint(0, 1000),
+                ),
+            ),
+            random_seed=generator.randint(0, 1000),
+        )
         crosser=stk.GeneticRecombination(
             get_gene=get_functional_group_type,
         ),
@@ -342,56 +475,198 @@ Now we only have to answer the second question,
         ),
         mutation_selector=stk.Roulette(
             num_batches=5
-            random_seed=random_seed,
+            random_seed=generator.randint(0, 1000),
         ),
         crossover_selector=stk.Roulette(
             num_batches=3,
             batch_size=2,
-            random_seed=random_seed,
+            random_seed=generator.randint(0, 1000),
         )
         # We don't need to do a normalization in this example.
         fitness_normalizer=stk.NullFitnessNormalizer(),
-
     )
-
-
-
-Defining a Fitness Calculator
------------------------------
-
-One remaining EA component we need to define is a
-:class:`.FitnessCalculator`.
-
-
-Defining an Initial Population
-------------------------------
-
 
 Defining a Database
 -------------------
+
+The last thing we need to do is define the database.
 
 
 
 Final Version
 =============
 
+The final version of our code is
 
-This is a complete, basic EA. However, it has some obvious limitations:
 
-* Only a single :class:`.Mutator` is defined. This means that only the
-  space of bromo building blocks was explored.
-* The :class:`.RandomBuildingBlock` mutator throws away an entire
-  building block each time it performs a mutation. This means all the
-  chemical information in it is lost. We would like a mutation which
-  only *modifies* the building block, so that the new building block
-  shares a some chemical features with the old one.
-* The :class:`.FitnessCalculator` re-calculated the fitness value on
-  molecules for which it had already calculated fitness values. This
-  is OK in this example, but often a fitness calculation can be
-  expensive and repeating it would seriously degrade the performance
-  of our EA.
+.. code-block:: python
 
-Next, you can read the intermediate tutorial, which will address all
-of these limitations, and show you additional
-customizations you can make to the EA, which allow it to be more
-powerful and more efficient.
+    import stk
+    import rdkit.Chem.AllChem as rdkit
+    import pymongo
+    import vabane as vb
+    import numpy as np
+
+    def get_building_block(
+        generator,
+        atomic_number,
+        functional_group_factory,
+    ):
+        # The number of atoms, excluding hydrogen, in our building
+        # block.
+        num_atoms = generator.randint(10, 25)
+        # The distance between the bromine or fluorine atoms in our
+        # building block.
+        fg_separation = generator.randint(1, num_atoms-3)
+
+        atom_factory = vb.RandomAtomFactory(
+                # Our building blocks will consist of a mixture of
+                # carbons, with a maximum valence of either 4 or 2.
+                atoms=(vb.Atom(6, 0, 4), vb.Atom(6, 0, 2), ),
+                # All of our building blocks will have 2 halogen atoms,
+                # separated by a random number of carbon atoms.
+                required_atoms=(
+                    (vb.Atom(atomic_number, 0, 1), )
+                    +
+                    (vb.Atom(6, 0, 4), ) * fg_separation
+                    +
+                    (vb.Atom(atomic_number, 0, 1), )
+                ),
+                num_atoms=num_atoms,
+        )
+        atoms = tuple(atom_factory.get_atoms())
+        bond_factory = vb.RandomBondFactory(
+            required_bonds=tuple(
+                vb.Bond(i, i+1, 1) for i in range(fg_separation+1)
+            ),
+        )
+        bonds = bond_factory.get_bonds(atoms)
+        return stk.BuildingBlock.init_from_vabene_molecule(
+            molecule=vb.Molecule(atoms, bonds),
+            functional_groups=[functional_group_factory],
+        )
+
+    def get_initial_population(fluoros, bromos):
+        for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
+            yield stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles=fluoro,
+                            functional_groups=[stk.FluoroFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles=bromo,
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='AB',
+                    num_repeating_units=1,
+                ),
+            )
+
+    def get_rigidity(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(
+            mol=rdkit_molecule,
+        )
+        # Add 1 to the denominator to prevent division by 0.
+        return 1 / (num_rotatable_bonds + 1)
+
+    def get_functional_group_type(building_block):
+        functional_group, = building_block.get_functional_groups(0)
+        return functional_group.__class__
+
+    def is_fluoro(building_block):
+        fg, = building_block.get_functional_groups(0)
+        return fg.__class__ is stk.Fluoro
+
+    def is_bromo(building_block):
+        fg, = building_block.get_functional_groups(0)
+        return fg.__class__ is stk.Bromo
+
+    # Use a random seed to get reproducible results.
+    random_seed = 4
+    generator = np.random.RandomState(random_seed)
+
+    # Make 1000 fluoro building bocks.
+    fluoros = tuple(
+        get_building_block(generator, 9, stk.FluoroFactory())
+        for i in range(1000)
+    )
+    # Make 1000 bromo building blocks.
+    bromos = tuple(
+        get_building_block(generator, 35, stk.BromoFactory())
+        for i in range(1000)
+    )
+
+    ea = stk.EvolutionaryAlgorithm(
+        initial_population=tuple(
+            get_initial_population(fluoros, bromos)
+        ),
+        fitness_calculator=stk.FitnessFunction(get_rigidity),
+        mutator=stk.RandomMutator(
+            mutators=(
+                stk.RandomBuildingBlock(
+                    building_blocks=fluoros,
+                    is_replaceable=is_fluoro,
+                    random_seed=generator.randint(0, 1000),
+                ),
+                stk.SimilarBuildingBlock(
+                    building_blocks=fluoros,
+                    is_replaceable=is_fluoro,
+                    random_seed=generator.randint(0, 1000),
+                ),
+                stk.RandomBuildingBlock(
+                    building_blocks=bromos,
+                    is_replaceable=is_bromo,
+                    random_seed=generator.randint(0, 1000),
+                ),
+                stk.SimilarBuildingBlock(
+                    building_blocks=bromos,
+                    is_replaceable=is_bromo,
+                    random_seed=generator.randint(0, 1000),
+                ),
+            ),
+            random_seed=generator.randint(0, 1000),
+        )
+        crosser=stk.GeneticRecombination(
+            get_gene=get_functional_group_type,
+        ),
+        generation_selector=stk.Best(
+            num_batches=25,
+            duplicate_molecules=False,
+        ),
+        mutation_selector=stk.Roulette(
+            num_batches=5
+            random_seed=generator.randint(0, 1000),
+        ),
+        crossover_selector=stk.Roulette(
+            num_batches=3,
+            batch_size=2,
+            random_seed=generator.randint(0, 1000),
+        )
+        # We don't need to do a normalization in this example.
+        fitness_normalizer=stk.NullFitnessNormalizer(),
+    )
+
+    generations = []
+    for generation in ea.get_generations(50):
+        molecules = (
+            record.get_molecule()
+            for record in generation.get_molecule_records()
+        )
+        db.put_many(molecules)
+        generations.append(generation)
+
+    fitness_progress = stk.ProgressPlotter(
+        generations=generations,
+        get_property=lambda record: record.get_fitness_value(),
+        y_label='Fitness Value',
+    )
+    fitness_progress.write('fitness_progress.png')
+
+
+Next, you can read the intermediate tutorial, which will show you
+some additional customization options for the EA.
