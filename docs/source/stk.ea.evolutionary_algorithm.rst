@@ -19,4 +19,3 @@ Submodules
 .. toctree::
 
    stk.ea.evolutionary_algorithm.evolutionary_algorithm
-   stk.ea.evolutionary_algorithm.utilities
