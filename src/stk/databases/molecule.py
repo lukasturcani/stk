@@ -55,6 +55,23 @@ class MoleculeDatabase:
 
         raise NotImplementedError()
 
+    def put_many(self, molecules):
+        """
+        Put `molecules` into the database.
+
+        Parameters
+        ----------
+        molecules : :class:`iterable` of :class:`.Molecule`
+            The molecules to place into the database.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        raise NotImplementedError()
+
     def get(self, key):
         """
         Get the molecule with `key` from the database.
