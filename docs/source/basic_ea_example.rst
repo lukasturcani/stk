@@ -780,13 +780,17 @@ The final version of our code is
 
 The plot of fitness we produced looks like this:
 
-.. image::
+.. image:: https://i.imgur.com/7Grpuxb.png
 
 
 and the plot of the number of rotatable bonds looks like this:
 
-.. image::
+.. image:: https://i.imgur.com/zvRgqha.png
 
+
+Clearly, our EA was able to quickly minimize the number of rotatable
+bonds to the lowest possible value across all members of the
+population.
 
 We can also compare the molecules in our initial population
 
