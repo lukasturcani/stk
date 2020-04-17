@@ -855,7 +855,8 @@ to those in the final population
 
 .. image:: https://i.imgur.com/alBW1OS.png
 
-where the hydrogen atoms have been left out for clarity. Again, the
+where the hydrogen atoms have been left out for clarity. Looking
+at these, the
 EA obviously managed to reduce the complexity of the molecules as well.
 
 Next, you can read the intermediate tutorial, which will show you
