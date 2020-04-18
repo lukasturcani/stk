@@ -342,13 +342,13 @@ to generate our building blocks
 
     fluoros = tuple(get_building_blocks(
         # Assume that fluoros.txt is in the same folder as this
-        # script.
+        # code.
         path=pathlib.Path(__file__).parent / 'fluoros.txt',
         functional_group_factory=stk.FluoroFactory()),
     )
     bromos = tuple(get_building_blocks(
         # Assume that bromos.txt is in the same folder as this
-        # script.
+        # code.
         path=pathlib.Path(__file__).parent / 'bromos.txt',
         functional_group_factory=stk.BromoFactory()),
     )
