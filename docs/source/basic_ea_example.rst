@@ -235,7 +235,7 @@ bonds in a molecule
 In addition to minimizing the number of rotatable bonds, we also
 want to minimize the molecular complexity, so that molecules made
 by the EA look at least somewhat reasonable. :mod:`rdkit` provides a
-a function called :func:`BertzCT`, which returns a measure of
+function called :func:`BertzCT`, which returns a measure of
 molecular complexity. In addition to this, we will also count the
 number of rings of size less than 5, as an additional measure of
 complexity
