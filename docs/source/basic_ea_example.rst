@@ -13,14 +13,6 @@ You can get all the code associated with tutorial by running::
 
     $ git clone https://github.com/lukasturcani/basic_ea
 
-This tutorial relies on a Python library, which does not come
-with :mod:`stk`, called :mod:`vabene`. It used to make a
-library of building blocks, which the EA uses, in order to find the
-optimal molecules for our task. You can install it with::
-
-    $ pip install vabene
-
-
 EA Components
 =============
 
@@ -39,18 +31,6 @@ customize the algorithm. We will need to use a
    molecules.
 #. :class:`.FitnessCalculator` - Used to calculate the fitness value
    of molecules.
-#. :class:`.FitnessNormalizer` - Used to normalize the fitness values
-   of molecules. Both the :class:`.FitnessCalculator` and the
-   :class:`.FitnessNormalizer` assign fitness values to molecules,
-   however the difference between them is that a
-   :class:`.FitnessCalculator` can only return a fitness value based
-   on the molecule itself, while a :class:`.FitnessNormalizer`
-   can take into account all the other fitness values in the
-   population. For example, it could divide the fitness values by the
-   population average. A fitness value is always first assigned by a
-   :class:`.FitnessCalculator`, and can then be optionally followed
-   by a :class:`.FitnessNormalizer`
-
 
 Basic EA Loop
 =============
@@ -72,11 +52,10 @@ Python script, such as
         generation_selector=...,
         mutation_selector=...,
         crossover_selector=...,
-        fitness_normalizer=...,
     )
 
-    # Go through 15 generations of the EA.
-    for i, generation in enumerate(ea.get_generations(15)):
+    # Go through 50 generations of the EA.
+    for i, generation in enumerate(ea.get_generations(50)):
 
         # The generation object gives you access to the molecules
         # found in the generation.
@@ -86,8 +65,8 @@ you can write each molecule in each generation to a file
 
 .. code-block:: python
 
-    # Go through 15 generations of the EA.
-    for i, generation in enumerate(ea.get_generations(15)):
+    # Go through 50 generations of the EA.
+    for i, generation in enumerate(ea.get_generations(50)):
         # Go through the molecules in the generation, and write them
         # to a file.
         for molecule_id, molecule_record in enumerate(
@@ -135,8 +114,8 @@ writing a bunch of files
 
 .. code-block:: python
 
-    # Go through 15 generations of the EA.
-    for generation in ea.get_generations(15):
+    # Go through 50 generations of the EA.
+    for generation in ea.get_generations(50):
         for record in generation.get_molecule_records():
             db.put(record.get_molecule())
 
@@ -159,7 +138,7 @@ previous generations
 .. code-block:: python
 
     generations = []
-    for generation in ea.get_generations(15):
+    for generation in ea.get_generations(50):
         for record in generation.get_molecule_records():
             db.put(record.get_molecule())
         generations.append(generation)
@@ -195,12 +174,11 @@ Ok, we now have a half-decent EA loop, so let's review it.
         generation_selector=...,
         mutation_selector=...,
         crossover_selector=...,
-        fitness_normalizer=...,
     )
 
-    # Go through 15 generations of the EA.
+    # Go through 50 generations of the EA.
     generations = []
-    for generation in ea.get_generations(15):
+    for generation in ea.get_generations(50):
         for record in generation.get_molecule_records():
             db.put(record.get_molecule())
         generations.append(generation)
@@ -255,28 +233,39 @@ bonds in a molecule
         return 1 / (num_rotatable_bonds + 1)
 
 In addition to minimizing the number of rotatable bonds, we also
-want to minimize the molecular complexity, so that they look
-at least somewhat reasonable. :mod:`rdkit` provides a simple
-way to calculate complexity
+want to minimize the molecular complexity, so that molecules made
+by the EA look at least somewhat reasonable. :mod:`rdkit` provides a
+a function called :func:`BertzCT`, which returns a measure of
+molecular complexity. In addition to this, we will also count the
+number of rings of size less than 5, as an additional measure of
+complexity
 
 .. code-block:: python
 
     from rdkit.Chem.GraphDescriptors import BertzCT
 
     def get_complexity(molecule):
-        return BertzCT(molecule)
+        num_bad_rings = sum(
+            1 for ring in rdkit.GetSymmSSSR(molecule) if len(ring) < 5
+        )
+        # Multiply by 10 and raise to the power of 2 to increase the
+        # penalty for having many small rings. These numbers were
+        # chosen by trial and error, so do don't worry about them
+        # too much.
+        return BertzCT(molecule) + 10*num_bad_rings**2
 
-Now that we can combine the two values into a single fitness value,
-that the EA can optimize. There are multiple way to do this, but a
-easy way is take the ratio of the value we want to maximize,
-the rigidity, with the value with want to minimize, the complexity.
+Now we can combine the rigidity and complexity into a single fitness
+value, that the EA can optimize. There are multiple way to do this, but
+an easy thing to do is just divide the rigidity by the complexity
 
 .. code-block:: python
 
     def get_fitness_value(molecule):
         rdkit_molecule = molecule.to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_molecule)
-        return (
+        # Multiply by 100 just to scale the values up a bit, which
+        # makes for nicer plots later.
+        return 100*(
             get_rigidity(rdkit_molecule)
             / get_complexity(rdkit_molecule)
         )
@@ -298,120 +287,71 @@ can construct.
 
 Lets begin by defining an initial population. The first thing we will
 need is a set of building blocks, with which we can build our
-molecules. We can use the :mod:`vabene` library to create random
-molecular graphs, which can be used to make our building blocks
+molecules. In this, example we will use two files from
+https://github.com/lukasturcani/basic_ea, ``bromos.txt`` and
+``fluoros.txt``. Each file contains the SMILES strings of buildings
+blocks, holding the respective functional groups. The building
+blocks in these files are randomly generated molecular graphs.
+We can define a function which will load the building blocks from
+these files
 
 .. code-block:: python
 
-    import vabene as vb
-    import numpy as np
-    import itertools as it
+    def get_building_blocks(path, functional_group_factory):
+        with open(path, 'r') as f:
+            content = f.readlines()
 
-    def get_building_block(
-        generator,
-        atomic_number,
-        functional_group_factory,
-    ):
-        # The number of atoms, excluding hydrogen, in our building
-        # block.
-        num_atoms = generator.randint(7, 15)
-        # The distance between the bromine or fluorine atoms in our
-        # building block.
-        fg_separation = generator.randint(1, num_atoms-3)
-
-        atom_factory = vb.RandomAtomFactory(
-            # Our building blocks will be composed from a mix of
-            # carbon atoms with maximum valance of 4, carbon atoms
-            # with a maximum valence of 3 and oxygen atoms with a
-            # maximum valence of 2.
-            atoms=(
-                vb.Atom(6, 0, 4),
-                vb.Atom(6, 0, 3),
-                vb.Atom(8, 0, 2),
-            ),
-            # All of our building blocks will have 2 halogen atoms,
-            # separated by a random number of carbon atoms.
-            required_atoms=(
-                (vb.Atom(atomic_number, 0, 1), )
-                +
-                (vb.Atom(6, 0, 4), ) * fg_separation
-                +
-                (vb.Atom(atomic_number, 0, 1), )
-            ),
-            num_atoms=num_atoms,
-            random_seed=generator.randint(0, 1000),
-        )
-        atoms = tuple(atom_factory.get_atoms())
-        bond_factory = vb.RandomBondFactory(
-            required_bonds=tuple(
-                vb.Bond(i, i+1, 1) for i in range(fg_separation+1)
-            ),
-            random_seed=generator.randint(0, 1000),
-        )
-        bonds = bond_factory.get_bonds(atoms)
-
-        building_block = stk.BuildingBlock.init_from_rdkit_mol(
-            molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
-            functional_groups=[functional_group_factory],
-        )
-        # We can give random coordinates to the building block,
-        # because it's fast and doesn't matter in this case.
-        return building_block.with_position_matrix(
-            position_matrix=generator.uniform(
-                low=-100,
-                high=100,
-                size=(building_block.get_num_atoms(), 3),
-            ),
-        )
-
-Note that we need to define a function which converts
-:mod:`vabene` molecules into :mod:`rdkit` molecules
-
-.. code-block:: python
-
-    def vabene_to_rdkit(molecule):
-        editable = rdkit.EditableMol(rdkit.Mol())
-        for atom in molecule.get_atoms():
-            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
-            rdkit_atom.SetFormalCharge(atom.get_charge())
-            editable.AddAtom(rdkit_atom)
-
-        for bond in molecule.get_bonds():
-            editable.AddBond(
-                beginAtomIdx=bond.get_atom1_id(),
-                endAtomIdx=bond.get_atom2_id(),
-                order=rdkit.BondType(bond.get_order()),
+        for smiles in content:
+            molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+            molecule.AddConformer(
+                conf=rdkit.Conformer(molecule.GetNumAtoms()),
+            )
+            rdkit.Kekulize(molecule)
+            building_block = stk.BuildingBlock.init_from_rdkit_mol(
+                molecule=molecule,
+                functional_groups=[functional_group_factory],
+            )
+            yield building_block.with_position_matrix(
+                position_matrix=get_position_matrix(building_block),
             )
 
-        rdkit_molecule = editable.GetMol()
-        rdkit.SanitizeMol(rdkit_molecule)
-        rdkit_molecule = rdkit.AddHs(rdkit_molecule)
-        rdkit.Kekulize(rdkit_molecule)
-        rdkit_molecule.AddConformer(
-            conf=rdkit.Conformer(rdkit_molecule.GetNumAtoms()),
+
+    def get_position_matrix(molecule):
+        generator = np.random.RandomState(4)
+        position_matrix = generator.uniform(
+            low=-500,
+            high=500,
+            size=(molecule.get_num_atoms(), 3),
         )
-        return rdkit_molecule
+        molecule = molecule.with_position_matrix(position_matrix)
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        rdkit.Compute2DCoords(rdkit_molecule)
+        try:
+            rdkit.MMFFOptimizeMolecule(rdkit_molecule)
+        except Exception:
+            pass
+        return rdkit_molecule.GetConformer().GetPositions()
 
 Once these functions are defined, we can use :func:`get_building_block`
-to generate out building blocks
+to generate our building blocks
 
 .. code-block:: python
 
-    # Use a random seed to get reproducible results.
-    random_seed = 4
-    generator = np.random.RandomState(random_seed)
+    import pathlib
 
-    # Make 1000 fluoro building bocks.
-    fluoros = tuple(
-        get_building_block(generator, 9, stk.FluoroFactory())
-        for i in range(1000)
+    fluoros = tuple(get_building_blocks(
+        # Assume that fluoros.txt is in the same folder as this
+        # script.
+        path=pathlib.Path(__file__).parent / 'fluoros.txt',
+        functional_group_factory=stk.FluoroFactory()),
     )
-    # Make 1000 bromo building blocks.
-    bromos = tuple(
-        get_building_block(generator, 35, stk.BromoFactory())
-        for i in range(1000)
+    bromos = tuple(get_building_blocks(
+        # Assume that bromos.txt is in the same folder as this
+        # script.
+        path=pathlib.Path(__file__).parent / 'bromos.txt',
+        functional_group_factory=stk.BromoFactory()),
     )
-
 
 In this example, the EA will create ``AB`` dimers, using the
 :class:`.Linear`  topology graph. The initial population of 25 such
@@ -429,6 +369,7 @@ building blocks
                     num_repeating_units=1,
                 ),
             )
+
 
     initial_population = tuple(get_initial_population(fluoros, bromos)
 
@@ -539,8 +480,6 @@ remaining ones too
             batch_size=2,
             random_seed=generator.randint(0, 1000),
         ),
-        # We don't need to do a normalization in this example.
-        fitness_normalizer=stk.NullFitnessNormalizer(),
     )
 
 Defining a Database
@@ -588,95 +527,46 @@ The final version of our code is
     import rdkit.Chem.AllChem as rdkit
     from rdkit.Chem.GraphDescriptors import BertzCT
     import pymongo
-    import vabene as vb
     import numpy as np
     import itertools as it
     import logging
+    import pathlib
 
+    def get_building_blocks(path, functional_group_factory):
+        with open(path, 'r') as f:
+            content = f.readlines()
 
-    logger = logging.getLogger(__name__)
-
-
-    def vabene_to_rdkit(molecule):
-        editable = rdkit.EditableMol(rdkit.Mol())
-        for atom in molecule.get_atoms():
-            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
-            rdkit_atom.SetFormalCharge(atom.get_charge())
-            editable.AddAtom(rdkit_atom)
-
-        for bond in molecule.get_bonds():
-            editable.AddBond(
-                beginAtomIdx=bond.get_atom1_id(),
-                endAtomIdx=bond.get_atom2_id(),
-                order=rdkit.BondType(bond.get_order()),
+        for smiles in content:
+            molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+            molecule.AddConformer(
+                conf=rdkit.Conformer(molecule.GetNumAtoms()),
+            )
+            rdkit.Kekulize(molecule)
+            building_block = stk.BuildingBlock.init_from_rdkit_mol(
+                molecule=molecule,
+                functional_groups=[functional_group_factory],
+            )
+            yield building_block.with_position_matrix(
+                position_matrix=get_position_matrix(building_block),
             )
 
-        rdkit_molecule = editable.GetMol()
+
+    def get_position_matrix(molecule):
+        generator = np.random.RandomState(4)
+        position_matrix = generator.uniform(
+            low=-500,
+            high=500,
+            size=(molecule.get_num_atoms(), 3),
+        )
+        molecule = molecule.with_position_matrix(position_matrix)
+        rdkit_molecule = molecule.to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_molecule)
-        rdkit_molecule = rdkit.AddHs(rdkit_molecule)
-        rdkit.Kekulize(rdkit_molecule)
-        rdkit_molecule.AddConformer(
-            conf=rdkit.Conformer(rdkit_molecule.GetNumAtoms()),
-        )
-        return rdkit_molecule
-
-
-    def get_building_block(
-        generator,
-        atomic_number,
-        functional_group_factory,
-    ):
-        # The number of atoms, excluding hydrogen, in our building
-        # block.
-        num_atoms = generator.randint(7, 15)
-        # The distance between the bromine or fluorine atoms in our
-        # building block.
-        fg_separation = generator.randint(1, num_atoms-3)
-
-        atom_factory = vb.RandomAtomFactory(
-            # Our building blocks will be composed from a mix of
-            # carbon atoms with maximum valance of 4, carbon atoms
-            # with a maximum valence of 3 and oxygen atoms with a
-            # maximum valence of 2.
-            atoms=(
-                vb.Atom(6, 0, 4),
-                vb.Atom(6, 0, 3),
-                vb.Atom(8, 0, 2),
-            ),
-            # All of our building blocks will have 2 halogen atoms,
-            # separated by a random number of carbon atoms.
-            required_atoms=(
-                (vb.Atom(atomic_number, 0, 1), )
-                +
-                (vb.Atom(6, 0, 4), ) * fg_separation
-                +
-                (vb.Atom(atomic_number, 0, 1), )
-            ),
-            num_atoms=num_atoms,
-            random_seed=generator.randint(0, 1000),
-        )
-        atoms = tuple(atom_factory.get_atoms())
-        bond_factory = vb.RandomBondFactory(
-            required_bonds=tuple(
-                vb.Bond(i, i+1, 1) for i in range(fg_separation+1)
-            ),
-            random_seed=generator.randint(0, 1000),
-        )
-        bonds = bond_factory.get_bonds(atoms)
-
-        building_block = stk.BuildingBlock.init_from_rdkit_mol(
-            molecule=vabene_to_rdkit(vb.Molecule(atoms, bonds)),
-            functional_groups=[functional_group_factory],
-        )
-        # We can give random coordinates to the building block,
-        # because it's fast and doesn't matter in this case.
-        return building_block.with_position_matrix(
-            position_matrix=generator.uniform(
-                low=-100,
-                high=100,
-                size=(building_block.get_num_atoms(), 3),
-            ),
-        )
+        rdkit.Compute2DCoords(rdkit_molecule)
+        try:
+            rdkit.MMFFOptimizeMolecule(rdkit_molecule)
+        except Exception:
+            pass
+        return rdkit_molecule.GetConformer().GetPositions()
 
 
     def get_initial_population(fluoros, bromos):
@@ -691,20 +581,22 @@ The final version of our code is
 
 
     def get_rigidity(molecule):
-        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(
-            mol=rdkit_molecule,
-        )
+        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(molecule)
         # Add 1 to the denominator to prevent division by 0.
         return 1 / (num_rotatable_bonds + 1)
 
+
     def get_complexity(molecule):
-        return BertzCT(molecule)
+        num_bad_rings = sum(
+            1 for ring in rdkit.GetSymmSSSR(molecule) if len(ring) < 5
+        )
+        return BertzCT(molecule) + 10*num_bad_rings**2
 
 
     def get_fitness_value(molecule):
         rdkit_molecule = molecule.to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_molecule)
-        return (
+        return 100*(
             get_rigidity(rdkit_molecule)
             / get_complexity(rdkit_molecule)
         )
@@ -731,6 +623,18 @@ The final version of our code is
         return rdkit.CalcNumRotatableBonds(molecule)
 
 
+    def write(molecule, path):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        rdkit_molecule = rdkit.RemoveHs(rdkit_molecule)
+        building_block = stk.BuildingBlock.init_from_rdkit_mol(
+            molecule=rdkit_molecule,
+        )
+        building_block.with_position_matrix(
+            position_matrix=get_position_matrix(building_block),
+        ).write(path)
+
+
     def main():
         logging.basicConfig(level=logging.INFO)
 
@@ -740,15 +644,14 @@ The final version of our code is
 
         logger.info('Making building blocks.')
 
-        # Make 1000 fluoro building bocks.
-        fluoros = tuple(
-            get_building_block(generator, 9, stk.FluoroFactory())
-            for i in range(1000)
+        # Load the building block databases.
+        fluoros = tuple(get_building_blocks(
+            path=pathlib.Path(__file__).parent / 'fluoros.txt',
+            functional_group_factory=stk.FluoroFactory()),
         )
-        # Make 1000 bromo building blocks.
-        bromos = tuple(
-            get_building_block(generator, 35, stk.BromoFactory())
-            for i in range(1000)
+        bromos = tuple(get_building_blocks(
+            path=pathlib.Path(__file__).parent / 'bromos.txt',
+            functional_group_factory=stk.BromoFactory()),
         )
 
         db = stk.ConstructedMoleculeMongoDb(pymongo.MongoClient())
@@ -805,10 +708,14 @@ The final version of our code is
         logger.info('Starting EA.')
 
         generations = []
-        for generation in ea.get_generations(15):
+        for generation in ea.get_generations(50):
             for record in generation.get_molecule_records():
                 db.put(record.get_molecule())
             generations.append(generation)
+
+        # Write the final population.
+        for i, record in enumerate(generation.get_molecule_records()):
+            write(record.get_molecule(), f'final_{i}.mol')
 
         logger.info('Making fitness plot.')
 
@@ -827,6 +734,7 @@ The final version of our code is
             y_label='Number of Rotatable Bonds',
         )
         rotatable_bonds_progress.write('rotatable_bonds_progress.png')
+
 
     if __name__ == '__main__':
         main()
