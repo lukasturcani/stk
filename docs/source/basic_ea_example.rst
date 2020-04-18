@@ -532,6 +532,7 @@ The final version of our code is
     import logging
     import pathlib
 
+
     def get_building_blocks(path, functional_group_factory):
         with open(path, 'r') as f:
             content = f.readlines()
