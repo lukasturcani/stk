@@ -795,7 +795,7 @@ def remake(mol):
 
 
 def orthogonal_vector(vector):
-    ortho = [0, 0, 0]
+    ortho = np.array([0., 0., 0.])
     for m, val in enumerate(vector):
         if not np.allclose(val, 0, atol=1e-8):
             n = (m+1) % 3
