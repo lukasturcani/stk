@@ -526,11 +526,16 @@ The final version of our code is
     import stk
     import rdkit.Chem.AllChem as rdkit
     from rdkit.Chem.GraphDescriptors import BertzCT
+    from rdkit import RDLogger
     import pymongo
     import numpy as np
     import itertools as it
     import logging
     import pathlib
+
+    rdkit_logger = RDLogger.logger()
+    rdkit_logger.setLevel(RDLogger.CRITICAL)
+    logger = logging.getLogger(__name__)
 
 
     def get_building_blocks(path, functional_group_factory):
