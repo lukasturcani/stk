@@ -371,7 +371,7 @@ building blocks
             )
 
 
-    initial_population = tuple(get_initial_population(fluoros, bromos)
+    initial_population = tuple(get_initial_population(fluoros, bromos))
 
 Next, we can define our mutation operations. There are a multiple
 options, as you can see in the sidebar. One thing that you might
