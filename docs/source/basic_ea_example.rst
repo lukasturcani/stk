@@ -344,14 +344,14 @@ to generate our building blocks
         # Assume that fluoros.txt is in the same folder as this
         # code.
         path=pathlib.Path(__file__).parent / 'fluoros.txt',
-        functional_group_factory=stk.FluoroFactory()),
-    )
+        functional_group_factory=stk.FluoroFactory(),
+    ))
     bromos = tuple(get_building_blocks(
         # Assume that bromos.txt is in the same folder as this
         # code.
         path=pathlib.Path(__file__).parent / 'bromos.txt',
-        functional_group_factory=stk.BromoFactory()),
-    )
+        functional_group_factory=stk.BromoFactory(),
+    ))
 
 In this example, the EA will create ``AB`` dimers, using the
 :class:`.Linear`  topology graph. The initial population of 25 such
