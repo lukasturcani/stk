@@ -5,3 +5,4 @@ from .replace_fitness import *
 from .shift_up import *
 from .sum import *
 from .power import *
+from .sequence import *

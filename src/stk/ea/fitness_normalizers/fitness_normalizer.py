@@ -7,6 +7,7 @@ Fitness Normalizer
 
     Divide By Mean <stk.ea.fitness_normalizers.divide_by_mean>
     Multiply <stk.ea.fitness_normalizers.multiply>
+    Normalizer Sequence <stk.ea.fitness_normalizers.sequence>
     Null Fitness Normalizer <stk.ea.fitness_normalizers.null>
     Power <stk.ea.fitness_normalizers.power>
     Replace Fitness <stk.ea.fitness_normalizers.replace_fitness>
