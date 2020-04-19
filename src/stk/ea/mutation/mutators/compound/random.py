@@ -10,10 +10,28 @@ import numpy as np
 
 class RandomMutator:
     """
-
+    Use some other mutator at random.
 
     Examples
     --------
+    *Use One of Several Mutators at Random*
+
+    .. code-block:: python
+
+        import stk
+
+        mutator = stk.RandomMutator(
+            mutators=(
+                stk.RandomBuildingBlock(...),
+                stk.SimilarBuildingBlock(...),
+                stk.RandomBuildingBlock(...),
+            ),
+        )
+        # Use one of the component mutators at random.
+        mutation_record = mutator.mutate(record)
+        # A different mutator may get selected at random the second,
+        # third, etc, time.
+        mutation_record2 = mutator.mutate(record)
 
     """
 
