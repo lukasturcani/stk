@@ -117,20 +117,12 @@ class Implementation:
             yield from self._crosser.cross(batch)
 
     def _with_fitness_values(self, map_, population):
-        no_fitness = tuple(
-            record for record in population
-            if record.get_fitness_value(normalized=False) is None
-        )
-        molecules = (record.get_molecule() for record in no_fitness)
+        molecules = (record.get_molecule() for record in population)
         fitness_values = map_(
             self._fitness_calculator.get_fitness_value,
             molecules,
         )
-        yield from (
-            record for record in population
-            if record.get_fitness_value(normalized=False) is not None
-        )
-        for record, fitness_value in zip(no_fitness, fitness_values):
+        for record, fitness_value in zip(population, fitness_values):
             yield record.with_fitness_value(
                 fitness_value=fitness_value,
                 normalized=False,
