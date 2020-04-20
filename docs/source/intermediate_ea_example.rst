@@ -45,3 +45,89 @@ Plotting Selection
     is often useful for validation, analysis and debugging.
 
 
+You can get all the code associated with the tutorial by running::
+
+    $ git clone https://github.com/lukasturcani/intermediate_ea
+
+
+Defining a New Fitness Calculator
+=================================
+
+In the basic example, we created a :class:`.FitnessCalculator` by first
+defining a Python function, which we then wrapped with
+:class:`.FitnessFunction`. The function we defined calculated some
+property values of a molecule, namely complexity, the number of small
+rings and the number of rotatable bonds, and then combined them into
+a single fitness value. One problem with this approach is that
+the values were combined in a very ad-hoc way, which makes it
+difficult to reason about the contribution of each property to the
+final fitness value.
+
+As an alternative to this approach, we can define three
+Python functions, each of which returns a property of the molecule
+whose fitness value we want
+
+.. code-block:: python
+
+    import rdkit.Chem.AllChem as rdkit
+
+
+    def get_num_rotatable_bonds(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        return rdkit.CalcNumRotatableBonds(rdkit_molecule)
+
+
+    def get_complexity(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        return BertzCT(rdkit_molecule)
+
+
+    def get_num_bad_rings(molecule):
+        rdkit_molecule = molecule.to_rdkit_mol()
+        rdkit.SanitizeMol(rdkit_molecule)
+        return sum(
+            1
+            for ring in rdkit.GetSymmSSSR(rdkit_molecule)
+            if len(ring) < 5
+        )
+
+
+Now, instead of defining another Python function which combines
+these property values into a single value, we can create a
+:class:`.FitnessCalculator` which returns a :class:`tuple` of
+property values as our fitness value. This is done by using a
+:class:`.PropertyVector` instead of :class:`.FitnessFunction`
+
+.. code-block:: python
+
+    import stk
+
+    fitness_calculator = stk.PropertyVector(
+        property_functions=(
+            get_num_rotatable_bonds,
+            get_complexity,
+            get_num_bad_rings,
+        ),
+    )
+
+
+When we run
+
+    .. code-block:: python
+
+    fitness_value = fitness_calculator.get_fitness_value(some_molecule)
+
+Our ``fitness_value`` with a class:`tuple` of the form
+``(num_rotatable_bonds, complexity, num_bad_rings)``. This is a good
+start, but our fitness value must be a single number. We can achieve
+this by defining a :class:`.FitnessNormalizer`.
+
+
+Defining a Fitness Normalizer
+=============================
+
+Fitness normalization is process that runs after fitness calculation.
+The basic idea, is that a :class:`.FitnessCalculator` calculated
+the fitness value

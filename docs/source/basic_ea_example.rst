@@ -9,7 +9,7 @@ This tutorial will introduce you the basic components needed for
 building an EA with :mod:`stk`. You can see a basic outline of the
 EA in :class:`.EvolutionaryAlgorithm`.
 
-You can get all the code associated with tutorial by running::
+You can get all the code associated with the tutorial by running::
 
     $ git clone https://github.com/lukasturcani/basic_ea
 
