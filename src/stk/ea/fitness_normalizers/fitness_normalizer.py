@@ -5,6 +5,7 @@ Fitness Normalizer
 .. toctree::
     :maxdepth: 2
 
+    Add <stk.ea.fitness_normalizers.add>
     Divide By Mean <stk.ea.fitness_normalizers.divide_by_mean>
     Multiply <stk.ea.fitness_normalizers.multiply>
     Normalizer Sequence <stk.ea.fitness_normalizers.sequence>
