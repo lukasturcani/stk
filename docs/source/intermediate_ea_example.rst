@@ -20,7 +20,7 @@ Caching Fitness Values
     values, even if it had already calculated one for the molecule in a
     previous generation. In the basic example, this is not a big deal,
     because the fitness function has a very low computational cost.
-    However, in many applications the fitness function will be
+    However, in many applications, the fitness function will be
     expensive, likely including a structure optimization step. In
     cases like this, it is extremely important that the fitness value
     is returned from a database, instead of being recalculated,
@@ -119,7 +119,7 @@ When we run
 
     fitness_value = fitness_calculator.get_fitness_value(some_molecule)
 
-Our ``fitness_value`` is a class:`tuple` of the form
+Our ``fitness_value`` is a :class:`tuple` of the form
 ``(num_rotatable_bonds, complexity, num_bad_rings)``. This is a good
 start, but our fitness value must be a single number. We can achieve
 this by defining a :class:`.FitnessNormalizer`.
@@ -138,13 +138,17 @@ new fitness values. When a :class:`.FitnessNormalizer` assigns a
 new fitness value to a molecule, its fitness value depends both
 on the molecule itself, and, if desired, the fitness values of all
 other molecules in the population. For example, :class:`.DivideByMean`
-is a  :class:`.FitnessNormalizer`, which first calculates the mean
-fitness value in the entire population and the then replaces
-the fitness value of each molecule in the population with its
-original value, divided by the mean value.
+is a  :class:`.FitnessNormalizer`, which assigns new fitness values
+according to the formula
 
+.. code-block::
 
-It is quite common to want to do multiple fitness normalization in
+    new_fitness_value = old_fitness_values / mean_fitness_value
+
+In order to calculate ``mean_fitness_value``, we have to be able to
+consider all the fitness values in the population.
+
+It is quite common to want to do multiple fitness normalizations in
 sequence, and for this there is :class:`.NormalizerSequence`.
 :class:`.NormalizerSequence` is a compound :class:`.FitnessNormalizer`.
 This means it is initialized with other fitness normalizers, and
@@ -159,15 +163,15 @@ of each fitness value in the population we could define
     fitness_normalizer = stk.NormalizerSequence(
         fitness_normalizers=(
             stk.DivideByMean(),
-            stk.Power(1),
+            stk.Power(-1),
         ),
     )
 
 
 For the EA in this example, we want to perform a couple of
-normalization steps, recall that the initial fitness values has the
+normalization steps, recall that the initial fitness values have the
 form  ``(num_rotatable_bonds, complexity, num_bad_rings)``.
-First, we wil use :class:`.DivideByMean`, which in cases where
+First, we will use :class:`.DivideByMean`, which in cases where
 the fitness value is a :class:`tuple`, divides each member of the
 :class:`tuple` by its own mean. This means the number of rotatable
 bonds of each molecule is divided by the mean number of rotatable
@@ -175,13 +179,13 @@ bonds in the population, the complexity of each molecule is
 divided by the mean complexity in the population and so on.
 After using :class:`.DivideByMean`, each fitness value
 is still a :class:`tuple`, but the value for each component is scaled
-related to the population average. This scaling is important,
+by the population average. This scaling is important,
 because normally the different properties of a molecule have
 very different orders of magnitude, which makes them very hard to
 combine reasonably into a single value. However, scaling by
 the population average removes differences in orders of magnitude,
 and also removes the units of each quantity. This means they can
-be safely combined by something like a sum, for example. Our
+be safely combined by something like a sum. Our
 initial fitness normalizer therefore looks like this
 
 .. code-block:: python
@@ -195,7 +199,7 @@ initial fitness normalizer therefore looks like this
 However, you might notice an issue here. We are dividing by the
 mean, but the property values we are using, such as
 the number of bad rings or number of rotatable bonds have values
-which are allowed to be zero. This means that its quite possible for
+which are allowed to be zero. This means that it's quite possible for
 the population mean to be zero. If the population mean is zero
 and we divide by zero - we will have a problem. We can prevent this
 by adding ``1`` to every element of the :class:`tuple` before
@@ -211,9 +215,9 @@ using :class:`.DivideByMean`
         ),
     )
 
-:class:`.Add` is a fitness normalizer, which add a number to
+:class:`.Add` is a fitness normalizer, which adds a number to
 every fitness value. The number can be a :class:`tuple` of
-numbers, if a our fitness value has that shape.
+numbers, if a our fitness value is also a :class:`tuple`.
 
 
 Next, we can multiply each component of the :class:`tuple` by a
@@ -231,9 +235,9 @@ different amount to the final fitness value
     )
 
 In our example, we do not actually have to use :class:`.Multiply`,
-because all the coefficients are set to ``1``. However if we wanted
+because all the coefficients are set to ``1``. However, if we wanted
 the number of bad rings to contribute twice as much to the final
-fitness value as the number of rotatable bonds we would have used
+fitness value as the other properties, we would have used
 
 .. code-block:: python
 
@@ -258,10 +262,10 @@ fitness value. We can do this by taking a sum
 :class:`.Sum` is a :class:`.FitnessNormalizer`, which assumes that
 each fitness value in the population is a :class:`tuple`. It then
 replaces the fitness value with the sum of all elements of the
-:lass:`tuple`, to get the new fitness value.
+:class:`tuple`, to get the new fitness value.
 
-Finally, we recognize that all the elements of the :class:`tuple`
-number of rotatable bonds, complexity and the number of bad rings,
+Finally, we recognize that all the elements of the :class:`tuple`,
+the number of rotatable bonds, complexity and the number of bad rings,
 indicate a *low* fitness value. This means our final fitness value
 should be the inverse of the sum, because as these values grow bigger,
 our fitness value should become smaller
@@ -334,10 +338,10 @@ database automatically
 
 The `input_database` is a database that :class:`.PropertyVector`
 will check before calculating a fitness value. If a fitness value for
-a molecule already exists in the `input_database` already exists, it
+a molecule already exists in the `input_database`, it
 will return the value from the database and not recalculate it. The
 `output_database` is a database that the :class:`.PropertyVector` will
-placed the returned fitness value into. By using the same database
+place any returned fitness value into. By using the same database
 for both the `input_database` and `output_database`, our
 :class:`.PropertyVector` will deposit and retrieve values from it,
 avoiding recalculations where possible.
@@ -375,10 +379,10 @@ selections we want to plot.
 We don't have to assign a :class:`.SelectionPlotter` to a variable,
 we just have to create the instance, and it will make plots of which
 molecules were selected in each :meth:`~.Selector.select` call.
-This is an example example graph, showing a which molecules were
+This is an example graph, showing which molecules were
 selected for mutation
 
-.. image::
+.. image:: https://i.imgur.com/rx8qayL.png
 
 
 You will get a new graph written for every :meth:`~.Selector.select`
@@ -699,3 +703,30 @@ basic tutorial, we get our final version
 
     if __name__ == '__main__':
         main()
+
+
+Here is a plot of how the fitness value change across generations
+
+
+.. image:: https://i.imgur.com/IMoMF4n.png
+
+
+and here is the change in the number of rotatable bonds
+
+.. image:: https://i.imgur.com/pWVMB14.png
+
+
+We can see that our EA was pretty good lowering the number the number
+of rotatable bonds, without us having to resort to any magic numbers
+in our fitness function.
+
+Finally, we can compare the initial population
+
+.. image:: https://i.imgur.com/0px3bL0.png
+
+to the final population
+
+.. image:: https://i.imgur.com/wYHHUBP.png
+
+Once again, we can see that the complexity of the molecules in the
+final generation is reduce, when compared to the intial population.
