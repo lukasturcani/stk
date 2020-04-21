@@ -729,4 +729,4 @@ to the final population
 .. image:: https://i.imgur.com/wYHHUBP.png
 
 Once again, we can see that the complexity of the molecules in the
-final generation is reduce, when compared to the intial population.
+final generation is reduced, when compared to the initial population.
