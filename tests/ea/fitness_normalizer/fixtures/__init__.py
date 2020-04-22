@@ -6,3 +6,4 @@ from .shift_up import *
 from .sum import *
 from .add import *
 from .power import *
+from .sequence import *
