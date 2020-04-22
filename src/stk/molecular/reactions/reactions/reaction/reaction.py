@@ -68,6 +68,11 @@ class Reaction:
 
     """
 
+    # Keep empty __init__() to override ugly default docstring.
+    def __init__(self):
+        """"""
+        return
+
     def get_result(self):
         """
         Get the result of carrying out the reaction.

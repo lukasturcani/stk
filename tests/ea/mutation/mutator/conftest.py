@@ -10,6 +10,7 @@ from .fixtures import *  # noqa
         lazy_fixture('random_building_block'),
         lazy_fixture('random_topology_graph'),
         lazy_fixture('similar_building_block'),
+        lazy_fixture('random_mutator'),
     ),
 )
 def case_data(request):

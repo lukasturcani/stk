@@ -76,7 +76,7 @@ class FunctionalGroupFactory:
 
     Examples
     --------
-    *Usage*
+    *Using a Single Functional Group From a Factory*
 
     You have a building block with two functional groups, but you want
     to use just one.
@@ -87,12 +87,14 @@ class FunctionalGroupFactory:
 
         amino_factory = stk.PrimaryAminoFactory()
         building_block = stk.BuildingBlock('NCCN')
-        amino_group = next(
-            amino_factory.get_functional_groups(building_block)
+        amino_group, = amino_factory.get_functional_groups(
+            molecule=building_block,
         )
         building_block = building_block.with_functional_groups(
             functional_groups=(amino_group, ),
         )
+
+    *Using a Subset of Functional Groups From a Factory*
 
     You have multiple functional groups, but you want the building
     block to use a specific subset.

@@ -34,7 +34,7 @@ class MoleculeKeyMaker:
     :mod:`molecule_key_maker <.key_makers.molecule>`, can
     serve as good examples.
 
-    *Usage*
+    *Creating a New Key Maker Directly*
 
     Apart from using the subclasses provided, a
     :class:`.MoleculeKeyMaker` can be used directly , if you don't

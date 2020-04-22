@@ -38,6 +38,11 @@ class ReactionFactory:
 
     """
 
+    # Keep empty __init__() to override ugly default docstring.
+    def __init__(self):
+        """"""
+        return
+
     def get_reaction(self, construction_state, edge_group):
         """
         Get a reaction to use on the `edge_group`.

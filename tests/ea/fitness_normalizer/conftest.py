@@ -7,10 +7,13 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
+        lazy_fixture('add'),
         lazy_fixture('divide_by_mean'),
         lazy_fixture('multiply'),
         lazy_fixture('null'),
+        lazy_fixture('power'),
         lazy_fixture('replace_fitness'),
+        lazy_fixture('sequence'),
         lazy_fixture('shift_up'),
         lazy_fixture('sum'),
     ),
