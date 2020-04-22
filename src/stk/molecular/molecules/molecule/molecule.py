@@ -836,7 +836,9 @@ class Molecule:
         atom_ids : :class:`iterable` of :class:`int`, optional
             The atom ids of atoms to write. Can be a single
             :class:`int`, if a single atom is to be used, or
-            ``None``, if all atoms are to be used.
+            ``None``, if all atoms are to be used. If you use this
+            parameter, the atom ids in the file may not correspond to
+            the atom ids in the molecule.
 
         Returns
         -------

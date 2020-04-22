@@ -50,9 +50,9 @@ def _to_mdl_mol_block(self, atom_ids=None):
 
     atom_lines = []
     # This set gets used by bonds.
-    atom_ids = {}
-    for new_atom_id, old_atom_id in enumerate(sorted(atom_ids), 1):
-        atom_ids[old_atom_id] = new_atom_id
+    id_map = {}
+    for new_atom_id, old_atom_id in enumerate(atom_ids, 1):
+        id_map[old_atom_id] = new_atom_id
 
         x, y, z = self._position_matrix[:, old_atom_id]
         atom = self._atoms[old_atom_id]
@@ -69,11 +69,11 @@ def _to_mdl_mol_block(self, atom_ids=None):
     for bond in self._bonds:
         a1 = bond.get_atom1().get_id()
         a2 = bond.get_atom2().get_id()
-        if a1 in atom_ids and a2 in atom_ids:
+        if a1 in id_map and a2 in id_map:
             bond_lines.append(
                 f'M  V30 {len(bond_lines)+1} '
                 f'{int(bond.get_order())} '
-                f'{atom_ids[a1]} {atom_ids[a2]}\n'
+                f'{id_map[a1]} {id_map[a2]}\n'
             )
 
     num_bonds = len(bond_lines)
@@ -84,7 +84,7 @@ def _to_mdl_mol_block(self, atom_ids=None):
         '\n'
         '  0  0  0  0  0  0  0  0  0  0999 V3000\n'
         'M  V30 BEGIN CTAB\n'
-        f'M  V30 COUNTS {len(atom_ids)} {num_bonds} 0 0 0\n'
+        f'M  V30 COUNTS {len(id_map)} {num_bonds} 0 0 0\n'
         'M  V30 BEGIN ATOM\n'
         f'{atom_block}'
         'M  V30 END ATOM\n'
