@@ -17,8 +17,15 @@ topology_graph = stk.polymer.Linear(
         CaseData(
             fitness_normalizer=stk.NormalizerSequence(
                 fitness_normalizers=(
-                    stk.Multiply((1, 2, 4)),
-                    stk.Sum(),
+                    stk.Multiply(
+                        coefficient=(1, 2, 4),
+                        filter=lambda population, record:
+                            record.get_fitness_value() is not None,
+                    ),
+                    stk.Sum(
+                        filter=lambda population, record:
+                            record.get_fitness_value() is not None,
+                    ),
                 ),
             ),
             population=(
@@ -36,13 +43,13 @@ topology_graph = stk.polymer.Linear(
             normalized=(
                 stk.MoleculeRecord(
                     topology_graph=topology_graph,
-                ).with_fitness_value((4, 20, 4)),
+                ).with_fitness_value(28),
                 stk.MoleculeRecord(
                     topology_graph=topology_graph,
-                ).with_fitness_value((9, 40, 8)),
+                ).with_fitness_value(57),
                 stk.MoleculeRecord(
                     topology_graph=topology_graph,
-                ).with_fitness_value((16, 60, 16)),
+                ).with_fitness_value(92),
                 stk.MoleculeRecord(topology_graph),
             ),
         ),

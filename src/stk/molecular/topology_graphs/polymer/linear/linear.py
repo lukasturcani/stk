@@ -35,7 +35,9 @@ class Linear(TopologyGraph):
             ),
         )
 
-    However, building blocks with a single functional group can
+    *Construction with Capping Units*
+
+    Building blocks with a single functional group can
     also be provided as capping units
 
     .. code-block:: python
@@ -49,26 +51,7 @@ class Linear(TopologyGraph):
             ),
         )
 
-    The repeating unit can also be specified through the indices of
-    the building blocks
-
-    .. code-block:: python
-
-        # p1 and p2 are different ways to write the same thing.
-        p1 = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(bb1, bb2, bb3),
-                repeating_unit='ACB',
-                num_repeating_units=1,
-            ),
-        )
-        p2 = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(bb1, bb2, bb3),
-                repeating_unit=(0, 2, 1),
-                num_repeating_units=1,
-            ),
-        )
+    *Defining the Orientation of Each Building Block*
 
     The `orientations` parameter allows the direction of each building
     block along to the chain to be flipped
@@ -146,6 +129,29 @@ class Linear(TopologyGraph):
             random_seed=4,
         )
         p9 = stk.ConstructedMolecule(chain4)
+
+    *Using Numbers to Define Repeating Unit*
+
+    The repeating unit can also be specified through the indices of
+    the building blocks
+
+    .. code-block:: python
+
+        # p1 and p2 are different ways to write the same thing.
+        p1 = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit='ACB',
+                num_repeating_units=1,
+            ),
+        )
+        p2 = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit=(0, 2, 1),
+                num_repeating_units=1,
+            ),
+        )
 
     """
 
