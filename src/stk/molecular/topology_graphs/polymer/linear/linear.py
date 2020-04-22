@@ -130,7 +130,7 @@ class Linear(TopologyGraph):
         )
         p9 = stk.ConstructedMolecule(chain4)
 
-    *Using Numbers to Define Repeating Unit*
+    *Using Numbers to Define the Repeating Unit*
 
     The repeating unit can also be specified through the indices of
     the building blocks

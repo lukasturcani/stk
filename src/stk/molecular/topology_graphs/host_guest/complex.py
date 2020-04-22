@@ -41,6 +41,8 @@ class Complex(TopologyGraph):
             ),
         )
 
+    *Changing the Position of the Guest*
+
     You can change the position and orientation of the guest, as well
     as its displacement
 
