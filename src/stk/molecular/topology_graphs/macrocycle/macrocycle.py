@@ -38,30 +38,7 @@ class Macrocycle(TopologyGraph):
             ),
         )
 
-    The repeating unit can also be specified through the indices of
-    the building blocks
-
-    .. code-block:: python
-
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
-        bb3 = stk.BuildingBlock('BrCNNCBr', [stk.BromoFactory()])
-
-        # c1 and c2 are different ways to write the same thing.
-        c1 = stk.ConstructedMolecule(
-            topology_graph=stk.macrocycle.Macrocycle(
-                building_blocks=(bb1, bb2, bb3),
-                repeating_unit='ACB',
-                num_repeating_units=3
-            )
-        )
-        c2 = stk.ConstructedMolecule(
-            topology_graph=stk.macrocycle.Macrocycle(
-                building_blocks=(bb1, bb2, bb3),
-                repeating_unit=(0, 2, 1),
-                num_repeating_units=3,
-            )
-        )
+    *Defining the Orientation of Each Building Block*
 
     The `orientations` parameter allows the direction of each building
     block along to the chain to be flipped
@@ -139,6 +116,33 @@ class Macrocycle(TopologyGraph):
             random_seed=4,
         )
         c9 = stk.ConstructedMolecule(cycle4)
+
+    *Using Numbers to Define the Repeating Unit*
+
+    The repeating unit can also be specified through the indices of
+    the building blocks
+
+    .. code-block:: python
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+        bb3 = stk.BuildingBlock('BrCNNCBr', [stk.BromoFactory()])
+
+        # c1 and c2 are different ways to write the same thing.
+        c1 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit='ACB',
+                num_repeating_units=3
+            )
+        )
+        c2 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit=(0, 2, 1),
+                num_repeating_units=3,
+            )
+        )
 
     """
 

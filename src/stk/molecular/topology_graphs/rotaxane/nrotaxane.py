@@ -61,36 +61,7 @@ class NRotaxane(TopologyGraph):
             ),
         )
 
-    The repeating unit can also be specified through the indices of
-    the building blocks
-
-    .. code-block:: python
-
-        # r1 and r2 are different ways to write the same thing.
-        r1 = stk.ConstructedMolecule(
-            topology_graph=stk.rotaxane.NRotaxane(
-                axle=stk.BuildingBlock.init_from_molecule(axle),
-                cycles=(
-                    stk.BuildingBlock.init_from_molecule(cycle),
-                    stk.BuildingBlock.init_from_molecule(cycle2),
-                    stk.BuildingBlock.init_from_molecule(cycle3),
-                ),
-                repeating_unit='ACB',
-                num_repeating_units=3,
-            ),
-        )
-        r2 = stk.ConstructedMolecule(
-            topology_graph=stk.rotaxane.NRotaxane(
-                axle=stk.BuildingBlock.init_from_molecule(axle),
-                cycles=(
-                    stk.BuildingBlock.init_from_molecule(cycle),
-                    stk.BuildingBlock.init_from_molecule(cycle2),
-                    stk.BuildingBlock.init_from_molecule(cycle3),
-                ),
-                repeating_unit=(0, 2, 1),
-                num_repeating_units=3,
-            ),
-        )
+    *Defining the Orientation of Each Building Block*
 
     The `orientations` parameter allows the direction of each cycle
     along the axle to be flipped
@@ -186,6 +157,39 @@ class NRotaxane(TopologyGraph):
             random_seed=4,
         )
         p9 = stk.ConstructedMolecule(rotaxane4)
+
+    *Using Numbers to Define the Repeating Unit*
+
+    The repeating unit can also be specified through the indices of
+    the building blocks
+
+    .. code-block:: python
+
+        # r1 and r2 are different ways to write the same thing.
+        r1 = stk.ConstructedMolecule(
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle2),
+                    stk.BuildingBlock.init_from_molecule(cycle3),
+                ),
+                repeating_unit='ACB',
+                num_repeating_units=3,
+            ),
+        )
+        r2 = stk.ConstructedMolecule(
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle2),
+                    stk.BuildingBlock.init_from_molecule(cycle3),
+                ),
+                repeating_unit=(0, 2, 1),
+                num_repeating_units=3,
+            ),
+        )
 
     """
 
