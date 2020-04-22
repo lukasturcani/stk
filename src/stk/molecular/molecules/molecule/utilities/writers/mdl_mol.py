@@ -50,37 +50,30 @@ def _to_mdl_mol_block(self, atom_ids=None):
 
     atom_lines = []
     # This set gets used by bonds.
-    atoms = set()
-    for i, atom_id in enumerate(atom_ids, 1):
-        atoms.add(atom_id)
+    atom_ids = {}
+    for new_atom_id, old_atom_id in enumerate(sorted(atom_ids), 1):
+        atom_ids[old_atom_id] = new_atom_id
 
-        x, y, z = self._position_matrix[:, atom_id]
-        atom = self._atoms[atom_id]
+        x, y, z = self._position_matrix[:, old_atom_id]
+        atom = self._atoms[old_atom_id]
         symbol = atom.__class__.__name__
         charge = atom.get_charge()
         charge = f' CHG={charge}' if charge else ''
         atom_lines.append(
-            'M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n'.format(
-                atom_id+1, symbol, x, y, z, charge
-            )
+            f'M  V30 {new_atom_id} {symbol} {x:.4f} '
+            f'{y:.4f} {z:.4f} 0{charge}\n'
         )
     atom_block = ''.join(atom_lines)
-    num_atoms = i
 
     bond_lines = []
-    for bond_idx, bond in enumerate(self._bonds):
+    for bond in self._bonds:
         a1 = bond.get_atom1().get_id()
         a2 = bond.get_atom2().get_id()
-        if a1 in atoms and a2 in atoms:
-            # Keep bond ids if all bonds are getting written.
-            if num_atoms == len(self._atoms):
-                bond_id = bond_idx
-            else:
-                bond_id = len(bond_lines)
-
+        if a1 in atom_ids and a2 in atom_ids:
             bond_lines.append(
-                f'M  V30 {bond_id+1} '
-                f'{int(bond.get_order())} {a1+1} {a2+1}\n'
+                f'M  V30 {len(bond_lines)+1} '
+                f'{int(bond.get_order())} '
+                f'{atom_ids[a1]} {atom_ids[a2]}\n'
             )
 
     num_bonds = len(bond_lines)
@@ -91,7 +84,7 @@ def _to_mdl_mol_block(self, atom_ids=None):
         '\n'
         '  0  0  0  0  0  0  0  0  0  0999 V3000\n'
         'M  V30 BEGIN CTAB\n'
-        f'M  V30 COUNTS {num_atoms} {num_bonds} 0 0 0\n'
+        f'M  V30 COUNTS {len(atom_ids)} {num_bonds} 0 0 0\n'
         'M  V30 BEGIN ATOM\n'
         f'{atom_block}'
         'M  V30 END ATOM\n'
