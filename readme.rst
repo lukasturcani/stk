@@ -13,7 +13,8 @@ Overview
 ========
 
 ``stk`` is a Python library which allows the construction,
-manipulation, and automatic design of molecules.
+manipulation, and automatic design of molecules, as well as the
+creation of molecular and molecular property databases.
 
 Installation
 ============
