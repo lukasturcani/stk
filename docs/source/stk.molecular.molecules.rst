@@ -6,6 +6,13 @@ stk.molecular.molecules package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+
+   stk.molecular.molecules.molecule
+
 Submodules
 ----------
 
@@ -13,4 +20,3 @@ Submodules
 
    stk.molecular.molecules.building_block
    stk.molecular.molecules.constructed_molecule
-   stk.molecular.molecules.molecule

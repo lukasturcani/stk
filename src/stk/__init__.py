@@ -1,6 +1,7 @@
 from .utilities import *
 from .molecular import *
-from .calculators import *
-from .populations import *
+from .serialization import *
+from .databases import *
+from .ea import *
 
-__version__ = '2019.12.20.0'
+__version__ = '2020.04.23.0'

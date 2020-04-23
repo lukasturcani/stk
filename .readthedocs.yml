@@ -1,14 +1,8 @@
 version: 2
 
-conda:
-  environment: docs/environment.yml
-
 sphinx:
-  configuration: docs/source/conf.py
-
-formats: all
+    configuration: docs/source/conf.py
 
 python:
-  install:
-    - method: setuptools
-      path: .
+    install:
+        - requirements: docs/requirements.txt

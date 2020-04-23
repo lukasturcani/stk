@@ -3,15 +3,17 @@
 
 .. figure:: docs/source/figures/stk.png
 
-Requires Python 3.6+.
+.. image:: https://travis-ci.com/lukasturcani/stk.svg?branch=master
+    :target: https://travis-ci.com/github/lukasturcani/stk
+
+.. image:: https://readthedocs.org/projects/stk/badge/?version=latest
+    :target: https://stk.readthedocs.io
 
 Overview
 ========
 
 ``stk`` is a Python library which allows the construction,
 manipulation, property calculation and automatic design of molecules.
-
-Slack user group: https://t.co/LCPzWhvsVO
 
 Installation
 ============

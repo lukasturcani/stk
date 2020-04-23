@@ -8,10 +8,8 @@
    :caption: stk
    :maxdepth: 2
 
-   Introduction <introduction>
+   Construction Overview <construction_overview>
    Basic Examples <basic_examples>
-   Cookbook <cookbook>
-   Developer Guide <developer_guide>
 
 .. toctree::
    :hidden:
@@ -20,45 +18,55 @@
 
    Building Block <stk.molecular.molecules.building_block>
    Constructed Molecule <stk.molecular.molecules.constructed_molecule>
-   Functional Groups <stk.molecular.functional_groups>
-   Populations <stk.populations>
+   Functional Groups <stk.molecular.functional_groups.functional_groups.functional_group>
+   Functional Group Factories <stk.molecular.functional_groups.factories.functional_group_factory>
+   Key Makers <stk.molecular.key_makers.molecule>
+   Reactions <stk.molecular.reactions.reactions.reaction.reaction>
+   Reaction Factories <stk.molecular.reactions.factories.reaction_factory>
 
 .. toctree::
    :hidden:
    :caption: Topology Graphs
    :maxdepth: 2
 
-   Polymer <stk.molecular.topology_graphs.polymer>
-   Organic Cage <stk.molecular.topology_graphs.cage.base>
-   Covalent Organic Framework <stk.molecular.topology_graphs.cof>
-   Host Guest Complex <stk.molecular.topology_graphs.host_guest>
-   Macrocycle <stk.molecular.topology_graphs.macrocycle>
-   Rotaxane <stk.molecular.topology_graphs.rotaxane>
-   Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph>
+   Polymer <polymer>
+   Organic Cage <stk.molecular.topology_graphs.cage.cage>
+   Covalent Organic Framework <stk.molecular.topology_graphs.cof.cof>
+   Host Guest Complex <stk.molecular.topology_graphs.host_guest.complex>
+   Macrocycle <stk.molecular.topology_graphs.macrocycle.macrocycle>
+   [n]Rotaxane <stk.molecular.topology_graphs.rotaxane.nrotaxane>
+   Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph.topology_graph.topology_graph>
 
 .. toctree::
    :hidden:
-   :caption: Calculators
+   :caption: Molecular Databases
    :maxdepth: 2
 
-   Introduction <calculators>
-   Optimizers <stk.calculators.optimization.optimizers>
-   Energy Calculators <stk.calculators.energy.energy_calculators>
-   Compound Calculators <stk.calculators.compound>
+    Molecule <stk.databases.molecule>
+    Constructed Molecule <stk.databases.constructed_molecule>
+    Value <stk.databases.value>
 
 .. toctree::
    :hidden:
    :caption: Evolutionary Algorithm
    :maxdepth: 2
 
-   Introduction <ea>
-   Fitness Calculators <stk.calculators.ea.fitness_calculators>
-   Fitness Normalizers <stk.calculators.ea.fitness_normalizers>
-   Selection <stk.calculators.ea.selectors>
-   Mutation <stk.calculators.ea.mutators>
-   Crossover <stk.calculators.ea.crossers>
-   Termination <stk.calculators.ea.terminators>
-   Plotting <stk.calculators.ea.plotters>
+   Overview <stk.ea.evolutionary_algorithm.evolutionary_algorithm>
+   Basic Example <basic_ea_example>
+   Intermediate Example <intermediate_ea_example>
+   Fitness Calculators <stk.ea.fitness_calculators.fitness_calculator>
+   Fitness Normalizers <stk.ea.fitness_normalizers.fitness_normalizer>
+   Selection <stk.ea.selection.selectors.selector>
+   Mutation <mutation>
+   Crossover <crossover>
+   Plotting <plotters>
+
+.. toctree::
+   :hidden:
+   :caption: Developer Guide
+   :maxdepth: 2
+
+   Software Architecture <software_architecture>
 
 
 ============
@@ -67,13 +75,11 @@ Introduction
 
 GitHub: https://www.github.com/lukasturcani/stk
 
-Slack: https://t.co/LCPzWhvsVO
-
 
 Installation
 ------------
 
-To get ``stk``, you can install it with pip::
+To get :mod:`.stk`, you can install it with pip::
 
     $ pip install stk
 
@@ -85,242 +91,122 @@ Make sure you also install :mod:`rdkit`, which is a dependency::
 Overview
 --------
 
-``stk`` is a Python library which allows the construction,
-manipulation, property calculation and automatic design of molecules.
+Molecular Construction
+......................
 
-For quick navigation through the modules of ``stk``, use
-:ref:`modindex`.
+:mod:`.stk` provides tools for constructing a variety of molecular
+structures, including organic cages, covalent organic frameworks,
+polymers and macrocycles, among others. While additional molecular
+structures are always being added, :mod:`stk` provides tools which
+allow users to easily specify new kinds of molecular structures,
+no matter how simple or complex, in case something they want to build
+is not built-in. :mod:`stk` also makes it easy to specify which isomer
+of a given structure should be built.
 
-Among other things, ``stk`` allows you to construct molecules like this
+Here is a preview of some of the more complex structures
+:mod:`stk` can construct
 
-.. image:: https://i.imgur.com/HI5cciM.png
-
-and many others.
-
-The key idea behind ``stk`` is that the construction of a molecule can
-be broken down into two fundamental pieces of information, its
-building blocks and its topology graph. The building blocks of a
-molecule are molecules, or molecular fragments, which are used for
-construction. The smallest possible building block is a single atom
-and constructed molecules can become the building blocks of other
-constructed molecules. The topology graph is an abstract representation
-of a constructed molecule. The nodes of the graph represent the
-positions of the building blocks and the edges of the graph represent
-which building blocks have bonds formed between them during
-construction.
-
-To use ``stk`` you only have to choose which building blocks and
-topology graph you wish to use and ``stk`` will take care of everything
-else, take for example the construction of a linear polymer
-
-.. code-block:: python
-
-    import stk
-
-    polymer = stk.ConstructedMolecule(
-        building_blocks=[
-            stk.BuildingBlock('BrCCBr', ['bromine']),
-            stk.BuildingBlock('BrCNCBr', ['bromine'])
-        ],
-        topology_graph=stk.polymer.Linear(
-            repeating_unit='ABBBA',
-            num_repeating_units=2
-        )
-    )
-    # You can write the molecule to a file if you want to view it.
-    polymer.write('polymer.mol')
-
-which will produce
-
-.. image:: https://i.imgur.com/XmKRRun.png
-
-
-Because the topology graph is an idealized representation of the
-constructed molecule, the bonds formed during construction often have
-unrealistic lengths. This means that constructed molecules will need to
-undergo structure optimization. There is no single correct way to go
-about this, because the appropriate methodology for structure
-optimization will depend various factors, such as the nature of the
-constructed molecule, the desired accuracy and time constraints.
-``stk`` provides objects called optimizers, which provide a simple
-and consistent interface to different optimization methodologies, and
-can act as an API for external chemistry software. Alternatively,
-``stk`` allows you to write constructed molecules in common chemical
-file formats, which can be used as input for computational chemistry
-software, if you wish to do this manually.
-
-.. figure:: https://i.imgur.com/UlCnTj9.png
-    :align: center
-
-    The general construction workflow of ``stk``.
-
-The abstraction provided by the topology graph has a number of
-powerful benefits. Firstly, because every vertex is responsible for the
-placement of a building block, it is extremely easy to construct
-different structural isomers of the constructed molecule. The vertex
-can be told to perform different transformations on the building block,
-so that its orientation in the constructed molecule changes. For the
-end user, selecting the transformation and therefore structural isomer
-is relatively easy. Take the example of an organic cage, which can be
-constructed with the following code
-
-.. code-block:: python
-
-    # Create the building blocks.
-    bb1 = stk.BuildingBlock('O=CC(C=O)C(Cl)C=O', ['aldehyde'])
-    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', ['aldehyde'])
-    bb3 = stk.BuildingBlock('NCC(Cl)N', ['amine'])
-    bb4 = stk.BuildingBlock('NCCN', ['amine'])
-
-    # Create the topology graph.
-    tetrahedron = stk.cage.FourPlusSix()
-
-    # Because there are multiple building blocks with the same
-    # number of functional groups, they need to be explicitly
-    # placed on vertices, as there are multiple valid combinations.
-    building_block_vertices = {
-        bb1: tetrahedron.vertices[:1],
-        bb2: tetrahedron.vertices[1:4],
-        bb3: tetrahedron.vertices[4:5],
-        bb4: tetrahedron.vertices[5:]
-    }
-
-    # Create the molecule.
-    cage = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2, bb3, bb4],
-        topology_graph=tetrahedron,
-        building_block_vertices=building_block_vertices
-    )
-    # You can write the molecule to a file if you want to view it.
-    cage.write('cage.mol')
-
-and looks like this
-
-.. figure:: https://i.imgur.com/MAFrzAl.png
-
-
-You can see that the green atoms on adjacent building blocks
-point toward the different edges. However, by specifying a different
-edge to align with, the building block will be rotated
-
-.. code-block:: python
-
-    # Vertex 0 gets aligned to the third edge it's connected to.
-    isomer_graph = stk.cage.FourPlusSix(vertex_alignments={0: 2})
-    building_block_vertices = {
-        bb1: isomer_graph.vertices[:1],
-        bb2: isomer_graph.vertices[1:4],
-        bb3: isomer_graph.vertices[4:5],
-        bb4: isomer_graph.vertices[5:]
-    }
-    isomer = stk.ConstructedMolecule(
-        building_blocks=[bb1, bb2, bb3, bb4],
-        topology_graph=tetrahedron,
-        building_block_vertices=building_block_vertices
-    )
-    isomer.write('cage_isomer.mol')
-
-.. figure:: https://i.imgur.com/cg9n69u.png
-
-
-The same thing can be done to any other building block on the cage to
-perform a rotation on it. You can also write a loop, to create all the
-structural isomers of a single cage in one swoop
-
-.. code-block:: python
-
-    import itertools as it
-
-    edges = (
-        range(len(v.edges)) for v in stk.cage.FourPlusSix.vertex_data
-    )
-    # Create 5184 structural isomers.
-    isomers = []
-    for i, aligners in enumerate(it.product(*edges)):
-        tetrahedron = stk.cage.FourPlusSix(
-            vertex_alignments={
-                vertex.id: edge
-                for vertex, edge
-                in zip(stk.cage.FourPlusSix.vertex_data, aligners)
-            }
-        )
-        isomer = stk.ConstructedMolecule(
-            building_blocks=[bb1, bb2, bb3, bb4],
-            topology_graph=tetrahedron,
-            building_block_vertices={
-                bb1: tetrahedron.vertices[:1],
-                bb2: tetrahedron.vertices[1:4],
-                bb3: tetrahedron.vertices[4:5],
-                bb4: tetrahedron.vertices[5:]
-            }
-        )
-        isomers.append(isomer)
-
-
-The second major benefit of the topology graph is that the vertices and
-edges can hold additional state useful for the construction of a
-molecule. An example of this is in the construction of different
-structural isomers, but another can be seen in the construction of
-periodic systems. For example, ``stk`` allows you to construct
-covalent organic frameworks. With the topology graph this is trivial
-to implement, simply label some of the edges a periodic and they
-will construct periodic bonds instead of regular ones.
-
-The third benefit of the topology graph is that it allows users to
-easily modify the construction of molecules by placing different
-building blocks on different vertices. The user can use the
-*building_block_vertices* parameter with any topology graph.
-
-The fourth benefit of the topology graph is that the construction of
-a molecule is broken down into a independent steps. Each vertex
-represents a single, independent operation on a building block while
-each edge represents a single, independent operation on a collection
-of building blocks. As a result, each vertex and edge represents a
-single operation, which can be executed in parallel. This allows
-``stk`` to scale efficiently to large topology graphs and take
-advantage of multiple cores even during the construction of a single
-molecule.
-
-Property Calculation
---------------------
-
-``stk`` provides a number calculators to carry out property
-calculations. When these are not sufficient, ``stk`` molecules can
-be converted to and from :mod:`rdkit` molecules, which provides
-additional property calculation and cheminformatics facilities.
-
-Working With Multiple Molecules
--------------------------------
-
-It is often the case that the construction and property calculation
-needs to be performed on molecules in bulk and in parallel. For this,
-``stk`` provides the :class:`.Population`, which is a specialized
-container providing these facilities.
+.. image:: https://i.imgur.com/PvkfoGs.jpg
 
 Automatic Molecular Design
---------------------------
+..........................
 
-To perform automatic design, ``stk`` includes an evolutionary
-algorithm, which can make use of the construction facilities in
-``stk`` but is not required to.
+:mod:`.stk` provides an evolutionary algorithm, which can be used for
+discovery of new molecules, which have properties desired by the user.
+This evolutionary algorithm works with any molecule :mod:`stk` can
+construct, even those defined by users.
+
+Databases
+.........
+
+:mod:`.stk` provides tools for the creation of molecular databases,
+and storage of molecular property values. :mod:`stk` comes with
+support for the creation of MongoDB databases, which can be used to
+store molecules constructed by users, or discovered by the
+evolutionary algorithm. In addition, property values calculated for
+those molecules can also be stored and retrieved from the database.
+
+Usable Defaults
+...............
+
+A goal of :mod:`.stk` is to provide simple interfaces and require
+minimal information from users to achieve basic and common tasks,
+but also allow extensive customization and extension in
+order to fulfill complex requirements.
+
+Extensibility and Customization
+...............................
+
+Every part of :mod:`.stk` can be extended and customized in user
+code, and every user-made extension is indistinguishable from
+natively implemented features. This means users can use
+:mod:`.stk` to construct new classes of molecules, add new
+kinds of molecular databases, and add or customize evolutionary
+algorithm operations, all
+without looking at :mod:`.stk` source code. All such extensions will
+work with the rest of :mod:`.stk` as though they were part of the
+library itself.
+
+Documentation and Examples
+..........................
+
+Every use-case and extension or customization of :mod:`.stk` has
+documentation and examples which will guide users.
+:mod:`.stk` is built around abstract base classes, which means
+all user extensions to :mod:`.stk` involve creating a new class and
+defining, usually, a single method.
+
+
+Future Releases
+---------------
+
+:mod:`.stk` is under active development. Important features in the
+future will include:
+
+Molecular Database Visualization
+................................
+
+Currently :mod:`stk` allows users to store molecules in a database.
+However, a current goal is to develop an app which can be used to
+visually inspect and browse the molecules in the database. This should
+help multi-member research groups, where a computational scientist
+is responsible for suggesting molecules for synthesis, while an
+experimentalist actually has to make them. By providing an app to
+inspect the database, all collaborators can examine the currently
+deposited molecules in real-time.
+
+Distributed Evolutionary Algorithms
+...................................
+
+Evolutionary algorithms are very simple to parallelize. It's just a
+matter of calculating each fitness value on a separate CPU core.
+However, this idea can be taken further. Instead of calculating the
+fitness function on a separate CPU core, calculate it on a separate
+computer. :mod:`stk` will support fitness functions, which instead
+of calculating the fitness value locally, send the molecule over the
+internet to a server, so that the server is responsible for calculating
+the fitness value, which it then sends back to the client. You will
+be able to keep adding servers as your computational requirements
+increase, and the load will be distributed fairly between them.
+This will allow continuous horizontal scaling of :mod:`stk`
+evolutionary algorithms.
 
 What Next?
 ----------
 
-A good thing to look at are some `basic examples`_, which will allow
-you to get a feel for ``stk``. Further examples of molecular
-construction can be seen by looking at the different topology graphs.
-The documentation of the various topology graph classes in ``stk``
-also contains usage
-examples. More advanced examples can be seen in the `cookbook`_ and
-if you want to experiment with automated molecular design you can look
-into how to write an input file for the evolutionary algorithm. If
-``stk`` does not have a topology graph for a molecule you would like to
-construct, you can always implement a new one yourself. Alternatively,
-if you would like to request an extension to
-``stk``, or you have any other question about ``stk``, feel free to
-message me on your favourite platform or file an issue on GitHub.
+Something you might like to do first, is look at the
+`construction overview`_, which can give you a picture of how
+:mod:`stk` goes about constructing molecules. It will also introduce
+you to the basic concepts and types found within :mod:`stk`. Next, the
+`basic examples`_, will allow
+you to get a feel for how to use :mod:`stk`. After that, examples of
+molecular construction can be seen by looking at the documentation of
+the different topology graphs. In general, you will find examples on
+how to use a class, in that classes documentation.
+Once you are comfortable with construction, you can start looking at
+how to deposit and retrieve the molecules from databases. Finally,
+:mod:`stk` provides multiple examples on how to use its evolutionary
+algorithm.
 
-
+.. _`construction overview`: construction_overview.html
 .. _`basic examples`: basic_examples.html
-.. _`cookbook`: cookbook.html

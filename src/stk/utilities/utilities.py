@@ -795,7 +795,7 @@ def remake(mol):
 
 
 def orthogonal_vector(vector):
-    ortho = [0, 0, 0]
+    ortho = np.array([0., 0., 0.])
     for m, val in enumerate(vector):
         if not np.allclose(val, 0, atol=1e-8):
             n = (m+1) % 3
@@ -871,7 +871,8 @@ def rotation_matrix_arbitrary_axis(angle, axis):
 
     axis : :class:`numpy.ndarray`
         A 3 element aray which represents a vector. The vector is the
-        axis about which the rotation is carried out.
+        axis about which the rotation is carried out. Must be of
+        unit magnitude.
 
     Returns
     -------
@@ -879,8 +880,6 @@ def rotation_matrix_arbitrary_axis(angle, axis):
         A ``3x3`` array representing a rotation matrix.
 
     """
-
-    axis = normalize_vector(axis)
 
     a = np.cos(angle/2)
     b, c, d = axis * np.sin(angle/2)
@@ -1061,10 +1060,13 @@ def vector_angle(vector1, vector2):
 
     """
 
+    if np.all(np.equal(vector1, vector2)):
+        return 0.
+
     numerator = np.dot(vector1, vector2)
-    denominator = (np.linalg.norm(vector1) * np.linalg.norm(vector2))
+    denominator = np.linalg.norm(vector1) * np.linalg.norm(vector2)
     # This if statement prevents returns of NaN due to floating point
-    # incurracy.
+    # inaccuracy.
     term = numerator/denominator
     if term >= 1.:
         return 0.0
@@ -1554,3 +1556,18 @@ class XTBExtractor:
                     frequencies.append(freq)
 
         self.frequencies = [float(i) for i in frequencies]
+
+
+def get_acute_vector(reference, vector):
+    if (
+        # vector_angle is NaN if reference is [0, 0, 0].
+        not np.allclose(reference, [0, 0, 0], atol=1e-5)
+        and vector_angle(vector, reference) > np.pi/2
+    ):
+        return vector * -1
+    return vector
+
+
+def get_plane_normal(points):
+    centroid = points.sum(axis=0) / len(points)
+    return np.linalg.svd(points - centroid)[-1][2, :]

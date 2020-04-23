@@ -18,6 +18,37 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
+import sys
+from unittest.mock import MagicMock
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+
+MOCK_MODULES = [
+    'rdkit',
+    'rdkit.Chem',
+    'rdkit.Chem.AllChem',
+    'rdkit.Geometry',
+    'numpy',
+    'numpy.linalg',
+    'scipy',
+    'scipy.spatial',
+    'scipy.spatial.distance',
+    'scipy.optimize',
+    'scipy.sparse',
+    'scipy.constants',
+    'matplotlib',
+    'matplotlib.pyplot',
+    'pandas',
+    'pathos',
+    'seaborn',
+]
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -101,7 +132,9 @@ html_theme = 'sphinx_rtd_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'collapse_navigation': False,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
