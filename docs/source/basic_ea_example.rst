@@ -83,7 +83,7 @@ Adding a Database
 -----------------
 
 See Also
-    :ref:`database_example`
+    :ref:`placing-and-retrieving-molecules-from-a-database`
 
 
 
