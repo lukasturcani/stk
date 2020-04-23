@@ -4,4 +4,4 @@ from .serialization import *
 from .databases import *
 from .ea import *
 
-__version__ = '2020.04.23.0'
+__version__ = '2020.04.23.1'
