@@ -1,3 +1,6 @@
+Compound Crossers
+=================
+
 .. toctree::
    :maxdepth: 2
 
