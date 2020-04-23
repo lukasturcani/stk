@@ -1,3 +1,9 @@
+"""
+Normalizer Sequence
+===================
+
+"""
+
 from .fitness_normalizer import FitnessNormalizer
 
 
