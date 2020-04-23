@@ -32,6 +32,11 @@ customize the algorithm. We will need to use a
 #. :class:`.FitnessCalculator` - Used to calculate the fitness value
    of molecules.
 
+An important class in our EA is also the :class:`.MoleculeRecord`.
+The :class:`.MoleculeRecord` holds a molecule being considered by the
+EA, as well as additional relevant information, such as its fitness
+value.
+
 Basic EA Loop
 =============
 
