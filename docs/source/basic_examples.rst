@@ -189,7 +189,7 @@ and the :class:`.ConstructedMolecule`
 You can see what file formats are supported by reading the
 documentation for :meth:`~.Molecule.write`.
 
-.. database_example:
+.. _database_example:
 
 Placing and Retrieving Molecules From a Database
 ================================================

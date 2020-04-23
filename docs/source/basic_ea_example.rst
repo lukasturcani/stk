@@ -83,9 +83,7 @@ Adding a Database
 -----------------
 
 See Also
-........
-
-:ref:`.database_example`
+    :ref:`database_example`
 
 
 
