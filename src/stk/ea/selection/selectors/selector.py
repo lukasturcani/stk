@@ -8,7 +8,7 @@ Selector
     Above Average <stk.ea.selection.selectors.above_average>
     Best <stk.ea.selection.selectors.best>
     Filter Batches <stk.ea.selection.selectors.filter_batches>
-    Filter Molecule <stk.ea.selection.selectors.filter_molecules>
+    Filter Molecules <stk.ea.selection.selectors.filter_molecules>
     Remove Batches <stk.ea.selection.selectors.remove_batches>
     Remove Molecules <stk.ea.selection.selectors.remove_molecules>
     Roulette <stk.ea.selection.selectors.roulette>
