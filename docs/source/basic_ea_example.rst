@@ -85,7 +85,7 @@ Adding a Database
 See Also
 ........
 
-:ref:`database_example`
+:ref:`.database_example`
 
 
 
@@ -206,7 +206,7 @@ Defining EA Components
 ======================
 
 When defining EA components, there are two major questions that the
-user must answer
+user must answer:
 
 * What molecular properties do I want to optimize?
 * What kinds of molecular structures do I want to consider?
@@ -406,21 +406,29 @@ you want to use, for example
 
     mutator = stk.RandomMutator(
         mutators=(
+            # Substitutes a building block with a fluoro group with
+            # a random building block in fluoros.
             stk.RandomBuildingBlock(
                 building_blocks=fluoros,
                 is_replaceable=is_fluoro,
                 random_seed=generator.randint(0, 1000),
             ),
+            # Substitutes a building block with a fluoro group with
+            # a similar building block in fluoros.
             stk.SimilarBuildingBlock(
                 building_blocks=fluoros,
                 is_replaceable=is_fluoro,
                 random_seed=generator.randint(0, 1000),
             ),
+            # Substitutes a building block with a bromo group with
+            # a random building block in bromos.
             stk.RandomBuildingBlock(
                 building_blocks=bromos,
                 is_replaceable=is_bromo,
                 random_seed=generator.randint(0, 1000),
             ),
+            # Substitutes a building block with a bromo group with
+            # a similar building block in bromos.
             stk.SimilarBuildingBlock(
                 building_blocks=bromos,
                 is_replaceable=is_bromo,
