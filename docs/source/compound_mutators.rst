@@ -1,3 +1,6 @@
+Compound Mutators
+=================
+
 .. toctree::
    :maxdepth: 2
 
