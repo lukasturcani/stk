@@ -127,7 +127,7 @@ this by defining a :class:`.FitnessNormalizer`.
 Defining a Fitness Normalizer
 =============================
 
-Fitness normalization is process that runs after fitness calculation.
+Fitness normalization is a process that runs after fitness calculation.
 The basic idea, is that a :class:`.FitnessCalculator` takes as a
 parameter a single molecule and returns its fitness value. This
 fitness value will always be the same for the same molecule.
@@ -185,8 +185,8 @@ very different orders of magnitude, which makes them very hard to
 combine reasonably into a single value. However, scaling by
 the population average removes differences in orders of magnitude,
 and also removes the units of each quantity. This means they can
-be safely combined by something like a sum. Our
-initial fitness normalizer therefore looks like this
+be safely combined by something like a sum. Therefore, our
+initial fitness normalizer looks like this
 
 .. code-block:: python
 
@@ -311,11 +311,11 @@ We now return to our :class:`.FitnessCalculator`, recall
         ),
     )
 
-One of the improvements we want to make, is prevent the recalculation
-of fitness values, for molecules where a fitness value was already
-found. We can achieve this by storing calculated fitness values in a
-:class:`.ValueDatabase`, such as :class:`.ValueMongoDb`. By using
-the `input_database` and `output_database` parameters, our
+One of the improvements we want to make, is to prevent the
+recalculation of fitness values, for molecules where a fitness value
+was already found. We can achieve this by storing calculated fitness
+values in a :class:`.ValueDatabase`, such as :class:`.ValueMongoDb`. By
+using the `input_database` and `output_database` parameters, our
 :class:`.PropertyVector` will deposit and retrieve values from this
 database automatically
 
