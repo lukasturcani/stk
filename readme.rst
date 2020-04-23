@@ -3,6 +3,12 @@
 
 .. figure:: docs/source/figures/stk.png
 
+.. image:: https://travis-ci.com/lukasturcani/stk.svg?branch=master
+    :target: https://travis-ci.com/github/lukasturcani/stk
+
+.. image:: https://readthedocs.org/projects/stk/badge/?version=latest
+    :target: https://stk.readthedocs.io
+
 Overview
 ========
 
