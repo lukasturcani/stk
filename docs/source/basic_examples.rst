@@ -99,8 +99,8 @@ a :class:`.TopologyGraph`, which, in turn,  requires
         ),
     )
 
-Each topology graph requires different input parameters,
-for example, organic cage topology graphs only require the
+Each topology graph requires different input parameters.
+For example, organic cage topology graphs only require the
 :class:`.BuildingBlock` instances.
 
 .. code-block:: python
@@ -188,6 +188,8 @@ and the :class:`.ConstructedMolecule`
 
 You can see what file formats are supported by reading the
 documentation for :meth:`~.Molecule.write`.
+
+.. database_example:
 
 Placing and Retrieving Molecules From a Database
 ================================================

@@ -173,8 +173,7 @@ help multi-member research groups, where a computational scientist
 is responsible for suggesting molecules for synthesis, while an
 experimentalist actually has to make them. By providing an app to
 inspect the database, all collaborators can examine the currently
-deposited molecules in real-time, without the need to send emails all
-the time.
+deposited molecules in real-time.
 
 Distributed Evolutionary Algorithms
 ...................................

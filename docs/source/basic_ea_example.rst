@@ -5,11 +5,11 @@ Basic EA Example
 Introduction
 ============
 
-This tutorial will introduce you the basic components needed for
+This tutorial will introduce you to the basic components needed for
 building an EA with :mod:`stk`. You can see a basic outline of the
 EA in :class:`.EvolutionaryAlgorithm`.
 
-You can get all the code associated with the tutorial by running::
+You can get all the code associated with this tutorial by running::
 
     $ git clone https://github.com/lukasturcani/basic_ea
 
@@ -81,6 +81,13 @@ While this is a perfectly valid EA loop, we can make it a lot better.
 
 Adding a Database
 -----------------
+
+See Also
+........
+
+:ref:`database_example`
+
+
 
 One of the main things that will significantly improve our quality of
 life, is replacing our file writing, with a molecular database.
