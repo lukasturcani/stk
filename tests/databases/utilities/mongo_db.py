@@ -41,3 +41,9 @@ class MockMongoCollection:
                 return False
 
         return True
+
+    def index_information(self):
+        return {}
+
+    def create_index(self, index):
+        return
