@@ -194,6 +194,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         jsonizer=ConstructedMoleculeJsonizer(),
         dejsonizer=ConstructedMoleculeDejsonizer(),
         lru_cache_size=128,
+        indices=('InChIKey', ),
     ):
         """
         Initialize a :class:`.ConstructedMoleculeMongoDb`.
@@ -234,6 +235,10 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             the number of molecules which fit into the LRU cache. If
             ``None``, the cache size will be unlimited.
 
+        indices : :class:`tuple` of :class:`str`, optional
+            The names of molecule keys, on which an index should be
+            created, in order to minimize lookup time.
+
         """
 
         database = mongo_client[database]
@@ -247,6 +252,21 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         self._get = lru_cache(maxsize=lru_cache_size)(self._get)
         self._put = lru_cache(maxsize=lru_cache_size)(self._put)
+
+        for index in indices:
+            # Do not create the same index twice.
+            if f'{index}_1' not in self._molecules.index_information():
+                self._molecules.create_index(index)
+            if (
+                f'{index}_1'
+                not in self._constructed_molecules.index_information()
+            ):
+                self._constructed_molecules.create_index(index)
+            if (
+                f'{index}_1'
+                not in self._position_matrices.index_information()
+            ):
+                self._position_matrices.create_index(index)
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()

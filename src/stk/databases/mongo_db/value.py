@@ -74,6 +74,7 @@ class ValueMongoDb(ValueDatabase):
         database='stk',
         key_makers=(InchiKey(), ),
         lru_cache_size=128,
+        indices=('InChIKey', ),
     ):
         """
         Initialize a :class:`.ValueMongoDb` instance.
@@ -102,12 +103,21 @@ class ValueMongoDb(ValueDatabase):
             the number of values which fit into the LRU cache. If
             ``None``, the cache size will be unlimited.
 
+        indices : :class:`tuple` of :class:`str`, optional
+            The names of molecule keys, on which an index should be
+            created, in order to minimize lookup time.
+
         """
 
         self._values = mongo_client[database][collection]
         self._key_makers = key_makers
         self._put = lru_cache(maxsize=lru_cache_size)(self._put)
         self._get = lru_cache(maxsize=lru_cache_size)(self._get)
+
+        for index in indices:
+            # Do not create the same index twice.
+            if f'{index}_1' not in self._values.index_information():
+                self._values.create_index(index)
 
     def put(self, molecule, value):
         json = {'v': value}
