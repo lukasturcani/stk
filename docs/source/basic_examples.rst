@@ -80,7 +80,7 @@ a :class:`.TopologyGraph`, which, in turn,  requires
     # React the amine functional groups during construction.
     bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
     # React the aldehyde functional groups during construction.
-    bb2 = stk.BuildingBlock('O=CC(C=O)C=O', [stk.AldehydeFactory()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
     # Build a polymer.
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear(
