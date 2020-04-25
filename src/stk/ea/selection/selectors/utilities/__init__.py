@@ -1,1 +1,1 @@
-from .yielded_batches import *
+from .yielded_batches import *  # noqa
