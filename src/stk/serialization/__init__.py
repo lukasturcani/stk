@@ -1,1 +1,1 @@
-from .json import *
+from .json import *  # noqa

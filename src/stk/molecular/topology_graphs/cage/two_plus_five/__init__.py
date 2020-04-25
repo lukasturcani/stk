@@ -1,1 +1,1 @@
-from .twelve_plus_thirty import *
+from .twelve_plus_thirty import *  # noqa

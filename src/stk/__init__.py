@@ -1,7 +1,7 @@
-from .utilities import *
-from .molecular import *
-from .serialization import *
-from .databases import *
-from .ea import *
+from .utilities import *  # noqa
+from .molecular import *  # noqa
+from .serialization import *  # noqa
+from .databases import *  # noqa
+from .ea import *  # noqa
 
-__version__ = '2020.04.24.0'
+__version__ = '2020.04.25.0'

@@ -1,1 +1,1 @@
-from .record import *
+from .record import *  # noqa

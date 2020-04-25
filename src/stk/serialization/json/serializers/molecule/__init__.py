@@ -1,1 +1,1 @@
-from .molecule import MoleculeJsonizer
+from .molecule import MoleculeJsonizer  # noqa

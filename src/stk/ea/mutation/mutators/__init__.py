@@ -1,2 +1,2 @@
-from .molecule import *
-from .compound import *
+from .molecule import *  # noqa
+from .compound import *  # noqa

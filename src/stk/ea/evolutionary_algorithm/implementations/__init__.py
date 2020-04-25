@@ -1,2 +1,2 @@
-from .serial import Serial
-from .parallel import Parallel
+from .serial import Serial  # noqa
+from .parallel import Parallel  # noqa
