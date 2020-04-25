@@ -1,2 +1,2 @@
-from . import vertices
-from .macrocycle import *
+from . import vertices  # noqa
+from .macrocycle import *  # noqa

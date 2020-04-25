@@ -1,9 +1,9 @@
-from .crossover import *
-from .fitness_calculators import *
-from .mutation import *
-from .fitness_normalizers import *
-from .plotters import *
-from .selection import *
-from .generation import *
-from .evolutionary_algorithm import *
-from .molecule_records import *
+from .crossover import *  # noqa
+from .fitness_calculators import *  # noqa
+from .mutation import *  # noqa
+from .fitness_normalizers import *  # noqa
+from .plotters import *  # noqa
+from .selection import *  # noqa
+from .generation import *  # noqa
+from .evolutionary_algorithm import *  # noqa
+from .molecule_records import *  # noqa

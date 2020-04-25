@@ -1,1 +1,1 @@
-from .random import RandomMutator
+from .random import RandomMutator  # noqa

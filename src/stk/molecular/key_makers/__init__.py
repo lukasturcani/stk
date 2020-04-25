@@ -1,3 +1,3 @@
-from .molecule import *
-from .inchi import *
-from .inchi_key import *
+from .molecule import *  # noqa
+from .inchi import *  # noqa
+from .inchi_key import *  # noqa

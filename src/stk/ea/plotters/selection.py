@@ -164,8 +164,6 @@ class SelectionPlotter:
 
         self._plots += 1
         sns.set(style='darkgrid')
-        fig = plt.figure()
-
         df = pd.DataFrame()
         for record, selection_count in counter.items():
             label = self._record_label(record)

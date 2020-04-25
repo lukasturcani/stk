@@ -91,6 +91,11 @@ Make sure you also install :mod:`rdkit`, which is a dependency::
 Overview
 --------
 
+:mod:`stk` is a Python library which allows construction and
+manipulation of complex molecules, as well as automatic
+molecular design, and the creation of molecular, and molecular property,
+databases.
+
 Molecular Construction
 ......................
 

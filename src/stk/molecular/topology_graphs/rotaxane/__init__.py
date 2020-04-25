@@ -6,5 +6,5 @@ Rotaxane
 
 """
 
-from . import vertices
-from .nrotaxane import *
+from . import vertices  # noqa
+from .nrotaxane import *  # noqa
