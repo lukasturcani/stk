@@ -91,4 +91,3 @@ class BondInfo:
         """
 
         return self._building_block_id
-        return self._building_block_id
