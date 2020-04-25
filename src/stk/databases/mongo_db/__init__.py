@@ -1,3 +1,3 @@
-from .value import *
-from .molecule import *
-from .constructed_molecule import *
+from .value import *  # noqa
+from .molecule import *  # noqa
+from .constructed_molecule import *  # noqa

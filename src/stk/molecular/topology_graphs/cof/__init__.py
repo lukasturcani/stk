@@ -1,6 +1,6 @@
-from .hexagonal import *
-from .honeycomb import *
-from .kagome import *
-from .linkerless_honeycomb import *
-from .square import *
-from . import cof
+from .hexagonal import *  # noqa
+from .honeycomb import *  # noqa
+from .kagome import *  # noqa
+from .linkerless_honeycomb import *  # noqa
+from .square import *  # noqa
+from . import cof  # noqa

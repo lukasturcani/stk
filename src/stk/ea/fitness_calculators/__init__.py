@@ -1,3 +1,3 @@
-from .fitness_calculator import *
-from .fitness_function import *
-from .property_vector import *
+from .fitness_calculator import *  # noqa
+from .fitness_function import *  # noqa
+from .property_vector import *  # noqa

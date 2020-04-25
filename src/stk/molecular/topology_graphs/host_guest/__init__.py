@@ -1,2 +1,2 @@
-from . import vertices
-from .complex import *
+from . import vertices  # noqa
+from .complex import *  # noqa

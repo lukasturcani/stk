@@ -12,5 +12,5 @@ to its needs.
 
 """
 
-from .progress import *
-from .selection import *
+from .progress import *  # noqa
+from .selection import *  # noqa
