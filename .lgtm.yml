@@ -1,0 +1,3 @@
+queries:
+    - exclude: py/missing-call-to-init
+    - exclude: py/similar-function
