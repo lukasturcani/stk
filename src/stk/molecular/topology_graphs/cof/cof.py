@@ -340,11 +340,11 @@ class Cof(TopologyGraph):
         lattice = [
             [
                 [
-                    {} for k in zdim
+                    {} for _ in zdim
                 ]
-                for j in ydim
+                for _ in ydim
             ]
-            for i in xdim
+            for _ in xdim
         ]
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
