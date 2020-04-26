@@ -28,15 +28,6 @@ class MoleculeDejsonizer:
 
     """
 
-    # Keep this empty __init__() method for the docstring.
-    def __init__(self):
-        """
-        Initialize a :class`.MoleculeDejsonizer`.
-
-        """
-
-        return
-
     def from_json(self, json):
         """
         Get a :class:`.Molecule` from a JSON.

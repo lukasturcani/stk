@@ -126,11 +126,6 @@ class FunctionalGroupFactory:
 
     """
 
-    # Keep empty __init__() to override ugly default docstring.
-    def __init__(self):
-        """"""
-        return
-
     def get_functional_groups(self, molecule):
         """
         Yield functional groups in `molecule`.
