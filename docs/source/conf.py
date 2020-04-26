@@ -19,6 +19,7 @@
 #
 
 import sys
+import types
 from unittest.mock import MagicMock
 
 
@@ -71,6 +72,17 @@ autodoc_default_options = {
     'inherited-members': True,
     'show-inheritance': True,
 }
+
+
+def skip(app, what, name, obj, options):
+    # Skip init default Python init methods.
+    if '__init__' in name and not isinstance(obj, types.FunctionType):
+        return True
+
+
+def setup(app):
+    app.connect('autodoc-skip-member', skip)
+
 
 add_module_names = False
 # numpydoc_show_class_members = False
