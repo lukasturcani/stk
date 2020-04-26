@@ -74,10 +74,11 @@ autodoc_default_options = {
 }
 
 
-def skip(app, what, name, obj, options):
+def skip(app, what, name, obj, would_skip, options):
     # Skip init default Python init methods.
     if '__init__' in name and not isinstance(obj, types.FunctionType):
         return True
+    return would_skip
 
 
 def setup(app):
