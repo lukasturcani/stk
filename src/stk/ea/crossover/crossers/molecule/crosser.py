@@ -29,11 +29,6 @@ class MoleculeCrosser:
 
     """
 
-    # Keep empty __init__() to override ugly default docstring.
-    def __init__(self):
-        """"""
-        return
-
     def cross(self, records):
         """
         Cross `records`.
