@@ -19,6 +19,7 @@ from stk.utilities import (
     vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
+    _is_metal_atom
 )
 from .utilities import writers, updaters
 
@@ -721,10 +722,22 @@ class Molecule:
             mol.AddAtom(rdkit_atom)
 
         for bond in self._bonds:
+            if bond.is_dative():
+                bond_order = rdkit.BondType.DATIVE
+            else:
+                bond_order = rdkit.BondType(bond.get_order())
+            # Check atom ordering.
+            # Atom2 should be the metal atom.
+            if _is_metal_atom(bond.get_atom1()):
+                atom2_id = bond.get_atom1()
+                atom1_id = bond.get_atom2()
+            else:
+                atom1_id = bond.get_atom1()
+                atom2_id = bond.get_atom2()
             mol.AddBond(
-                beginAtomIdx=bond.get_atom1().get_id(),
-                endAtomIdx=bond.get_atom2().get_id(),
-                order=rdkit.BondType(bond.get_order())
+                beginAtomIdx=atom1_id,
+                endAtomIdx=atom2_id,
+                order=bond_order
             )
 
         mol = mol.GetMol()

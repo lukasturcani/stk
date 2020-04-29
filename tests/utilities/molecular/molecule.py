@@ -12,6 +12,7 @@ def is_equivalent_bond(bond1, bond2):
     assert bond1.__class__ is bond2.__class__
     assert bond1.get_order() == bond2.get_order()
     assert bond1.get_periodicity() == bond2.get_periodicity()
+    assert bond1.is_dative() == bond2.is_dative()
     is_equivalent_atom(bond1.get_atom1(), bond2.get_atom1())
     is_equivalent_atom(bond1.get_atom2(), bond2.get_atom2())
 

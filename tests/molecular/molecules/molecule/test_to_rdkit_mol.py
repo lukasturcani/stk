@@ -1,3 +1,6 @@
+from rdkit.AllChem import Chem as rdkit
+
+
 def test_to_rdkit_mol(molecule):
     """
     Test :meth:`.Molecule.to_rdkit_mol`.
@@ -30,3 +33,5 @@ def test_to_rdkit_mol(molecule):
             bond.get_atom1().get_id() == rdkit_bond.GetBeginAtomIdx()
         )
         assert bond.get_atom2().get_id() == rdkit_bond.GetEndAtomIdx()
+        if rdkit_bond.GetBondType() == rdkit.BondType.DATIVE:
+            assert bond.is_dative()
