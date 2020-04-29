@@ -14,8 +14,7 @@ from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bonds import Bond
 from .molecule import Molecule
-from ...utilities import remake, flatten
-from .utilities import _is_metal_atom
+from ...utilities import remake, flatten, is_metal_atom
 
 logger = logging.getLogger(__name__)
 
@@ -558,7 +557,7 @@ class BuildingBlock(Molecule):
         for b in molecule.GetBonds():
             # Check atom ordering.
             # Atom2 in stk should be the metal atom.
-            if _is_metal_atom(atoms[b.GetBeginAtomIdx()]):
+            if is_metal_atom(atoms[b.GetBeginAtomIdx()]):
                 atom2 = atoms[b.GetBeginAtomIdx()]
                 atom1 = atoms[b.GetEndAtomIdx()]
             else:
