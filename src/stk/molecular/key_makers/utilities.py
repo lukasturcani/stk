@@ -54,5 +54,5 @@ def get_smiles(molecule):
         The SMILES.
 
     """
-
-    return rdkit.MolToSmiles(molecule.to_rdkit_mol())
+    rdkit_mol = rdkit.RemoveHs(molecule.to_rdkit_mol())
+    return rdkit.MolToSmiles(rdkit_mol)
