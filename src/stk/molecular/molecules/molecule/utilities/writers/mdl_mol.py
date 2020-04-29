@@ -70,9 +70,13 @@ def _to_mdl_mol_block(self, atom_ids=None):
         a1 = bond.get_atom1().get_id()
         a2 = bond.get_atom2().get_id()
         if a1 in id_map and a2 in id_map:
+            if bond.is_dative():
+                bond_order = 9
+            else:
+                bond_order = int(bond.get_order())
             bond_lines.append(
                 f'M  V30 {len(bond_lines)+1} '
-                f'{int(bond.get_order())} '
+                f'{bond_order} '
                 f'{id_map[a1]} {id_map[a2]}\n'
             )
 
