@@ -7,7 +7,7 @@ from ..case_data import CaseData
 
 rdkit_molecule = rdkit.MolFromSmiles('Br[C+2][C+2]Br')
 rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
-dative_molecule = rdkit.MolFromSmiles('[Fe2+]<-N')
+dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
 dative_molecule.AddConformer(rdkit.Conformer(
     dative_molecule.GetNumAtoms())
 )
