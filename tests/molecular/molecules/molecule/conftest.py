@@ -4,10 +4,17 @@ import os
 from pytest_lazyfixture import lazy_fixture
 import stk
 import numpy as np
+import rdkit.Chem.AllChem as rdkit
 
 from .case_data import CaseData
 # Fixtures need to be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
+
+
+dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
+dative_molecule.AddConformer(rdkit.Conformer(
+    dative_molecule.GetNumAtoms())
+)
 
 
 @pytest.fixture(
@@ -55,6 +62,9 @@ from .fixtures import *  # noqa
                 repeating_unit='AB',
                 num_repeating_units=2,
             ),
+        ),
+        stk.BuildingBlock.init_from_rdkit_mol(
+            molecule=dative_molecule,
         ),
     ],
     scope='function',
