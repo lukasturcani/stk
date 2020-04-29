@@ -17,7 +17,7 @@ class Bond:
         atom2,
         order,
         periodicity=(0, 0, 0),
-        is_dative=False
+        is_dative=False,
     ):
         """
         Initialize a :class:`Bond`.
@@ -195,7 +195,7 @@ class Bond:
 
         """
 
-        return self._is_dative is True
+        return self._is_dative
 
     def __repr__(self):
         if isinstance(self._order, float) and self._order.is_integer():

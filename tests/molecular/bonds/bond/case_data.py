@@ -31,7 +31,7 @@ class CaseData:
         atom2,
         order,
         periodicity,
-        is_dative
+        is_dative,
     ):
         """
         Initialize a :class:`.CaseData` instance.
