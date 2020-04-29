@@ -302,5 +302,5 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         return self._dejsonizer.from_json({
             'molecule': json,
-            'matrix':  position_matrix,
+            'matrix': position_matrix,
         })

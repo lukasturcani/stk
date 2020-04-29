@@ -37,3 +37,22 @@ def get_inchi_key(molecule):
     """
 
     return rdkit.MolToInchiKey(molecule.to_rdkit_mol())
+
+
+def get_smiles(molecule):
+    """
+    Get the RDKit canonical, isomeric SMILES of `molecule`.
+
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule whose SMILES is required.
+
+    Returns
+    -------
+    :class:`str`
+        The SMILES.
+
+    """
+
+    return rdkit.MolToSmiles(molecule.to_rdkit_mol())

@@ -7,6 +7,7 @@ Molecule Key Maker
 
     InChI <stk.molecular.key_makers.inchi>
     InChIKey <stk.molecular.key_makers.inchi_key>
+    SMILES <stk.molecular.key_makers.smiles>
 
 """
 
@@ -106,9 +107,18 @@ class MoleculeKeyMaker:
         :class:`object`
             The key of `molecule`.
 
-        """
+        Raises
+        ------
+        :class:`ValueError`
+            If key of `molecule` is an empty string.
 
-        return self._get_key(molecule)
+        """
+        key = self._get_key(molecule)
+        if not key:
+            raise ValueError(
+                f'Key ({self._key_name}) of {molecule} is empty string'
+            )
+        return key
 
     def __str__(self):
         return repr(self)
