@@ -1,3 +1,6 @@
+
+from stk.utilities import _is_metal_atom
+
 def _write_mdl_mol_file(self, path, atom_ids):
     """
     Write to a V3000 ``.mol`` file.
@@ -67,8 +70,14 @@ def _to_mdl_mol_block(self, atom_ids=None):
 
     bond_lines = []
     for bond in self._bonds:
-        a1 = bond.get_atom1().get_id()
-        a2 = bond.get_atom2().get_id()
+        # Check atom ordering.
+        # Atom2 should be the metal atom.
+        if _is_metal_atom(bond.get_atom1()):
+            a2 = bond.get_atom1().get_id()
+            a1 = bond.get_atom2().get_id()
+        else:
+            a1 = bond.get_atom1().get_id()
+            a2 = bond.get_atom2().get_id()
         if a1 in id_map and a2 in id_map:
             if bond.is_dative():
                 bond_order = 9
