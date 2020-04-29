@@ -15,7 +15,7 @@ from ..atoms import Atom
 from ..bonds import Bond
 from .molecule import Molecule
 from ...utilities import remake, flatten
-
+from .utilities import _is_metal_atom
 
 logger = logging.getLogger(__name__)
 
@@ -554,31 +554,25 @@ class BuildingBlock(Molecule):
             for a in molecule.GetAtoms()
         )
 
-        # Metal atomic numbers.
-        metal_atomic_numbers = list(range(21, 31))
-        metal_atomic_numbers += list(range(39, 49))+list(range(72, 81))
-
         bonds = []
         for b in molecule.GetBonds():
-            atom1 = atoms[b.GetBeginAtomIdx()]
-            atom2 = atoms[b.GetEndAtomIdx()]
-            if b.GetBondType() == rdkit.BondType.DATIVE:
-                is_dative = True
-            elif atom1.get_atomic_number() in metal_atomic_numbers:
-                is_dative = True
-            elif atom2.get_atomic_number() in metal_atomic_numbers:
-                is_dative = True
+            # Check atom ordering.
+            # Atom2 in stk should be the metal atom.
+            if _is_metal_atom(atoms[b.GetBeginAtomIdx()]):
+                atom2 = atoms[b.GetBeginAtomIdx()]
+                atom1 = atoms[b.GetEndAtomIdx()]
             else:
-                is_dative = False
-            bonds.append(
-                Bond(
-                    atom1=atom1,
-                    atom2=atom2,
-                    order=b.GetBondTypeAsDouble(),
-                    is_dative=is_dative,
-                )
-            )
+                atom1 = atoms[b.GetBeginAtomIdx()]
+                atom2 = atoms[b.GetEndAtomIdx()]
+
+            bonds.append(Bond(
+                atom1=atom1,
+                atom2=atom2,
+                order=b.GetBondTypeAsDouble(),
+                is_dative=b.GetBondType() == rdkit.BondType.DATIVE,
+            ))
         bonds = tuple(bonds)
+
         position_matrix = molecule.GetConformer().GetPositions()
 
         super().__init__(atoms, bonds, position_matrix)
