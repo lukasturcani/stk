@@ -26,13 +26,15 @@ def _one_one_reaction(
     functional_group1,
     functional_group2,
     bond_order,
-    periodicity
+    periodicity,
+    is_dative,
 ):
     return OneOneReaction(
         functional_group1=functional_group1,
         functional_group2=functional_group2,
         bond_order=bond_order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
 
 
@@ -41,13 +43,15 @@ def _one_two_reaction(
     functional_group1,
     functional_group2,
     bond_order,
-    periodicity
+    periodicity,
+    is_dative,
 ):
     return OneTwoReaction(
         functional_group1=functional_group1,
         functional_group2=functional_group2,
         bond_order=bond_order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
 
 
@@ -56,7 +60,8 @@ def _two_two_reaction(
     functional_group1,
     functional_group2,
     bond_order,
-    periodicity
+    periodicity,
+    is_dative,
 ):
     return TwoTwoReaction(
         construction_state=construction_state,
@@ -64,6 +69,7 @@ def _two_two_reaction(
         functional_group2=functional_group2,
         bond_order=bond_order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
 
 
@@ -110,7 +116,7 @@ class GenericReactionFactory(ReactionFactory):
 
     """
 
-    def __init__(self, bond_orders=None):
+    def __init__(self, bond_orders=None, is_datives=None):
         """
         Initialize a :class:`.GenericReactionFactory`.
 
@@ -138,6 +144,22 @@ class GenericReactionFactory(ReactionFactory):
             an amine and an aldehyde functional group, the reaction
             will create bonds with a bond order of 2.
 
+        is_datives : :class:`dict`, optional
+            Maps a :class:`frozenset` of
+            :class:`.GenericFunctionalGroup` subclasses to the
+            flags of whether a bond is dative for their respective
+            reactions, if a pair of functional groups is missing, a
+            default is_dative of ``False`` will be used for their
+            reactions. If `is_datives` is ``None``, the following
+            :class:`dict` will be used
+
+            .. code-block:: python
+
+                is_datives = {}
+
+            This means that there are currently no reactions that
+            produce dative bonds defined in stk.
+
         """
 
         # Used for __repr__.
@@ -153,6 +175,15 @@ class GenericReactionFactory(ReactionFactory):
             }
 
         self._bond_orders = bond_orders
+
+        # Used for __repr__.
+        self._default_is_datives = is_datives is None
+
+        if is_datives is None:
+            # Empty until coordination functional groups are defined.
+            is_datives = {}
+
+        self._is_datives = is_datives
 
     def get_reaction(self, construction_state, edge_group):
         functional_groups = tuple(
@@ -173,6 +204,10 @@ class GenericReactionFactory(ReactionFactory):
                 1,
             ),
             periodicity=edge.get_periodicity(),
+            is_dative=self._is_datives.get(
+                self._get_is_dative_key(functional_groups),
+                False,
+            ),
         )
 
     def _get_bond_order_key(self, functional_groups):
@@ -196,6 +231,27 @@ class GenericReactionFactory(ReactionFactory):
 
         return frozenset(map(type, functional_groups))
 
+    def _get_is_dative_key(self, functional_groups):
+        """
+        Return a key for the :attr:`_is_dative`.
+
+        Parameters
+        ----------
+        functional_groups : :class:`iterable`
+            A :class:`iterable` of :class:`.GenericFunctionalGroup`
+            instances. You want to to get the bond order for a reaction
+            involving these instances.
+
+        Returns
+        -------
+        :class:`frozenset`
+            A key for :attr:`_is_dative`, which maps to the correct
+            dativity.
+
+        """
+
+        return frozenset(map(type, functional_groups))
+
     def __str__(self):
         return repr(self)
 
@@ -203,4 +259,10 @@ class GenericReactionFactory(ReactionFactory):
         bond_orders = (
             '' if self._default_bond_orders else f'{self._bond_orders}'
         )
-        return f'{self.__class__.__name__}({bond_orders})'
+
+        dativity = (
+            '' if self._default_is_datives
+            else ', contains dative bonds'
+        )
+
+        return f'{self.__class__.__name__}({bond_orders}{dativity})'

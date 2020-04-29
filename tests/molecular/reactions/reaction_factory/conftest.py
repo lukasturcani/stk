@@ -225,6 +225,18 @@ def bond_order(request):
 
 
 @pytest.fixture(
+    params=(True, False),
+)
+def is_dative(request):
+    """
+    Whether or not a bond created by a :class:`.Reaction` is dative.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
     params=(
         lazy_fixture('one_one_reaction'),
         lazy_fixture('one_two_reaction'),

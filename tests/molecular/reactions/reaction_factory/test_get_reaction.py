@@ -118,3 +118,4 @@ def is_same_bond(bond1, bond2):
         )
     )
     assert bond1.get_periodicity() == bond2.get_periodicity()
+    assert bond1.is_dative() == bond2.is_dative()

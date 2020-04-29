@@ -28,6 +28,7 @@ class TwoTwoReaction(Reaction):
         functional_group2,
         bond_order,
         periodicity,
+        is_dative,
     ):
         """
         Initialize a :class:`.TwoTwoReaction` instance.
@@ -49,6 +50,9 @@ class TwoTwoReaction(Reaction):
         periodicity : :class:`tuple` of :class:`int`
             The periodicity of the bonds created by the reaction.
 
+        is_dative : :class:`bool`
+            ``True`` if created bond is dative.
+
         """
 
         self._position_matrix = (
@@ -58,6 +62,7 @@ class TwoTwoReaction(Reaction):
         self._functional_group2 = functional_group2
         self._bond_order = bond_order
         self._periodicity = periodicity
+        self._is_dative = is_dative
 
     def _get_new_atoms(self):
         return
@@ -70,6 +75,7 @@ class TwoTwoReaction(Reaction):
                 atom2=bonder2,
                 order=self._bond_order,
                 periodicity=self._periodicity,
+                is_dative=self._is_dative,
             )
 
     def _get_bonder_pairs(self):

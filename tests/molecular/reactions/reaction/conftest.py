@@ -228,6 +228,18 @@ def bond_order(request):
 
 
 @pytest.fixture(
+    params=(True, False),
+)
+def is_dative(request):
+    """
+    Whether or not a bond made by a reaction is dative.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
     params=(
         (0, 0, 0),
         (0, -1, 0),

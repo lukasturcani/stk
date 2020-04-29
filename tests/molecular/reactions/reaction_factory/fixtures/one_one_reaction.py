@@ -23,8 +23,13 @@ def one_one_reaction(
     functional_group1,
     functional_group1_2,
     bond_order,
+    is_dative,
 ):
     bond_order_key = frozenset({
+        type(functional_group1),
+        type(functional_group1_2),
+    })
+    is_dative_key = frozenset({
         type(functional_group1),
         type(functional_group1_2),
     })
@@ -33,6 +38,9 @@ def one_one_reaction(
         factory=stk.GenericReactionFactory(
             bond_orders={
                 bond_order_key: bond_order,
+            },
+            is_datives={
+                is_dative_key: is_dative,
             },
         ),
         construction_state=MockConstructionState(
@@ -54,6 +62,7 @@ def one_one_reaction(
                 functional_group2=functional_group1_2,
                 order=bond_order,
                 periodicity=periodicity,
+                is_dative=is_dative,
             ),
             deleted_atoms=it.chain(
                 functional_group1.get_deleters(),
@@ -68,10 +77,12 @@ def get_new_bonds(
     functional_group2,
     order,
     periodicity,
+    is_dative
 ):
     yield stk.Bond(
         atom1=next(functional_group1.get_bonders()),
         atom2=next(functional_group2.get_bonders()),
         order=order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )

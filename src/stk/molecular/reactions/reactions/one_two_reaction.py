@@ -26,6 +26,7 @@ class OneTwoReaction(Reaction):
         functional_group2,
         bond_order,
         periodicity,
+        is_dative,
     ):
         """
         Initialize a :class:`.OneTwoReaction` instance.
@@ -44,12 +45,16 @@ class OneTwoReaction(Reaction):
         periodicity : :class:`tuple` of :class:`int`
             The periodicity of the bond created by the reaction.
 
+        is_dative : :class:`bool`
+            ``True`` if created bond is dative.
+
         """
 
         self._functional_group1 = functional_group1
         self._functional_group2 = functional_group2
         self._bond_order = bond_order
         self._periodicity = periodicity
+        self._is_dative = is_dative
 
     def _get_new_atoms(self):
         return
@@ -64,6 +69,7 @@ class OneTwoReaction(Reaction):
                 atom2=bonder2,
                 order=self._bond_order,
                 periodicity=self._periodicity,
+                is_dative=self._is_dative
             )
 
     def _get_deleted_atoms(self):

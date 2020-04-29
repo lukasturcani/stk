@@ -11,6 +11,7 @@ def one_two_reaction(
     functional_group2,
     bond_order,
     periodicity,
+    is_dative,
 ):
     """
     A :class:`.CaseData` instance.
@@ -23,6 +24,7 @@ def one_two_reaction(
             functional_group2=functional_group2,
             bond_order=bond_order,
             periodicity=periodicity,
+            is_dative=is_dative,
         ),
         new_atoms=(),
         new_bonds=tuple(
@@ -31,6 +33,7 @@ def one_two_reaction(
                 functional_group2=functional_group2,
                 bond_order=bond_order,
                 periodicity=periodicity,
+                is_dative=is_dative,
             ),
         ),
         deleted_atoms=tuple(it.chain(
@@ -45,6 +48,7 @@ def get_bonds(
     functional_group2,
     bond_order,
     periodicity,
+    is_dative,
 ):
     bonders1 = functional_group1.get_bonders()
     bonders2 = functional_group2.get_bonders()
@@ -54,4 +58,5 @@ def get_bonds(
             atom2=bonder2,
             order=bond_order,
             periodicity=periodicity,
+            is_dative=is_dative,
         )

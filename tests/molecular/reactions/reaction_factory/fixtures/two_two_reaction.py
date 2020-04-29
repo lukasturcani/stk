@@ -24,8 +24,13 @@ def two_two_reaction(
     functional_group2,
     functional_group2_2,
     bond_order,
+    is_dative,
 ):
     bond_order_key = frozenset({
+        type(functional_group2),
+        type(functional_group2_2),
+    })
+    is_dative_key = frozenset({
         type(functional_group2),
         type(functional_group2_2),
     })
@@ -38,6 +43,9 @@ def two_two_reaction(
         factory=stk.GenericReactionFactory(
             bond_orders={
                 bond_order_key: bond_order,
+            },
+            is_datives={
+                is_dative_key: is_dative,
             },
         ),
         construction_state=MockConstructionState(
@@ -60,6 +68,7 @@ def two_two_reaction(
                 functional_group2=functional_group2_2,
                 order=bond_order,
                 periodicity=periodicity,
+                is_dative=is_dative,
             ),
             deleted_atoms=it.chain(
                 functional_group2.get_deleters(),
@@ -74,6 +83,7 @@ def get_new_bonds(
     functional_group2,
     order,
     periodicity,
+    is_dative,
 ):
     bonder1, bonder2 = functional_group1.get_bonders()
     bonder3, bonder4 = functional_group2.get_bonders()
@@ -82,12 +92,14 @@ def get_new_bonds(
         atom2=bonder3,
         order=order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
     yield stk.Bond(
         atom1=bonder2,
         atom2=bonder4,
         order=order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
 
 

@@ -25,6 +25,7 @@ def two_two_reaction(
     functional_group2_2,
     bond_order,
     periodicity,
+    is_dative,
 ):
     """
     A :class:`.CaseData` instance.
@@ -41,6 +42,7 @@ def two_two_reaction(
             functional_group2=functional_group2,
             bond_order=bond_order,
             periodicity=periodicity,
+            is_dative=is_dative,
         ),
         new_atoms=(),
         new_bonds=tuple(
@@ -49,6 +51,7 @@ def two_two_reaction(
                 functional_group2=functional_group2,
                 bond_order=bond_order,
                 periodicity=periodicity,
+                is_dative=is_dative,
             ),
         ),
         deleted_atoms=tuple(it.chain(
@@ -63,6 +66,7 @@ def get_bonds(
     functional_group2,
     bond_order,
     periodicity,
+    is_dative,
 ):
     b1, b2 = functional_group1.get_bonders()
     b3, b4 = functional_group2.get_bonders()
@@ -71,6 +75,7 @@ def get_bonds(
         atom2=b3,
         order=bond_order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
 
     yield stk.Bond(
@@ -78,6 +83,7 @@ def get_bonds(
         atom2=b4,
         order=bond_order,
         periodicity=periodicity,
+        is_dative=is_dative,
     )
 
 
