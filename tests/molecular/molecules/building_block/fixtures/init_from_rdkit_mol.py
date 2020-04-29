@@ -7,6 +7,10 @@ from ..case_data import CaseData
 
 rdkit_molecule = rdkit.MolFromSmiles('Br[C+2][C+2]Br')
 rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
+dative_molecule = rdkit.MolFromSmiles('[Fe2+]<-N')
+dative_molecule.AddConformer(rdkit.Conformer(
+    dative_molecule.GetNumAtoms())
+)
 
 
 @pytest.fixture(
@@ -81,6 +85,14 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             functional_groups=(),
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
+        ),
+        CaseData(
+            building_block=stk.BuildingBlock.init_from_rdkit_mol(
+                molecule=dative_molecule,
+            ),
+            functional_groups=(),
+            core_atom_ids=(0, 1),
+            placer_ids=(0, 1),
         ),
     ),
 )

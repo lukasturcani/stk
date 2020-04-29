@@ -553,14 +553,32 @@ class BuildingBlock(Molecule):
             Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
             for a in molecule.GetAtoms()
         )
-        bonds = tuple(
-            Bond(
-                atom1=atoms[b.GetBeginAtomIdx()],
-                atom2=atoms[b.GetEndAtomIdx()],
-                order=b.GetBondTypeAsDouble(),
+
+        # Metal atomic numbers.
+        metal_atomic_numbers = list(range(21, 31))
+        metal_atomic_numbers += list(range(39, 49))+list(range(72, 81))
+
+        bonds = []
+        for b in molecule.GetBonds():
+            atom1 = atoms[b.GetBeginAtomIdx()]
+            atom2 = atoms[b.GetEndAtomIdx()]
+            if b.GetBondType() == rdkit.BondType.DATIVE:
+                is_dative = True
+            elif atom1.get_atomic_number() in metal_atomic_numbers:
+                is_dative = True
+            elif atom2.get_atomic_number() in metal_atomic_numbers:
+                is_dative = True
+            else:
+                is_dative = False
+            bonds.append(
+                Bond(
+                    atom1=atom1,
+                    atom2=atom2,
+                    order=b.GetBondTypeAsDouble(),
+                    is_dative=is_dative,
+                )
             )
-            for b in molecule.GetBonds()
-        )
+        bonds = tuple(bonds)
         position_matrix = molecule.GetConformer().GetPositions()
 
         super().__init__(atoms, bonds, position_matrix)
