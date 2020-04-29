@@ -17,7 +17,10 @@ def get_inchi(molecule):
 
     """
 
-    return rdkit.MolToInchi(molecule.to_rdkit_mol())
+    return rdkit.MolToInchi(
+        molecule.to_rdkit_mol(),
+        treatWarningAsError=True,
+    )
 
 
 def get_inchi_key(molecule):
@@ -36,7 +39,10 @@ def get_inchi_key(molecule):
 
     """
 
-    return rdkit.MolToInchiKey(molecule.to_rdkit_mol())
+    return rdkit.MolToInchiKey(
+        molecule.to_rdkit_mol(),
+        treatWarningAsError=True,
+    )
 
 
 def get_smiles(molecule):
