@@ -11,7 +11,7 @@ def to_bond(atoms, json):
         atom2=atoms[json[1]],
         order=json[2],
         periodicity=tuple(json[3]),
-        is_dative=tuple(json[4]),
+        is_dative=bool(json[4]),
     )
 
 
