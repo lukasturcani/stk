@@ -43,9 +43,7 @@ from ..case_data import CaseData
                 mongo_client=MockMongoClient(),
                 lru_cache_size=0,
                 jsonizer=stk.MoleculeJsonizer(
-                    key_makers=(
-                        stk.Smiles()
-                    ),
+                    key_makers=(stk.Smiles(),)
                 ),
             ),
             molecule=stk.BuildingBlock('BrBr'),

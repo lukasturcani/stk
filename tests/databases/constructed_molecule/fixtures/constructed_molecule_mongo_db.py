@@ -118,7 +118,7 @@ from ..case_data import CaseData
             database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=MockMongoClient(),
                 jsonizer=stk.ConstructedMoleculeJsonizer(
-                    key_makers=(stk.Smiles())
+                    key_makers=(stk.Smiles(),)
                 ),
                 lru_cache_size=128,
             ),
