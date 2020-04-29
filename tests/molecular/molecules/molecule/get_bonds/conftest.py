@@ -34,8 +34,8 @@ dative_molecule.AddConformer(rdkit.Conformer(
             ),
             bonds=(
                 stk.Bond(
-                    stk.Fe(0, charge=2),
                     stk.N(1),
+                    stk.Fe(0, charge=2),
                     1,
                     is_dative=True
                 ),

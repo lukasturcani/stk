@@ -450,7 +450,7 @@ def flatten(iterable, excluded_types=None):
             yield x
 
 
-def _is_metal_atom(atom):
+def is_metal_atom(atom):
     """
     Check if atom has atomic number of a metal atom.
     Parameters

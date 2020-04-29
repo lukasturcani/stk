@@ -1,4 +1,4 @@
-from rdkit.AllChem import Chem as rdkit
+from rdkit.Chem import AllChem as rdkit
 
 
 def test_to_rdkit_mol(molecule):
