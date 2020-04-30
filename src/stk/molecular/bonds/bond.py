@@ -42,8 +42,8 @@ class Bond:
             axis in the negative direction.
 
         is_dative : :class:`bool`, optional
-            ``True`` if bond is dative. A dative bond does not affect
-            the valency of atom2.
+            ``True`` if bond is dative. In a dative bond, `atom1`
+            donates electrons to `atom2`.
 
         """
 
