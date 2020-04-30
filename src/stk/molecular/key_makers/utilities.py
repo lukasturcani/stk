@@ -60,7 +60,7 @@ def get_smiles(molecule):
 
     rdkit_mol = rdkit.RemoveHs(molecule.to_rdkit_mol())
     return rdkit.MolToSmiles(
-        rdkit_mol,
+        mol=rdkit_mol,
         isomericSmiles=True,
         canonical=True,
     )
