@@ -114,28 +114,6 @@ from ..case_data import CaseData
             ),
             key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
         ),
-        CaseData(
-            database=stk.ConstructedMoleculeMongoDb(
-                mongo_client=MockMongoClient(),
-                jsonizer=stk.ConstructedMoleculeJsonizer(
-                    key_makers=(stk.Smiles(),)
-                ),
-                lru_cache_size=128,
-            ),
-            molecule=stk.ConstructedMolecule(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='Br[C+2][C+2]Br',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
-                    repeating_unit='A',
-                    num_repeating_units=2,
-                ),
-            ),
-            key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
-        ),
     ),
 )
 def constructed_molecule_mongo_db(request):

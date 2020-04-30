@@ -41,17 +41,6 @@ from ..case_data import CaseData
         CaseData(
             database=stk.MoleculeMongoDb(
                 mongo_client=MockMongoClient(),
-                lru_cache_size=0,
-                jsonizer=stk.MoleculeJsonizer(
-                    key_makers=(stk.Smiles(),)
-                ),
-            ),
-            molecule=stk.BuildingBlock('BrBr'),
-            key={'SMILES': 'BrBr'},
-        ),
-        CaseData(
-            database=stk.MoleculeMongoDb(
-                mongo_client=MockMongoClient(),
                 lru_cache_size=128,
                 jsonizer=stk.MoleculeJsonizer(
                     key_makers=(
