@@ -1,7 +1,12 @@
 import pytest
 import stk
+from rdkit.Chem import AllChem as rdkit
 
 from ..case_data import CaseData
+
+
+single_atom = rdkit.MolFromSmiles('N')
+single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
 
 
 @pytest.fixture(
@@ -384,6 +389,25 @@ from ..case_data import CaseData
                     bromine2=stk.Br(4),
                     bonders=(stk.C(1), stk.C(3)),
                     deleters=(stk.Br(2), stk.Br(4)),
+                ),
+            ),
+        ),
+
+        CaseData(
+            factory=stk.SingleAtomFactory(no_of_bonders=2),
+            molecule=stk.BuildingBlock.init_from_rdkit_mol(
+                single_atom
+            ),
+            functional_groups=(
+                stk.SingleAtom(
+                    atom=stk.N(0),
+                    bonders=(stk.N(0),),
+                    deleters=(),
+                ),
+                stk.SingleAtom(
+                    atom=stk.N(0),
+                    bonders=(stk.N(0),),
+                    deleters=(),
                 ),
             ),
         ),
