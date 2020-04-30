@@ -15,12 +15,7 @@ class SingleAtom(GenericFunctionalGroup):
 
     """
 
-    def __init__(
-        self,
-        atom,
-        bonders,
-        deleters,
-    ):
+    def __init__(self, atom):
         """
         Initialize a :class:`.SingleAtom` instance.
 
@@ -29,18 +24,13 @@ class SingleAtom(GenericFunctionalGroup):
         atom : :class:`.Atom`
             Any :class:`.Atom` will work.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
-
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
-
         """
 
         self._atom = atom
         atoms = (atom, )
+        bonders = (atom, )
 
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(atoms, bonders, ())
 
     def get_atom(self):
         """
@@ -71,7 +61,5 @@ class SingleAtom(GenericFunctionalGroup):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self._atom}, bonders={self._bonders}, '
-            f'deleters={self._deleters})'
+            f'{self.__class__.__name__}({self._atom})'
         )

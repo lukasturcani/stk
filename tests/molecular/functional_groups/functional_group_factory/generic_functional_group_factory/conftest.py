@@ -394,21 +394,13 @@ single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
         ),
 
         CaseData(
-            factory=stk.SingleAtomFactory(no_of_bonders=2),
+            factory=stk.SingleAtomFactory(num_functional_groups=2),
             molecule=stk.BuildingBlock.init_from_rdkit_mol(
                 single_atom
             ),
             functional_groups=(
-                stk.SingleAtom(
-                    atom=stk.N(0),
-                    bonders=(stk.N(0),),
-                    deleters=(),
-                ),
-                stk.SingleAtom(
-                    atom=stk.N(0),
-                    bonders=(stk.N(0),),
-                    deleters=(),
-                ),
+                stk.SingleAtom(atom=stk.N(0)),
+                stk.SingleAtom(atom=stk.N(0)),
             ),
         ),
     )

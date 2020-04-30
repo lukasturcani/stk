@@ -29,7 +29,9 @@ class SingleAtomFactory(FunctionalGroupFactory):
         atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
         metal_atom = stk.BuildingBlock.init_from_rdkit_mol(
             atom,
-            functional_groups=[stk.SingleAtomFactory(no_of_bonders=6)]
+            functional_groups=[stk.SingleAtomFactory(
+                num_functional_groups=6
+            )]
         )
 
     See Also
@@ -39,35 +41,21 @@ class SingleAtomFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(0, ), deleters=(), no_of_bonders=1):
+    def __init__(self, num_functional_groups=1):
         """
         Initialize a :class:`.SingleAtomFactory` instance.
 
         Parameters
         ----------
-        bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *bonder* atoms.
-
-        deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *deleter* atoms.
-
-        no_of_bonders : :class:`int`
+        num_functional_groups : :class:`int`
             The target number of functional groups to apply to the
             single atom.
 
         """
 
-        self._bonders = bonders
-        self._deleters = deleters
-        self._no_of_bonders = no_of_bonders
+        self._num_functional_groups = num_functional_groups
 
     def get_functional_groups(self, molecule):
-        for i in range(self._no_of_bonders):
+        for i in range(self._num_functional_groups):
             atoms = tuple(molecule.get_atoms((0)))
-            yield SingleAtom(
-                atom=atoms[0],
-                bonders=tuple(atoms[i] for i in self._bonders),
-                deleters=tuple(atoms[i] for i in self._deleters),
-            )
+            yield SingleAtom(atom=atoms[0])

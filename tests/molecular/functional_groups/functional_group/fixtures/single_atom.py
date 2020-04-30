@@ -11,15 +11,11 @@ def single_atom(get_atom_ids):
 
 
 def _single_atom(atom):
-    bonders = (atom, )
+    atoms = (atom, )
     deleters = ()
     return GenericCaseData(
-        functional_group=stk.SingleAtom(
-            atom=atom,
-            bonders=bonders,
-            deleters=deleters,
-        ),
-        atoms=(atom, ),
-        bonders=bonders,
+        functional_group=stk.SingleAtom(atom=atom),
+        atoms=atoms,
+        bonders=atoms,
         deleters=deleters,
     )
