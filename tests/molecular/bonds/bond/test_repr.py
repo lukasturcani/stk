@@ -23,4 +23,3 @@ def test_repr(bond):
     is_equivalent_atom(other.get_atom2(), bond.get_atom2())
     assert other.get_order() == bond.get_order()
     assert other.get_periodicity() == bond.get_periodicity()
-    assert other.is_dative() == bond.is_dative()

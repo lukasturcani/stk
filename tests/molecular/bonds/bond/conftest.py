@@ -94,30 +94,19 @@ def periodicity(x_periodicity, y_periodicity, z_periodicity):
     return x_periodicity, y_periodicity, z_periodicity
 
 
-@pytest.fixture(params=[True, False])
-def is_dative(request):
-    """
-    A possible bond dativity.
-
-    """
-
-    return request.param
-
-
 @pytest.fixture
-def case_data(atom1, atom2, order, periodicity, is_dative):
+def case_data(atom1, atom2, order, periodicity):
     """
     A :class:`.CaseData` instance.
 
     """
 
     return CaseData(
-        bond=stk.Bond(atom1, atom2, order, periodicity, is_dative),
+        bond=stk.Bond(atom1, atom2, order, periodicity),
         atom1=atom1,
         atom2=atom2,
         order=order,
         periodicity=periodicity,
-        is_dative=is_dative,
     )
 
 

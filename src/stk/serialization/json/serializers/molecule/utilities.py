@@ -41,5 +41,4 @@ def bond_to_json(bond):
         bond.get_atom2().get_id(),
         bond.get_order(),
         bond.get_periodicity(),
-        bond.is_dative(),
     )

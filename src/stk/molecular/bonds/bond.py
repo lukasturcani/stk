@@ -11,14 +11,7 @@ class Bond:
 
     """
 
-    def __init__(
-        self,
-        atom1,
-        atom2,
-        order,
-        periodicity=(0, 0, 0),
-        is_dative=False,
-    ):
+    def __init__(self, atom1, atom2, order, periodicity=(0, 0, 0)):
         """
         Initialize a :class:`Bond`.
 
@@ -41,17 +34,12 @@ class Bond:
             not periodic across the y axis and is periodic across the z
             axis in the negative direction.
 
-        is_dative : :class:`bool`, optional
-            ``True`` if bond is dative. A dative bond does not affect
-            the valency of `atom2`.
-
         """
 
         self._atom1 = atom1
         self._atom2 = atom2
         self._order = order
         self._periodicity = periodicity
-        self._is_dative = is_dative
 
     def get_atom1(self):
         """
@@ -184,19 +172,6 @@ class Bond:
 
         return any(direction != 0 for direction in self._periodicity)
 
-    def is_dative(self):
-        """
-        Return ``True`` if the bond is dative.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if the bond is dative.
-
-        """
-
-        return self._is_dative
-
     def __repr__(self):
         if isinstance(self._order, float) and self._order.is_integer():
             self._order = int(self._order)
@@ -207,16 +182,10 @@ class Bond:
             else ''
         )
 
-        dativity = (
-            f', is_dative={self._is_dative}'
-            if self.is_dative()
-            else ''
-        )
-
         cls_name = self.__class__.__name__
         return (
             f'{cls_name}({self._atom1!r}, {self._atom2!r}, '
-            f'{self._order}{periodicity}{dativity})'
+            f'{self._order}{periodicity})'
         )
 
     def __str__(self):
