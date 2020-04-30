@@ -58,7 +58,10 @@ def get_smiles(molecule):
 
     """
 
-    rdkit_mol = rdkit.RemoveHs(molecule.to_rdkit_mol())
+    rdkit_mol = molecule.to_rdkit_mol()
+    rdkit.AssignStereochemistryFrom3D(rdkit_mol)
+    rdkit.SanitizeMol(rdkit_mol)
+    rdkit_mol = rdkit.RemoveHs(rdkit_mol)
     return rdkit.MolToSmiles(
         mol=rdkit_mol,
         isomericSmiles=True,
