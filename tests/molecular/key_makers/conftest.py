@@ -31,6 +31,12 @@ from .case_data import CaseData
             key='NCCN',
         ),
         CaseData(
+            key_maker=stk.Smiles(),
+            molecule=stk.BuildingBlock('C[C@H](O)c1ccccc1'),
+            key_name='SMILES',
+            key='C[C@H](O)c1ccccc1',
+        ),
+        CaseData(
             key_maker=stk.MoleculeKeyMaker(
                 key_name='NumAtoms',
                 get_key=lambda molecule: molecule.get_num_atoms(),
