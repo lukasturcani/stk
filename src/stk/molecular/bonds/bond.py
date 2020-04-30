@@ -43,7 +43,7 @@ class Bond:
 
         is_dative : :class:`bool`, optional
             ``True`` if bond is dative. A dative bond does not affect
-            the valency of atom2.
+            the valency of `atom2`.
 
         """
 
