@@ -14,6 +14,8 @@ class InchiKey(MoleculeKeyMaker):
 
     Examples
     --------
+    *Adding InChIKey to a Molecule's JSON*
+
     You want to use the InChIKey as part of a JSON representation of a
     molecule
 

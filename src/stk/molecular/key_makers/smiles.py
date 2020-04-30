@@ -14,6 +14,8 @@ class Smiles(MoleculeKeyMaker):
 
     Examples
     --------
+    *Adding SMILES to a Molecule's JSON*
+
     You want to use the isomeric, canonical SMILES from RDKit as part
     of a JSON representation of a molecule
 
