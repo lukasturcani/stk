@@ -452,12 +452,12 @@ def flatten(iterable, excluded_types=None):
 
 def is_metal_atom(atom):
     """
-    Check if atom has atomic number of a metal atom.
+    Check if `atom` is a metal.
 
     Parameters
     ----------
     atom : :class:`.Atom`
-        An stk Atom.
+        An atom.
 
     Returns
     -------
@@ -466,11 +466,10 @@ def is_metal_atom(atom):
 
     """
 
-    # Metal atomic numbers.
     metal_atomic_numbers = set(chain(
-        list(range(21, 31)),
-        list(range(39, 49)),
-        list(range(72, 81))
+        range(21, 31),
+        range(39, 49),
+        range(72, 81)
     ))
 
     return atom.get_atomic_number() in metal_atomic_numbers

@@ -11,12 +11,6 @@ from .case_data import CaseData
 from .fixtures import *  # noqa
 
 
-dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
-dative_molecule.AddConformer(rdkit.Conformer(
-    dative_molecule.GetNumAtoms())
-)
-
-
 @pytest.fixture(
     params=[
         stk.BuildingBlock.init(
@@ -62,9 +56,6 @@ dative_molecule.AddConformer(rdkit.Conformer(
                 repeating_unit='AB',
                 num_repeating_units=2,
             ),
-        ),
-        stk.BuildingBlock.init_from_rdkit_mol(
-            molecule=dative_molecule,
         ),
     ],
     scope='function',

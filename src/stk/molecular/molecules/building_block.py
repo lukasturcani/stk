@@ -555,8 +555,8 @@ class BuildingBlock(Molecule):
 
         bonds = []
         for b in molecule.GetBonds():
-            # Check atom ordering.
-            # Atom2 in stk should be the metal atom.
+            # atom2 in stk should be the metal atom to maintain
+            # bond directionality.
             if is_metal_atom(atoms[b.GetBeginAtomIdx()]):
                 atom2 = atoms[b.GetBeginAtomIdx()]
                 atom1 = atoms[b.GetEndAtomIdx()]
