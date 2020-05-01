@@ -38,6 +38,9 @@ stk.molecular.functional_groups.factories.fluoro_factory\
     Iodo Factory <\
 stk.molecular.functional_groups.factories.iodo_factory\
 >
+    Metal Bound Atom Factory <\
+stk.molecular.functional_groups.factories.metal_bound_atom_factory\
+>
     Primary Amino Factory <\
 stk.molecular.functional_groups.factories.primary_amino_factory\
 >
