@@ -133,7 +133,7 @@ class GenericReactionFactory(ReactionFactory):
                     frozenset({stk.Amide, stk.Amine}): 2,
                     frozenset({stk.Alkene}): 2,
                     frozenset({stk.Alkyne}): 2,
-                    frozenset({stk.SingleAtom, stk.SingleAtom}): 9,
+                    frozenset({stk.SingleAtom}): 9,
                 }
 
             This means that if you want to get a reaction for
@@ -152,7 +152,7 @@ class GenericReactionFactory(ReactionFactory):
                 frozenset({Amide, PrimaryAmino}): 2,
                 frozenset({Alkene}): 2,
                 frozenset({Alkyne}): 2,
-                frozenset({SingleAtom, SingleAtom}): 9,
+                frozenset({SingleAtom}): 9,
             }
 
         self._bond_orders = bond_orders
