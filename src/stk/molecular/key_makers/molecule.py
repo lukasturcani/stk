@@ -107,18 +107,9 @@ class MoleculeKeyMaker:
         :class:`object`
             The key of `molecule`.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If key of `molecule` is an empty string.
-
         """
-        key = self._get_key(molecule)
-        if not key:
-            raise ValueError(
-                f'Key ({self._key_name}) of {molecule} is empty string'
-            )
-        return key
+
+        return self._get_key(molecule)
 
     def __str__(self):
         return repr(self)
