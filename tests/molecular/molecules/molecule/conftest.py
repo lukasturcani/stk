@@ -190,8 +190,8 @@ def get_atom_ids(request):
 
 
 dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
-dative_molecule.AddConformer(rdkit.Conformer(
-    dative_molecule.GetNumAtoms())
+dative_molecule.AddConformer(
+    conf=rdkit.Conformer(dative_molecule.GetNumAtoms()),
 )
 
 
