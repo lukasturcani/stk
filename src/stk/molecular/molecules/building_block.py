@@ -553,7 +553,6 @@ class BuildingBlock(Molecule):
             Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
             for a in molecule.GetAtoms()
         )
-
         bonds = tuple(
             Bond(
                 atom1=atoms[b.GetBeginAtomIdx()],
