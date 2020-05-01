@@ -557,7 +557,10 @@ class BuildingBlock(Molecule):
             Bond(
                 atom1=atoms[b.GetBeginAtomIdx()],
                 atom2=atoms[b.GetEndAtomIdx()],
-                order=b.GetBondTypeAsDouble(),
+                order=(
+                    9 if b.GetBondType() == rdkit.BondType.DATIVE 
+                    else b.GetBondTypeAsDouble()
+                )
             )
             for b in molecule.GetBonds()
         )
