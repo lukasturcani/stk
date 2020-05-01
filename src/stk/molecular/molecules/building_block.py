@@ -556,14 +556,13 @@ class BuildingBlock(Molecule):
 
         bonds = []
         for b in molecule.GetBonds():
-            if b.GetBondType() == rdkit.BondType.DATIVE:
-                order = 9
-            else:
-                order = b.GetBondTypeAsDouble()
             bonds.append(Bond(
                 atom1=atoms[b.GetBeginAtomIdx()],
                 atom2=atoms[b.GetEndAtomIdx()],
-                order=order,
+                order=(
+                    9 if b.GetBondType() == rdkit.BondType.DATIVE 
+                    else b.GetBondTypeAsDouble()
+                ),
             ))
 
         bonds = tuple(bonds)
