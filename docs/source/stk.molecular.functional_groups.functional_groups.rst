@@ -29,5 +29,6 @@ Submodules
    stk.molecular.functional_groups.functional_groups.primary_amino
    stk.molecular.functional_groups.functional_groups.ring_amine
    stk.molecular.functional_groups.functional_groups.secondary_amino
+   stk.molecular.functional_groups.functional_groups.single_atom
    stk.molecular.functional_groups.functional_groups.thioacid
    stk.molecular.functional_groups.functional_groups.thiol
