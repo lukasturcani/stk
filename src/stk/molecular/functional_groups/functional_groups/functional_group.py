@@ -42,6 +42,9 @@ stk.molecular.functional_groups.functional_groups.ring_amine\
     Secondary Amino <\
 stk.molecular.functional_groups.functional_groups.secondary_amino\
 >
+    Single Atom <\
+stk.molecular.functional_groups.functional_groups.single_atom\
+>
     Thioacid <\
 stk.molecular.functional_groups.functional_groups.thioacid\
 >
