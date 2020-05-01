@@ -98,7 +98,7 @@ from ..case_data import CaseData
                         ),
                     ),
                 ),
-                lru_cache_size=0,
+                lru_cache_size=128,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
