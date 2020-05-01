@@ -554,18 +554,16 @@ class BuildingBlock(Molecule):
             for a in molecule.GetAtoms()
         )
 
-        bonds = []
-        for b in molecule.GetBonds():
-            bonds.append(Bond(
+        bonds = tuple(
+            Bond(
                 atom1=atoms[b.GetBeginAtomIdx()],
                 atom2=atoms[b.GetEndAtomIdx()],
                 order=(
                     9 if b.GetBondType() == rdkit.BondType.DATIVE 
                     else b.GetBondTypeAsDouble()
-                ),
-            ))
-
-        bonds = tuple(bonds)
+            )
+            for b in molecule.GetBonds()
+        )
         position_matrix = molecule.GetConformer().GetPositions()
 
         super().__init__(atoms, bonds, position_matrix)
