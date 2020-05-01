@@ -33,7 +33,7 @@ class Smiles(MoleculeKeyMaker):
 
     def __init__(self):
         """
-        Initialize a :class:`Smiles` instance.
+        Initialize a :class:`.Smiles` instance.
 
         """
 
