@@ -560,6 +560,7 @@ class BuildingBlock(Molecule):
                 order=(
                     9 if b.GetBondType() == rdkit.BondType.DATIVE 
                     else b.GetBondTypeAsDouble()
+                )
             )
             for b in molecule.GetBonds()
         )
