@@ -9,6 +9,7 @@ from .fixtures import * # noqa
     params=(
         lazy_fixture('primary_amino'),
         lazy_fixture('secondary_amino'),
+        lazy_fixture('single_atom'),
         lazy_fixture('aldehyde'),
         lazy_fixture('carboxylic_acid'),
         lazy_fixture('amide'),

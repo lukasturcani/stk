@@ -16,5 +16,6 @@ from .iodo import *  # noqa
 from .primary_amino import *  # noqa
 from .ring_amine import *  # noqa
 from .secondary_amino import *  # noqa
+from .single_atom import *  # noqa
 from .thioacid import *  # noqa
 from .thiol import *  # noqa
