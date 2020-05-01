@@ -14,7 +14,7 @@ class MetalBoundAtomFactory(FunctionalGroupFactory):
     Creates :class:`.MetalBoundAtom` instances.
 
     Creates functional groups from substructures, which match the
-    ``[metal_smiles][atom_smiles]`` functional group string.
+    ``[metal]~[atom]`` functional group string.
 
     Examples
     --------
@@ -65,8 +65,8 @@ class MetalBoundAtomFactory(FunctionalGroupFactory):
             metal_centre,
             functional_groups=[
                 stk.MetalBoundAtomFactory(
-                    atom_smiles='[N]'
-                    metal_smiles='[Fe]',
+                    atom_smarts='[N]'
+                    metal_smarts='[Fe]',
                 )
             ]
         )
@@ -78,24 +78,24 @@ class MetalBoundAtomFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, atom_smiles, metal_smiles):
+    def __init__(self, atom_smarts, metal_smarts):
         """
         Initialize a :class:`.MetalBoundAtomFactory` instance.
 
         Parameters
         ----------
-        atom_smiles : :class:`str`
-            SMILES defining the *bonder* atom.
+        atom_smarts : :class:`str`
+            SMARTS defining the *bonder* atom.
 
-        metal_smiles : :class:`str`
-            SMILES defining the *metal* atom.
+        metal_smarts : :class:`str`
+            SMARTS defining the *metal* atom.
 
         """
 
-        self._smiles = f'[{metal_smiles}][{atom_smiles}]'
+        self._smarts = f'[{metal_smarts}]~[{atom_smarts}]'
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids(self._smiles, molecule):
+        for atom_ids in _get_atom_ids(self._smarts, molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield MetalBoundAtom(
                 atom=atoms[1],

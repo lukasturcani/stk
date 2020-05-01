@@ -397,8 +397,8 @@ metal_bound_atom.AddConformer(rdkit.Conformer(
 
         CaseData(
             factory=stk.MetalBoundAtomFactory(
-                atom_smiles='N',
-                metal_smiles='Fe',
+                atom_smarts='N',
+                metal_smarts='Fe',
             ),
             molecule=stk.BuildingBlock.init_from_rdkit_mol(
                 metal_bound_atom
