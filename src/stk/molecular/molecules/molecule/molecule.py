@@ -728,7 +728,7 @@ class Molecule:
             mol.AddBond(
                 beginAtomIdx=bond.get_atom1().get_id(),
                 endAtomIdx=bond.get_atom2().get_id(),
-                order=rdkit_bond
+                order=rdkit.BondType(bond.get_order()),
             )
 
         mol = mol.GetMol()
