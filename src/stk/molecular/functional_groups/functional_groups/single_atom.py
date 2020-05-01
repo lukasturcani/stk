@@ -1,6 +1,7 @@
 """
-SingleAtom
-==========
+Single Atom
+===========
+
 """
 
 from .generic_functional_group import GenericFunctionalGroup
@@ -28,9 +29,7 @@ class SingleAtom(GenericFunctionalGroup):
 
         self._atom = atom
         atoms = (atom, )
-        bonders = (atom, )
-
-        super().__init__(atoms, bonders, ())
+        super().__init__(atoms, atoms, ())
 
     def get_atom(self):
         """
@@ -39,7 +38,7 @@ class SingleAtom(GenericFunctionalGroup):
         Returns
         -------
         :class:`.Atom`
-            The atom to which the functional group is attached.
+            The atom.
 
         """
 
