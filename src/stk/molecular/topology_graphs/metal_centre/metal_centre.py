@@ -31,8 +31,9 @@ class MetalCentre(TopologyGraph):
         atom = rdkit.MolFromSmiles('[Fe+2]')
         atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
         metal_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
+        atom_0 = list(metal_atom.get_atoms())[0]
         metal_atom = metal_atom.with_functional_groups(
-            (stk.SingleAtom(atom_0) for i in range(no_fgs))
+            (stk.SingleAtom(atom_0) for i in range(6))
         )
 
 
@@ -40,8 +41,9 @@ class MetalCentre(TopologyGraph):
         atom = rdkit.MolFromSmiles('N')
         atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
         binding_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
+        atom_0 = list(binding_atom.get_atoms())[0]
         binding_atom = binding_atom.with_functional_groups(
-            (stk.SingleAtom(atom_0) for i in range(no_fgs))
+            (stk.SingleAtom(atom_0) for i in range(1))
         )
 
         # Build an Fe atom with octahedrally coordinated N atoms.
