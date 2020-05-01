@@ -40,16 +40,13 @@ def get_inchi_key(molecule):
     Raises
     ------
     :class:`ValueError`
-        If InChIKey of `molecule` is an empty string.
+        If the InChIKey of `molecule` cannot be generated.
 
     """
 
     key = rdkit.MolToInchiKey(molecule.to_rdkit_mol())
     if not key:
-        raise ValueError(
-            f'InChIKey of {molecule} is empty string'
-        )
-
+        raise ValueError(f'InChIKey of {molecule} is empty.')
     return key
 
 
