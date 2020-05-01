@@ -30,6 +30,9 @@ stk.molecular.functional_groups.functional_groups.\
 generic_functional_group\
 >
     Iodo <stk.molecular.functional_groups.functional_groups.iodo>
+    MetalBoundAtom <\
+stk.molecular.functional_groups.functional_groups.metal_bound_atom
+>
     Primary Amino <\
 stk.molecular.functional_groups.functional_groups.primary_amino\
 >
