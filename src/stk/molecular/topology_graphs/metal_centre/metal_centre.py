@@ -1,6 +1,7 @@
 """
 Metal Centre
 ============
+
 """
 
 from ..topology_graph import TopologyGraph
@@ -29,21 +30,18 @@ class MetalCentre(TopologyGraph):
         # Metal atom with 6 functional groups.
         atom = rdkit.MolFromSmiles('[Fe+2]')
         atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
-        metal_atom = stk.BuildingBlock.init_from_rdkit_mol(
-            atom,
-            functional_groups=[stk.SingleAtomFactory(
-                num_functional_groups=6
-            )]
+        metal_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
+        metal_atom = metal_atom.with_functional_groups(
+            (stk.SingleAtom(atom_0) for i in range(no_fgs))
         )
+
 
         # Nitrogen atom.
         atom = rdkit.MolFromSmiles('N')
         atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
-        binding_atom = stk.BuildingBlock.init_from_rdkit_mol(
-            atom,
-            functional_groups=[stk.SingleAtomFactory(
-                num_functional_groups=1
-            )]
+        binding_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
+        binding_atom = binding_atom.with_functional_groups(
+            (stk.SingleAtom(atom_0) for i in range(no_fgs))
         )
 
         # Build an Fe atom with octahedrally coordinated N atoms.
