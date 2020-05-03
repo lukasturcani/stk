@@ -6,6 +6,7 @@ Metal Centre
 
 from ..topology_graph import TopologyGraph
 from ...reactions import GenericReactionFactory
+from ...functional_groups import SingleAtom
 
 
 class MetalCentre(TopologyGraph):
@@ -62,11 +63,18 @@ class MetalCentre(TopologyGraph):
         self,
         building_blocks,
         vertex_alignments=None,
-        reaction_factory=GenericReactionFactory(),
+        reaction_factory=GenericReactionFactory(
+            bond_orders={
+                frozenset({SingleAtom}): 9,
+            }
+        ),
         num_processes=1,
     ):
         """
         Initialize a :class:`.MetalCentre`.
+
+        Default :class:`.ReactionFactory` produces dative bonds (
+        bond_order=9) between :class:`.SingleAtom` functional groups.
 
         Parameters
         ----------
