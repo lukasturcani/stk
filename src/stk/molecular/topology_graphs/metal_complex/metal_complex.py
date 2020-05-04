@@ -171,7 +171,7 @@ class MetalComplex(TopologyGraph):
     #     return state
 
     def _get_scale(self, building_block_vertices):
-        return 3
+        return 1
 
     def __repr__(self):
         vertex_alignments = (
