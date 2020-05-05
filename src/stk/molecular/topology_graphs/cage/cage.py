@@ -244,7 +244,7 @@ class Cage(TopologyGraph):
         ------
         :class:`AssertionError`
             If the any building block does not have a
-            correct number of functional groups.
+            valid number of functional groups.
 
         :class:`ValueError`
             If the there are multiple building blocks with the
@@ -372,6 +372,10 @@ class Cage(TopologyGraph):
 
         Raises
         ------
+        :class:`AssertionError`
+            If the any building block does not have a
+            valid number of functional groups.
+
         :class:`ValueError`
             If there are multiple building blocks with the same number
             of functional groups.
