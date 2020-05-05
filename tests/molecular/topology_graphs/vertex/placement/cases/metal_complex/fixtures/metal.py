@@ -5,7 +5,7 @@ from rdkit.Chem import AllChem as rdkit
 
 from ....case_data import CaseData
 
-vertices = stk.metal_centre.vertices
+vertices = stk.metal_complex.vertices
 
 single_atom = rdkit.MolFromSmiles('[Fe]')
 single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
