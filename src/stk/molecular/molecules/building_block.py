@@ -420,18 +420,17 @@ class BuildingBlock(Molecule):
 
         """
 
-        if os.path.exists(path):
-            _, extension = os.path.splitext(path)
+        _, extension = os.path.splitext(path)
 
-            if extension not in cls._init_funcs:
-                raise ValueError(
-                    f'Unable to initialize from "{extension}" files.'
-                )
-            # This remake needs to be here because molecules loaded
-            # with rdkit often have issues, because rdkit tries to do
-            # bits of structural analysis like stereocenters. remake
-            # gets rid of all this problematic metadata.
-            molecule = remake(cls._init_funcs[extension](path))
+        if extension not in cls._init_funcs:
+            raise ValueError(
+                f'Unable to initialize from "{extension}" files.'
+            )
+        # This remake needs to be here because molecules loaded
+        # with rdkit often have issues, because rdkit tries to do
+        # bits of structural analysis like stereocenters. remake
+        # gets rid of all this problematic metadata.
+        molecule = remake(cls._init_funcs[extension](path))
 
         return cls.init_from_rdkit_mol(
             molecule=molecule,
@@ -558,7 +557,7 @@ class BuildingBlock(Molecule):
                 atom1=atoms[b.GetBeginAtomIdx()],
                 atom2=atoms[b.GetEndAtomIdx()],
                 order=(
-                    9 if b.GetBondType() == rdkit.BondType.DATIVE 
+                    9 if b.GetBondType() == rdkit.BondType.DATIVE
                     else b.GetBondTypeAsDouble()
                 )
             )
