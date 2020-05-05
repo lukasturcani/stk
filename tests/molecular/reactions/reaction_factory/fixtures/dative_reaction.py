@@ -8,7 +8,7 @@ from .utilities import MockConstructionState, MockEdge
 
 
 @pytest.fixture
-def dative_one_one_reaction(
+def dative_reaction(
     periodicity,
     dative_functional_groups,
     dative_bond_order,
@@ -21,9 +21,11 @@ def dative_one_one_reaction(
     edge = MockEdge(0, periodicity)
     return CaseData(
         factory=stk.DativeReactionFactory(
-            bond_orders={
-                bond_order_key: dative_bond_order,
-            },
+            stk.GenericReactionFactory(
+                bond_orders={
+                    bond_order_key: dative_bond_order,
+                },
+            )
         ),
         construction_state=MockConstructionState(
             edges=(edge, ),

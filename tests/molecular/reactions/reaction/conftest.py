@@ -256,7 +256,7 @@ def dative_functional_groups(request):
 
     """
 
-    return request.param.clone()
+    return request.param
 
 
 @pytest.fixture(
@@ -273,7 +273,7 @@ def dative_bond_order(request):
 
 @pytest.fixture(
     params=(
-        lazy_fixture('dative_one_one_reaction'),
+        lazy_fixture('dative_reaction'),
     ),
 )
 def dative_case_data(request):
