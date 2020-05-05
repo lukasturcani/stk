@@ -1,6 +1,6 @@
 """
-Dative One-One Reaction
-=======================
+Dative Reaction
+===============
 
 """
 
@@ -14,9 +14,9 @@ class NoMetalAtomError(Exception):
     ...
 
 
-class DativeOneOneReaction(Reaction):
+class DativeReaction(Reaction):
     """
-    A reaction between two functional groups, each with 1 bonder atom.
+    A reaction between two functional groups.
 
     The reaction creates a dative bond between the *bonder* atoms, and
     deletes any *deleter* atoms. Importantly, the direction of the bond
@@ -24,40 +24,21 @@ class DativeOneOneReaction(Reaction):
 
     """
 
-    def __init__(
-        self,
-        functional_group1,
-        functional_group2,
-        bond_order,
-        periodicity,
-    ):
+    def __init__(self, reaction):
         """
-        Initialize a :class:`.OneOneReaction` instance.
+        Initialize a :class:`.DativeReaction` instance.
 
         Parameters
         ----------
-        functional_group1 : :class:`.GenericFunctionalGroup`
-            The first functional group in the reaction.
-
-        functional_group2 : :class:`.GenericFunctionalGroup`
-            The second functional group in the reaction.
-
-        bond_order : :class:`int`
-            The bond order of the bond created by the reaction.
-
-        periodicity : :class:`tuple` of :class:`int`
-            The periodicity of the bond created by the reaction.
+        reaction : :class:`.Reaction`
+            The reaction.
 
         """
 
-        self._functional_group1 = functional_group1
-        self._functional_group2 = functional_group2
-        self._bond_order = bond_order
-        self._periodicity = periodicity
+        self._reaction = reaction
 
     def _get_new_atoms(self):
-        return
-        yield
+        return self._reaction._get_new_atoms()
 
     def _get_bond_directionality(self):
         """
@@ -98,8 +79,8 @@ class DativeOneOneReaction(Reaction):
 
             return atom.get_atomic_number() in metal_atomic_numbers
 
-        bondera = next(self._functional_group1.get_bonders())
-        bonderb = next(self._functional_group2.get_bonders())
+        bondera = next(self._reaction._functional_group1.get_bonders())
+        bonderb = next(self._reaction._functional_group2.get_bonders())
 
         if is_metal_atom(bondera):
             bonder2 = bondera
@@ -115,14 +96,15 @@ class DativeOneOneReaction(Reaction):
         return bonder1, bonder2
 
     def _get_new_bonds(self):
-        bonder1, bonder2 = self._get_bond_directionality()
-        yield Bond(
-            atom1=bonder1,
-            atom2=bonder2,
-            order=self._bond_order,
-            periodicity=self._periodicity,
-        )
+        bonds = self._reaction._get_new_bonds()
+        for bond in bonds:
+            bonder1, bonder2 = self._get_bond_directionality()
+            yield Bond(
+                atom1=bonder1,
+                atom2=bonder2,
+                order=self._reaction._bond_order,
+                periodicity=self._reaction._periodicity,
+            )
 
     def _get_deleted_atoms(self):
-        yield from self._functional_group1.get_deleters()
-        yield from self._functional_group2.get_deleters()
+        return self._reaction._get_deleted_atoms()
