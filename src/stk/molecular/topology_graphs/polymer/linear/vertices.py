@@ -52,15 +52,15 @@ class _LinearVertex(Vertex):
         return clone
 
     def place_building_block(self, building_block, edges):
-        building_block = building_block.with_centroid(
-            position=self._position,
-            atom_ids=building_block.get_placer_ids(),
-        )
         assert (
             building_block.get_num_functional_groups() == 2
         ), (
             f'{building_block} does not have exactly 2 functional '
             'groups.'
+        )
+        building_block = building_block.with_centroid(
+            position=self._position,
+            atom_ids=building_block.get_placer_ids(),
         )
         fg1, fg2 = building_block.get_functional_groups()
         fg1_position = building_block.get_centroid(
