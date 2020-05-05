@@ -170,6 +170,13 @@ class _CofVertex(Vertex):
 
 class _LinearCofVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
+        assert (
+            building_block.get_num_functional_groups() == 2
+        ), (
+            f'{building_block} needs to have exactly 2 functional '
+            'groups but has '
+            f'{building_block.get_num_functional_groups()}.'
+        )
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
@@ -209,6 +216,13 @@ class _LinearCofVertex(_CofVertex):
 
 class _NonLinearCofVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
+        assert (
+            building_block.get_num_functional_groups() > 2
+        ), (
+            f'{building_block} needs to have more than 2 functional '
+            'groups but has '
+            f'{building_block.get_num_functional_groups()}.'
+        )
         # Sort to ensure that for two vertices, which are periodically
         # equivalent, "edges" has identical ordering. This means that
         # the aligner_edge is chosen consistently in both cases.
