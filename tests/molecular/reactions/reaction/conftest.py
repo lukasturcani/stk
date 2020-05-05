@@ -240,3 +240,46 @@ def periodicity(request):
     """
 
     return request.param
+
+
+@pytest.fixture(
+    params=(
+        (
+            stk.SingleAtom(atom=stk.Fe(0)),
+            stk.SingleAtom(atom=stk.N(0))
+        ),
+    ),
+)
+def dative_functional_groups(request):
+    """
+    A :class:`.GenericFunctionalGroup` with 1 bonder atom.
+
+    """
+
+    return request.param.clone()
+
+
+@pytest.fixture(
+    params=(9, ),
+)
+def dative_bond_order(request):
+    """
+    The bond order of a bond created by a :class:`.Reaction`.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
+    params=(
+        lazy_fixture('dative_one_one_reaction'),
+    ),
+)
+def dative_case_data(request):
+    """
+    A :class:`.CaseData` instance.
+
+    """
+
+    return request.param
