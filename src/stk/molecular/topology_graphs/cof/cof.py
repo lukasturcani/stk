@@ -225,11 +225,11 @@ class Cof(TopologyGraph):
             this case.
 
         :class:`~.cof.UnoccupiedVertexError`
-            If a vertex of the cage topology graph does not have a
+            If a vertex of the COF topology graph does not have a
             building block placed on it.
 
         :class:`~.cof.OverlyOccupiedVertexError`
-            If vertex of the cage topology graph has more than one
+            If a vertex of the COF topology graph has more than one
             building block placed on it.
 
         """
