@@ -8,6 +8,9 @@ Reaction Factory
     Generic Reaction Factory <\
 stk.molecular.reactions.factories.generic_reaction_factory\
 >
+    Dative Reaction Factory <\
+stk.molecular.reactions.factories.dative_reaction_factory\
+>
 
 """
 
