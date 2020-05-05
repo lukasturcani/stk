@@ -242,6 +242,10 @@ class Cage(TopologyGraph):
 
         Raises
         ------
+        :class:`AssertionError`
+            If the any building block does not have a
+            correct number of functional groups.
+
         :class:`ValueError`
             If the there are multiple building blocks with the
             same number of functional_groups in `building_blocks`,
@@ -251,7 +255,20 @@ class Cage(TopologyGraph):
 
         """
 
+        # Use tuple here because it prints nicely.
+        allowed_degrees = tuple(self._vertices_of_degree.keys())
         if isinstance(building_blocks, dict):
+            for building_block in building_blocks:
+                assert (
+                    building_block.get_num_functional_groups()
+                    in self._vertices_of_degree.keys()
+                ), (
+                    'The number of functional groups of '
+                    f'{building_block}, '
+                    f'{building_block.get_num_functional_groups()}, '
+                    'is not one of '
+                    f'{allowed_degrees}.'
+                )
             building_blocks = {
                 building_block: self._get_vertices(ids)
                 for building_block, ids in building_blocks.items()
@@ -353,11 +370,28 @@ class Cage(TopologyGraph):
             :class:`list` of :class:`.Vertex` instances it should be
             placed on.
 
+        Raises
+        ------
+        :class:`ValueError`
+            If there are multiple building blocks with the same number
+            of functional groups.
+
         """
+
+        # Use tuple here because it prints nicely.
+        allowed_degrees = tuple(self._vertices_of_degree.keys())
 
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
+            assert (
+                num_fgs in self._vertices_of_degree.keys()
+            ), (
+                'The number of functional groups of '
+                f'{building_block}, {num_fgs}, is not one of '
+                f'{allowed_degrees}.'
+            )
+
             if num_fgs in building_blocks_by_degree:
                 raise ValueError(
                     'If there are multiple building blocks with the '
