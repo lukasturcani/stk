@@ -160,6 +160,14 @@ class GenericReactionFactory(ReactionFactory):
                 edge_group=edge_group,
             )
         )
+        assert (
+            len(functional_groups) == 2
+        ), (
+            f'{edge_group} should have 2 functional groups but has '
+            f'{len(functional_groups)}. Check that all vertices have '
+            'a building block placed on them, and that there is only '
+            '1 building block placed on each vertex.'
+        )
         functional_group1, functional_group2 = functional_groups
         edge = construction_state.get_edge(
             edge_id=next(edge_group.get_edge_ids()),
