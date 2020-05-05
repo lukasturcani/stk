@@ -130,14 +130,6 @@ class Cof(TopologyGraph):
 
     """
 
-    def __init_subclass__(cls, **kwargs):
-        vertex_degrees = Counter(
-            vertex_id
-            for edge in cls._edge_prototypes
-            for vertex_id in edge.get_vertex_ids()
-        )
-        cls._allowed_degrees = set(vertex_degrees.values())
-
     def __init__(
         self,
         building_blocks,
@@ -195,10 +187,6 @@ class Cof(TopologyGraph):
 
         Raises
         ------
-        :class:`AssertionError`
-            If the any building block does not have a
-            valid number of functional groups.
-
         :class:`ValueError`
             If the there are multiple building blocks with the
             same number of functional_groups in `building_blocks`,
@@ -221,17 +209,6 @@ class Cof(TopologyGraph):
         vertices = self._get_vertices(lattice)
 
         if isinstance(building_blocks, dict):
-            for building_block in building_blocks:
-                assert (
-                    building_block.get_num_functional_groups()
-                    in self._allowed_degrees
-                ), (
-                    'The number of functional groups of '
-                    f'{building_block}, '
-                    f'{building_block.get_num_functional_groups()}, '
-                    'is not one of '
-                    f'{tuple(self._allowed_degrees)}.'
-                )
             get_vertex = partial(getitem, vertices)
             building_block_vertices = {
                 building_block: map(
@@ -443,13 +420,8 @@ class Cof(TopologyGraph):
 
         return tuple(edge_clones)
 
-    @classmethod
-    def _get_building_block_vertices(
-        cls,
-        building_blocks,
-        vertices,
-        edges,
-    ):
+    @staticmethod
+    def _get_building_block_vertices(building_blocks, vertices, edges):
         """
         Map building blocks to the vertices of the graph.
 
@@ -474,10 +446,6 @@ class Cof(TopologyGraph):
 
         Raises
         ------
-        :class:`AssertionError`
-            If the any building block does not have a
-            valid number of functional groups.
-
         :class:`ValueError`
             If there are multiple building blocks with the same number
             of functional groups.
@@ -487,13 +455,6 @@ class Cof(TopologyGraph):
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
-            assert (
-                num_fgs in cls._allowed_degrees
-            ), (
-                'The number of functional groups of '
-                f'{building_block}, {num_fgs}, is not one of '
-                f'{tuple(cls._allowed_degrees)}.'
-            )
             if num_fgs in building_blocks_by_degree:
                 raise ValueError(
                     'If there are multiple building blocks with the '
