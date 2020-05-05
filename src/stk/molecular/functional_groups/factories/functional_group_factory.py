@@ -47,7 +47,7 @@ stk.molecular.functional_groups.factories.ring_amine_factory\
     Secondary Amino Factory <\
 stk.molecular.functional_groups.factories.secondary_amino_factory\
 >
-    Smarts Functional Group Factory <\
+    SMARTS Functional Group Factory <\
 stk.molecular.functional_groups.factories.smarts_functional_group_factory\
 >
     Terminal Alkene Factory <\
