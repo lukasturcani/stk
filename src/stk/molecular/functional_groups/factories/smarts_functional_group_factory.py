@@ -1,6 +1,6 @@
 """
-Smarts Functional Group Factory
-==============
+SMARTS Functional Group Factory
+===============================
 
 """
 
@@ -12,16 +12,16 @@ from ..functional_groups import GenericFunctionalGroup
 class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
     """
     Creates :class:`.GenericFunctionalGroup` instances.
-
-    Creates functional groups from supplied substructures.
-
+    
     Examples
     --------
+    *Using SMARTS to Define Functional Groups*
+    
     You want to create a building block which has
     :class:`.GenericFunctionalGroup` functional groups based on the
-    SMARTS string: `[Br][C]`.
-    You want the `C` atom to be the *bonder* atom, and the
-    `Br` atom to be the *deleter* atom.
+    SMARTS string: ``[Br][C]``.
+    You want the ``C`` atom to be the *bonder* atom, and the
+    ``Br`` atom to be the *deleter* atom.
 
     .. code-block:: python
 
@@ -52,15 +52,14 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
         Parameters
         ----------
         smarts : :class:`str`
-            The SMARTS string to be searched for.
+            The SMARTS defining the functional group.
 
         bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *bonder* atoms.
+            The indices of atoms in `smarts`, which are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *deleter* atoms.
+            The indices of atoms in `smarts`, which are *deleter* 
+            atoms.
 
         """
 
