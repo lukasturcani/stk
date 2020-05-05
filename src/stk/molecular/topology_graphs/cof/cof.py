@@ -226,11 +226,11 @@ class Cof(TopologyGraph):
                     building_block.get_num_functional_groups()
                     in self._allowed_degrees
                 ), (
-                    'The number of functional groups of '
-                    f'{building_block}, '
-                    f'{building_block.get_num_functional_groups()}, '
-                    'is not one of '
-                    f'{tuple(self._allowed_degrees)}.'
+                    'The number of functional groups in '
+                    f'{building_block} needs to be one of '
+                    f'{tuple(self._allowed_degrees)}, but is '
+                    'currently '
+                    f'{building_block.get_num_functional_groups()}.'
                 )
             get_vertex = partial(getitem, vertices)
             building_block_vertices = {
@@ -490,9 +490,11 @@ class Cof(TopologyGraph):
             assert (
                 num_fgs in cls._allowed_degrees
             ), (
-                'The number of functional groups of '
-                f'{building_block}, {num_fgs}, is not one of '
-                f'{tuple(cls._allowed_degrees)}.'
+                'The number of functional groups in '
+                f'{building_block} needs to be one of '
+                f'{tuple(cls._allowed_degrees)}, but is '
+                'currently '
+                f'{building_block.get_num_functional_groups()}.'
             )
             if num_fgs in building_blocks_by_degree:
                 raise ValueError(

@@ -263,11 +263,11 @@ class Cage(TopologyGraph):
                     building_block.get_num_functional_groups()
                     in self._vertices_of_degree.keys()
                 ), (
-                    'The number of functional groups of '
-                    f'{building_block}, '
-                    f'{building_block.get_num_functional_groups()}, '
-                    'is not one of '
-                    f'{allowed_degrees}.'
+                    'The number of functional groups in '
+                    f'{building_block} needs to be one of '
+                    f'{allowed_degrees}, but is '
+                    'currently '
+                    f'{building_block.get_num_functional_groups()}.'
                 )
             building_blocks = {
                 building_block: self._get_vertices(ids)
@@ -391,9 +391,11 @@ class Cage(TopologyGraph):
             assert (
                 num_fgs in self._vertices_of_degree.keys()
             ), (
-                'The number of functional groups of '
-                f'{building_block}, {num_fgs}, is not one of '
-                f'{allowed_degrees}.'
+                'The number of functional groups in '
+                f'{building_block} needs to be one of '
+                f'{allowed_degrees}, but is '
+                'currently '
+                f'{building_block.get_num_functional_groups()}.'
             )
 
             if num_fgs in building_blocks_by_degree:
