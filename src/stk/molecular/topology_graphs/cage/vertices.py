@@ -137,6 +137,12 @@ class _CageVertex(Vertex):
 
 class _LinearCageVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
+        assert (
+            building_block.get_num_functional_groups() == 2
+        ), (
+            f'{building_block} does not have exactly 2 functional '
+            'groups.'
+        )
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
@@ -182,6 +188,12 @@ class _LinearCageVertex(_CageVertex):
 
 class _NonLinearCageVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
+        assert (
+            building_block.get_num_functional_groups() > 2
+        ), (
+            f'{building_block} does not have more than 2 functional '
+            ' groups.'
+        )
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
