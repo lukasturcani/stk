@@ -26,6 +26,24 @@ from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
 
 
+class UnoccupiedVertexError(Exception):
+    """
+    When COF vertex is not occupied by a building block.
+
+    """
+
+    pass
+
+
+class OverlyOccupiedVertexError(Exception):
+    """
+    When a COF vertex is occupied by more than one building block.
+
+    """
+
+    pass
+
+
 class Cof(TopologyGraph):
     """
     Represents a COF topology graph.
@@ -206,6 +224,14 @@ class Cof(TopologyGraph):
             desired placement of building blocks is ambiguous in
             this case.
 
+        :class:`~.cof.UnoccupiedVertexError`
+            If a vertex of the cage topology graph does not have a
+            building block placed on it.
+
+        :class:`~.cof.OverlyOccupiedVertexError`
+            If vertex of the cage topology graph has more than one
+            building block placed on it.
+
         """
 
         self._vertex_alignments = (
@@ -251,6 +277,12 @@ class Cof(TopologyGraph):
                 )
             )
 
+        self._check_building_block_vertices(
+            num_vertices=(
+                np.product(lattice_size)*len(self._vertex_prototypes)
+            ),
+            building_block_vertices=building_block_vertices,
+        )
         super().__init__(
             building_block_vertices=building_block_vertices,
             edges=edges,
@@ -259,6 +291,34 @@ class Cof(TopologyGraph):
             num_processes=num_processes,
             edge_groups=self._get_edge_groups(edges),
         )
+
+    @classmethod
+    def _check_building_block_vertices(
+        cls,
+        num_vertices,
+        building_block_vertices,
+    ):
+        unassigned_ids = set(range(num_vertices))
+        assigned_ids = set()
+        vertices = (
+            vertex
+            for vertices_ in building_block_vertices.values()
+            for vertex in vertices_
+        )
+        for vertex in vertices:
+            if vertex.get_id() in assigned_ids:
+                raise OverlyOccupiedVertexError(
+                    f'Vertex {vertex.get_id()} has multiple building '
+                    'blocks placed on it.'
+                )
+            assigned_ids.add(vertex.get_id())
+            unassigned_ids.remove(vertex.get_id())
+
+        if unassigned_ids:
+            raise UnoccupiedVertexError(
+                'The following vertices are unoccupied '
+                f'{unassigned_ids}.'
+            )
 
     def clone(self):
         clone = super().clone()

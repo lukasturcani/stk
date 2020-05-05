@@ -260,6 +260,10 @@ class Cage(TopologyGraph):
 
         Raises
         ------
+        :class:`AssertionError`
+            If the any building block does not have a
+            valid number of functional groups.
+
         :class:`ValueError`
             If the there are multiple building blocks with the
             same number of functional_groups in `building_blocks`,
@@ -267,11 +271,11 @@ class Cage(TopologyGraph):
             desired placement of building blocks is ambiguous in
             this case.
 
-        :class:`.UnoccupiedVertexError`
+        :class:`~.cage.UnoccupiedVertexError`
             If a vertex of the cage topology graph does not have a
             building block placed on it.
 
-        :class:`.OverlyOccupiedVertexError`
+        :class:`~.cage.OverlyOccupiedVertexError`
             If vertex of the cage topology graph has more than one
             building block placed on it.
 
