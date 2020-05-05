@@ -40,7 +40,7 @@ class DativeReaction(Reaction):
     def _get_new_atoms(self):
         return self._reaction._get_new_atoms()
 
-    def _get_bond_directionality(self):
+    def _get_bond_directionality(self, bond):
         """
         Get the correct bond direction for a dative bond.
 
@@ -79,8 +79,8 @@ class DativeReaction(Reaction):
 
             return atom.get_atomic_number() in metal_atomic_numbers
 
-        bondera = next(self._reaction._functional_group1.get_bonders())
-        bonderb = next(self._reaction._functional_group2.get_bonders())
+        bondera = bond.get_atom1()
+        bonderb = bond.get_atom2()
 
         if is_metal_atom(bondera):
             bonder2 = bondera
@@ -98,12 +98,12 @@ class DativeReaction(Reaction):
     def _get_new_bonds(self):
         bonds = self._reaction._get_new_bonds()
         for bond in bonds:
-            bonder1, bonder2 = self._get_bond_directionality()
+            bonder1, bonder2 = self._get_bond_directionality(bond)
             yield Bond(
                 atom1=bonder1,
                 atom2=bonder2,
-                order=self._reaction._bond_order,
-                periodicity=self._reaction._periodicity,
+                order=bond.get_order(),
+                periodicity=bond.get_periodicity(),
             )
 
     def _get_deleted_atoms(self):
