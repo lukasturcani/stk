@@ -28,7 +28,7 @@ from ...reactions import GenericReactionFactory
 
 class UnoccupiedVertexError(Exception):
     """
-    When COF vertex is not occupied by a building block.
+    When a COF vertex is not occupied by a building block.
 
     """
 
