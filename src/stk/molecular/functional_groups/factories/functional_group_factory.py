@@ -47,6 +47,9 @@ stk.molecular.functional_groups.factories.ring_amine_factory\
     Secondary Amino Factory <\
 stk.molecular.functional_groups.factories.secondary_amino_factory\
 >
+    SMARTS Functional Group Factory <\
+stk.molecular.functional_groups.factories.smarts_functional_group_factory\
+>
     Terminal Alkene Factory <\
 stk.molecular.functional_groups.factories.terminal_alkene_factory\
 >
@@ -125,11 +128,6 @@ class FunctionalGroupFactory:
     :mod:`.functional_group_factory`, can serve as good examples.
 
     """
-
-    # Keep empty __init__() to override ugly default docstring.
-    def __init__(self):
-        """"""
-        return
 
     def get_functional_groups(self, molecule):
         """

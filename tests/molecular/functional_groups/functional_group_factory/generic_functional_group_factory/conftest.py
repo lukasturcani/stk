@@ -387,6 +387,22 @@ from ..case_data import CaseData
                 ),
             ),
         ),
+
+        CaseData(
+            factory=stk.SmartsFunctionalGroupFactory(
+                smarts='[C][N]',
+                bonders=(0, ),
+                deleters=(1, ),
+            ),
+            molecule=stk.BuildingBlock('NCC'),
+            functional_groups=(
+                stk.GenericFunctionalGroup(
+                    atoms=(stk.N(0), stk.C(1)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.N(0), ),
+                ),
+            ),
+        ),
     )
 )
 def case_data(request):

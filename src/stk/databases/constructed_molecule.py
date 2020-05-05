@@ -33,11 +33,6 @@ class ConstructedMoleculeDatabase:
 
     """
 
-    # Keep empty __init__() to override ugly default docstring.
-    def __init__(self):
-        """"""
-        return
-
     def put(self, molecule):
         """
         Put `molecule` into the database.

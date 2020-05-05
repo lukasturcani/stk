@@ -7,6 +7,7 @@ Molecule Key Maker
 
     InChI <stk.molecular.key_makers.inchi>
     InChIKey <stk.molecular.key_makers.inchi_key>
+    SMILES <stk.molecular.key_makers.smiles>
 
 """
 

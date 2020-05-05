@@ -14,6 +14,8 @@ class Inchi(MoleculeKeyMaker):
 
     Examples
     --------
+    *Adding InChI to a Molecule's JSON*
+
     You want to use the InChI as part of a JSON representation of a
     molecule
 

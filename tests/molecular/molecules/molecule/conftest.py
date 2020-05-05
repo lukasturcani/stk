@@ -4,6 +4,7 @@ import os
 from pytest_lazyfixture import lazy_fixture
 import stk
 import numpy as np
+from rdkit.Chem import AllChem as rdkit
 
 from .case_data import CaseData
 # Fixtures need to be visible for lazy_fixture() calls.
@@ -188,6 +189,12 @@ def get_atom_ids(request):
     return request.param
 
 
+dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
+dative_molecule.AddConformer(
+    conf=rdkit.Conformer(dative_molecule.GetNumAtoms()),
+)
+
+
 @pytest.fixture(
     params=(
         CaseData(
@@ -208,6 +215,12 @@ def get_atom_ids(request):
                 .with_canonical_atom_ordering()
             ),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+        ),
+        CaseData(
+            molecule=(
+                stk.BuildingBlock.init_from_rdkit_mol(dative_molecule)
+            ),
+            smiles='N->[Fe+2]',
         ),
     ),
 )

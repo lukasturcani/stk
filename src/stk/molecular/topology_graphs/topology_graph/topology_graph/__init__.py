@@ -1,1 +1,1 @@
-from .topology_graph import *
+from .topology_graph import *  # noqa
