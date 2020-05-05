@@ -260,12 +260,12 @@ class Cof(TopologyGraph):
                 )
             get_vertex = partial(getitem, vertices)
             building_block_vertices = {
-                building_block: map(
+                building_block: tuple(map(
                     get_vertex,
                     # Account for the fact that a building block can
                     # be mapped to a single int.
                     (ids, ) if isinstance(ids, int) else ids
-                )
+                ))
                 for building_block, ids in building_blocks.items()
             }
         else:
