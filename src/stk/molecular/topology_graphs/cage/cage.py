@@ -276,7 +276,7 @@ class Cage(TopologyGraph):
             building block placed on it.
 
         :class:`~.cage.OverlyOccupiedVertexError`
-            If vertex of the cage topology graph has more than one
+            If a vertex of the cage topology graph has more than one
             building block placed on it.
 
         """
