@@ -59,8 +59,9 @@ class _CycleVertex(Vertex):
         assert (
             building_block.get_num_functional_groups() == 2
         ), (
-            f'{building_block} does not have exactly 2 functional '
-            'groups.'
+            f'{building_block} needs to have exactly 2 functional '
+            'groups but has '
+            f'{building_block.get_num_functional_groups()}.'
         )
         building_block = building_block.with_centroid(
             position=self._position,
