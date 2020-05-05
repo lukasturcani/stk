@@ -72,7 +72,7 @@ from ...reactions import GenericReactionFactory
 
 class UnoccupiedVertexError(Exception):
     """
-    When cage vertex is not occupied by a building block.
+    When a cage vertex is not occupied by a building block.
 
     """
 
