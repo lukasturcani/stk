@@ -18,7 +18,7 @@ stk.molecular.reactions.reactions.ring_amine_reaction\
 stk.molecular.reactions.reactions.two_two_reaction\
 >
     Dative Reaction <\
-stk.molecular.reactions.reactions.dative_reaction\
+stk.molecular.reactions.reactions.dative_reaction.dative_reaction\
 >
 
 """
