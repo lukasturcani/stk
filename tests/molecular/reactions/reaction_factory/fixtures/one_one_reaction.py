@@ -8,16 +8,6 @@ from .utilities import MockConstructionState, MockEdge
 
 
 @pytest.fixture
-def functional_group1_2(functional_group1):
-    """
-    A :class:`.GenericFunctionalGroup` with 1 bonder atom.
-
-    """
-
-    return functional_group1.clone()
-
-
-@pytest.fixture
 def one_one_reaction(
     periodicity,
     functional_group1,

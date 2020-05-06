@@ -145,6 +145,16 @@ def functional_group1(request):
     return request.param
 
 
+@pytest.fixture
+def functional_group1_2(functional_group1):
+    """
+    A :class:`.GenericFunctionalGroup` instance with 1 bonder atom.
+
+    """
+
+    return functional_group1
+
+
 @pytest.fixture(
     params=(
 
