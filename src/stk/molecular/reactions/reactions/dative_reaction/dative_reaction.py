@@ -4,8 +4,6 @@ Dative Reaction
 
 """
 
-from itertools import chain
-
 from .utilities import is_metal
 from ..reaction import Reaction
 from ....bonds import Bond
@@ -38,8 +36,8 @@ class DativeReaction(Reaction):
         return self._reaction._get_new_atoms()
 
     def _get_new_bonds(self):
-        for bond in self._reaction.get_new_bonds():
-            if bond.get_orer() == 9 and is_metal(bond.get_atom1()):
+        for bond in self._reaction._get_new_bonds():
+            if bond.get_order() == 9 and is_metal(bond.get_atom1()):
                 yield Bond(
                     atom1=bond.get_atom2(),
                     atom2=bond.get_atom1(),

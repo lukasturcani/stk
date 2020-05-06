@@ -133,7 +133,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(32), ),
             deleters=(stk.S(12), stk.H(21)),
         ),
-
+        stk.SingleAtom(atom=stk.Fe(0)),
     ),
 )
 def functional_group1(request):
@@ -204,6 +204,7 @@ def functional_group2(request):
         lazy_fixture('one_one_reaction'),
         lazy_fixture('one_two_reaction'),
         lazy_fixture('two_two_reaction'),
+        lazy_fixture('dative_reaction'),
     ),
 )
 def case_data(request):
@@ -216,7 +217,7 @@ def case_data(request):
 
 
 @pytest.fixture(
-    params=(1, 3),
+    params=(1, 3, 9),
 )
 def bond_order(request):
     """
@@ -236,49 +237,6 @@ def bond_order(request):
 def periodicity(request):
     """
     The periodicity of a bond made by a reaction.
-
-    """
-
-    return request.param
-
-
-@pytest.fixture(
-    params=(
-        (
-            stk.SingleAtom(atom=stk.Fe(0)),
-            stk.SingleAtom(atom=stk.N(0))
-        ),
-    ),
-)
-def dative_functional_groups(request):
-    """
-    A :class:`.GenericFunctionalGroup` with 1 bonder atom.
-
-    """
-
-    return request.param
-
-
-@pytest.fixture(
-    params=(9, ),
-)
-def dative_bond_order(request):
-    """
-    The bond order of a bond created by a :class:`.Reaction`.
-
-    """
-
-    return request.param
-
-
-@pytest.fixture(
-    params=(
-        lazy_fixture('dative_reaction'),
-    ),
-)
-def dative_case_data(request):
-    """
-    A :class:`.CaseData` instance.
 
     """
 

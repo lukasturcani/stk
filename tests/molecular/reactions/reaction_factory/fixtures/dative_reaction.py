@@ -8,12 +8,22 @@ from .utilities import MockConstructionState, MockEdge
 
 
 @pytest.fixture
+def functional_group2(functional_group1):
+    """
+    A :class:`.GenericFunctionalGroup` with 1 bonder atom.
+    
+    """
+    
+    return functional_group1
+
+
+@pytest.fixture
 def dative_reaction(
+    functional_group1,
+    functional_group2,
     periodicity,
-    dative_functional_groups,
-    dative_bond_order,
+    bond_order,
 ):
-    functional_group1, functional_group2 = dative_functional_groups
     bond_order_key = frozenset({
         type(functional_group1),
         type(functional_group2),
@@ -23,7 +33,7 @@ def dative_reaction(
         factory=stk.DativeReactionFactory(
             stk.GenericReactionFactory(
                 bond_orders={
-                    bond_order_key: dative_bond_order,
+                    bond_order_key: bond_order,
                 },
             )
         ),
@@ -44,7 +54,7 @@ def dative_reaction(
             new_bonds=get_new_bonds(
                 functional_group1=functional_group1,
                 functional_group2=functional_group2,
-                order=dative_bond_order,
+                order=bond_order,
                 periodicity=periodicity,
             ),
             deleted_atoms=it.chain(
@@ -55,12 +65,11 @@ def dative_reaction(
     )
 
 
-def is_metal_atom(atom):
-    # Metal atomic numbers.
+def is_metal(atom):
     metal_atomic_numbers = set(it.chain(
-        list(range(21, 31)),
-        list(range(39, 49)),
-        list(range(72, 81))
+        range(21, 31),
+        range(39, 49),
+        range(72, 81),
     ))
 
     return atom.get_atomic_number() in metal_atomic_numbers
@@ -73,19 +82,20 @@ def get_new_bonds(
     periodicity,
 ):
 
-    bondera = next(functional_group1.get_bonders())
-    bonderb = next(functional_group2.get_bonders())
+    bonder1, = functional_group1.get_bonders()
+    bonder2, = functional_group2.get_bonders()
 
-    if is_metal_atom(bondera):
-        bonder2 = bondera
-        bonder1 = bonderb
-    elif is_metal_atom(bonderb):
-        bonder2 = bonderb
-        bonder1 = bondera
-
-    yield stk.Bond(
-        atom1=bonder1,
-        atom2=bonder2,
-        order=order,
-        periodicity=periodicity,
-    )
+    if is_metal(bonder1):
+        yield stk.Bond(
+            atom1=bonder2,
+            atom2=bonder1,
+            order=order,
+            periodicity=periodicity,
+        )
+    else:
+        yield stk.Bond(
+            atom1=bonder1,
+            atom2=bonder2,
+            order=order,
+            periodicity=periodicity,
+        )
