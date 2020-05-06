@@ -6,12 +6,9 @@ Dative Reaction
 
 from itertools import chain
 
-from .reaction import Reaction
-from ...bonds import Bond
-
-
-class NoMetalAtomError(Exception):
-    ...
+from .utilities import is_metal
+from ..reaction import Reaction
+from ....bonds import Bond
 
 
 class DativeReaction(Reaction):
@@ -20,7 +17,7 @@ class DativeReaction(Reaction):
 
     The reaction creates a dative bond between the *bonder* atoms, and
     deletes any *deleter* atoms. Importantly, the direction of the bond
-    is set such that `bonder2` is the metal atom.
+    is set to run from the non-metal atom to the metal atom.
 
     """
 
@@ -31,7 +28,7 @@ class DativeReaction(Reaction):
         Parameters
         ----------
         reaction : :class:`.Reaction`
-            The reaction.
+            A reaction which should be made dative.
 
         """
 
@@ -40,71 +37,17 @@ class DativeReaction(Reaction):
     def _get_new_atoms(self):
         return self._reaction._get_new_atoms()
 
-    def _get_bond_directionality(self, bond):
-        """
-        Get the correct bond direction for a dative bond.
-
-        Dative bonds go: `organic` -> `metal`, where only the valency
-        of `metal` is impacted by the bond.
-
-        Raises
-        ------
-        :class:`NoMetalAtomError`
-            If neither atom is a metal atom.
-
-        """
-
-        def is_metal_atom(atom):
-            """
-            Check if atom is a metal atom.
-
-            Parameters
-            ----------
-            atom : :class:`.Atom`
-                An atom.
-
-            Returns
-            -------
-            :class:`bool`
-                ``True`` if `atom` is a metal atom.
-
-            """
-
-            # Metal atomic numbers.
-            metal_atomic_numbers = set(chain(
-                list(range(21, 31)),
-                list(range(39, 49)),
-                list(range(72, 81))
-            ))
-
-            return atom.get_atomic_number() in metal_atomic_numbers
-
-        bondera = bond.get_atom1()
-        bonderb = bond.get_atom2()
-
-        if is_metal_atom(bondera):
-            bonder2 = bondera
-            bonder1 = bonderb
-        elif is_metal_atom(bonderb):
-            bonder2 = bonderb
-            bonder1 = bondera
-        else:
-            raise NoMetalAtomError(
-                f'{bondera} and {bonderb} are metal atoms, so a dative'
-                ' bond is not necessary.'
-            )
-        return bonder1, bonder2
-
     def _get_new_bonds(self):
-        bonds = self._reaction._get_new_bonds()
-        for bond in bonds:
-            bonder1, bonder2 = self._get_bond_directionality(bond)
-            yield Bond(
-                atom1=bonder1,
-                atom2=bonder2,
-                order=bond.get_order(),
-                periodicity=bond.get_periodicity(),
-            )
+        for bond in self._reaction.get_new_bonds():
+            if bond.get_orer() == 9 and is_metal(bond.get_atom1()):
+                yield Bond(
+                    atom1=bond.get_atom2(),
+                    atom2=bond.get_atom1(),
+                    order=bond.get_order(),
+                    periodicity=bond.get_periodicity(),
+                )
+            else:
+                yield bond
 
     def _get_deleted_atoms(self):
         return self._reaction._get_deleted_atoms()
