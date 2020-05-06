@@ -1,11 +1,6 @@
 from .utilities import are_equivalent_bonds
 
 
-def test_get_new_dative_bonds(dative_case_data):
-
-    test_get_new_bonds(dative_case_data)
-
-
 def test_get_new_bonds(case_data):
     """
     Test that correct bonds are added by a :class:`.Reaction`.
