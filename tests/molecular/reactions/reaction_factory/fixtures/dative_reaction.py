@@ -8,10 +8,10 @@ from .utilities import MockConstructionState, MockEdge
 
 
 @pytest.fixture
-def one_one_reaction(
-    periodicity,
+def dative_reaction(
     functional_group1,
     functional_group1_2,
+    periodicity,
     bond_order,
 ):
     bond_order_key = frozenset({
@@ -20,10 +20,12 @@ def one_one_reaction(
     })
     edge = MockEdge(0, periodicity)
     return CaseData(
-        factory=stk.GenericReactionFactory(
-            bond_orders={
-                bond_order_key: bond_order,
-            },
+        factory=stk.DativeReactionFactory(
+            stk.GenericReactionFactory(
+                bond_orders={
+                    bond_order_key: bond_order,
+                },
+            )
         ),
         construction_state=MockConstructionState(
             edges=(edge, ),
@@ -53,15 +55,37 @@ def one_one_reaction(
     )
 
 
+def is_metal(atom):
+    metal_atomic_numbers = set(it.chain(
+        range(21, 31),
+        range(39, 49),
+        range(72, 81),
+    ))
+
+    return atom.get_atomic_number() in metal_atomic_numbers
+
+
 def get_new_bonds(
     functional_group1,
     functional_group2,
     order,
     periodicity,
 ):
-    yield stk.Bond(
-        atom1=next(functional_group1.get_bonders()),
-        atom2=next(functional_group2.get_bonders()),
-        order=order,
-        periodicity=periodicity,
-    )
+
+    bonder1, = functional_group1.get_bonders()
+    bonder2, = functional_group2.get_bonders()
+
+    if is_metal(bonder1):
+        yield stk.Bond(
+            atom1=bonder2,
+            atom2=bonder1,
+            order=order,
+            periodicity=periodicity,
+        )
+    else:
+        yield stk.Bond(
+            atom1=bonder1,
+            atom2=bonder2,
+            order=order,
+            periodicity=periodicity,
+        )

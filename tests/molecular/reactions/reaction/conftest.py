@@ -133,7 +133,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(32), ),
             deleters=(stk.S(12), stk.H(21)),
         ),
-
+        stk.SingleAtom(atom=stk.Fe(0)),
     ),
 )
 def functional_group1(request):
@@ -143,6 +143,16 @@ def functional_group1(request):
     """
 
     return request.param
+
+
+@pytest.fixture
+def functional_group1_2(functional_group1):
+    """
+    A :class:`.GenericFunctionalGroup` instance with 1 bonder atom.
+
+    """
+
+    return functional_group1
 
 
 @pytest.fixture(
@@ -204,6 +214,7 @@ def functional_group2(request):
         lazy_fixture('one_one_reaction'),
         lazy_fixture('one_two_reaction'),
         lazy_fixture('two_two_reaction'),
+        lazy_fixture('dative_reaction'),
     ),
 )
 def case_data(request):
@@ -216,7 +227,7 @@ def case_data(request):
 
 
 @pytest.fixture(
-    params=(1, 3),
+    params=(1, 3, 9),
 )
 def bond_order(request):
     """
