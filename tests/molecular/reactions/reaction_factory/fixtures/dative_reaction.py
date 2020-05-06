@@ -54,7 +54,7 @@ def dative_reaction(
             new_bonds=get_new_bonds(
                 functional_group1=functional_group1,
                 functional_group2=functional_group2,
-                order=dative_bond_order,
+                order=bond_order,
                 periodicity=periodicity,
             ),
             deleted_atoms=it.chain(
