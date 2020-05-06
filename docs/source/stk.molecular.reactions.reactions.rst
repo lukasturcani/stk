@@ -11,6 +11,7 @@ Subpackages
 
 .. toctree::
 
+   stk.molecular.reactions.reactions.dative_reaction
    stk.molecular.reactions.reactions.reaction
 
 Submodules

@@ -11,5 +11,6 @@ Submodules
 
 .. toctree::
 
+   stk.molecular.reactions.factories.dative_reaction_factory
    stk.molecular.reactions.factories.generic_reaction_factory
    stk.molecular.reactions.factories.reaction_factory

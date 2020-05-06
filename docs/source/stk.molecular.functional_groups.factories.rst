@@ -26,6 +26,7 @@ Submodules
    stk.molecular.functional_groups.factories.primary_amino_factory
    stk.molecular.functional_groups.factories.ring_amine_factory
    stk.molecular.functional_groups.factories.secondary_amino_factory
+   stk.molecular.functional_groups.factories.smarts_functional_group_factory
    stk.molecular.functional_groups.factories.terminal_alkene_factory
    stk.molecular.functional_groups.factories.terminal_alkyne_factory
    stk.molecular.functional_groups.factories.thioacid_factory

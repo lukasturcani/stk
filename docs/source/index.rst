@@ -196,6 +196,16 @@ increase, and the load will be distributed fairly between them.
 This will allow continuous horizontal scaling of :mod:`stk`
 evolutionary algorithms.
 
+More Molecular Structures
+.........................
+
+:mod:`.stk` is always being expanded with new molecular structures.
+If there is a specific kind of molecule you would like to be able
+to construct with :mod:`.stk`, and you don't feel like implementing
+it yourself, simply create an issue on
+https://github.com/lukasturcani/stk/issues, and describe what you would
+like to build.
+
 What Next?
 ----------
 
