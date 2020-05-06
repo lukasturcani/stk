@@ -4,8 +4,6 @@ Dative Reaction
 
 """
 
-from itertools import chain
-
 from .utilities import is_metal
 from ..reaction import Reaction
 from ....bonds import Bond
