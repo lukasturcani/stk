@@ -4,8 +4,6 @@ Metal Complex
 
 """
 
-from itertools import chain
-
 from ..topology_graph import TopologyGraph
 from ...reactions import GenericReactionFactory
 
@@ -13,12 +11,6 @@ from ...reactions import GenericReactionFactory
 class MetalComplex(TopologyGraph):
     """
     Represents a metal complex topology graph.
-
-    Examples
-    --------
-    *Construction*
-
-    *Leaving Unsubstitued Sites*
 
     """
 
