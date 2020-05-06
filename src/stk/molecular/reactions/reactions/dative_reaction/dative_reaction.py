@@ -39,7 +39,7 @@ class DativeReaction(Reaction):
 
     def _get_new_bonds(self):
         for bond in self._reaction._get_new_bonds():
-            if bond.get_orer() == 9 and is_metal(bond.get_atom1()):
+            if bond.get_order() == 9 and is_metal(bond.get_atom1()):
                 yield Bond(
                     atom1=bond.get_atom2(),
                     atom2=bond.get_atom1(),
