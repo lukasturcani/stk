@@ -22,4 +22,4 @@ def is_metal(atom):
         range(39, 49),
         range(72, 81),
     )
-    return atom in metal_atomic_numbers
+    return atom.get_atomic_number() in metal_atomic_numbers
