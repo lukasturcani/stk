@@ -2,11 +2,6 @@ import itertools as it
 import numpy as np
 
 
-def test_get_dative_reaction(dative_case_data):
-
-    test_get_reaction(dative_case_data)
-
-
 def test_get_reaction(case_data):
     """
     Test :class:`.ReactionFactory.get_reaction`.
