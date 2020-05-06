@@ -63,17 +63,7 @@ class MetalComplex(TopologyGraph):
             for ligand, ids in ligands.items()
         }
 
-        building_blocks_types = set(chain(
-            metals.keys(), ligands.keys()
-        ))
-        building_blocks = {i: [] for i in building_blocks_types}
-        for bb in building_blocks_types:
-            if bb in metals:
-                for v in metals[bb]:
-                    building_blocks[bb].append(v)
-            if bb in ligands:
-                for v in ligands[bb]:
-                    building_blocks[bb].append(v)
+        building_blocks = {**metals, **ligands}
 
         super().__init__(
             building_block_vertices={
