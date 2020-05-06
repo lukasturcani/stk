@@ -32,7 +32,7 @@ def dative_reaction(
             reaction=stk.OneOneReaction(
                 functional_group1=functional_group1,
                 functional_group2=functional_group2,
-                bond_order=dative_bond_order,
+                bond_order=bond_order,
                 periodicity=periodicity,
             ),
         ),
