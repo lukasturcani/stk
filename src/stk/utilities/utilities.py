@@ -800,10 +800,10 @@ def get_projection(start, target):
 
     """
 
-    projection = start * np.dot(
-        target,
-        start
-    ) / np.dot(start, start)
+    projection = target * np.dot(
+        start,
+        target
+    ) / np.dot(target, target)
 
     return projection
 

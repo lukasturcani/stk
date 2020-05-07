@@ -111,8 +111,8 @@ class _BiDentateLigandVertex(Vertex):
         fg_vector = fg1_position - fg0_position
 
         proj_onto_fg_vector = get_projection(
-            start=fg_vector,
-            target=placer_to_core_vector
+            start=placer_to_core_vector,
+            target=fg_vector,
         )
 
         edge_centroid = (
