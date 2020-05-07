@@ -61,7 +61,7 @@ class _MonoDentateLigandVertex(Vertex):
 
     def map_functional_groups_to_edges(self, building_block, edges):
 
-        return {0: edges[0]}
+        return {0: edges[0].get_id()}
 
 
 class _BiDentateLigandVertex(Vertex):
