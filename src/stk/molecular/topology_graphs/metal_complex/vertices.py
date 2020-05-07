@@ -63,39 +63,18 @@ class _BiDentateLigandVertex(Vertex):
 
     """
 
-    def __init__(
-        self,
-        id,
-        position,
-    ):
-        """
-        Initialize a :class:`._BiDentateLigandVertex`.
-
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the vertex.
-
-        position : :class:`tuple` of :class:`float`
-            The position of the vertex.
-
-        """
-
-        super().__init__(id, position)
-
-    def clone(self):
-        clone = super().clone()
-        return clone
-
     def place_building_block(self, building_block, edges):
-        # Translate building block to vertex position.
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-
-        # Align vector between 2 edges with vector between centroid of
-        # placers in 2 FGs.
+        assert (
+            building_block.get_num_functional_groups() == 2
+        ), (
+            f'{building_block} needs to have exactly 2 functional '
+            'groups but has '
+            f'{building_block.get_num_functional_groups()}.'
+        )
         fg0, fg1 = building_block.get_functional_groups()
         fg0_position = building_block.get_centroid(
             atom_ids=fg0.get_placer_ids(),
@@ -103,23 +82,14 @@ class _BiDentateLigandVertex(Vertex):
         fg1_position = building_block.get_centroid(
             atom_ids=fg1.get_placer_ids(),
         )
-        start = fg1_position - fg0_position
-        # Vector between connected edges.
-        c_edge_positions = [
-            i.get_position() for i in edges
-        ]
-        target = c_edge_positions[1] - c_edge_positions[0]
+        edge_position1, edge_position2 = (
+            edge.get_position() for edge in edges
+        )
         building_block = building_block.with_rotation_between_vectors(
-            start=start,
-            target=target,
+            start=fg1_position-fg0_position,
+            target=edge_position2-edge_position1,
             origin=building_block.get_centroid(),
         )
-
-        # Align vector between edge-self.position with vector between
-        # placer centroid and core of the molecule centroid.
-        # Importantly, we use a projection of the placer-core vector
-        # that is orthogonal to the FG-FG vector in a bidentate
-        # ligand for this alignment.
         edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
         )
@@ -151,8 +121,6 @@ class _BiDentateLigandVertex(Vertex):
             target=target,
             origin=building_block.get_centroid(),
         )
-
-        # Translate building block to vertex position.
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
