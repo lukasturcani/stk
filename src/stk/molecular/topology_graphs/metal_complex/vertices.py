@@ -68,6 +68,19 @@ class _BiDentateLigandVertex(Vertex):
 
     """
 
+    def _get_projection(start, target):
+        """
+        Get the projection of `start` onto `target`.
+
+        """
+
+        projection = start * np.dot(
+            target,
+            start
+        ) / np.dot(start, start)
+
+        return projection
+
     def place_building_block(self, building_block, edges):
         building_block = building_block.with_centroid(
             position=self._position,
@@ -80,12 +93,10 @@ class _BiDentateLigandVertex(Vertex):
             'groups but has '
             f'{building_block.get_num_functional_groups()}.'
         )
-        fg0, fg1 = building_block.get_functional_groups()
-        fg0_position = building_block.get_centroid(
-            atom_ids=fg0.get_placer_ids(),
-        )
-        fg1_position = building_block.get_centroid(
-            atom_ids=fg1.get_placer_ids(),
+
+        fg0_position, fg1_position = (
+            building_block.get_centroid(fg.get_placer_ids())
+            for fg in building_block.get_functional_groups()
         )
         edge_position1, edge_position2 = (
             edge.get_position() for edge in edges
@@ -95,37 +106,39 @@ class _BiDentateLigandVertex(Vertex):
             target=edge_position2-edge_position1,
             origin=building_block.get_centroid(),
         )
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+
         placer_centroid = building_block.get_centroid(
             atom_ids=building_block.get_placer_ids(),
         )
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        fg0_position = building_block.get_centroid(
-            atom_ids=fg0.get_placer_ids(),
-        )
-        fg1_position = building_block.get_centroid(
-            atom_ids=fg1.get_placer_ids(),
+        placer_to_core_vector = placer_centroid - core_centroid
+
+        fg0_position, fg1_position = (
+            building_block.get_centroid(fg.get_placer_ids())
+            for fg in building_block.get_functional_groups()
         )
         fg_vector = fg1_position - fg0_position
-        placer_to_core_vector = placer_centroid - core_centroid
-        proj_onto_fg_vector = fg_vector * np.dot(
-            placer_to_core_vector,
-            fg_vector
-        ) / np.dot(fg_vector, fg_vector)
+
+        proj_onto_fg_vector = self._get_projection(
+            start=fg_vector,
+            target=placer_to_core_vector
+        )
+
+        edge_centroid = (
+            sum(edge.get_position() for edge in edges) / len(edges)
+        )
         building_block = building_block.with_rotation_between_vectors(
             start=proj_onto_fg_vector - placer_to_core_vector,
             target=self._position - edge_centroid,
             origin=building_block.get_centroid(),
         )
-        building_block = building_block.with_centroid(
+
+        return building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
-        )
-        return building_block.get_position_matrix()
+        ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         fg, = building_block.get_functional_groups(0)
