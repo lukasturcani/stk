@@ -99,8 +99,6 @@ class _BiDentateLigandVertex(Vertex):
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-
-        fg0, fg1 = building_block.get_functional_groups()
         fg0_position = building_block.get_centroid(
             atom_ids=fg0.get_placer_ids(),
         )
@@ -113,12 +111,9 @@ class _BiDentateLigandVertex(Vertex):
             placer_to_core_vector,
             fg_vector
         ) / np.dot(fg_vector, fg_vector)
-        orthogonal_vector = proj_onto_fg_vector - placer_to_core_vector
-        start = orthogonal_vector
-        target = self._position - edge_centroid
         building_block = building_block.with_rotation_between_vectors(
-            start=start,
-            target=target,
+            start=proj_onto_fg_vector - placer_to_core_vector,
+            target=self._position - edge_centroid,
             origin=building_block.get_centroid(),
         )
         building_block = building_block.with_centroid(
