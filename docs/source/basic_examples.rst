@@ -555,6 +555,75 @@ other :mod:`~.functional_group_factory`. Note that the number you
 provide to the factory, is not the id of the atom found in the
 molecule!!
 
+Handling Molecules with Metal Atoms and Dative Bonds
+====================================================
+
+All :mod:`stk` :class:`.Molecule` instances (including
+:class:`.BuildingBlock` and :class:`.ConstructedMolecule`) can contain
+metal atoms and handle various coordination reactions. This does
+introduce issues at the interface with the :mod:`rdkit` library.
+The only implementation detail that is affected is that a dative bond
+is required to not produce atoms with too high of a valency, which results in an
+error in :mod:`rdkit`. Specifically, atoms that are bonded to metals
+through coordination bonds often end up with too high a valency if
+those bonds are considered as covalent. To solve this, dative bonds are
+used, which can be handled by :mod:`rdkit` since release 2017.09.1
+(found here__).
+
+__ https://www.rdkit.org/docs/RDKit_Book.html
+
+Unfortunately, when working with metal-containing systems, any
+:class:`.BuildingBlock` initialization functions that required ETKDG
+will fail because the ETKDG algorithm will fail. Importantly,
+the :mod:`stk` .mol file interface works with the :mod:`rdkit`
+definition of dative bonds. This is achieved by using the bond order of
+`9` for dative bonds in the .mol file and ensuring the dative bond
+goes from `A` --> `B`, where `A` is the atom with the unchanged valency
+(the non-metal atom). Therefore, to initialize a metal-containing
+:class:`.BuildingBlock` you can build the molecule (using some external
+ software) and save it to a .mol file and load the molecule using
+
+.. code-block:: python
+
+    import stk
+    import rdkit.Chem.AllChem as rdkit
+
+    bb1 = stk.BuildingBlock.init_from_file('path/to/file.mol')
+    bb1.write('path/to/file.mol')
+
+    # Produce an rdkit molecule from file.
+    rdkit_mol = rdkit.MolFromMolFile('path/to/file.mol')
+
+    # Or using stk.
+    rdkit_mol = bb.to_rdkit_mol()
+
+Dative bonds are not defined for the InChI or InChiIKey functions of
+:mod:`rdkit`. Therefore, when storing metal-containing molecules in a
+database, a different key is required. Because dative bonds are
+implemented in the definition of SMILES, the SMILES string makes a
+useful key for metal-containing molecules. We have implemented a SMILES
+:class:`.KeyMaker` for this purpose
+
+.. code-block:: python
+
+    import stk
+    import pymongo
+
+    client = pymongo.MongoClient()
+    db = stk.MoleculeMongoDb(
+        mongo_client=client,
+            jsonizer=stk.MoleculeJsonizer(
+                key_makers=(stk.Smiles()),
+        ),
+    )
+
+    bb = stk.BuildingBlock.init_from_file('path/to/file.mol')
+    db.put(bb)
+
+Note that the documentation of :class:`.MoleculeMongoDb`, shows how
+you can use your own code to retrieve your molecules with SMILES (or
+any other molecular property) as the key.
+
 Extending stk
 =============
 
