@@ -34,6 +34,13 @@ class _MonoDentateLigandVertex(Vertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
+        assert (
+            building_block.get_num_functional_groups() == 1
+        ), (
+            f'{building_block} needs to have exactly 1 functional '
+            'group but has '
+            f'{building_block.get_num_functional_groups()}.'
+        )
         fg, = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
@@ -51,10 +58,8 @@ class _MonoDentateLigandVertex(Vertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        edges = sorted(edges, key=lambda i: i.get_id())
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+
+        return {0: edges[0]}
 
 
 class _BiDentateLigandVertex(Vertex):
