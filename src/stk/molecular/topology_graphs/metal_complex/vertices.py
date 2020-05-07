@@ -34,7 +34,7 @@ class _MonoDentateLigandVertex(Vertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        fg, = building_block.get_functional_groups()
+        fg, = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
         )
@@ -44,11 +44,9 @@ class _MonoDentateLigandVertex(Vertex):
         edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
         )
-        target = edge_centroid - self._position
         return building_block.with_rotation_between_vectors(
             start=fg_centroid - core_centroid,
-            # _cap_direction is defined by a subclass.
-            target=target,
+            target=edge_centroid - self._position,
             origin=self._position,
         ).get_position_matrix()
 
