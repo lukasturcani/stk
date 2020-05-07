@@ -113,10 +113,6 @@ class MetalComplex(TopologyGraph):
         for vertex_id in vertex_ids:
             yield self._ligand_vertex_prototypes[vertex_id]
 
-    def clone(self):
-        clone = super().clone()
-        return clone
-
     def _get_scale(self, building_block_vertices):
         return 1
 
