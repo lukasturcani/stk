@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.spatial.distance import euclidean
 
+from stk.utilities import get_projection
+
 from ..topology_graph import Vertex
 
 
@@ -68,19 +70,6 @@ class _BiDentateLigandVertex(Vertex):
 
     """
 
-    def _get_projection(start, target):
-        """
-        Get the projection of `start` onto `target`.
-
-        """
-
-        projection = start * np.dot(
-            target,
-            start
-        ) / np.dot(start, start)
-
-        return projection
-
     def place_building_block(self, building_block, edges):
         building_block = building_block.with_centroid(
             position=self._position,
@@ -121,7 +110,7 @@ class _BiDentateLigandVertex(Vertex):
         )
         fg_vector = fg1_position - fg0_position
 
-        proj_onto_fg_vector = self._get_projection(
+        proj_onto_fg_vector = get_projection(
             start=fg_vector,
             target=placer_to_core_vector
         )

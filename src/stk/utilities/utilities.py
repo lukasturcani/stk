@@ -794,6 +794,20 @@ def remake(mol):
     return m
 
 
+def get_projection(start, target):
+    """
+    Get the projection of `start` onto `target`.
+
+    """
+
+    projection = start * np.dot(
+        target,
+        start
+    ) / np.dot(start, start)
+
+    return projection
+
+
 def orthogonal_vector(vector):
     ortho = np.array([0., 0., 0.])
     for m, val in enumerate(vector):
