@@ -61,7 +61,7 @@ class BuildingBlock(Molecule):
         smiles,
         functional_groups=(),
         placer_ids=None,
-        random_seed=4,
+        random_seed=None,
         position_matrix=None,
     ):
         """
@@ -127,7 +127,7 @@ class BuildingBlock(Molecule):
 
         """
 
-        if random_seed != 4:
+        if random_seed is not None:
             warnings.warn(
                 'The random seed parameter will be removed in any '
                 'version of stk released on, or after, 01/08/20. '
@@ -136,6 +136,8 @@ class BuildingBlock(Molecule):
                 'position_matrix parameter.',
                 FutureWarning,
             )
+        else:
+            random_seed = 4
 
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
         if position_matrix is None:
@@ -226,7 +228,8 @@ class BuildingBlock(Molecule):
         molecule,
         functional_groups=(),
         placer_ids=None,
-        random_seed=4,
+        random_seed=None,
+        position_matrix=None,
     ):
         """
         Initialize from a :mod:`vabene.Molecule`.
@@ -272,7 +275,17 @@ class BuildingBlock(Molecule):
                *placer* ids.
 
         random_seed : :class:`int`, optional
-            Random seed passed to :func:`rdkit.ETKDGv2`
+            Random seed passed to :func:`rdkit.ETKDGv2`. This
+            argument is deprecated and will be removed in any
+            version of :mod:`stk` released on, or after, 01/08/20.
+            If you want to change the position matrix of the
+            initialized building block, please use
+            `position_matrix`.
+
+        position_matrix : :class:`numpy.ndarray`, optional
+            The position matrix the building block should use. If
+            ``None``, :func:`rdkit.ETKDGv2` will be used to calculated
+            it.
 
         Returns
         -------
@@ -285,6 +298,18 @@ class BuildingBlock(Molecule):
             If embedding the molecule fails.
 
         """
+
+        if random_seed is not None:
+            warnings.warn(
+                'The random seed parameter will be removed in any '
+                'version of stk released on, or after, 01/08/20. '
+                'If you want to change the position matrix of the '
+                'initialized building block, please use the '
+                'position_matrix parameter.',
+                FutureWarning,
+            )
+        else:
+            random_seed = 4
 
         editable = rdkit.EditableMol(rdkit.Mol())
         for atom in molecule.get_atoms():
@@ -302,12 +327,21 @@ class BuildingBlock(Molecule):
         rdkit_molecule = editable.GetMol()
         rdkit.SanitizeMol(rdkit_molecule)
         rdkit_molecule = rdkit.AddHs(rdkit_molecule)
-        params = rdkit.ETKDGv2()
-        params.randomSeed = random_seed
-        if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
-            raise RuntimeError(
-                f'Embedding with seed value of {random_seed} failed.'
-            )
+
+        if position_matrix is None:
+            params = rdkit.ETKDGv2()
+            params.randomSeed = random_seed
+            if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
+                raise RuntimeError(
+                    f'Embedding with seed value of {random_seed} '
+                    'failed.'
+                )
+        else:
+            conformer = rdkit.Conformer(rdkit_molecule.GetNumAtoms())
+            for atom_id, position in enumerate(position_matrix):
+                conformer.SetAtomPosition(atom_id, position)
+            rdkit_molecule.AddConformer(conformer)
+
         rdkit.Kekulize(rdkit_molecule)
         return cls.init_from_rdkit_mol(
             molecule=rdkit_molecule,
