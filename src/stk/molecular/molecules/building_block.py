@@ -129,7 +129,8 @@ class BuildingBlock(Molecule):
 
         if random_seed is not None:
             warnings.warn(
-                'The random seed parameter will be removed in any '
+                'The BuildingBlock random seed parameter will be '
+                'removed in any '
                 'version of stk released on, or after, 01/08/20. '
                 'If you want to change the position matrix of the '
                 'initialized building block, please use the '
@@ -301,7 +302,8 @@ class BuildingBlock(Molecule):
 
         if random_seed is not None:
             warnings.warn(
-                'The random seed parameter will be removed in any '
+                'The init_from_vabene_molecule random seed parameter '
+                'will be removed in any '
                 'version of stk released on, or after, 01/08/20. '
                 'If you want to change the position matrix of the '
                 'initialized building block, please use the '
