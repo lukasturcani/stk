@@ -9,6 +9,7 @@ import logging
 import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
+import warnings
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -61,6 +62,7 @@ class BuildingBlock(Molecule):
         functional_groups=(),
         placer_ids=None,
         random_seed=4,
+        position_matrix=None,
     ):
         """
         Initialize a :class:`.BuildingBlock`.
@@ -68,7 +70,7 @@ class BuildingBlock(Molecule):
         Notes
         -----
         The molecule is given 3D coordinates with
-        :func:`rdkit.ETKDGv2()`.
+        :func:`rdkit.ETKDGv2`.
 
         Parameters
         ----------
@@ -106,7 +108,17 @@ class BuildingBlock(Molecule):
                *placer* ids.
 
         random_seed : :class:`int`, optional
-            Random seed passed to :func:`rdkit.ETKDGv2`
+            Random seed passed to :func:`rdkit.ETKDGv2`. This
+            argument is deprecated and will be removed in any
+            version of :mod:`stk` released on, or after, 01/08/20.
+            If you want to change the position matrix of the
+            initialized building block, please use
+            `position_matrix`.
+
+        position_matrix : :class:`numpy.ndarray`, optional
+            The position matrix the building block should use. If
+            ``None``, :func:`rdkit.ETKDGv2` will be used to calculated
+            it.
 
         Raises
         ------
@@ -115,14 +127,32 @@ class BuildingBlock(Molecule):
 
         """
 
-        molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        params = rdkit.ETKDGv2()
-        params.randomSeed = random_seed
-        if rdkit.EmbedMolecule(molecule, params) == -1:
-            raise RuntimeError(
-                f'Embedding with seed value of {random_seed} failed.'
+        if random_seed != 4:
+            warnings.warn(
+                'The random seed parameter will be removed in any '
+                'version of stk released on, or after, 01/08/20. '
+                'If you want to change the position matrix of the '
+                'initialized building block, please use the '
+                'position_matrix parameter.',
+                FutureWarning,
             )
-        rdkit.Kekulize(molecule)
+
+        molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        if position_matrix is None:
+            params = rdkit.ETKDGv2()
+            params.randomSeed = random_seed
+            if rdkit.EmbedMolecule(molecule, params) == -1:
+                raise RuntimeError(
+                    f'Embedding with seed value of {random_seed} '
+                    'failed.'
+                )
+            rdkit.Kekulize(molecule)
+        else:
+            conformer = rdkit.Conformer(molecule.GetNumAtoms())
+            for atom_id, position in enumerate(position_matrix):
+                conformer.SetAtomPosition(atom_id, position)
+            molecule.AddConformer(conformer)
+
         self._init_from_rdkit_mol(
             molecule=molecule,
             functional_groups=functional_groups,
