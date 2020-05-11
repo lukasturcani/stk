@@ -117,7 +117,7 @@ class BuildingBlock(Molecule):
 
         position_matrix : :class:`numpy.ndarray`, optional
             The position matrix the building block should use. If
-            ``None``, :func:`rdkit.ETKDGv2` will be used to calculated
+            ``None``, :func:`rdkit.ETKDGv2` will be used to calculate
             it.
 
         Raises
@@ -285,7 +285,7 @@ class BuildingBlock(Molecule):
 
         position_matrix : :class:`numpy.ndarray`, optional
             The position matrix the building block should use. If
-            ``None``, :func:`rdkit.ETKDGv2` will be used to calculated
+            ``None``, :func:`rdkit.ETKDGv2` will be used to calculate
             it.
 
         Returns
