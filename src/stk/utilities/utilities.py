@@ -802,7 +802,7 @@ def get_projection(start, target):
 
     return target * np.dot(
         start,
-        target
+        target,
     ) / np.dot(target, target)
 
 
