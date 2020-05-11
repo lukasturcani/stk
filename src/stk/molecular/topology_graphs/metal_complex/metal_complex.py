@@ -27,13 +27,11 @@ class MetalComplex(TopologyGraph):
         Parameters
         ----------
         metals : :class:`dict`
-            A :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+            Maps :class:`.BuildingBlock` instances to the ids of the
+            vertices they should be placed on.
 
         ligands : :class:`dict`
-            A :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
+            Maps :class:`.BuildingBlock` instances to the ids of the
             vertices it should be placed on.
 
         reaction_factory : :class:`.ReactionFactory`, optional
@@ -46,22 +44,16 @@ class MetalComplex(TopologyGraph):
 
         """
 
-        metals = {
-            metal: self._get_metal_vertices(ids)
+        building_block_vertices = {
+            metal: tuple(self._get_metal_vertices(ids))
             for metal, ids in metals.items()
         }
-        ligands = {
-            ligand: self._get_ligand_vertices(ids)
+        building_block_vertices.update(
+            (ligand, tuple(self._get_ligand_vertices(ids))
             for ligand, ids in ligands.items()
-        }
-
-        building_blocks = {**metals, **ligands}
-
+        )
         super().__init__(
-            building_block_vertices={
-                building_block: tuple(vertices)
-                for building_block, vertices in building_blocks.items()
-            },
+            building_block_vertices=building_block_vertices,
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
             construction_stages=(),
