@@ -800,12 +800,10 @@ def get_projection(start, target):
 
     """
 
-    projection = target * np.dot(
+    return target * np.dot(
         start,
         target
     ) / np.dot(target, target)
-
-    return projection
 
 
 def orthogonal_vector(vector):
