@@ -12,6 +12,23 @@ class MetalComplex(TopologyGraph):
     """
     Represents a metal complex topology graph.
 
+    Notes
+    -----
+    *Subclass Implementation*
+    
+    <Fill me in.>
+    
+    Examples
+    --------
+    *Subclass Implmentation*
+    
+    <Fill me in. You can just use the standard 
+    disclaimer here, see Cage documentation.>
+    
+    *Construction*
+    
+    <Fill me in.>
+
     """
 
     def __init__(
