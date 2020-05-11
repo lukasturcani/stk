@@ -12,12 +12,9 @@ import numpy as np
 import time
 from contextlib import contextmanager
 import os
-import subprocess as sp
-import gzip
 import re
 from collections import deque
 import tarfile
-from glob import iglob
 
 
 # Holds the elements Van der Waals radii in Angstroms.
