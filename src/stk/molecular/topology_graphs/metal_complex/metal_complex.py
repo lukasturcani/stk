@@ -66,7 +66,7 @@ class MetalComplex(TopologyGraph):
             for metal, ids in metals.items()
         }
         building_block_vertices.update(
-            (ligand, tuple(self._get_ligand_vertices(ids))
+            (ligand, tuple(self._get_ligand_vertices(ids)))
             for ligand, ids in ligands.items()
         )
         super().__init__(
