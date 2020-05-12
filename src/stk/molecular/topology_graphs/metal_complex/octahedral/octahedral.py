@@ -19,7 +19,9 @@ class Octahedral(MetalComplex):
     Ligand building blocks with one functional group are required for
     this topology.
 
-    :class:`.BuildingBlock` placements:
+    .. code-block:: python
+
+        # :class:`.BuildingBlock` placements:
         metals: (0, )
         ligands: (0, 1, 2, 3, 4, 5)
 
