@@ -50,6 +50,29 @@ _bi_1 = stk.BuildingBlock(
                 '[H])<-N([H])([H])C([H])([H])C([H])([H])N->2([H])[H]'
             ),
         ),
+
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                stk.metal_complex.BidentateSquarePlanar(
+                    metals=_palladium_atom,
+                    ligands=_bi_1,
+                    reaction_factory=stk.DativeReactionFactory(
+                        stk.GenericReactionFactory(
+                            bond_orders={
+                                frozenset({
+                                    stk.GenericFunctionalGroup,
+                                    stk.SingleAtom
+                                }): 9
+                            }
+                        )
+                    )
+                )
+            ),
+            smiles=(
+                '[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]2(<-N1([H])'
+                '[H])<-N([H])([H])C([H])([H])C([H])([H])N->2([H])[H]'
+            ),
+        ),
     ),
 )
 def metal_complex_bidentatesquareplanar(request):
