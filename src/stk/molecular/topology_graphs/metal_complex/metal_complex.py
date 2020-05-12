@@ -40,17 +40,21 @@ class MetalComplex(TopologyGraph):
     """
     Represents a metal complex topology graph.
 
+    Notes
+    -----
+    *Subclass Implementation*
+
+    Each subclass needs to define the iterable attributes,
+    :attr:`_metal_vertex_prototypes` and
+    :attr:`_ligand_vertex_prototypes`, which define the positions for
+    metal-based and ligand-based vertices, respectively.
+
     Examples
     --------
     *Subclass Implementation*
 
     The source code of the subclasses, listed in
     :mod:`~.metal_complex.metal_complex`, can serve as good examples.
-
-    Each subclass needs to define the iterable attributes,
-    :attr:`_metal_vertex_prototypes` and
-    :attr:`_ligand_vertex_prototypes`, which define the positions for
-    metal-based and ligand-based vertices, respectively.
 
     *Construction*
 
@@ -177,22 +181,6 @@ class MetalComplex(TopologyGraph):
                 )
             )
         )
-    Notes
-    -----
-    *Subclass Implementation*
-    
-    <Fill me in.>
-    
-    Examples
-    --------
-    *Subclass Implmentation*
-    
-    <Fill me in. You can just use the standard 
-    disclaimer here, see Cage documentation.>
-    
-    *Construction*
-    
-    <Fill me in.>
 
     """
 
