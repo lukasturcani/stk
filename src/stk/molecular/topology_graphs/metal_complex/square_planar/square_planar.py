@@ -19,7 +19,9 @@ class SquarePlanar(MetalComplex):
     Linker building blocks with one functional group is required
     for this topology graph.
 
-    :class:`.BuildingBlock` placements:
+    .. code-block:: python
+
+        # :class:`.BuildingBlock` placements:
         metals: (0, )
         ligands: (0, 1, 2, 3)
 
