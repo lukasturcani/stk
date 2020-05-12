@@ -18,7 +18,7 @@ class _MetalVertex(Vertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        edges = sorted(edges, key=lambda i: i.get_id())
+
         return {
             fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
         }
@@ -101,7 +101,7 @@ class _BiDentateLigandVertex(Vertex):
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        placer_to_core_vector = placer_centroid - core_centroid
+        core_to_placer = placer_centroid - core_centroid
 
         fg0_position, fg1_position = (
             building_block.get_centroid(fg.get_placer_ids())
@@ -109,8 +109,8 @@ class _BiDentateLigandVertex(Vertex):
         )
         fg_vector = fg1_position - fg0_position
 
-        proj_onto_fg_vector = get_projection(
-            start=placer_to_core_vector,
+        fg_vector_projection = get_projection(
+            start=core_to_placer,
             target=fg_vector,
         )
 
@@ -118,7 +118,7 @@ class _BiDentateLigandVertex(Vertex):
             sum(edge.get_position() for edge in edges) / len(edges)
         )
         building_block = building_block.with_rotation_between_vectors(
-            start=proj_onto_fg_vector - placer_to_core_vector,
+            start=fg_vector_projection - core_to_placer,
             target=self._position - edge_centroid,
             origin=building_block.get_centroid(),
         )
