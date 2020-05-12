@@ -40,6 +40,7 @@ class MetalComplex(TopologyGraph):
     """
     Represents a metal complex topology graph.
 
+<<<<<<< HEAD
     Examples
     --------
     *Subclass Implementation*
@@ -177,6 +178,24 @@ class MetalComplex(TopologyGraph):
                 )
             )
         )
+=======
+    Notes
+    -----
+    *Subclass Implementation*
+    
+    <Fill me in.>
+    
+    Examples
+    --------
+    *Subclass Implmentation*
+    
+    <Fill me in. You can just use the standard 
+    disclaimer here, see Cage documentation.>
+    
+    *Construction*
+    
+    <Fill me in.>
+>>>>>>> 8c19d795138087e11601738404cdd115d7870ad7
 
     """
 
@@ -192,6 +211,7 @@ class MetalComplex(TopologyGraph):
 
         Parameters
         ----------
+<<<<<<< HEAD
         metals : :class:`dict` or :class:`.BuildingBlock`
             Can be a :class:`dict` which maps the
             :class:`.BuildingBlock` instances to the ids of the
@@ -211,6 +231,15 @@ class MetalComplex(TopologyGraph):
             Can also be a :class:`.BuildingBlock` instance, which
             should be placed at all :attr:`_ligand_vertex_prototypes`
             on the topology graph.
+=======
+        metals : :class:`dict`
+            Maps :class:`.BuildingBlock` instances to the ids of the
+            vertices they should be placed on.
+
+        ligands : :class:`dict`
+            Maps :class:`.BuildingBlock` instances to the ids of the
+            vertices it should be placed on.
+>>>>>>> 8c19d795138087e11601738404cdd115d7870ad7
 
         reaction_factory : :class:`.ReactionFactory`, optional
             The reaction factory to use for creating bonds between
@@ -222,6 +251,7 @@ class MetalComplex(TopologyGraph):
 
         """
 
+<<<<<<< HEAD
         if isinstance(metals, dict):
             metals = {
                 metal: self._get_metal_vertices(ids)
@@ -246,11 +276,18 @@ class MetalComplex(TopologyGraph):
 
         building_blocks = {**metals, **ligands}
 
+=======
+        building_block_vertices = {
+            metal: tuple(self._get_metal_vertices(ids))
+            for metal, ids in metals.items()
+        }
+        building_block_vertices.update(
+            (ligand, tuple(self._get_ligand_vertices(ids)))
+            for ligand, ids in ligands.items()
+        )
+>>>>>>> 8c19d795138087e11601738404cdd115d7870ad7
         super().__init__(
-            building_block_vertices={
-                building_block: tuple(vertices)
-                for building_block, vertices in building_blocks.items()
-            },
+            building_block_vertices=building_block_vertices,
             edges=self._edge_prototypes,
             reaction_factory=reaction_factory,
             construction_stages=(),
