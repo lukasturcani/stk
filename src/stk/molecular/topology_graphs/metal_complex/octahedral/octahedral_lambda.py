@@ -21,9 +21,9 @@ class OctahedralLambda(MetalComplex):
 
     .. code-block:: python
 
-        :class:`.BuildingBlock` placements:
-            metals: (0, )
-            ligands: (0, 1, 2)
+        # :class:`.BuildingBlock` placements:
+        metals: (0, )
+        ligands: (0, 1, 2)
 
     See :class:`.MetalComplex` for more details and examples.
 
