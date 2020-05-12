@@ -2,6 +2,34 @@
 Metal Complex
 =============
 
+.. toctree::
+    :maxdepth: 2
+
+    Paddlewheel <\
+    stk.molecular.topology_graphs.metal_complex.paddlewheel.paddlewheel\
+>
+    Porphyrin <\
+stk.molecular.topology_graphs.metal_complex.porphyrin.porphyrin\
+>
+    Octahedral <\
+stk.molecular.topology_graphs.metal_complex.octahedral.octahedral\
+>
+    Octahedral Lambda <\
+stk.molecular.topology_graphs.metal_complex.octahedral.octahedral_lambda\
+>
+    Octahedral Delta <\
+stk.molecular.topology_graphs.metal_complex.octahedral.octahedral_delta\
+>
+    Square Planar <\
+stk.molecular.topology_graphs.metal_complex.square_planar.square_planar\
+>
+    Bidentate Square Planar <\
+stk.molecular.topology_graphs.metal_complex.square_planar.bidentate_square_planar\
+>
+    Cis Protected Square Planar <\
+stk.molecular.topology_graphs.metal_complex.square_planar.cis_protected_square_planar\
+>
+
 """
 
 from ..topology_graph import TopologyGraph
@@ -11,6 +39,144 @@ from ...reactions import GenericReactionFactory
 class MetalComplex(TopologyGraph):
     """
     Represents a metal complex topology graph.
+
+    Examples
+    --------
+    *Subclass Implementation*
+
+    The source code of the subclasses, listed in
+    :mod:`~.metal_complex.metal_complex`, can serve as good examples.
+
+    Each subclass needs to define the iterable attributes,
+    :attr:`_metal_vertex_prototypes` and
+    :attr:`_ligand_vertex_prototypes`, which define the positions for
+    metal-based and ligand-based vertices, respectively.
+
+    *Construction*
+
+    In some cases, constructing metal-containing archiectures requires
+    more explicit input than other :class:`.TopologyGraph`. For
+    example, to build a six-coordinate iron(II) complex with an
+    octahedral geometry and lambda stereochemistry, we firstly need to
+    define a metal atom (with six functional groups) and the organic
+    ligand :class:`.BuildingBlock` (with two functional groups).
+
+    .. code-block:: python
+        import stk
+
+        # Define a single atom of desired smiles with coordinates
+        # (0, 0, 0) using RDKit.
+        atom = rdkit.MolFromSmiles('[Fe+2]')
+        atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
+        stk_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
+        atom_0, = stk_atom.get_atoms(0)
+
+        # Assign the atom with 6 functional groups.
+        stk_atom = stk_atom.with_functional_groups(
+            (stk.SingleAtom(atom_0) for i in range(6))
+        )
+
+        # Define an organic linker with two functional groups.
+        # In this example, the ordering of the functional groups is set
+        # such that the ligand orientation is consistent and the target
+        # stereochemistry is obtained.
+        bidentate_ligand = stk.BuildingBlock(
+            smiles='C=NC/C=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+    Next we perform construction of the :class:`.TopologyGraph`. Note
+    that :class:`.MetalComplex` topologies have a different
+    initializer, that clearly defines the placement of metal and ligand
+    building blocks. Each :class:`.MetalComplex` provides example
+    placements in their docstring.
+    It is crucial that metal-ligand bonds are correctly created to be
+    dative (i.e. the valence of the ligand `bonder` is not affected by
+    the bond). This is handled by providing the
+    :class:`DativeReactionFactory` a :class:`GenericReactionFactory`
+    with the bond order of the expected functional groups defined to be
+    9.
+
+    .. code-block:: python
+
+        complex = stk.ConstructedMolecule(
+            stk.metal_complex.OctahedralLambda(
+                metals={stk_atom: 0},
+                ligands={bidentate_ligand: (0, 1, 2)},
+                reaction_factory=stk.DativeReactionFactory(
+                    stk.GenericReactionFactory(
+                        bond_orders={
+                            frozenset({
+                                stk.GenericFunctionalGroup,
+                                stk.SingleAtom
+                            }): 9
+                        }
+                    )
+                )
+            )
+        )
+
+    *Leaving Unsubstitued Sites*
+
+    Sometimes when building metal complexes to be used as
+    :class:`.BuildingBlock` for a :class:`.ConstructedMolecule`, it is
+    necessary to build a metal with open metal sites. Here, we provide
+    the :class:`.CisProtectedSquarePlanar` topology to allow the user
+    to build a square planar palladium(II) complex with two open metal
+    sites. Notice in this example, that the metal and ligand placement
+    is not specified upon initialisation. This is possible for all
+    topologies.
+
+    .. code-block:: python
+
+        import stk
+
+        # Define single metal atom with four functional groups.
+        pd_metal = build_single_atom(
+            smiles='[Pd+2]',
+            no_fgs=4
+        )
+
+        # Define a bidentate ligand with two functional groups.
+        bidentate_ligand = stk.BuildingBlock(
+            smiles='NCCN',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#7]~[#6]',
+                    bonders=(0, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+        # Construct a cis-protected square planar metal complex.
+        complex = stk.ConstructedMolecule(
+            stk.metal_complex.CisProtectedSquarePlanar(
+                metals=pd_metal,
+                ligands=bidentate_ligand,
+                reaction_factory=stk.DativeReactionFactory(
+                    stk.GenericReactionFactory(
+                        bond_orders={
+                            frozenset({
+                                stk.GenericFunctionalGroup,
+                                stk.SingleAtom
+                            }): 9
+                        }
+                    )
+                )
+            )
+        )
 
     """
 
