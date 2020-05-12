@@ -56,6 +56,31 @@ _quad_1 = stk.BuildingBlock(
                 ')C([H])=C3[H])N->52)=C([H])C([H])=C1Br'
             ),
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                stk.metal_complex.Porphyrin(
+                    metals=_zinc_atom,
+                    ligands=_quad_1,
+                    reaction_factory=stk.DativeReactionFactory(
+                        stk.GenericReactionFactory(
+                            bond_orders={
+                                frozenset({
+                                    stk.GenericFunctionalGroup,
+                                    stk.SingleAtom
+                                }): 9
+                            }
+                        )
+                    )
+                )
+            ),
+            smiles=(
+                '[H]C1=C([H])C(C2=C3C([H])=C([H])C4=N3->[Zn+2]35<-N'
+                '6=C(C([H])=C([H])C6=C(C6=C([H])C([H])=C(Br)C([H])=C6'
+                '[H])C6=C([H])C([H])=C2N->36)C(C2=C([H])C([H])=C(Br)C'
+                '([H])=C2[H])=C2C([H])=C([H])C(=C4C3=C([H])C([H])=C(Br'
+                ')C([H])=C3[H])N->52)=C([H])C([H])=C1Br'
+            ),
+        ),
     ),
 )
 def metal_complex_porphyrin(request):
