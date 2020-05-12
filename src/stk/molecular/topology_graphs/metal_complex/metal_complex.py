@@ -192,15 +192,25 @@ class MetalComplex(TopologyGraph):
 
         Parameters
         ----------
-        metals : :class:`dict`
-            A :class:`dict` which maps the
+        metals : :class:`dict` or :class:`.BuildingBlock`
+            Can be a :class:`dict` which maps the
             :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+            vertices in :attr:`_metal_vertex_prototypes` it should
+            be placed on.
 
-        ligands : :class:`dict`
-            A :class:`dict` which maps the
+            Can also be a :class:`.BuildingBlock` instance, which
+            should be placed at all :attr:`_metal_vertex_prototypes`
+            on the topology graph.
+
+        ligands : :class:`dict` or :class:`.BuildingBlock`
+            Can be a :class:`dict` which maps the
             :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+            vertices in :attr:`_ligand_vertex_prototypes` it should be
+            placed on.
+
+            Can also be a :class:`.BuildingBlock` instance, which
+            should be placed at all :attr:`_ligand_vertex_prototypes`
+            on the topology graph.
 
         reaction_factory : :class:`.ReactionFactory`, optional
             The reaction factory to use for creating bonds between
@@ -212,14 +222,27 @@ class MetalComplex(TopologyGraph):
 
         """
 
-        metals = {
-            metal: self._get_metal_vertices(ids)
-            for metal, ids in metals.items()
-        }
-        ligands = {
-            ligand: self._get_ligand_vertices(ids)
-            for ligand, ids in ligands.items()
-        }
+        if isinstance(metals, dict):
+            metals = {
+                metal: self._get_metal_vertices(ids)
+                for metal, ids in metals.items()
+            }
+        else:
+            metals = {
+                metals: self._get_metal_vertices(ids)
+                for ids in range(len(self._metal_vertex_prototypes))
+            }
+
+        if isinstance(metals, dict):
+            ligands = {
+                ligand: self._get_ligand_vertices(ids)
+                for ligand, ids in ligands.items()
+            }
+        else:
+            ligands = {
+                ligands: self._get_metal_vertices(ids)
+                for ids in range(len(self._ligand_vertex_prototypes))
+            }
 
         building_blocks = {**metals, **ligands}
 
