@@ -19,7 +19,9 @@ class CisProtectedSquarePlanar(MetalComplex):
     Linker building blocks with two functional groups are required
     for this topology graph.
 
-    :class:`.BuildingBlock` placements:
+    .. code-block:: python
+
+        # :class:`.BuildingBlock` placements:
         metals: (0, )
         ligands: (0, )
 
