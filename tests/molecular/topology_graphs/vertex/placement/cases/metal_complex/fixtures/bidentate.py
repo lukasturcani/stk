@@ -14,7 +14,7 @@ def bidentate(position, building_block_2):
 
     point1, point2 = points = (
         position + [-10, 0, 0],
-        position + [-10, 0, 0],
+        position + [0, -10, 0],
     )
 
     def get_fg0_point(building_block):
@@ -26,7 +26,7 @@ def bidentate(position, building_block_2):
     def get_fg1_point(building_block):
         return get_closest_point(
             points=points,
-            point=get_fg_position(0, building_block),
+            point=get_fg_position(1, building_block),
         )
 
     vertex = vertices._BiDentateLigandVertex(
@@ -61,15 +61,15 @@ def get_fg_position(id, building_block):
 def get_edges(vertex):
     vertex2 = stk.Vertex(1, vertex.get_position() + [-1, -1, 0])
     yield stk.Edge(
-        0,
-        vertex,
-        vertex2,
+        id=0,
+        vertex1=vertex,
+        vertex2=vertex2,
         position=vertex.get_position() + [-1, 0, 0]
     )
     yield stk.Edge(
-        1,
-        vertex,
-        vertex2,
+        id=1,
+        vertex1=vertex,
+        vertex2=vertex2,
         position=vertex.get_position() + [0, -1, 0]
     )
 
