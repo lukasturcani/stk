@@ -19,7 +19,9 @@ class Paddlewheel(MetalComplex):
     Ligand building blocks with two functional groups are required for
     this topology.
 
-    :class:`.BuildingBlock` placements:
+    .. code-block:: python
+
+        # :class:`.BuildingBlock` placements:
         metals: (0, 1)
         ligands: (0, 1, 2, 3)
 
