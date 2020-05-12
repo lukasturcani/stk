@@ -29,8 +29,6 @@ class OctahedralLambda(MetalComplex):
 
     """
 
-    # Use fg_assignment to ensure the desired stereochemistry is
-    # achieved.
     _metal_vertex_prototypes = (
         _MetalVertex(0, [0, 0, 0]),
     )
