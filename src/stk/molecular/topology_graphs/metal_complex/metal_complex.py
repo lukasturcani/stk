@@ -227,28 +227,26 @@ class MetalComplex(TopologyGraph):
         """
 
         if isinstance(metals, dict):
-            metals = {
-                metal: self._get_metal_vertices(ids)
+            building_block_vertices = {
+                metal: tuple(self._get_metal_vertices(ids))
                 for metal, ids in metals.items()
             }
         else:
-            metals = {
-                metals: self._get_metal_vertices(ids)
+            building_block_vertices = {
+                metals: tuple(self._get_metal_vertices(ids))
                 for ids in range(len(self._metal_vertex_prototypes))
             }
 
         if isinstance(metals, dict):
-            ligands = {
-                ligand: self._get_ligand_vertices(ids)
+            building_block_vertices.update(
+                (ligand, tuple(self._get_ligand_vertices(ids)))
                 for ligand, ids in ligands.items()
-            }
+            )
         else:
-            ligands = {
-                ligands: self._get_metal_vertices(ids)
+            building_block_vertices.update(
+                (ligands, tuple(self._get_metal_vertices(ids)))
                 for ids in range(len(self._ligand_vertex_prototypes))
-            }
-
-        building_blocks = {**metals, **ligands}
+            )
 
         super().__init__(
             building_block_vertices=building_block_vertices,
