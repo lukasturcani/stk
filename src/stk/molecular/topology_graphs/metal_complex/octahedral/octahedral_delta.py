@@ -21,7 +21,7 @@ class OctahedralDelta(MetalComplex):
 
     .. code-block:: python
 
-        :class:`.BuildingBlock` placements:
+        # :class:`.BuildingBlock` placements:
         metals: (0, )
         ligands: (0, 1, 2)
 
