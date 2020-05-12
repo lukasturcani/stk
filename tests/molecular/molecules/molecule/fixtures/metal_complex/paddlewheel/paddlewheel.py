@@ -57,6 +57,31 @@ _bi_1 = stk.BuildingBlock(
                 '([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
             ),
         ),
+
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                stk.metal_complex.Paddlewheel(
+                    metals=_copper_atom,
+                    ligands=_bi_1,
+                    reaction_factory=stk.DativeReactionFactory(
+                        stk.GenericReactionFactory(
+                            bond_orders={
+                                frozenset({
+                                    stk.GenericFunctionalGroup,
+                                    stk.SingleAtom
+                                }): 9
+                            }
+                        )
+                    )
+                )
+            ),
+            smiles=(
+                '[H]C1=C([H])C(C2=O->[Cu+2]34<-O=C(C5=C([H])C([H])=C('
+                'Br)C([H])=C5[H])O->[Cu+2](<-O2)(<-OC(C2=C([H])C([H])'
+                '=C(Br)C([H])=C2[H])=O->3)<-OC(C2=C([H])C([H])=C(Br)C'
+                '([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
+            ),
+        ),
     ),
 )
 def metal_complex_paddlewheel(request):
