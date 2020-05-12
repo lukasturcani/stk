@@ -560,28 +560,22 @@ Handling Molecules with Metal Atoms and Dative Bonds
 
 All :mod:`stk` :class:`.Molecule` instances (including
 :class:`.BuildingBlock` and :class:`.ConstructedMolecule`) can contain
-metal atoms and handle various coordination reactions. This does
-introduce issues at the interface with the :mod:`rdkit` library.
-The only implementation detail that is affected is that a dative bond
-is required to not produce atoms with too high of a valency, which results in an
-error in :mod:`rdkit`. Specifically, atoms that are bonded to metals
-through coordination bonds often end up with too high a valency if
-those bonds are considered as covalent. To solve this, dative bonds are
-used, which can be handled by :mod:`rdkit` since release 2017.09.1
-(found here__).
+metal atoms and handle various coordination reactions. To do so a
+dative bond is required between metal and coordinating atoms to not
+produce atoms with too high of a valency. Specifically, atoms that are
+bonded to metals through coordination bonds often end up with too high
+a valency if those bonds are considered as covalent.
 
-__ https://www.rdkit.org/docs/RDKit_Book.html
-
-Unfortunately, when working with metal-containing systems, any
-:class:`.BuildingBlock` initialization functions that required ETKDG
+Furthermore, when working with metal-containing systems, any
+:class:`.BuildingBlock` initialization functions that require ETKDG
 will fail because the ETKDG algorithm will fail. Importantly,
-the :mod:`stk` .mol file interface works with the :mod:`rdkit`
-definition of dative bonds. This is achieved by using the bond order of
-`9` for dative bonds in the .mol file and ensuring the dative bond
-goes from `A` --> `B`, where `A` is the atom with the unchanged valency
-(the non-metal atom). Therefore, to initialize a metal-containing
-:class:`.BuildingBlock` you can build the molecule (using some external
- software) and save it to a .mol file and load the molecule using
+the :mod:`stk` .mol file can read dative bonds, which is achieved by
+using the bond order of `9` for dative bonds in the .mol file and
+ensuring the dative bond goes from `A` --> `B`, where `A` is the atom
+with the unchanged valency (the non-metal atom). Therefore, to
+initialize a metal-containing :class:`.BuildingBlock` you can build the
+molecule (using some external software) and save it to a .mol file and
+load the molecule using
 
 .. code-block:: python
 
@@ -596,6 +590,10 @@ goes from `A` --> `B`, where `A` is the atom with the unchanged valency
 
     # Or using stk.
     rdkit_mol = bb.to_rdkit_mol()
+
+
+Making Keys for Molecules with Dative Bonds
+===========================================
 
 Dative bonds are not defined for the InChI or InChiIKey functions of
 :mod:`rdkit`. Therefore, when storing metal-containing molecules in a
