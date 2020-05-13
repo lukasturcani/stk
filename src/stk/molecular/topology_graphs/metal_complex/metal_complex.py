@@ -32,6 +32,7 @@ stk.molecular.topology_graphs.metal_complex.square_planar.cis_protected_square_p
 
 """
 
+from collections import Counter, defaultdict
 from itertools import product
 
 from ..topology_graph import TopologyGraph
@@ -165,6 +166,16 @@ class MetalComplex(TopologyGraph):
 
     """
 
+    def __init_subclass__(cls, **kwargs):
+        cls._vertex_degrees = Counter(
+            vertex_id
+            for edge in cls._edge_prototypes
+            for vertex_id in edge.get_vertex_ids()
+        )
+        cls._vertices_of_degree = defaultdict(set)
+        for vertex_id, degree in cls._vertex_degrees.items():
+            cls._vertices_of_degree[degree].add(vertex_id)
+
     def __init__(
         self,
         metals,
@@ -215,6 +226,12 @@ class MetalComplex(TopologyGraph):
 
         """
 
+        building_block_vertices = self._normalize_metals(metals)
+        building_block_vertices.update(
+            (keys, values)
+            for keys, values in self._normalize_ligands(ligands)
+        )
+
         # By default, assign a dative bond order to available
         # functional groups.
         if reaction_factory is None:
@@ -240,28 +257,6 @@ class MetalComplex(TopologyGraph):
                 )
             )
 
-        if isinstance(metals, dict):
-            building_block_vertices = {
-                metal: tuple(self._get_metal_vertices(ids))
-                for metal, ids in metals.items()
-            }
-        else:
-            building_block_vertices = {
-                metals: tuple(self._get_metal_vertices(ids))
-                for ids in range(len(self._metal_vertex_prototypes))
-            }
-
-        if isinstance(metals, dict):
-            building_block_vertices.update(
-                (ligand, tuple(self._get_ligand_vertices(ids)))
-                for ligand, ids in ligands.items()
-            )
-        else:
-            building_block_vertices.update(
-                (ligands, tuple(self._get_metal_vertices(ids)))
-                for ids in range(len(self._ligand_vertex_prototypes))
-            )
-
         super().__init__(
             building_block_vertices=building_block_vertices,
             edges=self._edge_prototypes,
@@ -270,6 +265,106 @@ class MetalComplex(TopologyGraph):
             num_processes=num_processes,
             edge_groups=None,
         )
+
+    def _normalize_metals(self, metals):
+        """
+        Return map between metals and vertices.
+
+        Parameters
+        ----------
+        metals : :class:`dict` or :class:`.BuildingBlock`
+            The metal-based building blocks.
+
+        Returns
+        -------
+        metals_dict : :class:`dict`
+            Map of :class:`.BuildingBlock` to a :class:`tuple` of
+            :class:`.Vertex`
+
+        """
+
+        if isinstance(metals, dict):
+            metals_dict = {
+                metal: tuple(self._get_metal_vertices(ids))
+                for metal, ids in metals.items()
+            }
+        else:
+            metals_dict = {
+                metals: tuple(self._get_metal_vertices(ids))
+                for ids in range(len(self._metal_vertex_prototypes))
+            }
+
+        return metals_dict
+
+    def _normalize_ligands(self, ligands):
+        """
+        Return map ligands and vertices.
+
+        Parameters
+        ----------
+        ligands : :class:`dict` or :class:`.BuildingBlock` or \
+                :class:`tuple`
+            The organic-based building blocks.
+
+
+        Returns
+        -------
+        ligands_dict : :class:`dict`
+            Map of :class:`.BuildingBlock` to a :class:`tuple` of
+            :class:`.Vertex`
+
+        Raises
+        ------
+        :class:`AssertionError`
+            If a :class:`tuple` is provided for ligands but there is
+            ambiguity on ligand-vertex assignment because two ligands
+            have the same number of functional groups.
+
+        """
+
+        if isinstance(ligands, dict):
+            ligands_dict = {
+                ligand: tuple(self._get_ligand_vertices(ids))
+                for ligand, ids in ligands.items()
+            }
+        elif isinstance(ligands, tuple):
+            ligand_vertices_of_degree = {
+                degree: vertex_ids for degree, vertex_ids
+                in self._vertices_of_degree.keys()
+                if vertex_ids in (
+                    i.id for i in self._ligand_vertex_prototypes
+                )
+            }
+
+            ligand_degrees = {
+                ligand: ligand.get_num_functional_groups()
+                for ligand in ligands
+            }
+
+            assert (
+                all(
+                    i == 1
+                    for i in Counter(ligand_degrees.values()).values()
+                )
+            ), (
+                f'There is ambiguity in the placement of ligands '
+                f'with the same number of functional groups.'
+            )
+
+            ligands_dict = {
+                ligand: tuple(self._get_ligand_vertices(
+                    ligand_vertices_of_degree[degree]
+                ))
+                for ligand, degree in ligand_degrees.items()
+            }
+
+        else:
+            ligands_dict = {
+                ligands: tuple(self._get_ligand_vertices(ids))
+                for ids in range(len(self._ligand_vertex_prototypes))
+            }
+
+        return building_block_vertices
 
     def _get_metal_vertices(self, vertex_ids):
         """
