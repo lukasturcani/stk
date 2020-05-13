@@ -1,17 +1,16 @@
 import pytest
 import stk
-from rdkit.Chem import AllChem as rdkit
 
 from ....case_data import CaseData
 
 
-atom = rdkit.MolFromSmiles('[Pd+2]')
-atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
-
-_palladium_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
-atom_0, = _palladium_atom.get_atoms(0)
-_palladium_atom = _palladium_atom.with_functional_groups(
-    (stk.SingleAtom(atom_0) for i in range(4))
+_palladium_atom = stk.BuildingBlock(
+    smiles='[Pd+2]',
+    functional_groups=(
+        stk.SingleAtom(stk.Pd(0, charge=2))
+        for i in range(4)
+    ),
+    position_matrix=([0, 0, 0], ),
 )
 
 _mo_1 = stk.BuildingBlock(
