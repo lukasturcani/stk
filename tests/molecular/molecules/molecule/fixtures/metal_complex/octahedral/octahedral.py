@@ -1,17 +1,16 @@
 import pytest
 import stk
-from rdkit.Chem import AllChem as rdkit
 
 from ....case_data import CaseData
 
 
-atom = rdkit.MolFromSmiles('[Fe+2]')
-atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
-
-_iron_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
-atom_0, = _iron_atom.get_atoms(0)
-_iron_atom = _iron_atom.with_functional_groups(
-    (stk.SingleAtom(atom_0) for i in range(6))
+_iron_atom = stk.BuildingBlock(
+    smiles='[Fe+2]',
+    functional_groups=(
+        stk.SingleAtom(stk.Fe(0, charge=2))
+        for i in range(6)
+    ),
+    position_matrix=([0, 0, 0], ),
 )
 
 _iron_mo_1 = stk.BuildingBlock(
