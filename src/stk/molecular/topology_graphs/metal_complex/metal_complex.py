@@ -47,9 +47,9 @@ class MetalComplex(TopologyGraph):
     -----
     *Subclass Implementation*
 
-    Each subclass needs to define the iterable attributes,
+    Each subclass needs to define the attributes,
     :attr:`_metal_vertex_prototypes` and
-    :attr:`_ligand_vertex_prototypes`, which are iterables of
+    :attr:`_ligand_vertex_prototypes`, which are :class:`tuple` of
     :class:`.Vertex` instances and define the positions for
     metal-based and ligand-based vertices, respectively.
 
