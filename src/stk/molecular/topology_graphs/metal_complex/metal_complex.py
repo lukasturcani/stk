@@ -68,7 +68,6 @@ class MetalComplex(TopologyGraph):
     .. code-block:: python
 
         import stk
-        import numpy as np
 
         metal = stk.BuildingBlock(
             smiles='[Fe+2]',
@@ -76,7 +75,7 @@ class MetalComplex(TopologyGraph):
                 stk.SingleAtom(stk.Fe(0, charge=2))
                 for i in range(6)
             ),
-            position_matrix=np.array([[0, 0, 0]]),
+            position_matrix=([0, 0, 0], ),
         )
 
     We also need to define an organic ligand :class:`.BuildingBlock`
@@ -158,8 +157,8 @@ class MetalComplex(TopologyGraph):
 
     *Leaving Unsubstitued Sites*
 
-    Some metal complex topologies represent metal complexes with 
-    unsubstituted metal sites. For example, 
+    Some metal complex topologies represent metal complexes with
+    unsubstituted metal sites. For example,
     here we show how to build a square planar
     palladium(II) complex with two open metal sites.
 
@@ -173,7 +172,7 @@ class MetalComplex(TopologyGraph):
                 stk.SingleAtom(stk.Pd(0, charge=2))
                 for i in range(4)
             ),
-            position_matrix=np.array([[0, 0, 0]]),
+            position_matrix=([0, 0, 0], ),
         )
 
         # Define a bidentate ligand with two functional groups.
@@ -208,12 +207,12 @@ class MetalComplex(TopologyGraph):
         for vertex in cls._metal_vertex_prototypes:
             degree = cls._vertex_degress[vertex.get_id()]
             cls._metals_of_degree[degree].add(vertex.get_id())
-        
+
         cls._ligands_of_degree = defaultdict(set)
         for vertex in cls._ligand_vertex_prototypes:
             degree = cls._vertex_degress[vertex.get_id()]
             cls._ligands_of_degree[degree].add(vertex.get_id())
-            
+
     def __init__(
         self,
         metals,
@@ -267,7 +266,7 @@ class MetalComplex(TopologyGraph):
         building_block_vertices = self._normalize_metals(metals)
         building_block_vertices.update(
             (building_block, vertices)
-            for building_block, vertices 
+            for building_block, vertices
             in self._normalize_ligands(ligands)
         )
 
@@ -291,7 +290,7 @@ class MetalComplex(TopologyGraph):
             reaction_factory = DativeReactionFactory(
                 GenericReactionFactory(
                     bond_orders={
-                        frozenset(pair): 9 
+                        frozenset(pair): 9
                         for pair in functional_group_pairs
                     }
                 )
@@ -375,13 +374,14 @@ class MetalComplex(TopologyGraph):
             assert (
                 all(
                     i == 1
-                    for i in Counter(ligand_degrees.values()).values()
+                    for i
+                    in Counter(ligands_by_degree.values()).values()
                 )
             ), (
                 f'There is ambiguity in the placement of ligands '
                 f'with the same number of functional groups.'
             )
-            ligand_vertices = self._ligands_of_degree[]
+
             ligands_dict = {
                 ligand: tuple(
                     self._get_ligand_vertices(
