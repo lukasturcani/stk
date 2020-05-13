@@ -46,7 +46,8 @@ class MetalComplex(TopologyGraph):
 
     Each subclass needs to define the iterable attributes,
     :attr:`_metal_vertex_prototypes` and
-    :attr:`_ligand_vertex_prototypes`, which define the positions for
+    :attr:`_ligand_vertex_prototypes`, which are iterables of
+    :class:`.Vertex` instances and define the positions for
     metal-based and ligand-based vertices, respectively.
 
     Examples
@@ -63,7 +64,7 @@ class MetalComplex(TopologyGraph):
     1 atom and multiple functional groups
 
     .. code-block:: python
-    
+
         import stk
         import numpy as np
 
@@ -75,9 +76,9 @@ class MetalComplex(TopologyGraph):
             ),
             position_matrix=np.array([[0, 0, 0]]),
         )
-        
+
     We also need to define an organic ligand :class:`.BuildingBlock`
-    
+
     .. code-block:: python
 
         # Define an organic linker with two functional groups.
@@ -97,29 +98,25 @@ class MetalComplex(TopologyGraph):
             ]
         )
 
-    Finally, we can create the :class:`.MetalComplex`. 
-    
+    Finally, we can create the :class:`.MetalComplex`.
+
     .. code-block:: python
-    
+
         complex = stk.ConstructedMolecule(
             stk.metal_complex.OctahedralLambda(
                 metals=metal,
                 ligands=bidentate,
             )
         )
-    
+
     *Construction with Multiple Metals & Ligands*
-    
+
     When multiple metals or ligands are used, the `metals` and
     `ligands` parameters accept values of type :class:`dict`, which
-    specify the exact vertex each metal or ligand needs to be placed 
+    specify the exact vertex each metal or ligand needs to be placed
     on. However, if each ligand is has a different number of
-    functional groups, they can be provided together in a 
+    functional groups, they can be provided together in a
     :class:`tuple`.
-
-    .. code-block:: python
-        
-        <Fill me in.>
 
     Note that the valid vertex identifiers depend on the exact
     metal complex you are using. These are detailed in the docstring
@@ -128,7 +125,7 @@ class MetalComplex(TopologyGraph):
     *Leaving Unsubstitued Sites*
 
     Sometimes you may want to build a metal comlex with open metal
-    sites. For example, here we show how to build a square planar 
+    sites. For example, here we show how to build a square planar
     palladium(II) complex with two open metal sites.
 
     .. code-block:: python
@@ -143,7 +140,7 @@ class MetalComplex(TopologyGraph):
             ),
             position_matrix=np.array([[0, 0, 0]]),
         )
-        
+
         # Define a bidentate ligand with two functional groups.
         bidentate_ligand = stk.BuildingBlock(
             smiles='NCCN',
@@ -198,7 +195,7 @@ class MetalComplex(TopologyGraph):
             Can also be a :class:`.BuildingBlock` instance, which
             should be placed at all :attr:`_ligand_vertex_prototypes`
             on the topology graph.
-            
+
             If each :class:`.BuildingBlock` has a different number
             of functional groups, they can be supplied together in
             a :class:`tuple`.
