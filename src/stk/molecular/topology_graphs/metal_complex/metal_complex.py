@@ -158,8 +158,9 @@ class MetalComplex(TopologyGraph):
 
     *Leaving Unsubstitued Sites*
 
-    Sometimes you may want to build a metal comlex with open metal
-    sites. For example, here we show how to build a square planar
+    Some metal complex topologies represent metal complexes with 
+    unsubstituted metal sites. For example, 
+    here we show how to build a square planar
     palladium(II) complex with two open metal sites.
 
     .. code-block:: python
