@@ -222,7 +222,7 @@ class MetalComplex(TopologyGraph):
         ----------
         metals : :class:`dict` or :class:`.BuildingBlock`
             Can be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
+            :class:`.BuildingBlock` instances to the indices of the
             vertices in :attr:`_metal_vertex_prototypes` it should
             be placed on.
 
@@ -233,7 +233,7 @@ class MetalComplex(TopologyGraph):
         ligands : :class:`dict` or :class:`.BuildingBlock` or \
                 :class:`tuple`
             Can be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
+            :class:`.BuildingBlock` instances to the indices of the
             vertices in :attr:`_ligand_vertex_prototypes` it should be
             placed on.
 
