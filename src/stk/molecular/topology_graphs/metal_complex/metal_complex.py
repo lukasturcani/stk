@@ -56,35 +56,32 @@ class MetalComplex(TopologyGraph):
     The source code of the subclasses, listed in
     :mod:`~.metal_complex.metal_complex`, can serve as good examples.
 
-    *Construction*
+    *Basic Construction*
 
-    In some cases, constructing metal-containing archiectures requires
-    more explicit input than other :class:`.TopologyGraph`. For
-    example, to build a six-coordinate iron(II) complex with an
-    octahedral geometry and lambda stereochemistry, we firstly need to
-    define a metal atom (with six functional groups) and the organic
-    ligand :class:`.BuildingBlock` (with two functional groups).
+    For most :class:`.MetalComplex` topology graphs, we first
+    need to define a metal :class:`.BuildingBlock`, consisting of
+    1 atom and multiple functional groups
 
     .. code-block:: python
+    
         import stk
+        import numpy as np
 
-        # Define a single atom of desired smiles with coordinates
-        # (0, 0, 0) using RDKit.
-        atom = rdkit.MolFromSmiles('[Fe+2]')
-        atom.AddConformer(rdkit.Conformer(atom.GetNumAtoms()))
-        stk_atom = stk.BuildingBlock.init_from_rdkit_mol(atom)
-        atom_0, = stk_atom.get_atoms(0)
-
-        # Assign the atom with 6 functional groups.
-        stk_atom = stk_atom.with_functional_groups(
-            (stk.SingleAtom(atom_0) for i in range(6))
+        metal = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=np.array([[0, 0, 0]]),
         )
+        
+    We also need to define an organic ligand :class:`.BuildingBlock`
+    
+    .. code-block:: python
 
         # Define an organic linker with two functional groups.
-        # In this example, the ordering of the functional groups is set
-        # such that the ligand orientation is consistent and the target
-        # stereochemistry is obtained.
-        bidentate_ligand = stk.BuildingBlock(
+        bidentate = stk.BuildingBlock(
             smiles='C=NC/C=N/Br',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -100,58 +97,53 @@ class MetalComplex(TopologyGraph):
             ]
         )
 
-    Next we perform construction of the :class:`.TopologyGraph`. Note
-    that :class:`.MetalComplex` topologies have a different
-    initializer, that clearly defines the placement of metal and ligand
-    building blocks. Each :class:`.MetalComplex` provides example
-    placements in their docstring.
-    It is crucial that metal-ligand bonds are correctly created to be
-    dative (i.e. the valence of the ligand `bonder` is not affected by
-    the bond). This is handled by providing the
-    :class:`DativeReactionFactory` a :class:`GenericReactionFactory`
-    with the bond order of the expected functional groups defined to be
-    9.
-
+    Finally, we can create the :class:`.MetalComplex`. 
+    
     .. code-block:: python
-
+    
         complex = stk.ConstructedMolecule(
             stk.metal_complex.OctahedralLambda(
-                metals={stk_atom: 0},
-                ligands={bidentate_ligand: (0, 1, 2)},
-                reaction_factory=stk.DativeReactionFactory(
-                    stk.GenericReactionFactory(
-                        bond_orders={
-                            frozenset({
-                                stk.GenericFunctionalGroup,
-                                stk.SingleAtom
-                            }): 9
-                        }
-                    )
-                )
+                metals=metal,
+                ligands=bidentate,
             )
         )
+    
+    *Construction with Multiple Metals & Ligands*
+    
+    When multiple metals or ligands are used, the `metals` and
+    `ligands` parameters accept values of type :class:`dict`, which
+    specify the exact vertex each metal or ligand needs to be placed 
+    on. However, if each ligand is has a different number of
+    functional groups, they can be provided together in a 
+    :class:`tuple`.
+
+    .. code-block:: python
+        
+        <Fill me in.>
+
+    Note that the valid vertex identifiers depend on the exact
+    metal complex you are using. These are detailed in the docstring
+    for that specific metal vertex topology graph.
 
     *Leaving Unsubstitued Sites*
 
-    Sometimes when building metal complexes to be used as
-    :class:`.BuildingBlock` for a :class:`.ConstructedMolecule`, it is
-    necessary to build a metal with open metal sites. Here, we provide
-    the :class:`.CisProtectedSquarePlanar` topology to allow the user
-    to build a square planar palladium(II) complex with two open metal
-    sites. Notice in this example, that the metal and ligand placement
-    is not specified upon initialisation. This is possible for all
-    topologies.
+    Sometimes you may want to build a metal comlex with open metal
+    sites. For example, here we show how to build a square planar 
+    palladium(II) complex with two open metal sites.
 
     .. code-block:: python
 
         import stk
 
-        # Define single metal atom with four functional groups.
-        pd_metal = build_single_atom(
+        pd = stk.BuildingBlock(
             smiles='[Pd+2]',
-            no_fgs=4
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(4)
+            ),
+            position_matrix=np.array([[0, 0, 0]]),
         )
-
+        
         # Define a bidentate ligand with two functional groups.
         bidentate_ligand = stk.BuildingBlock(
             smiles='NCCN',
@@ -169,16 +161,6 @@ class MetalComplex(TopologyGraph):
             stk.metal_complex.CisProtectedSquarePlanar(
                 metals=pd_metal,
                 ligands=bidentate_ligand,
-                reaction_factory=stk.DativeReactionFactory(
-                    stk.GenericReactionFactory(
-                        bond_orders={
-                            frozenset({
-                                stk.GenericFunctionalGroup,
-                                stk.SingleAtom
-                            }): 9
-                        }
-                    )
-                )
             )
         )
 
@@ -206,7 +188,8 @@ class MetalComplex(TopologyGraph):
             should be placed at all :attr:`_metal_vertex_prototypes`
             on the topology graph.
 
-        ligands : :class:`dict` or :class:`.BuildingBlock`
+        ligands : :class:`dict` or :class:`.BuildingBlock` or \
+                :class:`tuple`
             Can be a :class:`dict` which maps the
             :class:`.BuildingBlock` instances to the ids of the
             vertices in :attr:`_ligand_vertex_prototypes` it should be
@@ -215,6 +198,10 @@ class MetalComplex(TopologyGraph):
             Can also be a :class:`.BuildingBlock` instance, which
             should be placed at all :attr:`_ligand_vertex_prototypes`
             on the topology graph.
+            
+            If each :class:`.BuildingBlock` has a different number
+            of functional groups, they can be supplied together in
+            a :class:`tuple`.
 
         reaction_factory : :class:`.ReactionFactory`, optional
             The reaction factory to use for creating bonds between
