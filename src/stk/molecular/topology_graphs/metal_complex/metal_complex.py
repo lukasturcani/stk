@@ -32,8 +32,10 @@ stk.molecular.topology_graphs.metal_complex.square_planar.cis_protected_square_p
 
 """
 
+from itertools import product
+
 from ..topology_graph import TopologyGraph
-from ...reactions import GenericReactionFactory
+from ...reactions import DativeReactionFactory, GenericReactionFactory
 
 
 class MetalComplex(TopologyGraph):
@@ -167,7 +169,7 @@ class MetalComplex(TopologyGraph):
         self,
         metals,
         ligands,
-        reaction_factory=GenericReactionFactory(),
+        reaction_factory=None,
         num_processes=1,
     ):
         """
@@ -203,12 +205,40 @@ class MetalComplex(TopologyGraph):
         reaction_factory : :class:`.ReactionFactory`, optional
             The reaction factory to use for creating bonds between
             building blocks.
+            By default, a :class:`.DativeReactionFactory` is used,
+            which produces only dative bonds in any reactions done by
+            this topology construction.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
 
         """
+
+        # By default, assign a dative bond order to available
+        # functional groups.
+        if reaction_factory is None:
+            if not isinstance(metals, dict):
+                metals = tuple(metals)
+            if not isinstance(ligands, dict):
+                ligands = tuple(ligands)
+            metal_functional_groups = (
+                i.get_functional_groups() for i in metals
+            )
+            ligand_functional_groups = (
+                i.get_functional_groups() for i in ligands
+            )
+            functional_group_pairs = product(
+                metal_functional_groups,
+                ligand_functional_groups
+            )
+            reaction_factory = DativeReactionFactory(
+                GenericReactionFactory(
+                    bond_orders={
+                        frozenset(i): 9 for i in functional_group_pairs
+                    }
+                )
+            )
 
         if isinstance(metals, dict):
             building_block_vertices = {
