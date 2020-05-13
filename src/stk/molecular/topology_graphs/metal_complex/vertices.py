@@ -118,8 +118,8 @@ class _BiDentateLigandVertex(Vertex):
             sum(edge.get_position() for edge in edges) / len(edges)
         )
         building_block = building_block.with_rotation_between_vectors(
-            start=fg_vector_projection - core_to_placer,
-            target=self._position - edge_centroid,
+            start=core_to_placer - fg_vector_projection,
+            target=edge_centroid - self._position,
             origin=building_block.get_centroid(),
         )
 
