@@ -117,7 +117,39 @@ class MetalComplex(TopologyGraph):
     When multiple metals or ligands are used, the `metals` and
     `ligands` parameters accept values of type :class:`dict`, which
     specify the exact vertex each metal or ligand needs to be placed
-    on. However, if each ligand is has a different number of
+    on.
+
+    .. code-block:: python
+
+        # Define a second organic linker with two functional groups.
+        bidentate2 = stk.BuildingBlock(
+            smiles='C=NC(C)(C)/C(C)=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+        # Build heteroleptic complex.
+        complex = stk.ConstructedMolecule(
+            stk.metal_complex.OctahedralLambda(
+                metals=metal,
+                ligands={
+                    bidentate: (0, 1),
+                    bidentate2: (2, ),
+                },
+            )
+        )
+
+    However, if each ligand is has a different number of
     functional groups, they can be provided together in a
     :class:`tuple`.
 
