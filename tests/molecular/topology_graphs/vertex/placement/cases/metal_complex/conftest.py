@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 from pytest_lazyfixture import lazy_fixture
 
 # Fixtures need to be visible for lazy_fixture() calls.
@@ -19,3 +20,17 @@ def case_data(request):
     """
 
     return request.param
+
+
+@pytest.fixture(
+    params=(
+        [1, 2, -20],
+    ),
+)
+def position(request):
+    """
+    The `position` of a vertex.
+
+    """
+
+    return np.array(request.param, dtype=np.float64)

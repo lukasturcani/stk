@@ -1,5 +1,4 @@
 import pytest
-import numpy as np
 import stk
 from functools import partial
 from scipy.spatial.distance import euclidean
@@ -86,17 +85,3 @@ def get_edge(vertex):
 )
 def building_block_1(request):
     return request.param
-
-
-@pytest.fixture(
-    params=(
-        [1, 2, -20],
-    ),
-)
-def position(request):
-    """
-    The `position` of a vertex.
-
-    """
-
-    return np.array(request.param, dtype=np.float64)
