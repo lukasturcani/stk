@@ -260,8 +260,9 @@ class MetalComplex(TopologyGraph):
 
         building_block_vertices = self._normalize_metals(metals)
         building_block_vertices.update(
-            (keys, values)
-            for keys, values in self._normalize_ligands(ligands)
+            (building_block, vertices)
+            for building_block, vertices 
+            in self._normalize_ligands(ligands)
         )
 
         # By default, assign a dative bond order to available
