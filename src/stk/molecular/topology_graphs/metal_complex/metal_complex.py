@@ -396,7 +396,7 @@ class MetalComplex(TopologyGraph):
                 for ids in range(len(self._ligand_vertex_prototypes))
             }
 
-        return building_block_vertices
+        return ligands_dict
 
     def _get_metal_vertices(self, vertex_ids):
         """
