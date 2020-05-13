@@ -204,10 +204,16 @@ class MetalComplex(TopologyGraph):
             for edge in cls._edge_prototypes
             for vertex_id in edge.get_vertex_ids()
         )
-        cls._vertices_of_degree = defaultdict(set)
-        for vertex_id, degree in cls._vertex_degrees.items():
-            cls._vertices_of_degree[degree].add(vertex_id)
-
+        cls._metals_of_degree = defaultdict(set)
+        for vertex in cls._metal_vertex_prototypes:
+            degree = cls._vertex_degress[vertex.get_id()]
+            cls._metals_of_degree[degree].add(vertex.get_id())
+        
+        cls._ligands_of_degree = defaultdict(set)
+        for vertex in cls._ligand_vertex_prototypes:
+            degree = cls._vertex_degress[vertex.get_id()]
+            cls._ligands_of_degree[degree].add(vertex.get_id())
+            
     def __init__(
         self,
         metals,
@@ -268,24 +274,25 @@ class MetalComplex(TopologyGraph):
         # By default, assign a dative bond order to available
         # functional groups.
         if reaction_factory is None:
-            if not isinstance(metals, dict):
-                metals = tuple(metals)
-            if not isinstance(ligands, dict):
-                ligands = tuple(ligands)
-            metal_functional_groups = (
-                i.get_functional_groups() for i in metals
+            metal_functional_groups = set(
+                type(functional_group)
+                for metal in self._normalize_metals(metals)
+                for functional_group in metal.get_functional_groups()
             )
-            ligand_functional_groups = (
-                i.get_functional_groups() for i in ligands
+            ligand_functional_groups = set(
+                functional_group
+                for ligand in self._normalize_ligands(ligands)
+                for functional_group in ligand.get_functional_groups()
             )
             functional_group_pairs = product(
                 metal_functional_groups,
-                ligand_functional_groups
+                ligand_functional_groups,
             )
             reaction_factory = DativeReactionFactory(
                 GenericReactionFactory(
                     bond_orders={
-                        frozenset(i): 9 for i in functional_group_pairs
+                        frozenset(pair): 9 
+                        for pair in functional_group_pairs
                     }
                 )
             )
@@ -301,7 +308,7 @@ class MetalComplex(TopologyGraph):
 
     def _normalize_metals(self, metals):
         """
-        Return map between metals and vertices.
+        Return a map between metals and vertices.
 
         Parameters
         ----------
@@ -310,7 +317,7 @@ class MetalComplex(TopologyGraph):
 
         Returns
         -------
-        metals_dict : :class:`dict`
+        :class:`dict`
             Map of :class:`.BuildingBlock` to a :class:`tuple` of
             :class:`.Vertex`
 
@@ -322,16 +329,16 @@ class MetalComplex(TopologyGraph):
                 for metal, ids in metals.items()
             }
         else:
+            vertices = range(len(self._metal_vertex_prototypes))
             metals_dict = {
-                metals: tuple(self._get_metal_vertices(ids))
-                for ids in range(len(self._metal_vertex_prototypes))
+                metals: tuple(self._get_metal_vertices(vertices))
             }
 
         return metals_dict
 
     def _normalize_ligands(self, ligands):
         """
-        Return map ligands and vertices.
+        Return a map ligands and vertices.
 
         Parameters
         ----------
@@ -339,10 +346,9 @@ class MetalComplex(TopologyGraph):
                 :class:`tuple`
             The organic-based building blocks.
 
-
         Returns
         -------
-        ligands_dict : :class:`dict`
+        :class:`dict`
             Map of :class:`.BuildingBlock` to a :class:`tuple` of
             :class:`.Vertex`
 
@@ -361,16 +367,8 @@ class MetalComplex(TopologyGraph):
                 for ligand, ids in ligands.items()
             }
         elif isinstance(ligands, tuple):
-            ligand_vertices_of_degree = {
-                degree: vertex_ids for degree, vertex_ids
-                in self._vertices_of_degree.keys()
-                if vertex_ids in (
-                    i.id for i in self._ligand_vertex_prototypes
-                )
-            }
-
-            ligand_degrees = {
-                ligand: ligand.get_num_functional_groups()
+            ligands_by_degree = {
+                ligand.get_num_functional_groups(): ligand
                 for ligand in ligands
             }
 
@@ -383,18 +381,22 @@ class MetalComplex(TopologyGraph):
                 f'There is ambiguity in the placement of ligands '
                 f'with the same number of functional groups.'
             )
-
+            ligand_vertices = self._ligands_of_degree[]
             ligands_dict = {
-                ligand: tuple(self._get_ligand_vertices(
-                    ligand_vertices_of_degree[degree]
-                ))
-                for ligand, degree in ligand_degrees.items()
+                ligand: tuple(
+                    self._get_ligand_vertices(
+                        self._ligands_of_degree[
+                            ligand.get_num_functional_groups()
+                        ]
+                    )
+                )
+                for ligand in ligands
             }
 
         else:
+            ids = range(len(self._ligand_vertex_prototypes))
             ligands_dict = {
                 ligands: tuple(self._get_ligand_vertices(ids))
-                for ids in range(len(self._ligand_vertex_prototypes))
             }
 
         return ligands_dict
