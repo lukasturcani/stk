@@ -235,7 +235,7 @@ class MetalComplex(TopologyGraph):
             Can also be a :class:`.BuildingBlock` instance, which
             should be placed at all :attr:`_metal_vertex_prototypes`
             on the topology graph.
-            
+
             If each :class:`.BuildingBlock` has a different number
             of functional groups, they can be supplied together in
             a :class:`tuple`.
@@ -344,14 +344,10 @@ class MetalComplex(TopologyGraph):
                     in functional_group_counter.values()
                 )
             ), (
-                f'Cannot use a tuple when multiple metals '
-                f'have the same number of functional groups. '
+                'Cannot use a tuple when multiple metals '
+                'have the same number of functional groups. '
                 'Use a dictionary instead.'
             )
-            metals_by_degree = {
-                metal.get_num_functional_groups(): metal
-                for metal in metals
-            }
             metals_dict = {
                 metal: tuple(
                     self._get_metal_vertices(
@@ -412,14 +408,10 @@ class MetalComplex(TopologyGraph):
                     in functional_group_counter.values()
                 )
             ), (
-                f'Cannot use a tuple when multiple ligands '
-                f'have the same number of functional groups. '
+                'Cannot use a tuple when multiple ligands '
+                'have the same number of functional groups. '
                 'Use a dictionary instead.'
             )
-            ligands_by_degree = {
-                ligand.get_num_functional_groups(): ligand
-                for ligand in ligands
-            }
             ligands_dict = {
                 ligand: tuple(
                     self._get_ligand_vertices(
