@@ -17,13 +17,14 @@ class OctahedralLambda(MetalComplex):
     required for this topology.
 
     Ligand building blocks with two functional groups are required for
-    this topology.
+    this topology graph.
 
-    .. code-block:: python
+    When using a :class:`dict` for initialization, a
+    :class:`.BuildingBlock` needs to be assigned to each of the
+    following numbers:
 
-        # :class:`.BuildingBlock` placements:
-        metals: (0, )
-        ligands: (0, 1, 2)
+        | metals: (0, )
+        | ligands: (0, 1, 2)
 
     See :class:`.MetalComplex` for more details and examples.
 
