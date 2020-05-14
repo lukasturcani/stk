@@ -75,7 +75,7 @@ class MetalComplex(TopologyGraph):
                 stk.SingleAtom(stk.Fe(0, charge=2))
                 for i in range(6)
             ),
-            position_matrix=([0, 0, 0], ),
+            position_matrix=[[0, 0, 0]],
         )
 
     We also need to define an organic ligand :class:`.BuildingBlock`
@@ -172,7 +172,7 @@ class MetalComplex(TopologyGraph):
                 stk.SingleAtom(stk.Pd(0, charge=2))
                 for i in range(4)
             ),
-            position_matrix=([0, 0, 0], ),
+            position_matrix=[[0, 0, 0]],
         )
 
         # Define a bidentate ligand with two functional groups.
