@@ -13,6 +13,15 @@ _copper_atom = stk.BuildingBlock(
     position_matrix=([0, 0, 0], ),
 )
 
+_palladium_atom = stk.BuildingBlock(
+    smiles='[Pd+2]',
+    functional_groups=(
+        stk.SingleAtom(stk.Pd(0, charge=2))
+        for i in range(4)
+    ),
+    position_matrix=([0, 0, 0], ),
+)
+
 _bi_1 = stk.BuildingBlock(
     smiles='O=C(O)c1ccc(Br)cc1',
     functional_groups=[
@@ -35,7 +44,10 @@ _bi_1 = stk.BuildingBlock(
         CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.Paddlewheel(
-                    metals={_copper_atom: (0, 1)},
+                    metals={
+                        _copper_atom: (0, ),
+                        _palladium_atom: (1, )
+                    },
                     ligands={_bi_1: (0, 1, 2, 3)},
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
@@ -50,7 +62,7 @@ _bi_1 = stk.BuildingBlock(
                 )
             ),
             smiles=(
-                '[H]C1=C([H])C(C2=O->[Cu+2]34<-O=C(C5=C([H])C([H])=C('
+                '[H]C1=C([H])C(C2=O->[Pd+2]34<-O=C(C5=C([H])C([H])=C('
                 'Br)C([H])=C5[H])O->[Cu+2](<-O2)(<-OC(C2=C([H])C([H])'
                 '=C(Br)C([H])=C2[H])=O->3)<-OC(C2=C([H])C([H])=C(Br)C'
                 '([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
