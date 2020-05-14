@@ -222,6 +222,20 @@ dative_molecule.AddConformer(
             ),
             smiles='N->[Fe+2]',
         ),
+        CaseData(
+            molecule=stk.BuildingBlock(
+                smiles='[Fe+2]',
+                position_matrix=[[0, 0, 0]],
+            ),
+            smiles='[Fe+2]',
+        ),
+        CaseData(
+            molecule=stk.BuildingBlock(
+                smiles='[Fe+2]',
+                position_matrix=np.array([[0, 0, 0]]),
+            ),
+            smiles='[Fe+2]',
+        ),
     ),
 )
 def building_block(request):
