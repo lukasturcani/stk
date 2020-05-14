@@ -10,6 +10,7 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import warnings
+import numpy as np
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -151,6 +152,11 @@ class BuildingBlock(Molecule):
                 )
             rdkit.Kekulize(molecule)
         else:
+            # Make sure the position matrix always holds floats.
+            position_matrix = np.array(
+                position_matrix,
+                dtype=np.float64,
+            )
             conformer = rdkit.Conformer(molecule.GetNumAtoms())
             for atom_id, position in enumerate(position_matrix):
                 conformer.SetAtomPosition(atom_id, position)
@@ -339,6 +345,11 @@ class BuildingBlock(Molecule):
                     'failed.'
                 )
         else:
+            # Make sure the position matrix always holds floats.
+            position_matrix = np.array(
+                position_matrix,
+                dtype=np.float64,
+            )
             conformer = rdkit.Conformer(rdkit_molecule.GetNumAtoms())
             for atom_id, position in enumerate(position_matrix):
                 conformer.SetAtomPosition(atom_id, position)
