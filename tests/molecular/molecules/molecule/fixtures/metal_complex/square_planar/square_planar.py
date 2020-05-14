@@ -32,16 +32,6 @@ _mo_1 = stk.BuildingBlock(
                 stk.metal_complex.SquarePlanar(
                     metals={_palladium_atom: 0},
                     ligands={_mo_1: (0, 1, 2, 3)},
-                    reaction_factory=stk.DativeReactionFactory(
-                        stk.GenericReactionFactory(
-                            bond_orders={
-                                frozenset({
-                                    stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
-                            }
-                        )
-                    )
                 )
             ),
             smiles=(
@@ -59,16 +49,6 @@ _mo_1 = stk.BuildingBlock(
                 stk.metal_complex.SquarePlanar(
                     metals=_palladium_atom,
                     ligands=_mo_1,
-                    reaction_factory=stk.DativeReactionFactory(
-                        stk.GenericReactionFactory(
-                            bond_orders={
-                                frozenset({
-                                    stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
-                            }
-                        )
-                    )
                 )
             ),
             smiles=(
