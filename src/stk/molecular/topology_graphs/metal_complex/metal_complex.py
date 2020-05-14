@@ -203,15 +203,15 @@ class MetalComplex(TopologyGraph):
             for edge in cls._edge_prototypes
             for vertex_id in edge.get_vertex_ids()
         )
-        cls._metals_of_degree = defaultdict(set)
+        cls._metal_vertices_of_degree = defaultdict(set)
         for vertex in cls._metal_vertex_prototypes:
             degree = cls._vertex_degress[vertex.get_id()]
-            cls._metals_of_degree[degree].add(vertex.get_id())
+            cls._metal_vertices_of_degree[degree].add(vertex.get_id())
 
-        cls._ligands_of_degree = defaultdict(set)
+        cls._ligand_vertices_of_degree = defaultdict(set)
         for vertex in cls._ligand_vertex_prototypes:
             degree = cls._vertex_degress[vertex.get_id()]
-            cls._ligands_of_degree[degree].add(vertex.get_id())
+            cls._ligand_vertices_of_degree[degree].add(vertex.get_id())
 
     def __init__(
         self,
@@ -225,7 +225,8 @@ class MetalComplex(TopologyGraph):
 
         Parameters
         ----------
-        metals : :class:`dict` or :class:`.BuildingBlock`
+        metals : :class:`dict` or :class:`.BuildingBlock` or \
+                :class:`tuple`
             Can be a :class:`dict` which maps the
             :class:`.BuildingBlock` instances to the indices of the
             vertices in :attr:`_metal_vertex_prototypes` it should
@@ -234,6 +235,10 @@ class MetalComplex(TopologyGraph):
             Can also be a :class:`.BuildingBlock` instance, which
             should be placed at all :attr:`_metal_vertex_prototypes`
             on the topology graph.
+            
+            If each :class:`.BuildingBlock` has a different number
+            of functional groups, they can be supplied together in
+            a :class:`tuple`.
 
         ligands : :class:`dict` or :class:`.BuildingBlock` or \
                 :class:`tuple`
@@ -279,7 +284,7 @@ class MetalComplex(TopologyGraph):
                 for functional_group in metal.get_functional_groups()
             )
             ligand_functional_groups = set(
-                functional_group
+                type(functional_group)
                 for ligand in self._normalize_ligands(ligands)
                 for functional_group in ligand.get_functional_groups()
             )
@@ -327,10 +332,40 @@ class MetalComplex(TopologyGraph):
                 metal: tuple(self._get_metal_vertices(ids))
                 for metal, ids in metals.items()
             }
-        else:
-            vertices = range(len(self._metal_vertex_prototypes))
+        elif isinstance(metals, tuple):
+            functional_group_counter = Counter(
+                metal.get_num_functional_groups()
+                for metal in metals
+            )
+            assert (
+                all(
+                    count == 1
+                    for count
+                    in functional_group_counter.values()
+                )
+            ), (
+                f'Cannot use a tuple when multiple metals '
+                f'have the same number of functional groups. '
+                'Use a dictionary instead.'
+            )
+            metals_by_degree = {
+                metal.get_num_functional_groups(): metal
+                for metal in metals
+            }
             metals_dict = {
-                metals: tuple(self._get_metal_vertices(vertices))
+                metal: tuple(
+                    self._get_metal_vertices(
+                        self._metal_vertices_of_degree[
+                            metal.get_num_functional_groups()
+                        ]
+                    )
+                )
+                for metal in metals
+            }
+        else:
+            ids = range(len(self._metal_vertex_prototypes))
+            metals_dict = {
+                metals: tuple(self._get_metal_vertices(ids))
             }
 
         return metals_dict
@@ -366,26 +401,29 @@ class MetalComplex(TopologyGraph):
                 for ligand, ids in ligands.items()
             }
         elif isinstance(ligands, tuple):
+            functional_group_counter = Counter(
+                ligand.get_num_functional_groups()
+                for ligand in ligands
+            )
+            assert (
+                all(
+                    count == 1
+                    for count
+                    in functional_group_counter.values()
+                )
+            ), (
+                f'Cannot use a tuple when multiple ligands '
+                f'have the same number of functional groups. '
+                'Use a dictionary instead.'
+            )
             ligands_by_degree = {
                 ligand.get_num_functional_groups(): ligand
                 for ligand in ligands
             }
-
-            assert (
-                all(
-                    i == 1
-                    for i
-                    in Counter(ligands_by_degree.values()).values()
-                )
-            ), (
-                f'There is ambiguity in the placement of ligands '
-                f'with the same number of functional groups.'
-            )
-
             ligands_dict = {
                 ligand: tuple(
                     self._get_ligand_vertices(
-                        self._ligands_of_degree[
+                        self._ligand_vertices_of_degree[
                             ligand.get_num_functional_groups()
                         ]
                     )
