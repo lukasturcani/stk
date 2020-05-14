@@ -155,7 +155,7 @@ class MetalComplex(TopologyGraph):
     metal complex you are using. These are detailed in the docstring
     for that specific metal vertex topology graph.
 
-    *Leaving Unsubstitued Sites*
+    *Leaving Unsubstituted Sites*
 
     Some metal complex topologies represent metal complexes with
     unsubstituted metal sites. For example,
@@ -232,13 +232,13 @@ class MetalComplex(TopologyGraph):
             vertices in :attr:`_metal_vertex_prototypes` it should
             be placed on.
 
-            Can also be a :class:`.BuildingBlock` instance, which
-            should be placed at all :attr:`_metal_vertex_prototypes`
-            on the topology graph.
-
             If each :class:`.BuildingBlock` has a different number
             of functional groups, they can be supplied together in
             a :class:`tuple`.
+
+            Can also be a :class:`.BuildingBlock` instance, which
+            should be placed on all :attr:`_metal_vertex_prototypes`
+            on the topology graph.
 
         ligands : :class:`dict` or :class:`.BuildingBlock` or \
                 :class:`tuple`
@@ -247,13 +247,13 @@ class MetalComplex(TopologyGraph):
             vertices in :attr:`_ligand_vertex_prototypes` it should be
             placed on.
 
-            Can also be a :class:`.BuildingBlock` instance, which
-            should be placed at all :attr:`_ligand_vertex_prototypes`
-            on the topology graph.
-
             If each :class:`.BuildingBlock` has a different number
             of functional groups, they can be supplied together in
             a :class:`tuple`.
+
+            Can also be a :class:`.BuildingBlock` instance, which
+            should be placed on all :attr:`_ligand_vertex_prototypes`
+            on the topology graph.
 
         reaction_factory : :class:`.ReactionFactory`, optional
             The reaction factory to use for creating bonds between
