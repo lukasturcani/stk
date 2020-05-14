@@ -205,12 +205,12 @@ class MetalComplex(TopologyGraph):
         )
         cls._metal_vertices_of_degree = defaultdict(set)
         for vertex in cls._metal_vertex_prototypes:
-            degree = cls._vertex_degress[vertex.get_id()]
+            degree = cls._vertex_degrees[vertex.get_id()]
             cls._metal_vertices_of_degree[degree].add(vertex.get_id())
 
         cls._ligand_vertices_of_degree = defaultdict(set)
         for vertex in cls._ligand_vertex_prototypes:
-            degree = cls._vertex_degress[vertex.get_id()]
+            degree = cls._vertex_degrees[vertex.get_id()]
             cls._ligand_vertices_of_degree[degree].add(vertex.get_id())
 
     def __init__(

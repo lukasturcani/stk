@@ -18,11 +18,11 @@ class SquarePlanar(MetalComplex):
 
     Linker building blocks with one functional group are required
     for this topology graph.
-    
+
     When using a :class:`dict` for initialization, a
     building block needs to be assigned to the following
     numbers:
-    
+
         metals: (0, )
         ligands: (0, 1, 2, 3)
 
