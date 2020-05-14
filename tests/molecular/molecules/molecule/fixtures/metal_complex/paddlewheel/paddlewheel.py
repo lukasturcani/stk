@@ -37,6 +37,21 @@ _bi_1 = stk.BuildingBlock(
         ),
     ]
 )
+_bi_2 = stk.BuildingBlock(
+    smiles='Nc1ccc(C(=O)O)cc1',
+    functional_groups=[
+        stk.SmartsFunctionalGroupFactory(
+            smarts='[#6]~[#8]~[#1]',
+            bonders=(1, ),
+            deleters=(2, ),
+        ),
+        stk.SmartsFunctionalGroupFactory(
+            smarts='[#6]~[#8X1]',
+            bonders=(1, ),
+            deleters=(),
+        ),
+    ]
+)
 
 
 @pytest.fixture(
@@ -48,7 +63,10 @@ _bi_1 = stk.BuildingBlock(
                         _copper_atom: (0, ),
                         _palladium_atom: (1, )
                     },
-                    ligands={_bi_1: (0, 1, 2, 3)},
+                    ligands={
+                        _bi_1: (2, 3),
+                        _bi_2: (0, 1),
+                    },
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
