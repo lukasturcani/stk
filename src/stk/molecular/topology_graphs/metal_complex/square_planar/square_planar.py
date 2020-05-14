@@ -16,12 +16,13 @@ class SquarePlanar(MetalComplex):
     Metal building blocks with at least four functional groups are
     required for this topology graph.
 
-    Linker building blocks with one functional group is required
+    Linker building blocks with one functional group are required
     for this topology graph.
-
-    .. code-block:: python
-
-        # :class:`.BuildingBlock` placements:
+    
+    When using a :class:`dict` for initialization, a
+    building block needs to be assigned to the following
+    numbers:
+    
         metals: (0, )
         ligands: (0, 1, 2, 3)
 
