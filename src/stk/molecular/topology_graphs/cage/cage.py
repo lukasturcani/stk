@@ -254,11 +254,11 @@ class Cage(TopologyGraph):
     *Metal-Organic Cage Construction*
 
     A series of common metal-organic cage topologies are provided and
-    can be constructed in the same way as :class:`.Cage` instances
-    using metal atoms and :class:`DativeReactionFactory` instances to
-    produce metal-ligand bonds. Each metal topology has specific
-    vertices for the metal atoms/complexes, which can be found in their
-    documentation.
+    can be constructed in the same way as other :class:`.Cage` 
+    instances using metal atoms and :class:`DativeReactionFactory` 
+    instances to produce metal-ligand bonds. Each metal topology has 
+    specific vertices reserved for the metal atoms or complexes, 
+    which are listed in their documentation.
 
     .. code-block:: python
 
@@ -271,7 +271,7 @@ class Cage(TopologyGraph):
                 stk.SingleAtom(stk.Pd(0, charge=2))
                 for i in range(4)
             ),
-            position_matrix=([0, 0, 0], ),
+            position_matrix=[[0., 0., 0.]],
         )
 
         # Build a building block with two functional groups using
@@ -290,11 +290,12 @@ class Cage(TopologyGraph):
             ],
         )
 
-        # Build a metal-organic cage with dative bonds between
-        # GenericFunctionalGroup and SingleAtom functional groups.
         cage1 = stk.ConstructedMolecule(
             stk.cage.M2L4Lantern(
                 building_blocks=(palladium_atom, bb1),
+                # Ensure that bonds between the GenericFunctionalGroups
+                # of the ligand and the SingleAtom functional groups
+                # of the metal are dative.
                 reaction_factory=stk.DativeReactionFactory(
                     stk.GenericReactionFactory(
                         bond_orders={
@@ -313,14 +314,11 @@ class Cage(TopologyGraph):
     When building metal-organic cages from octahedral metals, i.e.
     Fe(II), the stereochemistry of the metal centre can be important.
     Maintaining that stereochemistry around specific metal centres
-    during :class:`.Cage` construction is difficult, so we have
-    provided an alternative route to these types of structures.
+    during :class:`.Cage` construction is difficult, so an
+    alternative route to these types of structures can be taken.
     Firstly, you would construct a :class:`.MetalComplex` instance
     with the appropriate stereochemistry and dummy reactive groups
-    (bromine in the following example). Then, :class:`.MetalComplex`
-    instances can be placed on the appropriate :class:`.Cage` topology
-    to produce a structure with the desired stereochemistry at all
-    metal centres.
+    (bromine in the following example)
 
     .. code-block:: python
 
@@ -331,7 +329,7 @@ class Cage(TopologyGraph):
                 stk.SingleAtom(stk.Fe(0, charge=2))
                 for i in range(6)
             ),
-            position_matrix=([0, 0, 0], ),
+            position_matrix=[[0, 0, 0]],
         )
 
         # Define coordinating ligand with dummy bromine groups and
@@ -359,6 +357,13 @@ class Cage(TopologyGraph):
                 ligands=bb2,
             )
         )
+    
+    Then, :class:`.MetalComplex`
+    instances can be placed on the appropriate :class:`.Cage` topology
+    to produce a structure with the desired stereochemistry at all
+    metal centres.
+
+    .. code-block:: python
 
         # Assign Bromo functional groups to the metal complex.
         iron_oct_delta = stk.BuildingBlock.init_from_molecule(
@@ -378,10 +383,10 @@ class Cage(TopologyGraph):
         # Build an M4L6 Tetrahedron with a spacer.
         cage2 = stk.ConstructedMolecule(
             stk.cage.M4L6TetrahedronSpacer(
-                building_blocks={
-                    iron_oct_delta: range(4),
-                    bb3: range(4, 10)
-                },
+                building_blocks=(
+                    iron_oct_delta,
+                    bb3,
+                ),
             )
         )
 
