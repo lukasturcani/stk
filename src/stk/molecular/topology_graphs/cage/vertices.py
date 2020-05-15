@@ -290,7 +290,12 @@ class _BentMetalComplexCageVertex(_CageVertex):
         }
 
 
-class _MetalVertex(_CageVertex):
+class _UnaligningVertex(_CageVertex):
+    """
+    Just places a building block, does not align.
+
+    """
+    
     def place_building_block(self, building_block, edges):
         return building_block.with_centroid(
             position=self._position,
