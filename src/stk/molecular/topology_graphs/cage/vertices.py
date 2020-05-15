@@ -328,3 +328,15 @@ class _UnaligningVertex(_CageVertex):
         return {
             fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
         }
+
+    @classmethod
+    def init_at_center(cls, id, vertices):
+        vertex = cls.__new__(cls)
+        vertex._id = id
+        vertex._position = (
+            sum(vertex.get_position() for vertex in vertices)
+            / len(vertices)
+        )
+        vertex._use_neighbor_placement = True
+        vertex._aligner_edge = 0
+        return vertex
