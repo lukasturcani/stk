@@ -558,39 +558,46 @@ molecule!!
 Handling Molecules with Metal Atoms and Dative Bonds
 ====================================================
 
-All :mod:`stk` :class:`.Molecule` instances (including
+All :mod:`stk` :class:`.Molecule` instances (such as
 :class:`.BuildingBlock` and :class:`.ConstructedMolecule`) can contain
-metal atoms and handle various coordination reactions. To do so a
-dative bond is required between metal and coordinating atoms to not
-produce atoms with too high of a valency. Specifically, atoms that are
-bonded to metals through coordination bonds often end up with too high
-a valency if those bonds are considered as covalent.
+metal atoms and handle various coordination reactions. 
+In order to represent dative bonds in these systems, a bond order of 
+9 is used.
 
 Furthermore, when working with metal-containing systems, any
 :class:`.BuildingBlock` initialization functions that require ETKDG
-will fail because the ETKDG algorithm will fail. Importantly,
-the :mod:`stk` .mol file can read dative bonds, which is achieved by
-using the bond order of `9` for dative bonds in the .mol file and
-ensuring the dative bond goes from `A` --> `B`, where `A` is the atom
-with the unchanged valency (the non-metal atom). Therefore, to
-initialize a metal-containing :class:`.BuildingBlock` you can build the
-molecule (using some external software) and save it to a .mol file and
-load the molecule using
+may fail, because the ETKDG algorithm is liable to fail. In cases
+like this, you probably want to set the position matrix explicitly,
+which will mean that ETKDG will not be used.
 
 .. code-block:: python
 
     import stk
+
+    bb = stk.BuildingBlock('[Fe+2]', position_matrix=[[0., 0., 0.]])
+
+If you want to get a more complex position matrix, defining a 
+function may be a good idea
+
+.. code-block:: python
+
     import rdkit.Chem.AllChem as rdkit
 
-    bb1 = stk.BuildingBlock.init_from_file('path/to/file.mol')
-    bb1.write('path/to/file.mol')
+    def get_position_matrix(smiles):
+        molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        rdkit.EmbedMolecule(molecule)
+        rdkit.UFFOptimizeMolecule(molecule)
+        return molecule.GetConformer().GetPositions()
 
-    # Produce an rdkit molecule from file.
-    rdkit_mol = rdkit.MolFromMolFile('path/to/file.mol')
 
-    # Or using stk.
-    rdkit_mol = bb.to_rdkit_mol()
+    smiles = 'CCCO->[Fe+2]'
+    bb = stk.BuildingBlock(
+        smiles=smiles,
+        position_matrix=get_position_matrix(smiles),
+    )
 
+Finally, :mod:`stk` will also read bonds from ``.mol`` files,
+which have a bond order of 9, as dative.
 
 Making Keys for Molecules with Dative Bonds
 ===========================================
