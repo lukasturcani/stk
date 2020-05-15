@@ -10,7 +10,7 @@ from .fixtures import *  # noqa
         lazy_fixture('linear'),
         lazy_fixture('nonlinear'),
         lazy_fixture('bent_metal'),
-        lazy_fixture('metal'),
+        lazy_fixture('unaligning'),
     ),
 )
 def case_data(request):
