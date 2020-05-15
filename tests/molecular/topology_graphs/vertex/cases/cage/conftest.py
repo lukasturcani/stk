@@ -73,7 +73,7 @@ def cls(request):
     params=(
         vertices._LinearCageVertex.init_at_center,
         vertices._NonLinearCageVertex.init_at_center,
-        vertices._MetalVertex.init_at_center,
+        vertices._UnaligningVertex.init_at_center,
         vertices._BentMetalComplexCageVertex.init_at_center,
     ),
 )
