@@ -240,7 +240,7 @@ class Cage(TopologyGraph):
             vertex_alignments={0: 1, 1: 1, 2: 2},
         )
 
-    *Metal-organic Cage Construction*
+    *Metal-Organic Cage Construction*
 
     A series of common metal-organic cage topologies are provided and
     can be constructed in the same way as :class:`.Cage` instances
@@ -297,7 +297,7 @@ class Cage(TopologyGraph):
             )
         )
 
-    *Controlling Metal-complex Stereochemistry*
+    *Controlling Metal-Complex Stereochemistry*
 
     When building metal-organic cages from octahedral metals, i.e.
     Fe(II), the stereochemistry of the metal centre can be important.
