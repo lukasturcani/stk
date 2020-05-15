@@ -4,7 +4,7 @@ import stk
 
 from ....case_data import CaseData
 
-vertices = stk.metal_complex.vertices
+vertices = stk.cage.vertices
 
 
 @pytest.fixture(
