@@ -2,6 +2,9 @@
 Cage
 ====
 
+Organic
+-------
+
 .. toctree::
     :maxdepth: 2
 
@@ -59,6 +62,13 @@ stk.molecular.topology_graphs.cage.two_plus_five.twelve_plus_thirty\
     Twenty Plus Thirty <\
 stk.molecular.topology_graphs.cage.two_plus_three.twenty_plus_thirty\
 >
+
+Metal-Organic
+-------------
+
+.. toctree::
+    :maxdepth: 2
+    
     M2L4 Lantern <\
 stk.molecular.topology_graphs.cage.metal_topologies.m2l4_lantern\
 >
@@ -75,7 +85,8 @@ stk.molecular.topology_graphs.cage.metal_topologies.m4l4_square\
 stk.molecular.topology_graphs.cage.metal_topologies.m4l4_tetrahedron\
 >
     M4L6 Tetrahedron Spacer <\
-stk.molecular.topology_graphs.cage.metal_topologies.m4l6_tetrahedron_spacer\
+stk.molecular.topology_graphs.cage.metal_topologies\
+.m4l6_tetrahedron_spacer\
 >
     M4L6 Tetrahedron <\
 stk.molecular.topology_graphs.cage.metal_topologies.m4l6_tetrahedron\
