@@ -7,6 +7,7 @@ from .three_plus_three import *  # noqa
 from .two_plus_five import *  # noqa
 from .two_plus_four import *  # noqa
 from .two_plus_three import *  # noqa
+from .metal_topologies import *  # noqa
 
 
 @pytest.fixture(
@@ -29,6 +30,19 @@ from .two_plus_three import *  # noqa
         lazy_fixture('cage_six_plus_nine'),
         lazy_fixture('cage_twenty_plus_thirty'),
         lazy_fixture('cage_two_plus_three'),
+        lazy_fixture('mcage_m2l4_lantern'),
+        lazy_fixture('mcage_m3l3_triangle'),
+        lazy_fixture('mcage_m3l6'),
+        lazy_fixture('mcage_m4l4_square'),
+        lazy_fixture('mcage_m4l4_tetrahedron'),
+        lazy_fixture('mcage_m4l6_tetrahedron'),
+        lazy_fixture('mcage_m4l6_tetrahedron_spacer'),
+        lazy_fixture('mcage_m4l8'),
+        lazy_fixture('mcage_m6l2l3_prism'),
+        lazy_fixture('mcage_m6l12_cube'),
+        lazy_fixture('mcage_m8l6_cube'),
+        lazy_fixture('mcage_m12l24'),
+        lazy_fixture('mcage_m24l48'),
     ),
 )
 def cage(request):
