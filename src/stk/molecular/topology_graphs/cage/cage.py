@@ -115,6 +115,7 @@ stk.molecular.topology_graphs.cage.metal_topologies.m24l48\
 from collections import Counter, defaultdict
 from functools import partial
 
+from .vertices import _UnaligningVertex
 from .cage_construction_state import _CageConstructionState
 from ..topology_graph import TopologyGraph
 from ...reactions import GenericReactionFactory
@@ -478,6 +479,9 @@ class Cage(TopologyGraph):
             if vertex_alignments is not None
             else {}
         )
+        building_block_vertices = self._with_unaligning_vertices(
+            building_block_vertices=building_block_vertices,
+        )
         building_block_vertices = self._assign_aligners(
             building_block_vertices=building_block_vertices,
             vertex_alignments=self._vertex_alignments,
@@ -521,6 +525,23 @@ class Cage(TopologyGraph):
             return cls._get_building_block_vertices(
                 building_blocks=building_blocks,
             )
+
+    def _with_unaligning_vertices(cls, building_block_vertices):
+        clone = {}
+        for building_block, vertices in (
+            building_block_vertices.items()
+        ):
+            # Building blocks with 1 placer, cannot be aligned and
+            # must therefore use an UnaligningVertex.
+            if len(set(building_block.get_placer_ids())) == 1:
+                clone[building_block] = tuple(map(
+                    _UnaligningVertex,
+                    vertices,
+                ))
+            else:
+                clone[building_block] = vertices
+
+        return clone
 
     @classmethod
     def _assign_aligners(
