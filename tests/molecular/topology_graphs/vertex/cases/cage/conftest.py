@@ -61,7 +61,7 @@ def position(request):
     params=(
         vertices._LinearCageVertex,
         vertices._NonLinearCageVertex,
-        vertices._MetalVertex,
+        vertices._UnaligningVertex,
         vertices._BentMetalComplexCageVertex,
     ),
 )
