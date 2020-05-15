@@ -68,7 +68,7 @@ Metal-Organic
 
 .. toctree::
     :maxdepth: 2
-    
+
     M2L4 Lantern <\
 stk.molecular.topology_graphs.cage.metal_topologies.m2l4_lantern\
 >
@@ -254,10 +254,10 @@ class Cage(TopologyGraph):
     *Metal-Organic Cage Construction*
 
     A series of common metal-organic cage topologies are provided and
-    can be constructed in the same way as other :class:`.Cage` 
-    instances using metal atoms and :class:`DativeReactionFactory` 
-    instances to produce metal-ligand bonds. Each metal topology has 
-    specific vertices reserved for the metal atoms or complexes, 
+    can be constructed in the same way as other :class:`.Cage`
+    instances using metal atoms and :class:`DativeReactionFactory`
+    instances to produce metal-ligand bonds. Each metal topology has
+    specific vertices reserved for the metal atoms or complexes,
     which are listed in their documentation.
 
     .. code-block:: python
@@ -357,7 +357,7 @@ class Cage(TopologyGraph):
                 ligands=bb2,
             )
         )
-    
+
     Then, :class:`.MetalComplex`
     instances can be placed on the appropriate :class:`.Cage` topology
     to produce a structure with the desired stereochemistry at all
