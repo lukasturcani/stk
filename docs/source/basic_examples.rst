@@ -560,15 +560,15 @@ Handling Molecules with Metal Atoms and Dative Bonds
 
 All :mod:`stk` :class:`.Molecule` instances (such as
 :class:`.BuildingBlock` and :class:`.ConstructedMolecule`) can contain
-metal atoms and handle various coordination reactions. 
-In order to represent dative bonds in these systems, a bond order of 
+metal atoms and handle various coordination reactions.
+In order to represent dative bonds in these systems, a bond order of
 9 is used.
 
 Furthermore, when working with metal-containing systems, any
 :class:`.BuildingBlock` initialization functions that require ETKDG
-may fail, because the ETKDG algorithm is liable to fail. In cases
-like this, you probably want to set the position matrix explicitly,
-which will mean that ETKDG will not be used.
+may fail, because the ETKDG algorithm is liable to fail in these cases.
+In cases like this, you probably want to set the position matrix
+explicitly, which will mean that ETKDG will not be used.
 
 .. code-block:: python
 
@@ -576,7 +576,7 @@ which will mean that ETKDG will not be used.
 
     bb = stk.BuildingBlock('[Fe+2]', position_matrix=[[0., 0., 0.]])
 
-If you want to get a more complex position matrix, defining a 
+If you want to get a more complex position matrix, defining a
 function may be a good idea
 
 .. code-block:: python
