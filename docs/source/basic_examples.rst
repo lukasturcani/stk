@@ -583,6 +583,7 @@ function may be a good idea
 
     import rdkit.Chem.AllChem as rdkit
 
+
     def get_position_matrix(smiles):
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
         rdkit.EmbedMolecule(molecule)
