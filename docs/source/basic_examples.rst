@@ -624,10 +624,9 @@ useful key for metal-containing molecules. You can use the
     bb = stk.BuildingBlock('BrO->[Fe+2]')
     db.put(bb)
     # Use the Smiles() key maker to get the retrieval SMILES,
-    # to make sure that the atoms in the SMILES are ordered
-    # correctly.
+    # to make sure it has canonical atom ordering.
     retrieval_smiles = stk.Smiles().get_key(bb)
-    retrieved = db.get({'SMILES': retrieval_smiles})
+    retrieved_bb = db.get({'SMILES': retrieval_smiles})
 
 Extending stk
 =============
