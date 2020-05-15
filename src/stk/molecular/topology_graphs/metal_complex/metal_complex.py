@@ -272,7 +272,7 @@ class MetalComplex(TopologyGraph):
         building_block_vertices.update(
             (building_block, vertices)
             for building_block, vertices
-            in self._normalize_ligands(ligands)
+            in self._normalize_ligands(ligands).items()
         )
 
         # By default, assign a dative bond order to available
