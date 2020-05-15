@@ -621,11 +621,11 @@ useful key for metal-containing molecules. You can use the
             key_makers=(stk.Smiles(), ),
         ),
     )
-    db.put(stk.BuildingBlock('BrO->[Fe+2]'))
-
-Note that the documentation of :class:`.MoleculeMongoDb`, shows how
-you can use your own code to retrieve your molecules with SMILES (or
-any other molecular property) as the key.
+    bb = stk.BuildingBlock('BrO->[Fe+2]')
+    db.put(bb)
+    # Use the Smiles() key maker to get the retrieval SMILES,
+    # to make sure that the SMILES has the correct form.
+    retrieved = db.get({'SMILES': stk.Smiles().get_key(bb)})
 
 Extending stk
 =============
