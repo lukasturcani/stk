@@ -278,8 +278,8 @@ class Cage(TopologyGraph):
         # the SmartsFunctionalGroupFactory.
         bb1 = stk.BuildingBlock(
             smiles=(
-                '[H]C1=NC([H])=C([H])C(C2=C([H])C([H])=C([H])C(C3=C('
-                '[H])C([H])=NC([H])=C3[H])=C2[H])=C1[H]'
+                'C1=NC=CC(C2=CC=CC(C3=C'
+                'C=NC=C3)=C2)=C1'
             ),
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -335,7 +335,7 @@ class Cage(TopologyGraph):
         # Define coordinating ligand with dummy bromine groups and
         # metal coordianting functional groups.
         bb2 = stk.BuildingBlock(
-            smiles='[H]C1=NC(C([H])=NBr)=C([H])C([H])=C1[H]',
+            smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
                     smarts='[#6]~[#7X2]~[#35]',
@@ -374,8 +374,8 @@ class Cage(TopologyGraph):
         # Define spacer building block.
         bb3 = stk.BuildingBlock(
             smiles=(
-                '[H]C1=C([H])C(C2=C([H])C([H])=C(Br)C([H])=C2[H])=C('
-                '[H])C([H])=C1Br'
+                'C1=CC(C2=CC=C(Br)C=C2)=C'
+                'C=C1Br'
             ),
             functional_groups=[stk.BromoFactory()]
         )
