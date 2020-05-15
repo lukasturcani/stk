@@ -5,3 +5,12 @@ stk.molecular.topology\_graphs.metal\_complex.octahedral package
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   stk.molecular.topology_graphs.metal_complex.octahedral.octahedral
+   stk.molecular.topology_graphs.metal_complex.octahedral.octahedral_delta
+   stk.molecular.topology_graphs.metal_complex.octahedral.octahedral_lambda

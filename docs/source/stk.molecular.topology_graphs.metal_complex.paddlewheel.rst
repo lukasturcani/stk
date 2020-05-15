@@ -5,3 +5,10 @@ stk.molecular.topology\_graphs.metal\_complex.paddlewheel package
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   stk.molecular.topology_graphs.metal_complex.paddlewheel.paddlewheel
