@@ -6,7 +6,7 @@ Metal Complex
     :maxdepth: 2
 
     Paddlewheel <\
-    stk.molecular.topology_graphs.metal_complex.paddlewheel.paddlewheel\
+stk.molecular.topology_graphs.metal_complex.paddlewheel.paddlewheel\
 >
     Porphyrin <\
 stk.molecular.topology_graphs.metal_complex.porphyrin.porphyrin\
@@ -15,19 +15,24 @@ stk.molecular.topology_graphs.metal_complex.porphyrin.porphyrin\
 stk.molecular.topology_graphs.metal_complex.octahedral.octahedral\
 >
     Octahedral Lambda <\
-stk.molecular.topology_graphs.metal_complex.octahedral.octahedral_lambda\
+stk.molecular.topology_graphs.metal_complex.octahedral\
+.octahedral_lambda\
 >
     Octahedral Delta <\
-stk.molecular.topology_graphs.metal_complex.octahedral.octahedral_delta\
+stk.molecular.topology_graphs.metal_complex.octahedral\
+.octahedral_delta\
 >
     Square Planar <\
-stk.molecular.topology_graphs.metal_complex.square_planar.square_planar\
+stk.molecular.topology_graphs.metal_complex.square_planar\
+.square_planar\
 >
     Bidentate Square Planar <\
-stk.molecular.topology_graphs.metal_complex.square_planar.bidentate_square_planar\
+stk.molecular.topology_graphs.metal_complex.square_planar\
+.bidentate_square_planar\
 >
     Cis Protected Square Planar <\
-stk.molecular.topology_graphs.metal_complex.square_planar.cis_protected_square_planar\
+stk.molecular.topology_graphs.metal_complex.square_planar\
+.cis_protected_square_planar\
 >
 
 """
