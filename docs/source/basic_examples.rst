@@ -625,8 +625,8 @@ useful key for metal-containing molecules. You can use the
     db.put(bb)
     # Use the Smiles() key maker to get the retrieval SMILES,
     # to make sure it has canonical atom ordering.
-    retrieval_smiles = stk.Smiles().get_key(bb)
-    retrieved_bb = db.get({'SMILES': retrieval_smiles})
+    canonical_smiles = stk.Smiles().get_key(bb)
+    retrieved_bb = db.get({'SMILES': canonical_smiles})
 
 Extending stk
 =============
