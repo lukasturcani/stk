@@ -555,6 +555,79 @@ other :mod:`~.functional_group_factory`. Note that the number you
 provide to the factory, is not the id of the atom found in the
 molecule!!
 
+Handling Molecules with Metal Atoms and Dative Bonds
+====================================================
+
+All :mod:`stk` :class:`.Molecule` instances (such as
+:class:`.BuildingBlock` and :class:`.ConstructedMolecule`) can contain
+metal atoms and handle various coordination reactions.
+In order to represent dative bonds in these systems, a bond order of
+9 is used.
+
+Furthermore, when working with metal-containing systems, any
+:class:`.BuildingBlock` initialization functions that require ETKDG
+may fail, because the ETKDG algorithm is liable to fail in these cases.
+In cases like this, you probably want to set the position matrix
+explicitly, which will mean that ETKDG will not be used.
+
+.. code-block:: python
+
+    import stk
+
+    bb = stk.BuildingBlock('[Fe+2]', position_matrix=[[0., 0., 0.]])
+
+If you want to get a more complex position matrix, defining a
+function may be a good idea
+
+.. code-block:: python
+
+    import rdkit.Chem.AllChem as rdkit
+
+
+    def get_position_matrix(smiles):
+        molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        rdkit.EmbedMolecule(molecule)
+        rdkit.UFFOptimizeMolecule(molecule)
+        return molecule.GetConformer().GetPositions()
+
+
+    smiles = 'CCCO->[Fe+2]'
+    bb = stk.BuildingBlock(
+        smiles=smiles,
+        position_matrix=get_position_matrix(smiles),
+    )
+
+Finally, :mod:`stk` will also read bonds from ``.mol`` files,
+which have a bond order of 9, as dative.
+
+Making Keys for Molecules with Dative Bonds
+===========================================
+
+Dative bonds are not defined in an InChI or InChiIKey.
+Therefore, when storing metal-containing molecules in a
+database, a different key is required. Because dative bonds are
+implemented in SMILES, the SMILES string makes a
+useful key for metal-containing molecules. You can use the
+:class:`.Smiles` key maker for this purpose
+
+.. code-block:: python
+
+    import stk
+    import pymongo
+
+    db = stk.MoleculeMongoDb(
+        mongo_client=pymongo.MongoClient(),
+        jsonizer=stk.MoleculeJsonizer(
+            key_makers=(stk.Smiles(), ),
+        ),
+    )
+    bb = stk.BuildingBlock('BrO->[Fe+2]')
+    db.put(bb)
+    # Use the Smiles() key maker to get the retrieval SMILES,
+    # to make sure it has canonical atom ordering.
+    canonical_smiles = stk.Smiles().get_key(bb)
+    retrieved_bb = db.get({'SMILES': canonical_smiles})
+
 Extending stk
 =============
 
