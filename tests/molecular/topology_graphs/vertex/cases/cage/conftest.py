@@ -61,6 +61,8 @@ def position(request):
     params=(
         vertices._LinearCageVertex,
         vertices._NonLinearCageVertex,
+        vertices._MetalVertex,
+        vertices._BentMetalComplexCageVertex,
     ),
 )
 def cls(request):
@@ -71,6 +73,8 @@ def cls(request):
     params=(
         vertices._LinearCageVertex.init_at_center,
         vertices._NonLinearCageVertex.init_at_center,
+        vertices._MetalVertex.init_at_center,
+        vertices._BentMetalComplexCageVertex.init_at_center,
     ),
 )
 def init_at_center(request):
