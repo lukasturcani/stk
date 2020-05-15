@@ -598,25 +598,22 @@ Making Keys for Molecules with Dative Bonds
 Dative bonds are not defined for the InChI or InChiIKey functions of
 :mod:`rdkit`. Therefore, when storing metal-containing molecules in a
 database, a different key is required. Because dative bonds are
-implemented in the definition of SMILES, the SMILES string makes a
-useful key for metal-containing molecules. We have implemented a SMILES
-:class:`.KeyMaker` for this purpose
+implemented in SMILES, the SMILES string makes a
+useful key for metal-containing molecules. You can use the
+:class:`.Smiles` key maker for this purpose
 
 .. code-block:: python
 
     import stk
     import pymongo
 
-    client = pymongo.MongoClient()
     db = stk.MoleculeMongoDb(
-        mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(
-                key_makers=(stk.Smiles()),
+        mongo_client=pymongo.MongoClient(),
+        jsonizer=stk.MoleculeJsonizer(
+            key_makers=(stk.Smiles(), ),
         ),
     )
-
-    bb = stk.BuildingBlock.init_from_file('path/to/file.mol')
-    db.put(bb)
+    db.put(stk.BuildingBlock('BrO->[Fe+2]'))
 
 Note that the documentation of :class:`.MoleculeMongoDb`, shows how
 you can use your own code to retrieve your molecules with SMILES (or
