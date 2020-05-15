@@ -470,45 +470,18 @@ class Cage(TopologyGraph):
 
         """
 
-        # Use tuple here because it prints nicely.
-        allowed_degrees = tuple(self._vertices_of_degree.keys())
-        if isinstance(building_blocks, dict):
-            for building_block in building_blocks:
-                assert (
-                    building_block.get_num_functional_groups()
-                    in self._vertices_of_degree.keys()
-                ), (
-                    'The number of functional groups in '
-                    f'{building_block} needs to be one of '
-                    f'{allowed_degrees}, but is '
-                    'currently '
-                    f'{building_block.get_num_functional_groups()}.'
-                )
-            building_blocks = {
-                building_block: self._get_vertices(ids)
-                for building_block, ids in building_blocks.items()
-            }
-
-        else:
-            building_blocks = self._get_building_block_vertices(
-                building_blocks=building_blocks,
-            )
-
-        self._vertex_alignments = vertex_alignments = (
+        building_block_vertices = self._normalize_building_blocks(
+            building_blocks=building_blocks,
+        )
+        self._vertex_alignments = (
             dict(vertex_alignments)
             if vertex_alignments is not None
             else {}
         )
-
-        def with_aligner(vertex):
-            return vertex.with_aligner_edge(
-                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
-            )
-
-        building_block_vertices = {
-            building_block: tuple(map(with_aligner, vertices))
-            for building_block, vertices in building_blocks.items()
-        }
+        building_block_vertices = self._assign_aligners(
+            building_block_vertices=building_block_vertices,
+            vertex_alignments=self._vertex_alignments,
+        )
         self._check_building_block_vertices(building_block_vertices)
         super().__init__(
             building_block_vertices=building_block_vertices,
@@ -522,6 +495,49 @@ class Cage(TopologyGraph):
             num_processes=num_processes,
             edge_groups=None,
         )
+
+    @classmethod
+    def _normalize_building_blocks(cls, building_blocks):
+        # Use tuple here because it prints nicely.
+        allowed_degrees = tuple(cls._vertices_of_degree.keys())
+        if isinstance(building_blocks, dict):
+            for building_block in building_blocks:
+                assert (
+                    building_block.get_num_functional_groups()
+                    in cls._vertices_of_degree.keys()
+                ), (
+                    'The number of functional groups in '
+                    f'{building_block} needs to be one of '
+                    f'{allowed_degrees}, but is '
+                    'currently '
+                    f'{building_block.get_num_functional_groups()}.'
+                )
+            return {
+                building_block: cls._get_vertices(ids)
+                for building_block, ids in building_blocks.items()
+            }
+
+        else:
+            return cls._get_building_block_vertices(
+                building_blocks=building_blocks,
+            )
+
+    @classmethod
+    def _assign_aligners(
+        cls,
+        building_block_vertices,
+        vertex_alignments,
+    ):
+        def with_aligner(vertex):
+            return vertex.with_aligner_edge(
+                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
+            )
+
+        return {
+            building_block: tuple(map(with_aligner, vertices))
+            for building_block, vertices
+            in building_block_vertices.items()
+        }
 
     @classmethod
     def _check_building_block_vertices(cls, building_block_vertices):
@@ -554,7 +570,8 @@ class Cage(TopologyGraph):
         clone._vertex_alignments = dict(self._vertex_alignments)
         return clone
 
-    def _get_vertices(self, vertex_ids):
+    @classmethod
+    def _get_vertices(cls, vertex_ids):
         """
         Yield vertex prototypes.
 
@@ -574,7 +591,7 @@ class Cage(TopologyGraph):
             vertex_ids = (vertex_ids, )
 
         for vertex_id in vertex_ids:
-            yield self._vertex_prototypes[vertex_id]
+            yield cls._vertex_prototypes[vertex_id]
 
     def _has_degree(self, degree, vertex):
         """
@@ -597,7 +614,8 @@ class Cage(TopologyGraph):
 
         return vertex.get_id() in self._vertices_of_degree[degree]
 
-    def _get_building_block_vertices(self, building_blocks):
+    @classmethod
+    def _get_building_block_vertices(cls, building_blocks):
         """
         Map building blocks to the vertices of the graph.
 
@@ -626,13 +644,13 @@ class Cage(TopologyGraph):
         """
 
         # Use tuple here because it prints nicely.
-        allowed_degrees = tuple(self._vertices_of_degree.keys())
+        allowed_degrees = tuple(cls._vertices_of_degree.keys())
 
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
             assert (
-                num_fgs in self._vertices_of_degree.keys()
+                num_fgs in cls._vertices_of_degree.keys()
             ), (
                 'The number of functional groups in '
                 f'{building_block} needs to be one of '
@@ -650,8 +668,8 @@ class Cage(TopologyGraph):
             building_blocks_by_degree[num_fgs] = building_block
 
         building_block_vertices = {}
-        for vertex in self._vertex_prototypes:
-            vertex_degree = self._vertex_degrees[vertex.get_id()]
+        for vertex in cls._vertex_prototypes:
+            vertex_degree = cls._vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
             building_block_vertices[building_block] = (
                 building_block_vertices.get(building_block, [])

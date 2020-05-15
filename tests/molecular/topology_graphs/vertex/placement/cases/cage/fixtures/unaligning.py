@@ -10,7 +10,7 @@ vertices = stk.metal_complex.vertices
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._MetalVertex(
+            vertex=vertices._UnaligningVertex(
                 id=0,
                 position=(1, 2, 3),
             ),
@@ -25,5 +25,5 @@ vertices = stk.metal_complex.vertices
         ),
     ),
 )
-def metal(request):
+def unaligning(request):
     return request.param
