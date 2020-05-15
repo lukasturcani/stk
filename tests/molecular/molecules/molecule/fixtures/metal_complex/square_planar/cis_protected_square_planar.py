@@ -72,5 +72,5 @@ _bi_1 = stk.BuildingBlock(
         ),
     ),
 )
-def metal_complex_cisprotectedsquareplanar(request):
+def metal_complex_cis_protected_square_planar(request):
     return request.param

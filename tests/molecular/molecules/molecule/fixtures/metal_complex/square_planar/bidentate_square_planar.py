@@ -74,5 +74,5 @@ _bi_1 = stk.BuildingBlock(
         ),
     ),
 )
-def metal_complex_bidentatesquareplanar(request):
+def metal_complex_bidentate_square_planar(request):
     return request.param

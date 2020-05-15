@@ -63,5 +63,5 @@ _mo_1 = stk.BuildingBlock(
         ),
     ),
 )
-def metal_complex_squareplanar(request):
+def metal_complex_square_planar(request):
     return request.param

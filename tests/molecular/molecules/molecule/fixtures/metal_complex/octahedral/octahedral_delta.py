@@ -81,5 +81,5 @@ _iron_bi_1 = stk.BuildingBlock(
         ),
     ),
 )
-def metal_complex_octahedraldelta(request):
+def metal_complex_octahedral_delta(request):
     return request.param
