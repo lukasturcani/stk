@@ -4,15 +4,14 @@ import stk
 
 from ....case_data import CaseData
 
-vertices = stk.metal_complex.vertices
+vertices = stk.cage.vertices
 
 
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._MetalVertex(
-                id=0,
-                position=(1, 2, 3),
+            vertex=vertices._UnaligningVertex(
+                vertex=vertices._CageVertex(0, (1, 2, 3)),
             ),
             edges=(),
             building_block=stk.BuildingBlock(
@@ -25,5 +24,5 @@ vertices = stk.metal_complex.vertices
         ),
     ),
 )
-def metal(request):
+def unaligning(request):
     return request.param
