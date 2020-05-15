@@ -82,8 +82,8 @@ _bi_2 = stk.BuildingBlock(
             smiles=(
                 '[H]C1=C([H])C(C2=O->[Pd+2]34<-O=C(C5=C([H])C([H])=C('
                 'Br)C([H])=C5[H])O->[Cu+2](<-O2)(<-OC(C2=C([H])C([H])'
-                '=C(Br)C([H])=C2[H])=O->3)<-OC(C2=C([H])C([H])=C(Br)C'
-                '([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
+                '=C(N([H])[H])C([H])=C2[H])=O->3)<-OC(C2=C([H])C([H])'
+                '=C(N([H])[H])C([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
             ),
         ),
 
