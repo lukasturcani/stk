@@ -9,7 +9,6 @@ from .fixtures import *  # noqa
     params=(
         lazy_fixture('linear'),
         lazy_fixture('nonlinear'),
-        lazy_fixture('bent_metal'),
         lazy_fixture('unaligning'),
     ),
 )
