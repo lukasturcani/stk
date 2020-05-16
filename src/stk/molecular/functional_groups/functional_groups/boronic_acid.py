@@ -26,6 +26,7 @@ class BoronicAcid(GenericFunctionalGroup):
         atom,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.BoronicAcid` instance.
@@ -56,6 +57,9 @@ class BoronicAcid(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._boron = boron
@@ -65,7 +69,12 @@ class BoronicAcid(GenericFunctionalGroup):
         self._hydrogen2 = hydrogen2
         self._atom = atom
         atoms = (boron, oxygen1, hydrogen1, oxygen2, hydrogen2, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_boron(self):
         """

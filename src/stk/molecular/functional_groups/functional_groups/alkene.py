@@ -26,6 +26,7 @@ class Alkene(GenericFunctionalGroup):
         atom4,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Alkene` instance.
@@ -56,6 +57,9 @@ class Alkene(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._carbon1 = carbon1
@@ -65,7 +69,12 @@ class Alkene(GenericFunctionalGroup):
         self._atom3 = atom3
         self._atom4 = atom4
         atoms = (carbon1, atom1, atom2, carbon2, atom3, atom4)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_carbon1(self):
         """

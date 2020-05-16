@@ -25,6 +25,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
         atom,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.CarboxylicAcid` instance.
@@ -52,6 +53,9 @@ class CarboxylicAcid(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._carbon = carbon
@@ -59,8 +63,12 @@ class CarboxylicAcid(GenericFunctionalGroup):
         self._oxygen2 = oxygen2
         self._hydrogen = hydrogen
         self._atom = atom
-        atoms = (carbon, oxygen1, oxygen2, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=(carbon, oxygen1, oxygen2, hydrogen, atom),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_carbon(self):
         """

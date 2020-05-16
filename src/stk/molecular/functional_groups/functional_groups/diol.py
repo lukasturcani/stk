@@ -26,6 +26,7 @@ class Diol(GenericFunctionalGroup):
         hydrogen2,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Diol` instance.
@@ -56,6 +57,9 @@ class Diol(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._atom1 = atom1
@@ -65,7 +69,12 @@ class Diol(GenericFunctionalGroup):
         self._oxygen2 = oxygen2
         self._hydrogen2 = hydrogen2
         atoms = (atom1, oxygen1, hydrogen1, atom2, oxygen2, hydrogen2)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_atom1(self):
         """

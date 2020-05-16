@@ -26,6 +26,7 @@ class Amide(GenericFunctionalGroup):
         atom,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Amide` instance.
@@ -56,6 +57,9 @@ class Amide(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._carbon = carbon
@@ -65,7 +69,12 @@ class Amide(GenericFunctionalGroup):
         self._hydrogen2 = hydrogen2
         self._atom = atom
         atoms = (carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_carbon(self):
         """

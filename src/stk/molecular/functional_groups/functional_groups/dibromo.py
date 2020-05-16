@@ -24,6 +24,7 @@ class Dibromo(GenericFunctionalGroup):
         atom2,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Dibromo` instance.
@@ -48,14 +49,21 @@ class Dibromo(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._bromine1 = bromine1
         self._atom1 = atom1
         self._bromine2 = bromine2
         self._atom2 = atom2
-        atoms = (bromine1, atom1, bromine2, atom2)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=(bromine1, atom1, bromine2, atom2),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_atom1(self):
         """

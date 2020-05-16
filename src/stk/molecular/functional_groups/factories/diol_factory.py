@@ -61,7 +61,12 @@ class DiolFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(2, 3), deleters=(0, 1, 4, 5)):
+    def __init__(
+        self,
+        bonders=(2, 3),
+        deleters=(0, 1, 4, 5),
+        placers=None,
+    ):
         """
         Initialize a :class:`.DiolFactory` instance.
 
@@ -75,10 +80,15 @@ class DiolFactory(FunctionalGroupFactory):
             The indices of atoms in the functional group string, which
             are *deleter* atoms.
 
+        placers : :class:`tuple` of :class:`int`, optional
+            The indices of atoms in the functional group string, which
+            are *placer* atoms. If ``None``, `bonders` will be used.
+
         """
 
         self._bonders = bonders
         self._deleters = deleters
+        self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
         ids = _get_atom_ids('[H][O][#6]~[#6][O][H]', molecule)
@@ -93,4 +103,5 @@ class DiolFactory(FunctionalGroupFactory):
                 hydrogen2=atoms[5],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
+                placers=tuple(atoms[i] for i in self._placers),
             )

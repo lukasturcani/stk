@@ -16,7 +16,7 @@ class Iodo(GenericFunctionalGroup):
 
     """
 
-    def __init__(self, iodine, atom, bonders, deleters):
+    def __init__(self, iodine, atom, bonders, deleters, placers=None):
         """
         Initialize a :class:`.Iodo` instance.
 
@@ -34,11 +34,19 @@ class Iodo(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._iodine = iodine
         self._atom = atom
-        super().__init__((iodine, atom), bonders, deleters)
+        super().__init__(
+            atoms=(iodine, atom),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_iodine(self):
         """

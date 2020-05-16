@@ -62,7 +62,12 @@ class BoronicAcidFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(2, 3, 4, 5)):
+    def __init__(
+        self,
+        bonders=(1, ),
+        deleters=(2, 3, 4, 5),
+        placers=None,
+    ):
         """
         Initialize a :class:`.BoronicAcidFactory` instance.
 
@@ -76,10 +81,15 @@ class BoronicAcidFactory(FunctionalGroupFactory):
             The indices of atoms in the functional group string, which
             are *deleter* atoms.
 
+        placers : :class:`tuple` of :class:`int`, optional
+            The indices of atoms in the functional group string, which
+            are *placer* atoms. If ``None``, `bonders` will be used.
+
         """
 
         self._bonders = bonders
         self._deleters = deleters
+        self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
         ids = _get_atom_ids('[*][B]([O][H])[O][H]', molecule)
@@ -94,4 +104,5 @@ class BoronicAcidFactory(FunctionalGroupFactory):
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
+                placers=tuple(atoms[i] for i in self._placers),
             )

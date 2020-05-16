@@ -16,7 +16,14 @@ class Fluoro(GenericFunctionalGroup):
 
     """
 
-    def __init__(self, fluorine, atom, bonders, deleters):
+    def __init__(
+        self,
+        fluorine,
+        atom,
+        bonders,
+        deleters,
+        placers=None,
+    ):
         """
         Initialize a :class:`.Fluoro` instance.
 
@@ -34,11 +41,19 @@ class Fluoro(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._fluorine = fluorine
         self._atom = atom
-        super().__init__((fluorine, atom), bonders, deleters)
+        super().__init__(
+            atoms=(fluorine, atom),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_fluorine(self):
         """

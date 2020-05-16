@@ -24,6 +24,7 @@ class SecondaryAmino(GenericFunctionalGroup):
         atom2,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.SecondaryAmine` instance.
@@ -48,14 +49,21 @@ class SecondaryAmino(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._nitrogen = nitrogen
         self._hydrogen = hydrogen
         self._atom1 = atom1
         self._atom2 = atom2
-        atoms = (nitrogen, hydrogen, atom1, atom2)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=(nitrogen, hydrogen, atom1, atom2),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_nitrogen(self):
         """

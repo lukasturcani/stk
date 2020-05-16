@@ -24,6 +24,7 @@ class Difluoro(GenericFunctionalGroup):
         atom2,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Difluoro` instance.
@@ -42,14 +43,21 @@ class Difluoro(GenericFunctionalGroup):
         atom2 : :class:`.Atom`
             The ``[atom2]`` atom.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._fluorine1 = fluorine1
         self._atom1 = atom1
         self._fluorine2 = fluorine2
         self._atom2 = atom2
-        atoms = (fluorine1, atom1, fluorine2, atom2)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=(fluorine1, atom1, fluorine2, atom2),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_atom1(self):
         """

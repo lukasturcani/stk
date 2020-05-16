@@ -16,7 +16,7 @@ class Bromo(GenericFunctionalGroup):
 
     """
 
-    def __init__(self, bromine, atom, bonders, deleters):
+    def __init__(self, bromine, atom, bonders, deleters, placers=None):
         """
         Initialize a :class:`.Bromo` instance.
 
@@ -34,11 +34,19 @@ class Bromo(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._bromine = bromine
         self._atom = atom
-        super().__init__((bromine, atom), bonders, deleters)
+        super().__init__(
+            atoms=(bromine, atom),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_bromine(self):
         """
