@@ -16,7 +16,15 @@ class Alcohol(GenericFunctionalGroup):
 
     """
 
-    def __init__(self, oxygen, hydrogen, atom, bonders, deleters):
+    def __init__(
+        self,
+        oxygen,
+        hydrogen,
+        atom,
+        bonders,
+        deleters,
+        placers=None,
+    ):
         """
         Initialize a :class:`.Alcohol` instance.
 
@@ -37,13 +45,21 @@ class Alcohol(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._oxygen = oxygen
         self._hydrogen = hydrogen
         self._atom = atom
         atoms = (oxygen, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_oxygen(self):
         """

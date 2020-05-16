@@ -24,7 +24,8 @@ class Thioacid(GenericFunctionalGroup):
         hydrogen,
         atom,
         bonders,
-        deleters
+        deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Thioacid` functional group.
@@ -52,6 +53,9 @@ class Thioacid(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._carbon = carbon
@@ -59,8 +63,12 @@ class Thioacid(GenericFunctionalGroup):
         self._sulfur = sulfur
         self._hydrogen = hydrogen
         self._atom = atom
-        atoms = (carbon, oxygen, sulfur, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=(carbon, oxygen, sulfur, hydrogen, atom),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_carbon(self):
         """

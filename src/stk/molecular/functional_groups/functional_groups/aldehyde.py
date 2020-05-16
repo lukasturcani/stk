@@ -24,6 +24,7 @@ class Aldehyde(GenericFunctionalGroup):
         atom,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initialize a :class:`.Aldehyde` instance.
@@ -48,6 +49,9 @@ class Aldehyde(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._carbon = carbon
@@ -55,7 +59,12 @@ class Aldehyde(GenericFunctionalGroup):
         self._hydrogen = hydrogen
         self._atom = atom
         atoms = (carbon, oxygen, hydrogen, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_carbon(self):
         """

@@ -24,6 +24,7 @@ class PrimaryAmino(GenericFunctionalGroup):
         atom,
         bonders,
         deleters,
+        placers=None,
     ):
         """
         Initializes a :class:`.PrimaryAmino` instance.
@@ -48,14 +49,21 @@ class PrimaryAmino(GenericFunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
+
         """
 
         self._nitrogen = nitrogen
         self._hydrogen1 = hydrogen1
         self._hydrogen2 = hydrogen2
         self._atom = atom
-        atoms = (nitrogen, hydrogen1, hydrogen2, atom)
-        super().__init__(atoms, bonders, deleters)
+        super().__init__(
+            atoms=(nitrogen, hydrogen1, hydrogen2, atom),
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
     def get_nitrogen(self):
         """
