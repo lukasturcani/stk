@@ -12,11 +12,11 @@ from ..functional_groups import GenericFunctionalGroup
 class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
     """
     Creates :class:`.GenericFunctionalGroup` instances.
-    
+
     Examples
     --------
     *Using SMARTS to Define Functional Groups*
-    
+
     You want to create a building block which has
     :class:`.GenericFunctionalGroup` functional groups based on the
     SMARTS string: ``[Br][C]``.
@@ -45,7 +45,7 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, smarts, bonders, deleters):
+    def __init__(self, smarts, bonders, deleters, placers=None):
         """
         Initialize a :class:`.SmartsFunctionalGroupFactory` instance.
 
@@ -58,14 +58,19 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
             The indices of atoms in `smarts`, which are *bonder* atoms.
 
         deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in `smarts`, which are *deleter* 
+            The indices of atoms in `smarts`, which are *deleter*
             atoms.
+
+        placers : :class:`tuple` of :class:`int`, optional
+            The indices of atoms in `smarts`, which are *placer* atoms.
+            If ``None``, the *bonder* atoms will be used.
 
         """
 
         self._smarts = smarts
         self._bonders = bonders
         self._deleters = deleters
+        self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
         for atom_ids in _get_atom_ids(self._smarts, molecule):
@@ -74,4 +79,5 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
                 atoms=atoms,
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
+                placers=tuple(atoms[i] for i in self._placers),
             )
