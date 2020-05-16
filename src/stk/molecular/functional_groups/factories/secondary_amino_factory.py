@@ -62,7 +62,7 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(0, )):
+    def __init__(self, bonders=(1, ), deleters=(0, ), placers=None):
         """
         Initialize a :class:`.SecondaryAminoFactory` instance.
 
@@ -76,10 +76,15 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
             The indices of atoms in the functional group string, which
             are deleter atoms.
 
+        placers : :class:`tuple` of :class:`int`, optional
+            The indices of atoms in the functional group string, which
+            are *placer* atoms. If ``None``, `bonders` will be used.
+
         """
 
         self._bonders = bonders
         self._deleters = deleters
+        self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
         for atom_ids in _get_atom_ids('[H][N]([#6])[#6]', molecule):
@@ -91,4 +96,5 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
                 atom2=atoms[3],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
+                placers=tuple(atoms[i] for i in self._placers),
             )
