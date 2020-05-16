@@ -21,7 +21,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     """
 
-    def __init__(self, atoms, bonders, deleters):
+    def __init__(self, atoms, bonders, deleters, placers=None):
         """
         Initialize a :class:`.GenericFunctionalGroup`.
 
@@ -36,12 +36,16 @@ class GenericFunctionalGroup(FunctionalGroup):
         deleters : :class:`tuple` of :class:`.Atom`
             The deleter atoms in the functional group.
 
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms of the functional group. If ``None``,
+            the `bonders` will be used.
+
         """
 
         deleter_set = set(atom.get_id() for atom in deleters)
         super().__init__(
             atoms=atoms,
-            placers=bonders,
+            placers=bonders if placers is None else placers,
             core_atoms=tuple(
                 atom for atom in atoms
                 if atom.get_id() not in deleter_set

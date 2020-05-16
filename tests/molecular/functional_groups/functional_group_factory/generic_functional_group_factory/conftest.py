@@ -403,6 +403,31 @@ from ..case_data import CaseData
                 ),
             ),
         ),
+
+        CaseData(
+            factory=stk.SmartsFunctionalGroupFactory(
+                smarts='CBr',
+                bonders=(0, ),
+                deleters=(1, ),
+                placers=(1, ),
+            ),
+            molecule=stk.BuildingBlock('CC(Br)C(Br)CC'),
+            functional_groups=(
+                stk.GenericFunctionalGroup(
+                    atoms=(stk.C(1), stk.Br(2)),
+                    bonders=(stk.C(1), ),
+                    deleters=(stk.Br(2), ),
+                    placers=(stk.Br(2), ),
+                ),
+                stk.GenericFunctionalGroup(
+                    atoms=(stk.C(3), stk.Br(4)),
+                    bonders=(stk.C(3), ),
+                    deleters=(stk.Br(4), ),
+                    placers=(stk.Br(4), ),
+                ),
+            ),
+        ),
+
     )
 )
 def case_data(request):
