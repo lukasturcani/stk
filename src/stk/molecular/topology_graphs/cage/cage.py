@@ -359,8 +359,8 @@ class Cage(TopologyGraph):
             )
         )
 
-    Then, :class:`.MetalComplex`
-    instances can be placed on the appropriate :class:`.Cage` topology
+    Then the metal complexes
+    can be placed on the appropriate :class:`.Cage` topology
     to produce a structure with the desired stereochemistry at all
     metal centres.
 
