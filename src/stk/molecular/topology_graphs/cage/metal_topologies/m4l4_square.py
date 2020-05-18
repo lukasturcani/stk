@@ -26,16 +26,31 @@ class M4L4Square(Cage):
 
     Examples
     --------
+    *Aligning Metal Complex Building Blocks*
 
-    *Advanced Construction*
-
-    When building metal-organic structures, it is common that
-    functional groups, defined by metal atoms, will be overlapping.
-    Therefore, to build :class:`.M4L4Square` instances with the desired
-    building block alignment, corner and linker building blocks must
-    have functional groups with additional `placer` atoms. First we
-    build the metal atom (Pd(II) with four functional groups).
-
+    When building metal-organic cages from metal complex 
+    building blocks, it is common that
+    the metal complex :class:`.BuildingBlock` will have 
+    multiple functional groups, but that those functional groups
+    are overlapping. This means that some of its atoms appear in 
+    multiple functional groups. A difficulty arises when the 
+    atom shared between the functional groups is a *placer* atom.
+    
+    *Placer* atoms are used to align building blocks, so that
+    they have an appropriate orientation in the final topology.
+    If there is only one *placer* atom, no alignment can be made,
+    as no vector running between *placer* atoms can be defined,
+    and used for the alignment of the :class:`.BuildingBlock`.
+    
+    By default, :mod:`stk` may create overlapping functional
+    groups, which may lead to a lack of an appropriate number
+    of *placer* atoms, leading to a :class:`.BuildingBlock` 
+    being unalinged. However, the user can manually set the 
+    *placer* atoms of functional groups, so that the *placer*
+    atoms do not appear in multiple functional groups, which
+    leads to proper alignment.
+    
+    First we build a metal complex
 
     .. code-block:: python
 
@@ -47,15 +62,10 @@ class M4L4Square(Cage):
                 stk.SingleAtom(stk.Pd(0, charge=2))
                 for i in range(4)
             ),
-            position_matrix=([0, 0, 0], ),
+            position_matrix=[[0., 0., 0.]],
         )
 
-    Next we build the corner unit, which is a cis-protected square
-    planar metal complex.
-
-    .. code-block:: python
-
-        bb1 = stk.BuildingBlock(
+        ligand = stk.BuildingBlock(
             smiles='NCCN',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -66,35 +76,38 @@ class M4L4Square(Cage):
             ]
         )
 
-        corner_bb = stk.ConstructedMolecule(
+        metal_complex = stk.ConstructedMolecule(
             stk.metal_complex.CisProtectedSquarePlanar(
                 metals=metal_atom,
-                ligands=bb1,
+                ligands=ligand,
             )
         )
-
-    We then define a new :class:`.BuildingBlock` with functional groups
-    that have two placer atoms to enforce alignment of the corner unit.
+        
+    Next, we convert the metal complex into a :class:`.BuildingBlock`,
+    taking care to define functional groups which do not have
+    overlapping *placer* atoms
 
     .. code-block:: python
 
-        corner_bb = stk.BuildingBlock.init_from_molecule(
-            molecule=corner_bb,
+        metal_complex = stk.BuildingBlock.init_from_molecule(
+            molecule=metal_complex,
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
                     smarts='[Pd]~[#7]',
                     bonders=(0, ),
                     deleters=(),
-                    placers=(0, 1),
+                    # The nitrogen atom will be different
+                    # for each functional group.
+                    placers=(1, ),
                 ),
             ]
         )
 
-    We also load in the organic linker as normal.
+    We load in the organic linker of the cage as normal
 
     .. code-block:: python
 
-        linker_bb = stk.BuildingBlock(
+        linker = stk.BuildingBlock(
             smiles='C1=NC=CC(C2=CC=NC=C2)=C1',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -107,26 +120,23 @@ class M4L4Square(Cage):
 
     And finally, we build the cage with a
     :class:`DativeReactionFactory` instance to produce dative bonds.
-    The intializer for this topology is different to other
-    :class:`.Cage` instances because both building block types have
-    the same number of functional groups.
 
     .. code-block:: python
 
         cage = stk.ConstructedMolecule(
             stk.cage.M4L4Square(
-                corners=corner_bb,
-                linkers=linker_bb,
+                corners=metal_complex,
+                linkers=linker,
                 reaction_factory=stk.DativeReactionFactory(
                     stk.GenericReactionFactory(
                         bond_orders={
                             frozenset({
                                 stk.GenericFunctionalGroup,
-                                stk.GenericFunctionalGroup
+                                stk.GenericFunctionalGroup,
                             }): 9
                         }
                     )
-                )
+                ),
             )
         )
 
@@ -186,7 +196,6 @@ class M4L4Square(Cage):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
-
 
         """
 
