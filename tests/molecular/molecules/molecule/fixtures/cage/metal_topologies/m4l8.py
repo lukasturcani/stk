@@ -69,5 +69,5 @@ linker = stk.BuildingBlock(
         ),
     ),
 )
-def mcage_m4l8(request):
+def metal_cage_m4l8(request):
     return request.param

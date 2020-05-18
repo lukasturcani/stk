@@ -91,5 +91,5 @@ iron_complex = stk.BuildingBlock.init_from_molecule(
         ),
     ),
 )
-def mcage_m4l6_tetrahedron_spacer(request):
+def metal_cage_m4l6_tetrahedron_spacer(request):
     return request.param
