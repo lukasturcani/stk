@@ -98,7 +98,7 @@ class M4L4Square(Cage):
                     deleters=(),
                     # The nitrogen atom will be different
                     # for each functional group.
-                    placers=(1, ),
+                    placers=(0, 1),
                 ),
             ]
         )
