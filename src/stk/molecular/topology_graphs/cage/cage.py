@@ -526,7 +526,8 @@ class Cage(TopologyGraph):
                 building_blocks=building_blocks,
             )
 
-    def _with_unaligning_vertices(cls, building_block_vertices):
+    @staticmethod
+    def _with_unaligning_vertices(building_block_vertices):
         clone = dict(building_block_vertices)
         for building_block, vertices in clone.items():
             # Building blocks with 1 placer, cannot be aligned and
