@@ -29,10 +29,10 @@
    :caption: Topology Graphs
    :maxdepth: 2
 
-   Polymer <polymer>
-   Organic Cage <stk.molecular.topology_graphs.cage.cage>
-   Covalent Organic Framework <stk.molecular.topology_graphs.cof.cof>
-   Metal Complex <stk.molecular.topology_graphs.metal_complex.metal_complex>
+   Polymers <polymer>
+   Organic & Metal-Organic Cages <stk.molecular.topology_graphs.cage.cage>
+   Covalent Organic Frameworks <stk.molecular.topology_graphs.cof.cof>
+   Metal Complexes <stk.molecular.topology_graphs.metal_complex.metal_complex>
    Host Guest Complex <stk.molecular.topology_graphs.host_guest.complex>
    Macrocycle <stk.molecular.topology_graphs.macrocycle.macrocycle>
    [n]Rotaxane <stk.molecular.topology_graphs.rotaxane.nrotaxane>
