@@ -23,8 +23,8 @@ class M8L6Cube(Cage):
     :class:`.BuildingBlock` needs to be assigned to each of the
     following numbers:
 
-        | metals (3 functional groups): range(8)
-        | ligands (4 functional groups): range(8, 14)
+        | metals (3 functional groups): 0 to 7
+        | ligands (4 functional groups): 8 to 13
 
     See :class:`.Cage` for more details and examples.
 

@@ -23,8 +23,8 @@ class M4L8(Cage):
     :class:`.BuildingBlock` needs to be assigned to each of the
     following numbers:
 
-        | metals: range(4)
-        | ligands: range(4, 12)
+        | metals: (0, 1, 2, 3)
+        | ligands: (4, 5, 6, 7, 8, 9, 10, 11)
 
     See :class:`.Cage` for more details and examples.
 

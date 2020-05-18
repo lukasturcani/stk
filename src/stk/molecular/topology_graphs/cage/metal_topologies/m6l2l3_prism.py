@@ -25,9 +25,9 @@ class M6L2L3Prism(Cage):
     :class:`.BuildingBlock` needs to be assigned to each of the
     following numbers:
 
-        | metals: range(6)
-        | ligand A (3 functional groups): range(6, 8)
-        | ligand B (4 functional groups): range(8, 11)
+        | metals: 0 to 5
+        | ligand A (3 functional groups): (6, 7)
+        | ligand B (4 functional groups): (8, 9, 10)
 
     See :class:`.Cage` for more details and examples.
 

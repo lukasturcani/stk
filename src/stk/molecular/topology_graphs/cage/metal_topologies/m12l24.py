@@ -23,8 +23,8 @@ class M12L24(Cage):
     :class:`.BuildingBlock` needs to be assigned to each of the
     following numbers:
 
-        | metals: range(12)
-        | ligands: range(12, 36)
+        | metals: 0 to 11
+        | ligands: 12 to 35
 
     See :class:`.Cage` for more details and examples.
 
