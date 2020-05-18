@@ -1,4 +1,3 @@
-"""
 from .m2l4_lantern import *
 from .m3l3_triangle import *
 from .m3l6 import *
@@ -12,4 +11,3 @@ from .m6l2l3_prism import *
 from .m8l6_cube import *
 from .m12l24 import *
 from .m24l48 import *
-"""

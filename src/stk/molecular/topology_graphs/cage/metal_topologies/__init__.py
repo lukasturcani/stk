@@ -1,4 +1,3 @@
-"""
 from .m2l4_lantern import *  # noqa
 from .m3l3_triangle import *  # noqa
 from .m3l6 import *  # noqa
@@ -12,4 +11,3 @@ from .m6l2l3_prism import *  # noqa
 from .m8l6_cube import *  # noqa
 from .m12l24 import *  # noqa
 from .m24l48 import *  # noqa
-"""
