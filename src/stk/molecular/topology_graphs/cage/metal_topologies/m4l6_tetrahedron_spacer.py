@@ -28,8 +28,8 @@ class M4L6TetrahedronSpacer(Cage):
     :class:`.BuildingBlock` needs to be assigned to each of the
     following numbers:
 
-        | metals: range(4)
-        | linkers: rangr(4, 10)
+        | metals: (0, 1, 2, 3)
+        | linkers: (4, 5, 6, 7, 8, 9)
 
     Examples
     --------
@@ -37,19 +37,19 @@ class M4L6TetrahedronSpacer(Cage):
 
     Many metal-organic cages are built using a process called
     subcomponent self-assembly, which is a complex chemical process
-    that occurs in solution. In :class:`.Cage`, we provide an example
-    of an alchemical approach using :class:`M4L6TetrahedronSpacer` to
-    building these types of cages. It is alchemical because the bonds
+    that occurs in solution. In :class:`.Cage`, an example is
+    provided of an alchemical approach using
+    :class:`.M4L6TetrahedronSpacer` to
+    build these types of cages. It is alchemical because the bonds
     formed during construction are not the same as the experimental
     reaction. Instead of forming bonds at the metal centre, we create
     bonds between disconnected ligands.
 
-    The :class:`M4L6TetrahedronSpacer` topology is provided for cases
+    The :class:`.M4L6TetrahedronSpacer` topology is provided for cases
     where the linkers cannot be disconnected symmetrically. However,
     in the case that the linker can be disconnected
-    in a symmetrical fashion, we have provided the
-    :class:`M4L6Tetrahedron` topology, where the metal vertices on the
-    tetrahedron are connected directly.
+    in a symmetrical fashion, the
+    :class:`.M4L6Tetrahedron` topology can be used.
 
     """
 
