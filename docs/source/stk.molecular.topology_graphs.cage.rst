@@ -11,6 +11,7 @@ Subpackages
 
 .. toctree::
 
+   stk.molecular.topology_graphs.cage.metal_topologies
    stk.molecular.topology_graphs.cage.three_plus_four
    stk.molecular.topology_graphs.cage.three_plus_three
    stk.molecular.topology_graphs.cage.two_plus_five
