@@ -127,6 +127,19 @@ class _CageVertex(Vertex):
             ),
         )
 
+    def get_aligner_edge(self):
+        """
+        Return the aligner edge of the vertex.
+
+        Returns
+        -------
+        :class:`int`
+            The aligner edge.
+
+        """
+
+        return self._aligner_edge
+
     def __str__(self):
         return (
             f'Vertex(id={self._id}, '
@@ -263,3 +276,42 @@ class _NonLinearCageVertex(_CageVertex):
                 edge_sorter.get_items(),
             )
         }
+
+
+class _UnaligningVertex(_CageVertex):
+    """
+    Just places a building block, does not align.
+
+    """
+
+    def __init__(self, vertex):
+        super().__init__(
+            id=vertex.get_id(),
+            position=vertex.get_position(),
+            use_neighbor_placement=vertex.use_neighbor_placement(),
+            aligner_edge=vertex.get_aligner_edge()
+        )
+
+    def place_building_block(self, building_block, edges):
+        return building_block.with_centroid(
+            position=self._position,
+            atom_ids=building_block.get_placer_ids(),
+        ).get_position_matrix()
+
+    def map_functional_groups_to_edges(self, building_block, edges):
+
+        return {
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+        }
+
+    @classmethod
+    def init_at_center(cls, id, vertices):
+        vertex = cls.__new__(cls)
+        vertex._id = id
+        vertex._position = (
+            sum(vertex.get_position() for vertex in vertices)
+            / len(vertices)
+        )
+        vertex._use_neighbor_placement = True
+        vertex._aligner_edge = 0
+        return vertex

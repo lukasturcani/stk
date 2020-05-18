@@ -13,6 +13,7 @@ vertices = stk.cage.vertices
     params=(
         lazy_fixture('cage1'),
         lazy_fixture('cage2'),
+        lazy_fixture('cage3'),
     ),
 )
 def case_data(request):
@@ -47,6 +48,18 @@ def cage2(init_at_center, vertices_):
     )
 
 
+@pytest.fixture
+def cage3(position):
+    return CaseData(
+        vertex=vertices._UnaligningVertex(
+            vertex=vertices._CageVertex(0, position),
+        ),
+        id=0,
+        position=position,
+        cell=np.array([0, 0, 0]),
+    )
+
+
 @pytest.fixture(
     params=(
         [0, 0, 0],
@@ -71,6 +84,7 @@ def cls(request):
     params=(
         vertices._LinearCageVertex.init_at_center,
         vertices._NonLinearCageVertex.init_at_center,
+        vertices._UnaligningVertex.init_at_center,
     ),
 )
 def init_at_center(request):

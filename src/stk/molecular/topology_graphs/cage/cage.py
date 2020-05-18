@@ -2,6 +2,9 @@
 Cage
 ====
 
+Organic
+-------
+
 .. toctree::
     :maxdepth: 2
 
@@ -60,11 +63,59 @@ stk.molecular.topology_graphs.cage.two_plus_five.twelve_plus_thirty\
 stk.molecular.topology_graphs.cage.two_plus_three.twenty_plus_thirty\
 >
 
+Metal-Organic
+-------------
+
+.. toctree::
+    :maxdepth: 2
+
+    M2L4 Lantern <\
+stk.molecular.topology_graphs.cage.metal_topologies.m2l4_lantern\
+>
+    M3L3 Triangle <\
+stk.molecular.topology_graphs.cage.metal_topologies.m3l3_triangle\
+>
+    M3L6 <\
+stk.molecular.topology_graphs.cage.metal_topologies.m3l6\
+>
+    M4L4 Square <\
+stk.molecular.topology_graphs.cage.metal_topologies.m4l4_square\
+>
+    M4L4 Tetrahedron <\
+stk.molecular.topology_graphs.cage.metal_topologies.m4l4_tetrahedron\
+>
+    M4L6 Tetrahedron Spacer <\
+stk.molecular.topology_graphs.cage.metal_topologies\
+.m4l6_tetrahedron_spacer\
+>
+    M4L6 Tetrahedron <\
+stk.molecular.topology_graphs.cage.metal_topologies.m4l6_tetrahedron\
+>
+    M4L8 <\
+stk.molecular.topology_graphs.cage.metal_topologies.m4l8\
+>
+    M6L2L3 Prism <\
+stk.molecular.topology_graphs.cage.metal_topologies.m6l2l3_prism\
+>
+    M6L12 Cube <\
+stk.molecular.topology_graphs.cage.metal_topologies.m6l12_cube\
+>
+    M8L6 Cube <\
+stk.molecular.topology_graphs.cage.metal_topologies.m8l6_cube\
+>
+    M12L24 <\
+stk.molecular.topology_graphs.cage.metal_topologies.m12l24\
+>
+    M24L48 <\
+stk.molecular.topology_graphs.cage.metal_topologies.m24l48\
+>
+
 """
 
 from collections import Counter, defaultdict
 from functools import partial
 
+from .vertices import _UnaligningVertex
 from .cage_construction_state import _CageConstructionState
 from ..topology_graph import TopologyGraph
 from ...reactions import GenericReactionFactory
@@ -201,6 +252,259 @@ class Cage(TopologyGraph):
             vertex_alignments={0: 1, 1: 1, 2: 2},
         )
 
+    *Metal-Organic Cage Construction*
+
+    A series of common metal-organic cage topologies are provided and
+    can be constructed in the same way as other :class:`.Cage`
+    instances using metal atoms and :class:`DativeReactionFactory`
+    instances to produce metal-ligand bonds. Each metal topology has
+    specific vertices reserved for the metal atoms or complexes,
+    which are listed in their documentation.
+
+    .. code-block:: python
+
+        import stk
+
+        # Produce a Pd+2 atom with 4 functional groups.
+        palladium_atom = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(4)
+            ),
+            position_matrix=[[0., 0., 0.]],
+        )
+
+        # Build a building block with two functional groups using
+        # the SmartsFunctionalGroupFactory.
+        bb1 = stk.BuildingBlock(
+            smiles=(
+                'C1=NC=CC(C2=CC=CC(C3=C'
+                'C=NC=C3)=C2)=C1'
+            ),
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        cage1 = stk.ConstructedMolecule(
+            stk.cage.M2L4Lantern(
+                building_blocks=(palladium_atom, bb1),
+                # Ensure that bonds between the GenericFunctionalGroups
+                # of the ligand and the SingleAtom functional groups
+                # of the metal are dative.
+                reaction_factory=stk.DativeReactionFactory(
+                    stk.GenericReactionFactory(
+                        bond_orders={
+                            frozenset({
+                                stk.GenericFunctionalGroup,
+                                stk.SingleAtom
+                            }): 9
+                        }
+                    )
+                )
+            )
+        )
+
+    *Controlling Metal-Complex Stereochemistry*
+
+    When building metal-organic cages from octahedral metals, i.e.
+    Fe(II), the stereochemistry of the metal centre can be important.
+    Maintaining that stereochemistry around specific metal centres
+    during :class:`.Cage` construction is difficult, so an
+    alternative route to these types of structures can be taken.
+    Firstly, you would construct a :class:`.MetalComplex` instance
+    with the appropriate stereochemistry and dummy reactive groups
+    (bromine in the following example)
+
+    .. code-block:: python
+
+        # Produce a Fe+2 atom with 6 functional groups.
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        # Define coordinating ligand with dummy bromine groups and
+        # metal coordianting functional groups.
+        bb2 = stk.BuildingBlock(
+            smiles='C1=NC(C=NBr)=CC=C1',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+        # Build iron complex with delta stereochemistry.
+        iron_oct_delta = stk.ConstructedMolecule(
+            stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+            )
+        )
+
+    Then the metal complexes
+    can be placed on the appropriate :class:`.Cage` topology
+    to produce a structure with the desired stereochemistry at all
+    metal centres.
+
+    .. code-block:: python
+
+        # Assign Bromo functional groups to the metal complex.
+        iron_oct_delta = stk.BuildingBlock.init_from_molecule(
+            molecule=iron_oct_delta,
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        # Define spacer building block.
+        bb3 = stk.BuildingBlock(
+            smiles=(
+                'C1=CC(C2=CC=C(Br)C=C2)=C'
+                'C=C1Br'
+            ),
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        # Build an M4L6 Tetrahedron with a spacer.
+        cage2 = stk.ConstructedMolecule(
+            stk.cage.M4L6TetrahedronSpacer(
+                building_blocks=(
+                    iron_oct_delta,
+                    bb3,
+                ),
+            )
+        )
+
+    *Aligning Metal Complex Building Blocks*
+
+    When building metal-organic cages from metal complex
+    building blocks, it is common that
+    the metal complex :class:`.BuildingBlock` will have
+    multiple functional groups, but that those functional groups
+    are overlapping. This means that some of its atoms appear in
+    multiple functional groups. A difficulty arises when the
+    atom shared between the functional groups is a *placer* atom.
+
+    *Placer* atoms are used to align building blocks, so that
+    they have an appropriate orientation in the final topology.
+    If there is only one *placer* atom, no alignment can be made,
+    as no vector running between *placer* atoms can be defined,
+    and used for the alignment of the :class:`.BuildingBlock`.
+
+    By default, :mod:`stk` may create overlapping functional
+    groups, which may lead to a lack of an appropriate number
+    of *placer* atoms, leading to a :class:`.BuildingBlock`
+    being unalinged. However, the user can manually set the
+    *placer* atoms of functional groups, so that not all of the
+    *placer* atoms appear in multiple functional groups, which
+    leads to proper alignment.
+
+    First we build a metal complex
+
+    .. code-block:: python
+
+        import stk
+
+        metal_atom = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(4)
+            ),
+            position_matrix=[[0., 0., 0.]],
+        )
+
+        ligand = stk.BuildingBlock(
+            smiles='NCCN',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#7]~[#6]',
+                    bonders=(0, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+        metal_complex = stk.ConstructedMolecule(
+            stk.metal_complex.CisProtectedSquarePlanar(
+                metals=metal_atom,
+                ligands=ligand,
+            )
+        )
+
+    Next, we convert the metal complex into a :class:`.BuildingBlock`,
+    taking care to define functional groups which do not have
+    overlapping *placer* atoms
+
+    .. code-block:: python
+
+        metal_complex = stk.BuildingBlock.init_from_molecule(
+            molecule=metal_complex,
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[Pd]~[#7]',
+                    bonders=(0, ),
+                    deleters=(),
+                    # The nitrogen atom will be different
+                    # for each functional group.
+                    placers=(0, 1),
+                ),
+            ]
+        )
+
+    We load in the organic linker of the cage as normal
+
+    .. code-block:: python
+
+        linker = stk.BuildingBlock(
+            smiles='C1=NC=CC(C2=CC=NC=C2)=C1',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+    And finally, we build the cage with a
+    :class:`DativeReactionFactory` instance to produce dative bonds.
+
+    .. code-block:: python
+
+        cage = stk.ConstructedMolecule(
+            stk.cage.M4L4Square(
+                corners=metal_complex,
+                linkers=linker,
+                reaction_factory=stk.DativeReactionFactory(
+                    stk.GenericReactionFactory(
+                        bond_orders={
+                            frozenset({
+                                stk.GenericFunctionalGroup,
+                                stk.GenericFunctionalGroup,
+                            }): 9
+                        }
+                    )
+                ),
+            )
+        )
+
     """
 
     def __init_subclass__(cls, **kwargs):
@@ -281,45 +585,21 @@ class Cage(TopologyGraph):
 
         """
 
-        # Use tuple here because it prints nicely.
-        allowed_degrees = tuple(self._vertices_of_degree.keys())
-        if isinstance(building_blocks, dict):
-            for building_block in building_blocks:
-                assert (
-                    building_block.get_num_functional_groups()
-                    in self._vertices_of_degree.keys()
-                ), (
-                    'The number of functional groups in '
-                    f'{building_block} needs to be one of '
-                    f'{allowed_degrees}, but is '
-                    'currently '
-                    f'{building_block.get_num_functional_groups()}.'
-                )
-            building_blocks = {
-                building_block: self._get_vertices(ids)
-                for building_block, ids in building_blocks.items()
-            }
-
-        else:
-            building_blocks = self._get_building_block_vertices(
-                building_blocks=building_blocks,
-            )
-
-        self._vertex_alignments = vertex_alignments = (
+        building_block_vertices = self._normalize_building_blocks(
+            building_blocks=building_blocks,
+        )
+        self._vertex_alignments = (
             dict(vertex_alignments)
             if vertex_alignments is not None
             else {}
         )
-
-        def with_aligner(vertex):
-            return vertex.with_aligner_edge(
-                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
-            )
-
-        building_block_vertices = {
-            building_block: tuple(map(with_aligner, vertices))
-            for building_block, vertices in building_blocks.items()
-        }
+        building_block_vertices = self._with_unaligning_vertices(
+            building_block_vertices=building_block_vertices,
+        )
+        building_block_vertices = self._assign_aligners(
+            building_block_vertices=building_block_vertices,
+            vertex_alignments=self._vertex_alignments,
+        )
         self._check_building_block_vertices(building_block_vertices)
         super().__init__(
             building_block_vertices=building_block_vertices,
@@ -333,6 +613,63 @@ class Cage(TopologyGraph):
             num_processes=num_processes,
             edge_groups=None,
         )
+
+    @classmethod
+    def _normalize_building_blocks(cls, building_blocks):
+        # Use tuple here because it prints nicely.
+        allowed_degrees = tuple(cls._vertices_of_degree.keys())
+        if isinstance(building_blocks, dict):
+            for building_block in building_blocks:
+                assert (
+                    building_block.get_num_functional_groups()
+                    in cls._vertices_of_degree.keys()
+                ), (
+                    'The number of functional groups in '
+                    f'{building_block} needs to be one of '
+                    f'{allowed_degrees}, but is '
+                    'currently '
+                    f'{building_block.get_num_functional_groups()}.'
+                )
+            return {
+                building_block: cls._get_vertices(ids)
+                for building_block, ids in building_blocks.items()
+            }
+
+        else:
+            return cls._get_building_block_vertices(
+                building_blocks=building_blocks,
+            )
+
+    @staticmethod
+    def _with_unaligning_vertices(building_block_vertices):
+        clone = dict(building_block_vertices)
+        for building_block, vertices in clone.items():
+            # Building blocks with 1 placer, cannot be aligned and
+            # must therefore use an UnaligningVertex.
+            if len(set(building_block.get_placer_ids())) == 1:
+                clone[building_block] = tuple(map(
+                    _UnaligningVertex,
+                    vertices,
+                ))
+
+        return clone
+
+    @classmethod
+    def _assign_aligners(
+        cls,
+        building_block_vertices,
+        vertex_alignments,
+    ):
+        def with_aligner(vertex):
+            return vertex.with_aligner_edge(
+                aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
+            )
+
+        return {
+            building_block: tuple(map(with_aligner, vertices))
+            for building_block, vertices
+            in building_block_vertices.items()
+        }
 
     @classmethod
     def _check_building_block_vertices(cls, building_block_vertices):
@@ -365,7 +702,8 @@ class Cage(TopologyGraph):
         clone._vertex_alignments = dict(self._vertex_alignments)
         return clone
 
-    def _get_vertices(self, vertex_ids):
+    @classmethod
+    def _get_vertices(cls, vertex_ids):
         """
         Yield vertex prototypes.
 
@@ -385,7 +723,7 @@ class Cage(TopologyGraph):
             vertex_ids = (vertex_ids, )
 
         for vertex_id in vertex_ids:
-            yield self._vertex_prototypes[vertex_id]
+            yield cls._vertex_prototypes[vertex_id]
 
     def _has_degree(self, degree, vertex):
         """
@@ -408,7 +746,8 @@ class Cage(TopologyGraph):
 
         return vertex.get_id() in self._vertices_of_degree[degree]
 
-    def _get_building_block_vertices(self, building_blocks):
+    @classmethod
+    def _get_building_block_vertices(cls, building_blocks):
         """
         Map building blocks to the vertices of the graph.
 
@@ -437,13 +776,13 @@ class Cage(TopologyGraph):
         """
 
         # Use tuple here because it prints nicely.
-        allowed_degrees = tuple(self._vertices_of_degree.keys())
+        allowed_degrees = tuple(cls._vertices_of_degree.keys())
 
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
             assert (
-                num_fgs in self._vertices_of_degree.keys()
+                num_fgs in cls._vertices_of_degree.keys()
             ), (
                 'The number of functional groups in '
                 f'{building_block} needs to be one of '
@@ -461,8 +800,8 @@ class Cage(TopologyGraph):
             building_blocks_by_degree[num_fgs] = building_block
 
         building_block_vertices = {}
-        for vertex in self._vertex_prototypes:
-            vertex_degree = self._vertex_degrees[vertex.get_id()]
+        for vertex in cls._vertex_prototypes:
+            vertex_degree = cls._vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
             building_block_vertices[building_block] = (
                 building_block_vertices.get(building_block, [])
