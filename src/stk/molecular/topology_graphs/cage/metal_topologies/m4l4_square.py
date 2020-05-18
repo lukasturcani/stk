@@ -28,28 +28,28 @@ class M4L4Square(Cage):
     --------
     *Aligning Metal Complex Building Blocks*
 
-    When building metal-organic cages from metal complex 
+    When building metal-organic cages from metal complex
     building blocks, it is common that
-    the metal complex :class:`.BuildingBlock` will have 
+    the metal complex :class:`.BuildingBlock` will have
     multiple functional groups, but that those functional groups
-    are overlapping. This means that some of its atoms appear in 
-    multiple functional groups. A difficulty arises when the 
+    are overlapping. This means that some of its atoms appear in
+    multiple functional groups. A difficulty arises when the
     atom shared between the functional groups is a *placer* atom.
-    
+
     *Placer* atoms are used to align building blocks, so that
     they have an appropriate orientation in the final topology.
     If there is only one *placer* atom, no alignment can be made,
     as no vector running between *placer* atoms can be defined,
     and used for the alignment of the :class:`.BuildingBlock`.
-    
+
     By default, :mod:`stk` may create overlapping functional
     groups, which may lead to a lack of an appropriate number
-    of *placer* atoms, leading to a :class:`.BuildingBlock` 
-    being unalinged. However, the user can manually set the 
-    *placer* atoms of functional groups, so that the *placer*
-    atoms do not appear in multiple functional groups, which
+    of *placer* atoms, leading to a :class:`.BuildingBlock`
+    being unalinged. However, the user can manually set the
+    *placer* atoms of functional groups, so that not all of the
+    *placer* atoms appear in multiple functional groups, which
     leads to proper alignment.
-    
+
     First we build a metal complex
 
     .. code-block:: python
@@ -82,7 +82,7 @@ class M4L4Square(Cage):
                 ligands=ligand,
             )
         )
-        
+
     Next, we convert the metal complex into a :class:`.BuildingBlock`,
     taking care to define functional groups which do not have
     overlapping *placer* atoms
