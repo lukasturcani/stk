@@ -369,7 +369,7 @@ class Cage(TopologyGraph):
         # Assign Bromo functional groups to the metal complex.
         iron_oct_delta = stk.BuildingBlock.init_from_molecule(
             molecule=iron_oct_delta,
-            functional_groups=[stk.BromoFactory()]
+            functional_groups=[stk.BromoFactory()],
         )
 
         # Define spacer building block.
@@ -378,7 +378,7 @@ class Cage(TopologyGraph):
                 'C1=CC(C2=CC=C(Br)C=C2)=C'
                 'C=C1Br'
             ),
-            functional_groups=[stk.BromoFactory()]
+            functional_groups=[stk.BromoFactory()],
         )
 
         # Build an M4L6 Tetrahedron with a spacer.
