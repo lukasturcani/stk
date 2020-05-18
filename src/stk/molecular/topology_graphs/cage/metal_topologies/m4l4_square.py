@@ -7,7 +7,7 @@ M4L4 Square
 from ..cage import Cage
 from ..vertices import _LinearCageVertex
 from ...topology_graph import Edge
-from ...reactions import GenericReactionFactory
+from ....reactions import GenericReactionFactory
 
 
 class M4L4Square(Cage):
@@ -84,26 +84,14 @@ class M4L4Square(Cage):
         """
 
         if isinstance(corners, dict):
-            building_blocks = {
-                corner: tuple(self._get_vertices(ids))
-                for corner, ids in corners.items()
-            }
+            building_blocks = corners
         else:
-            ids = (0, 1, 2, 3)
-            building_blocks = {
-                corners: tuple(self._get_vertices(ids))
-            }
+            building_blocks = {corners: (0, 1, 2, 3)}
 
         if isinstance(linkers, dict):
-            linkers_dict = {
-                linker: tuple(self._get_vertices(ids))
-                for linker, ids in corners.items()
-            }
+            linkers_dict = linkers
         else:
-            ids = (4, 5, 6, 7)
-            linkers_dict = {
-                linkers: tuple(self._get_vertices(ids))
-            }
+            linkers_dict = {linkers: (4, 5, 6, 7)}
 
         building_blocks.update(
             (building_block, vertices)
