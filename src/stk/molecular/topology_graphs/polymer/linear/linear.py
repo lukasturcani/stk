@@ -47,7 +47,7 @@ class Linear(TopologyGraph):
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2, bb3),
                 repeating_unit='ABABC',
-                num_repeating_unit=1,
+                num_repeating_units=1,
             ),
         )
 
