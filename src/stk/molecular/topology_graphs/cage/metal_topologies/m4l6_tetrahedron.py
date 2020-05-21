@@ -61,7 +61,7 @@ class M4L6Tetrahedron(Cage):
     process completes all metal-ligand reactions performed during the
     subcomponent self-assembly process.
 
-  .. code-block:: python
+    .. code-block:: python
 
         # Produce a Fe+2 atom with 6 functional groups.
         iron_atom = stk.BuildingBlock(
