@@ -101,8 +101,9 @@ Molecular Construction
 ......................
 
 :mod:`.stk` provides tools for constructing a variety of molecular
-structures, including organic cages, covalent organic frameworks,
-polymers and macrocycles, among others. While additional molecular
+structures, including organic and metal-organic cages,
+covalent organic frameworks, polymers and metal complexes, to name a
+few. While additional molecular
 structures are always being added, :mod:`stk` provides tools which
 allow users to easily specify new kinds of molecular structures,
 no matter how simple or complex, in case something they want to build
