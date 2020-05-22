@@ -25,8 +25,8 @@ class M6L12Cube(Cage):
     :class:`.BuildingBlock` needs to be assigned to each of the
     following numbers:
 
-        | metals: range(6)
-        | ligands: range(6, 18)
+        | metals: (0, 1, 2, 3, 4, 5)
+        | ligands: (6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)
 
     See :class:`.Cage` for more details and examples.
 

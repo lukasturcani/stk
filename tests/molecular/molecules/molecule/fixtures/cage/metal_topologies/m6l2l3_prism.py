@@ -111,5 +111,5 @@ iron_complex = stk.BuildingBlock.init_from_molecule(
         ),
     ),
 )
-def mcage_m6l2l3_prism(request):
+def metal_cage_m6l2l3_prism(request):
     return request.param

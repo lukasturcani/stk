@@ -94,5 +94,5 @@ linker = stk.BuildingBlock(
         ),
     ),
 )
-def mcage_m3l3_triangle(request):
+def metal_cage_m3l3_triangle(request):
     return request.param

@@ -9,7 +9,7 @@ import numpy as np
 from ..cage import Cage
 from ..vertices import _LinearCageVertex
 from ...topology_graph import Edge
-from ...reactions import GenericReactionFactory
+from ....reactions import GenericReactionFactory
 
 
 class M3L3Triangle(Cage):
@@ -87,26 +87,14 @@ class M3L3Triangle(Cage):
         """
 
         if isinstance(corners, dict):
-            building_blocks = {
-                corner: tuple(self._get_vertices(ids))
-                for corner, ids in corners.items()
-            }
+            building_blocks = corners
         else:
-            ids = (0, 1, 2)
-            building_blocks = {
-                corners: tuple(self._get_vertices(ids))
-            }
+            building_blocks = {corners: (0, 1, 2)}
 
         if isinstance(linkers, dict):
-            linkers_dict = {
-                linker: tuple(self._get_vertices(ids))
-                for linker, ids in corners.items()
-            }
+            linkers_dict = linkers
         else:
-            ids = (3, 4, 5)
-            linkers_dict = {
-                linkers: tuple(self._get_vertices(ids))
-            }
+            linkers_dict = {linkers: (3, 4, 5)}
 
         building_blocks.update(
             (building_block, vertices)

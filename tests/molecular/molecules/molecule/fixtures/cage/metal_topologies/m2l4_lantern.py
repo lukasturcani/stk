@@ -61,5 +61,5 @@ linker = stk.BuildingBlock(
         ),
     ),
 )
-def mcage_m2l4_lantern(request):
+def metal_cage_m2l4_lantern(request):
     return request.param

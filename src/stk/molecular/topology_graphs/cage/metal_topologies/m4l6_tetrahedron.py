@@ -61,7 +61,7 @@ class M4L6Tetrahedron(Cage):
     process completes all metal-ligand reactions performed during the
     subcomponent self-assembly process.
 
-  .. code-block:: python
+    .. code-block:: python
 
         # Produce a Fe+2 atom with 6 functional groups.
         iron_atom = stk.BuildingBlock(
@@ -115,11 +115,13 @@ class M4L6Tetrahedron(Cage):
 
     """
 
+    _x = 1/(2*np.sqrt(2))
+    _y = 0.5
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [0, 0, np.sqrt(6)/2]),
-        _NonLinearCageVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        _NonLinearCageVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        _NonLinearCageVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
+        _NonLinearCageVertex(0, [_y, 0, -_x]),
+        _NonLinearCageVertex(1, [-_y, 0, -_x]),
+        _NonLinearCageVertex(2, [0, _y, _x]),
+        _NonLinearCageVertex(3, [0, -_y, _x]),
     )
 
     _edge_prototypes = (
