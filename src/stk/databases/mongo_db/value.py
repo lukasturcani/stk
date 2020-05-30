@@ -114,9 +114,13 @@ class ValueMongoDb(ValueDatabase):
         self._put = lru_cache(maxsize=lru_cache_size)(self._put)
         self._get = lru_cache(maxsize=lru_cache_size)(self._get)
 
+        index_information = self._values.index_information()
+        if 'v_1' not in index_information:
+            self._values.create_index('v')
+
         for index in indices:
             # Do not create the same index twice.
-            if f'{index}_1' not in self._values.index_information():
+            if f'{index}_1' not in index_information:
                 self._values.create_index(index)
 
     def put(self, molecule, value):
