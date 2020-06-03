@@ -66,7 +66,7 @@ def get_smiles(molecule):
 
     """
 
-    rdkit_mol = molecule.to_rdkit_mol()
+    rdkit_mol = molecule.with_canonical_atom_ordering().to_rdkit_mol()
     rdkit.AssignStereochemistryFrom3D(rdkit_mol)
     rdkit.SanitizeMol(rdkit_mol)
     rdkit_mol = rdkit.RemoveHs(rdkit_mol)
