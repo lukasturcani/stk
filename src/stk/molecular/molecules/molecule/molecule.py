@@ -21,6 +21,7 @@ from stk.utilities import (
     rotation_matrix_arbitrary_axis,
 )
 from .utilities import writers, updaters
+from ..utilities import sort_bond_atoms_by_id, get_bond_atom_ids
 
 
 class Molecule:
@@ -808,9 +809,13 @@ class Molecule:
             atom_map.values(),
             key=lambda atom: atom.get_id()
         ))
-        self._bonds = tuple(
-            bond.with_atoms(atom_map) for bond in self._bonds
-        )
+        self._bonds = tuple(sorted(
+            (
+                sort_bond_atoms_by_id(bond.with_atoms(atom_map))
+                for bond in self._bonds
+            ),
+            key=get_bond_atom_ids,
+        ))
         old_ids = {
             atom.get_id(): old_id for old_id, atom in atom_map.items()
         }
