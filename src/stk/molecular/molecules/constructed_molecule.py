@@ -10,6 +10,7 @@ import rdkit.Chem.AllChem as rdkit
 from .molecule import Molecule
 from ..atoms import AtomInfo
 from ..bonds import BondInfo
+from .utilities import get_bond_info_atom_ids, sort_bond_atoms_by_id
 
 logger = logging.getLogger(__name__)
 
@@ -239,11 +240,16 @@ class ConstructedMolecule(Molecule):
 
         def get_bond_info(info):
             return BondInfo(
-                bond=info.get_bond().with_atoms(atom_map),
+                bond=sort_bond_atoms_by_id(
+                    info.get_bond().with_atoms(atom_map)
+                ),
                 building_block=info.get_building_block(),
                 building_block_id=info.get_building_block_id(),
             )
 
         self._atom_infos = tuple(map(get_atom_info, self._atoms))
-        self._bond_infos = tuple(map(get_bond_info, self._bond_infos))
+        self._bond_infos = tuple(sorted(
+            map(get_bond_info, self._bond_infos),
+            key=get_bond_info_atom_ids,
+        ))
         return self

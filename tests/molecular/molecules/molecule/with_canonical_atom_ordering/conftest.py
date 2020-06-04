@@ -24,9 +24,9 @@ bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
                     stk.N(3, 1),
                 ),
                 bonds=(
+                    stk.Bond(stk.Cl(0), stk.N(3, 1), 1),
                     stk.Bond(stk.Br(1), stk.C(2, 2), 1),
                     stk.Bond(stk.C(2, 2), stk.N(3, 1), 1),
-                    stk.Bond(stk.N(3, 1), stk.Cl(0), 1),
                 ),
                 position_matrix=np.array([
                 ]),
@@ -58,7 +58,7 @@ bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
                 ),
                 bonds=(
                     stk.Bond(stk.C(0, 2), stk.N(2, 1), 1),
-                    stk.Bond(stk.S(3), stk.O(1, 1), 1),
+                    stk.Bond(stk.O(1, 1), stk.S(3), 1),
                     stk.Bond(stk.N(2, 1), stk.S(3), 1),
                 ),
                 position_matrix=np.array([]),
@@ -91,7 +91,7 @@ bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
                         building_block_id=0,
                     ),
                     stk.BondInfo(
-                        bond=stk.Bond(stk.S(3), stk.O(1, 1), 1),
+                        bond=stk.Bond(stk.O(1, 1), stk.S(3), 1),
                         building_block=bb2,
                         building_block_id=1,
                     ),
