@@ -17,9 +17,10 @@ def sort_bond_atoms_by_id(bond):
 
 
 def get_bond_atom_ids(bond):
-    return sorted(
-        (bond.get_atom1().get_id(), bond.get_atom2().get_id())
-    )
+    return sorted((
+        bond.get_atom1().get_id(), 
+        bond.get_atom2().get_id(),
+    ))
 
 
 def get_bond_info_atom_ids(bond_info):
