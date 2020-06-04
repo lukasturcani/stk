@@ -1,8 +1,5 @@
 """
-This module defines general-purpose objects, functions and classes.
-
-Functions, classes, etc. defined here should not depend on any other
-part of ``stk``. They must be completely self-sufficient.
+This module defines utilities for molecules.
 
 """
 
