@@ -49,12 +49,12 @@ def _write_pdb_file(self, path, atom_ids):
         name = f'{element}{atom_counts[element]}'
         # Make sure the coords are no more than 8 columns wide
         # each.
-        x, y, z = (f'{i}'[:8] for i in coords[:, atom])
+        x, y, z = (i for i in coords[:, atom])
         lines.append(
             f'{hetatm:<6}{serial:>5} {name:<4}'
             f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
             f'{res_seq:>4}{i_code:<1}   '
-            f'{x:>8}{y:>8}{z:>8}'
+            f' {x:>7.3f} {y:>7.3f} {z:>7.3f}'
             f'{occupancy:>6}{temp_factor:>6}          '
             f'{element:>2}{self._atoms[atom].get_charge():>2}\n'
         )
