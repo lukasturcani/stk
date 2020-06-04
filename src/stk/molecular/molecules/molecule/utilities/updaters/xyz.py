@@ -43,6 +43,8 @@ def _with_structure_from_xyz(self, path):
     new_coords = []
     for i, line in enumerate(content):
         element, *coords = line.split()
+        # Handle XYZ files with capitilisation of element symbols.
+        element = element.title()
         if element.isnumeric():
             element = periodic_table[int(element)]
 
