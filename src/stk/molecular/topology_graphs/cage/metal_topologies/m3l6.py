@@ -61,7 +61,7 @@ class M3L6(Cage):
             position=[
                 _R*np.cos((_theta+np.pi/4)),
                 _R*np.sin((_theta+np.pi/4)),
-                1
+                0.5
             ],
             use_neighbor_placement=False
         ),
@@ -70,7 +70,7 @@ class M3L6(Cage):
             position=[
                 _R*np.cos((_theta+1*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)),
-                -1
+                -0.5
             ],
             use_neighbor_placement=False
         ),
@@ -80,7 +80,7 @@ class M3L6(Cage):
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(4*np.pi/3)),
-                1
+                0.5
             ],
             use_neighbor_placement=False
         ),
@@ -89,7 +89,7 @@ class M3L6(Cage):
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(4*np.pi/3)),
-                -1
+                -0.5
             ],
             use_neighbor_placement=False
         ),
@@ -99,7 +99,7 @@ class M3L6(Cage):
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(2*np.pi/3)),
-                1
+                0.5
             ],
             use_neighbor_placement=False
         ),
@@ -108,7 +108,7 @@ class M3L6(Cage):
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(2*np.pi/3)),
-                -1
+                -0.5
             ],
             use_neighbor_placement=False
         ),

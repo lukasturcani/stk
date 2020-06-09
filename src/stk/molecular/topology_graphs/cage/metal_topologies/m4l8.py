@@ -36,17 +36,17 @@ class M4L8(Cage):
         _NonLinearCageVertex(2, [-1, 0, 0]),
         _NonLinearCageVertex(3, [0, -1, 0]),
 
-        _LinearCageVertex(4, [1, 1, 1], False),
-        _LinearCageVertex(5, [1, 1, -1], False),
+        _LinearCageVertex(4, [1, 1, 0.5], False),
+        _LinearCageVertex(5, [1, 1, -0.5], False),
 
-        _LinearCageVertex(6, [1, -1, 1], False),
-        _LinearCageVertex(7, [1, -1, -1], False),
+        _LinearCageVertex(6, [1, -1, 0.5], False),
+        _LinearCageVertex(7, [1, -1, -0.5], False),
 
-        _LinearCageVertex(8, [-1, -1, 1], False),
-        _LinearCageVertex(9, [-1, -1, -1], False),
+        _LinearCageVertex(8, [-1, -1, 0.5], False),
+        _LinearCageVertex(9, [-1, -1, -0.5], False),
 
-        _LinearCageVertex(10, [-1, 1, 1], False),
-        _LinearCageVertex(11, [-1, 1, -1], False),
+        _LinearCageVertex(10, [-1, 1, 0.5], False),
+        _LinearCageVertex(11, [-1, 1, -0.5], False),
     )
 
     _edge_prototypes = (
