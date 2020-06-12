@@ -825,7 +825,7 @@ class Cage(TopologyGraph):
 
     def __repr__(self):
         vertex_alignments = (
-            ', vertex_alignments={self._vertex_alignments}'
+            f'vertex_alignments={self._vertex_alignments}'
             if self._vertex_alignments
             else ''
         )
