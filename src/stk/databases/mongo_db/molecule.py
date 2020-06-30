@@ -262,8 +262,20 @@ class MoleculeMongoDb(MoleculeDatabase):
         return self._put(HashableDict(json))
 
     def _put(self, json):
-        self._molecules.insert_one(json['molecule'])
-        self._position_matrices.insert_one(json['matrix'])
+        # insert_one() corrupts the state of the dict it is passed
+        # as an argument (it adds various keys and values items to it).
+        # Using insert_one(json['molecule']) would mean that the json
+        # in the lru_cache is modified with some extra items added by
+        # insert_one(). This means that the next time _put() is used
+        # with a clean json, it will not match the one in the cache,
+        # because the one in the cache has the extra items added by
+        # insert_one(). To prevent this use
+        # insert_one(dict(json['molecule'])), which means that a copy
+        # is modified by insert_one and the json in the cache is
+        # not changed.
+
+        self._molecules.insert_one(dict(json['molecule']))
+        self._position_matrices.insert_one(dict(json['matrix']))
 
     def get(self, key):
         # lru_cache requires that the parameters to the cached function
