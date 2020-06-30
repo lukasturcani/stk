@@ -263,7 +263,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     def _put(self, json):
         # insert_one() corrupts the state of the dict it is passed
-        # as an argument (it adds various keys and values items to it).
+        # as an argument (it adds various items to it).
         # Using insert_one(json['molecule']) would mean that the json
         # in the lru_cache is modified with some extra items added by
         # insert_one(). This means that the next time _put() is used
