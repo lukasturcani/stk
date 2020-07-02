@@ -382,22 +382,10 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             upsert=True,
         )
 
-        # First read the building blocks present in the constructed
-        # molecule entry already in the database, if it exists. Then
-        # merge building blocks in that entry with the building
-        # blocks present in the current JSON. This prevents keys of
-        # building blocks already present in the database from being
-        # removed, if they are not also present in the current JSON.
-        entries = (
-            molecule['BB']
-            for molecule in self._constructed_molecules.find(query)
+        self._add_database_building_block_keys(
+            query=query,
+            building_block_keys=json['constructedMolecule']['BB'],
         )
-        for building_blocks in entries:
-            for building_block1, building_block2 in zip(
-                 json['constructedMolecule']['BB'],
-                 building_blocks,
-            ):
-                building_block1.update(building_block2)
 
         self._constructed_molecules.update_many(
             filter=query,
@@ -422,6 +410,55 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 },
                 upsert=True,
             )
+
+    def _add_database_building_block_keys(
+        self,
+        query,
+        building_block_keys,
+    ):
+        """
+        Add previously deposited keys to `building_block_keys`.
+
+        Checks the constructed molecule collection to find all
+        constructed molecule entries which match `query`. All matches
+        should merely be duplicate entries for the same constructed
+        molecule, potentially using different molecular keys.
+
+        It then looks at the keys of the building blocks for the
+        entries found in the collection. It adds those keys to the
+        equivalent building block in `building_block_keys`.
+
+        This means that when `building_block_keys` is used to update
+        an entry in the database, it does not remove any building
+        block keys already there.
+
+        Parameters
+        ----------
+        query : :class:`dict`
+            A query which matches entries, corresponding to a
+            single constructed molecule.
+
+        building_block_keys : :class:`list` of :class:`dict`
+            Each :class:`dict` represents a building block of the
+            constructed molecule matched by `query`. The :class:`dict`
+            holds the name of a molecular key and its value for that
+            particular building block. Key-value pairs for building
+            block molecular keys already found in the database are
+            added to the dictionaries by this method.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        database_keys = (
+            molecule['BB']
+            for molecule in self._constructed_molecules.find(query)
+        )
+        for key_set in database_keys:
+            for keys1, keys2 in zip(building_block_keys, key_set):
+                keys1.update(keys2)
 
     def get(self, key):
         # lru_cache requires that the parameters to the cached function
