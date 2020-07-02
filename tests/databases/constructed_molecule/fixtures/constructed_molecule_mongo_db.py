@@ -1,8 +1,8 @@
 import pytest
 import stk
 import rdkit.Chem.AllChem as rdkit
+import pymongo
 
-from ...utilities import MockMongoClient
 from ..case_data import CaseData
 
 
@@ -10,8 +10,10 @@ from ..case_data import CaseData
     params=(
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
-                mongo_client=MockMongoClient(),
-                lru_cache_size=0,
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
+                put_lru_cache_size=0,
+                get_lru_cache_size=0,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -34,8 +36,10 @@ from ..case_data import CaseData
         ),
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
-                mongo_client=MockMongoClient(),
-                lru_cache_size=128,
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
+                put_lru_cache_size=128,
+                get_lru_cache_size=128,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -58,7 +62,8 @@ from ..case_data import CaseData
         ),
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
-                mongo_client=MockMongoClient(),
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
@@ -69,7 +74,8 @@ from ..case_data import CaseData
                         ),
                     ),
                 ),
-                lru_cache_size=0,
+                put_lru_cache_size=0,
+                get_lru_cache_size=0,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -87,7 +93,8 @@ from ..case_data import CaseData
         ),
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
-                mongo_client=MockMongoClient(),
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
@@ -98,7 +105,8 @@ from ..case_data import CaseData
                         ),
                     ),
                 ),
-                lru_cache_size=128,
+                put_lru_cache_size=128,
+                get_lru_cache_size=128,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
