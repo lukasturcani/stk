@@ -1,8 +1,8 @@
 import pytest
 import stk
 import rdkit.Chem.AllChem as rdkit
+import pymongo
 
-from ...utilities import MockMongoClient
 from ..case_data import CaseData
 
 
@@ -10,8 +10,10 @@ from ..case_data import CaseData
     params=(
         CaseData(
             database=stk.MoleculeMongoDb(
-                mongo_client=MockMongoClient(),
-                lru_cache_size=0,
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
+                put_lru_cache_size=0,
+                get_lru_cache_size=0,
             ),
             molecule=stk.BuildingBlock('BrCCBr'),
             key={
@@ -21,8 +23,10 @@ from ..case_data import CaseData
         ),
         CaseData(
             database=stk.MoleculeMongoDb(
-                mongo_client=MockMongoClient(),
-                lru_cache_size=0,
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
+                put_lru_cache_size=0,
+                get_lru_cache_size=0,
                 jsonizer=stk.MoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
@@ -40,8 +44,10 @@ from ..case_data import CaseData
         ),
         CaseData(
             database=stk.MoleculeMongoDb(
-                mongo_client=MockMongoClient(),
-                lru_cache_size=128,
+                mongo_client=pymongo.MongoClient(),
+                database='_test_database',
+                put_lru_cache_size=128,
+                get_lru_cache_size=128,
                 jsonizer=stk.MoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
