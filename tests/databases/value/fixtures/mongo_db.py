@@ -11,7 +11,7 @@ from ..case_data import CaseData
             database=stk.ValueMongoDb(
                 mongo_client=pymongo.MongoClient(),
                 collection='values',
-                database='_test_database',
+                database='_stk_test_database_for_testing',
                 put_lru_cache_size=0,
                 get_lru_cache_size=0,
             ),
@@ -22,7 +22,7 @@ from ..case_data import CaseData
             database=stk.ValueMongoDb(
                 mongo_client=pymongo.MongoClient(),
                 collection='values',
-                database='_test_database',
+                database='_stk_test_database_for_testing',
                 put_lru_cache_size=128,
                 get_lru_cache_size=128,
             ),
