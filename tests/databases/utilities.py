@@ -50,7 +50,7 @@ def get_entry(item):
     Parameters
     ----------
     item : :class:`dict`
-        A record retrieved from a MongoDB collection.
+        A entry retrieved from a MongoDB collection.
 
     Returns
     -------
@@ -67,7 +67,7 @@ def get_entry(item):
 
 class DatabaseEntry:
     """
-    Represents an record in a MongoDB collection.
+    Represents an entry in a MongoDB collection.
 
     """
 
