@@ -11,7 +11,7 @@ from ..case_data import CaseData
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=pymongo.MongoClient(),
-                database='_test_database',
+                database='_stk_test_database_for_testing',
                 put_lru_cache_size=0,
                 get_lru_cache_size=0,
             ),
@@ -37,7 +37,7 @@ from ..case_data import CaseData
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=pymongo.MongoClient(),
-                database='_test_database',
+                database='_stk_test_database_for_testing',
                 put_lru_cache_size=128,
                 get_lru_cache_size=128,
             ),
@@ -63,7 +63,7 @@ from ..case_data import CaseData
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=pymongo.MongoClient(),
-                database='_test_database',
+                database='_stk_test_database_for_testing',
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
@@ -94,7 +94,7 @@ from ..case_data import CaseData
         CaseData(
             database=stk.ConstructedMoleculeMongoDb(
                 mongo_client=pymongo.MongoClient(),
-                database='_test_database',
+                database='_stk_test_database_for_testing',
                 jsonizer=stk.ConstructedMoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
