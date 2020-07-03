@@ -228,9 +228,9 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             the database.
 
         building_block_position_matrix_collection : :class:`str`
-            The name of the collection which stores the position
-            matrices of the building blocks of the molecules put into
-            and retrieved from the database.
+            The name of the collection, which stores the position
+            matrices of the building blocks of the constructed
+            molecules put into and retrieved from the database.
 
         jsonizer : :class:`.ConstructedMoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -269,10 +269,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         """
 
-        if lru_cache_size == '':
-            lru_cache_size = 128
-
-        else:
+        if lru_cache_size != '':
             warnings.warn(
                 'The lru_cache_size argument is deprecated and will '
                 'be removed in any version of stk released on, or '

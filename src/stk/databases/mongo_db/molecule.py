@@ -250,10 +250,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         """
 
-        if lru_cache_size == '':
-            lru_cache_size = 128
-
-        else:
+        if lru_cache_size != '':
             warnings.warn(
                 'The lru_cache_size argument is deprecated and will '
                 'be removed in any version of stk released on, or '
