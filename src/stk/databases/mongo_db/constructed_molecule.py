@@ -382,7 +382,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             upsert=True,
         )
 
-        self._add_database_building_block_keys(
+        self._add_building_block_keys_from_database(
             query=query,
             building_block_keys=json['constructedMolecule']['BB'],
         )
@@ -411,7 +411,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 upsert=True,
             )
 
-    def _add_database_building_block_keys(
+    def _add_building_block_keys_from_database(
         self,
         query,
         building_block_keys,
@@ -422,13 +422,28 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         Checks the constructed molecule collection to find all
         constructed molecule entries which match `query`. All matches
         should merely be duplicate entries for the same constructed
-        molecule, potentially using different molecular keys.
+        molecule.
 
-        It then looks at the keys of the building blocks for the
-        entries found in the collection. It adds those keys to the
-        equivalent building block in `building_block_keys`.
+        Each entry for the constructed molecule will have a
+        :class:`list` of building blocks, which were used to
+        construct the constructed molecule.
 
-        This means that when `building_block_keys` is used to update
+        A building block is represented in this :class:`list` through
+        a :class:`dict`, which maps the name of a molecular key
+        (like "SMILES" or "InChIKey") to the appropriate value for that
+        building block.
+
+        The database may have multiple different dictionaries for
+        the same building block, because each dictionary may hold
+        different molecular keys. These differing dictionaries will be
+        spread across the constructed molecule entries.
+
+        The various different dictionaries, which all represent
+        the same building block, are merged by this method. The merged
+        dictionary is the one held in `building_block_keys`, which is
+        updated in-place.
+
+        This means that when `building_block_keys` is used to replace
         an entry in the database, it does not remove any building
         block keys already there.
 
@@ -452,12 +467,16 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         """
 
-        database_keys = (
-            molecule['BB']
-            for molecule in self._constructed_molecules.find(query)
+        database_building_block_keys = (
+            molecule_entry['BB']
+            for molecule_entry
+            in self._constructed_molecules.find(query)
         )
-        for key_set in database_keys:
-            for keys1, keys2 in zip(building_block_keys, key_set):
+        for entry_building_block_keys in database_building_block_keys:
+            for keys1, keys2 in zip(
+                building_block_keys,
+                entry_building_block_keys,
+            ):
                 keys1.update(keys2)
 
     def get(self, key):
