@@ -11,6 +11,11 @@ def test_put_caching():
     database = stk.MoleculeMongoDb(
         mongo_client=client,
         database=database_name,
+        jsonizer=stk.MoleculeJsonizer(
+            key_makers=(
+                stk.InchiKey(),
+            ),
+        ),
     )
     molecule = stk.BuildingBlock('CCC')
     database.put(molecule)
@@ -38,6 +43,11 @@ def test_get_caching():
     database = stk.MoleculeMongoDb(
         mongo_client=client,
         database=database_name,
+        jsonizer=stk.MoleculeJsonizer(
+            key_makers=(
+                stk.InchiKey(),
+            ),
+        ),
     )
     molecule = stk.BuildingBlock('CCC')
     database.put(molecule)
