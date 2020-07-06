@@ -295,6 +295,9 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         self._get = lru_cache(maxsize=get_lru_cache_size)(self._get)
         self._put = lru_cache(maxsize=put_lru_cache_size)(self._put)
 
+        if 'c_1' not in self._molecules.index_information():
+            self._molecules.create_index('c')
+
         for index in indices:
             # Do not create the same index twice.
             if f'{index}_1' not in self._molecules.index_information():
