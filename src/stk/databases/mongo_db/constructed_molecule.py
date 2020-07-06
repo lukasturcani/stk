@@ -192,6 +192,9 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         molecule_collection='molecules',
         constructed_molecule_collection='constructed_molecules',
         position_matrix_collection='position_matrices',
+        building_block_position_matrix_collection=(
+            'building_block_position_matrices'
+        ),
         jsonizer=ConstructedMoleculeJsonizer(),
         dejsonizer=ConstructedMoleculeDejsonizer(),
         lru_cache_size='',
@@ -223,6 +226,11 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
             the database.
+
+        building_block_position_matrix_collection : :class:`str`
+            The name of the collection, which stores the position
+            matrices of the building blocks of the constructed
+            molecules put into and retrieved from the database.
 
         jsonizer : :class:`.ConstructedMoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -278,6 +286,9 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             constructed_molecule_collection
         ]
         self._position_matrices = database[position_matrix_collection]
+        self._building_block_position_matrices = database[
+            building_block_position_matrix_collection
+        ]
         self._jsonizer = jsonizer
         self._dejsonizer = dejsonizer
 
@@ -298,6 +309,16 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 not in self._position_matrices.index_information()
             ):
                 self._position_matrices.create_index(index)
+
+            if (
+                f'{index}_1'
+                not in
+                self._building_block_position_matrices
+                .index_information()
+            ):
+                self._building_block_position_matrices.create_index(
+                    index,
+                )
 
     def put(self, molecule):
         molecule = molecule.with_canonical_atom_ordering()
@@ -331,31 +352,129 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         ))
         return self._put(HashableDict(json))
 
-    def _put(self, json):
-        # insert_one() corrupts the state of the dict it is passed
-        # as an argument (it adds various items to it).
-        # Using insert_one(json['molecule']) would mean that the json
-        # in the lru_cache is modified with some extra items added by
-        # insert_one(). This means that the next time _put() is used
-        # with a clean json, it will not match the one in the cache,
-        # because the one in the cache has the extra items added by
-        # insert_one(). To prevent this use
-        # insert_one(dict(json['molecule'])), which means that a copy
-        # is modified by insert_one and the json in the cache is
-        # not changed.
+    @staticmethod
+    def _get_query(json):
+        keys = dict(json['matrix'])
+        keys.pop('m')
 
-        self._position_matrices.insert_one(dict(json['matrix']))
-        self._molecules.insert_one(dict(json['molecule']))
-        self._constructed_molecules.insert_one(
-            document=dict(json['constructedMolecule']),
+        query = {'$or': []}
+        for key, value in keys.items():
+            query['$or'].append({key: value})
+        return query
+
+    def _put(self, json):
+        query = self._get_query(json)
+        self._molecules.update_many(
+            filter=query,
+            update={
+                '$set': json['molecule'],
+            },
+            upsert=True,
+        )
+        self._position_matrices.update_many(
+            filter=query,
+            update={
+                '$set': json['matrix'],
+            },
+            upsert=True,
+        )
+
+        self._add_building_block_keys_from_database(
+            query=query,
+            building_block_keys=json['constructedMolecule']['BB'],
+        )
+
+        self._constructed_molecules.update_many(
+            filter=query,
+            update={
+                '$set': json['constructedMolecule'],
+            },
+            upsert=True,
         )
         for building_block_json in json['buildingBlocks']:
-            self._molecules.insert_one(
-                document=dict(building_block_json['molecule']),
+            building_block_query = self._get_query(building_block_json)
+            self._molecules.update_many(
+                filter=building_block_query,
+                update={
+                    '$set': building_block_json['molecule'],
+                },
+                upsert=True,
             )
-            self._position_matrices.insert_one(
-                document=dict(building_block_json['matrix']),
+            self._building_block_position_matrices.update_many(
+                filter=building_block_query,
+                update={
+                    '$set': building_block_json['matrix'],
+                },
+                upsert=True,
             )
+
+    def _add_building_block_keys_from_database(
+        self,
+        query,
+        building_block_keys,
+    ):
+        """
+        Add previously deposited keys to `building_block_keys`.
+
+        Checks the constructed molecule collection to find all
+        constructed molecule entries which match `query`. All matches
+        should merely be duplicate entries for the same constructed
+        molecule.
+
+        Each entry for the constructed molecule will have a
+        :class:`list` of building blocks, which were used to
+        construct the constructed molecule.
+
+        A building block is represented in this :class:`list` through
+        a :class:`dict`, which maps the name of a molecular key
+        (like "SMILES" or "InChIKey") to the appropriate value for that
+        building block.
+
+        The database may have multiple different dictionaries for
+        the same building block, because each dictionary may hold
+        different molecular keys. These differing dictionaries will be
+        spread across the constructed molecule entries.
+
+        The various different dictionaries, which all represent
+        the same building block, are merged by this method. The merged
+        dictionary is the one held in `building_block_keys`, which is
+        updated in-place.
+
+        This means that when `building_block_keys` is used to replace
+        an entry in the database, it does not remove any building
+        block keys already there.
+
+        Parameters
+        ----------
+        query : :class:`dict`
+            A query which matches entries, corresponding to a
+            single constructed molecule.
+
+        building_block_keys : :class:`list` of :class:`dict`
+            Each :class:`dict` represents a building block of the
+            constructed molecule matched by `query`. The :class:`dict`
+            holds the name of a molecular key and its value for that
+            particular building block. Key-value pairs for building
+            block molecular keys already found in the database are
+            added to the dictionaries by this method.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        database_building_block_keys = (
+            molecule_entry['BB']
+            for molecule_entry
+            in self._constructed_molecules.find(query)
+        )
+        for entry_building_block_keys in database_building_block_keys:
+            for keys1, keys2 in zip(
+                building_block_keys,
+                entry_building_block_keys,
+            ):
+                keys1.update(keys2)
 
     def get(self, key):
         # lru_cache requires that the parameters to the cached function
@@ -417,5 +536,6 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     def _get_building_block(self, key):
         return {
             'molecule': self._molecules.find_one(key),
-            'matrix': self._position_matrices.find_one(key),
+            'matrix':
+                self._building_block_position_matrices.find_one(key),
         }
