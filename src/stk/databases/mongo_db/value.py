@@ -165,7 +165,20 @@ class ValueMongoDb(ValueDatabase):
         return self._put(HashableDict(json))
 
     def _put(self, json):
-        self._values.insert_one(json)
+        keys = dict(json)
+        keys.pop('v')
+
+        query = {'$or': []}
+        for key, value in keys.items():
+            query['$or'].append({key: value})
+
+        self._values.update_many(
+            filter=query,
+            update={
+                '$set': json
+            },
+            upsert=True,
+        )
 
     def get(self, molecule):
 
