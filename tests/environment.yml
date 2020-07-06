@@ -7,9 +7,9 @@ dependencies:
   - attrs=19.3.0=py_0
   - blas=1.0=mkl
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2020.1.1=0
+  - ca-certificates=2020.6.24=0
   - cairo=1.14.12=h8948797_3
-  - certifi=2019.11.28=py37_0
+  - certifi=2020.6.20=py37_0
   - cycler=0.10.0=py37_0
   - dbus=1.13.12=h746ee38_0
   - expat=2.2.6=he6710b0_0
@@ -46,7 +46,7 @@ dependencies:
   - numpy=1.18.1=py37h4f9e942_0
   - numpy-base=1.18.1=py37hde5b4d6_1
   - olefile=0.46=py37_0
-  - openssl=1.1.1d=h7b6447c_4
+  - openssl=1.1.1g=h7b6447c_0
   - packaging=20.3=py_0
   - pandas=1.0.1=py37h0573a6f_0
   - pcre=8.43=he6710b0_0
@@ -56,6 +56,7 @@ dependencies:
   - pluggy=0.13.1=py37_0
   - py=1.8.1=py_0
   - py-boost=1.67.0=py37h04863e7_4
+  - pymongo=3.9.0=py37he6710b0_0
   - pyparsing=2.4.6=py_0
   - pyqt=5.9.2=py37h05f1152_2
   - pytest=5.3.5=py37_0
