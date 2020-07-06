@@ -119,7 +119,7 @@ class ConstructedMoleculeJsonizer:
             )
 
         molecule_json = self._jsonizer.to_json(molecule)
-        molecule_json['c'] = True
+        molecule_json['molecule']['c'] = True
 
         constructed_molecule_json = {
             'BB': tuple(map(
