@@ -69,7 +69,7 @@ def test_update_2():
     """
     Test that existing entries are updated.
 
-    In this test, your first create two separate entries, using
+    In this test, you first create two separate entries, using
     different molecule keys. You then update both at the same time,
     with a database which uses both molecule keys.
 
@@ -164,7 +164,7 @@ def test_update_3():
     """
     Test that existing entries are updated.
 
-    In this test, your first create one entry with two keys. Then
+    In this test, you first create one entry with two keys. Then
     update the entry with databases, each using 1 different key.
     No duplicate entries should be made in the database this way.
 
