@@ -5,6 +5,7 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
+import warnings
 
 from stk.serialization import (
     MoleculeJsonizer,
@@ -187,7 +188,9 @@ class MoleculeMongoDb(MoleculeDatabase):
         position_matrix_collection='position_matrices',
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
-        lru_cache_size=128,
+        lru_cache_size='',
+        put_lru_cache_size=128,
+        get_lru_cache_size=128,
         indices=('InChIKey', ),
     ):
         """
@@ -219,9 +222,26 @@ class MoleculeMongoDb(MoleculeDatabase):
             JSON representations.
 
         lru_cache_size : :class:`int`, optional
+            This argument is deprecated and will be removed in any
+            version of :mod:`stk` released on, or after, 01/01/21.
+            Use the `put_lru_cache_size` and `get_lru_cache_size`
+            arguments instead.
+
             A RAM-based least recently used cache is used to avoid
             reading and writing to the database repeatedly. This sets
-            the number of molecules which fit into the LRU cache. If
+            the number of values which fit into the LRU cache. If
+            ``None``, the cache size will be unlimited.
+
+        put_lru_cache_size : :class:`int`, optional
+            A RAM-based least recently used cache is used to avoid
+            writing to the database repeatedly. This sets
+            the number of values which fit into the LRU cache. If
+            ``None``, the cache size will be unlimited.
+
+        get_lru_cache_size : :class:`int`, optional
+            A RAM-based least recently used cache is used to avoid
+            reading from the database repeatedly. This sets
+            the number of values which fit into the LRU cache. If
             ``None``, the cache size will be unlimited.
 
         indices : :class:`tuple` of :class:`str`, optional
@@ -230,14 +250,25 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         """
 
+        if lru_cache_size != '':
+            warnings.warn(
+                'The lru_cache_size argument is deprecated and will '
+                'be removed in any version of stk released on, or '
+                'after, 01/01/21. Use the put_lru_cache_size and '
+                'get_lru_cache_size arguments instead.',
+                FutureWarning,
+            )
+            put_lru_cache_size = lru_cache_size
+            get_lru_cache_size = lru_cache_size
+
         database = mongo_client[database]
         self._molecules = database[molecule_collection]
         self._position_matrices = database[position_matrix_collection]
         self._jsonizer = jsonizer
         self._dejsonizer = dejsonizer
 
-        self._get = lru_cache(maxsize=lru_cache_size)(self._get)
-        self._put = lru_cache(maxsize=lru_cache_size)(self._put)
+        self._get = lru_cache(maxsize=get_lru_cache_size)(self._get)
+        self._put = lru_cache(maxsize=put_lru_cache_size)(self._put)
 
         for index in indices:
             # Do not create the same index twice.
