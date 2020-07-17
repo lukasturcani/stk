@@ -34,10 +34,11 @@ class Complex(TopologyGraph):
                 ),
             ),
         )
+        guest = stk.BuildingBlock('[Br][Br]')
         complex1 = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
                 host=stk.BuildingBlock.init_from_molecule(host),
-                guest=stk.BuildingBlock('[Br][Br]'),
+                guest=guest,
             ),
         )
 
@@ -51,7 +52,7 @@ class Complex(TopologyGraph):
         complex2 = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
                 host=stk.BuildingBlock.init_from_molecule(host),
-                guest=stk.BuildingBlock('[Br][Br]'),
+                guest=guest,
                 # Apply a rotation onto the guest molecule such that
                 # the vector returned by get_direction() has the same
                 # direction as [1, 1, 1].
