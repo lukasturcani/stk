@@ -407,6 +407,24 @@ class TopologyGraph:
             )
         )
 
+    def get_periodic_info(self):
+        """
+        Get unit cell matrix of periodic topology graph.
+
+        Returns
+        -------
+        cell_matrix : :class:`tuple` of :class:`np.array`
+            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+
+        Raises
+        ------
+        :class:`NotPeriodicError`
+            If the topology graph is not periodic.
+
+        """
+
+        raise NotImplementedError()
+
     def _get_scale(self, building_block_vertices):
         """
         Get the scale, which should be applied to topology graph.
