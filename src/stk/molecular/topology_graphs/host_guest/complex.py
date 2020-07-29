@@ -47,6 +47,7 @@ class Complex(TopologyGraph):
     as its displacement
 
     .. code-block:: python
+
         guest = stk.BuildingBlock('[Br][Br]')
         complex2 = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
