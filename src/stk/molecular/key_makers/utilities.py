@@ -15,12 +15,17 @@ def get_inchi(molecule):
     :class:`str`
         The InChI.
 
+    Raises
+    ------
+    :class:`ValueError`
+        If the InChI of `molecule` cannot be generated.
+
     """
 
-    return rdkit.MolToInchi(
-        mol=molecule.to_rdkit_mol(),
-        treatWarningAsError=True,
-    )
+    inchi = rdkit.MolToInchi(molecule.to_rdkit_mol())
+    if inchi:
+        return inchi
+    raise ValueError('The InChI of {molecule} was empty.')
 
 
 def get_inchi_key(molecule):
