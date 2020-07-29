@@ -19,7 +19,8 @@ class TurbomoleWriter:
     *Writing to File with Unit Cell*
 
     This writer can write to file for visualisation with the unit cell
-    included for periodic molecules.
+    included for periodic molecules. Note that this always assumes P1
+    space group.
 
     .. code-block:: python
 
