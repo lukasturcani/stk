@@ -86,6 +86,23 @@ class Cof(TopologyGraph):
             topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
         )
 
+    *Accessing the periodic unit cell*
+
+    The same :class:`.Cof` instance can be built as a periodic
+    structure, which has a unit cell (assuming as P1 space group) that
+    can be accessed at any time from the :class:`.TopologyGraph`
+    instance.
+
+    .. code-block:: python
+
+        topology_graph = stk.cof.Honeycomb(
+            building_blocks=(bb1, bb2),
+            lattice_size=(3, 3, 1),
+            periodic=True,
+        )
+        cof = stk.ConstructedMolecule(topology_graph)
+        cell_matrix = topology.get_periodic_cell()
+
     *Structural Isomer Construction*
 
     Different structural isomers of COFs can be made by using the
