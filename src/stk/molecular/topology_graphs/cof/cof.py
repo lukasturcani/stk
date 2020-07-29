@@ -86,7 +86,7 @@ class Cof(TopologyGraph):
             topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
         )
 
-    *Accessing the periodic unit cell*
+    *Accessing the Periodic Unit Cell*
 
     The same :class:`.Cof` instance can be built as a periodic
     structure, which has a unit cell (assuming as P1 space group) that
