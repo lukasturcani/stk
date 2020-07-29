@@ -17,10 +17,7 @@ def get_inchi(molecule):
 
     """
 
-    return rdkit.MolToInchi(
-        mol=molecule.to_rdkit_mol(),
-        treatWarningAsError=True,
-    )
+    return rdkit.MolToInchi(molecule.to_rdkit_mol())
 
 
 def get_inchi_key(molecule):
