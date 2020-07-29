@@ -15,5 +15,7 @@ install:
     - conda env create -f ./tests/environment.yml
     - conda activate stk_test
 
+services: mongodb
+
 script:
     - pytest
