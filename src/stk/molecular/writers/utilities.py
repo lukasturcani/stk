@@ -14,7 +14,11 @@ def abs_cap(val, max_abs_val=1):
     where numerical errors may result in an argument > 1 being passed
     in.
 
-    This code is modified from the pymatgen source code.
+    This code is modified from the pymatgen source code [1]_.
+
+    References
+    ----------
+    .. [1] https://pymatgen.org/pymatgen.util.num.html
 
     """
 
@@ -27,7 +31,11 @@ def cell_matrix_to_lengths_angles(periodic_cell):
 
     Lengths are in Angstrom. Angles are in degrees.
 
-    This code is modified from the pymatgen source code.
+    This code is modified from the pymatgen source code [1]_.
+
+    References
+    ----------
+    .. [1] https://pymatgen.org/_modules/pymatgen/core/lattice.html
 
     """
 
