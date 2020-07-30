@@ -11,12 +11,12 @@ from .linkerless_honeycomb import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('cof_honeycomb'),
-        lazy_fixture('cof_kagome'),
-        lazy_fixture('cof_square'),
-        lazy_fixture('cof_hexagonal'),
-        lazy_fixture('cof_linkerless_honeycomb'),
+        lazy_fixture('framework_honeycomb'),
+        lazy_fixture('framework_kagome'),
+        lazy_fixture('framework_square'),
+        lazy_fixture('framework_hexagonal'),
+        lazy_fixture('framework_linkerless_honeycomb'),
     ),
 )
-def cof(request):
+def framework(request):
     return request.param

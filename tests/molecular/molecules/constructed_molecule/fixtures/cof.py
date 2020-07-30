@@ -4,23 +4,23 @@ import stk
 from ..case_data import CaseData
 
 
-class CofData:
+class FrameworkData:
     """
-    Data to initialize a COF :class:`.CaseData` instance.
+    Data to initialize a framework :class:`.CaseData` instance.
 
     Attributes
     ----------
     topology_graph : :class:`type`
-        A COF class.
+        A framework class.
 
     building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-        The building blocks of the COF.
+        The building blocks of the framework.
 
     lattice_size : :class:`tuple` of :class:`int`
         The size of the lattice.
 
     vertex_alignments : :class:`dict`
-        Passed to the `vertex_alignments` parameter of the COF
+        Passed to the `vertex_alignments` parameter of the framework
         initializer.
 
     num_new_atoms : :class:`int`
@@ -32,7 +32,7 @@ class CofData:
     num_building_blocks : :class:`dict`
         For each building block in :attr:`building_blocks`, maps its
         index to the number of times its used in the construction of
-        the COF.
+        the framework.
 
     """
 
@@ -47,22 +47,22 @@ class CofData:
         num_building_blocks,
     ):
         """
-        Initialize a :class:`.CofData` instance.
+        Initialize a :class:`.FrameworkData` instance.
 
         Parameters
         ----------
         topology_graph : :class:`type`
-            A COF class.
+            A framework class.
 
         building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            The building blocks of the COF.
+            The building blocks of the framework.
 
         lattice_size : :class:`tuple` of :class:`int`
             The size of the lattice.
 
         vertex_alignments : :class:`dict`
-            Passed to the `vertex_alignments` parameter of the COF
-            initializer.
+            Passed to the `vertex_alignments` parameter of the
+            framework initializer.
 
         num_new_atoms : :class:`int`
             The number of new atoms added by the construction process.
@@ -73,7 +73,7 @@ class CofData:
         num_building_blocks : :class:`dict`
             For each building block in `building_blocks`, maps its
             index to the number of times its used in the construction
-            of the COF.
+            of the framework.
 
         """
 
@@ -95,8 +95,8 @@ class CofData:
 
 @pytest.fixture(
     params=(
-        CofData(
-            topology_graph=stk.cof.Honeycomb,
+        FrameworkData(
+            topology_graph=stk.framework.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
@@ -115,8 +115,8 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData(
-            topology_graph=stk.cof.Honeycomb,
+        FrameworkData(
+            topology_graph=stk.framework.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
@@ -135,8 +135,8 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData(
-            topology_graph=stk.cof.Honeycomb,
+        FrameworkData(
+            topology_graph=stk.framework.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
@@ -155,8 +155,8 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData(
-            topology_graph=stk.cof.LinkerlessHoneycomb,
+        FrameworkData(
+            topology_graph=stk.framework.LinkerlessHoneycomb,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
@@ -171,8 +171,8 @@ class CofData:
             num_new_bonds=8,
             num_building_blocks={0: 8},
         ),
-        CofData(
-            topology_graph=stk.cof.Hexagonal,
+        FrameworkData(
+            topology_graph=stk.framework.Hexagonal,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
@@ -195,8 +195,8 @@ class CofData:
             num_new_bonds=81,
             num_building_blocks={0: 16, 1: 48},
         ),
-        CofData(
-            topology_graph=stk.cof.Kagome,
+        FrameworkData(
+            topology_graph=stk.framework.Kagome,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
@@ -216,8 +216,8 @@ class CofData:
             num_new_bonds=41,
             num_building_blocks={0: 12, 1: 24},
         ),
-        CofData(
-            topology_graph=stk.cof.Square,
+        FrameworkData(
+            topology_graph=stk.framework.Square,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
@@ -236,9 +236,9 @@ class CofData:
         ),
     ),
 )
-def cof_data(request):
+def framework_data(request):
     """
-    A :class:`.CofData` instance.
+    A :class:`.FrameworkData` instance.
 
     """
 
@@ -246,16 +246,16 @@ def cof_data(request):
 
 
 @pytest.fixture
-def cof(cof_data):
+def framework(framework_data):
     """
     A :class:`.CaseData` instance.
 
     """
 
     return CaseData(
-        constructed_molecule=cof_data.constructed_molecule,
-        num_new_atoms=cof_data.num_new_atoms,
-        num_new_bonds=cof_data.num_new_bonds,
-        num_building_blocks=cof_data.num_building_blocks,
-        building_blocks=cof_data.building_blocks,
+        constructed_molecule=framework_data.constructed_molecule,
+        num_new_atoms=framework_data.num_new_atoms,
+        num_new_bonds=framework_data.num_new_bonds,
+        num_building_blocks=framework_data.num_building_blocks,
+        building_blocks=framework_data.building_blocks,
     )

@@ -254,7 +254,7 @@ def building_block(request):
     params=(
         lazy_fixture('building_block'),
         lazy_fixture('cage'),
-        lazy_fixture('cof'),
+        lazy_fixture('framework'),
         lazy_fixture('polymer'),
         lazy_fixture('host_guest'),
         lazy_fixture('macrocycle'),

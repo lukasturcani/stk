@@ -2,14 +2,14 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 import numpy as np
 import stk
-from stk.molecular.topology_graphs.cof.edge import _CofEdge as Edge
+from stk.molecular.topology_graphs.framework.edge import _FrameworkEdge as Edge
 from functools import partial
 from scipy.spatial.distance import euclidean
 
 
 from ....case_data import CaseData
 
-vertices = stk.cof.vertices
+vertices = stk.framework.vertices
 
 
 @pytest.fixture(
@@ -103,7 +103,7 @@ def position(request):
 
 def _nonlinear(position, aligner_edge, building_block):
     """
-    Return a test case for a nonlinear COF vertex.
+    Return a test case for a nonlinear framework vertex.
 
     Parameters
     ----------
@@ -131,7 +131,7 @@ def _nonlinear(position, aligner_edge, building_block):
         get_normal: np.array([0, 0, 1]),
     }
 
-    vertex = vertices._NonLinearCofVertex(
+    vertex = vertices._NonLinearFrameworkVertex(
         id=0,
         position=position,
         aligner_edge=aligner_edge,

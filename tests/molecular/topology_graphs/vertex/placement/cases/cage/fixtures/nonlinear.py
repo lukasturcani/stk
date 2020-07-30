@@ -101,7 +101,7 @@ def position(request):
 
 def _nonlinear(position, aligner_edge, building_block):
     """
-    Return a test case for a nonlinear COF vertex.
+    Return a test case for a nonlinear framework vertex.
 
     Parameters
     ----------

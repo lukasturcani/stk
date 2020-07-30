@@ -8,7 +8,7 @@ from ...case_data import CaseData
     params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.cof.Kagome(
+                topology_graph=stk.framework.Kagome(
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles='BrC1=C(Br)[C+]=N1',
@@ -46,5 +46,5 @@ from ...case_data import CaseData
         ),
     ),
 )
-def cof_kagome(request):
+def framework_kagome(request):
     return request.param
