@@ -1,13 +1,13 @@
 class CaseData:
     """
-    A :class:`.Writer` test case.
+    A :class:`.TurbomoleWriter` test case.
 
     Attributes
     ----------
     molecule : :class:`.Molecule`
         Molecule to test.
 
-    writer : :class:`.???????`
+    writer : :class:`.TurbomoleWriter`
         The writer to test.
 
     string : :class:`str`

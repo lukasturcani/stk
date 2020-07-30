@@ -30,7 +30,7 @@ def _test_write(molecule, writer, string, periodic_cell=None):
     molecule : :class:`.Molecule`
         Molecule to test.
 
-    writer : :class:`.???????`
+    writer : :class:`.TurbomoleWriter`
         The writer to test.
 
     string : :class:`str`
@@ -45,8 +45,8 @@ def _test_write(molecule, writer, string, periodic_cell=None):
 
     """
 
-    test_string = writer.write(
-        mol=molecule,
+    test_string = writer.write_string(
+        molecule=molecule,
         periodic_cell=periodic_cell,
     )
 
