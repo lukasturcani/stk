@@ -6,13 +6,12 @@ from stk.molecular.topology_graphs.cof.cof import NotPeriodicError
 
 def test_get_periodic_cell(periodic_case):
     """
-    Test correction deletion of atoms by a :class:`.Reaction`.
+    Test collection of periodic cell from `.TopologyGraph`.
 
     Parameters
     ----------
-    case_data : :class:`.CaseData`
-        A test case. Includes the reaction and atoms which should have
-        been deleted.
+    periodic_case : :class:`.CaseData`
+        A test case. Includes the topology graph and expected cell.
 
     Returns
     -------
@@ -22,21 +21,22 @@ def test_get_periodic_cell(periodic_case):
 
     _test_get_periodic_cell(
         topology_graph=periodic_case.topology_graph,
-        periodic_cell=periodic_case.cell,
+        cell=periodic_case.cell,
     )
 
 
-def _test_get_periodic_cell(topology_graph, periodic_cell):
+def _test_get_periodic_cell(topology_graph, cell):
     """
-    Test that the correct atoms are deleted by `reaction_result`.
+    Test that the correct cell is extracted.
 
     Parameters
     ----------
-    reaction_result : :class:`.ReactionResult`
-        The result of a reaction.
+    topology_graph : :class:`.TopologyGraph`
+        The topology graph.
 
-    deleted_atoms : :class:`tuple` of :class:`.Atom`
-        The atoms which should be deleted by the reaction.
+    cell : :class:`tuple` of :class:`np.array` or :class:`NoneType`
+        Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+        `None` if topology graph is not periodic.
 
     Returns
     -------
@@ -45,7 +45,7 @@ def _test_get_periodic_cell(topology_graph, periodic_cell):
     """
 
     if not topology_graph._periodic:
-        assert periodic_cell is None
+        assert cell is None
         with pytest.raises(NotPeriodicError):
             test_cell = topology_graph.get_periodic_cell()
 
@@ -53,5 +53,5 @@ def _test_get_periodic_cell(topology_graph, periodic_cell):
         test_cell = topology_graph.get_periodic_cell()
         assert np.all(np.array([
             np.allclose(i, j, atol=1e-4)
-            for i, j in zip(test_cell, periodic_cell)
+            for i, j in zip(test_cell, cell)
         ]))
