@@ -33,9 +33,5 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
     ),
 )
 def periodic_case(request):
-    """
-    The periodicity of a bond made by a reaction.
-
-    """
 
     return request.param
