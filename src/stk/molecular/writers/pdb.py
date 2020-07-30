@@ -14,7 +14,7 @@ from .utilities import cell_matrix_to_lengths_angles
 
 class PdbWriter:
     """
-    A writer class for `.pdb` files.
+    A writer class for ``.pdb`` files.
 
     Examples
     --------
@@ -38,28 +38,28 @@ class PdbWriter:
         cof = stk.ConstructedMolecule(topology_graph)
         writer = stk.PdbWriter()
         writer.write(
-            mol=cof,
+            molecule=cof,
             file='cof.pdb',
             periodic_cell=topology_graph.get_periodic_cell()
         )
 
     """
 
-    def _write_string(self, mol, atom_ids, periodic_cell=None):
+    def _write_content(self, molecule, atom_ids, periodic_cell=None):
 
         if atom_ids is None:
-            atom_ids = range(mol.get_num_atoms())
+            atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
 
-        lines = []
+        content = []
         if periodic_cell is not None:
             # Input unit cell information.
             lengths_and_angles = cell_matrix_to_lengths_angles(
                 periodic_cell
             )
             a, b, c, alpha, beta, gamma = lengths_and_angles
-            lines.append(
+            content.append(
                 f'CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}'
                 f' {alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f} '
                 f'P 1\n'
@@ -75,12 +75,12 @@ class PdbWriter:
         occupancy = '1.00'
         temp_factor = '0.00'
 
-        coords = mol.get_position_matrix()
+        coords = molecule.get_position_matrix()
         # This set will be used by bonds.
         atoms = set()
         for atom_id in atom_ids:
             atoms.add(atom_id)
-            atom, = mol.get_atoms(atom_ids=atom_id)
+            atom, = molecule.get_atoms(atom_ids=atom_id)
             serial = atom_id+1
             element = atom.__class__.__name__
             charge = atom.get_charge()
@@ -90,7 +90,7 @@ class PdbWriter:
             # each.
             x, y, z = (i for i in coords[atom_id])
 
-            lines.append(
+            content.append(
                 f'{hetatm:<6}{serial:>5} {name:<4}'
                 f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
                 f'{res_seq:>4}{i_code:<1}   '
@@ -100,32 +100,34 @@ class PdbWriter:
             )
 
         conect = 'CONECT'
-        for bond in mol.get_bonds():
+        for bond in molecule.get_bonds():
             a1 = bond.get_atom1().get_id()
             a2 = bond.get_atom2().get_id()
             # # Do not form periodic bonds in a PDB.
             # if periodic_cell is not None and bond.is_periodic():
             #     continue
             if a1 in atoms and a2 in atoms:
-                lines.append(
+                content.append(
                     f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
                 )
 
-        lines.append('END\n')
+        content.append('END\n')
 
-        return ''.join(lines)
+        return content
 
-    def write(self, mol, file=None, atom_ids=None, periodic_cell=None):
+    def write_string(
+        self,
+        molecule,
+        atom_ids=None,
+        periodic_cell=None
+    ):
         """
-        Write `mol` to `.pdb` file format.
+        Write `molecule` to ``.pdb`` file format to string.
 
         Parameters
         ----------
-        mol : :class:`.Molecule`
-            Molecule to write to `.pdb` format.
-
-        file : :class:`str`, optional
-            The full path to the file being written.
+        molecule : :class:`.Molecule`
+            Molecule to write to ``.pdb`` format.
 
         atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. Can be a single
@@ -138,18 +140,56 @@ class PdbWriter:
         Returns
         -------
         string :class:`string`
-            The string containing all information for a `.pdb` file.
-
-        None : :class:`NoneType`
-            A file is written if :attr:`file` is not `None`.
+            The string containing all information for a ``.pdb`` file.
 
         """
 
-        string = self._write_string(mol, atom_ids, periodic_cell)
+        content = self._write_content(
+            molecule=molecule,
+            atom_ids=atom_ids,
+            periodic_cell=periodic_cell,
+        )
 
-        if file is None:
-            return string
-        else:
-            with open(file, 'w') as f:
-                f.write(string)
-            return None
+        return ''.join(content)
+
+    def write(
+        self,
+        molecule,
+        path=None,
+        atom_ids=None,
+        periodic_cell=None
+    ):
+        """
+        Write `molecule` to ``.pdb`` file format.
+
+        Parameters
+        ----------
+        molecule : :class:`.Molecule`
+            Molecule to write to ``.pdb`` format.
+
+        path : :class:`str`, optional
+            The full path to the file being written.
+
+        atom_ids : :class:`iterable` of :class:`int`
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
+
+        periodic_cell : :class:`tuple` of :class:`np.array`
+            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+            A file is written.
+
+        """
+
+        content = self._write_content(
+            molecule=molecule,
+            atom_ids=atom_ids,
+            periodic_cell=periodic_cell,
+        )
+
+        with open(path, 'w') as f:
+            f.write(''.join(content))
