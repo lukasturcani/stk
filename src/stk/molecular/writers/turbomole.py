@@ -59,7 +59,6 @@ class TurbomoleWriter:
                 periodic_cell
             )
             a, b, c, alpha, beta, gamma = lengths_and_angles
-            print(lengths_and_angles)
             lines.append(
                 '$periodic 3\n'
                 '$cell angs\n'
@@ -68,7 +67,7 @@ class TurbomoleWriter:
             )
 
         coords = mol.get_position_matrix()
-        lines.append('$cood angs\n')
+        lines.append('$coord angs\n')
         for atom_id in atom_ids:
             atom, = mol.get_atoms(atom_ids=atom_id)
             element = atom.__class__.__name__
