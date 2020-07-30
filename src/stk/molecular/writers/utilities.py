@@ -14,6 +14,8 @@ def abs_cap(val, max_abs_val=1):
     where numerical errors may result in an argument > 1 being passed
     in.
 
+    This code is modified from the pymatgen source code.
+
     """
 
     return max(min(val, max_abs_val), -max_abs_val)
@@ -24,6 +26,8 @@ def cell_matrix_to_lengths_angles(periodic_cell):
     Convert cell matrix to lengths and angles.
 
     Lengths are in Angstrom. Angles are in degrees.
+
+    This code is modified from the pymatgen source code.
 
     """
 
