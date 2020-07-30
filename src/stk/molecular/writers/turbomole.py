@@ -9,6 +9,8 @@ TurbomoleWriter
 
 """
 
+from .utilities import cell_matrix_to_lengths_angles
+
 
 class TurbomoleWriter:
     """
@@ -45,7 +47,40 @@ class TurbomoleWriter:
 
     def _write_string(self, mol, atom_ids, periodic_cell=None):
 
-        raise NotImplementedError()
+        if atom_ids is None:
+            atom_ids = range(mol.get_num_atoms())
+        elif isinstance(atom_ids, int):
+            atom_ids = (atom_ids, )
+
+        lines = []
+        if periodic_cell is not None:
+            # Input unit cell information.
+            lengths_and_angles = cell_matrix_to_lengths_angles(
+                periodic_cell
+            )
+            a, b, c, alpha, beta, gamma = lengths_and_angles
+            print(lengths_and_angles)
+            lines.append(
+                '$periodic 3\n'
+                '$cell angs\n'
+                f' {a:>8.3f} {b:>8.3f} {c:>8.3f} '
+                f'{alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f}\n'
+            )
+
+        coords = mol.get_position_matrix()
+        lines.append('$cood angs\n')
+        for atom_id in atom_ids:
+            atom, = mol.get_atoms(atom_ids=atom_id)
+            element = atom.__class__.__name__
+            x, y, z = (i for i in coords[atom_id])
+            lines.append(
+                f' {round(x, 4)} {round(y, 4)} {round(z, 4)} '
+                f'{element}\n'
+            )
+
+        lines.append('$end\n')
+
+        return ''.join(lines)
 
     def write(self, mol, file=None, atom_ids=None, periodic_cell=None):
         """
@@ -76,4 +111,11 @@ class TurbomoleWriter:
 
         """
 
-        raise NotImplementedError()
+        string = self._write_string(mol, atom_ids, periodic_cell)
+
+        if file is None:
+            return string
+        else:
+            with open(file, 'w') as f:
+                f.write(string)
+            return None
