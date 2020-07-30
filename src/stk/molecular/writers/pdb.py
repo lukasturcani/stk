@@ -59,7 +59,6 @@ class PdbWriter:
                 periodic_cell
             )
             a, b, c, alpha, beta, gamma = lengths_and_angles
-            print(lengths_and_angles)
             lines.append(
                 f'CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}'
                 f' {alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f} '
