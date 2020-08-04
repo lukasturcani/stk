@@ -39,7 +39,11 @@ class ValueDatabase:
         )
 
         for key, molecule in molecule_db.get_entries():
-            value = value_db.get(molecule)
+            try:
+                value = value_db.get(molecule)
+            except KeyError:
+                # In case molecule is not in value_db.
+                pass
 
     """
 
