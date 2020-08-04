@@ -16,6 +16,7 @@ class _ReactionsSummary:
         '_bonds',
         '_bond_infos',
         '_deleted_ids',
+        '_deleted_bonds',
     ]
 
     def __init__(self, num_atoms, reaction_results):
@@ -43,6 +44,7 @@ class _ReactionsSummary:
         self._bonds = []
         self._bond_infos = []
         self._deleted_ids = set()
+        self._deleted_bonds = set()
 
         for result in reaction_results:
             self._with_reaction_result(result)
@@ -77,6 +79,10 @@ class _ReactionsSummary:
 
         self._deleted_ids.update(
             atom.get_id() for atom in result.get_deleted_atoms()
+        )
+
+        self._deleted_bonds.update(
+            bond for bond in result.get_deleted_bonds()
         )
 
     def _with_atom_batch(self, batch):
