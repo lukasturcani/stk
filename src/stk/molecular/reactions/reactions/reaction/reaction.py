@@ -135,7 +135,7 @@ class Reaction:
 
     def _get_deleted_bonds(self):
         """
-        Yield the bonds removed by the reaction.
+        Yield the bonds removed by the reaction between existing atoms.
 
         Yields
         ------
