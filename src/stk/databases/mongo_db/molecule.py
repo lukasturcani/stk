@@ -396,10 +396,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                     'This suggests your database is corrupted.'
                 )
 
-            yield {
-                'key_values': key_values,
-                'molecule': self._dejsonizer.from_json({
-                    'molecule': json,
-                    'matrix': pos_mat_entry,
-                })
-            }
+            yield self._dejsonizer.from_json({
+                'molecule': json,
+                'matrix': pos_mat_entry,
+            })
