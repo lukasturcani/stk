@@ -83,6 +83,13 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     ordering, which allows position matrices to be used across
     different atom id orderings.
 
+    All entries in a database can be iterated over very simply
+
+    .. code-block:: python
+
+        for entry in db.get_entries():
+            # Do something to entry.
+
     By default, the only molecular key the database stores, is the
     InChIKey. However, additional keys can be added to the JSON stored
     in the database by using a different
