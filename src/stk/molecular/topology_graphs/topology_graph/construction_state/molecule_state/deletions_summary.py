@@ -17,6 +17,7 @@ class _DeletionsSummary:
         '_bond_infos',
         '_position_matrix',
         '_deleted_ids',
+        '_deleted_bond_ids',
 
         '_valid_atoms',
         '_valid_atom_infos',
@@ -33,6 +34,7 @@ class _DeletionsSummary:
         bond_infos,
         position_matrix,
         deleted_ids,
+        deleted_bond_ids,
     ):
         """
         Initialize a :class:`._DeletionsSummary` instance.
@@ -57,6 +59,9 @@ class _DeletionsSummary:
         deleted_ids : :class:`iterable` of :class:`int`
             The ids of `atoms`, which should be deleted.
 
+        deleted_bond_ids : :class:`iterable` of :class:`tuple`
+            Tuple of atom ids of bonds that should be deleted.
+
         """
 
         self._atoms = tuple(atoms)
@@ -65,6 +70,7 @@ class _DeletionsSummary:
         self._bond_infos = tuple(bond_infos)
         self._position_matrix = np.array(position_matrix)
         self._deleted_ids = set(deleted_ids)
+        self._deleted_bond_ids = set(deleted_bond_ids)
 
         self._valid_atoms = []
         self._valid_atom_infos = []
@@ -87,6 +93,7 @@ class _DeletionsSummary:
         atom_infos = self._atom_infos
         position_matrix = self._position_matrix
         deleted_ids = self._deleted_ids
+        deleted_bond_ids = self._deleted_bond_ids
 
         def valid_atom(atom):
             return atom.get_id() not in deleted_ids
@@ -115,9 +122,12 @@ class _DeletionsSummary:
 
         def valid_bond(bond_data):
             index, bond = bond_data
+            atom1_id = bond.get_atom1().get_id()
+            atom2_id = bond.get_atom2().get_id()
             return (
-                bond.get_atom1().get_id() not in deleted_ids
-                and bond.get_atom2().get_id() not in deleted_ids
+                atom1_id not in deleted_ids
+                and atom2_id not in deleted_ids
+                and (atom1_id, atom2_id) not in deleted_bond_ids
             )
 
         bonds = self._bonds
