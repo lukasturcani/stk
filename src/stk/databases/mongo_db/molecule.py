@@ -354,3 +354,52 @@ class MoleculeMongoDb(MoleculeDatabase):
             'molecule': json,
             'matrix': position_matrix,
         })
+
+    def _get_available_key_values(self, collection_entry):
+
+        # Ignore keys reserved by position matrix collections.
+        reserved_keys = ('m', '_id')
+
+        key_values = {
+            i: collection_entry[i] for i in collection_entry.keys()
+            if i not in reserved_keys
+        }
+
+        return key_values
+
+    def get_entries(self):
+        """
+        Get entries in database.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            All `molecule` instances in database.
+
+        """
+
+        position_matrix_cursor = self._position_matrices.find()
+
+        for pos_mat_entry in position_matrix_cursor:
+            key_values = self._get_available_key_values(pos_mat_entry)
+
+            # Do 'or' query over all key value pairs.
+            query = {'$or': []}
+            for key, value in key_values.items():
+                query['$or'].append({key: value})
+
+            json = self._molecules.find_one(query)
+            if json is None:
+                raise KeyError(
+                    'No molecule found in the database associated '
+                    f'with a position matrix with query: {query}. '
+                    'This suggests your database is corrupted.'
+                )
+
+            yield {
+                'key_values': key_values,
+                'molecule': self._dejsonizer.from_json({
+                    'molecule': json,
+                    'matrix': pos_mat_entry,
+                })
+            }
