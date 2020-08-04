@@ -166,7 +166,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         db = stk.MoleculeMongoDb(
             mongo_client=client,
             jsonizer=stk.MoleculeJsonizer(
-            key_makers=(stk.InchiKey(), smiles),
+                key_makers=(stk.InchiKey(), smiles),
             ),
         )
 
@@ -327,7 +327,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         Parameters
         ----------
         key : :class:`.HashableDict`
-            The key of a a molecule, which is to be returned from the
+            The key of a molecule, which is to be returned from the
             database.
 
         Returns
