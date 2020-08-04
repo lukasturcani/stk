@@ -539,3 +539,67 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             'matrix':
                 self._building_block_position_matrices.find_one(key),
         }
+
+    def _get_available_key_values(self, collection_entry):
+
+        # Ignore keys reserved by constructed molecule collections.
+        reserved_keys = ('_id', 'BB', 'nBB', 'aI', 'bI')
+
+        key_values = {
+            i: collection_entry[i] for i in collection_entry.keys()
+            if i not in reserved_keys
+        }
+
+        return key_values
+
+    def get_entries(self):
+        """
+        Get entries in database.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            All `molecule` instances in database.
+
+        """
+
+        c_molecule_cursor = self._constructed_molecules.find()
+
+        for c_molecule_entry in c_molecule_cursor:
+            key_values = self._get_available_key_values(
+                c_molecule_entry
+            )
+
+            # Do 'or' query over all key value pairs.
+            query = {'$or': []}
+            for key, value in key_values.items():
+                query['$or'].append({key: value})
+
+            molecule_json = self._molecules.find_one(query)
+            if molecule_json is None:
+                raise KeyError(
+                    'No molecule found in the database associated '
+                    f'with a position matrix with query: {query}. '
+                    'This suggests your database is corrupted.'
+                )
+
+            position_matrix = self._position_matrices.find_one(query)
+            if position_matrix is None:
+                raise KeyError(
+                    'No position matrix found in the database '
+                    'associated with a position matrix with query: '
+                    f'{query}. This suggests your database is '
+                    'corrupted.'
+                )
+
+            yield self._dejsonizer.from_json(
+                json={
+                    'molecule': molecule_json,
+                    'constructedMolecule': c_molecule_entry,
+                    'matrix': position_matrix,
+                    'buildingBlocks': tuple(map(
+                        self._get_building_block,
+                        c_molecule_entry['BB'],
+                    ))
+                },
+            )
