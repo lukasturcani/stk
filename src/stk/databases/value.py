@@ -22,6 +22,25 @@ class ValueDatabase:
     :mod:`molecule_value_database <.databases.value>`,
     can serve as good examples.
 
+    *Iterating Through Entries in Database*
+
+    The :meth:`.get_entries` method of a molecule database instance can
+    be used to iterate through entries, the keys of which can be used
+    to access values.
+
+    .. code-block:: python
+
+        client = pymongo.MongoClient()
+        molecule_db = stk.MoleculeMongoDb(client)
+
+        value_db = stk.ValueMongoDb(
+            mongo_client=client,
+            collection='atom_counts',
+        )
+
+        for key, molecule in molecule_db.get_entries():
+            value = value_db.get(molecule)
+
     """
 
     def put(self, molecule, value):
