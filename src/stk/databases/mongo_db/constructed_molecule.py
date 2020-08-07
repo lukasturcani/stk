@@ -87,7 +87,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. code-block:: python
 
-        for entry in db.get_entries():
+        for entry in db.get_all():
             # Do something to entry.
 
     By default, the only molecular key the database stores, is the
