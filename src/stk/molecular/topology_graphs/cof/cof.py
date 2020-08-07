@@ -12,12 +12,12 @@ Covalent Organic Framework
 stk.molecular.topology_graphs.cof.linkerless_honeycomb\
 >
     Square <stk.molecular.topology_graphs.cof.square>
-    PeriodicHexagonal <\
-        stk.molecular.topology_graphs.cof.periodic_hexagonal\
-    >
+    Periodic Hexagonal <\
+stk.molecular.topology_graphs.cof.periodic_hexagonal\
+>
     PeriodicHoneycomb <\
-        stk.molecular.topology_graphs.cof.periodic_honeycomb\
-    >
+stk.molecular.topology_graphs.cof.periodic_honeycomb\
+>
     PeriodicKagome <stk.molecular.topology_graphs.cof.periodic_kagome>
     PeriodicLinkerless Honeycomb <\
 stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
