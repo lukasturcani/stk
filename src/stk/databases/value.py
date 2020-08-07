@@ -38,7 +38,7 @@ class ValueDatabase:
             collection='atom_counts',
         )
 
-        for key, molecule in molecule_db.get_all():
+        for molecule in molecule_db.get_all():
             try:
                 value = value_db.get(molecule)
             except KeyError:
