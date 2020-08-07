@@ -13,14 +13,13 @@ class CaseData:
     string : :class:`str`
         The expected output string.
 
-    periodic_cell : :class:`tuple` of :class:`np.array`
-        Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
-        Required for testing writing of constructed molecules with
-        periodic unit cells.
+    periodic_info : :class:`.PeriodicInfo`
+        Information about periodic cell. Required for testing writing
+        of constructed molecules with periodic unit cells.
 
     """
 
-    def __init__(self, molecule, writer, string, periodic_cell):
+    def __init__(self, molecule, writer, string, periodic_info):
         """
         Initialize a :class:`.CaseData` instance.
 
@@ -35,12 +34,12 @@ class CaseData:
         string : :class:`str`
             The expected output string.
 
-        periodic_cell : :class:`tuple` of :class:`np.array`
-            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+        periodic_info : :class:`.PeriodicInfo`
+            Information about periodic cell.
 
         """
 
         self.molecule = molecule
         self.writer = writer
         self.string = string
-        self.periodic_cell = periodic_cell
+        self.periodic_info = periodic_info

@@ -17,11 +17,11 @@ def test_write(case_data):
         molecule=case_data.molecule,
         writer=case_data.writer,
         string=case_data.string,
-        periodic_cell=case_data.periodic_cell,
+        periodic_info=case_data.periodic_info,
     )
 
 
-def _test_write(molecule, writer, string, periodic_cell=None):
+def _test_write(molecule, writer, string, periodic_info=None):
     """
     Test that the written string matches expected string.
 
@@ -36,8 +36,8 @@ def _test_write(molecule, writer, string, periodic_cell=None):
     string : :class:`str`
         The expected output string.
 
-    periodic_cell : :class:`tuple` of :class:`np.array`, optional
-        Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+    periodic_info : :class:`.PeriodicInfo`
+        Periodic information.
 
     Returns
     -------
@@ -45,9 +45,9 @@ def _test_write(molecule, writer, string, periodic_cell=None):
 
     """
 
-    test_string = writer.write_string(
+    test_string = writer.to_string(
         molecule=molecule,
-        periodic_cell=periodic_cell,
+        periodic_info=periodic_info,
     )
 
     assert test_string == string

@@ -5,10 +5,9 @@ from .case_data import CaseData
 
 bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-topology_graph = stk.cof.Honeycomb(
+topology_graph = stk.cof.PeriodicHoneycomb(
     building_blocks=(bb1, bb2),
     lattice_size=(1, 1, 1),
-    periodic=True
 )
 cof = stk.ConstructedMolecule(topology_graph)
 
@@ -25,7 +24,7 @@ cof = stk.ConstructedMolecule(topology_graph)
                 '6964 1.144 H\n 0.7695 0.528 -1.2387 H\n 1.1821 -1.102'
                 '2 -0.4922 H\n$end\n'
             ),
-            periodic_cell=None,
+            periodic_info=None,
         ),
         CaseData(
             molecule=cof,
@@ -55,7 +54,7 @@ cof = stk.ConstructedMolecule(topology_graph)
                 '2.4614 H\n 8.6266 17.2456 52.469 H\n 7.8451 15.9202 5'
                 '3.4778 H\n$end\n'
             ),
-            periodic_cell=topology_graph.get_periodic_cell(),
+            periodic_info=topology_graph.get_periodic_info(),
         ),
     ),
 )

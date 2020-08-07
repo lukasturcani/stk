@@ -41,6 +41,6 @@ def _test_write(molecule, writer, string):
 
     """
 
-    test_string = writer.write_string(molecule)
+    test_string = writer.to_string(molecule)
 
     assert test_string == string
