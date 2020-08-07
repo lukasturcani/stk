@@ -772,3 +772,22 @@ def get_acute_vector(reference, vector):
 def get_plane_normal(points):
     centroid = points.sum(axis=0) / len(points)
     return np.linalg.svd(points - centroid)[-1][2, :]
+
+
+def abs_cap(val, max_abs_val=1):
+    """
+    Returns the value with its absolute value capped at max_abs_val.
+
+    Particularly useful in passing values to trignometric functions
+    where numerical errors may result in an argument > 1 being passed
+    in.
+
+    This code is modified from the pymatgen source code [1]_.
+
+    References
+    ----------
+    .. [1] https://pymatgen.org/pymatgen.util.num.html
+
+    """
+
+    return max(min(val, max_abs_val), -max_abs_val)

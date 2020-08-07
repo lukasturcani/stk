@@ -9,8 +9,6 @@ PdbWriter
 
 """
 
-from .utilities import cell_matrix_to_lengths_angles
-
 
 class PdbWriter:
     """
@@ -30,22 +28,21 @@ class PdbWriter:
 
         bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
         bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-        topology_graph = stk.cof.Honeycomb(
+        topology_graph = stk.cof.PeriodicHoneycomb(
             building_blocks=(bb1, bb2),
             lattice_size=(3, 3, 1),
-            periodic=True,
         )
         cof = stk.ConstructedMolecule(topology_graph)
         writer = stk.PdbWriter()
         writer.write(
             molecule=cof,
             file='cof.pdb',
-            periodic_cell=topology_graph.get_periodic_cell()
+            periodic_info=topology_graph.get_periodic_info()
         )
 
     """
 
-    def _write_content(self, molecule, atom_ids, periodic_cell=None):
+    def _write_content(self, molecule, atom_ids, periodic_info=None):
 
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
@@ -53,11 +50,9 @@ class PdbWriter:
             atom_ids = (atom_ids, )
 
         content = []
-        if periodic_cell is not None:
+        if periodic_info is not None:
             # Input unit cell information.
-            lengths_and_angles = cell_matrix_to_lengths_angles(
-                periodic_cell
-            )
+            lengths_and_angles = periodic_info.get_lengths_and_angles()
             a, b, c, alpha, beta, gamma = lengths_and_angles
             content.append(
                 f'CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}'
@@ -119,7 +114,7 @@ class PdbWriter:
         self,
         molecule,
         atom_ids=None,
-        periodic_cell=None
+        periodic_info=None
     ):
         """
         Write `molecule` to ``.pdb`` file format to string.
@@ -134,8 +129,8 @@ class PdbWriter:
             :class:`int`, if a single atom is to be used, or ``None``,
             if all atoms are to be used.
 
-        periodic_cell : :class:`tuple` of :class:`np.array`
-            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+        periodic_info : :class:`.PeriodicInfo`
+            Information about periodic cell.
 
         Returns
         -------
@@ -147,7 +142,7 @@ class PdbWriter:
         content = self._write_content(
             molecule=molecule,
             atom_ids=atom_ids,
-            periodic_cell=periodic_cell,
+            periodic_info=periodic_info,
         )
 
         return ''.join(content)
@@ -157,7 +152,7 @@ class PdbWriter:
         molecule,
         path=None,
         atom_ids=None,
-        periodic_cell=None
+        periodic_info=None
     ):
         """
         Write `molecule` to ``.pdb`` file format.
@@ -175,8 +170,8 @@ class PdbWriter:
             :class:`int`, if a single atom is to be used, or ``None``,
             if all atoms are to be used.
 
-        periodic_cell : :class:`tuple` of :class:`np.array`
-            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+        periodic_info : :class:`.PeriodicInfo`
+            Information about periodic cell.
 
         Returns
         -------
@@ -188,7 +183,7 @@ class PdbWriter:
         content = self._write_content(
             molecule=molecule,
             atom_ids=atom_ids,
-            periodic_cell=periodic_cell,
+            periodic_info=periodic_info,
         )
 
         with open(path, 'w') as f:
