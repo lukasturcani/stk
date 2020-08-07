@@ -1,21 +1,21 @@
 """
-Periodic Hexagonal
-==================
+Periodic Linkerless Honeycomb
+=============================
 
 """
 
 from collections import Counter
 from .cof import OverlyOccupiedVertexError, UnoccupiedVertexError
-from .hexagonal import Hexagonal
+from .linkerless_honeycomb import LinkerlessHoneycomb
 from ...reactions import GenericReactionFactory
 from ..topology_graph import TopologyGraph
 
 
-class PeriodicHexagonal(TopologyGraph):
+class PeriodicLinkerlessHoneycomb(TopologyGraph):
     """
-    Represents a periodic hexagonal COF topology graph.
+    Represents a periodic honeycomb COF topology graph.
 
-    Building blocks with six and two functional groups are required
+    Building blocks with three functional groups are required
     for this topology graph.
 
     See :class:`.Cof` for more details and examples.
@@ -94,7 +94,7 @@ class PeriodicHexagonal(TopologyGraph):
 
         """
 
-        self._internal = Hexagonal(
+        self._internal = LinkerlessHoneycomb(
             building_blocks=building_blocks,
             lattice_size=lattice_size,
             periodic=True,

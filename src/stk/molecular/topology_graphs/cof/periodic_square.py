@@ -1,21 +1,21 @@
 """
-Periodic Hexagonal
-==================
+Periodic Square
+===============
 
 """
 
 from collections import Counter
 from .cof import OverlyOccupiedVertexError, UnoccupiedVertexError
-from .hexagonal import Hexagonal
+from .square import Square
 from ...reactions import GenericReactionFactory
 from ..topology_graph import TopologyGraph
 
 
-class PeriodicHexagonal(TopologyGraph):
+class PeriodicSquare(TopologyGraph):
     """
-    Represents a periodic hexagonal COF topology graph.
+    Represents a periodic square COF topology graph.
 
-    Building blocks with six and two functional groups are required
+    Building blocks with four and two functional groups are required
     for this topology graph.
 
     See :class:`.Cof` for more details and examples.
@@ -94,7 +94,7 @@ class PeriodicHexagonal(TopologyGraph):
 
         """
 
-        self._internal = Hexagonal(
+        self._internal = Square(
             building_blocks=building_blocks,
             lattice_size=lattice_size,
             periodic=True,
