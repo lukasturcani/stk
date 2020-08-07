@@ -74,14 +74,14 @@ class MoleculeDatabase:
 
         raise NotImplementedError()
 
-    def get_entries(self):
+    def get_all(self):
         """
-        Get entries in database.
+        Get all molecules in the database.
 
         Yields
         ------
         :class:`.Molecule`
-            All `molecule` instances in database.
+            A molecule in the database.
 
         """
 
