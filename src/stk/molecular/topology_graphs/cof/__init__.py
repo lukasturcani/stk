@@ -4,3 +4,4 @@ from .kagome import *  # noqa
 from .linkerless_honeycomb import *  # noqa
 from .square import *  # noqa
 from .cof import *  # noqa
+from .periodic_hexagonal import *  # noqa

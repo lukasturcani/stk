@@ -12,6 +12,17 @@ Covalent Organic Framework
 stk.molecular.topology_graphs.cof.linkerless_honeycomb\
 >
     Square <stk.molecular.topology_graphs.cof.square>
+    PeriodicHexagonal <\
+        stk.molecular.topology_graphs.cof.periodic_hexagonal\
+    >
+    PeriodicHoneycomb <\
+        stk.molecular.topology_graphs.cof.periodic_honeycomb\
+    >
+    PeriodicKagome <stk.molecular.topology_graphs.cof.periodic_kagome>
+    PeriodicLinkerless Honeycomb <\
+stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
+>
+    PeriodicSquare <stk.molecular.topology_graphs.cof.periodic_square>
 
 """
 
@@ -38,15 +49,6 @@ class UnoccupiedVertexError(Exception):
 class OverlyOccupiedVertexError(Exception):
     """
     When a COF vertex is occupied by more than one building block.
-
-    """
-
-    pass
-
-
-class NotPeriodicError(Exception):
-    """
-    When a COF is not periodic.
 
     """
 
@@ -614,35 +616,6 @@ class Cof(TopologyGraph):
             bb.get_maximum_diameter()
             for bb in building_block_vertices
         )
-
-    def get_periodic_cell(self):
-        """
-        Get unit cell matrix of periodic topology graph.
-
-        Returns
-        -------
-        cell_matrix : :class:`tuple` of :class:`np.array`
-            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
-
-        Raises
-        ------
-        :class:`NotPeriodicError`
-            If the topology graph is not periodic.
-
-        """
-
-        if not self._periodic:
-            raise NotPeriodicError(
-                f'Argument periodic is {self._periodic}'
-            )
-
-        lattice_constants = self._get_lattice_constants()
-        cell_matrix = tuple(
-            i*j*self._scale
-            for i, j in zip(lattice_constants, self._lattice_size)
-        )
-
-        return cell_matrix
 
     def __repr__(self):
         x, y, z = self._lattice_size
