@@ -1,6 +1,6 @@
 """
-PeriodicHexagonal
-=================
+Periodic Hexagonal
+==================
 
 """
 
