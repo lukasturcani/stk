@@ -11,10 +11,9 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 @pytest.fixture(
     params=(
         CaseData(
-            topology_graph=stk.cof.Honeycomb(
+            topology_graph=stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 1, 2),
-                periodic=True,
             ),
             cell=(
                 np.array([109.29499828, 0., 0.]),

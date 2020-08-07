@@ -1,10 +1,7 @@
-import pytest
 import numpy as np
 
-from stk.molecular.topology_graphs.cof.cof import NotPeriodicError
 
-
-def test_get_periodic_cell(periodic_case):
+def test_get_periodic_info(periodic_case):
     """
     Test collection of periodic cell from `.TopologyGraph`.
 
@@ -19,13 +16,13 @@ def test_get_periodic_cell(periodic_case):
 
     """
 
-    _test_get_periodic_cell(
+    _test_get_periodic_info(
         topology_graph=periodic_case.topology_graph,
         cell=periodic_case.cell,
     )
 
 
-def _test_get_periodic_cell(topology_graph, cell):
+def _test_get_periodic_info(topology_graph, cell):
     """
     Test that the correct cell is extracted.
 
@@ -44,13 +41,15 @@ def _test_get_periodic_cell(topology_graph, cell):
 
     """
 
-    if not topology_graph._periodic:
-        assert cell is None
-        with pytest.raises(NotPeriodicError):
-            test_cell = topology_graph.get_periodic_cell()
-
-    else:
-        test_cell = topology_graph.get_periodic_cell()
+    try:
+        if not topology_graph._periodic:
+            assert cell is None
+    except AttributeError:
+        # Topology must be a PeriodicClass to access periodic info.
+        assert hasattr(topology_graph, '_internal')
+        test_cell = (
+            topology_graph.get_periodic_info().get_cell_matrix()
+        )
         assert np.all(np.array([
             np.allclose(i, j, atol=1e-4)
             for i, j in zip(test_cell, cell)
