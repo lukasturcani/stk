@@ -25,21 +25,22 @@ def test_get_entries():
         get_lru_cache_size=0,
     )
 
-    molecule_list = [
+    molecules = (
         stk.BuildingBlock('CCC').with_canonical_atom_ordering(),
         stk.BuildingBlock('BrCCCBr').with_canonical_atom_ordering(),
         stk.BuildingBlock('NCCN').with_canonical_atom_ordering(),
-    ]
-    molecule_key_dict = {
-        key_maker.get_key(i): i for i in molecule_list
+    )
+    molecules_by_key = {
+        key_maker.get_key(molecule): molecule 
+        for molecule in molecules
     }
 
-    for molecule in molecule_list:
+    for molecule in molecules:
         database.put(molecule)
 
-    for i, retrieved in enumerate(database.get_entries()):
+    for i, retrieved in enumerate(database.get_all()):
         key = key_maker.get_key(retrieved)
-        molecule = molecule_key_dict[key]
+        molecule = molecules_by_key[key]
         is_equivalent_molecule(
             molecule1=molecule.with_canonical_atom_ordering(),
             molecule2=retrieved.with_canonical_atom_ordering(),
