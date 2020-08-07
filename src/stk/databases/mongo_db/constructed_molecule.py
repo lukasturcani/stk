@@ -547,40 +547,31 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 self._building_block_position_matrices.find_one(key),
         }
 
-    def _get_available_key_values(self, collection_entry):
-
+    def _get_molecule_keys(self, entry):
         # Ignore keys reserved by constructed molecule collections.
         reserved_keys = ('_id', 'BB', 'nBB', 'aI', 'bI')
 
-        key_values = {
-            i: collection_entry[i] for i in collection_entry.keys()
-            if i not in reserved_keys
-        }
+        for key, value in entry.items():
+            if key not in reserved_keys:
+                yield key, value
 
-        return key_values
-
-    def get_entries(self):
+    def get_all(self):
         """
-        Get entries in database.
+        Get all molecules in the database.
 
         Yields
         ------
         :class:`.Molecule`
-            All `molecule` instances in database.
+            All molecule in the database.
 
         """
 
-        c_molecule_cursor = self._constructed_molecules.find()
-
-        for c_molecule_entry in c_molecule_cursor:
-            key_values = self._get_available_key_values(
-                c_molecule_entry
-            )
-
+        for entry in self._constructed_molecules.find():
             # Do 'or' query over all key value pairs.
-            query = {'$or': []}
-            for key, value in key_values.items():
-                query['$or'].append({key: value})
+            query = {'$or': [
+                {key: value} 
+                for key, value in self._get_molecule_keys(entry)
+            ]}
 
             molecule_json = self._molecules.find_one(query)
             if molecule_json is None:
@@ -602,7 +593,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             yield self._dejsonizer.from_json(
                 json={
                     'molecule': molecule_json,
-                    'constructedMolecule': c_molecule_entry,
+                    'constructedMolecule': entry,
                     'matrix': position_matrix,
                     'buildingBlocks': tuple(map(
                         self._get_building_block,
