@@ -15,14 +15,14 @@ stk.molecular.topology_graphs.cof.linkerless_honeycomb\
     Periodic Hexagonal <\
 stk.molecular.topology_graphs.cof.periodic_hexagonal\
 >
-    PeriodicHoneycomb <\
+    Periodic Honeycomb <\
 stk.molecular.topology_graphs.cof.periodic_honeycomb\
 >
-    PeriodicKagome <stk.molecular.topology_graphs.cof.periodic_kagome>
-    PeriodicLinkerless Honeycomb <\
+    Periodic Kagome <stk.molecular.topology_graphs.cof.periodic_kagome>
+    Periodic Linkerless Honeycomb <\
 stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
 >
-    PeriodicSquare <stk.molecular.topology_graphs.cof.periodic_square>
+    Periodic Square <stk.molecular.topology_graphs.cof.periodic_square>
 
 """
 
