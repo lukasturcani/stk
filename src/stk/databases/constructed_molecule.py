@@ -74,7 +74,7 @@ class ConstructedMoleculeDatabase:
 
         raise NotImplementedError()
 
-    def get_entries(self):
+    def get_all(self):
         """
         Get all entries in the database.
 
