@@ -4,7 +4,7 @@ import pymongo
 from tests.utilities import is_equivalent_molecule
 
 
-def test_get_entries():
+def test_get_all():
     """
     Test iteration over all entries.
 
@@ -31,7 +31,7 @@ def test_get_entries():
         stk.BuildingBlock('NCCN').with_canonical_atom_ordering(),
     )
     molecules_by_key = {
-        key_maker.get_key(molecule): molecule 
+        key_maker.get_key(molecule): molecule
         for molecule in molecules
     }
 
@@ -47,4 +47,4 @@ def test_get_entries():
         )
 
     # Check number of molecules.
-    assert i+1 == len(molecule_list)
+    assert i+1 == len(molecules)

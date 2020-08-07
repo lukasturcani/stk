@@ -569,7 +569,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         for entry in self._constructed_molecules.find():
             # Do 'or' query over all key value pairs.
             query = {'$or': [
-                {key: value} 
+                {key: value}
                 for key, value in self._get_molecule_keys(entry)
             ]}
 
@@ -597,7 +597,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                     'matrix': position_matrix,
                     'buildingBlocks': tuple(map(
                         self._get_building_block,
-                        c_molecule_entry['BB'],
+                        entry['BB'],
                     ))
                 },
             )

@@ -367,14 +367,13 @@ class MoleculeMongoDb(MoleculeDatabase):
         # Ignore keys reserved by position matrix collections.
         reserved_keys = ('m', '_id')
 
-        return key_values
         for key, value in entry.items():
             if key not in reserved_keys:
                 yield key, value
 
-    def get_entries(self):
+    def get_all(self):
         """
-        Get entries in database.
+        Get all molecules in the database.
 
         Yields
         ------
@@ -386,7 +385,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         for entry in self._position_matrices.find():
             # Do 'or' query over all key value pairs.
             query = {'$or': [
-                {key: value} 
+                {key: value}
                 for key, value in self._get_molecule_keys(entry)
             ]}
 

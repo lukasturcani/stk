@@ -56,14 +56,14 @@ def test_get_all():
         ),
     ]
     molecules_by_key = {
-        key_maker.get_key(molecule): molecule 
+        key_maker.get_key(molecule): molecule
         for molecule in molecules
     }
 
     for molecule in molecules:
         database.put(molecule)
 
-    for i, retrieved in enumerate(database.get_entries()):
+    for i, retrieved in enumerate(database.get_all()):
         key = key_maker.get_key(retrieved)
         molecule = molecules_by_key[key]
         is_equivalent_constructed_molecule(
@@ -72,4 +72,4 @@ def test_get_all():
         )
 
     # Check number of molecules.
-    assert i+1 == len(constructed_molecule_list)
+    assert i+1 == len(molecules)
