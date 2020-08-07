@@ -4,11 +4,10 @@ Periodic Hexagonal
 
 """
 
-from collections import Counter
-from .cof import OverlyOccupiedVertexError, UnoccupiedVertexError
 from .hexagonal import Hexagonal
 from ...reactions import GenericReactionFactory
 from ..topology_graph import TopologyGraph
+from ...molecules import PeriodicInfo
 
 
 class PeriodicHexagonal(TopologyGraph):
@@ -125,27 +124,28 @@ class PeriodicHexagonal(TopologyGraph):
     def clone(self):
         return self._internal.clone()
 
-    def get_periodic_cell(self):
+    def get_periodic_info(self):
         """
-        Get unit cell matrix of periodic topology graph.
+        Get unit cell information of periodic topology graph.
 
         Returns
         -------
-        cell_matrix : :class:`tuple` of :class:`np.array`
-            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+        :class:`.PeriodicInfo`
+            Class containing periodic information of cell.
 
         """
 
-        lattice_constants = self._get_lattice_constants()
-        cell_matrix = tuple(
-            i*j*self._internal._scale
-            for i, j in zip(
-                lattice_constants,
-                self._internal._lattice_size
+        lattice_constants = self._internal._get_lattice_constants()
+
+        return PeriodicInfo(
+            cell_matrix=tuple(
+                i*j*self._internal._scale
+                for i, j in zip(
+                    lattice_constants,
+                    self._internal._lattice_size
+                )
             )
         )
-
-        return cell_matrix
 
     def __repr__(self):
         x, y, z = self._internal._lattice_size

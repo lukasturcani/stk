@@ -97,13 +97,13 @@ class Cof(TopologyGraph):
 
     .. code-block:: python
 
-        topology_graph = stk.cof.Honeycomb(
+        topology_graph = stk.cof.PeriodicHoneycomb(
             building_blocks=(bb1, bb2),
             lattice_size=(3, 3, 1),
-            periodic=True,
         )
         cof = stk.ConstructedMolecule(topology_graph)
-        cell_matrix = topology.get_periodic_cell()
+        periodic_info = topology.get_periodic_info()
+        cell_matrix = periodic_info.get_cell_matrix()
 
     *Structural Isomer Construction*
 
