@@ -80,7 +80,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     .. code-block:: python
 
-        for entry in db.get_entries():
+        for entry in db.get_all():
             # Do something to entry.
 
     By default, the only molecular key the database stores, is the
@@ -362,17 +362,15 @@ class MoleculeMongoDb(MoleculeDatabase):
             'matrix': position_matrix,
         })
 
-    def _get_available_key_values(self, collection_entry):
+    def _get_molecule_keys(self, entry):
 
         # Ignore keys reserved by position matrix collections.
         reserved_keys = ('m', '_id')
 
-        key_values = {
-            i: collection_entry[i] for i in collection_entry.keys()
-            if i not in reserved_keys
-        }
-
         return key_values
+        for key, value in entry.items():
+            if key not in reserved_keys:
+                yield key, value
 
     def get_entries(self):
         """
@@ -385,15 +383,12 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         """
 
-        position_matrix_cursor = self._position_matrices.find()
-
-        for pos_mat_entry in position_matrix_cursor:
-            key_values = self._get_available_key_values(pos_mat_entry)
-
+        for entry in self._position_matrices.find():
             # Do 'or' query over all key value pairs.
-            query = {'$or': []}
-            for key, value in key_values.items():
-                query['$or'].append({key: value})
+            query = {'$or': [
+                {key: value} 
+                for key, value in self._get_molecule_keys(entry)
+            ]}
 
             json = self._molecules.find_one(query)
             if json is None:
@@ -405,5 +400,5 @@ class MoleculeMongoDb(MoleculeDatabase):
 
             yield self._dejsonizer.from_json({
                 'molecule': json,
-                'matrix': pos_mat_entry,
+                'matrix': entry,
             })
