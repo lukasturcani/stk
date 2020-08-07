@@ -4,9 +4,9 @@ import pymongo
 from tests.utilities import is_equivalent_constructed_molecule
 
 
-def test_get_entries():
+def test_get_all():
     """
-    Test iteration over all entries.
+    Test iteration over all molecules.
 
     """
 
@@ -27,7 +27,7 @@ def test_get_entries():
         get_lru_cache_size=0,
     )
 
-    constructed_molecule_list = [
+    molecules = [
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(stk.BuildingBlock(
@@ -55,16 +55,17 @@ def test_get_entries():
             ),
         ),
     ]
-    molecule_key_dict = {
-        key_maker.get_key(i): i for i in constructed_molecule_list
+    molecules_by_key = {
+        key_maker.get_key(molecule): molecule 
+        for molecule in molecules
     }
 
-    for molecule in constructed_molecule_list:
+    for molecule in molecules:
         database.put(molecule)
 
     for i, retrieved in enumerate(database.get_entries()):
         key = key_maker.get_key(retrieved)
-        molecule = molecule_key_dict[key]
+        molecule = molecules_by_key[key]
         is_equivalent_constructed_molecule(
             molecule.with_canonical_atom_ordering(),
             retrieved.with_canonical_atom_ordering(),
