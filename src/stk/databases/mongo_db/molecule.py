@@ -76,6 +76,13 @@ class MoleculeMongoDb(MoleculeDatabase):
     ordering, which allows position matrices to be used across
     different atom id orderings.
 
+    All entries in a database can be iterated over very simply
+
+    .. code-block:: python
+
+        for entry in db.get_all():
+            # Do something to entry.
+
     By default, the only molecular key the database stores, is the
     InChIKey. However, additional keys can be added to the JSON stored
     in the database by using a different :class:`.MoleculeJsonizer`
@@ -166,7 +173,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         db = stk.MoleculeMongoDb(
             mongo_client=client,
             jsonizer=stk.MoleculeJsonizer(
-            key_makers=(stk.InchiKey(), smiles),
+                key_makers=(stk.InchiKey(), smiles),
             ),
         )
 
@@ -327,7 +334,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         Parameters
         ----------
         key : :class:`.HashableDict`
-            The key of a a molecule, which is to be returned from the
+            The key of a molecule, which is to be returned from the
             database.
 
         Returns
@@ -354,3 +361,43 @@ class MoleculeMongoDb(MoleculeDatabase):
             'molecule': json,
             'matrix': position_matrix,
         })
+
+    def _get_molecule_keys(self, entry):
+
+        # Ignore keys reserved by position matrix collections.
+        reserved_keys = ('m', '_id')
+
+        for key, value in entry.items():
+            if key not in reserved_keys:
+                yield key, value
+
+    def get_all(self):
+        """
+        Get all molecules in the database.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            All `molecule` instances in database.
+
+        """
+
+        for entry in self._position_matrices.find():
+            # Do 'or' query over all key value pairs.
+            query = {'$or': [
+                {key: value}
+                for key, value in self._get_molecule_keys(entry)
+            ]}
+
+            json = self._molecules.find_one(query)
+            if json is None:
+                raise KeyError(
+                    'No molecule found in the database associated '
+                    f'with a position matrix with query: {query}. '
+                    'This suggests your database is corrupted.'
+                )
+
+            yield self._dejsonizer.from_json({
+                'molecule': json,
+                'matrix': entry,
+            })

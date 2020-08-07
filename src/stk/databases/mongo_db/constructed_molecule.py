@@ -83,6 +83,13 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     ordering, which allows position matrices to be used across
     different atom id orderings.
 
+    All entries in a database can be iterated over very simply
+
+    .. code-block:: python
+
+        for entry in db.get_all():
+            # Do something to entry.
+
     By default, the only molecular key the database stores, is the
     InChIKey. However, additional keys can be added to the JSON stored
     in the database by using a different
@@ -539,3 +546,58 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             'matrix':
                 self._building_block_position_matrices.find_one(key),
         }
+
+    def _get_molecule_keys(self, entry):
+        # Ignore keys reserved by constructed molecule collections.
+        reserved_keys = ('_id', 'BB', 'nBB', 'aI', 'bI')
+
+        for key, value in entry.items():
+            if key not in reserved_keys:
+                yield key, value
+
+    def get_all(self):
+        """
+        Get all molecules in the database.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            All molecule in the database.
+
+        """
+
+        for entry in self._constructed_molecules.find():
+            # Do 'or' query over all key value pairs.
+            query = {'$or': [
+                {key: value}
+                for key, value in self._get_molecule_keys(entry)
+            ]}
+
+            molecule_json = self._molecules.find_one(query)
+            if molecule_json is None:
+                raise KeyError(
+                    'No molecule found in the database associated '
+                    f'with a position matrix with query: {query}. '
+                    'This suggests your database is corrupted.'
+                )
+
+            position_matrix = self._position_matrices.find_one(query)
+            if position_matrix is None:
+                raise KeyError(
+                    'No position matrix found in the database '
+                    'associated with a position matrix with query: '
+                    f'{query}. This suggests your database is '
+                    'corrupted.'
+                )
+
+            yield self._dejsonizer.from_json(
+                json={
+                    'molecule': molecule_json,
+                    'constructedMolecule': entry,
+                    'matrix': position_matrix,
+                    'buildingBlocks': tuple(map(
+                        self._get_building_block,
+                        entry['BB'],
+                    ))
+                },
+            )

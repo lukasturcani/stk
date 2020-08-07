@@ -73,3 +73,16 @@ class MoleculeDatabase:
         """
 
         raise NotImplementedError()
+
+    def get_all(self):
+        """
+        Get all molecules in the database.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            A molecule in the database.
+
+        """
+
+        raise NotImplementedError()
