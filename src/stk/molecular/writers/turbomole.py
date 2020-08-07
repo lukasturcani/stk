@@ -76,7 +76,7 @@ class TurbomoleWriter:
 
         return content
 
-    def write_string(
+    def to_string(
         self,
         molecule,
         atom_ids=None,

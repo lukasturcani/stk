@@ -88,7 +88,7 @@ class MolWriter:
             '$$$$\n'
         )
 
-    def write_string(self, molecule, atom_ids=None):
+    def to_string(self, molecule, atom_ids=None):
         """
         Write `molecule` to V3000 ``.mol`` format as string.
 
