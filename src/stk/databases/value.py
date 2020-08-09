@@ -24,7 +24,7 @@ class ValueDatabase:
 
     *Iterating Through Entries in Database*
 
-    The :meth:`.get_entries` method of a molecule database instance can
+    The :meth:`.get_all` method of a molecule database instance can
     be used to iterate through entries, the keys of which can be used
     to access values.
 
