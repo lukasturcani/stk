@@ -73,3 +73,16 @@ class ConstructedMoleculeDatabase:
         """
 
         raise NotImplementedError()
+
+    def get_all(self):
+        """
+        Get all entries in the database.
+
+        Yields
+        ------
+        :class:`.ConstructedMolecule`
+            A molecule in the database.
+
+        """
+
+        raise NotImplementedError()

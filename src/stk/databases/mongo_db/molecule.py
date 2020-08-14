@@ -5,6 +5,7 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
+import warnings
 
 from stk.serialization import (
     MoleculeJsonizer,
@@ -74,6 +75,13 @@ class MoleculeMongoDb(MoleculeDatabase):
     is because the database gives the molecules a canonical atom
     ordering, which allows position matrices to be used across
     different atom id orderings.
+
+    All entries in a database can be iterated over very simply
+
+    .. code-block:: python
+
+        for entry in db.get_all():
+            # Do something to entry.
 
     By default, the only molecular key the database stores, is the
     InChIKey. However, additional keys can be added to the JSON stored
@@ -165,7 +173,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         db = stk.MoleculeMongoDb(
             mongo_client=client,
             jsonizer=stk.MoleculeJsonizer(
-            key_makers=(stk.InchiKey(), smiles),
+                key_makers=(stk.InchiKey(), smiles),
             ),
         )
 
@@ -187,7 +195,9 @@ class MoleculeMongoDb(MoleculeDatabase):
         position_matrix_collection='position_matrices',
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
-        lru_cache_size=128,
+        lru_cache_size='',
+        put_lru_cache_size=128,
+        get_lru_cache_size=128,
         indices=('InChIKey', ),
     ):
         """
@@ -219,9 +229,26 @@ class MoleculeMongoDb(MoleculeDatabase):
             JSON representations.
 
         lru_cache_size : :class:`int`, optional
+            This argument is deprecated and will be removed in any
+            version of :mod:`stk` released on, or after, 01/01/21.
+            Use the `put_lru_cache_size` and `get_lru_cache_size`
+            arguments instead.
+
             A RAM-based least recently used cache is used to avoid
             reading and writing to the database repeatedly. This sets
-            the number of molecules which fit into the LRU cache. If
+            the number of values which fit into the LRU cache. If
+            ``None``, the cache size will be unlimited.
+
+        put_lru_cache_size : :class:`int`, optional
+            A RAM-based least recently used cache is used to avoid
+            writing to the database repeatedly. This sets
+            the number of values which fit into the LRU cache. If
+            ``None``, the cache size will be unlimited.
+
+        get_lru_cache_size : :class:`int`, optional
+            A RAM-based least recently used cache is used to avoid
+            reading from the database repeatedly. This sets
+            the number of values which fit into the LRU cache. If
             ``None``, the cache size will be unlimited.
 
         indices : :class:`tuple` of :class:`str`, optional
@@ -230,14 +257,25 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         """
 
+        if lru_cache_size != '':
+            warnings.warn(
+                'The lru_cache_size argument is deprecated and will '
+                'be removed in any version of stk released on, or '
+                'after, 01/01/21. Use the put_lru_cache_size and '
+                'get_lru_cache_size arguments instead.',
+                FutureWarning,
+            )
+            put_lru_cache_size = lru_cache_size
+            get_lru_cache_size = lru_cache_size
+
         database = mongo_client[database]
         self._molecules = database[molecule_collection]
         self._position_matrices = database[position_matrix_collection]
         self._jsonizer = jsonizer
         self._dejsonizer = dejsonizer
 
-        self._get = lru_cache(maxsize=lru_cache_size)(self._get)
-        self._put = lru_cache(maxsize=lru_cache_size)(self._put)
+        self._get = lru_cache(maxsize=get_lru_cache_size)(self._get)
+        self._put = lru_cache(maxsize=put_lru_cache_size)(self._put)
 
         for index in indices:
             # Do not create the same index twice.
@@ -262,8 +300,27 @@ class MoleculeMongoDb(MoleculeDatabase):
         return self._put(HashableDict(json))
 
     def _put(self, json):
-        self._molecules.insert_one(json['molecule'])
-        self._position_matrices.insert_one(json['matrix'])
+        keys = dict(json['matrix'])
+        keys.pop('m')
+
+        query = {'$or': []}
+        for key, value in keys.items():
+            query['$or'].append({key: value})
+
+        self._molecules.update_many(
+            filter=query,
+            update={
+                '$set': json['molecule'],
+            },
+            upsert=True,
+        )
+        self._position_matrices.update_many(
+            filter=query,
+            update={
+                '$set': json['matrix'],
+            },
+            upsert=True,
+        )
 
     def get(self, key):
         # lru_cache requires that the parameters to the cached function
@@ -277,7 +334,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         Parameters
         ----------
         key : :class:`.HashableDict`
-            The key of a a molecule, which is to be returned from the
+            The key of a molecule, which is to be returned from the
             database.
 
         Returns
@@ -304,3 +361,43 @@ class MoleculeMongoDb(MoleculeDatabase):
             'molecule': json,
             'matrix': position_matrix,
         })
+
+    def _get_molecule_keys(self, entry):
+
+        # Ignore keys reserved by position matrix collections.
+        reserved_keys = ('m', '_id')
+
+        for key, value in entry.items():
+            if key not in reserved_keys:
+                yield key, value
+
+    def get_all(self):
+        """
+        Get all molecules in the database.
+
+        Yields
+        ------
+        :class:`.Molecule`
+            All `molecule` instances in database.
+
+        """
+
+        for entry in self._position_matrices.find():
+            # Do 'or' query over all key value pairs.
+            query = {'$or': [
+                {key: value}
+                for key, value in self._get_molecule_keys(entry)
+            ]}
+
+            json = self._molecules.find_one(query)
+            if json is None:
+                raise KeyError(
+                    'No molecule found in the database associated '
+                    f'with a position matrix with query: {query}. '
+                    'This suggests your database is corrupted.'
+                )
+
+            yield self._dejsonizer.from_json({
+                'molecule': json,
+                'matrix': entry,
+            })
