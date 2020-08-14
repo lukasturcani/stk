@@ -1,17 +1,25 @@
 """
-Covalent Organic Framework
-==========================
+Framework
+=========
+
+2D Covalent Organic Frameworks and Metal--Organic Frameworks
+------------------------------------------------------------
 
 .. toctree::
     :maxdepth: 2
 
-    Hexagonal <stk.molecular.topology_graphs.cof.hexagonal>
-    Honeycomb <stk.molecular.topology_graphs.cof.honeycomb>
-    Kagome <stk.molecular.topology_graphs.cof.kagome>
+    Hexagonal <stk.molecular.topology_graphs.framework.hexagonal>
+    Honeycomb <stk.molecular.topology_graphs.framework.honeycomb>
+    Kagome <stk.molecular.topology_graphs.framework.kagome>
     Linkerless Honeycomb <\
-stk.molecular.topology_graphs.cof.linkerless_honeycomb\
+stk.molecular.topology_graphs.framework.linkerless_honeycomb\
 >
-    Square <stk.molecular.topology_graphs.cof.square>
+    Square <stk.molecular.topology_graphs.framework.square>
+
+3D Covalent Organic Frameworks and Metal--Organic Frameworks
+------------------------------------------------------------
+
+On their way...
 
 """
 
@@ -22,13 +30,13 @@ from functools import partial
 from operator import getitem
 
 from ..topology_graph import TopologyGraph, EdgeGroup
-from .edge import _CofEdge
+from .edge import _FrameworkEdge
 from ...reactions import GenericReactionFactory
 
 
 class UnoccupiedVertexError(Exception):
     """
-    When a COF vertex is not occupied by a building block.
+    When a framework vertex is not occupied by a building block.
 
     """
 
@@ -37,33 +45,42 @@ class UnoccupiedVertexError(Exception):
 
 class OverlyOccupiedVertexError(Exception):
     """
-    When a COF vertex is occupied by more than one building block.
+    When a framework vertex is occupied by more than 1 building block.
 
     """
 
     pass
 
 
-class Cof(TopologyGraph):
+class NotPeriodicError(Exception):
     """
-    Represents a COF topology graph.
+    When a framework is not periodic.
+
+    """
+
+    pass
+
+
+class Framework(TopologyGraph):
+    """
+    Represents a framework topology graph.
 
     Notes
     -----
-    COF topologies are added by creating a subclass, which defines
-    the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
-    attributes.
+    Framework topologies are added by creating a subclass, which
+    defines the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes`
+    class attributes.
 
     Examples
     --------
     *Subclass Implementation*
 
-    The source code of the subclasses, listed in :mod:`~.cof.cof`,
-    can serve as good examples.
+    The source code of the subclasses, listed in
+    :mod:`~.framework.framework`, can serve as good examples.
 
-    *Basic Construction*
+    *Basic Construction of Covalent Organic Frameworks*
 
-    :class:`.Cof` instances can be made by providing the building
+    :class:`.Framework` instances can be made by providing the building
     block molecules and lattice size only (using :class:`.Honeycomb`
     as an example)
 
@@ -74,18 +91,38 @@ class Cof(TopologyGraph):
         bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
         bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
         cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
+            topology_graph=stk.framework.Honeycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1)
+            ),
         )
+
+    *Accessing the Periodic Unit Cell*
+
+    The same :class:`.Framework` instance can be built as a periodic
+    structure, which has a unit cell (assuming as P1 space group) that
+    can be accessed at any time from the :class:`.TopologyGraph`
+    instance.
+
+    .. code-block:: python
+
+        topology_graph = stk.framework.Honeycomb(
+            building_blocks=(bb1, bb2),
+            lattice_size=(3, 3, 1),
+            periodic=True,
+        )
+        cof = stk.ConstructedMolecule(topology_graph)
+        cell_matrix = topology.get_periodic_cell()
 
     *Structural Isomer Construction*
 
-    Different structural isomers of COFs can be made by using the
+    Different structural isomers of frameworks can be made by using the
     `vertex_alignments` optional parameter
 
     .. code-block:: python
 
         cof2 = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
+            topology_graph=stk.framework.Honeycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 3, 1),
                 vertex_alignments={0: 2, 1: 1, 2: 1},
@@ -98,7 +135,7 @@ class Cof(TopologyGraph):
     can be mapped to ``0``, ``1`` or ``2``.
 
     By changing which edge each vertex is aligned with, a different
-    structural isomer of the COF can be formed.
+    structural isomer of the framework can be formed.
 
     *Multi-Building Block COF Construction*
 
@@ -115,7 +152,7 @@ class Cof(TopologyGraph):
         bb4 = stk.BuildingBlock('BrCC(NCBr)CBr', [stk.BromoFactory()])
 
         cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
+            topology_graph=stk.framework.Honeycomb(
                 # building_blocks is now a dict, which maps building
                 # blocks to the id of the vertices it should be placed
                 # on. You can use ranges to specify the ids.
@@ -134,7 +171,7 @@ class Cof(TopologyGraph):
     .. code-block:: python
 
         cof2 = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
+            topology_graph=stk.framework.Honeycomb(
                 building_blocks={
                     bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
                     bb2: 3,
@@ -145,6 +182,10 @@ class Cof(TopologyGraph):
                 vertex_alignments={0: 2, 1: 1, 2: 1},
             ),
         )
+
+    *Constructing Metal-Organic Frameworks*
+
+    To be written.
 
     """
 
@@ -166,7 +207,7 @@ class Cof(TopologyGraph):
         num_processes=1,
     ):
         """
-        Initialize a :class:`.Cof` instance.
+        Initialize a :class:`.Framework` instance.
 
         Parameters
         ----------
@@ -224,13 +265,13 @@ class Cof(TopologyGraph):
             desired placement of building blocks is ambiguous in
             this case.
 
-        :class:`~.cof.UnoccupiedVertexError`
-            If a vertex of the COF topology graph does not have a
-            building block placed on it.
+        :class:`~.framework.UnoccupiedVertexError`
+            If a vertex of the framework topology graph does not have
+            a building block placed on it.
 
-        :class:`~.cof.OverlyOccupiedVertexError`
-            If a vertex of the COF topology graph has more than one
-            building block placed on it.
+        :class:`~.framework.OverlyOccupiedVertexError`
+            If a vertex of the framework topology graph has more than
+            one building block placed on it.
 
         """
 
@@ -329,7 +370,7 @@ class Cof(TopologyGraph):
 
     def _get_edge_groups(self, edges):
         """
-        Get the edge groups for the COF.
+        Get the edge groups for the framework.
 
         Parameters
         ----------
@@ -489,7 +530,7 @@ class Cof(TopologyGraph):
                 dim >= 0 and dim < max_dim
                 for dim, max_dim in dims
             )
-            edge_clones.append(_CofEdge(
+            edge_clones.append(_FrameworkEdge(
                 parent_id=edge.get_id(),
                 id=id_,
                 vertex1=lattice[x][y][z][edge.get_vertex1_id()],
@@ -589,6 +630,35 @@ class Cof(TopologyGraph):
             for bb in building_block_vertices
         )
 
+    def get_periodic_cell(self):
+        """
+        Get unit cell matrix of periodic topology graph.
+
+        Returns
+        -------
+        cell_matrix : :class:`tuple` of :class:`np.array`
+            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
+
+        Raises
+        ------
+        :class:`NotPeriodicError`
+            If the topology graph is not periodic.
+
+        """
+
+        if not self._periodic:
+            raise NotPeriodicError(
+                f'Argument periodic is {self._periodic}'
+            )
+
+        lattice_constants = self._get_lattice_constants()
+        cell_matrix = tuple(
+            i*j*self._scale
+            for i, j in zip(lattice_constants, self._lattice_size)
+        )
+
+        return cell_matrix
+
     def __repr__(self):
         x, y, z = self._lattice_size
         periodic = ', periodic=True' if self._periodic else ''
@@ -598,7 +668,7 @@ class Cof(TopologyGraph):
             else ''
         )
         return (
-            f'cof.{self.__class__.__name__}('
+            f'framework.{self.__class__.__name__}('
             f'({x}, {y}, {z})'
             f'{vertex_alignments}'
             f'{periodic})'

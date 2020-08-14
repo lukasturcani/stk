@@ -8,7 +8,7 @@ from .fixtures import *  # noqa
 @pytest.fixture(
     params=(
         lazy_fixture('linear'),
-        lazy_fixture('cof'),
+        lazy_fixture('framework'),
     ),
 )
 def case_data(request):

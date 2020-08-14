@@ -8,7 +8,7 @@ from ...case_data import CaseData
     params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.cof.Honeycomb(
+                topology_graph=stk.framework.Honeycomb(
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles='BrC1=C(Br)[C+]=N1',
@@ -39,7 +39,7 @@ from ...case_data import CaseData
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.cof.Honeycomb(
+                topology_graph=stk.framework.Honeycomb(
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles='BrC1=C(Br)[C+]=N1',
@@ -72,7 +72,7 @@ from ...case_data import CaseData
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.cof.Honeycomb(
+                topology_graph=stk.framework.Honeycomb(
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles='BrC1=C(Br)[C+]=N1',
@@ -105,5 +105,5 @@ from ...case_data import CaseData
         ),
     ),
 )
-def cof_honeycomb(request):
+def framework_honeycomb(request):
     return request.param

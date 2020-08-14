@@ -8,7 +8,7 @@ from ...case_data import CaseData
     params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.cof.LinkerlessHoneycomb(
+                topology_graph=stk.framework.LinkerlessHoneycomb(
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles=(
@@ -33,5 +33,5 @@ from ...case_data import CaseData
         ),
     ),
 )
-def cof_linkerless_honeycomb(request):
+def framework_linkerless_honeycomb(request):
     return request.param

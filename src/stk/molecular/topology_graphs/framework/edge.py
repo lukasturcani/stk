@@ -1,9 +1,9 @@
 from ..topology_graph import Edge
 
 
-class _CofEdge(Edge):
+class _FrameworkEdge(Edge):
     """
-    A :class:`.Cof` edge.
+    A :class:`.Framework` edge.
 
     """
 
@@ -17,7 +17,7 @@ class _CofEdge(Edge):
         position=None,
     ):
         """
-        Initialize a :class:`.CofEdge`.
+        Initialize a :class:`.FrameworkEdge`.
 
         Parameters
         ----------

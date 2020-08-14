@@ -6,19 +6,19 @@ Linkerless Honeycomb
 
 import numpy as np
 
-from .cof import Cof
-from .vertices import _NonLinearCofVertex
+from .framework import Framework
+from .vertices import _NonLinearFrameworkVertex
 from ..topology_graph import Edge
 
 
-class LinkerlessHoneycomb(Cof):
+class LinkerlessHoneycomb(Framework):
     """
-    Represents a honeycomb COF topology graph.
+    Represents a honeycomb framework topology graph.
 
     Building blocks with three functional groups are required
     for this topology graph.
 
-    See :class:`.Cof` for more details and examples.
+    See :class:`.Framework` for more details and examples.
 
     """
 
@@ -29,8 +29,8 @@ class LinkerlessHoneycomb(Cof):
     )
 
     _vertex_prototypes = (
-        _NonLinearCofVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
-        _NonLinearCofVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
+        _NonLinearFrameworkVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
+        _NonLinearFrameworkVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
     )
 
     _edge_prototypes = (

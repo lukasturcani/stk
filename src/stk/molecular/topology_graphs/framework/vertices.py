@@ -9,15 +9,15 @@ from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
 
 
-class _CofVertex(Vertex):
+class _FrameworkVertex(Vertex):
     """
-    A :class:`.Cof` vertex.
+    A :class:`.Framework` vertex.
 
     """
 
     def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
         """
-        Initialize a :class:`._Cof` vertex.
+        Initialize a :class:`._Framework` vertex.
 
         Parameters
         ----------
@@ -55,7 +55,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`._CofVertex` in the middle of `vertices`.
+        Initialize a :class:`._FrameworkVertex` in mid. of `vertices`.
 
         Parameters
         ----------
@@ -77,7 +77,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`._CofVertex`
+        :class:`._FrameworkVertex`
             The new vertex.
 
         """
@@ -103,7 +103,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`.CofVertex` at the center of `vertices`.
+        Initialize a :class:`.FrameworkVertex` at center of `vertices`.
 
         The `vertices` are shifted according to the lattice constants
         and cell shifts.
@@ -134,7 +134,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`.CofVertex`
+        :class:`.FrameworkVertex`
             The new vertex.
 
         """
@@ -168,7 +168,7 @@ class _CofVertex(Vertex):
         )
 
 
-class _LinearCofVertex(_CofVertex):
+class _LinearFrameworkVertex(_FrameworkVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -214,7 +214,7 @@ class _LinearCofVertex(_CofVertex):
         }
 
 
-class _NonLinearCofVertex(_CofVertex):
+class _NonLinearFrameworkVertex(_FrameworkVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2

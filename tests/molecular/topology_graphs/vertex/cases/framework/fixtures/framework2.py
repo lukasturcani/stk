@@ -3,11 +3,11 @@ import stk
 
 from ....case_data import CaseData
 
-vertices = stk.cof.honeycomb
+vertices = stk.framework.honeycomb
 
 
 @pytest.fixture
-def cof2(init_at_center, id, vertices_, aligner_edge, cell):
+def framework2(init_at_center, id, vertices_, aligner_edge, cell):
     return CaseData(
         vertex=init_at_center(id, vertices_, aligner_edge, cell),
         id=id,
@@ -20,8 +20,8 @@ def cof2(init_at_center, id, vertices_, aligner_edge, cell):
 
 @pytest.fixture(
     params=(
-        vertices._LinearCofVertex.init_at_center,
-        vertices._NonLinearCofVertex.init_at_center,
+        vertices._LinearFrameworkVertex.init_at_center,
+        vertices._NonLinearFrameworkVertex.init_at_center,
     ),
 )
 def init_at_center(request):

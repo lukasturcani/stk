@@ -7,19 +7,19 @@ Honeycomb
 import numpy as np
 
 
-from .cof import Cof
-from .vertices import _LinearCofVertex, _NonLinearCofVertex
+from .framework import Framework
+from .vertices import _LinearFrameworkVertex, _NonLinearFrameworkVertex
 from ..topology_graph import Edge
 
 
-class Honeycomb(Cof):
+class Honeycomb(Framework):
     """
-    Represents a honeycomb COF topology graph.
+    Represents a honeycomb framework topology graph.
 
     Building blocks with three and two functional groups are required
     for this topology graph.
 
-    See :class:`.Cof` for more details and examples.
+    See :class:`.Framework` for more details and examples.
 
     """
 
@@ -30,23 +30,23 @@ class Honeycomb(Cof):
     )
 
     _vertex_prototypes = (
-        _NonLinearCofVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
-        _NonLinearCofVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
+        _NonLinearFrameworkVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
+        _NonLinearFrameworkVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
-        _LinearCofVertex.init_at_center(
+        _LinearFrameworkVertex.init_at_center(
             id=2,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
-        _LinearCofVertex.init_at_shifted_center(
+        _LinearFrameworkVertex.init_at_shifted_center(
             id=3,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
-        _LinearCofVertex.init_at_shifted_center(
+        _LinearFrameworkVertex.init_at_shifted_center(
             id=4,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
