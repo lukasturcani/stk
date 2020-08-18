@@ -49,14 +49,14 @@ class PeriodicInfo:
         self._x_vector = x_vector
         self._y_vector = y_vector
         self._z_vector = z_vector
-        self._cell_matrix = tuple(x_vector, y_vector, z_vector)
+        self._cell_matrix = (x_vector, y_vector, z_vector)
 
         a, b, c = tuple(
             np.sqrt(np.sum(i ** 2)).tolist() for i in self._cell_matrix
         )
         self._a = a
-        self._b = a
-        self._c = a
+        self._b = b
+        self._c = c
 
         lengths = (a, b, c)
         angles = np.zeros(3)
