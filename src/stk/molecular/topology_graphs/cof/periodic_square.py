@@ -4,13 +4,15 @@ Periodic Square
 
 """
 
-from .square import Square
+import numpy as np
 from ...reactions import GenericReactionFactory
-from ..topology_graph import TopologyGraph
-from ...molecules import PeriodicInfo
+from .cof import Cof
+from .vertices import _LinearCofVertex, _NonLinearCofVertex
+from ..topology_graph import Edge
+from ...periodic_info import PeriodicInfo
 
 
-class PeriodicSquare(TopologyGraph):
+class PeriodicSquare(Cof):
     """
     Represents a periodic square COF topology graph.
 
@@ -93,7 +95,7 @@ class PeriodicSquare(TopologyGraph):
 
         """
 
-        self._internal = Square(
+        super().__init__(
             building_blocks=building_blocks,
             lattice_size=lattice_size,
             periodic=True,
@@ -101,28 +103,6 @@ class PeriodicSquare(TopologyGraph):
             reaction_factory=reaction_factory,
             num_processes=num_processes,
         )
-
-    def construct(self):
-        """
-        Construct a :class:`.ConstructedMolecule`.
-
-        Returns
-        -------
-        :class:`.ConstructionResult`
-            The data describing the :class:`.ConstructedMolecule`.
-
-        """
-
-        return self._internal.construct()
-
-    def get_building_blocks(self):
-        yield from self._internal.get_building_blocks()
-
-    def get_num_building_block(self, building_block):
-        return self._internal.get_num_building_block(building_block)
-
-    def clone(self):
-        return self._internal.clone()
 
     def get_periodic_info(self):
         """
@@ -135,31 +115,59 @@ class PeriodicSquare(TopologyGraph):
 
         """
 
-        lattice_constants = self._internal._get_lattice_constants()
+        lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
-            cell_matrix=tuple(
-                i*j*self._internal._scale
-                for i, j in zip(
-                    lattice_constants,
-                    self._internal._lattice_size
-                )
-            )
+            x_vector=(
+                lattice_constants[0]*self._lattice_size[0]*self._scale
+            ),
+            y_vector=(
+                lattice_constants[1]*self._lattice_size[1]*self._scale
+            ),
+            z_vector=(
+                lattice_constants[2]*self._lattice_size[2]*self._scale
+            ),
         )
 
-    def __repr__(self):
-        x, y, z = self._internal._lattice_size
-        periodic = (
-            ', periodic=True' if self._internal._periodic else ''
-        )
-        vertex_alignments = (
-            f', vertex_alignments={self._internal._vertex_alignments}'
-            if self._internal._vertex_alignments
-            else ''
-        )
-        return (
-            f'cof.{self.__class__.__name__}('
-            f'({x}, {y}, {z})'
-            f'{vertex_alignments}'
-            f'{periodic})'
-        )
+    _lattice_constants = _a, _b, _c = (
+        np.array([1., 0., 0.]),
+        np.array([0., 1., 0.]),
+        np.array([0., 0., 1.])
+    )
+
+    _vertex_prototypes = (
+        _NonLinearCofVertex(0, (0.5)*_a + (0.5)*_b + (0.5)*_c),
+    )
+    _vertex_prototypes = (
+        *_vertex_prototypes,
+        _LinearCofVertex.init_at_shifted_center(
+            id=1,
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[0]),
+            cell_shifts=((0, 0, 0), (1, 0, 0)),
+            lattice_constants=_lattice_constants,
+        ),
+        _LinearCofVertex.init_at_shifted_center(
+            id=2,
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[0]),
+            cell_shifts=((0, 0, 0), (0, 1, 0)),
+            lattice_constants=_lattice_constants,
+        ),
+
+    )
+
+    _edge_prototypes = (
+        Edge(0, _vertex_prototypes[1], _vertex_prototypes[0]),
+        Edge(
+            id=1,
+            vertex1=_vertex_prototypes[1],
+            vertex2=_vertex_prototypes[0],
+            periodicity=(1, 0, 0),
+        ),
+        Edge(2, _vertex_prototypes[2], _vertex_prototypes[0]),
+        Edge(
+            id=3,
+            vertex1=_vertex_prototypes[2],
+            vertex2=_vertex_prototypes[0],
+            periodicity=(0, 1, 0),
+        ),
+    )

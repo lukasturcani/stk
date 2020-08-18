@@ -4,13 +4,15 @@ Periodic Kagome
 
 """
 
-from .kagome import Kagome
+import numpy as np
 from ...reactions import GenericReactionFactory
-from ..topology_graph import TopologyGraph
-from ...molecules import PeriodicInfo
+from .cof import Cof
+from .vertices import _LinearCofVertex, _NonLinearCofVertex
+from ..topology_graph import Edge
+from ...periodic_info import PeriodicInfo
 
 
-class PeriodicKagome(TopologyGraph):
+class PeriodicKagome(Cof):
     """
     Represents a periodic kagome COF topology graph.
 
@@ -93,7 +95,7 @@ class PeriodicKagome(TopologyGraph):
 
         """
 
-        self._internal = Kagome(
+        super().__init__(
             building_blocks=building_blocks,
             lattice_size=lattice_size,
             periodic=True,
@@ -101,28 +103,6 @@ class PeriodicKagome(TopologyGraph):
             reaction_factory=reaction_factory,
             num_processes=num_processes,
         )
-
-    def construct(self):
-        """
-        Construct a :class:`.ConstructedMolecule`.
-
-        Returns
-        -------
-        :class:`.ConstructionResult`
-            The data describing the :class:`.ConstructedMolecule`.
-
-        """
-
-        return self._internal.construct()
-
-    def get_building_blocks(self):
-        yield from self._internal.get_building_blocks()
-
-    def get_num_building_block(self, building_block):
-        return self._internal.get_num_building_block(building_block)
-
-    def clone(self):
-        return self._internal.clone()
 
     def get_periodic_info(self):
         """
@@ -135,31 +115,98 @@ class PeriodicKagome(TopologyGraph):
 
         """
 
-        lattice_constants = self._internal._get_lattice_constants()
+        lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
-            cell_matrix=tuple(
-                i*j*self._internal._scale
-                for i, j in zip(
-                    lattice_constants,
-                    self._internal._lattice_size
-                )
-            )
+            x_vector=(
+                lattice_constants[0]*self._lattice_size[0]*self._scale
+            ),
+            y_vector=(
+                lattice_constants[1]*self._lattice_size[1]*self._scale
+            ),
+            z_vector=(
+                lattice_constants[2]*self._lattice_size[2]*self._scale
+            ),
         )
 
-    def __repr__(self):
-        x, y, z = self._internal._lattice_size
-        periodic = (
-            ', periodic=True' if self._internal._periodic else ''
-        )
-        vertex_alignments = (
-            f', vertex_alignments={self._internal._vertex_alignments}'
-            if self._internal._vertex_alignments
-            else ''
-        )
-        return (
-            f'cof.{self.__class__.__name__}('
-            f'({x}, {y}, {z})'
-            f'{vertex_alignments}'
-            f'{periodic})'
-        )
+    _lattice_constants = _a, _b, _c = (
+        np.array([1., 0., 0.]),
+        np.array([0.5, 0.866, 0.]),
+        np.array([0., 0., 5/1.7321])
+    )
+
+    _vertex_prototypes = (
+        _NonLinearCofVertex(0, (1/4)*_a + (3/4)*_b + (0.5)*_c),
+        _NonLinearCofVertex(1, (3/4)*_a + (3/4)*_b + (1/2)*_c),
+        _NonLinearCofVertex(2, (3/4)*_a + (1/4)*_b + (1/2)*_c),
+    )
+
+    _vertex_prototypes = (
+        *_vertex_prototypes,
+        _LinearCofVertex.init_at_center(
+            id=3,
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+        ),
+        _LinearCofVertex.init_at_center(
+            id=4,
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
+        ),
+        _LinearCofVertex.init_at_center(
+            id=5,
+            vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
+        ),
+        _LinearCofVertex.init_at_shifted_center(
+            id=6,
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            cell_shifts=((0, 0, 0), (-1, 0, 0)),
+            lattice_constants=_lattice_constants
+        ),
+        _LinearCofVertex.init_at_shifted_center(
+            id=7,
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
+            cell_shifts=((0, 0, 0), (-1, 1, 0)),
+            lattice_constants=_lattice_constants
+        ),
+        _LinearCofVertex.init_at_shifted_center(
+            id=8,
+            vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
+            cell_shifts=((0, 0, 0), (0, 1, 0)),
+            lattice_constants=_lattice_constants
+        ),
+
+    )
+
+    _edge_prototypes = (
+        Edge(0, _vertex_prototypes[3], _vertex_prototypes[0]),
+        Edge(1, _vertex_prototypes[3], _vertex_prototypes[1]),
+
+        Edge(2, _vertex_prototypes[4], _vertex_prototypes[0]),
+        Edge(3, _vertex_prototypes[4], _vertex_prototypes[2]),
+
+        Edge(4, _vertex_prototypes[5], _vertex_prototypes[1]),
+        Edge(5, _vertex_prototypes[5], _vertex_prototypes[2]),
+
+        Edge(6, _vertex_prototypes[6], _vertex_prototypes[0]),
+        Edge(
+            id=7,
+            vertex1=_vertex_prototypes[6],
+            vertex2=_vertex_prototypes[1],
+            periodicity=(-1, 0, 0),
+        ),
+
+        Edge(8, _vertex_prototypes[7], _vertex_prototypes[0]),
+        Edge(
+            id=9,
+            vertex1=_vertex_prototypes[7],
+            vertex2=_vertex_prototypes[2],
+            periodicity=(-1, 1, 0),
+        ),
+
+        Edge(10, _vertex_prototypes[8], _vertex_prototypes[1]),
+        Edge(
+            id=11,
+            vertex1=_vertex_prototypes[8],
+            vertex2=_vertex_prototypes[2],
+            periodicity=(0, 1, 0),
+        ),
+    )
