@@ -104,6 +104,13 @@ class Cof(TopologyGraph):
         cof = stk.ConstructedMolecule(topology_graph)
         periodic_info = topology.get_periodic_info()
         cell_matrix = periodic_info.get_cell_matrix()
+        # Can access all unit-cell parameters.
+        a = periodic_info.get_a()
+        b = periodic_info.get_b()
+        c = periodic_info.get_c()
+        alpha = periodic_info.get_alpha()
+        beta = periodic_info.get_beta()
+        gamma = periodic_info.get_gamma()
 
     *Structural Isomer Construction*
 
