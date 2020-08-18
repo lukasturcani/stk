@@ -28,7 +28,7 @@ class CaseData:
         molecule : :class:`.Molecule`
             Molecule to test.
 
-        writer : :class:`.???????`
+        writer : :class:`.TurbomoleWriter`
             The writer to test.
 
         string : :class:`str`

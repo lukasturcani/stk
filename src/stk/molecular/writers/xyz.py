@@ -1,24 +1,19 @@
 """
-XyzWriter
+Xyz Writer
 =========
-
-.. toctree::
-    :maxdepth: 2
-
-    XyzWriter <stk.molecular.writers.xyz>
 
 """
 
 
 class XyzWriter:
     """
-    A writer class for `.xyz` files.
+    A writer class for ``.xyz`` files.
 
     Examples
     --------
-    *Writing to File*
+    *Writing to a File*
 
-    This writer can write to file for visualisation
+    This writer can write to a file for visualisation
 
     .. code-block:: python
 
@@ -52,7 +47,7 @@ class XyzWriter:
 
     def to_string(self, molecule, atom_ids=None):
         """
-        Write `molecule` to `.xyz` format as string.
+        Get the ``.xyz`` string of  `molecule`.
 
         Parameters
         ----------
@@ -66,8 +61,8 @@ class XyzWriter:
 
         Returns
         -------
-        content : :class:`str`
-            String in `.xyz` file format.
+        :class:`str`
+            String in ``.xyz`` file format.
 
         """
 
@@ -77,15 +72,15 @@ class XyzWriter:
 
     def write(self, molecule, path, atom_ids=None):
         """
-        Write `molecule` to `.xyz` file format.
+        Write `molecule` to ``.xyz`` file format.
 
         Parameters
         ----------
         molecule : :class:`.Molecule`
-            Molecule to write to `.xyz` format.
+            Molecule to write to ``.xyz`` format.
 
         path : :class:`str`
-            The full path to the file being written..
+            The full path to the file being written.
 
         atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. Can be a single

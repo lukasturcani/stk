@@ -2,11 +2,6 @@
 MolWriter
 =========
 
-.. toctree::
-    :maxdepth: 2
-
-    MolWriter <stk.molecular.writers.xyz>
-
 """
 
 
@@ -16,9 +11,9 @@ class MolWriter:
 
     Examples
     --------
-    *Writing to File*
+    *Writing to a File*
 
-    This writer can write to file for visualisation
+    This writer can write to a file for visualisation
 
     .. code-block:: python
 
@@ -90,7 +85,7 @@ class MolWriter:
 
     def to_string(self, molecule, atom_ids=None):
         """
-        Write `molecule` to V3000 ``.mol`` format as string.
+        Get a V3000 ``.mol`` file format string of `molecule`.
 
         Parameters
         ----------
@@ -104,7 +99,7 @@ class MolWriter:
 
         Returns
         -------
-        content : :class:`str`
+        :class:`str`
             String in V3000 ``.mol`` file format.
 
         """
@@ -121,7 +116,7 @@ class MolWriter:
             Molecule to write to V3000 ``.mol`` format.
 
         path : :class:`str`
-            The full path to the file being written..
+            The full path to the file being written.
 
         atom_ids : :class:`iterable` of :class:`int`
             The atom ids of atoms to write. Can be a single

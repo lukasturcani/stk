@@ -24,7 +24,7 @@ class CaseData:
         molecule : :class:`.Molecule`
             Molecule to test.
 
-        writer : :class:`.???????`
+        writer : :class:`.XyzWriter`
             The writer to test.
 
         string : :class:`str`

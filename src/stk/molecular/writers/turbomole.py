@@ -2,11 +2,6 @@
 TurbomoleWriter
 ===============
 
-.. toctree::
-    :maxdepth: 2
-
-    TurbomoleWriter <stk.molecular.writers.turbomole>
-
 """
 
 
@@ -16,11 +11,11 @@ class TurbomoleWriter:
 
     Examples
     --------
-    *Writing to File with Unit Cell*
+    *Writing to a File with Unit Cell*
 
-    This writer can write to file for visualisation with the unit cell
-    included for periodic molecules. Note that this always assumes P1
-    space group.
+    This writer can write to a file for visualisation with the unit
+    cell included for periodic molecules. Note that this always assumes
+    P1 space group.
 
     .. code-block:: python
 
@@ -52,8 +47,12 @@ class TurbomoleWriter:
         content = []
         if periodic_info is not None:
             # Input unit cell information.
-            lengths_and_angles = periodic_info.get_lengths_and_angles()
-            a, b, c, alpha, beta, gamma = lengths_and_angles
+            a = periodic_info.get_a()
+            b = periodic_info.get_b()
+            c = periodic_info.get_c()
+            alpha = periodic_info.get_alpha()
+            beta = periodic_info.get_beta()
+            gamma = periodic_info.get_gamma()
             content.append(
                 '$periodic 3\n'
                 '$cell angs\n'
@@ -83,7 +82,7 @@ class TurbomoleWriter:
         periodic_info=None
     ):
         """
-        Write `molecule` to ``Turbomole`` file format as string.
+        Get a ``Turbomole`` file format string of `molecule`.
 
         Parameters
         ----------
@@ -96,12 +95,12 @@ class TurbomoleWriter:
             if all atoms are to be used.
 
         periodic_info : :class:`.PeriodicInfo`
-            Information about periodic cell.
+            Information about the periodic cell.
 
         Returns
         -------
-        string :class:`string`
-            The string containing all information for a `.coord` file.
+        :class:`string`
+            The content of a `.coord` file.
 
         """
 
@@ -131,7 +130,7 @@ class TurbomoleWriter:
             if all atoms are to be used.
 
         periodic_info : :class:`.PeriodicInfo`
-            Information about periodic cell.
+            Information about the periodic cell.
 
         Returns
         -------

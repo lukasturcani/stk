@@ -2,11 +2,6 @@
 PdbWriter
 ==========
 
-.. toctree::
-    :maxdepth: 2
-
-    PdbWriter <stk.molecular.writers.pdb>
-
 """
 
 
@@ -16,11 +11,11 @@ class PdbWriter:
 
     Examples
     --------
-    *Writing to File with Unit Cell*
+    *Writing to a File with Unit Cell*
 
-    This writer can write to file for visualisation with the unit cell
-    included for periodic molecules. Note that this always assumes P1
-    space group.
+    This writer can write to a file for visualisation with the unit
+    cell included for periodic molecules. Note that this always assumes
+    P1 space group.
 
     .. code-block:: python
 
@@ -52,8 +47,12 @@ class PdbWriter:
         content = []
         if periodic_info is not None:
             # Input unit cell information.
-            lengths_and_angles = periodic_info.get_lengths_and_angles()
-            a, b, c, alpha, beta, gamma = lengths_and_angles
+            a = periodic_info.get_a()
+            b = periodic_info.get_b()
+            c = periodic_info.get_c()
+            alpha = periodic_info.get_alpha()
+            beta = periodic_info.get_beta()
+            gamma = periodic_info.get_gamma()
             content.append(
                 f'CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}'
                 f' {alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f} '
@@ -98,9 +97,6 @@ class PdbWriter:
         for bond in molecule.get_bonds():
             a1 = bond.get_atom1().get_id()
             a2 = bond.get_atom2().get_id()
-            # # Do not form periodic bonds in a PDB.
-            # if periodic_cell is not None and bond.is_periodic():
-            #     continue
             if a1 in atoms and a2 in atoms:
                 content.append(
                     f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
@@ -117,7 +113,7 @@ class PdbWriter:
         periodic_info=None
     ):
         """
-        Write `molecule` to ``.pdb`` file format to string.
+        Get a ``.pdb`` file format string of `molecule`.
 
         Parameters
         ----------
@@ -130,12 +126,12 @@ class PdbWriter:
             if all atoms are to be used.
 
         periodic_info : :class:`.PeriodicInfo`
-            Information about periodic cell.
+            Information about the periodic cell.
 
         Returns
         -------
-        string :class:`string`
-            The string containing all information for a ``.pdb`` file.
+        :class:`string`
+            A string holding the content of a ``.pdf`` file.
 
         """
 
@@ -150,7 +146,7 @@ class PdbWriter:
     def write(
         self,
         molecule,
-        path=None,
+        path,
         atom_ids=None,
         periodic_info=None
     ):
@@ -162,7 +158,7 @@ class PdbWriter:
         molecule : :class:`.Molecule`
             Molecule to write to ``.pdb`` format.
 
-        path : :class:`str`, optional
+        path : :class:`str`
             The full path to the file being written.
 
         atom_ids : :class:`iterable` of :class:`int`
@@ -171,7 +167,7 @@ class PdbWriter:
             if all atoms are to be used.
 
         periodic_info : :class:`.PeriodicInfo`
-            Information about periodic cell.
+            Information about the periodic cell.
 
         Returns
         -------
