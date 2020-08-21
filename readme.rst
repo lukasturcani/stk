@@ -33,11 +33,11 @@ Make sure you also install rdkit, which is a dependency::
 How To Cite
 ===========
 
-If you use ``stk`` please cite::
+If you use ``stk`` please cite:
 
     https://github.com/lukasturcani/stk
 
-and::
+and:
 
     https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
 
