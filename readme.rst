@@ -30,6 +30,18 @@ Make sure you also install rdkit, which is a dependency::
     $ conda install -c rdkit rdkit
 
 
+How To Cite
+===========
+
+If you use ``stk`` please cite::
+
+    https://github.com/lukasturcani/stk
+
+and::
+
+    https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
+
+
 Publications
 ============
 
