@@ -33,8 +33,6 @@ class ValueMongoDb(ValueDatabase):
     .. code-block:: python
 
         import stk
-        # pymongo does not come with stk, you have to install it
-        # explicitly with "pip install pymongo".
         import pymongo
 
         # Connect to a MongoDB. This example connects to a local

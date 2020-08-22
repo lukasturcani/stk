@@ -200,10 +200,7 @@ Requirements
 :mod:`stk` allows you to place molecules into a
 :class:`.MoleculeDatabase`. Out-of-the-box, :mod:`stk` comes
 with support for a :class:`.MoleculeMongoDb`. In order to use it
-locally, you have to install MongoDB on your computer. You will
-then also have to install :mod:`pymongo` with::
-
-    $ pip install pymongo
+locally, you have to install MongoDB on your computer.
 
 Documentation for installing, and making sure your local MongoDB is
 working properly, can be found here__. Trust me, this is easy to do

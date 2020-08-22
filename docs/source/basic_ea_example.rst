@@ -522,8 +522,6 @@ Assuming everything is setup, we can create our database instance
 
 .. code-block:: python
 
-    # pymongo does not come with stk, you have to install it
-    # explicitly with "pip install pymongo".
     import pymongo
 
     # Connect to a MongoDB. This example connects to a local
