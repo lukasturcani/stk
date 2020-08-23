@@ -139,7 +139,7 @@ Molecular Database Visualization
 .. image:: https://i.imgur.com/8MCBUGZ.png
 
 :mod:`.stk` has a sibling project called `stk-vis`_, which is a
-cross-platform application, which lets you connect to database
+cross-platform application, which lets you connect to a database
 created by :mod:`.stk`, and view the molecules deposited into it.
 `stk-vis`_ also shows you any molecular properties you deposited,
 and lets you browse the building blocks of any constructed molecules.
@@ -156,8 +156,9 @@ Features of `stk-vis`_ include
   database.
 * Sorting molecules according to property values to quickly find ones
   with the best and worst properties.
-* Examination of building blocks of constructed molecules and th
-  building blocks of those building blocks and so on.
+* You can list the building blocks of any constructed molecules.
+  If those building blocks are also constructed molecules, you can
+  list their building blocks as well, and so on.
 
 You read more about `stk-vis`_ here:
 
@@ -200,9 +201,11 @@ Future Releases
 ---------------
 
 :mod:`.stk` is under active development. You can get alerted
-when a new release comes out by going to the GitHub page and
+when a new release comes out by going to the `GitHub page`_ and
 click on the ``watch`` button in the top right corner. Then select
 ``Releases only`` from the dropdown menu.
+
+.. _`GitHub page`: https://github.com/lukasturcani/stk
 
 Important features in the future will include:
 
