@@ -136,7 +136,6 @@ those molecules can also be stored and retrieved from the database.
 Molecular Database Visualization
 ................................
 
-
 .. image:: https://i.imgur.com/8MCBUGZ.png
 
 :mod:`.stk` has a sibling project called `stk-vis`_, which is a
