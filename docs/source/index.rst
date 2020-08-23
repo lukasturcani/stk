@@ -200,8 +200,12 @@ defining, usually, a single method.
 Future Releases
 ---------------
 
-:mod:`.stk` is under active development. Important features in the
-future will include:
+:mod:`.stk` is under active development. You can get alerted
+when a new release comes out by going to the GitHub page and
+click on the ``watch`` button in the top right corner. Then select
+``Releases only`` from the dropdown menu.
+
+Important features in the future will include:
 
 
 Distributed Evolutionary Algorithms
