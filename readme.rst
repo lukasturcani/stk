@@ -29,6 +29,10 @@ Make sure you also install rdkit, which is a dependency::
 
     $ conda install -c rdkit rdkit
 
+If you would like to get updated when a new release of ``stk`` comes
+out, which happens pretty regularly, click on the ``watch`` button on
+the top right corner of the GitHub page. Then select ``Releases only``
+from the dropdown menu.
 
 How To Cite
 ===========
