@@ -1,6 +1,6 @@
 :author: Lukas Turcani
 :Documentation: https://stk.readthedocs.io
-:Latest pip Release: 2020.07.29.0
+:Latest pip Release: 2020.08.23.0
 
 .. figure:: docs/source/figures/stk.png
 
