@@ -206,7 +206,7 @@ Documentation for installing, and making sure your local MongoDB is
 working properly, can be found here__. Trust me, this is easy to do
 and worth it.
 
-__ https://api.mongodb.com/python/current/
+__ https://docs.mongodb.com/manual/installation/
 
 You can also use a remote MongoDB, in which case you do not have to
 install it locally, but you will still need to install

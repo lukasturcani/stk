@@ -28,15 +28,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     Examples
     --------
-    Before using this class, make sure you have :mod:`pymongo` and
-    that its working properly. I recommend reading at least the
-    introductory and installation
-    documentation of :mod:`pymongo` before using this class. Those
-    docs can be found here__.
-
-    __ https://api.mongodb.com/python/current/
-
-    *Usage*
+    *Storing and Retrieving Constructed Molecules*
 
     You want to store and retrieve a :class:`.ConstructedMolecule`
     from the database
@@ -81,12 +73,16 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     ordering, which allows position matrices to be used across
     different atom id orderings.
 
+    *Iterating over All Entries in the Database*
+
     All entries in a database can be iterated over very simply
 
     .. code-block:: python
 
         for entry in db.get_all():
             # Do something to entry.
+
+    *Using Alternative Keys for Retrieving Molecules*
 
     By default, the only molecular key the database stores, is the
     InChIKey. However, additional keys can be added to the JSON stored
