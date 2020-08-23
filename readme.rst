@@ -38,7 +38,9 @@ You can see the latest releases here:
     https://github.com/lukasturcani/stk/releases
 
 There will be a corresponding release on ``pip`` for each release
-on GitHub.
+on GitHub, and you can update your ``stk`` with::
+
+    $ pip install stk --upgrade
 
 How To Cite
 ===========
