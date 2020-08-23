@@ -370,16 +370,6 @@ class MoleculeMongoDb(MoleculeDatabase):
                 yield key, value
 
     def get_all(self):
-        """
-        Get all molecules in the database.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            All `molecule` instances in database.
-
-        """
-
         for entry in self._position_matrices.find():
             # Do 'or' query over all key value pairs.
             query = {'$or': [

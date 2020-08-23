@@ -554,16 +554,6 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 yield key, value
 
     def get_all(self):
-        """
-        Get all molecules in the database.
-
-        Yields
-        ------
-        :class:`.Molecule`
-            All molecule in the database.
-
-        """
-
         for entry in self._constructed_molecules.find():
             # Do 'or' query over all key value pairs.
             query = {'$or': [
