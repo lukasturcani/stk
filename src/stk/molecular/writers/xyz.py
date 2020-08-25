@@ -1,5 +1,5 @@
 """
-Xyz Writer
+XYZ Writer
 ==========
 
 """
