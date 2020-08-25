@@ -32,7 +32,7 @@ class PeriodicKagome(Cof):
         num_processes=1,
     ):
         """
-        Initialize a :class:`.Cof` instance.
+        Initialize a :class:`.PeriodicKagome` instance.
 
         Parameters
         ----------
@@ -111,7 +111,7 @@ class PeriodicKagome(Cof):
         Returns
         -------
         :class:`.PeriodicInfo`
-            Class containing periodic information of cell.
+            Periodic cell information.
 
         """
 

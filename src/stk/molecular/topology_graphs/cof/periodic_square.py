@@ -32,7 +32,7 @@ class PeriodicSquare(Cof):
         num_processes=1,
     ):
         """
-        Initialize a :class:`.Cof` instance.
+        Initialize a :class:`.PeriodicSquare` instance.
 
         Parameters
         ----------
@@ -111,7 +111,7 @@ class PeriodicSquare(Cof):
         Returns
         -------
         :class:`.PeriodicInfo`
-            Class containing periodic information of cell.
+            Periodic cell information.
 
         """
 

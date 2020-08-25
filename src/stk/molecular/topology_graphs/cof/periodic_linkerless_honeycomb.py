@@ -32,7 +32,7 @@ class PeriodicLinkerlessHoneycomb(Cof):
         num_processes=1,
     ):
         """
-        Initialize a :class:`.Cof` instance.
+        Initialize a :class:`.PeriodicLinkerlessHoneycomb` instance.
 
         Parameters
         ----------
@@ -111,7 +111,7 @@ class PeriodicLinkerlessHoneycomb(Cof):
         Returns
         -------
         :class:`.PeriodicInfo`
-            Class containing periodic information of cell.
+            Periodic cell information.
 
         """
 
