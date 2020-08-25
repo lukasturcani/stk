@@ -1,6 +1,5 @@
 :author: Lukas Turcani
 :Documentation: https://stk.readthedocs.io
-:Latest pip Release: 2020.07.29.0
 
 .. figure:: docs/source/figures/stk.png
 
@@ -28,6 +27,31 @@ To get ``stk``, you can install it with pip::
 Make sure you also install rdkit, which is a dependency::
 
     $ conda install -c rdkit rdkit
+
+If you would like to get updated when a new release of ``stk`` comes
+out, which happens pretty regularly, click on the ``watch`` button on
+the top right corner of the GitHub page. Then select ``Releases only``
+from the dropdown menu.
+
+You can see the latest releases here:
+
+    https://github.com/lukasturcani/stk/releases
+
+There will be a corresponding release on ``pip`` for each release
+on GitHub, and you can update your ``stk`` with::
+
+    $ pip install stk --upgrade
+
+How To Cite
+===========
+
+If you use ``stk`` please cite
+
+    https://github.com/lukasturcani/stk
+
+and
+
+    https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
 
 
 Publications

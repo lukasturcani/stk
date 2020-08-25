@@ -43,8 +43,6 @@ class FitnessFunction(FitnessCalculator):
     .. code-block:: python
 
         import stk
-        # pymongo does not come with stk, you have to install it
-        # separately with "pip install pymongo"
         import pymongo
 
         # Create a database which stores the fitness value of each
@@ -93,9 +91,6 @@ class FitnessFunction(FitnessCalculator):
     .. code-block:: python
 
         import stk
-
-        # pymongo does not come with stk, you have to install it
-        # separately with "pip install pymongo"
         import pymongo
 
         # You can use the same database for both the input_database
