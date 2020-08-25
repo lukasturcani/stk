@@ -95,33 +95,137 @@ class PeriodicInfo:
         return clone
 
     def get_x_vector(self):
+        """
+        Get x vector.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Cell lattice vector of shape (3, ) in x direction in
+            Angstrom.
+
+        """
+
         return self._x_vector
 
     def get_y_vector(self):
+        """
+        Get y vector.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Cell lattice vector of shape (3, ) in y direction in
+            Angstrom.
+
+        """
+
         return self._y_vector
 
     def get_z_vector(self):
+        """
+        Get z vector.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Cell lattice vector of shape (3, ) in z direction in
+            Angstrom.
+
+        """
+
         return self._z_vector
 
     def get_cell_matrix(self):
+        """
+        Get cell matrix.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`numpy.ndarray`
+            Tuple of length three containing x, y and z direction
+            lattice vector of shape (3, ) in Angstrom.
+
+        """
+
         return self._cell_matrix
 
     def get_a(self):
+        """
+        Get *a* length.
+
+        Returns
+        -------
+        :class:`float`
+            Length of cell along *a* direction in Angstrom.
+
+        """
+
         return self._a
 
     def get_b(self):
+        """
+        Get *b* length.
+
+        Returns
+        -------
+        :class:`float`
+            Length of cell along *b* direction in Angstrom.
+
+        """
+
         return self._b
 
     def get_c(self):
+        """
+        Get *c* length.
+
+        Returns
+        -------
+        :class:`float`
+            Length of cell along *c* direction in Angstrom.
+
+        """
+
         return self._c
 
     def get_alpha(self):
+        """
+        Get *alpha* angle.
+
+        Returns
+        -------
+        :class:`float`
+            *Alpha* angle of cell in degrees.
+
+        """
+
         return self._alpha
 
     def get_beta(self):
+        """
+        Get *beta* angle.
+
+        Returns
+        -------
+        :class:`float`
+            *Beta* angle of cell in degrees.
+
+        """
+
         return self._beta
 
     def get_gamma(self):
+        """
+        Get *gamma* angle.
+
+        Returns
+        -------
+        :class:`float`
+            *Gamma* angle of cell in degrees.
+
+        """
+
         return self._gamma
 
     def __str__(self):
