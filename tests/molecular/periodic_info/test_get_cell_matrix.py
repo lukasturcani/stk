@@ -16,14 +16,13 @@ def test_get_cell_matrix(periodic_case):
 
     """
 
-    assert np.all(np.array([
-        np.allclose(i, j, atol=1e-6)
-        for i, j in zip(
-            (
-                periodic_case.x_vector,
-                periodic_case.y_vector,
-                periodic_case.z_vector
-            ),
-            periodic_case.periodic_info.get_cell_matrix(),
-        )
-    ]))
+    test = np.array((
+        periodic_case.x_vector,
+        periodic_case.y_vector,
+        periodic_case.z_vector,
+    ))
+    original = np.array(
+        periodic_case.periodic_info.get_cell_matrix()
+    )
+
+    assert np.all(np.allclose(test, original, atol=1e-6))
