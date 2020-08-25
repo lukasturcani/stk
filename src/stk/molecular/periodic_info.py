@@ -96,12 +96,12 @@ class PeriodicInfo:
 
     def get_x_vector(self):
         """
-        Get x vector.
+        Get *x* vector.
 
         Returns
         -------
         :class:`numpy.ndarray`
-            Cell lattice vector of shape (3, ) in x direction in
+            Cell lattice vector of shape (3, ) in *x* direction in
             Angstrom.
 
         """
@@ -110,12 +110,12 @@ class PeriodicInfo:
 
     def get_y_vector(self):
         """
-        Get y vector.
+        Get *y* vector.
 
         Returns
         -------
         :class:`numpy.ndarray`
-            Cell lattice vector of shape (3, ) in y direction in
+            Cell lattice vector of shape (3, ) in *y* direction in
             Angstrom.
 
         """
@@ -124,12 +124,12 @@ class PeriodicInfo:
 
     def get_z_vector(self):
         """
-        Get z vector.
+        Get *z* vector.
 
         Returns
         -------
         :class:`numpy.ndarray`
-            Cell lattice vector of shape (3, ) in z direction in
+            Cell lattice vector of shape (3, ) in *z* direction in
             Angstrom.
 
         """
@@ -143,7 +143,7 @@ class PeriodicInfo:
         Returns
         -------
         :class:`tuple` of :class:`numpy.ndarray`
-            Tuple of length three containing x, y and z direction
+            Tuple of length three containing *x*, *y* and *z* direction
             lattice vector of shape (3, ) in Angstrom.
 
         """
