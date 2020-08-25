@@ -8,7 +8,7 @@ Class holding periodic cell information.
 
 import logging
 import numpy as np
-from ..utilities import abs_cap
+from ..utilities import cap_absolute_value
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +63,12 @@ class PeriodicInfo:
         for i in range(3):
             j = (i + 1) % 3
             k = (i + 2) % 3
-            angles[i] = abs_cap(
-                np.dot(self._cell_matrix[j], self._cell_matrix[k])
-                / (lengths[j] * lengths[k])
+            angles[i] = cap_absolute_value(
+                value=(
+                    np.dot(
+                        self._cell_matrix[j], self._cell_matrix[k]
+                    ) / (lengths[j] * lengths[k])
+                ),
             )
         angles = np.arccos(angles) * 180.0 / np.pi
 

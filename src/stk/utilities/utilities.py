@@ -774,9 +774,9 @@ def get_plane_normal(points):
     return np.linalg.svd(points - centroid)[-1][2, :]
 
 
-def abs_cap(val, max_abs_val=1):
+def cap_absolute_value(value, max_absolute_value=1):
     """
-    Returns the value with its absolute value capped at max_abs_val.
+    Returns `value` with absolute value capped at `max_absolute_value`.
 
     Particularly useful in passing values to trignometric functions
     where numerical errors may result in an argument > 1 being passed
@@ -784,10 +784,24 @@ def abs_cap(val, max_abs_val=1):
 
     This code is modified from the pymatgen source code [1]_.
 
+    Parameters
+    ----------
+    value : :class:`float`
+        Value to cap.
+
+    max_absolute_value : :class:`float`, optional
+        Absolute value to cap `value` at.
+        Defaults to 1.
+
+    Returns
+    -------
+    :class:`float`
+        `value` capped at `max_absolute_value` with sign preserved.
+
     References
     ----------
     .. [1] https://pymatgen.org/pymatgen.util.num.html
 
     """
 
-    return max(min(val, max_abs_val), -max_abs_val)
+    return max(min(value, max_absolute_value), -max_absolute_value)
