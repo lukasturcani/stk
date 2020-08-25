@@ -17,7 +17,7 @@ def test_get_cell_matrix(periodic_case):
     """
 
     assert np.all(np.array([
-        np.allclose(i, j, atol=1e-4)
+        np.allclose(i, j, atol=1e-6)
         for i, j in zip(
             (
                 periodic_case.x_vector,

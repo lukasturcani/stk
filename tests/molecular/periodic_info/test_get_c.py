@@ -19,5 +19,5 @@ def test_get_c(periodic_case):
     assert np.isclose(
         periodic_case.c,
         periodic_case.periodic_info.get_c(),
-        atol=1e-4
+        atol=1e-6,
     )

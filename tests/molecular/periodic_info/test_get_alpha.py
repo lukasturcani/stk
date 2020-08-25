@@ -19,5 +19,5 @@ def test_get_alpha(periodic_case):
     assert np.isclose(
         periodic_case.alpha,
         periodic_case.periodic_info.get_alpha(),
-        atol=1e-4
+        atol=1e-6,
     )

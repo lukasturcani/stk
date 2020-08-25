@@ -18,10 +18,9 @@ def test_clone(periodic_case):
 
     clone = periodic_case.periodic_info.clone()
 
-    assert np.all(np.array([
-        np.allclose(i, j, atol=1e-4)
-        for i, j in zip(
-            clone.get_cell_matrix(),
-            periodic_case.periodic_info.get_cell_matrix()
-        )
-    ]))
+    test = np.array(clone.get_cell_matrix())
+    original = np.array(
+        periodic_case.periodic_info.get_cell_matrix()
+    )
+
+    assert np.all(np.equal(test, original))
