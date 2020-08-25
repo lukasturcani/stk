@@ -1,6 +1,6 @@
 """
-MolWriter
-=========
+Mol Writer
+==========
 
 """
 
@@ -12,8 +12,6 @@ class MolWriter:
     Examples
     --------
     *Writing to a File*
-
-    This writer can write to a file for visualisation
 
     .. code-block:: python
 

@@ -1,6 +1,6 @@
 """
-TurbomoleWriter
-===============
+Turbomole Writer
+================
 
 """
 
@@ -11,9 +11,9 @@ class TurbomoleWriter:
 
     Examples
     --------
-    *Writing to a File with Unit Cell*
+    *Writing to a File with a Unit Cell*
 
-    This writer can write to a file for visualisation with the unit
+    This writer can write to a file with the unit
     cell included for periodic molecules. Note that this always assumes
     P1 space group.
 
