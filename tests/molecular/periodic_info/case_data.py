@@ -60,12 +60,35 @@ class CaseData:
         periodic_info : :class:`.PeriodicInfo`
             The information to test.
 
-        cell : :class:`tuple` of :class:`np.array` or :class:`NoneType`
-            Tuple of cell lattice vectors (shape: (3,)) in Angstrom.
-            `None` if topology graph is not periodic.
+        x_vector : :class:`numpy.ndarray`
+            Cell lattice vector of shape (3, ) in x direction in
+            Angstrom.
 
-        lengths_and_angles : :class:`tuple` of :class:`float`
-            Lengths and angles that define cell matrix,
+        y_vector : :class:`numpy.ndarray`
+            Cell lattice vector of shape (3, ) in y direction in
+            Angstrom.
+
+        z_vector : :class:`numpy.ndarray`
+            Cell lattice vector of shape (3, ) in z direction in
+            Angstrom.
+
+        a : :class:`float`
+            Length in a direction of cell matrix.
+
+        b : :class:`float`
+            Length in b direction of cell matrix.
+
+        c : :class:`float`
+            Length in c direction of cell matrix.
+
+        alpha : :class:`float`
+            Alpha angle of cell matrix.
+
+        beta : :class:`float`
+            Beta angle of cell matrix.
+
+        gamma : :class:`float`
+            Gamma angle of cell matrix.
 
         """
 
