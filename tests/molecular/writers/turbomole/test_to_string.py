@@ -1,14 +1,11 @@
-def test_write(case_data, tmp_path):
+def test_to_string(case_data):
     """
-    Test writing of molecule to a file.
+    Test writing of molecule to a string.
 
     Parameters
     ----------
     case_data : :class:`.CaseData`
         A test case.
-
-    tmp_path : :class:`pathlib2.Path`
-        Path to temporary directory.
 
     Returns
     -------
@@ -16,31 +13,24 @@ def test_write(case_data, tmp_path):
 
     """
 
-    _test_write(
+    _test_to_string(
         molecule=case_data.molecule,
         writer=case_data.writer,
         string=case_data.string,
         periodic_info=case_data.periodic_info,
-        file_path=tmp_path/'tmp.pdb',
     )
 
 
-def _test_write(
-    molecule,
-    writer,
-    string,
-    file_path,
-    periodic_info=None,
-):
+def _test_to_string(molecule, writer, string, periodic_info=None):
     """
-    Test that the written file content matches expected string.
+    Test that the written string matches expected string.
 
     Parameters
     ----------
     molecule : :class:`.Molecule`
         Molecule to test.
 
-    writer : :class:`.PdbWriter`
+    writer : :class:`.TurbomoleWriter`
         The writer to test.
 
     string : :class:`str`
@@ -49,22 +39,15 @@ def _test_write(
     periodic_info : :class:`.PeriodicInfo`
         Periodic information.
 
-    file_path : :class:`str`
-        Path to temporary file.
-
     Returns
     -------
     None : :class:`NoneType`
 
     """
 
-    writer.write(
+    test_string = writer.to_string(
         molecule=molecule,
-        path=file_path,
         periodic_info=periodic_info,
     )
 
-    with open(file_path, 'r') as f:
-        content = f.read()
-
-    assert content == string
+    assert test_string == string

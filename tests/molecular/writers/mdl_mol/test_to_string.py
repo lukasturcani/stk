@@ -1,14 +1,11 @@
-def test_write(case_data, tmp_path):
+def test_to_string(case_data):
     """
-    Test writing of molecule to a file.
+    Test writing of molecule to a string.
 
     Parameters
     ----------
     case_data : :class:`.CaseData`
         A test case.
-
-    tmp_path : :class:`pathlib2.Path`
-        Path to temporary directory.
 
     Returns
     -------
@@ -16,17 +13,16 @@ def test_write(case_data, tmp_path):
 
     """
 
-    _test_write(
+    _test_to_string(
         molecule=case_data.molecule,
         writer=case_data.writer,
         string=case_data.string,
-        file_path=tmp_path/'tmp.mol',
     )
 
 
-def _test_write(molecule, writer, string, file_path):
+def _test_to_string(molecule, writer, string):
     """
-    Test that the written file content matches expected string.
+    Test that the written string matches expected string.
 
     Parameters
     ----------
@@ -39,18 +35,12 @@ def _test_write(molecule, writer, string, file_path):
     string : :class:`str`
         The expected output string.
 
-    file_path : :class:`str`
-        Path to temporary file.
-
     Returns
     -------
     None : :class:`NoneType`
 
     """
 
-    writer.write(molecule, file_path)
+    test_string = writer.to_string(molecule)
 
-    with open(file_path, 'r') as f:
-        content = f.read()
-
-    assert content == string
+    assert test_string == string
