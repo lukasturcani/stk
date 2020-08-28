@@ -24,16 +24,16 @@ def test_clone(periodic_case):
         np.array(original.get_cell_matrix()),
     ))
     assert np.all(np.equal(
-        clone.get_x_vector(),
-        original.get_x_vector(),
+        clone.get_vector_1(),
+        original.get_vector_1(),
     ))
     assert np.all(np.equal(
-        clone.get_y_vector(),
-        original.get_y_vector(),
+        clone.get_vector_2(),
+        original.get_vector_2(),
     ))
     assert np.all(np.equal(
-        clone.get_z_vector(),
-        original.get_z_vector(),
+        clone.get_vector_3(),
+        original.get_vector_3(),
     ))
     assert clone.get_a() == original.get_a()
     assert clone.get_b() == original.get_b()

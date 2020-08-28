@@ -7,15 +7,15 @@ class CaseData:
     periodic_info : :class:`.PeriodicInfo`
         The information to test.
 
-    x_vector : :class:`numpy.ndarray`
+    vector_1 : :class:`numpy.ndarray`
         Cell lattice vector of shape (3, ) in x direction in
         Angstrom.
 
-    y_vector : :class:`numpy.ndarray`
+    vector_2 : :class:`numpy.ndarray`
         Cell lattice vector of shape (3, ) in y direction in
         Angstrom.
 
-    z_vector : :class:`numpy.ndarray`
+    vector_3 : :class:`numpy.ndarray`
         Cell lattice vector of shape (3, ) in z direction in
         Angstrom.
 
@@ -42,9 +42,9 @@ class CaseData:
     def __init__(
         self,
         periodic_info,
-        x_vector,
-        y_vector,
-        z_vector,
+        vector_1,
+        vector_2,
+        vector_3,
         a,
         b,
         c,
@@ -60,15 +60,15 @@ class CaseData:
         periodic_info : :class:`.PeriodicInfo`
             The information to test.
 
-        x_vector : :class:`numpy.ndarray`
+        vector_1 : :class:`numpy.ndarray`
             Cell lattice vector of shape (3, ) in x direction in
             Angstrom.
 
-        y_vector : :class:`numpy.ndarray`
+        vector_2 : :class:`numpy.ndarray`
             Cell lattice vector of shape (3, ) in y direction in
             Angstrom.
 
-        z_vector : :class:`numpy.ndarray`
+        vector_3 : :class:`numpy.ndarray`
             Cell lattice vector of shape (3, ) in z direction in
             Angstrom.
 
@@ -93,9 +93,9 @@ class CaseData:
         """
 
         self.periodic_info = periodic_info
-        self.x_vector = x_vector
-        self.y_vector = y_vector
-        self.z_vector = z_vector
+        self.vector_1 = vector_1
+        self.vector_2 = vector_2
+        self.vector_3 = vector_3
         self.a = a
         self.b = b
         self.c = c

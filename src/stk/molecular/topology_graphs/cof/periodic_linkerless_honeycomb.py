@@ -118,13 +118,13 @@ class PeriodicLinkerlessHoneycomb(Cof):
         lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
-            x_vector=(
+            vector_1=(
                 lattice_constants[0]*self._lattice_size[0]*self._scale
             ),
-            y_vector=(
+            vector_2=(
                 lattice_constants[1]*self._lattice_size[1]*self._scale
             ),
-            z_vector=(
+            vector_3=(
                 lattice_constants[2]*self._lattice_size[2]*self._scale
             ),
         )
