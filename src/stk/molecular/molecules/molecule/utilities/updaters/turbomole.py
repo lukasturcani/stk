@@ -1,3 +1,4 @@
+import numpy as np
 from stk.utilities import periodic_table
 
 
@@ -95,4 +96,5 @@ def _with_structure_from_turbomole(self, path):
         )
 
     # Update the structure.
+    new_coords = np.array(new_coords)
     return self._with_position_matrix(new_coords)
