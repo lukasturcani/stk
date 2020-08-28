@@ -17,9 +17,9 @@ def test_get_cell_matrix(periodic_case):
     """
 
     test = np.array((
-        periodic_case.x_vector,
-        periodic_case.y_vector,
-        periodic_case.z_vector,
+        periodic_case.vector_1,
+        periodic_case.vector_2,
+        periodic_case.vector_3,
     ))
     original = np.array(
         periodic_case.periodic_info.get_cell_matrix()

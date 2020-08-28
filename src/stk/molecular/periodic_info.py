@@ -19,7 +19,7 @@ class PeriodicInfo:
 
     """
 
-    def __init__(self, x_vector, y_vector, z_vector):
+    def __init__(self, vector_1, vector_2, vector_3):
         """
         Initialize a :class:`.PeriodicInfo` instance.
 
@@ -29,27 +29,24 @@ class PeriodicInfo:
 
         Parameters
         ----------
-        x_vector : :class:`numpy.ndarray`
-            Cell lattice vector of shape (3, ) in x direction in
-            Angstrom.
+        vector_1 : :class:`numpy.ndarray`
+            First cell lattice vector of shape (3, ) in Angstrom.
 
-        y_vector : :class:`numpy.ndarray`
-            Cell lattice vector of shape (3, ) in y direction in
-            Angstrom.
+        vector_2 : :class:`numpy.ndarray`
+            Second cell lattice vector of shape (3, ) in Angstrom.
 
-        z_vector : :class:`numpy.ndarray`
-            Cell lattice vector of shape (3, ) in z direction in
-            Angstrom.
+        vector_3 : :class:`numpy.ndarray`
+            Third cell lattice vector of shape (3, ) in Angstrom.
 
         References
         ----------
         .. [1] https://pymatgen.org/_modules/pymatgen/core/lattice.html
 
         """
-        self._x_vector = x_vector
-        self._y_vector = y_vector
-        self._z_vector = z_vector
-        self._cell_matrix = (x_vector, y_vector, z_vector)
+        self._vector_1 = vector_1
+        self._vector_2 = vector_2
+        self._vector_3 = vector_3
+        self._cell_matrix = (vector_1, vector_2, vector_3)
 
         a, b, c = tuple(
             np.sqrt(np.sum(i ** 2)).tolist() for i in self._cell_matrix
@@ -91,13 +88,13 @@ class PeriodicInfo:
         clone = self.__class__.__new__(self.__class__)
         PeriodicInfo.__init__(
             self=clone,
-            x_vector=self._x_vector,
-            y_vector=self._y_vector,
-            z_vector=self._z_vector,
+            vector_1=self._vector_1,
+            vector_2=self._vector_2,
+            vector_3=self._vector_3,
         )
         return clone
 
-    def get_x_vector(self):
+    def get_vector_1(self):
         """
         Get *x* vector.
 
@@ -109,9 +106,9 @@ class PeriodicInfo:
 
         """
 
-        return self._x_vector
+        return self._vector_1
 
-    def get_y_vector(self):
+    def get_vector_2(self):
         """
         Get *y* vector.
 
@@ -123,9 +120,9 @@ class PeriodicInfo:
 
         """
 
-        return self._y_vector
+        return self._vector_2
 
-    def get_z_vector(self):
+    def get_vector_3(self):
         """
         Get *z* vector.
 
@@ -137,7 +134,7 @@ class PeriodicInfo:
 
         """
 
-        return self._z_vector
+        return self._vector_3
 
     def get_cell_matrix(self):
         """
