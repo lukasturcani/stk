@@ -186,7 +186,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         mongo_client,
         database='stk',
         molecule_collection='molecules',
-        position_matrix_collection='position_matrices',
+        position_matrix_collection=None,
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
         lru_cache_size='',
@@ -212,7 +212,8 @@ class MoleculeMongoDb(MoleculeDatabase):
         position_matrix_collection : :class:`str`
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
-            the cache.
+            the cache. When ``None``, defaults to
+            'building_block_position_matrices`.
 
         jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -250,6 +251,26 @@ class MoleculeMongoDb(MoleculeDatabase):
             created, in order to minimize lookup time.
 
         """
+
+        if position_matrix_collection is None:
+            position_matrix_collection = (
+                'building_block_position_matrices'
+            )
+            warnings.warn(
+                "The default value of the position_matrix_collection "
+                "parameter in MoleculeMongoDb has changed from "
+                "'position_matrices' "
+                "to 'building_block_position_matrices'! To remove "
+                "this warning, set the position_matrix_collection "
+                "parameter explicitly. You can still use the default "
+                "value, for example, position_matrix_collection='"
+                "building_block_position_matrices' will remove the "
+                "warning but use the default value. "
+                "This warning will be removed "
+                "in any version of stk released on, or after, "
+                "1/03/21.",
+                UserWarning,
+            )
 
         if lru_cache_size != '':
             warnings.warn(
