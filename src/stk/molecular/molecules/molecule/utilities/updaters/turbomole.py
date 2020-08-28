@@ -53,7 +53,6 @@ def _with_structure_from_turbomole(self, path):
                 coord_units = 'bohr'
             else:
                 coord_units = 'bohr'
-            coord_section = []
             coord_section = (
                 content[line_number+1:line_number+1+num_atoms]
             )
