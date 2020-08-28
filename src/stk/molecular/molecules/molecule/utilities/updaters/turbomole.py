@@ -6,7 +6,9 @@ def _with_structure_from_turbomole(self, path):
     """
     Return a clone, with its structure taken from a Turbomole file.
 
-    Note that coordinates in ``.coord`` files are given in Bohr.
+    Note that coordinates in ``.coord`` files can be given in Bohr or
+    Angstrom, which is handled. Fractional coordinates are not
+    currently handled.
 
     Parameters
     ----------
@@ -26,7 +28,7 @@ def _with_structure_from_turbomole(self, path):
         number of atoms in the molecule or if atom elements in the
         file do not agree with the atom elements in the molecule.
 
-    :class:`NotImplementedError`
+    :class:`RuntimeError`
         If the the Turbomole file has coordinates defined as fractional
         based on a unit cell.
 
@@ -34,36 +36,27 @@ def _with_structure_from_turbomole(self, path):
 
     bohr_to_ang = 0.5291772105638411
 
+    num_atoms = len(self._atoms)
     with open(path, 'r') as f:
         content = f.readlines()
 
-    for i, cont in enumerate(content):
-        if '$coord' in cont:
-            if 'angs' in cont:
+    for line_number, line in enumerate(content):
+        if '$coord' in line:
+            if 'angs' in line:
                 coord_units = 'angstrom'
-            elif 'frac' in cont:
+            elif 'frac' in line:
                 coord_units = 'fractional'
-                raise NotImplementedError(
+                raise RuntimeError(
                     'Fractional coordinates are not handled currently.'
                 )
-            elif 'bohr' in cont:
+            elif 'bohr' in line:
                 coord_units = 'bohr'
             else:
                 coord_units = 'bohr'
             coord_section = []
-            for j in content[i+1:]:
-                if '$' in j:
-                    break
-                coord_section.append(j)
-
-    # Check the atom count is correct.
-    num_atoms = len(self._atoms)
-    if len(coord_section) != num_atoms:
-        raise RuntimeError(
-            'The number of atoms in the coord file, '
-            f'{len(content)}, does not match the number of atoms '
-            f'in the molecule, {num_atoms}.'
-        )
+            coord_section = (
+                content[line_number+1:line_number+1+num_atoms]
+            )
 
     # Save all the coords in the file.
     new_coords = []
@@ -80,7 +73,7 @@ def _with_structure_from_turbomole(self, path):
         if coord_units == 'bohr':
             new_coords.append([float(i)*bohr_to_ang for i in coords])
         elif coord_units == 'fractional':
-            raise NotImplementedError(
+            raise RuntimeError(
                 'Fractional coordinates are not handled currently.'
             )
         else:
