@@ -40,6 +40,7 @@ def _with_structure_from_turbomole(self, path):
     with open(path, 'r') as f:
         content = f.readlines()
 
+    coord_units = 'bohr'
     for line_number, line in enumerate(content):
         if '$coord' in line:
             if 'angs' in line:
@@ -51,8 +52,7 @@ def _with_structure_from_turbomole(self, path):
                 )
             elif 'bohr' in line:
                 coord_units = 'bohr'
-            else:
-                coord_units = 'bohr'
+
             coord_section = (
                 content[line_number+1:line_number+1+num_atoms]
             )
