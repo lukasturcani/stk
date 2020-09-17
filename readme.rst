@@ -26,7 +26,7 @@ To get ``stk``, you can install it with pip::
 
 Make sure you also install rdkit, which is a dependency::
 
-    $ conda install -c rdkit rdkit
+    $ conda install -c rdkit rdkit=2020
 
 If you would like to get updated when a new release of ``stk`` comes
 out, which happens pretty regularly, click on the ``watch`` button on
