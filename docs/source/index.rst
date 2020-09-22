@@ -159,6 +159,7 @@ Features of `stk-vis`_ include
 * You can list the building blocks of any constructed molecules.
   If those building blocks are also constructed molecules, you can
   list their building blocks as well, and so on.
+* Writing molecules to files.
 
 You read more about `stk-vis`_ here:
 
