@@ -19,3 +19,23 @@ services: mongodb
 
 script:
     - pytest
+
+
+jobs:
+    include:
+        - name: pytest
+          script:
+            - pytest
+
+        - name: basic-ea
+          before_script:
+            - git clone https://github.com/lukasturcani/basic_ea --depth 1
+          script:
+            - python basic_ea/basic_ea.py
+
+        - name: intermediate-ea
+          before_script:
+            - git clone http://github.com/lukasturcani/intermediate_ea --depth 1
+          script:
+            - python intermediate_ea/intermediate_ea.py
+
