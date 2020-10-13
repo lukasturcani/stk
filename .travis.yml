@@ -14,8 +14,26 @@ install:
     - conda info -a
     - conda env create -f ./tests/environment.yml
     - conda activate stk_test
+    - git clone https://github.com/lukasturcani/basic_ea --depth 1
+    - git clone http://github.com/lukasturcani/intermediate_ea --depth 1
 
 services: mongodb
 
 script:
     - pytest
+
+
+jobs:
+    include:
+        - name: pytest
+          script:
+            - pytest
+
+        - name: basic-ea
+          script:
+            - python basic_ea/basic_ea.py
+
+        - name: intermediate-ea
+          script:
+            - python intermediate_ea/intermediate_ea.py
+
