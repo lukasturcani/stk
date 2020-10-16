@@ -18,6 +18,16 @@ from .case_data import CaseData
 
         CaseData(
             molecule=stk.BuildingBlock('NCCN'),
+            path='NCCN.pdb',
+        ),
+
+        CaseData(
+            molecule=stk.BuildingBlock('NCCN'),
+            path='NCCN_with_cell.pdb',
+        ),
+
+        CaseData(
+            molecule=stk.BuildingBlock('NCCN'),
             path='NCCN.mol',
         ),
 
