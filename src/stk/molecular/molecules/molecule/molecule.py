@@ -868,7 +868,4 @@ class Molecule:
         return repr(self)
 
     def __repr__(self):
-        return (
-            f'{self.__class__.__name__}({self._atoms!r}, '
-            f'{self._bonds!r}, {self._position_matrix!r})'
-        )
+        return f'<{self.__class__.__name__} at {id(self)}>'

@@ -86,7 +86,7 @@ To get :mod:`.stk`, you can install it with pip::
 
 Make sure you also install :mod:`rdkit`, which is a dependency::
 
-    $ conda install -c rdkit rdkit
+    $ conda install -c rdkit rdkit=2020
 
 
 Overview
@@ -159,6 +159,7 @@ Features of `stk-vis`_ include
 * You can list the building blocks of any constructed molecules.
   If those building blocks are also constructed molecules, you can
   list their building blocks as well, and so on.
+* Writing molecules to files.
 
 You read more about `stk-vis`_ here:
 
