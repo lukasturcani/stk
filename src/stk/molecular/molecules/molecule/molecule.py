@@ -749,6 +749,7 @@ class Molecule:
         #. ``.xyz`` - XYZ files
         #. ``.mae`` - Schrodinger Maestro files
         #. ``.coord`` - Turbomole files
+        #. ``.pdb`` - PDB files
 
         Parameters
         ----------
@@ -777,6 +778,7 @@ class Molecule:
             '.mae': updaters._with_structure_from_mae,
             '.xyz': updaters._with_structure_from_xyz,
             '.coord': updaters._with_structure_from_turbomole,
+            '.pdb': updaters._with_structure_from_pdb,
         }[extension](self.clone(), path)
 
     def with_canonical_atom_ordering(self):
