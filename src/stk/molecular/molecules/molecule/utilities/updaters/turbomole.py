@@ -172,7 +172,7 @@ def _get_coord_section(path, num_atoms):
 
 def _with_structure_from_turbomole(self, path):
     """
-    Return a clone, with its structure taken from a Turbomole file.
+    Update the structure with one taken from a Turbomole file.
 
     Note that coordinates in ``.coord`` files can be given in Bohr or
     Angstrom, which is handled. Fractional coordinates are not
@@ -187,7 +187,7 @@ def _with_structure_from_turbomole(self, path):
     Returns
     -------
     :class:`.Molecule`
-        A clone with atomic positions found in `path`.
+        The molecule is returned.
 
     Raises
     ------
