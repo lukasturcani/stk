@@ -749,6 +749,7 @@ class Molecule:
         #. ``.xyz`` - XYZ files
         #. ``.mae`` - Schrodinger Maestro files
         #. ``.coord`` - Turbomole files
+        #. ``.pdb`` - PDB files
 
         Parameters
         ----------
@@ -777,6 +778,7 @@ class Molecule:
             '.mae': updaters._with_structure_from_mae,
             '.xyz': updaters._with_structure_from_xyz,
             '.coord': updaters._with_structure_from_turbomole,
+            '.pdb': updaters._with_structure_from_pdb,
         }[extension](self.clone(), path)
 
     def with_canonical_atom_ordering(self):
@@ -868,7 +870,4 @@ class Molecule:
         return repr(self)
 
     def __repr__(self):
-        return (
-            f'{self.__class__.__name__}({self._atoms!r}, '
-            f'{self._bonds!r}, {self._position_matrix!r})'
-        )
+        return f'<{self.__class__.__name__} at {id(self)}>'
