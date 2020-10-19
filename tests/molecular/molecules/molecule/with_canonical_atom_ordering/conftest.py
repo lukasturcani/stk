@@ -5,7 +5,10 @@ import stk
 from .case_data import CaseData
 
 bb1 = stk.BuildingBlock('[C+2][N+]Br', [stk.BromoFactory()])
+canonical_bb1 = bb1.with_canonical_atom_ordering()
+
 bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
+canonical_bb2 = bb2.with_canonical_atom_ordering()
 
 
 @pytest.fixture(
@@ -65,34 +68,34 @@ bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
                 atom_infos=(
                     stk.AtomInfo(
                         atom=stk.C(0, 2),
-                        building_block=bb1,
+                        building_block=canonical_bb1,
                         building_block_id=0,
                     ),
                     stk.AtomInfo(
                         atom=stk.O(1, 1),
-                        building_block=bb2,
+                        building_block=canonical_bb2,
                         building_block_id=1,
                     ),
                     stk.AtomInfo(
                         atom=stk.N(2, 1),
-                        building_block=bb1,
+                        building_block=canonical_bb1,
                         building_block_id=0,
                     ),
                     stk.AtomInfo(
                         atom=stk.S(3),
-                        building_block=bb2,
+                        building_block=canonical_bb2,
                         building_block_id=1,
                     ),
                 ),
                 bond_infos=(
                     stk.BondInfo(
                         bond=stk.Bond(stk.C(0, 2), stk.N(2, 1), 1),
-                        building_block=bb1,
+                        building_block=canonical_bb1,
                         building_block_id=0,
                     ),
                     stk.BondInfo(
                         bond=stk.Bond(stk.O(1, 1), stk.S(3), 1),
-                        building_block=bb2,
+                        building_block=canonical_bb2,
                         building_block_id=1,
                     ),
                     stk.BondInfo(
@@ -102,8 +105,8 @@ bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
                     ),
                 ),
                 num_building_blocks={
-                    bb1: 1,
-                    bb2: 1,
+                    canonical_bb1: 1,
+                    canonical_bb2: 1,
                 },
             ),
         ),

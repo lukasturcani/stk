@@ -218,6 +218,23 @@ class ConstructedMolecule(Molecule):
         yield from self._bond_infos
 
     def _with_canonical_atom_ordering(self):
+        # Make all building blocks canonically ordered too.
+        building_blocks = {
+            building_block:
+                building_block.with_canonical_atom_ordering()
+
+            for building_block in self._num_building_blocks
+        }
+
+        self._num_building_blocks = {
+            building_block: num
+            for building_block, num
+            in zip(
+                building_blocks.values(),
+                self._num_building_blocks.values()
+            )
+        }
+
         ordering = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
         id_map = {
             new_id: atom.get_id()
@@ -232,18 +249,28 @@ class ConstructedMolecule(Molecule):
 
         def get_atom_info(atom):
             info = old_atom_infos[id_map[atom.get_id()]]
+            building_block = info.get_building_block()
             return AtomInfo(
                 atom=atom,
-                building_block=info.get_building_block(),
+                building_block=(
+                    building_block
+                    if building_block is None
+                    else building_blocks[building_block]
+                ),
                 building_block_id=info.get_building_block_id(),
             )
 
         def get_bond_info(info):
+            building_block = info.get_building_block()
             return BondInfo(
                 bond=sort_bond_atoms_by_id(
                     info.get_bond().with_atoms(atom_map)
                 ),
-                building_block=info.get_building_block(),
+                building_block=(
+                    building_block
+                    if building_block is None
+                    else building_blocks[building_block]
+                ),
                 building_block_id=info.get_building_block_id(),
             )
 

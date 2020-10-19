@@ -25,6 +25,8 @@ setup(
         'pathos',
         'seaborn',
         'numpy',
+        'pymongo',
+        'pymongo[srv]',
     ),
     python_requires='>=3.7',
 )

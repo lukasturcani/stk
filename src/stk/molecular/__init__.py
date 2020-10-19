@@ -5,3 +5,5 @@ from .atoms import *  # noqa
 from .bonds import *  # noqa
 from .reactions import *  # noqa
 from .key_makers import *  # noqa
+from .writers import *  # noqa
+from .periodic_info import *  # noqa
