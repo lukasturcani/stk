@@ -77,6 +77,9 @@ class RandomMutator:
             :class:`.MutationRecord` depends on which mutator was
             used.
 
+        None : :class:`NoneType`
+            If `record` cannot be mutated.
+
         """
 
         mutator = self._generator.choice(
