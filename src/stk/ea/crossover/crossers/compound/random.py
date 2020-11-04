@@ -37,7 +37,7 @@ class RandomCrosser:
 
     def __init__(self, crossers, weights=None, random_seed=None):
         """
-        Initialize a :class:`.RandomMutator` instance.
+        Initialize a :class:`.RandomCrosser` instance.
 
         Parameters
         ----------
