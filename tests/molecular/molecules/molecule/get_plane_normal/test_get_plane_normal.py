@@ -98,9 +98,9 @@ def _test_get_plane_normal(molecule, get_atom_ids, normal):
             position_matrix=molecule.get_position_matrix(),
             atom_ids=(0, 1),
         )
-        assert result @ direction < 1e-6
+        assert result @ direction < 1e-13
         return
 
     result = molecule.get_plane_normal(get_atom_ids(molecule))
     # The normal may be parallel or anti-parallel.
-    assert abs(abs(result @ normal) - 1) < 1e-6
+    assert abs(abs(result @ normal) - 1) < 1e-13
