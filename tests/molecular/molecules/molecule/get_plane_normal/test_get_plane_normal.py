@@ -103,4 +103,4 @@ def _test_get_plane_normal(molecule, get_atom_ids, normal):
 
     result = molecule.get_plane_normal(get_atom_ids(molecule))
     # The normal may be parallel or anti-parallel.
-    assert abs(abs(result @ normal) - 1) < 1e-13
+    assert abs(abs(result @ normal) - 1) < 1e-6
