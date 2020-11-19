@@ -543,12 +543,12 @@ def rotation_matrix(vector1, vector2):
     i = np.identity(3)
     mult_factor = (1-c)/np.square(s)
 
-    rot_mat = i + vx + np.multiply(np.dot(vx, vx), mult_factor)
-    # print(rot_mat @ rot_mat.T)
-    rot_mat = Rotation.from_matrix(rot_mat)
-    rot_mat = rot_mat.as_matrix()
-    # print(rot_mat @ rot_mat.T)
-    return rot_mat
+    # Initialize as a scipy Rotation object, which normalizes the
+    # matrix and allows for returns as quaternion or alternative
+    # type in the future.
+    return Rotation.from_matrix(
+        i + vx + np.multiply(np.dot(vx, vx), mult_factor)
+    ).as_matrix()
 
 
 def rotation_matrix_arbitrary_axis(angle, axis):
@@ -587,14 +587,14 @@ def rotation_matrix_arbitrary_axis(angle, axis):
     e32 = 2*(c*d + a*b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
-    rot_mat = np.array([[e11, e12, e13],
-                     [e21, e22, e23],
-                     [e31, e32, e33]])
-    # print(rot_mat @ rot_mat.T)
-    rot_mat = Rotation.from_matrix(rot_mat)
-    rot_mat = rot_mat.as_matrix()
-    # print(rot_mat @ rot_mat.T)
-    return rot_mat
+    # Initialize as a scipy Rotation object, which normalizes the
+    # matrix and allows for returns as quaternion or alternative
+    # type in the future.
+    return Rotation.from_matrix(np.array([
+        [e11, e12, e13],
+        [e21, e22, e23],
+        [e31, e32, e33]
+    ])).as_matrix()
 
 
 def dice_similarity(mol1, mol2, fp_radius=3):
