@@ -73,10 +73,13 @@ class Implementation:
             )
 
             self._logger.info('Doing mutations.')
-            mutation_records = tuple(map(
-                get_mutation_record,
-                self._mutation_selector.select(population),
-            ))
+            mutation_records = tuple(
+                record for record in map(
+                    get_mutation_record,
+                    self._mutation_selector.select(population),
+                )
+                if record is not None
+            )
 
             self._logger.info('Calculating fitness values.')
 
