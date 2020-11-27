@@ -15,9 +15,23 @@ class TwelvePlusThirty(Cage):
     """
     Represents a icosahedron cage topology graph.
 
+    Nonlinear building blocks with five functional groups are
+    required for this topology.
+
+    Linear building blocks with two functional groups are required for
+    this topology.
+
+    When using a :class:`dict` for initialization, a
+    :class:`.BuildingBlock` needs to be assigned to each of the
+    following numbers:
+
+        | 5-functional group: 0 to 11
+        | 2-functional group: 12 to 41
+
     See :class:`.Cage` for more details and examples.
 
     """
+
     # Vertices of a regular origin-centred icosahedron
     # Source: http://eusebeia.dyndns.org/4d/icosahedron
     _vertex_prototypes = (

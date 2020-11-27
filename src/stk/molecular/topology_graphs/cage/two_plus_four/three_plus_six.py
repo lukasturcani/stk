@@ -15,6 +15,19 @@ class ThreePlusSix(Cage):
     """
     Represents a cage topology graph.
 
+    Nonlinear building blocks with four functional groups are
+    required for this topology.
+
+    Linear building blocks with two functional groups are required for
+    this topology.
+
+    When using a :class:`dict` for initialization, a
+    :class:`.BuildingBlock` needs to be assigned to each of the
+    following numbers:
+
+        | 4-functional group: 0 to 2
+        | 2-functional group: 3 to 8
+
     See :class:`.Cage` for more details and examples.
 
     """

@@ -16,6 +16,13 @@ class SixPlusEight(Cage):
     Building blocks with three and four functional groups are required
     for this topology graph.
 
+    When using a :class:`dict` for initialization, a
+    :class:`.BuildingBlock` needs to be assigned to each of the
+    following numbers:
+
+        | 4-functional group: 0 to 5
+        | 3-functional group: 6 to 13
+
     See :class:`.Cage` for more details and examples.
 
     """

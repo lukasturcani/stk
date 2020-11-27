@@ -16,7 +16,7 @@ class Porphyrin(MetalComplex):
     Metal building blocks with at least four functional groups are
     required for this topology.
 
-    Ligand building blocks with two functional groups are required for
+    Ligand building blocks with one functional group are required for
     this topology graph.
 
     When using a :class:`dict` for initialization, a

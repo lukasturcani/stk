@@ -12,6 +12,8 @@ class Complex(TopologyGraph):
     """
     Represents a host-guest complex topology graph.
 
+    Host and guest building blocks do not require functional groups.
+
     Examples
     --------
     *Construction*

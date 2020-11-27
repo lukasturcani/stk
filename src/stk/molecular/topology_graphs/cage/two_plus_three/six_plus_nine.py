@@ -15,6 +15,19 @@ class SixPlusNine(Cage):
     """
     Represents a cage topology graph.
 
+    Nonlinear building blocks with three functional groups are
+    required for this topology.
+
+    Linear building blocks with two functional groups are required for
+    this topology.
+
+    When using a :class:`dict` for initialization, a
+    :class:`.BuildingBlock` needs to be assigned to each of the
+    following numbers:
+
+        | 3-functional group: 0 to 5
+        | 2-functional group: 5 to 14
+
     See :class:`.Cage` for more details and examples.
 
     """

@@ -13,6 +13,19 @@ class FourPlusSix2(Cage):
     """
     Represents a cage topology graph.
 
+    Nonlinear building blocks with three functional groups are
+    required for this topology.
+
+    Linear building blocks with two functional groups are required for
+    this topology.
+
+    When using a :class:`dict` for initialization, a
+    :class:`.BuildingBlock` needs to be assigned to each of the
+    following numbers:
+
+        | 3-functional group: 0 to 3
+        | 2-functional group: 4 to 9
+
     See :class:`.Cage` for more details and examples.
 
     """
