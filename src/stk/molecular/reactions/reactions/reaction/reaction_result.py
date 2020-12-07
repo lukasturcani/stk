@@ -23,7 +23,7 @@ class ReactionResult:
         new_atoms,
         new_bonds,
         deleted_atoms,
-        deleted_bonds
+        deleted_bonds,
     ):
         """
         Initialize a :class:`.ReactionResult` instance.
