@@ -196,6 +196,8 @@ class Cage(TopologyGraph):
     By changing which edge each vertex is aligned with, a different
     structural isomer of the cage can be formed.
 
+    .. _`multi-building block cage construction`:
+
     *Multi-Building Block Cage Construction*
 
     You can also build cages with multiple building blocks, but,

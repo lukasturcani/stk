@@ -17,14 +17,9 @@ class M3L3Triangle(Cage):
     Represents a cage topology graph.
 
     Both `corner` and `linker` vertices require building blocks with
-    two functional groups for this topology.
-
-    When using a :class:`dict` for initialization, a
-    :class:`.BuildingBlock` needs to be assigned to each of the
-    following numbers:
-
-        | corners: (0, 1, 2)
-        | linkers: (3, 4, 5)
+    two functional groups for this topology. This class replaces the
+    `building_blocks` parameter with the `corner` and `linker`
+    parameters.
 
     See :class:`.Cage` for more details and examples.
 

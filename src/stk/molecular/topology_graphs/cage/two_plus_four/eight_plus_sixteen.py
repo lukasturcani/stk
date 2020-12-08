@@ -21,9 +21,10 @@ class EightPlusSixteen(Cage):
     Linear building blocks with two functional groups are required for
     this topology.
 
-    When using a :class:`dict` for initialization, a
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`multi-building block cage construction`, a
     :class:`.BuildingBlock` needs to be assigned to each of the
-    following numbers:
+    following vertex ids:
 
         | 4-functional group: 0 to 7
         | 2-functional group: 8 to 23
