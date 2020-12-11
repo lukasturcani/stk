@@ -149,6 +149,8 @@ class Cage(TopologyGraph):
     :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
 
+    .. _multi-building-block-cage-construction:
+
     Examples
     --------
     *Subclass Implementation*
@@ -195,8 +197,6 @@ class Cage(TopologyGraph):
 
     By changing which edge each vertex is aligned with, a different
     structural isomer of the cage can be formed.
-
-    .. _`multi-building block cage construction`:
 
     *Multi-Building Block Cage Construction*
 

@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.serialization.json.deserializers.constructed_molecule
    stk.serialization.json.deserializers.molecule

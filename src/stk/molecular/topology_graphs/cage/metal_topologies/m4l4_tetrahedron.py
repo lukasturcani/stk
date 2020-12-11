@@ -19,9 +19,9 @@ class M4L4Tetrahedron(Cage):
     topology.
 
     When using a :class:`dict` for the `building_blocks` parameter,
-    as in :ref:`multi-building block cage construction`, a
-    :class:`.BuildingBlock` needs to be assigned to each of the
-    following vertex ids:
+    as in :ref:`multi-building-block-cage-construction`:
+    *Multi-Building Block Cage Construction*, a :class:`.BuildingBlock`
+    needs to be assigned to each of the following vertex ids:
 
         | 3-functional group (metal): 0 to 3
         | 3-functional group (linker): 4 to 7

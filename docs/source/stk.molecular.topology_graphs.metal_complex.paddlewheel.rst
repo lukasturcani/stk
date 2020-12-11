@@ -10,5 +10,6 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.metal_complex.paddlewheel.paddlewheel

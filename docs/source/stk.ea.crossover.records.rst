@@ -10,5 +10,6 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.crossover.records.record

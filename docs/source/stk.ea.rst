@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.crossover
    stk.ea.evolutionary_algorithm
@@ -24,5 +25,6 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.generation

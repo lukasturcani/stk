@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.functional_groups.factories.alcohol_factory
    stk.molecular.functional_groups.factories.aldehyde_factory

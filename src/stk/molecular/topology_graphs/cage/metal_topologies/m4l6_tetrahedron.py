@@ -20,6 +20,11 @@ class M4L6Tetrahedron(Cage):
     Building blocks with three functional groups are required for this
     topology.
 
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`multi-building-block-cage-construction`:
+    *Multi-Building Block Cage Construction*, a :class:`.BuildingBlock`
+    needs to be assigned to each of the following vertex ids:
+
     Examples
     --------
     *Building Metal-Organic Tetrahedron*
