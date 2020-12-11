@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.mutation.mutators.compound
    stk.ea.mutation.mutators.molecule

@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.metal_complex.octahedral
    stk.molecular.topology_graphs.metal_complex.paddlewheel
@@ -20,6 +21,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.metal_complex.metal_complex
    stk.molecular.topology_graphs.metal_complex.vertices

@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.key_makers.inchi
    stk.molecular.key_makers.inchi_key

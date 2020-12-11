@@ -39,6 +39,7 @@ MOCK_MODULES = [
     'scipy',
     'scipy.spatial',
     'scipy.spatial.distance',
+    'scipy.spatial.transform',
     'scipy.optimize',
     'scipy.sparse',
     'scipy.constants',

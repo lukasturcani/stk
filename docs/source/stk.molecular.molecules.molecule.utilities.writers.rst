@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.molecules.molecule.utilities.writers.mdl_mol
    stk.molecular.molecules.molecule.utilities.writers.pdb
