@@ -27,6 +27,7 @@ setup(
         'numpy',
         'pymongo',
         'pymongo[srv]',
+        'MCHammer',
     ),
     python_requires='>=3.7',
 )
