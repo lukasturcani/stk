@@ -6,12 +6,14 @@ Topology Graph
 
 from functools import partial
 import numpy as np
+import mchammer as mch
 
 from stk.utilities import flatten
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
 from ..edge_group import EdgeGroup
 from .implementations import _Parallel, _Serial
+
 
 
 class TopologyGraph:
@@ -117,6 +119,7 @@ class TopologyGraph:
         construction_stages,
         num_processes,
         edge_groups=None,
+        optimize=False,
     ):
         """
         Initialize an instance of :class:`.TopologyGraph`.
@@ -163,6 +166,10 @@ class TopologyGraph:
             The edge groups of the topology graph, if ``None``, every
             :class:`.Edge` is in its own edge group.
 
+        optimize : :class:`bool`, optional
+            `True` to apply cheap MCHammer optimization to long bonds
+            created during construction. Defaults to `False`
+
         """
 
         self._scale = scale = self._get_scale(building_block_vertices)
@@ -193,6 +200,7 @@ class TopologyGraph:
                 EdgeGroup((edge, )) for edge in self._edges
             )
         self._edge_groups = edge_groups
+        self._optimize = optimize
 
     def _with_building_blocks(self, building_block_map):
         """
@@ -304,6 +312,7 @@ class TopologyGraph:
         clone._reaction_factory = self._reaction_factory
         clone._implementation = self._implementation
         clone._edge_groups = self._edge_groups
+        clone._optimize = self._optimize
         return clone
 
     def get_building_blocks(self):
@@ -395,6 +404,8 @@ class TopologyGraph:
         state = self._get_construction_state()
         state = self._place_building_blocks(state)
         state = self._run_reactions(state)
+        if self._optimize:
+            state = self._run_optimization(state)
         return ConstructionResult(state)
 
     def _get_construction_state(self):
@@ -404,7 +415,7 @@ class TopologyGraph:
             lattice_constants=tuple(
                 np.array(constant, dtype=np.float64)*self._scale
                 for constant in self._get_lattice_constants()
-            )
+            ),
         )
 
     def _get_scale(self, building_block_vertices):
@@ -477,6 +488,79 @@ class TopologyGraph:
             reactions,
         )
         return state.with_reaction_results(reactions, results)
+
+    def _run_optimization(self, state):
+        """
+        Perform cheap MCHammer optimisation on state.
+
+        Parameters
+        ----------
+        state : :class:`.ConstructionState`
+            Holds data necessary to construct the molecule.
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The new construction state, updated to account for the
+            placed building blocks.
+
+        """
+
+        # Define MCHammer molecule to optimize.
+        # Define long bonds based on bond_info.
+        long_bond_ids = []
+        # Must ensure bond atom id ordering is such that
+        # atom1_id < atom2_id.
+        mch_bonds = []
+        for i, bond_infos in enumerate(state.get_bond_infos()):
+            ba1 = bond_infos.get_bond().get_atom1().get_id()
+            ba2 = bond_infos.get_bond().get_atom2().get_id()
+            if ba1 < ba2:
+                mch_bonds.append(
+                    mch.Bond(id=i, atom1_id=ba1, atom2_id=ba2)
+                )
+            else:
+                mch_bonds.append(
+                    mch.Bond(id=i, atom1_id=ba2, atom2_id=ba1)
+                )
+
+            # None for constructed bonds.
+            if bond_infos.get_building_block() is None:
+                if ba1 < ba2:
+                    ids = (ba1, ba2)
+                else:
+                    ids = (ba2, ba1)
+                long_bond_ids.append(ids)
+
+        mch_mol = mch.Molecule(
+            atoms=(
+                mch.Atom(
+                    id=atom.get_id(),
+                    element_string=atom.__class__.__name__,
+                ) for atom in state.get_atoms()
+            ),
+            bonds=mch_bonds,
+            position_matrix=state.get_position_matrix(),
+        )
+
+        # Run optimization.
+        optimizer = mch.Optimizer(
+            # set this to a tmp dir or remove?
+            output_dir='TESTING',
+            # How to allow the user to modify these settings
+            # (and all other settings)?
+            step_size=0.25,
+            target_bond_length=1.2,
+            num_steps=1000,
+        )
+        mch_mol = optimizer.optimize(
+            mol=mch_mol,
+            bond_pair_ids=long_bond_ids,
+        )
+
+        return state.with_optimization_results(
+            results=mch_mol.get_position_matrix()
+        )
 
     def _get_stages(self, construction_stages):
         """
