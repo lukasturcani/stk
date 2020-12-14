@@ -224,6 +224,34 @@ class _MoleculeState:
         for edge_id in edge_group.get_edge_ids():
             yield from self._edge_functional_groups[edge_id]
 
+    def with_optimization_results(self, results):
+        """
+        Return a clone holding the optimization results.
+
+        Parameters
+        ----------
+        results :
+            NEW POSMAT
+
+        Returns
+        -------
+        :class:`._MoleculeState`
+            The clone holding the reaction results. Has the same type
+            as the original instance.
+
+        """
+
+        return self.clone()._with_optimization_results(results)
+
+    def _with_optimization_results(self, results):
+        """
+        Modify the instance.
+
+        """
+
+        self._position_matrix = np.array(results)
+        return self
+
     def with_reaction_results(self, reactions, results):
         """
         Return a clone holding the reaction results.

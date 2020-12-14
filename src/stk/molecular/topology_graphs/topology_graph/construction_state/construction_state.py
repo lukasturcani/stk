@@ -285,6 +285,38 @@ class ConstructionState:
 
         return self.clone()._with_reaction_results(reactions, results)
 
+    def _with_optimization_results(self, results):
+        """
+        Modify the instance.
+
+        """
+
+        self._molecule_state = (
+            self._molecule_state.with_optimization_results(
+                results=results,
+            )
+        )
+        return self
+
+    def with_optimization_results(self, results):
+        """
+        Return a clone holding the optimization results.
+
+        Parameters
+        ----------
+        results :
+            NEW POS MAT
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The clone holding the reaction results. Has the same type
+            as the original instance.
+
+        """
+
+        return self.clone()._with_optimization_results(results)
+
     def _with_vertices(self, vertices):
         """
         Modify the instance.
