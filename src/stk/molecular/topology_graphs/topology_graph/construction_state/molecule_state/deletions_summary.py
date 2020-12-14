@@ -59,8 +59,8 @@ class _DeletionsSummary:
         deleted_atom_ids : :class:`iterable` of :class:`int`
             The ids of `atoms`, which should be deleted.
 
-        deleted_bond_ids : :class:`iterable` of :class:`tuple`
-            Tuple of atom ids of bonds that should be deleted.
+        deleted_bond_ids : :class:`iterable` of :class:`._BondId`
+            Ids of bonds that should be deleted.
 
         """
 

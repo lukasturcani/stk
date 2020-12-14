@@ -1,5 +1,25 @@
+from typing import NamedTuple
+
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
+
+
+class _BondId(NamedTuple):
+    """
+    Identifies a bond in a molecule.
+
+    Attributes
+    ----------
+    atom1_id
+        The id of the first :class:`.Atom` in the bond.
+
+    atom2_id
+        The id of the sceond :class:`.Atom` in the bond.
+
+    """
+
+    atom1_id: int
+    atom2_id: int
 
 
 class _ReactionsSummary:
@@ -82,7 +102,10 @@ class _ReactionsSummary:
         )
 
         self._deleted_bond_ids.update(
-            (bond.get_atom1().get_id(), bond.get_atom2().get_id())
+            _BondId(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+            )
             for bond in result.get_deleted_bonds()
         )
 
