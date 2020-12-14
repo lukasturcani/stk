@@ -15,7 +15,7 @@ class _ReactionsSummary:
         '_positions',
         '_bonds',
         '_bond_infos',
-        '_deleted_ids',
+        '_deleted_atom_ids',
         '_deleted_bond_ids',
     ]
 
@@ -43,7 +43,7 @@ class _ReactionsSummary:
         self._positions = []
         self._bonds = []
         self._bond_infos = []
-        self._deleted_ids = set()
+        self._deleted_atom_ids = set()
         self._deleted_bond_ids = set()
 
         for result in reaction_results:
@@ -77,7 +77,7 @@ class _ReactionsSummary:
         )
         self._with_bond_batch(bond_batch)
 
-        self._deleted_ids.update(
+        self._deleted_atom_ids.update(
             atom.get_id() for atom in result.get_deleted_atoms()
         )
 
@@ -175,7 +175,7 @@ class _ReactionsSummary:
 
         yield from self._bond_infos
 
-    def get_deleted_ids(self):
+    def get_deleted_atom_ids(self):
         """
         Yield the ids of deletable atoms held by the summary.
 
@@ -186,7 +186,7 @@ class _ReactionsSummary:
 
         """
 
-        yield from self._deleted_ids
+        yield from self._deleted_atom_ids
 
     def get_deleted_bond_ids(self):
         """

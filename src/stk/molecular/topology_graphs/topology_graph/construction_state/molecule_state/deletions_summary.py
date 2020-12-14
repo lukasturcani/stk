@@ -16,7 +16,7 @@ class _DeletionsSummary:
         '_bonds',
         '_bond_infos',
         '_position_matrix',
-        '_deleted_ids',
+        '_deleted_atom_ids',
         '_deleted_bond_ids',
 
         '_valid_atoms',
@@ -33,7 +33,7 @@ class _DeletionsSummary:
         bonds,
         bond_infos,
         position_matrix,
-        deleted_ids,
+        deleted_atom_ids,
         deleted_bond_ids,
     ):
         """
@@ -56,7 +56,7 @@ class _DeletionsSummary:
         position_matrix : :class:`numpy.ndarray`
             The position matrix for all the `atoms`.
 
-        deleted_ids : :class:`iterable` of :class:`int`
+        deleted_atom_ids : :class:`iterable` of :class:`int`
             The ids of `atoms`, which should be deleted.
 
         deleted_bond_ids : :class:`iterable` of :class:`tuple`
@@ -69,7 +69,7 @@ class _DeletionsSummary:
         self._bonds = tuple(bonds)
         self._bond_infos = tuple(bond_infos)
         self._position_matrix = np.array(position_matrix)
-        self._deleted_ids = set(deleted_ids)
+        self._deleted_atom_ids = set(deleted_atom_ids)
         self._deleted_bond_ids = set(deleted_bond_ids)
 
         self._valid_atoms = []
@@ -92,11 +92,11 @@ class _DeletionsSummary:
         atoms = self._atoms
         atom_infos = self._atom_infos
         position_matrix = self._position_matrix
-        deleted_ids = self._deleted_ids
+        deleted_atom_ids = self._deleted_atom_ids
         deleted_bond_ids = self._deleted_bond_ids
 
         def valid_atom(atom):
-            return atom.get_id() not in deleted_ids
+            return atom.get_id() not in deleted_atom_ids
 
         valid_atoms = self._valid_atoms
         valid_atom_infos = self._valid_atom_infos
@@ -125,8 +125,8 @@ class _DeletionsSummary:
             atom1_id = bond.get_atom1().get_id()
             atom2_id = bond.get_atom2().get_id()
             return (
-                atom1_id not in deleted_ids
-                and atom2_id not in deleted_ids
+                atom1_id not in deleted_atom_ids
+                and atom2_id not in deleted_atom_ids
                 and (atom1_id, atom2_id) not in deleted_bond_ids
             )
 
