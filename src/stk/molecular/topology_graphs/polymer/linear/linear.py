@@ -164,6 +164,7 @@ class Linear(TopologyGraph):
         random_seed=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`Linear` instance.
@@ -284,6 +285,7 @@ class Linear(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimize=optimize,
         )
 
     def clone(self):

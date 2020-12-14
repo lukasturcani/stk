@@ -30,6 +30,7 @@ class PeriodicLinkerlessHoneycomb(Cof):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.PeriodicLinkerlessHoneycomb` instance.
@@ -102,6 +103,7 @@ class PeriodicLinkerlessHoneycomb(Cof):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
+            optimize=optimize,
         )
 
     def get_periodic_info(self):

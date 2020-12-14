@@ -37,6 +37,7 @@ class M3L3Triangle(Cage):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.M3L3Triangle`.
@@ -106,6 +107,7 @@ class M3L3Triangle(Cage):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
+            optimize=optimize,
         )
 
     _x = 2*np.sqrt(3)/4

@@ -201,7 +201,8 @@ class NRotaxane(TopologyGraph):
         num_repeating_units,
         orientations=None,
         random_seed=None,
-        num_processes=1
+        num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`NRotaxane` instance.
@@ -312,6 +313,7 @@ class NRotaxane(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes,
             edge_groups=None,
+            optimize=optimize,
         )
 
     def clone(self):

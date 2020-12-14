@@ -30,6 +30,7 @@ class PeriodicHoneycomb(Cof):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.PeriodicHoneycomb` instance.

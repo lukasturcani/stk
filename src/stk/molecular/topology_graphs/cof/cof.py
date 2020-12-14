@@ -199,6 +199,7 @@ class Cof(TopologyGraph):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.Cof` instance.
@@ -325,6 +326,7 @@ class Cof(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes,
             edge_groups=self._get_edge_groups(edges),
+            optimize=optimize,
         )
 
     @classmethod

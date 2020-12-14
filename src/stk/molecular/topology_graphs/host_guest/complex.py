@@ -73,6 +73,7 @@ class Complex(TopologyGraph):
         guest_target=None,
         displacement=(0, 0, 0),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize an instance of :class:`.Complex`.
@@ -141,6 +142,7 @@ class Complex(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes,
             edge_groups=(),
+            optimize=optimize,
         )
 
     def clone(self):

@@ -224,6 +224,7 @@ class MetalComplex(TopologyGraph):
         ligands,
         reaction_factory=None,
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.MetalComplex`.
@@ -313,6 +314,7 @@ class MetalComplex(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes,
             edge_groups=None,
+            optimize=optimize,
         )
 
     def _normalize_metals(self, metals):

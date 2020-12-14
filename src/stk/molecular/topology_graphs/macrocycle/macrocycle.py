@@ -154,7 +154,8 @@ class Macrocycle(TopologyGraph):
         orientations=None,
         random_seed=None,
         reaction_factory=GenericReactionFactory(),
-        num_processes=1
+        num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`Macrocycle` instance.
@@ -277,6 +278,7 @@ class Macrocycle(TopologyGraph):
             construction_stages=(),
             num_processes=num_processes,
             edge_groups=None,
+            optimize=optimize,
         )
 
     def clone(self):

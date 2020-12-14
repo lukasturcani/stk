@@ -523,6 +523,7 @@ class Cage(TopologyGraph):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.Cage`.
@@ -612,6 +613,7 @@ class Cage(TopologyGraph):
             ),
             num_processes=num_processes,
             edge_groups=None,
+            optimize=optimize,
         )
 
     @classmethod

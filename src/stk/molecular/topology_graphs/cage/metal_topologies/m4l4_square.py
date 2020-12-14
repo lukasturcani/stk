@@ -35,6 +35,7 @@ class M4L4Square(Cage):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimize=False,
     ):
         """
         Initialize a :class:`.M4L4Square`.
@@ -103,6 +104,7 @@ class M4L4Square(Cage):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
+            optimize=optimize,
         )
 
     _vertex_prototypes = (
