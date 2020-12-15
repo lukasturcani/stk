@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.evolutionary_algorithm.implementations.implementation
    stk.ea.evolutionary_algorithm.implementations.parallel

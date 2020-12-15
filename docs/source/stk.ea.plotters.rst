@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.plotters.progress
    stk.ea.plotters.selection
