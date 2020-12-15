@@ -106,7 +106,7 @@ class M4L6Tetrahedron(Cage):
         # Build an M4L6 Tetrahedron.
         cage2 = stk.ConstructedMolecule(
             stk.cage.M4L6Tetrahedron(
-                building_blocks=iron_oct_delta,
+                building_blocks=(iron_oct_delta, ),
             )
         )
 
