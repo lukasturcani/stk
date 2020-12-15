@@ -20,12 +20,13 @@ class TenPlusTwenty(Cage):
     this topology.
 
     When using a :class:`dict` for the `building_blocks` parameter,
-    as in :ref:`multi-building-block-cage-construction`:
-    *Multi-Building Block Cage Construction*, a :class:`.BuildingBlock`
-    needs to be assigned to each of the following vertex ids:
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
 
-        | 4-functional group: 0 to 9
-        | 2-functional group: 10 to 29
+        | 4-functional groups: 0 to 9
+        | 2-functional groups: 10 to 29
 
     See :class:`.Cage` for more details and examples.
 
