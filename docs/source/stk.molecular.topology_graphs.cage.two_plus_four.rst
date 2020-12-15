@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.cage.two_plus_four.eight_plus_sixteen
    stk.molecular.topology_graphs.cage.two_plus_four.five_plus_ten

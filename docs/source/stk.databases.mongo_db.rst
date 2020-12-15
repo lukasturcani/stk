@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.databases.mongo_db.constructed_molecule
    stk.databases.mongo_db.molecule

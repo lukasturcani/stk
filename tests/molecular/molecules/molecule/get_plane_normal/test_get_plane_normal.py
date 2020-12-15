@@ -87,7 +87,7 @@ def _test_get_plane_normal(molecule, get_atom_ids, normal):
         assert not np.allclose(
             a=[0, 0, 0],
             b=molecule.get_plane_normal(get_atom_ids(molecule)),
-            atol=1e-13,
+            atol=1e-8,
         )
         return
 
@@ -98,9 +98,9 @@ def _test_get_plane_normal(molecule, get_atom_ids, normal):
             position_matrix=molecule.get_position_matrix(),
             atom_ids=(0, 1),
         )
-        assert result @ direction < 1e-13
+        assert result @ direction < 1e-8
         return
 
     result = molecule.get_plane_normal(get_atom_ids(molecule))
     # The normal may be parallel or anti-parallel.
-    assert abs(abs(result @ normal) - 1) < 1e-13
+    assert abs(abs(result @ normal) - 1) < 1e-8

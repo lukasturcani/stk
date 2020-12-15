@@ -6,6 +6,7 @@ part of ``stk``. They must be completely self-sufficient.
 
 """
 
+from scipy.spatial.transform import Rotation
 import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
 import numpy as np
@@ -541,7 +542,13 @@ def rotation_matrix(vector1, vector2):
     c = np.dot(vector1, vector2)
     i = np.identity(3)
     mult_factor = (1-c)/np.square(s)
-    return i + vx + np.multiply(np.dot(vx, vx), mult_factor)
+
+    # Initialize as a scipy Rotation object, which normalizes the
+    # matrix and allows for returns as quaternion or alternative
+    # type in the future.
+    return Rotation.from_matrix(
+        i + vx + np.multiply(np.dot(vx, vx), mult_factor)
+    ).as_matrix()
 
 
 def rotation_matrix_arbitrary_axis(angle, axis):
@@ -580,9 +587,14 @@ def rotation_matrix_arbitrary_axis(angle, axis):
     e32 = 2*(c*d + a*b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
-    return np.array([[e11, e12, e13],
-                     [e21, e22, e23],
-                     [e31, e32, e33]])
+    # Initialize as a scipy Rotation object, which normalizes the
+    # matrix and allows for returns as quaternion or alternative
+    # type in the future.
+    return Rotation.from_matrix(np.array([
+        [e11, e12, e13],
+        [e21, e22, e23],
+        [e31, e32, e33]
+    ])).as_matrix()
 
 
 def dice_similarity(mol1, mol2, fp_radius=3):

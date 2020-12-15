@@ -68,5 +68,5 @@ def _test_get_atomic_positions(
         assert np.allclose(
             a=position,
             b=position_matrix[atom_id],
-            atol=1e-13,
+            atol=1e-6,
         )
