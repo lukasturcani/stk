@@ -25,7 +25,7 @@ class M8L6Cube(Cage):
     needs to be assigned to each of the following vertex ids:
 
         | 3-functional group: 0 to 7
-        | 4-functoinal group: 8 to 13
+        | 4-functional group: 8 to 13
 
     See :class:`.Cage` for more details and examples.
 
