@@ -25,7 +25,7 @@ class M12L24(Cage):
     needs to be assigned to each of the following vertex ids:
 
         | 4-functional group: 0 to 11
-        | 2-functoinal group: 12 to 35
+        | 2-functional group: 12 to 35
 
     See :class:`.Cage` for more details and examples.
 
