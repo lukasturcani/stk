@@ -149,7 +149,7 @@ class Cage(TopologyGraph):
     :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
 
-    .. _multi-building-block-cage-construction:
+    .. _cage-topology-graph-examples:
 
     Examples
     --------
