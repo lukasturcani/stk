@@ -21,7 +21,7 @@ class M12L24(Cage):
 
     When using a :class:`dict` for the `building_blocks` parameter,
     as in :ref:`multi-building-block-cage-construction`:
-    *Multi-Building Block Cage Construction*, a 
+    *Multi-Building Block Cage Construction*, a
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
