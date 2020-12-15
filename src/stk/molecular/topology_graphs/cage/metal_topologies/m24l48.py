@@ -25,7 +25,7 @@ class M24L48(Cage):
     needs to be assigned to each of the following vertex ids:
 
         | 4-functional group: 0 to 23
-        | 2-functoinal group: 24 to 71
+        | 2-functional group: 24 to 71
 
     See :class:`.Cage` for more details and examples.
 
