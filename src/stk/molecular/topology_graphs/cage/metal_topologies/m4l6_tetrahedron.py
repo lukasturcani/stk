@@ -26,6 +26,8 @@ class M4L6Tetrahedron(Cage):
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
+        | 3-functional groups: 0 to 3
+
     Examples
     --------
     *Building Metal-Organic Tetrahedron*
