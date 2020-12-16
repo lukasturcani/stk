@@ -15,6 +15,10 @@ class Linear(TopologyGraph):
     """
     Represents a linear polymer topology graph.
 
+    Building blocks with two functional groups are required, unless the
+    building block's position is specified to only be at the capping
+    positions.
+
     Examples
     --------
     *Construction*
