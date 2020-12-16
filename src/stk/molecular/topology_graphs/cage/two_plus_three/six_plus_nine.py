@@ -22,12 +22,13 @@ class SixPlusNine(Cage):
     this topology.
 
     When using a :class:`dict` for the `building_blocks` parameter,
-    as in :ref:`multi-building-block-cage-construction`:
-    *Multi-Building Block Cage Construction*, a :class:`.BuildingBlock`
-    needs to be assigned to each of the following vertex ids:
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
 
-        | 3-functional group: 0 to 5
-        | 2-functional group: 5 to 14
+        | 3-functional groups: 0 to 5
+        | 2-functional groups: 5 to 14
 
     See :class:`.Cage` for more details and examples.
 

@@ -20,13 +20,13 @@ class M12L24(Cage):
     this topology.
 
     When using a :class:`dict` for the `building_blocks` parameter,
-    as in :ref:`multi-building-block-cage-construction`:
+    as in :ref:`cage-topology-graph-examples`:
     *Multi-Building Block Cage Construction*, a
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
-        | 4-functional group: 0 to 11
-        | 2-functional group: 12 to 35
+        | 4-functional groups: 0 to 11
+        | 2-functional groups: 12 to 35
 
     See :class:`.Cage` for more details and examples.
 
