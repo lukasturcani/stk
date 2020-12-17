@@ -21,13 +21,15 @@ class M6L2L3Prism(Cage):
     Ligand building blocks with three and four functional groups are
     required for ligand type A and B, respectively, on this topology.
 
-    When using a :class:`dict` for initialization, a
-    :class:`.BuildingBlock` needs to be assigned to each of the
-    following numbers:
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
 
-        | metals: 0 to 5
-        | ligand A (3 functional groups): (6, 7)
-        | ligand B (4 functional groups): (8, 9, 10)
+        | 3-functional groups (metal): 0 to 5
+        | 3-functional groups (ligand A): 6, 7
+        | 4-functional groups (ligand B): 8 to 10
 
     See :class:`.Cage` for more details and examples.
 

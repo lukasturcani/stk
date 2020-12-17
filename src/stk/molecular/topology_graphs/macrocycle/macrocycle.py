@@ -15,6 +15,9 @@ class Macrocycle(TopologyGraph):
     """
     Represents a macrocycle topology graph.
 
+    Building blocks with two functional groups are required
+    for this topology.
+
     Examples
     --------
     *Construction*
