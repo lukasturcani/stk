@@ -19,6 +19,15 @@ class PeriodicSquare(Cof):
     Building blocks with four and two functional groups are required
     for this topology graph.
 
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cof-topology-graph-examples`:
+    *Multi-Building Block COF Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
+
+        | 4-functional groups: 0
+        | 2-functional groups: 1 to 2
+
     See :class:`.Cof` for more details and examples.
 
     """
