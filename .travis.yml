@@ -13,7 +13,7 @@ install:
     - conda update -q conda
     - conda info -a
     - conda env create -f ./tests/environment.yml
-    - conda activate stk_test
+    - conda activate stk-test
 
 services: mongodb
 
@@ -38,4 +38,3 @@ jobs:
             - git clone http://github.com/lukasturcani/intermediate_ea --depth 1
           script:
             - python intermediate_ea/intermediate_ea.py
-
