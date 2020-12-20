@@ -1,0 +1,32 @@
+name: Run pytest
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v2
+
+        - name: Add conda to system path
+          run: |
+            # $CONDA is an environment variable pointing to the root of
+            # the miniconda directory
+            echo $CONDA/bin >> $GITHUB_PATH
+
+        - name: Install dependencies
+          run: |
+            conda env update --name base --file tests/environment.yml
+
+        - name: Lint with flake8
+          run: |
+            conda install flake8
+            flake8 . \
+                --count \
+                --show-source \
+                --max-line-length=71 \
+                --statistics
+        - name: Test with pytest
+          run: |
+            pytest
