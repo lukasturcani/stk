@@ -252,6 +252,7 @@ class ConstructedMolecule(Molecule):
             building_block = info.get_building_block()
             return AtomInfo(
                 atom=atom,
+                building_block_atom=info.get_building_block_atom(),
                 building_block=(
                     building_block
                     if building_block is None

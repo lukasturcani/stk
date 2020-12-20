@@ -104,6 +104,7 @@ class _DeletionsSummary:
             valid_atom_infos.append(
                 AtomInfo(
                     atom=valid_atoms[-1],
+                    building_block_atom=info.get_building_block_atom(),
                     building_block=info.get_building_block(),
                     building_block_id=info.get_building_block_id(),
                 )
