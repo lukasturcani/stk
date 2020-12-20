@@ -83,6 +83,20 @@ jobs:
               run: |
                 python basic_ea/basic_ea.py
 
+            - name: Upload fitness plot
+              uses: actions/upload-artifact@v2
+              with:
+                name: fitness-plot
+                path: fitness_progress.png
+
+            - name: Upload rotatable bonds plot
+              uses: actions/upload-artifact@v2
+              with:
+                name: rotatable-bonds-plot
+                path: rotatable_bonds_progress.png
+
+
+
     intermediate-ea:
         runs-on: ubuntu-latest
 
@@ -112,3 +126,15 @@ jobs:
             - name: Run the EA
               run: |
                 python intermediate_ea/intermediate_ea.py
+
+            - name: Upload fitness plot
+              uses: actions/upload-artifact@v2
+              with:
+                name: fitness-plot
+                path: fitness_progress.png
+
+            - name: Upload rotatable bonds plot
+              uses: actions/upload-artifact@v2
+              with:
+                name: rotatable-bonds-plot
+                path: rotatable_bonds_progress.png
