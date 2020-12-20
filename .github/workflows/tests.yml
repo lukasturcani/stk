@@ -86,13 +86,13 @@ jobs:
             - name: Upload fitness plot
               uses: actions/upload-artifact@v2
               with:
-                name: basic-fitness-plot
+                name: basic-ea-fitness-plot
                 path: fitness_progress.png
 
             - name: Upload rotatable bonds plot
               uses: actions/upload-artifact@v2
               with:
-                name: basic-rotatable-bonds-plot
+                name: basic-ea-rotatable-bonds-plot
                 path: rotatable_bonds_progress.png
 
 
@@ -130,11 +130,11 @@ jobs:
             - name: Upload fitness plot
               uses: actions/upload-artifact@v2
               with:
-                name: intermediate-fitness-plot
+                name: intermediate-ea-fitness-plot
                 path: fitness_progress.png
 
             - name: Upload rotatable bonds plot
               uses: actions/upload-artifact@v2
               with:
-                name: intermediate-rotatable-bonds-plot
+                name: intermediate-ea-rotatable-bonds-plot
                 path: rotatable_bonds_progress.png
