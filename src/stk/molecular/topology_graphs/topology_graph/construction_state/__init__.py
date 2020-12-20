@@ -1,1 +1,1 @@
-from .construction_state import ConstructionState
+from .construction_state import ConstructionState  # noqa

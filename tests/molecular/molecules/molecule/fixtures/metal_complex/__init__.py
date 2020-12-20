@@ -1,1 +1,1 @@
-from .metal_complex import *
+from .metal_complex import *  # noqa
