@@ -27,6 +27,6 @@ jobs:
                 --show-source \
                 --max-line-length=71 \
                 --statistics
-        - name: Test with pytest
+        - name: Run pytest
           run: |
             pytest

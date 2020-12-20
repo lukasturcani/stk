@@ -1,2 +1,2 @@
-from .axle import *
-from .cycle import *
+from .axle import *  # noqa
+from .cycle import *  # noqa

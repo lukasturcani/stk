@@ -1,9 +1,9 @@
-from .divide_by_mean import *
-from .multiply import *
-from .null import *
-from .replace_fitness import *
-from .shift_up import *
-from .sum import *
-from .add import *
-from .power import *
-from .sequence import *
+from .divide_by_mean import *  # noqa
+from .multiply import *  # noqa
+from .null import *  # noqa
+from .replace_fitness import *  # noqa
+from .shift_up import *  # noqa
+from .sum import *  # noqa
+from .add import *  # noqa
+from .power import *  # noqa
+from .sequence import *  # noqa
