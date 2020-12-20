@@ -1,2 +1,2 @@
-from .cof import *
-from .linear import *
+from .cof import *  # noqa
+from .linear import *  # noqa
