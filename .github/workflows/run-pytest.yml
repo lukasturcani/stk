@@ -3,7 +3,7 @@ name: Run pytest
 on: [push]
 
 jobs:
-    pytest-linux:
+    pytest-stable-linux:
         runs-on: ubuntu-latest
 
         steps:
@@ -24,15 +24,6 @@ jobs:
                 conda env update \
                     --name base \
                     --file tests/environment.yml
-
-            - name: Lint with flake8
-              run: |
-                conda install flake8
-                flake8 . \
-                    --count \
-                    --show-source \
-                    --max-line-length=71 \
-                    --statistics
 
             - name: Run pytest
               run: |
