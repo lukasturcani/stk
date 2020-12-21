@@ -3,8 +3,8 @@
 
 .. figure:: docs/source/figures/stk.png
 
-.. image:: https://travis-ci.com/lukasturcani/stk.svg?branch=master
-    :target: https://travis-ci.com/github/lukasturcani/stk
+.. image:: https://github.com/lukasturcani/stk/workflows/tests/badge.svg?branch=master
+    :target: https://github.com/lukasturcani/stk/actions?query=branch%3Amaster
 
 .. image:: https://readthedocs.org/projects/stk/badge/?version=latest
     :target: https://stk.readthedocs.io

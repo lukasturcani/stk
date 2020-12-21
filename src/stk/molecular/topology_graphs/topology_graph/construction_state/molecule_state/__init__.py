@@ -1,1 +1,1 @@
-from .molecule_state import _MoleculeState
+from .molecule_state import _MoleculeState  # noqa

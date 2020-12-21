@@ -1,2 +1,2 @@
-from .host import *
-from .guest import *
+from .host import *  # noqa
+from .guest import *  # noqa
