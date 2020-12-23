@@ -149,6 +149,8 @@ class Cage(TopologyGraph):
     :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
 
+    .. _cage-topology-graph-examples:
+
     Examples
     --------
     *Subclass Implementation*

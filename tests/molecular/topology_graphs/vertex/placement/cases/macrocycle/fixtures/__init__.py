@@ -1,2 +1,2 @@
-from .flip import *
-from .no_flip import *
+from .flip import *  # noqa
+from .no_flip import *  # noqa

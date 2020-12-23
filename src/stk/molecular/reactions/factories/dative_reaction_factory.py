@@ -17,9 +17,9 @@ class DativeReactionFactory(ReactionFactory):
     :class:`.GenericFunctionalGroup` instances. It returns a
     :class:`.Reaction` suitable for two such instances.
 
-    Dative bonds are defined with a `bond_order` of 9, 
+    Dative bonds are defined with a `bond_order` of 9,
     running from the non-metal atom to the metal atom.
-    
+
     """
 
     def __init__(self, reaction_factory):

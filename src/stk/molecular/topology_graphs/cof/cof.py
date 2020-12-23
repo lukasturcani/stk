@@ -65,6 +65,8 @@ class Cof(TopologyGraph):
     the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
 
+    .. _cof-topology-graph-examples:
+
     Examples
     --------
     *Subclass Implementation*

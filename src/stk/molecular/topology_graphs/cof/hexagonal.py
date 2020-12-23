@@ -19,6 +19,15 @@ class Hexagonal(Cof):
     Building blocks with six and two functional groups are required
     for this topology graph.
 
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cof-topology-graph-examples`:
+    *Multi-Building Block COF Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
+
+        | 6-functional groups: 0 to 3
+        | 2-functional groups: 4 to 15
+
     See :class:`.Cof` for more details and examples.
 
     """

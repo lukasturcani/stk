@@ -11,7 +11,10 @@ import numpy as np
             topology_graph=stk.polymer.Linear(
                 building_blocks=(
                     stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                    stk.BuildingBlock('BrCNCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='BrCNCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
                 ),
                 repeating_unit='AB',
                 num_repeating_units=2,

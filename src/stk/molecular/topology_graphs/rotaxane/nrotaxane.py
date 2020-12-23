@@ -14,6 +14,8 @@ class NRotaxane(TopologyGraph):
     """
     Represents [n]rotaxane topology graphs.
 
+    Axle and cycle building blocks do not require functional groups.
+
     This class assumes one axle with (n-1) macrocycles threaded on it.
     The macrocycles are spaced evenly along the axle in repeating
     patterns. The threaded macrocycles can be described analogously

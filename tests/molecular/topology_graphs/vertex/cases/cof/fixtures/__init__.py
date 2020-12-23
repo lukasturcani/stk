@@ -1,3 +1,3 @@
-from .cof1 import *
-from .cof2 import *
-from .cof3 import *
+from .cof1 import *  # noqa
+from .cof2 import *  # noqa
+from .cof3 import *  # noqa

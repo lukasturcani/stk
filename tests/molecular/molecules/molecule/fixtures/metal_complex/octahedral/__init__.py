@@ -1,3 +1,3 @@
-from .octahedral import *
-from .octahedral_delta import *
-from .octahedral_lambda import *
+from .octahedral import *  # noqa
+from .octahedral_delta import *  # noqa
+from .octahedral_lambda import *  # noqa

@@ -1,2 +1,2 @@
-from .genetic_recombination import *
-from .random import *
+from .genetic_recombination import *  # noqa
+from .random import *  # noqa
