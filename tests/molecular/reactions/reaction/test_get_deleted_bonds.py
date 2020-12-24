@@ -3,13 +3,13 @@ from .utilities import are_equivalent_bonds
 
 def test_get_deleted_bonds(case_data):
     """
-    Test that correct bonds are added by a :class:`.Reaction`.
+    Test that the correct bonds are deleted by a :class:`.Reaction`.
 
     Parameters
     ----------
     case_data : :class:`.CaseData`
         A test case. Holds the reaction to test and the bonds which
-        should be added.
+        should be deleted.
 
     Returns
     -------
@@ -25,7 +25,7 @@ def test_get_deleted_bonds(case_data):
 
 def _test_get_deleted_bonds(reaction_result, deleted_bonds):
     """
-    Test that the correct bonds are added by `reaction_result`.
+    Test that the correct bonds are deleted by `reaction_result`.
 
     Parameters
     ----------
@@ -33,7 +33,7 @@ def _test_get_deleted_bonds(reaction_result, deleted_bonds):
         The result of a reaction.
 
     new_bonds : :class:`tuple` of :class:`.Bond`
-        The bonds, which should be added by `reaction_result`.
+        The bonds, which should be deleted by `reaction_result`.
 
     Returns
     -------
