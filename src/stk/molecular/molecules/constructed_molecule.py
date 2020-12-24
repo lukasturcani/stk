@@ -226,6 +226,8 @@ class ConstructedMolecule(Molecule):
             for building_block in self._num_building_blocks
         }
 
+        # Cache these mappings for later, to avoid unnecessary
+        # re-computations of canonical ordering.
         canonical_map = {
             building_block: building_block.get_canonical_atom_ids()
             for building_block in self._num_building_blocks
