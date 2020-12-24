@@ -1,6 +1,10 @@
 import numpy as np
+import stk
 
-from tests.utilities import is_equivalent_molecule
+from tests.utilities import (
+    is_equivalent_molecule,
+    is_equivalent_constructed_molecule,
+)
 
 
 def test_from_json(case_data):
@@ -52,7 +56,13 @@ def _test_from_json(
     """
 
     result = dejsonizer.from_json(json)
-    is_equivalent_molecule(result, molecule)
+
+    {
+        stk.Molecule: is_equivalent_molecule,
+        stk.BuildingBlock: is_equivalent_molecule,
+        stk.ConstructedMolecule: is_equivalent_constructed_molecule,
+    }[type(molecule)](result, molecule)
+
     assert np.all(np.equal(
         molecule.get_position_matrix(),
         result.get_position_matrix(),
