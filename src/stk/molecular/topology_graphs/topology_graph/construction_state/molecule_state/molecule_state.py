@@ -106,7 +106,7 @@ class _MoleculeState:
         results,
     ):
         """
-        Return a clone holding the placement results.
+        Return a clone holding the placement results. ADD words
 
         Parameters
         ----------
