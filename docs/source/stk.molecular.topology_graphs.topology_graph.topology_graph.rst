@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.topology_graph.topology_graph.implementations
 
@@ -17,5 +18,6 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.topology_graph.topology_graph.topology_graph

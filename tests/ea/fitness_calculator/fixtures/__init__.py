@@ -1,2 +1,2 @@
-from .fitness_function import *
-from .property_vector import *
+from .fitness_function import *  # noqa
+from .property_vector import *  # noqa

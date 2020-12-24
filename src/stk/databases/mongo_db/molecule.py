@@ -30,23 +30,13 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     Examples
     --------
-    Before using this class, make sure you have :mod:`pymongo` and
-    that its working properly. I recommend reading at least the
-    introductory and installation
-    documentation of :mod:`pymongo` before using this class. Those
-    docs can be found here__.
-
-    __ https://api.mongodb.com/python/current/
-
-    *Usage*
+    *Storing and Retrieving Constructed Molecules*
 
     You want to store and retrieve a molecule from the database
 
     .. code-block:: python
 
         import stk
-        # pymongo does not come with stk, you have to install it
-        # explicitly with "pip install pymongo".
         import pymongo
 
         # Connect to a MongoDB. This example connects to a local
@@ -75,6 +65,17 @@ class MoleculeMongoDb(MoleculeDatabase):
     is because the database gives the molecules a canonical atom
     ordering, which allows position matrices to be used across
     different atom id orderings.
+
+    *Iterating over All Entries in the Database*
+
+    All entries in a database can be iterated over very simply
+
+    .. code-block:: python
+
+        for entry in db.get_all():
+            # Do something to entry.
+
+    *Using Alternative Keys for Retrieving Molecules*
 
     By default, the only molecular key the database stores, is the
     InChIKey. However, additional keys can be added to the JSON stored
@@ -166,7 +167,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         db = stk.MoleculeMongoDb(
             mongo_client=client,
             jsonizer=stk.MoleculeJsonizer(
-            key_makers=(stk.InchiKey(), smiles),
+                key_makers=(stk.InchiKey(), smiles),
             ),
         )
 
@@ -185,7 +186,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         mongo_client,
         database='stk',
         molecule_collection='molecules',
-        position_matrix_collection='position_matrices',
+        position_matrix_collection=None,
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
         lru_cache_size='',
@@ -211,7 +212,8 @@ class MoleculeMongoDb(MoleculeDatabase):
         position_matrix_collection : :class:`str`
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
-            the cache.
+            the cache. When ``None``, defaults to
+            'building_block_position_matrices`.
 
         jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -249,6 +251,26 @@ class MoleculeMongoDb(MoleculeDatabase):
             created, in order to minimize lookup time.
 
         """
+
+        if position_matrix_collection is None:
+            position_matrix_collection = (
+                'building_block_position_matrices'
+            )
+            warnings.warn(
+                "The default value of the position_matrix_collection "
+                "parameter in MoleculeMongoDb has changed from "
+                "'position_matrices' "
+                "to 'building_block_position_matrices'! To remove "
+                "this warning, set the position_matrix_collection "
+                "parameter explicitly. You can still use the default "
+                "value, for example, position_matrix_collection='"
+                "building_block_position_matrices' will remove the "
+                "warning but use the default value. "
+                "This warning will be removed "
+                "in any version of stk released on, or after, "
+                "1/03/21.",
+                UserWarning,
+            )
 
         if lru_cache_size != '':
             warnings.warn(
@@ -327,7 +349,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         Parameters
         ----------
         key : :class:`.HashableDict`
-            The key of a a molecule, which is to be returned from the
+            The key of a molecule, which is to be returned from the
             database.
 
         Returns
@@ -354,3 +376,33 @@ class MoleculeMongoDb(MoleculeDatabase):
             'molecule': json,
             'matrix': position_matrix,
         })
+
+    def _get_molecule_keys(self, entry):
+
+        # Ignore keys reserved by position matrix collections.
+        reserved_keys = ('m', '_id')
+
+        for key, value in entry.items():
+            if key not in reserved_keys:
+                yield key, value
+
+    def get_all(self):
+        for entry in self._position_matrices.find():
+            # Do 'or' query over all key value pairs.
+            query = {'$or': [
+                {key: value}
+                for key, value in self._get_molecule_keys(entry)
+            ]}
+
+            json = self._molecules.find_one(query)
+            if json is None:
+                raise KeyError(
+                    'No molecule found in the database associated '
+                    f'with a position matrix with query: {query}. '
+                    'This suggests your database is corrupted.'
+                )
+
+            yield self._dejsonizer.from_json({
+                'molecule': json,
+                'matrix': entry,
+            })

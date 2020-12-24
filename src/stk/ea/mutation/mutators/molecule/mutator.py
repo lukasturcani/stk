@@ -46,6 +46,9 @@ class MoleculeMutator:
         :class:`.MutationRecord`
             A record of the mutation.
 
+        None : :class:`NoneType`
+            If `record` cannot be mutated.
+
         """
 
         raise NotImplementedError()

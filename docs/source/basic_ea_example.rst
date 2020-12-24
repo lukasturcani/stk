@@ -505,13 +505,11 @@ Defining a Database
 
 The last thing we need to do is define the database. The default
 database of :mod:`stk` is MongoDB, which can be used with
-:class:`.ConstructedMoleculeMongoDb`. Before using this class, make
-sure you have :mod:`pymongo` and that its working properly. I recommend
-reading at least the introductory and installation
-documentation of :mod:`pymongo` before using this class. Those
-docs can be found here__.
+:class:`.ConstructedMoleculeMongoDb`. Before using this class, you
+need to have a MongoDB database, if you want to install one locally
+you can see how here__.
 
-__ https://api.mongodb.com/python/current/
+__ https://docs.mongodb.com/manual/installation/
 
 Note that this is easy to do, and well worth the minimal effort it
 requires to setup. Obviously, if you really don't want to
@@ -522,8 +520,6 @@ Assuming everything is setup, we can create our database instance
 
 .. code-block:: python
 
-    # pymongo does not come with stk, you have to install it
-    # explicitly with "pip install pymongo".
     import pymongo
 
     # Connect to a MongoDB. This example connects to a local

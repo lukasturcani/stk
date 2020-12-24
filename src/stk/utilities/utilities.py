@@ -6,6 +6,7 @@ part of ``stk``. They must be completely self-sufficient.
 
 """
 
+from scipy.spatial.transform import Rotation
 import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
 import numpy as np
@@ -541,7 +542,13 @@ def rotation_matrix(vector1, vector2):
     c = np.dot(vector1, vector2)
     i = np.identity(3)
     mult_factor = (1-c)/np.square(s)
-    return i + vx + np.multiply(np.dot(vx, vx), mult_factor)
+
+    # Initialize as a scipy Rotation object, which normalizes the
+    # matrix and allows for returns as quaternion or alternative
+    # type in the future.
+    return Rotation.from_matrix(
+        i + vx + np.multiply(np.dot(vx, vx), mult_factor)
+    ).as_matrix()
 
 
 def rotation_matrix_arbitrary_axis(angle, axis):
@@ -580,9 +587,14 @@ def rotation_matrix_arbitrary_axis(angle, axis):
     e32 = 2*(c*d + a*b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
-    return np.array([[e11, e12, e13],
-                     [e21, e22, e23],
-                     [e31, e32, e33]])
+    # Initialize as a scipy Rotation object, which normalizes the
+    # matrix and allows for returns as quaternion or alternative
+    # type in the future.
+    return Rotation.from_matrix(np.array([
+        [e11, e12, e13],
+        [e21, e22, e23],
+        [e31, e32, e33]
+    ])).as_matrix()
 
 
 def dice_similarity(mol1, mol2, fp_radius=3):
@@ -772,3 +784,36 @@ def get_acute_vector(reference, vector):
 def get_plane_normal(points):
     centroid = points.sum(axis=0) / len(points)
     return np.linalg.svd(points - centroid)[-1][2, :]
+
+
+def cap_absolute_value(value, max_absolute_value=1):
+    """
+    Returns `value` with absolute value capped at `max_absolute_value`.
+
+    Particularly useful in passing values to trignometric functions
+    where numerical errors may result in an argument > 1 being passed
+    in.
+
+    This code is modified from the pymatgen source code [1]_.
+
+    Parameters
+    ----------
+    value : :class:`float`
+        Value to cap.
+
+    max_absolute_value : :class:`float`, optional
+        Absolute value to cap `value` at.
+        Defaults to 1.
+
+    Returns
+    -------
+    :class:`float`
+        `value` capped at `max_absolute_value` with sign preserved.
+
+    References
+    ----------
+    .. [1] https://pymatgen.org/pymatgen.util.num.html
+
+    """
+
+    return max(min(value, max_absolute_value), -max_absolute_value)

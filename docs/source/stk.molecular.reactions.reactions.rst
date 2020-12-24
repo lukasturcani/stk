@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.reactions.reactions.dative_reaction
    stk.molecular.reactions.reactions.reaction
@@ -18,6 +19,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.reactions.reactions.one_one_reaction
    stk.molecular.reactions.reactions.one_two_reaction

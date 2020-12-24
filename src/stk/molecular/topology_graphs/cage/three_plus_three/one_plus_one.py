@@ -80,6 +80,17 @@ class OnePlusOne(Cage):
     """
     Represents a capsule cage topology graph.
 
+    Building blocks with three functional groups are required for
+    this topology.
+
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
+
+        | 3-functional groups: 0 to 1
+
     See :class:`.Cage` for more details and examples.
 
     """

@@ -1,1 +1,1 @@
-from .polymer import *
+from .polymer import *  # noqa

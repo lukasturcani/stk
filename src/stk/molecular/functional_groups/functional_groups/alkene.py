@@ -100,7 +100,7 @@ class Alkene(GenericFunctionalGroup):
 
         """
 
-        return self.atom1
+        return self._atom1
 
     def get_atom2(self):
         """
@@ -113,7 +113,7 @@ class Alkene(GenericFunctionalGroup):
 
         """
 
-        return self.atom2
+        return self._atom2
 
     def get_carbon2(self):
         """

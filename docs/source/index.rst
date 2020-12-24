@@ -86,7 +86,7 @@ To get :mod:`.stk`, you can install it with pip::
 
 Make sure you also install :mod:`rdkit`, which is a dependency::
 
-    $ conda install -c rdkit rdkit
+    $ conda install -c rdkit rdkit=2020
 
 
 Overview
@@ -133,6 +133,40 @@ store molecules constructed by users, or discovered by the
 evolutionary algorithm. In addition, property values calculated for
 those molecules can also be stored and retrieved from the database.
 
+Molecular Database Visualization
+................................
+
+.. image:: https://i.imgur.com/8MCBUGZ.png
+
+:mod:`.stk` has a sibling project called `stk-vis`_, which is a
+cross-platform application, which lets you connect to a database
+created by :mod:`.stk`, and view the molecules deposited into it.
+`stk-vis`_ also shows you any molecular properties you deposited,
+and lets you browse the building blocks of any constructed molecules.
+It's ideal for collaboration between multiple people, because one
+person can deposit a molecule into the database, and another person
+can immediately see and examine it. `stk-vis`_ is a stand-alone
+application and does not require coding or :mod:`.stk` to use.
+
+Features of `stk-vis`_ include
+
+* 3D interactive molecular rendering.
+* Image of the 2D molecular graph.
+* Tabulation of any molecular properties deposited into the
+  database.
+* Sorting molecules according to property values to quickly find ones
+  with the best and worst properties.
+* You can list the building blocks of any constructed molecules.
+  If those building blocks are also constructed molecules, you can
+  list their building blocks as well, and so on.
+* Writing molecules to files.
+
+You read more about `stk-vis`_ here:
+
+    https://github.com/lukasturcani/stk-vis
+
+.. _`stk-vis`: https://github.com/lukasturcani/stk-vis
+
 Usable Defaults
 ...............
 
@@ -167,20 +201,15 @@ defining, usually, a single method.
 Future Releases
 ---------------
 
-:mod:`.stk` is under active development. Important features in the
-future will include:
+:mod:`.stk` is under active development. You can get alerted
+when a new release comes out by going to the `GitHub page`_ and
+click on the ``watch`` button in the top right corner. Then select
+``Releases only`` from the dropdown menu.
 
-Molecular Database Visualization
-................................
+.. _`GitHub page`: https://github.com/lukasturcani/stk
 
-Currently :mod:`stk` allows users to store molecules in a database.
-However, a current goal is to develop an app which can be used to
-visually inspect and browse the molecules in the database. This should
-help multi-member research groups, where a computational scientist
-is responsible for suggesting molecules for synthesis, while an
-experimentalist actually has to make them. By providing an app to
-inspect the database, all collaborators can examine the currently
-deposited molecules in real-time.
+Important features in the future will include:
+
 
 Distributed Evolutionary Algorithms
 ...................................

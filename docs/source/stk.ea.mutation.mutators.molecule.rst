@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.mutation.mutators.molecule.mutator
    stk.ea.mutation.mutators.molecule.random_building_block

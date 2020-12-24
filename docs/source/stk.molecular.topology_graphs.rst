@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.cage
    stk.molecular.topology_graphs.cof

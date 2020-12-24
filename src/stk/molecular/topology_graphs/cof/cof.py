@@ -12,6 +12,17 @@ Covalent Organic Framework
 stk.molecular.topology_graphs.cof.linkerless_honeycomb\
 >
     Square <stk.molecular.topology_graphs.cof.square>
+    Periodic Hexagonal <\
+stk.molecular.topology_graphs.cof.periodic_hexagonal\
+>
+    Periodic Honeycomb <\
+stk.molecular.topology_graphs.cof.periodic_honeycomb\
+>
+    Periodic Kagome <stk.molecular.topology_graphs.cof.periodic_kagome>
+    Periodic Linkerless Honeycomb <\
+stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
+>
+    Periodic Square <stk.molecular.topology_graphs.cof.periodic_square>
 
 """
 
@@ -54,6 +65,8 @@ class Cof(TopologyGraph):
     the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
 
+    .. _cof-topology-graph-examples:
+
     Examples
     --------
     *Subclass Implementation*
@@ -76,6 +89,30 @@ class Cof(TopologyGraph):
         cof = stk.ConstructedMolecule(
             topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
         )
+
+    *Accessing the Periodic Unit Cell*
+
+    The same :class:`.Cof` instance can be built as a periodic
+    structure, which has a unit cell (assuming as P1 space group) that
+    can be accessed at any time from the :class:`.TopologyGraph`
+    instance.
+
+    .. code-block:: python
+
+        topology_graph = stk.cof.PeriodicHoneycomb(
+            building_blocks=(bb1, bb2),
+            lattice_size=(3, 3, 1),
+        )
+        cof = stk.ConstructedMolecule(topology_graph)
+        periodic_info = topology.get_periodic_info()
+        cell_matrix = periodic_info.get_cell_matrix()
+        # Can access all unit-cell parameters.
+        a = periodic_info.get_a()
+        b = periodic_info.get_b()
+        c = periodic_info.get_c()
+        alpha = periodic_info.get_alpha()
+        beta = periodic_info.get_beta()
+        gamma = periodic_info.get_gamma()
 
     *Structural Isomer Construction*
 

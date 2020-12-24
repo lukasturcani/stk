@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.serialization.json.deserializers
    stk.serialization.json.serializers

@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.atoms
    stk.molecular.bonds
@@ -18,3 +19,12 @@ Subpackages
    stk.molecular.molecules
    stk.molecular.reactions
    stk.molecular.topology_graphs
+   stk.molecular.writers
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   stk.molecular.periodic_info
