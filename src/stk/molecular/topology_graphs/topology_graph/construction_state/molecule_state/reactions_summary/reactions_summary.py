@@ -213,7 +213,7 @@ class _ReactionsSummary:
 
     def get_deleted_bond_ids(self):
         """
-        Yield the atom ids of bonds  to be deleted held by the summary.
+        Yield the atom ids of bonds to be deleted held by the summary.
 
         Yields
         ------
