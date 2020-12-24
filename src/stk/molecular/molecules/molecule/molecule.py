@@ -827,6 +827,25 @@ class Molecule:
         ]).T)
         return self
 
+    def get_canonical_atom_ids(self):
+        """
+        Map the id of each atom to its id under canonical ordering.
+
+        Returns
+        -------
+        :class:`dict`
+            Maps the id of each atom in the molecule to the id it would
+            have under canonical ordering.
+
+        """
+
+        return {
+            old_id: new_id
+            for old_id, new_id in enumerate(
+                rdkit.CanonicalRankAtoms(self.to_rdkit_mol()),
+            )
+        }
+
     def write(self, path, atom_ids=None):
         """
         Write the structure to a file.

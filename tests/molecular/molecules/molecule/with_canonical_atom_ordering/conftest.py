@@ -74,7 +74,7 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
                     ),
                     stk.AtomInfo(
                         atom=stk.O(1, 1),
-                        building_block_atom=stk.O(0, 2),
+                        building_block_atom=stk.O(0, 1),
                         building_block=canonical_bb2,
                         building_block_id=1,
                     ),
