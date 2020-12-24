@@ -73,6 +73,10 @@ def is_same_result(result1, result2):
         atoms1=result1.get_deleted_atoms(),
         atoms2=result2.get_deleted_atoms(),
     )
+    are_same_bonds(
+        result1.get_deleted_bonds(),
+        result2.get_deleted_bonds(),
+    )
 
 
 def are_same_new_atoms(new_atoms1, new_atoms2):

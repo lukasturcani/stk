@@ -1,5 +1,25 @@
+from typing import NamedTuple
+
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
+
+
+class _BondId(NamedTuple):
+    """
+    Identifies a bond in a molecule.
+
+    Attributes
+    ----------
+    atom1_id
+        The id of the first :class:`.Atom` in the bond.
+
+    atom2_id
+        The id of the sceond :class:`.Atom` in the bond.
+
+    """
+
+    atom1_id: int
+    atom2_id: int
 
 
 class _ReactionsSummary:
@@ -15,7 +35,8 @@ class _ReactionsSummary:
         '_positions',
         '_bonds',
         '_bond_infos',
-        '_deleted_ids',
+        '_deleted_atom_ids',
+        '_deleted_bond_ids',
     ]
 
     def __init__(self, num_atoms, reaction_results):
@@ -42,7 +63,8 @@ class _ReactionsSummary:
         self._positions = []
         self._bonds = []
         self._bond_infos = []
-        self._deleted_ids = set()
+        self._deleted_atom_ids = set()
+        self._deleted_bond_ids = set()
 
         for result in reaction_results:
             self._with_reaction_result(result)
@@ -75,8 +97,16 @@ class _ReactionsSummary:
         )
         self._with_bond_batch(bond_batch)
 
-        self._deleted_ids.update(
+        self._deleted_atom_ids.update(
             atom.get_id() for atom in result.get_deleted_atoms()
+        )
+
+        self._deleted_bond_ids.update(
+            _BondId(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+            )
+            for bond in result.get_deleted_bonds()
         )
 
     def _with_atom_batch(self, batch):
@@ -168,7 +198,7 @@ class _ReactionsSummary:
 
         yield from self._bond_infos
 
-    def get_deleted_ids(self):
+    def get_deleted_atom_ids(self):
         """
         Yield the ids of deletable atoms held by the summary.
 
@@ -179,7 +209,21 @@ class _ReactionsSummary:
 
         """
 
-        yield from self._deleted_ids
+        yield from self._deleted_atom_ids
+
+    def get_deleted_bond_ids(self):
+        """
+        Yield the atom ids of bonds to be deleted held by the summary.
+
+        Yields
+        ------
+        :class:`tuple`
+            A tuple of the atom ids of the bond which should be
+            deleted.
+
+        """
+
+        yield from self._deleted_bond_ids
 
     def get_positions(self):
         """

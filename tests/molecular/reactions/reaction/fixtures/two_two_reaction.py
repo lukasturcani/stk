@@ -55,6 +55,7 @@ def two_two_reaction(
             functional_group2_2.get_deleters(),
             functional_group2.get_deleters(),
         )),
+        deleted_bonds=(),
     )
 
 
