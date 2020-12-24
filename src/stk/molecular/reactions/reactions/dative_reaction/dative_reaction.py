@@ -49,3 +49,6 @@ class DativeReaction(Reaction):
 
     def _get_deleted_atoms(self):
         return self._reaction._get_deleted_atoms()
+
+    def _get_deleted_bonds(self):
+        return self._reaction._get_deleted_bonds()

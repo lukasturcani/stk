@@ -263,7 +263,8 @@ class _MoleculeState:
             bonds=self._bonds,
             bond_infos=self._bond_infos,
             position_matrix=self._position_matrix,
-            deleted_ids=reactions_summary.get_deleted_ids(),
+            deleted_atom_ids=reactions_summary.get_deleted_atom_ids(),
+            deleted_bond_ids=reactions_summary.get_deleted_bond_ids(),
         ))
         return self
 

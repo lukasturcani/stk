@@ -39,6 +39,7 @@ def dative_reaction(
             functional_group1.get_deleters(),
             functional_group1_2.get_deleters(),
         )),
+        deleted_bonds=(),
     )
 
 
