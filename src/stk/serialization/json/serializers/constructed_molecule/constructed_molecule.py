@@ -107,9 +107,17 @@ class ConstructedMoleculeJsonizer:
         building_block_indices[None] = None
 
         def atom_info_to_json(atom_info):
+            if atom_info.get_building_block() is None:
+                return (
+                    None,
+                    None,
+                    None,
+                )
+
             return (
                 building_block_indices[atom_info.get_building_block()],
                 atom_info.get_building_block_id(),
+                atom_info.get_building_block_atom().get_id(),
             )
 
         def bond_info_to_json(bond_info):

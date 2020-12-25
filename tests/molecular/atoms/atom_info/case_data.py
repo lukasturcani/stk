@@ -13,6 +13,10 @@ class CaseData:
     atom : :class:`.Atom`
         The atom, which should be held by :attr:`.atom_info`.
 
+    building_block_atom : :class:`.Atom`
+        The building block atom which should be held by
+        :attr:`.atom_info`.
+
     building_block : :class:`.BuildingBlock`
         The building block, which should be held by :attr:`.atom_info`.
 
@@ -22,7 +26,13 @@ class CaseData:
 
     """
 
-    def __init__(self, atom, building_block, building_block_id):
+    def __init__(
+        self,
+        atom,
+        building_block_atom,
+        building_block,
+        building_block_id,
+    ):
         """
         Initialize a :class:`.CaseData` instance.
 
@@ -30,6 +40,10 @@ class CaseData:
         ----------
         atom : :class:`.Atom`
             The atom, which should be held by an :class:`.AtomInfo`.
+
+        building_block_atom : :class:`.Atom`
+            The building block atom which should be held by an
+            :class:`.AtomInfo`.
 
         building_block : :class:`.BuildingBlock`
             The building block, which should be held by an
@@ -43,9 +57,11 @@ class CaseData:
 
         self.atom_info = stk.AtomInfo(
             atom=atom,
+            building_block_atom=building_block_atom,
             building_block=building_block,
             building_block_id=building_block_id,
         )
         self.atom = atom
+        self.building_block_atom = building_block_atom
         self.building_block = building_block
         self.building_block_id = building_block_id

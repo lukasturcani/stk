@@ -20,6 +20,21 @@ def atom(request):
 
 @pytest.fixture(
     params=(
+        stk.C(0),
+        None,
+    ),
+)
+def building_block_atom(request):
+    """
+    A valid building block atom for :class:`.AtomInfo`.
+
+    """
+
+    return request.param
+
+
+@pytest.fixture(
+    params=(
         stk.BuildingBlock('NCCN'),
         None,
     ),
@@ -49,10 +64,20 @@ def building_block_id(request):
 
 
 @pytest.fixture
-def case_data(atom, building_block, building_block_id):
+def case_data(
+    atom,
+    building_block_atom,
+    building_block,
+    building_block_id,
+):
     """
     A :class:`.CaseData` instance.
 
     """
 
-    return CaseData(atom, building_block, building_block_id)
+    return CaseData(
+        atom=atom,
+        building_block_atom=building_block_atom,
+        building_block=building_block,
+        building_block_id=building_block_id,
+    )

@@ -15,13 +15,21 @@ def to_bond(atoms, json):
 
 
 def to_atom_info(building_blocks, atom, json):
+    if json[0] is None:
+        return AtomInfo(
+            atom=atom,
+            building_block_atom=None,
+            building_block=None,
+            building_block_id=None,
+        )
+
+    building_block = building_blocks[json[0]]
+    building_block_atom, = building_block.get_atoms(json[2])
+
     return AtomInfo(
         atom=atom,
-        building_block=(
-            building_blocks[json[0]]
-            if json[0] is not None
-            else None
-        ),
+        building_block_atom=building_block_atom,
+        building_block=building_block,
         building_block_id=json[1],
     )
 
