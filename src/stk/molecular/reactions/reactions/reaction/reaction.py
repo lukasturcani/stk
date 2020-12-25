@@ -86,6 +86,7 @@ class Reaction:
             new_atoms=tuple(self._get_new_atoms()),
             new_bonds=tuple(self._get_new_bonds()),
             deleted_atoms=tuple(self._get_deleted_atoms()),
+            deleted_bonds=tuple(self._get_deleted_bonds()),
         )
 
     def _get_new_atoms(self):
@@ -127,6 +128,19 @@ class Reaction:
         ------
         :class:`.Atom`
             An atom deleted by the reaction.
+
+        """
+
+        raise NotImplementedError()
+
+    def _get_deleted_bonds(self):
+        """
+        Yield the bonds removed by the reaction between existing atoms.
+
+        Yields
+        ------
+        :class:`.Bond`
+            An bond deleted by the reaction.
 
         """
 
