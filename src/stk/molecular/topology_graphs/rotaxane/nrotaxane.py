@@ -38,7 +38,7 @@ class NRotaxane(TopologyGraph):
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
-                repeating_units='A',
+                repeating_unit='A',
                 num_repeating_units=5,
             ),
         )
