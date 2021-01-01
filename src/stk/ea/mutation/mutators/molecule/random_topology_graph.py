@@ -83,6 +83,21 @@ class RandomTopologyGraph(MoleculeMutator):
         self._generator = np.random.RandomState(random_seed)
 
     def mutate(self, record):
+        """
+        Return a mutant of `record`.
+
+        Parameters
+        ----------
+        record : :class:`.MoleculeRecord`
+            The molecule to be mutated.
+
+        Returns
+        -------
+        :class:`.MutationRecord`
+            A record of the mutation.
+
+        """
+
         replacement_func = self._generator.choice(
             a=self._replacement_funcs,
         )

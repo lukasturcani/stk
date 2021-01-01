@@ -77,8 +77,13 @@ class RandomMutator:
             :class:`.MutationRecord` depends on which mutator was
             used.
 
-        None : :class:`NoneType`
-            If `record` cannot be mutated.
+        Raises
+        ------
+        :class:`.MutationPreconditionViolation`
+            If the molecule which is meant to be mutated cannot be,
+            because it does not satisfy the necessary preconditions for
+            the mutation operation. See the
+            :class:`.MutationPreconditionViolation` for more info.
 
         """
 

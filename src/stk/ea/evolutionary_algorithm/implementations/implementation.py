@@ -2,6 +2,7 @@ import itertools as it
 
 from stk.utilities import dedupe
 from ...generation import Generation
+from ...mutation import MutationPreconditionViolation
 
 
 class Implementation:
@@ -40,8 +41,6 @@ class Implementation:
         self._logger = logger
 
     def _get_generations(self, num_generations, map_):
-        def get_mutation_record(batch):
-            return self._mutator.mutate(batch[0])
 
         def get_key(record):
             return self._key_maker.get_key(record.get_molecule())
@@ -74,11 +73,7 @@ class Implementation:
 
             self._logger.info('Doing mutations.')
             mutation_records = tuple(
-                record for record in map(
-                    get_mutation_record,
-                    self._mutation_selector.select(population),
-                )
-                if record is not None
+                self._get_mutation_records(population)
             )
 
             self._logger.info('Calculating fitness values.')
@@ -114,6 +109,18 @@ class Implementation:
                 mutation_records=mutation_records,
                 crossover_records=crossover_records,
             )
+
+    def _get_mutation_records(self, population):
+        for record, in self._mutation_selector.select(population):
+
+            try:
+                yield self._mutator.mutate(record)
+
+            except MutationPreconditionViolation as error:
+                self._logger.info(
+                    'Skipping mutation because it failed with an '
+                    f'allowed error {error}.'
+                )
 
     def _get_crossover_records(self, population):
         for batch in self._crossover_selector.select(population):

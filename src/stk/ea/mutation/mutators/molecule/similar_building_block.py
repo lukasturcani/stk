@@ -117,6 +117,21 @@ class SimilarBuildingBlock(MoleculeMutator):
         self._similar_building_blocks = {}
 
     def mutate(self, record):
+        """
+        Return a mutant of `record`.
+
+        Parameters
+        ----------
+        record : :class:`.MoleculeRecord`
+            The molecule to be mutated.
+
+        Returns
+        -------
+        :class:`.MutationRecord`
+            A record of the mutation.
+
+        """
+
         key = self._key_maker.get_key(record.get_molecule())
         if key not in self._similar_building_blocks:
             # Maps the key to a dict. The dict maps each
