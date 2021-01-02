@@ -7,7 +7,7 @@
 import numpy as np
 
 from .vertices import _AxleVertex, _CycleVertex
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class NRotaxane(TopologyGraph):
@@ -313,6 +313,7 @@ class NRotaxane(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=None,
         )
 

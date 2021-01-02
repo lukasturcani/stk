@@ -310,6 +310,7 @@ class TopologyGraph:
         clone._edges = self._edges
         clone._reaction_factory = self._reaction_factory
         clone._implementation = self._implementation
+        clone._optimizer = self._optimizer
         clone._edge_groups = self._edge_groups
         return clone
 

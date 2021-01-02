@@ -5,7 +5,7 @@ Host Guest Complex
 """
 
 from .vertices import _HostVertex, _GuestVertex
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class Complex(TopologyGraph):
@@ -142,6 +142,7 @@ class Complex(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=(),
         )
 

@@ -7,7 +7,7 @@ Linear
 import numpy as np
 
 from .vertices import _HeadVertex, _TailVertex, _LinearVertex
-from ...topology_graph import TopologyGraph, Edge
+from ...topology_graph import TopologyGraph, Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
 
@@ -287,6 +287,7 @@ class Linear(TopologyGraph):
             edges=tuple(edges),
             reaction_factory=reaction_factory,
             construction_stages=(),
+            optimizer=NullOptimizer(),
             num_processes=num_processes,
         )
 

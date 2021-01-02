@@ -40,7 +40,7 @@ stk.molecular.topology_graphs.metal_complex.square_planar\
 from collections import Counter, defaultdict
 from itertools import product
 
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 from ...reactions import DativeReactionFactory, GenericReactionFactory
 
 
@@ -312,6 +312,7 @@ class MetalComplex(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=None,
         )
 
