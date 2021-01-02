@@ -8,7 +8,6 @@ from functools import partial
 import numpy as np
 
 from stk.utilities import flatten
-from ..optimizer import Optimizer
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
 from ..edge_group import EdgeGroup
@@ -110,8 +109,6 @@ class TopologyGraph:
 
     """
 
-    _optimizer: Optimizer
-
     def __init__(
         self,
         building_block_vertices,
@@ -119,7 +116,7 @@ class TopologyGraph:
         reaction_factory,
         construction_stages,
         num_processes,
-        optimizer: Optimizer,
+        optimizer,
         edge_groups=None,
     ):
         """
@@ -163,7 +160,7 @@ class TopologyGraph:
             The number of parallel processes to create during
             :meth:`construct`.
 
-        optimizer
+        optimizer : :class:`.Optimizer`
             Used to optimize the structure of the constructed
             molecule.
 

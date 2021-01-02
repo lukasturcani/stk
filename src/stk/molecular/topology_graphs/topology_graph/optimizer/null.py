@@ -1,4 +1,3 @@
-from ..construction_state import ConstructionState
 from .optimizer import Optimizer
 
 
@@ -8,5 +7,5 @@ class NullOptimizer(Optimizer):
 
     """
 
-    def optimize(self, state: ConstructionState) -> ConstructionState:
+    def optimize(self, state):
         return state

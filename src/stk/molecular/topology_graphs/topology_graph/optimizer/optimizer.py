@@ -1,6 +1,3 @@
-from ..construction_state import ConstructionState
-
-
 class Optimizer:
     """
     An abstract base class for optimizers.
@@ -10,19 +7,19 @@ class Optimizer:
 
     """
 
-    def optimize(self, state: ConstructionState) -> ConstructionState:
+    def optimize(self, state):
         """
         Optimize the structure of a molecule under construction.
 
         Parameters
         ----------
-        state
+        state : :class:`.ConstructionState`
             The molecule being constructed.
 
         Returns
         -------
-        The optimized construction state.
-
+        :class:`.ConstructionState`
+            The optimized construction state.
 
         """
 
