@@ -163,7 +163,7 @@ class TopologyGraph:
             The number of parallel processes to create during
             :meth:`construct`.
 
-        optimizer : :class:`.Optimizer`
+        optimizer
             Used to optimize the structure of the constructed
             molecule.
 
