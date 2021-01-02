@@ -1,3 +1,10 @@
+"""
+Optimizer
+=========
+
+"""
+
+
 class Optimizer:
     """
     An abstract base class for optimizers.
