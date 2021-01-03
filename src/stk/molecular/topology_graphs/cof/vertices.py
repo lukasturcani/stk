@@ -286,3 +286,79 @@ class _NonLinearCofVertex(_CofVertex):
                 edge_sorter.get_items(),
             )
         }
+
+
+class _UnaligningVertex(_CofVertex):
+    """
+    Just places a building block, does not align.
+
+    """
+
+    def __init__(self, vertex):
+        super().__init__(
+            id=vertex.get_id(),
+            position=vertex.get_position(),
+            aligner_edge=vertex.get_aligner_edge(),
+            cell=vertex.get_cell(),
+        )
+
+    def place_building_block(self, building_block, edges):
+        return building_block.with_centroid(
+            position=self._position,
+            atom_ids=building_block.get_placer_ids(),
+        ).get_position_matrix()
+
+    def map_functional_groups_to_edges(self, building_block, edges):
+
+        return {
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+        }
+
+    @classmethod
+    def init_at_center(
+        cls,
+        id,
+        vertices,
+        aligner_edge=0,
+        cell=(0, 0, 0),
+    ):
+
+        vertex = cls.__new__(cls)
+        vertex._id = id
+        vertex._position = (
+            sum(vertex.get_position() for vertex in vertices)
+            / len(vertices)
+        )
+        vertex._cell = np.array(cell)
+        vertex._aligner_edge = aligner_edge
+        return vertex
+
+    @classmethod
+    def init_at_shifted_center(
+        cls,
+        id,
+        vertices,
+        cell_shifts,
+        lattice_constants,
+        aligner_edge=0,
+        cell=(0, 0, 0),
+    ):
+        new_vertex = cls.__new__(cls)
+        new_vertex._id = id
+
+        positions = []
+        for vertex, cell_shift in zip(vertices, cell_shifts):
+            shift = sum(
+                dim_shift*constant
+                for dim_shift, constant
+                in zip(cell_shift, lattice_constants)
+            )
+            positions.append(vertex.get_position() + shift)
+
+        new_vertex._position = np.divide(
+            np.sum(positions, axis=0),
+            len(positions),
+        )
+        new_vertex._cell = np.array(cell)
+        new_vertex._aligner_edge = aligner_edge
+        return new_vertex
