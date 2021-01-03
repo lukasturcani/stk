@@ -43,6 +43,19 @@ class _CofVertex(Vertex):
         self._aligner_edge = aligner_edge
         self._cell = np.array(cell)
 
+    def get_aligner_edge(self):
+        """
+        Return the aligner edge of the vertex.
+
+        Returns
+        -------
+        :class:`int`
+            The aligner edge.
+
+        """
+
+        return self._aligner_edge
+
     def get_cell(self):
         return np.array(self._cell)
 
@@ -181,6 +194,24 @@ class _LinearCofVertex(_CofVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
+
+        # Align the normal of the plane of best fit, defined by
+        # all atoms in the building block, with the z axis.
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
+        normal = building_block.get_plane_normal()
+        normal = get_acute_vector(
+            reference=core_centroid - self._position,
+            vector=normal,
+        )
+        building_block = building_block.with_rotation_between_vectors(
+            start=normal,
+            target=[0, 0, 1],
+            origin=self._position,
+        )
+
+        # Rotate to place fg-fg vector along edge-edge vector.
         fg, = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(fg.get_placer_ids())
         target = edges[0].get_position() - edges[1].get_position()
@@ -189,24 +220,6 @@ class _LinearCofVertex(_CofVertex):
         building_block = building_block.with_rotation_between_vectors(
             start=fg_centroid - self._position,
             target=target,
-            origin=self._position,
-        )
-
-        # Align the normal of the plane of best fit, defined by
-        # placer_ids, with the z axis.
-        core_centroid = building_block.get_centroid(
-            atom_ids=building_block.get_core_atom_ids(),
-        )
-        normal = building_block.get_plane_normal(
-            atom_ids=building_block.get_placer_ids(),
-        )
-        normal = get_acute_vector(
-            reference=core_centroid - self._position,
-            vector=normal,
-        )
-        building_block = building_block.with_rotation_between_vectors(
-            start=normal,
-            target=[0, 0, 1],
             origin=self._position,
         )
         return building_block.get_position_matrix()
