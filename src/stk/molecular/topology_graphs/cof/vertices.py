@@ -191,15 +191,25 @@ class _LinearCofVertex(_CofVertex):
             target=target,
             origin=self._position,
         )
+
+        # Align the normal of the plane of best fit, defined by
+        # placer_ids, with the z axis.
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        return building_block.with_rotation_to_minimize_angle(
-            start=core_centroid - self._position,
+        normal = building_block.get_plane_normal(
+            atom_ids=building_block.get_placer_ids(),
+        )
+        normal = get_acute_vector(
+            reference=core_centroid - self._position,
+            vector=normal,
+        )
+        building_block = building_block.with_rotation_between_vectors(
+            start=normal,
             target=[0, 0, 1],
-            axis=normalize_vector(target),
             origin=self._position,
-        ).get_position_matrix()
+        )
+        return building_block.get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         fg, = building_block.get_functional_groups(0)
