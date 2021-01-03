@@ -11,6 +11,7 @@ from .fixtures import *  # noqa
         lazy_fixture('cof1'),
         lazy_fixture('cof2'),
         lazy_fixture('cof3'),
+        lazy_fixture('unaligned_cof1'),
     ),
 )
 def case_data(request):
