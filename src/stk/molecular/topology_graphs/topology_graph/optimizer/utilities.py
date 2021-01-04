@@ -5,6 +5,11 @@ This module defines utilities for optimizers.
 
 from mchammer import Bond
 
+
+class OptimizationIncompleteError(Exception):
+    ...
+
+
 def get_mch_bond_topology(state):
     """
     Returns bonds with atom1_id < atom2_id and long bonds to optimize.

@@ -8,6 +8,7 @@ from .optimizer import Optimizer
 from .utilities import (
     get_mch_bond_topology,
     merge_subunits,
+    OptimizationIncompleteError,
 )
 
 import mchammer as mch
@@ -113,3 +114,64 @@ class Collapser(Optimizer):
             mch_result.get_final_position_matrix()
         )
 
+    def get_trajectory_results(self):
+        """
+        Extract trajectory results after optimisation.
+
+        Examples
+        --------
+        This optimisation's trajectory can be output in the
+        :class:`mchammer.Result` data structure if `save_trajectory` is
+        `True`. This data contains the structure at each step and
+        properties of the structure that are being optimised. Here is
+        an example of using this data
+
+        .. code-block:: python
+
+            coll_opt = stk.Collapser(
+                scale_steps=False,
+                save_trajectory=True,
+            )
+            polymer = stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(bb1, bb2),
+                    repeating_unit='AB',
+                    num_repeating_units=6,
+                    optimizer=coll_opt,
+                ),
+            )
+            polymer.write(f'polymer_opt.mol')
+
+            mch_result = coll_opt.get_trajectory_results()
+
+            # Output optimization log.
+            with open(f'TESTING/optimization.out', 'w') as f:
+                f.write(mch_result.get_log())
+
+            # Output trajectory as separate xyz files for
+            # visualisation. Note the use of a temporary stk.Molecule.
+            for step, new_pos_mat in mch_result.get_trajectory():
+                temp_ = polymer.with_position_matrix(new_pos_mat)
+                temp_.write(
+                    f'TESTING/traj_{step}.xyz'
+                )
+
+        Returns
+        -------
+        :class:`mchammer.Result`
+            The trajectory data for the optimisation.
+
+        Raises
+        ------
+        :class:`.OptimizationIncompleteError`
+            Raises if optimization has not been completed.
+
+        """
+
+        if self._trajectory_data is None:
+            raise OptimizationIncompleteError(
+                'Optimization has not been run, so trajectory data is '
+                'not available.'
+            )
+
+        return self._trajectory_data
