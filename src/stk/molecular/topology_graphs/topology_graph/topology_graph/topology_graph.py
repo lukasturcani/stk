@@ -506,6 +506,55 @@ class TopologyGraph:
 
         """
 
+        def merge_subunits_by_buildingblockid(state, subunits):
+            """
+            Merge subunits in stk.Molecule by building block ids.
+
+            """
+
+            subunit_building_block_ids = {i: set() for i in subunits}
+            atom_infos = list(state.get_atom_infos())
+            for su in subunits:
+                su_ids = subunits[su]
+                for su_id in su_ids:
+                    atom_info = [
+                        i for i in atom_infos
+                        if i.get_atom().get_id() == su_id
+                    ][0]
+
+                    subunit_building_block_ids[su].add(
+                        atom_info.get_building_block_id()
+                    )
+
+            new_subunits = {}
+            taken_subunits = set()
+            for su in subunits:
+                bb_ids = subunit_building_block_ids[su]
+                if len(bb_ids) > 1:
+                    raise ValueError(
+                        'Subunits not made up of single BuildingBlock'
+                    )
+                bb_id = list(bb_ids)[0]
+                if su in taken_subunits:
+                    continue
+
+                compound_subunit = subunits[su]
+                has_same_bb_id = [
+                    (su_id, bb_id) for su_id in subunits
+                    if list(
+                        subunit_building_block_ids[su_id]
+                    )[0] == bb_id
+                    and su_id != su
+                ]
+
+                for su_id, bb_id in has_same_bb_id:
+                    for i in subunits[su_id]:
+                        compound_subunit.add(i)
+                    taken_subunits.add(su_id)
+                new_subunits[su] = compound_subunit
+
+            return new_subunits
+
         # Define MCHammer molecule to optimize.
         # Define long bonds based on bond_info.
         long_bond_ids = []
@@ -545,21 +594,28 @@ class TopologyGraph:
 
         # Run optimization.
         optimizer = mch.Optimizer(
-            # set this to a tmp dir or remove?
-            output_dir='TESTING',
             # How to allow the user to modify these settings
             # (and all other settings)?
             step_size=0.25,
             target_bond_length=1.2,
             num_steps=1000,
         )
-        mch_mol = optimizer.optimize(
-            mol=mch_mol,
+        subunits = mch_mol.get_subunits(
             bond_pair_ids=long_bond_ids,
         )
+        # Just get final step.
+        mch_result = optimizer.get_result(
+            mol=mch_mol,
+            bond_pair_ids=long_bond_ids,
+            # Can merge subunits to match distinct BuildingBlocks in
+            # stk ConstructedMolecule.
+            subunits=merge_subunits_by_buildingblockid(
+                state, subunits
+            ),
+        )
 
-            results=mch_mol.get_position_matrix()
         return state.with_position_matrix(
+            mch_result.get_final_position_matrix()
         )
 
     def _get_stages(self, construction_stages):
