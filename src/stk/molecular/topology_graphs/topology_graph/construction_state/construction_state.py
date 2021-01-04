@@ -285,26 +285,26 @@ class ConstructionState:
 
         return self.clone()._with_reaction_results(reactions, results)
 
-    def _with_optimization_results(self, results):
+    def _with_position_matrix(self, position_matrix):
         """
         Modify the instance.
 
         """
 
         self._molecule_state = (
-            self._molecule_state.with_optimization_results(
-                results=results,
+            self._molecule_state.with_position_matrix(
+                position_matrix=position_matrix,
             )
         )
         return self
 
-    def with_optimization_results(self, results):
+    def with_position_matrix(self, position_matrix):
         """
-        Return a clone holding the optimization results.
+        Return a clone holding the optimization position_matrix.
 
         Parameters
         ----------
-        results :
+        position_matrix :
             NEW POS MAT
 
         Returns
@@ -315,7 +315,7 @@ class ConstructionState:
 
         """
 
-        return self.clone()._with_optimization_results(results)
+        return self.clone()._with_position_matrix(position_matrix)
 
     def _with_vertices(self, vertices):
         """

@@ -558,8 +558,8 @@ class TopologyGraph:
             bond_pair_ids=long_bond_ids,
         )
 
-        return state.with_optimization_results(
             results=mch_mol.get_position_matrix()
+        return state.with_position_matrix(
         )
 
     def _get_stages(self, construction_stages):
