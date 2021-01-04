@@ -8,7 +8,7 @@ import numpy as np
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
-from ..topology_graph import Edge
+from ..topology_graph import Edge, NullOptimizer
 from ...periodic_info import PeriodicInfo
 
 
@@ -39,7 +39,7 @@ class PeriodicHoneycomb(Cof):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
-        optimize=False,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.PeriodicHoneycomb` instance.
@@ -82,6 +82,10 @@ class PeriodicHoneycomb(Cof):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule. Defaults to :class:`NullOptimizer`.
+
         Raises
         ------
         :class:`AssertionError`
@@ -112,6 +116,7 @@ class PeriodicHoneycomb(Cof):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
+            optimizer=optimizer,
         )
 
     def get_periodic_info(self):

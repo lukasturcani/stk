@@ -158,7 +158,7 @@ class Macrocycle(TopologyGraph):
         random_seed=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
-        optimize=False,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`Macrocycle` instance.
@@ -204,6 +204,10 @@ class Macrocycle(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule. Defaults to :class:`NullOptimizer`.
 
         Raises
         ------
@@ -280,9 +284,8 @@ class Macrocycle(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
-            optimizer=NullOptimizer(),
+            optimizer=optimizer,
             edge_groups=None,
-            optimize=optimize,
         )
 
     def clone(self):

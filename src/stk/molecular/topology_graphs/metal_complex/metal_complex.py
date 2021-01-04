@@ -224,7 +224,7 @@ class MetalComplex(TopologyGraph):
         ligands,
         reaction_factory=None,
         num_processes=1,
-        optimize=False,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.MetalComplex`.
@@ -272,6 +272,10 @@ class MetalComplex(TopologyGraph):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule. Defaults to :class:`NullOptimizer`.
+
         """
 
         building_block_vertices = self._normalize_metals(metals)
@@ -313,9 +317,8 @@ class MetalComplex(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
-            optimizer=NullOptimizer(),
+            optimizer=optimizer,
             edge_groups=None,
-            optimize=optimize,
         )
 
     def _normalize_metals(self, metals):

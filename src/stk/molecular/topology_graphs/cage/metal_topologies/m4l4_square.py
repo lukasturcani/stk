@@ -6,7 +6,7 @@ M4L4 Square
 
 from ..cage import Cage
 from ..vertices import _LinearCageVertex
-from ...topology_graph import Edge
+from ...topology_graph import Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
 
@@ -30,7 +30,7 @@ class M4L4Square(Cage):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
-        optimize=False,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.M4L4Square`.
@@ -77,6 +77,10 @@ class M4L4Square(Cage):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule. Defaults to :class:`NullOptimizer`.
+
         """
 
         if isinstance(corners, dict):
@@ -99,7 +103,7 @@ class M4L4Square(Cage):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
-            optimize=optimize,
+            optimizer=optimizer,
         )
 
     _vertex_prototypes = (

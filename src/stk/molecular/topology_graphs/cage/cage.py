@@ -525,7 +525,7 @@ class Cage(TopologyGraph):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
-        optimize=False,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.Cage`.
@@ -564,6 +564,10 @@ class Cage(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule. Defaults to :class:`NullOptimizer`.
 
         Raises
         ------
@@ -614,9 +618,8 @@ class Cage(TopologyGraph):
                 in sorted(self._vertices_of_degree, reverse=True)
             ),
             num_processes=num_processes,
-            optimizer=NullOptimizer(),
+            optimizer=optimizer,
             edge_groups=None,
-            optimize=optimize,
         )
 
     @classmethod

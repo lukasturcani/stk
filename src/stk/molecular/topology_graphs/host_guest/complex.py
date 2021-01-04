@@ -75,7 +75,7 @@ class Complex(TopologyGraph):
         guest_target=None,
         displacement=(0, 0, 0),
         num_processes=1,
-        optimize=False,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize an instance of :class:`.Complex`.
@@ -102,6 +102,10 @@ class Complex(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule. Defaults to :class:`NullOptimizer`.
 
         Raises
         ------
@@ -143,9 +147,8 @@ class Complex(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
-            optimizer=NullOptimizer(),
+            optimizer=optimizer,
             edge_groups=(),
-            optimize=optimize,
         )
 
     def clone(self):
