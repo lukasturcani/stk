@@ -5,12 +5,14 @@ Host Guest Complex
 """
 
 from .vertices import _HostVertex, _GuestVertex
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class Complex(TopologyGraph):
     """
     Represents a host-guest complex topology graph.
+
+    Host and guest building blocks do not require functional groups.
 
     Examples
     --------
@@ -141,6 +143,7 @@ class Complex(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=(),
             optimize=optimize,
         )

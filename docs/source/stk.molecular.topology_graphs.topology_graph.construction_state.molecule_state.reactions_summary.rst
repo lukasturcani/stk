@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.topology_graph.construction_state.molecule_state.reactions_summary.atom_batch
    stk.molecular.topology_graphs.topology_graph.construction_state.molecule_state.reactions_summary.bond_batch

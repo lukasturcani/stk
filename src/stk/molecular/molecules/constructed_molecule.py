@@ -226,12 +226,19 @@ class ConstructedMolecule(Molecule):
             for building_block in self._num_building_blocks
         }
 
+        # Cache these mappings for later, to avoid unnecessary
+        # re-computations of canonical ordering.
+        canonical_map = {
+            building_block: building_block.get_canonical_atom_ids()
+            for building_block in self._num_building_blocks
+        }
+
         self._num_building_blocks = {
             building_block: num
             for building_block, num
             in zip(
                 building_blocks.values(),
-                self._num_building_blocks.values()
+                self._num_building_blocks.values(),
             )
         }
 
@@ -248,16 +255,43 @@ class ConstructedMolecule(Molecule):
         old_atom_infos = self._atom_infos
 
         def get_atom_info(atom):
-            info = old_atom_infos[id_map[atom.get_id()]]
-            building_block = info.get_building_block()
+
+            old_atom_info = old_atom_infos[id_map[atom.get_id()]]
+            old_building_block = old_atom_info.get_building_block()
+
+            if old_building_block is None:
+                return AtomInfo(
+                    atom=atom,
+                    building_block_atom=None,
+                    building_block=None,
+                    building_block_id=None,
+                )
+
+            old_building_block_atom = (
+                old_atom_info.get_building_block_atom()
+            )
+
+            canonical_building_block_atom_id = canonical_map[
+                old_building_block
+            ][old_building_block_atom.get_id()]
+
+            canonical_building_block = building_blocks[
+                old_building_block
+            ]
+
+            canonical_building_block_atom, = (
+                canonical_building_block.get_atoms(
+                    atom_ids=canonical_building_block_atom_id,
+                )
+            )
+
             return AtomInfo(
                 atom=atom,
-                building_block=(
-                    building_block
-                    if building_block is None
-                    else building_blocks[building_block]
+                building_block_atom=canonical_building_block_atom,
+                building_block=canonical_building_block,
+                building_block_id=(
+                    old_atom_info.get_building_block_id()
                 ),
-                building_block_id=info.get_building_block_id(),
             )
 
         def get_bond_info(info):

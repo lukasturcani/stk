@@ -19,6 +19,14 @@ class PeriodicLinkerlessHoneycomb(Cof):
     Building blocks with three functional groups are required
     for this topology graph.
 
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cof-topology-graph-examples`:
+    *Multi-Building Block COF Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
+
+        | 3-functional groups: 0 to 1
+
     See :class:`.Cof` for more details and examples.
 
     """

@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.crossover.crossers
    stk.ea.crossover.records

@@ -16,20 +16,16 @@ class M4L6TetrahedronSpacer(Cage):
     Represents a cage topology graph.
 
     This topology places a ditopic spacer between the vertices of the
-    tetrahderon.
+    tetrahedron.
 
-    Metal-based building blocks with three functional groups are
-    required for this topology.
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
 
-    Linker building blocks with two functional groups are required for
-    this topology.
-
-    When using a :class:`dict` for initialization, a
-    :class:`.BuildingBlock` needs to be assigned to each of the
-    following numbers:
-
-        | metals: (0, 1, 2, 3)
-        | linkers: (4, 5, 6, 7, 8, 9)
+        | 3-functional groups: 0 to 3
+        | 2-functional groups: 4 to 9
 
     Examples
     --------

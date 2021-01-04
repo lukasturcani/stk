@@ -10,6 +10,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.cage.metal_topologies
    stk.molecular.topology_graphs.cage.three_plus_four
@@ -22,6 +23,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.cage.cage
    stk.molecular.topology_graphs.cage.cage_construction_state

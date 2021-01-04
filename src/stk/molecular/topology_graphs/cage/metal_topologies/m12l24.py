@@ -19,12 +19,14 @@ class M12L24(Cage):
     Ligand building blocks with two functional groups are required for
     this topology.
 
-    When using a :class:`dict` for initialization, a
-    :class:`.BuildingBlock` needs to be assigned to each of the
-    following numbers:
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
 
-        | metals: 0 to 11
-        | ligands: 12 to 35
+        | 4-functional groups: 0 to 11
+        | 2-functional groups: 12 to 35
 
     See :class:`.Cage` for more details and examples.
 

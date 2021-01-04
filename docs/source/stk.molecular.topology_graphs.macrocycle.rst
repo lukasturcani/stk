@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.macrocycle.macrocycle
    stk.molecular.topology_graphs.macrocycle.vertices

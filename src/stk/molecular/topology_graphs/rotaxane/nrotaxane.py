@@ -7,12 +7,14 @@
 import numpy as np
 
 from .vertices import _AxleVertex, _CycleVertex
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class NRotaxane(TopologyGraph):
     """
     Represents [n]rotaxane topology graphs.
+
+    Axle and cycle building blocks do not require functional groups.
 
     This class assumes one axle with (n-1) macrocycles threaded on it.
     The macrocycles are spaced evenly along the axle in repeating
@@ -36,7 +38,7 @@ class NRotaxane(TopologyGraph):
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
-                repeating_units='A',
+                repeating_unit='A',
                 num_repeating_units=5,
             ),
         )
@@ -312,6 +314,7 @@ class NRotaxane(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=None,
             optimize=optimize,
         )

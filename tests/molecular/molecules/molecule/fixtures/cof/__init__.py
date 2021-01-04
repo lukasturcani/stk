@@ -1,1 +1,1 @@
-from .cof import *
+from .cof import *  # noqa

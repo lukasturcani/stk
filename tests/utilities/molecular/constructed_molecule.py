@@ -65,6 +65,15 @@ def is_equivalent_atom_info(info1, info2):
             info1.get_building_block(),
             info2.get_building_block(),
         )
+
+    if info1.get_building_block_atom() is None:
+        assert info2.get_building_block_atom() is None
+    else:
+        is_equivalent_atom(
+            atom1=info1.get_building_block_atom(),
+            atom2=info2.get_building_block_atom(),
+        )
+
     assert (
         info1.get_building_block_id() == info2.get_building_block_id()
     )

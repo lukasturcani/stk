@@ -7,13 +7,16 @@ Macrocycle
 import numpy as np
 
 from .vertices import _CycleVertex
-from ..topology_graph import TopologyGraph, Edge
+from ..topology_graph import TopologyGraph, NullOptimizer, Edge
 from ...reactions import GenericReactionFactory
 
 
 class Macrocycle(TopologyGraph):
     """
     Represents a macrocycle topology graph.
+
+    Building blocks with two functional groups are required
+    for this topology.
 
     Examples
     --------
@@ -277,6 +280,7 @@ class Macrocycle(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=None,
             optimize=optimize,
         )

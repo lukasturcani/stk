@@ -7,13 +7,17 @@ Linear
 import numpy as np
 
 from .vertices import _HeadVertex, _TailVertex, _LinearVertex
-from ...topology_graph import TopologyGraph, Edge
+from ...topology_graph import TopologyGraph, Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
 
 class Linear(TopologyGraph):
     """
     Represents a linear polymer topology graph.
+
+    Building blocks with two functional groups are required, unless the
+    building block's position is specified to only be at the capping
+    positions.
 
     Examples
     --------
@@ -284,6 +288,7 @@ class Linear(TopologyGraph):
             edges=tuple(edges),
             reaction_factory=reaction_factory,
             construction_stages=(),
+            optimizer=NullOptimizer(),
             num_processes=num_processes,
             optimize=optimize,
         )

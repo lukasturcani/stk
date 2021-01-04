@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.ea.fitness_normalizers.add
    stk.ea.fitness_normalizers.divide_by_mean

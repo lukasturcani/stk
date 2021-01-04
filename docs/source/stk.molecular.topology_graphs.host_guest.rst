@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.host_guest.complex
    stk.molecular.topology_graphs.host_guest.vertices

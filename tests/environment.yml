@@ -1,4 +1,4 @@
-name: stk_test
+name: stk-test
 channels:
   - rdkit
   - defaults

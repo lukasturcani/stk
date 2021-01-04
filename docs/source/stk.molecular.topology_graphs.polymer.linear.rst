@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.topology_graphs.polymer.linear.linear
    stk.molecular.topology_graphs.polymer.linear.vertices

@@ -1,1 +1,1 @@
-from .macrocycle import *
+from .macrocycle import *  # noqa

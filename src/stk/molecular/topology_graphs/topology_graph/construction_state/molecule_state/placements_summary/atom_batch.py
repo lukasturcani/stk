@@ -46,6 +46,7 @@ class _AtomBatch:
             atom_infos.append(
                 AtomInfo(
                     atom=_atoms[-1],
+                    building_block_atom=atom,
                     building_block=building_block,
                     building_block_id=building_block_id,
                 )

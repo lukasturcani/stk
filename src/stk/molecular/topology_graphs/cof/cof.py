@@ -32,7 +32,7 @@ import numpy as np
 from functools import partial
 from operator import getitem
 
-from ..topology_graph import TopologyGraph, EdgeGroup
+from ..topology_graph import TopologyGraph, NullOptimizer, EdgeGroup
 from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
 
@@ -64,6 +64,8 @@ class Cof(TopologyGraph):
     COF topologies are added by creating a subclass, which defines
     the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
+
+    .. _cof-topology-graph-examples:
 
     Examples
     --------
@@ -325,6 +327,7 @@ class Cof(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=self._get_edge_groups(edges),
             optimize=optimize,
         )

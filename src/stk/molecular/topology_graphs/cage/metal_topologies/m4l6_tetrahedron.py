@@ -20,6 +20,14 @@ class M4L6Tetrahedron(Cage):
     Building blocks with three functional groups are required for this
     topology.
 
+    When using a :class:`dict` for the `building_blocks` parameter,
+    as in :ref:`cage-topology-graph-examples`:
+    *Multi-Building Block Cage Construction*, a
+    :class:`.BuildingBlock`, with the following number of functional
+    groups, needs to be assigned to each of the following vertex ids:
+
+        | 3-functional groups: 0 to 3
+
     Examples
     --------
     *Building Metal-Organic Tetrahedron*
@@ -101,7 +109,7 @@ class M4L6Tetrahedron(Cage):
         # Build an M4L6 Tetrahedron.
         cage2 = stk.ConstructedMolecule(
             stk.cage.M4L6Tetrahedron(
-                building_blocks=iron_oct_delta,
+                building_blocks=(iron_oct_delta, ),
             )
         )
 

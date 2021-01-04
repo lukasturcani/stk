@@ -117,7 +117,7 @@ from functools import partial
 
 from .vertices import _UnaligningVertex
 from .cage_construction_state import _CageConstructionState
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 from ...reactions import GenericReactionFactory
 
 
@@ -148,6 +148,8 @@ class Cage(TopologyGraph):
     Cage topologies are added by creating a subclass, which defines the
     :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
     attributes.
+
+    .. _cage-topology-graph-examples:
 
     Examples
     --------
@@ -612,6 +614,7 @@ class Cage(TopologyGraph):
                 in sorted(self._vertices_of_degree, reverse=True)
             ),
             num_processes=num_processes,
+            optimizer=NullOptimizer(),
             edge_groups=None,
             optimize=optimize,
         )

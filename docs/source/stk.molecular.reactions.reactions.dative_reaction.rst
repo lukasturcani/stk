@@ -10,6 +10,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    stk.molecular.reactions.reactions.dative_reaction.dative_reaction
    stk.molecular.reactions.reactions.dative_reaction.utilities

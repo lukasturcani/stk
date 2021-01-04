@@ -1,7 +1,7 @@
-from .center import *
-from .head_1 import *
-from .head_2 import *
-from .head_3 import *
-from .tail_1 import *
-from .tail_2 import *
-from .tail_3 import *
+from .center import *  # noqa
+from .head_1 import *  # noqa
+from .head_2 import *  # noqa
+from .head_3 import *  # noqa
+from .tail_1 import *  # noqa
+from .tail_2 import *  # noqa
+from .tail_3 import *  # noqa

@@ -118,8 +118,8 @@ class TopologyGraph:
         reaction_factory,
         construction_stages,
         num_processes,
+        optimizer,
         edge_groups=None,
-        optimize=False,
     ):
         """
         Initialize an instance of :class:`.TopologyGraph`.
@@ -162,13 +162,13 @@ class TopologyGraph:
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`
+            Used to optimize the structure of the constructed
+            molecule.
+
         edge_groups : :class:`tuple` of :class:`.EdgeGroup`, optional
             The edge groups of the topology graph, if ``None``, every
             :class:`.Edge` is in its own edge group.
-
-        optimize : :class:`bool`, optional
-            `True` to apply cheap MCHammer optimization to long bonds
-            created during construction. Defaults to `False`
 
         """
 
@@ -200,7 +200,8 @@ class TopologyGraph:
                 EdgeGroup((edge, )) for edge in self._edges
             )
         self._edge_groups = edge_groups
-        self._optimize = optimize
+
+        self._optimizer = optimizer
 
     def _with_building_blocks(self, building_block_map):
         """
@@ -311,8 +312,8 @@ class TopologyGraph:
         clone._edges = self._edges
         clone._reaction_factory = self._reaction_factory
         clone._implementation = self._implementation
+        clone._optimizer = self._optimizer
         clone._edge_groups = self._edge_groups
-        clone._optimize = self._optimize
         return clone
 
     def get_building_blocks(self):
@@ -404,8 +405,7 @@ class TopologyGraph:
         state = self._get_construction_state()
         state = self._place_building_blocks(state)
         state = self._run_reactions(state)
-        if self._optimize:
-            state = self._run_optimization(state)
+        state = self._optimizer.optimize(state)
         return ConstructionResult(state)
 
     def _get_construction_state(self):

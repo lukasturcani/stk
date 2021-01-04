@@ -68,21 +68,25 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
                 atom_infos=(
                     stk.AtomInfo(
                         atom=stk.C(0, 2),
+                        building_block_atom=stk.C(0, 2),
                         building_block=canonical_bb1,
                         building_block_id=0,
                     ),
                     stk.AtomInfo(
                         atom=stk.O(1, 1),
+                        building_block_atom=stk.O(0, 1),
                         building_block=canonical_bb2,
                         building_block_id=1,
                     ),
                     stk.AtomInfo(
                         atom=stk.N(2, 1),
+                        building_block_atom=stk.N(2, 1),
                         building_block=canonical_bb1,
                         building_block_id=0,
                     ),
                     stk.AtomInfo(
                         atom=stk.S(3),
+                        building_block_atom=stk.S(2),
                         building_block=canonical_bb2,
                         building_block_id=1,
                     ),

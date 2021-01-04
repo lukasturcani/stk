@@ -1,19 +1,19 @@
-from .primary_amino import *
-from .secondary_amino import *
-from .single_atom import *
-from .aldehyde import *
-from .carboxylic_acid import *
-from .amide import *
-from .thioacid import *
-from .alcohol import *
-from .alkene import *
-from .alkyne import *
-from .boronic_acid import *
-from .bromo import *
-from .dibromo import *
-from .difluoro import *
-from .diol import *
-from .fluoro import *
-from .iodo import *
-from .thiol import *
-from .ring_amine import *
+from .primary_amino import *  # noqa
+from .secondary_amino import *  # noqa
+from .single_atom import *  # noqa
+from .aldehyde import *  # noqa
+from .carboxylic_acid import *  # noqa
+from .amide import *  # noqa
+from .thioacid import *  # noqa
+from .alcohol import *  # noqa
+from .alkene import *  # noqa
+from .alkyne import *  # noqa
+from .boronic_acid import *  # noqa
+from .bromo import *  # noqa
+from .dibromo import *  # noqa
+from .difluoro import *  # noqa
+from .diol import *  # noqa
+from .fluoro import *  # noqa
+from .iodo import *  # noqa
+from .thiol import *  # noqa
+from .ring_amine import *  # noqa

@@ -16,7 +16,8 @@ class _DeletionsSummary:
         '_bonds',
         '_bond_infos',
         '_position_matrix',
-        '_deleted_ids',
+        '_deleted_atom_ids',
+        '_deleted_bond_ids',
 
         '_valid_atoms',
         '_valid_atom_infos',
@@ -32,7 +33,8 @@ class _DeletionsSummary:
         bonds,
         bond_infos,
         position_matrix,
-        deleted_ids,
+        deleted_atom_ids,
+        deleted_bond_ids,
     ):
         """
         Initialize a :class:`._DeletionsSummary` instance.
@@ -54,8 +56,11 @@ class _DeletionsSummary:
         position_matrix : :class:`numpy.ndarray`
             The position matrix for all the `atoms`.
 
-        deleted_ids : :class:`iterable` of :class:`int`
+        deleted_atom_ids : :class:`iterable` of :class:`int`
             The ids of `atoms`, which should be deleted.
+
+        deleted_bond_ids : :class:`iterable` of :class:`._BondId`
+            Ids of bonds that should be deleted.
 
         """
 
@@ -64,7 +69,8 @@ class _DeletionsSummary:
         self._bonds = tuple(bonds)
         self._bond_infos = tuple(bond_infos)
         self._position_matrix = np.array(position_matrix)
-        self._deleted_ids = set(deleted_ids)
+        self._deleted_atom_ids = set(deleted_atom_ids)
+        self._deleted_bond_ids = set(deleted_bond_ids)
 
         self._valid_atoms = []
         self._valid_atom_infos = []
@@ -86,10 +92,11 @@ class _DeletionsSummary:
         atoms = self._atoms
         atom_infos = self._atom_infos
         position_matrix = self._position_matrix
-        deleted_ids = self._deleted_ids
+        deleted_atom_ids = self._deleted_atom_ids
+        deleted_bond_ids = self._deleted_bond_ids
 
         def valid_atom(atom):
-            return atom.get_id() not in deleted_ids
+            return atom.get_id() not in deleted_atom_ids
 
         valid_atoms = self._valid_atoms
         valid_atom_infos = self._valid_atom_infos
@@ -104,6 +111,7 @@ class _DeletionsSummary:
             valid_atom_infos.append(
                 AtomInfo(
                     atom=valid_atoms[-1],
+                    building_block_atom=info.get_building_block_atom(),
                     building_block=info.get_building_block(),
                     building_block_id=info.get_building_block_id(),
                 )
@@ -115,9 +123,12 @@ class _DeletionsSummary:
 
         def valid_bond(bond_data):
             index, bond = bond_data
+            atom1_id = bond.get_atom1().get_id()
+            atom2_id = bond.get_atom2().get_id()
             return (
-                bond.get_atom1().get_id() not in deleted_ids
-                and bond.get_atom2().get_id() not in deleted_ids
+                atom1_id not in deleted_atom_ids
+                and atom2_id not in deleted_atom_ids
+                and (atom1_id, atom2_id) not in deleted_bond_ids
             )
 
         bonds = self._bonds

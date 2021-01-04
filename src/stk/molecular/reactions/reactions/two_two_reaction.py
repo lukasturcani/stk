@@ -98,3 +98,7 @@ class TwoTwoReaction(Reaction):
     def _get_deleted_atoms(self):
         yield from self._functional_group1.get_deleters()
         yield from self._functional_group2.get_deleters()
+
+    def _get_deleted_bonds(self):
+        return
+        yield
