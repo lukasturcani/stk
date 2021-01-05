@@ -16,11 +16,28 @@ import mchammer as mch
 
 class Collapser(Optimizer):
     """
-    Perform rigid-body collapse of molecule.
+    Perform rigid-body collapse of molecule [1]_.
 
-    Implementation: [1]_
+    Examples
+    --------
+    Optimisation with stk simply collects the final position matrix.
+    The optimisation's trajectory can be output using the MCHammer
+    implementation if required by the user [1]_.
 
-    .. [1] https://github.com/andrewtarzia/MCHammer.
+    .. code-block:: python
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+        polymer.write(f'polymer_opt.mol')
+
+    References
+    ----------
+    .. [1] https://github.com/andrewtarzia/MCHammer
 
     """
 
@@ -29,7 +46,6 @@ class Collapser(Optimizer):
         step_size=0.1,
         distance_threshold=1.5,
         scale_steps=True,
-        save_trajectory=False,
     ):
         """
         Initialize an instance of :class:`.Collapser`.
@@ -37,23 +53,16 @@ class Collapser(Optimizer):
         Parameters
         ----------
         step_size : :class:`float`, optional
-            The relative size of the step to take during collapse.
-            Defaults to 0.1 Angstrom.
+            The relative size of the step to take during collapse in
+            Angstrom.
 
         distance_threshold : :class:`float`, optional
             Distance between distinct subunits to use as
             threshold for halting collapse in Angstrom.
-            Defaults to 1.5 Angstrom.
 
         scale_steps : :class:`bool`, optional
             Whether to scale the step of each distict building block
             by their relative distance from the molecules centroid.
-            Defaults to ``True``
-
-        save_trajectory : :class:`bool`, optional
-            `True` to save Collapser trajectory and information in
-            :attr:`_trajectory_data`.
-            Defaults to `False`.
 
         """
         self._optimizer = mch.Collapser(
@@ -63,21 +72,6 @@ class Collapser(Optimizer):
         )
 
     def optimize(self, state):
-        """
-        Optimize the structure of a molecule under construction.
-
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The molecule being constructed.
-
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The optimized construction state.
-
-        """
-
         # Define MCHammer molecule to optimize.
         long_bond_ids, mch_bonds = get_mch_bond_topology(state)
 

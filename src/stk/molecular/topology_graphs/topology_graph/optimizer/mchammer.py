@@ -16,11 +16,29 @@ import mchammer as mch
 
 class MCHammer(Optimizer):
     """
-    Perform Monte Carlo based optimisation of long-bonds in molecule.
+    Perform Monte Carlo optimisation of long-bonds in molecule [1]_.
 
-    Implementation: [1]_
+    Examples
+    --------
+    Optimisation with stk simply collects the final position matrix.
+    The optimisation's trajectory can be output using the MCHammer
+    implementation if required by the user [1]_.
 
-    .. [1] https://github.com/andrewtarzia/MCHammer.
+    .. code-block:: python
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=6,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+        polymer.write(f'polymer_opt.mol')
+
+    References
+    ----------
+    .. [1] https://github.com/andrewtarzia/MCHammer
 
     """
 
@@ -35,7 +53,6 @@ class MCHammer(Optimizer):
         nonbond_mu=3,
         beta=2,
         random_seed=None,
-        save_trajectory=False,
     ):
         """
         Initialize an instance of :class:`.MCHammer`.
@@ -44,51 +61,38 @@ class MCHammer(Optimizer):
         ----------
         step_size : :class:`float`, optional
             The relative size of the step to take during step.
-            Defaults to 0.25.
 
         target_bond_length : :class:`float`, optional
             Target equilibrium bond length for long bonds to minimize
-            to.
-            Defaults to 1.2 Angstrom.
+            to in Angstrom.
 
         num_steps : :class:`int`, optional
             Number of MC moves to perform.
-            Defaults to 500 steps.
 
         bond_epsilon : :class:`float`, optional
             Value of epsilon used in the bond potential in MC moves.
             Determines strength of the bond potential.
-            Defaults to 50.
 
         nonbond_epsilon : :class:`float`, optional
             Value of epsilon used in the nonbond potential in MC moves.
             Determines strength of the nonbond potential.
-            Defaults to 20.
 
         nonbond_sigma : :class:`float`, optional
             Value of sigma used in the nonbond potential in MC moves.
-            Defaults to 1.2.
 
         nonbond_mu : :class:`float`, optional
             Value of mu used in the nonbond potential in MC moves.
             Determines the steepness of the nonbond potential.
-            Defaults to 3.
 
         beta : :class:`float`, optional
             Value of beta used in the in MC moves. Beta takes the
             place of the inverse boltzmann temperature.
-            Defaults to 2.
 
         random_seed : :class:`int`, optional
             Random seed to use for MC algorithm. Should only be set
             if exactly reproducible results are required, otherwise
             a system-based random seed should be used for proper
             sampling.
-
-        save_trajectory : :class:`bool`, optional
-            `True` to save MCHammer trajectory and information in
-            :attr:`_trajectory_data`.
-            Defaults to `False`.
 
         """
         self._optimizer = mch.Optimizer(
@@ -102,25 +106,8 @@ class MCHammer(Optimizer):
             beta=beta,
             random_seed=random_seed,
         )
-        self._save_trajectory = save_trajectory
-        self._trajectory_data = None
 
     def optimize(self, state):
-        """
-        Optimize the structure of a molecule under construction.
-
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The molecule being constructed.
-
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The optimized construction state.
-
-        """
-
         # Define MCHammer molecule to optimize.
         long_bond_ids, mch_bonds = get_mch_bond_topology(state)
 
