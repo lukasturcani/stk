@@ -3,7 +3,8 @@ This module defines utilities for optimizers.
 
 """
 
-from mchammer import Bond
+import mchammer as mch
+from collections import defaultdict
 
 
 class OptimizationIncompleteError(Exception):
@@ -44,49 +45,23 @@ def get_mch_bond_topology(state):
     return long_bond_ids, mch_bonds
 
 
-def merge_subunits(state, subunits):
+def get_subunits(state):
     """
-    Merge subunits in stk.Molecule by building block ids.
+    Get connected graphs based on building block ids.
+
+    Returns
+    -------
+    subunits : :class:`.dict`
+        The subunits of `mol` split by building block id. Key is
+        subunit identifier, Value is :class:`iterable` of atom ids in
+        subunit.
 
     """
 
-    subunit_building_block_ids = {i: set() for i in subunits}
-    atom_infos = list(state.get_atom_infos())
-    for su in subunits:
-        su_ids = subunits[su]
-        for su_id in su_ids:
-            atom_info = [
-                i for i in atom_infos
-                if i.get_atom().get_id() == su_id
-            ][0]
+    subunits = defaultdict(list)
+    for atom_info in state.get_atom_infos():
+        subunits[atom_info.get_building_block_id()].append(
+            atom_info.get_atom().get_id()
+        )
 
-            subunit_building_block_ids[su].add(
-                atom_info.get_building_block_id()
-            )
-
-    new_subunits = {}
-    taken_subunits = set()
-    for su in subunits:
-        bb_ids = subunit_building_block_ids[su]
-        if len(bb_ids) > 1:
-            raise ValueError(
-                'Subunits not made up of singular BuildingBlock'
-            )
-        bb_id = list(bb_ids)[0]
-        if su in taken_subunits:
-            continue
-
-        compound_subunit = subunits[su]
-        has_same_bb_id = [
-            (su_id, bb_id) for su_id in subunits
-            if list(subunit_building_block_ids[su_id])[0] == bb_id
-            and su_id != su
-        ]
-
-        for su_id, bb_id in has_same_bb_id:
-            for i in subunits[su_id]:
-                compound_subunit.add(i)
-            taken_subunits.add(su_id)
-        new_subunits[su] = compound_subunit
-
-    return new_subunits
+    return subunits
