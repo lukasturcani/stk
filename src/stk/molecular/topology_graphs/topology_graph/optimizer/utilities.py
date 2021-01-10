@@ -7,10 +7,6 @@ import mchammer as mch
 from collections import defaultdict
 
 
-class OptimizationIncompleteError(Exception):
-    ...
-
-
 def get_mch_bond_topology(state):
     """
     Returns bond topology including long bonds to optimize.
@@ -22,10 +18,10 @@ def get_mch_bond_topology(state):
     for i, bond_infos in enumerate(state.get_bond_infos()):
         ba1 = bond_infos.get_bond().get_atom1().get_id()
         ba2 = bond_infos.get_bond().get_atom2().get_id()
-        # Must ensure bond atom id ordering is such that
-        # atom1_id < atom2_id.
+        # Must ensure bond atom id ordering is the same here as in
+        # line 30. Therefore, sort here.
         ba1, ba2 = sorted((ba1, ba2))
-        mch_bonds.append(mch.Bond(id=i, atom1_id=ba1, atom2_id=ba2))
+        mch_bonds.append(mch.Bond(id=i, atom_ids=(ba1, ba2)))
 
         # Define long bonds based on bond_info.
         # None for constructed bonds.

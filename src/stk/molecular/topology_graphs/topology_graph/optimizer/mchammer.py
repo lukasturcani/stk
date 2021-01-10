@@ -8,7 +8,6 @@ from .optimizer import Optimizer
 from .utilities import (
     get_mch_bond_topology,
     get_subunits,
-    OptimizationIncompleteError,
 )
 
 import mchammer as mch
@@ -123,10 +122,11 @@ class MCHammer(Optimizer):
         )
 
         # Run optimization.
+        mch_mol, results = self._optimizer.get_result(
+            mol=mch_mol,
+            bond_pair_ids=long_bond_ids,
+            subunits=get_subunits(state),
+        )
         return state.with_position_matrix(
-            self._optimizer.get_result(
-                mol=mch_mol,
-                bond_pair_ids=long_bond_ids,
-                subunits=get_subunits(state),
-            ).get_final_position_matrix()
+            mch_mol.get_position_matrix()
         )
