@@ -90,3 +90,42 @@ linker = stk.BuildingBlock(
 )
 def metal_cage_m4l4_square(request):
     return request.param
+
+
+@pytest.fixture(
+    params=(
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                stk.cage.M4L4Square(
+                    corners=palladium_cispbi_sqpl,
+                    linkers=linker,
+                    reaction_factory=stk.DativeReactionFactory(
+                        stk.GenericReactionFactory(
+                            bond_orders={
+                                frozenset({
+                                    stk.GenericFunctionalGroup,
+                                    stk.GenericFunctionalGroup
+                                }): 9
+                            }
+                        )
+                    ),
+                    optimizer=stk.MCHammer(),
+                )
+            ),
+            smiles=(
+                '[H]C1=C2C([H])=C([H])N(->[Pd+2]3(<-N4=C([H])C([H])=C'
+                '(C([H])=C4[H])C4=C([H])C([H])=N(->[Pd+2]5(<-N6=C([H]'
+                ')C([H])=C(C([H])=C6[H])C6=C([H])C([H])=N(->[Pd+2]7(<'
+                '-N8=C([H])C([H])=C(C([H])=C8[H])C8=C([H])C([H])=N(->'
+                '[Pd+2]9(<-N%10=C([H])C([H])=C2C([H])=C%10[H])<-N([H]'
+                ')([H])C([H])([H])C([H])([H])N->9([H])[H])C([H])=C8[H'
+                '])<-N([H])([H])C([H])([H])C([H])([H])N->7([H])[H])C('
+                '[H])=C6[H])<-N([H])([H])C([H])([H])C([H])([H])N->5(['
+                'H])[H])C([H])=C4[H])<-N([H])([H])C([H])([H])C([H])(['
+                'H])N->3([H])[H])=C1[H]'
+            ),
+        ),
+    ),
+)
+def metal_cage_opt_m4l4_square(request):
+    return request.param
