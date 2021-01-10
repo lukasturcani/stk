@@ -62,7 +62,10 @@ def cage_eight_plus_twelve(request):
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    optimizer=stk.MCHammer(),
+                    optimizer=stk.MCHammer(
+                        num_steps=150,
+                        random_seed=1000,
+                    ),
                 ),
             ),
             smiles=(

@@ -109,7 +109,10 @@ def metal_cage_m4l4_square(request):
                             }
                         )
                     ),
-                    optimizer=stk.MCHammer(),
+                    optimizer=stk.MCHammer(
+                        num_steps=150,
+                        random_seed=1000,
+                    ),
                 )
             ),
             smiles=(
