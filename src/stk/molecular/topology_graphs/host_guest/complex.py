@@ -43,6 +43,12 @@ class Complex(TopologyGraph):
             ),
         )
 
+    *Suggested Optimization*
+
+    For :class:`.Complex` topologies, we recommend using the
+    :class:`NullOptimizer` optimizer and optimizing the two molecules
+    prior to complex construction.
+
     *Changing the Position of the Guest*
 
     You can change the position and orientation of the guest, as well

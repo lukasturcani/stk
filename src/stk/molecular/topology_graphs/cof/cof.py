@@ -90,6 +90,11 @@ class Cof(TopologyGraph):
             topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
         )
 
+    *Suggested Optimization*
+
+    For :class:`.Cof` topologies, we recommend using the
+    :class:`.Collapser` optimizer if using the nonperiodic form.
+
     *Accessing the Periodic Unit Cell*
 
     The same :class:`.Cof` instance can be built as a periodic

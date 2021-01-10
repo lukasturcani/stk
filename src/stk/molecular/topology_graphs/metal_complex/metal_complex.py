@@ -115,6 +115,11 @@ class MetalComplex(TopologyGraph):
             )
         )
 
+    *Suggested Optimization*
+
+    For :class:`.MetalComplex` topologies, we recommend using the
+    :class:`.MCHammer` optimizer.
+
     *Construction with Multiple Metals & Ligands*
 
     When multiple metals or ligands are used, the `metals` and

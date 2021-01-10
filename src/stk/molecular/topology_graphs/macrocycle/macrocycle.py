@@ -41,6 +41,11 @@ class Macrocycle(TopologyGraph):
             ),
         )
 
+    *Suggested Optimization*
+
+    For :class:`.Macrocycle` topologies, we recommend using the
+    :class:`.MCHammer` optimizer.
+
     *Defining the Orientation of Each Building Block*
 
     The `orientations` parameter allows the direction of each building

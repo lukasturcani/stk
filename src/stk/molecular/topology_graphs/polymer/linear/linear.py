@@ -39,6 +39,11 @@ class Linear(TopologyGraph):
             ),
         )
 
+    *Suggested Optimization*
+
+    For :class:`.Linear` topologies, we recommend using the
+    :class:`.Collapser` optimizer.
+
     *Construction with Capping Units*
 
     Building blocks with a single functional group can

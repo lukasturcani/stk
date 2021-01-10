@@ -176,6 +176,13 @@ class Cage(TopologyGraph):
             topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
         )
 
+    *Suggested Optimization*
+
+    For :class:`.Cage` topologies, we recommend using the
+    :class:`.MCHammer` optimizer.
+    However, for cages formed from highly unsymetrical building blocks,
+    we recommend the simplified :class:`.Collapser` optimizer.
+
     *Structural Isomer Construction*
 
     Different structural isomers of cages can be made by using the

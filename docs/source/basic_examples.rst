@@ -124,9 +124,9 @@ We have implemented the open-source optimization code :mod:`MCHammer`
 [1]_ that specializes in the `collapsing` of molecules with long bonds
 like those constructed by :mod:`stk`. This code is entirely nonphysical
 and is, therefore, completely general to any chemistry. It provides two
-:class:`Optimizers`, :class:`Collapser` and :class:`MCHammer`.
+:class:`Optimizers`, :class:`.Collapser` and :class:`.MCHammer`.
 
-:class:`Collapser` performs rigid translations of the building blocks
+:class:`.Collapser` performs rigid translations of the building blocks
 toward the centroid of the :class:`ConstructedMolecule` until steric
 clashes occur.
 
@@ -141,7 +141,7 @@ clashes occur.
     )
     polymer.write(f'polymer_opt.mol')
 
-Similarly, :class:`MCHammer` performs rigid translations of the
+Similarly, :class:`.MCHammer` performs rigid translations of the
 building blocks either toward the centroid of the
 :class:`ConstructedMolecule` or along the bonds formed during
 construction following a Metropolis Monte Carlo algorithm with

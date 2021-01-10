@@ -152,7 +152,7 @@ class SelectionPlotter:
         population : :class:`tuple` of :class:`.MoleculeRecord`
             The population from which molecule records were selected.
 
-        counter : :class:`collections.Counter`
+        counter : :class:`.Collections.Counter`
             A counter specifying which records were selected and how
             many times.
 

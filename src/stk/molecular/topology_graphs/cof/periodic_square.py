@@ -28,6 +28,9 @@ class PeriodicSquare(Cof):
         | 4-functional groups: 0
         | 2-functional groups: 1 to 2
 
+    Note that :class:`Optimizer` does not optimize the
+    :class:`PeriodicInfo`.
+
     See :class:`.Cof` for more details and examples.
 
     """
