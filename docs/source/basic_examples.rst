@@ -112,6 +112,63 @@ Read the documentation for each kind of :class:`.TopologyGraph`, for
 more examples on how to initialize it, and to see what optional
 parameters you have available.
 
+Using In-built Optimizers During Construction
+=============================================
+
+All :class:`TopologyGraph` instances take an `optimizer` argument,
+which provides efficient optimization of :mod:`stk` structures from
+their `expanded` form. No optimization can be performed with the
+:class:`NullOptimizer`.
+
+We have implemented the open-source optimization code :mod:`MCHammer`
+[1]_ that specializes in the `collapsing` of molecules with long bonds
+like those constructed by :mod:`stk`. This code is entirely nonphysical
+and is, therefore, completely general to any chemistry. It provides two
+:class:`Optimizers`, :class:`Collapser` and :class:`MCHammer`.
+
+:class:`Collapser` performs rigid translations of the building blocks
+toward the centroid of the :class:`ConstructedMolecule` until steric
+clashes occur.
+
+.. code-block:: python
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+    polymer.write(f'polymer_opt.mol')
+
+Similarly, :class:`MCHammer` performs rigid translations of the
+building blocks either toward the centroid of the
+:class:`ConstructedMolecule` or along the bonds formed during
+construction following a Metropolis Monte Carlo algorithm with
+simplified potential energy terms for the long bonds and nonbonded
+interactions.
+
+.. code-block:: python
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
+        ),
+    )
+    polymer.write(f'polymer_opt.mol')
+
+The :mod:`MCHammer` optimizers return the final molecule only. Further
+visualisation of the full trajectory and properties can be performed
+using the :mod:`MCHammer` code explicitly. This is useful for
+determining optimal optimization parameters, for which safe options
+are provided by default in :mod:`stk`.
+
+Each :class:`TopologyGraph` will have a recommended :class:`Optimzer`.
+
+.. [1] https://github.com/andrewtarzia/MCHammer
+
 Using RDKit to Optimize Molecular Structures
 ============================================
 
