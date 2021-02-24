@@ -3,32 +3,58 @@ This module defines utilities for optimizers.
 
 """
 
-import mchammer as mch
 from collections import defaultdict
 
+import mchammer as mch
 
-def get_mch_bond_topology(state):
+
+def get_mch_bonds(state):
     """
-    Returns bond topology including long bonds to optimize.
+    Yield the bonds of the MCHammer molecule.
+
+    Parameters
+    ----------
+    state : :class:`.ConstructionState`
+        The state of the molecule under construction.
+
+    Yields
+    -------
+    :class:`MCHammer.Bond`
+        A bond in the molecule.
 
     """
 
-    long_bond_ids = []
-    mch_bonds = []
     for i, bond_infos in enumerate(state.get_bond_infos()):
         ba1 = bond_infos.get_bond().get_atom1().get_id()
         ba2 = bond_infos.get_bond().get_atom2().get_id()
         # Must ensure bond atom id ordering is the same here as in
         # line 30. Therefore, sort here.
         ba1, ba2 = sorted((ba1, ba2))
-        mch_bonds.append(mch.Bond(id=i, atom_ids=(ba1, ba2)))
+        yield mch.Bond(id=i, atom_ids=(ba1, ba2))
 
-        # Define long bonds based on bond_info.
-        # None for constructed bonds.
+
+def get_long_bond_ids(state):
+    """
+    Yield the ids of the long bonds to optimize.
+
+    Parameters
+    ----------
+    state : :class:`.ConstructionState`
+        The state of the molecule under construction.
+
+    Yields
+    -------
+    :class:`tuple` of :class:`int`
+        A pair of atom ids that identify a bond to be optimized.
+
+    """
+
+    for i, bond_infos in enumerate(state.get_bond_infos()):
+        ba1 = bond_infos.get_bond().get_atom1().get_id()
+        ba2 = bond_infos.get_bond().get_atom2().get_id()
+        # None if for constructed bonds.
         if bond_infos.get_building_block() is None:
-            long_bond_ids.append((ba1, ba2))
-
-    return long_bond_ids, mch_bonds
+            yield sorted((ba1, ba2))
 
 
 def get_subunits(state):

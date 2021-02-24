@@ -5,10 +5,7 @@ MCHammer
 """
 
 from .optimizer import Optimizer
-from .utilities import (
-    get_mch_bond_topology,
-    get_subunits,
-)
+from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
 
 import mchammer as mch
 
@@ -122,8 +119,6 @@ class MCHammer(Optimizer):
 
     def optimize(self, state):
         # Define MCHammer molecule to optimize.
-        long_bond_ids, mch_bonds = get_mch_bond_topology(state)
-
         mch_mol = mch.Molecule(
             atoms=(
                 mch.Atom(
@@ -131,16 +126,16 @@ class MCHammer(Optimizer):
                     element_string=atom.__class__.__name__,
                 ) for atom in state.get_atoms()
             ),
-            bonds=mch_bonds,
+            bonds=tuple(get_mch_bonds(state)),
             position_matrix=state.get_position_matrix(),
         )
 
         # Run optimization.
         mch_mol, results = self._optimizer.get_result(
             mol=mch_mol,
-            bond_pair_ids=long_bond_ids,
+            bond_pair_ids=tuple(get_long_bond_ids(state)),
             subunits=get_subunits(state),
         )
         return state.with_position_matrix(
-            mch_mol.get_position_matrix()
+            position_matrix=mch_mol.get_position_matrix(),
         )
