@@ -117,7 +117,7 @@ class MetalComplex(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.MetalComplex` topologies, we recommend using the
+    For :class:`.MetalComplex` topologies, it is recommend to use the
     :class:`.MCHammer` optimizer.
 
     *Construction with Multiple Metals & Ligands*
@@ -279,7 +279,7 @@ class MetalComplex(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         """
 

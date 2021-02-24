@@ -81,7 +81,7 @@ class M3L3Triangle(Cage):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         """
 

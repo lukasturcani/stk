@@ -178,10 +178,11 @@ class Cage(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.Cage` topologies, we recommend using the
+    For :class:`.Cage` topologies, it is recommend to use the
     :class:`.MCHammer` optimizer.
-    However, for cages formed from highly unsymetrical building blocks,
-    we recommend the simplified :class:`.Collapser` optimizer.
+    However, for cages formed from highly unsymmetrical building
+    blocks, it is recommend to use the simplified
+    :class:`.Collapser` optimizer.
 
     *Structural Isomer Construction*
 
@@ -574,7 +575,7 @@ class Cage(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         Raises
         ------

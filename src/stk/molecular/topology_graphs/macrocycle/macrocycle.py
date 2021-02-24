@@ -43,7 +43,7 @@ class Macrocycle(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.Macrocycle` topologies, we recommend using the
+    For :class:`.Macrocycle` topologies, it is recommended to use the
     :class:`.MCHammer` optimizer.
 
     *Defining the Orientation of Each Building Block*
@@ -212,7 +212,7 @@ class Macrocycle(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         Raises
         ------

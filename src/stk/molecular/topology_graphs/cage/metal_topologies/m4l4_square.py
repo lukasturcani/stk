@@ -79,7 +79,7 @@ class M4L4Square(Cage):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         """
 

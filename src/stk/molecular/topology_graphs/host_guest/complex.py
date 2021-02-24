@@ -45,8 +45,8 @@ class Complex(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.Complex` topologies, we recommend using the
-    :class:`NullOptimizer` optimizer and optimizing the two molecules
+    For :class:`.Complex` topologies, it is recommended to use the
+    :class:`NullOptimizer` and to optimize the two molecules
     prior to complex construction.
 
     *Changing the Position of the Guest*
@@ -111,7 +111,7 @@ class Complex(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         Raises
         ------

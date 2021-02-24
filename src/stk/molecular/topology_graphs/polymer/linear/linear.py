@@ -41,7 +41,7 @@ class Linear(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.Linear` topologies, we recommend using the
+    For :class:`.Linear` topologies, it is recommend to use the
     :class:`.Collapser` optimizer.
 
     *Construction with Capping Units*
@@ -226,7 +226,7 @@ class Linear(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         Raises
         ------

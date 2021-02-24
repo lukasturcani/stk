@@ -65,7 +65,7 @@ class NRotaxane(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.NRotaxane` topologies, we recommend using the
+    For :class:`.NRotaxane` topologies, it is recommend to use the
     :class:`.MCHammer` optimizer.
 
     *Defining the Orientation of Each Building Block*
@@ -260,7 +260,7 @@ class NRotaxane(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         Raises
         ------

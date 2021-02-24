@@ -92,8 +92,9 @@ class Cof(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.Cof` topologies, we recommend using the
+    For :class:`.Cof` topologies, it is recommend to use the
     :class:`.Collapser` optimizer if using the nonperiodic form.
+    However, no optimizer is valid for periodic systems currently.
 
     *Accessing the Periodic Unit Cell*
 
@@ -256,7 +257,7 @@ class Cof(TopologyGraph):
 
         optimizer : :class:`.Optimizer`, optional
             Used to optimize the structure of the constructed
-            molecule. Defaults to :class:`NullOptimizer`.
+            molecule.
 
         Raises
         ------
