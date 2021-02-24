@@ -46,6 +46,20 @@ class Macrocycle(TopologyGraph):
     For :class:`.Macrocycle` topologies, it is recommended to use the
     :class:`.MCHammer` optimizer.
 
+    .. code-block:: python
+
+        macrocycle = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
     *Defining the Orientation of Each Building Block*
 
     The `orientations` parameter allows the direction of each building

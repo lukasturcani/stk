@@ -109,7 +109,7 @@ class MetalComplex(TopologyGraph):
     .. code-block:: python
 
         complex = stk.ConstructedMolecule(
-            stk.metal_complex.OctahedralLambda(
+            topology_graph=stk.metal_complex.OctahedralLambda(
                 metals=metal,
                 ligands=bidentate,
             )
@@ -119,6 +119,16 @@ class MetalComplex(TopologyGraph):
 
     For :class:`.MetalComplex` topologies, it is recommend to use the
     :class:`.MCHammer` optimizer.
+
+    .. code-block:: python
+
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralLambda(
+                metals=metal,
+                ligands=bidentate,
+                optimizer=stk.MCHammer(),
+            )
+        )
 
     *Construction with Multiple Metals & Ligands*
 

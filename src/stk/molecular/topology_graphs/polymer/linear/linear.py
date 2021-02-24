@@ -44,6 +44,19 @@ class Linear(TopologyGraph):
     For :class:`.Linear` topologies, it is recommend to use the
     :class:`.Collapser` optimizer.
 
+    .. code-block:: python
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=12,
+                # Setting scale_steps to False tends to lead to a
+                # better structure.
+                optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+
     *Construction with Capping Units*
 
     Building blocks with a single functional group can

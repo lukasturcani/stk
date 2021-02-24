@@ -184,6 +184,16 @@ class Cage(TopologyGraph):
     blocks, it is recommend to use the simplified
     :class:`.Collapser` optimizer.
 
+
+    .. code-block:: python
+
+        cage1 = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(bb1, bb2),
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
     *Structural Isomer Construction*
 
     Different structural isomers of cages can be made by using the

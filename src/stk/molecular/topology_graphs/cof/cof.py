@@ -96,6 +96,18 @@ class Cof(TopologyGraph):
     :class:`.Collapser` optimizer if using the nonperiodic form.
     However, no optimizer is valid for periodic systems currently.
 
+    .. code-block:: python
+
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+                # Setting scale_steps to False tends to lead to a
+                # better structure.
+                optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+
     *Accessing the Periodic Unit Cell*
 
     The same :class:`.Cof` instance can be built as a periodic

@@ -61,11 +61,16 @@ def get_subunits(state):
     """
     Get connected graphs based on building block ids.
 
+    Parameters
+    ----------
+    state : :class:`.ConstructionState`
+        The state of the molecule under construction.
+
     Returns
     -------
-    subunits : :class:`.dict`
-        The subunits of `mol` split by building block id. Key is
-        subunit identifier, Value is :class:`iterable` of atom ids in
+    :class:`.dict`
+        The subunits of the molecule split by building block id. Key is
+        subunit identifier, Value is :class:`list` of atom ids in
         subunit.
 
     """

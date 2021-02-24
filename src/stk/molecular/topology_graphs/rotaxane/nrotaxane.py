@@ -65,8 +65,10 @@ class NRotaxane(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.NRotaxane` topologies, it is recommend to use the
-    :class:`.MCHammer` optimizer.
+    For :class:`.NRotaxane` topologies, there is no need to use an
+    optimizer, so stick with :class:`.NullOptimizer`. However, it is
+    recommended that all building blocks be optimized prior to
+    construction.
 
     *Defining the Orientation of Each Building Block*
 
