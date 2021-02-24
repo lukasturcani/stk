@@ -61,7 +61,7 @@ class MCHammer(Optimizer):
         nonbond_sigma=1.2,
         nonbond_mu=3,
         beta=2,
-        random_seed=None,
+        random_seed=1000,
     ):
         """
         Initialize an instance of :class:`.MCHammer`.
@@ -85,9 +85,12 @@ class MCHammer(Optimizer):
         nonbond_epsilon : :class:`float`, optional
             Value of epsilon used in the nonbond potential in MC moves.
             Determines strength of the nonbond potential.
+            Larger values lead to a larger building block repulsion.
 
         nonbond_sigma : :class:`float`, optional
             Value of sigma used in the nonbond potential in MC moves.
+            Larger values lead to building block repulsion at larger
+            distances.
 
         nonbond_mu : :class:`float`, optional
             Value of mu used in the nonbond potential in MC moves.
@@ -95,7 +98,7 @@ class MCHammer(Optimizer):
 
         beta : :class:`float`, optional
             Value of beta used in the in MC moves. Beta takes the
-            place of the inverse boltzmann temperature.
+            place of the inverse Boltzmann temperature.
 
         random_seed : :class:`int`, optional
             Random seed to use for MC algorithm. Should only be set
@@ -104,6 +107,7 @@ class MCHammer(Optimizer):
             sampling.
 
         """
+
         self._optimizer = mch.Optimizer(
             step_size=step_size,
             target_bond_length=target_bond_length,

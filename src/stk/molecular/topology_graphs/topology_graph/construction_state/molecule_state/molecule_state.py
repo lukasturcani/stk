@@ -226,17 +226,18 @@ class _MoleculeState:
 
     def with_position_matrix(self, position_matrix):
         """
-        Return a clone holding the optimization position_matrix.
+        Return a clone holding the `position_matrix`.
 
         Parameters
         ----------
-        position_matrix :
-            NEW POSMAT
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the clone. The shape of the matrix
+            is ``(n, 3)``.
 
         Returns
         -------
         :class:`._MoleculeState`
-            The clone holding the optimization results. Has the same
+            The clone holding the new position matrix. Has the same
             type as the original instance.
 
         """

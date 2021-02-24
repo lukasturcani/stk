@@ -300,18 +300,19 @@ class ConstructionState:
 
     def with_position_matrix(self, position_matrix):
         """
-        Return a clone holding the optimization position_matrix.
+        Return a clone holding the `position_matrix`.
 
         Parameters
         ----------
-        position_matrix :
-            NEW POS MAT
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the clone. The shape of the matrix
+            is ``(n, 3)``.
 
         Returns
         -------
         :class:`.ConstructionState`
-            The clone holding the reaction results. Has the same type
-            as the original instance.
+            The clone holding the new position matrix. Has the same
+            type as the original instance.
 
         """
 

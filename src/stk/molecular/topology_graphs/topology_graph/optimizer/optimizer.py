@@ -2,6 +2,21 @@
 Optimizer
 =========
 
+.. toctree::
+    :maxdepth: 2
+
+    Collapser <\
+stk.molecular.topology_graphs.topology_graph.optimizer.collapser\
+>
+
+    MCHammer <\
+stk.molecular.topology_graphs.topology_graph.optimizer.mchammer\
+>
+
+    NullOptimizer <\
+stk.molecular.topology_graphs.topology_graph.optimizer.null\
+>
+
 """
 
 
@@ -9,7 +24,7 @@ class Optimizer:
     """
     An abstract base class for optimizers.
 
-    An optimizer is used to change the structure of molecule under
+    An optimizer is used to change the structure of the molecule under
     construction to be more realistic.
 
     """

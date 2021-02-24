@@ -63,14 +63,15 @@ class Collapser(Optimizer):
             Angstrom.
 
         distance_threshold : :class:`float`, optional
-            Distance between distinct subunits to use as
+            Distance between distinct building blocks to use as
             threshold for halting collapse in Angstrom.
 
         scale_steps : :class:`bool`, optional
-            Whether to scale the step of each distict building block
-            by their relative distance from the molecules centroid.
+            Whether to scale the step of each distinct building block
+            by its relative distance from the molecules centroid.
 
         """
+
         self._optimizer = mch.Collapser(
             step_size=step_size,
             distance_threshold=distance_threshold,
