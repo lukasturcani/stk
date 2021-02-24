@@ -19,9 +19,10 @@ class MCHammer(Optimizer):
 
     Examples
     --------
-    Optimisation with stk simply collects the final position matrix.
-    The optimisation's trajectory can be output using the MCHammer
-    implementation if required by the user [1]_.
+    *Structure Optimization*
+
+    Using :class:`.MCHammer` will lead to :class:`.ConstructedMolecule`
+    structures without long bonds.
 
     .. code-block:: python
 
@@ -34,6 +35,15 @@ class MCHammer(Optimizer):
             ),
         )
         polymer.write(f'polymer_opt.mol')
+
+    Optimisation with :mod:`stk` simply collects the final position
+    matrix. The optimisation's trajectory can be output using the
+    :mod:`MCHammer` implementation if required by the user [1]_.
+
+    The open-source optimization code :mod:`MCHammer` specializes in
+    the `collapsing` of molecules with long bonds like those
+    constructed by :mod:`stk`. This code is entirely nonphysical and
+    is, therefore, completely general to any chemistry.
 
     References
     ----------
