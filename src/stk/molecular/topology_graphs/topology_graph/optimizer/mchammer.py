@@ -98,7 +98,7 @@ class MCHammer(Optimizer):
             place of the inverse Boltzmann temperature.
 
         random_seed : :class:`int` or :class:`NoneType`, optional
-            Random seed to use for MC algorithm. If 
+            Random seed to use for MC algorithm. If
             ``None`` a system-based random seed will be used
             and results will not be reproducible between
             invocations.
