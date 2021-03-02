@@ -10,7 +10,7 @@ import mchammer as mch
 
 def get_mch_bonds(state):
     """
-    Yield the bonds of the MCHammer molecule.
+    Yield the bonds of the :mod:`MCHammer` molecule.
 
     Parameters
     ----------
