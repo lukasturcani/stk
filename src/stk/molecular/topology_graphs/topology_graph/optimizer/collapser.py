@@ -12,7 +12,7 @@ import mchammer as mch
 
 class Collapser(Optimizer):
     """
-    Perform rigid-body collapse of molecule [1]_.
+    Performs rigid-body collapse of molecule [1]_.
 
     Examples
     --------
