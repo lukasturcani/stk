@@ -97,11 +97,11 @@ class MCHammer(Optimizer):
             Value of beta used in the in MC moves. Beta takes the
             place of the inverse Boltzmann temperature.
 
-        random_seed : :class:`int`, optional
-            Random seed to use for MC algorithm. Should only be set
-            if exactly reproducible results are required, otherwise
-            a system-based random seed should be used for proper
-            sampling.
+        random_seed : :class:`int` or :class:`NoneType`, optional
+            Random seed to use for MC algorithm. If 
+            ``None`` a system-based random seed will be used
+            and results will not be reproducible between
+            invocations.
 
         """
 
