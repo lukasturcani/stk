@@ -28,8 +28,8 @@ class PeriodicHoneycomb(Cof):
         | 3-functional groups: 0 to 1
         | 2-functional groups: 2 to 4
 
-    Note that :class:`Optimizer` does not optimize the
-    :class:`PeriodicInfo`.
+    Note that :class:`.Optimizer` does not optimize the
+    :class:`.PeriodicInfo`.
 
     See :class:`.Cof` for more details and examples.
 
