@@ -693,7 +693,7 @@ class Molecule:
         Parameters
         ----------
         position_matrix : :class:`numpy.ndarray`
-            A position matrix of the clone. The shape of the matrix
+            The position matrix of the clone. The shape of the matrix
             is ``(n, 3)``.
 
         Returns

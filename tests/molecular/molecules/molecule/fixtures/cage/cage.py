@@ -43,6 +43,8 @@ from .metal_topologies import *  # noqa
         lazy_fixture('metal_cage_m8l6_cube'),
         lazy_fixture('metal_cage_m12l24'),
         lazy_fixture('metal_cage_m24l48'),
+        lazy_fixture('cage_opt_eight_plus_twelve'),
+        lazy_fixture('metal_cage_opt_m4l4_square'),
     ),
 )
 def cage(request):

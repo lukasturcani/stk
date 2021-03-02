@@ -224,6 +224,35 @@ class _MoleculeState:
         for edge_id in edge_group.get_edge_ids():
             yield from self._edge_functional_groups[edge_id]
 
+    def with_position_matrix(self, position_matrix):
+        """
+        Return a clone holding the `position_matrix`.
+
+        Parameters
+        ----------
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the clone. The shape of the matrix
+            is ``(n, 3)``.
+
+        Returns
+        -------
+        :class:`._MoleculeState`
+            The clone holding the new position matrix. Has the same
+            type as the original instance.
+
+        """
+
+        return self.clone()._with_position_matrix(position_matrix)
+
+    def _with_position_matrix(self, position_matrix):
+        """
+        Modify the instance.
+
+        """
+
+        self._position_matrix = np.array(position_matrix)
+        return self
+
     def with_reaction_results(self, reactions, results):
         """
         Return a clone holding the reaction results.

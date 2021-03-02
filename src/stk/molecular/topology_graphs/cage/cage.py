@@ -117,7 +117,7 @@ from functools import partial
 
 from .vertices import _UnaligningVertex
 from .cage_construction_state import _CageConstructionState
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 from ...reactions import GenericReactionFactory
 
 
@@ -174,6 +174,24 @@ class Cage(TopologyGraph):
         )
         cage1 = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
+        )
+
+    *Suggested Optimization*
+
+    For :class:`.Cage` topologies, it is recommend to use the
+    :class:`.MCHammer` optimizer.
+    However, for cages formed from highly unsymmetrical building
+    blocks, it is recommend to use the simplified
+    :class:`.Collapser` optimizer.
+
+
+    .. code-block:: python
+
+        cage1 = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(bb1, bb2),
+                optimizer=stk.MCHammer(),
+            ),
         )
 
     *Structural Isomer Construction*
@@ -525,6 +543,7 @@ class Cage(TopologyGraph):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.Cage`.
@@ -563,6 +582,10 @@ class Cage(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         Raises
         ------
@@ -613,6 +636,7 @@ class Cage(TopologyGraph):
                 in sorted(self._vertices_of_degree, reverse=True)
             ),
             num_processes=num_processes,
+            optimizer=optimizer,
             edge_groups=None,
         )
 

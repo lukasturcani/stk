@@ -7,7 +7,7 @@ Macrocycle
 import numpy as np
 
 from .vertices import _CycleVertex
-from ..topology_graph import TopologyGraph, Edge
+from ..topology_graph import TopologyGraph, NullOptimizer, Edge
 from ...reactions import GenericReactionFactory
 
 
@@ -38,6 +38,25 @@ class Macrocycle(TopologyGraph):
                 ),
                 repeating_unit='AB',
                 num_repeating_units=5,
+            ),
+        )
+
+    *Suggested Optimization*
+
+    For :class:`.Macrocycle` topologies, it is recommended to use the
+    :class:`.MCHammer` optimizer.
+
+    .. code-block:: python
+
+        macrocycle = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
             ),
         )
 
@@ -157,7 +176,8 @@ class Macrocycle(TopologyGraph):
         orientations=None,
         random_seed=None,
         reaction_factory=GenericReactionFactory(),
-        num_processes=1
+        num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`Macrocycle` instance.
@@ -203,6 +223,10 @@ class Macrocycle(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         Raises
         ------
@@ -279,6 +303,7 @@ class Macrocycle(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=optimizer,
             edge_groups=None,
         )
 

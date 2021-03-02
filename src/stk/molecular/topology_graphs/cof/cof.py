@@ -32,7 +32,7 @@ import numpy as np
 from functools import partial
 from operator import getitem
 
-from ..topology_graph import TopologyGraph, EdgeGroup
+from ..topology_graph import TopologyGraph, NullOptimizer, EdgeGroup
 from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
 
@@ -88,6 +88,24 @@ class Cof(TopologyGraph):
         bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
         cof = stk.ConstructedMolecule(
             topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
+        )
+
+    *Suggested Optimization*
+
+    For :class:`.Cof` topologies, it is recommend to use the
+    :class:`.Collapser` optimizer if using the nonperiodic form.
+    However, no optimizer is valid for periodic systems currently.
+
+    .. code-block:: python
+
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+                # Setting scale_steps to False tends to lead to a
+                # better structure.
+                optimizer=stk.Collapser(scale_steps=False),
+            ),
         )
 
     *Accessing the Periodic Unit Cell*
@@ -201,6 +219,7 @@ class Cof(TopologyGraph):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.Cof` instance.
@@ -247,6 +266,10 @@ class Cof(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         Raises
         ------
@@ -326,6 +349,7 @@ class Cof(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=optimizer,
             edge_groups=self._get_edge_groups(edges),
         )
 

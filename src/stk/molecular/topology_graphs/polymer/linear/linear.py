@@ -7,7 +7,7 @@ Linear
 import numpy as np
 
 from .vertices import _HeadVertex, _TailVertex, _LinearVertex
-from ...topology_graph import TopologyGraph, Edge
+from ...topology_graph import TopologyGraph, Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
 
@@ -36,6 +36,24 @@ class Linear(TopologyGraph):
                 building_blocks=(bb1, bb2),
                 repeating_unit='AB',
                 num_repeating_units=12,
+            ),
+        )
+
+    *Suggested Optimization*
+
+    For :class:`.Linear` topologies, it is recommend to use the
+    :class:`.Collapser` optimizer.
+
+    .. code-block:: python
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=12,
+                # Setting scale_steps to False tends to lead to a
+                # better structure.
+                optimizer=stk.Collapser(scale_steps=False),
             ),
         )
 
@@ -168,6 +186,7 @@ class Linear(TopologyGraph):
         random_seed=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`Linear` instance.
@@ -217,6 +236,10 @@ class Linear(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         Raises
         ------
@@ -287,6 +310,7 @@ class Linear(TopologyGraph):
             edges=tuple(edges),
             reaction_factory=reaction_factory,
             construction_stages=(),
+            optimizer=optimizer,
             num_processes=num_processes,
         )
 
