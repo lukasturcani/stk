@@ -130,10 +130,10 @@ clashes occur.
         topology_graph=stk.polymer.Linear(
             building_blocks=(bb1, bb2),
             repeating_unit='AB',
+            num_repeating_units=3,
             optimizer=stk.Collapser(),
         ),
     )
-    polymer.write(f'polymer_opt.mol')
 
 Similarly, :class:`.MCHammer` performs rigid translations of the
 building blocks either toward the centroid of the
@@ -148,14 +148,14 @@ interactions.
         topology_graph=stk.polymer.Linear(
             building_blocks=(bb1, bb2),
             repeating_unit='AB',
+            num_repeating_units=3,
             optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
         ),
     )
-    polymer.write(f'polymer_opt.mol')
 
 See also
     The :class:`.Collapser` and :class:`.MCHammer` optimizers use the
-    algorithms from https://github.com/andrewtarzia/MCHammer
+    algorithms from https://github.com/andrewtarzia/MCHammer.
     :mod:`stk` returns the final molecule only but further visualisation of
     the full trajectory and properties can be performed
     using the :mod:`MCHammer` code explicitly. This is useful for
