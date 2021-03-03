@@ -37,6 +37,7 @@
    Macrocycle <stk.molecular.topology_graphs.macrocycle.macrocycle>
    [n]Rotaxane <stk.molecular.topology_graphs.rotaxane.nrotaxane>
    Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph.topology_graph.topology_graph>
+   Optimizers <stk.molecular.topology_graphs.topology_graph.optimizers.optimizer>
 
 .. toctree::
    :hidden:
