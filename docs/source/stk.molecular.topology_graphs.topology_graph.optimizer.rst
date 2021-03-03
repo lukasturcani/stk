@@ -12,5 +12,8 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   stk.molecular.topology_graphs.topology_graph.optimizer.collapser
+   stk.molecular.topology_graphs.topology_graph.optimizer.mchammer
    stk.molecular.topology_graphs.topology_graph.optimizer.null
    stk.molecular.topology_graphs.topology_graph.optimizer.optimizer
+   stk.molecular.topology_graphs.topology_graph.optimizer.utilities
