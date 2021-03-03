@@ -6,15 +6,15 @@ Optimizer
     :maxdepth: 2
 
     Collapser <\
-stk.molecular.topology_graphs.topology_graph.optimizer.collapser\
+stk.molecular.topology_graphs.topology_graph.optimizers.collapser\
 >
 
     MCHammer <\
-stk.molecular.topology_graphs.topology_graph.optimizer.mchammer\
+stk.molecular.topology_graphs.topology_graph.optimizers.mchammer\
 >
 
     NullOptimizer <\
-stk.molecular.topology_graphs.topology_graph.optimizer.null\
+stk.molecular.topology_graphs.topology_graph.optimizers.null\
 >
 
 """
