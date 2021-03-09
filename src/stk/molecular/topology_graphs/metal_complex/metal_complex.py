@@ -40,7 +40,7 @@ stk.molecular.topology_graphs.metal_complex.square_planar\
 from collections import Counter, defaultdict
 from itertools import product
 
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 from ...reactions import DativeReactionFactory, GenericReactionFactory
 
 
@@ -109,9 +109,24 @@ class MetalComplex(TopologyGraph):
     .. code-block:: python
 
         complex = stk.ConstructedMolecule(
-            stk.metal_complex.OctahedralLambda(
+            topology_graph=stk.metal_complex.OctahedralLambda(
                 metals=metal,
                 ligands=bidentate,
+            )
+        )
+
+    *Suggested Optimization*
+
+    For :class:`.MetalComplex` topologies, it is recommend to use the
+    :class:`.MCHammer` optimizer.
+
+    .. code-block:: python
+
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralLambda(
+                metals=metal,
+                ligands=bidentate,
+                optimizer=stk.MCHammer(),
             )
         )
 
@@ -224,6 +239,7 @@ class MetalComplex(TopologyGraph):
         ligands,
         reaction_factory=None,
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.MetalComplex`.
@@ -271,6 +287,10 @@ class MetalComplex(TopologyGraph):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
+
         """
 
         building_block_vertices = self._normalize_metals(metals)
@@ -312,6 +332,7 @@ class MetalComplex(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=optimizer,
             edge_groups=None,
         )
 

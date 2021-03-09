@@ -8,7 +8,7 @@ import numpy as np
 
 from ..cage import Cage
 from ..vertices import _LinearCageVertex
-from ...topology_graph import Edge
+from ...topology_graph import Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
 
@@ -32,6 +32,7 @@ class M3L3Triangle(Cage):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.M3L3Triangle`.
@@ -78,6 +79,9 @@ class M3L3Triangle(Cage):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         """
 
@@ -101,6 +105,7 @@ class M3L3Triangle(Cage):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
+            optimizer=optimizer,
         )
 
     _x = 2*np.sqrt(3)/4

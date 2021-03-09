@@ -285,6 +285,39 @@ class ConstructionState:
 
         return self.clone()._with_reaction_results(reactions, results)
 
+    def _with_position_matrix(self, position_matrix):
+        """
+        Modify the instance.
+
+        """
+
+        self._molecule_state = (
+            self._molecule_state.with_position_matrix(
+                position_matrix=position_matrix,
+            )
+        )
+        return self
+
+    def with_position_matrix(self, position_matrix):
+        """
+        Return a clone holding the `position_matrix`.
+
+        Parameters
+        ----------
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the clone. The shape of the matrix
+            is ``(n, 3)``.
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The clone holding the new position matrix. Has the same
+            type as the original instance.
+
+        """
+
+        return self.clone()._with_position_matrix(position_matrix)
+
     def _with_vertices(self, vertices):
         """
         Modify the instance.

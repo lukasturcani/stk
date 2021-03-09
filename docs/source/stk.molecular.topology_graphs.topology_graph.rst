@@ -13,6 +13,7 @@ Subpackages
    :maxdepth: 4
 
    stk.molecular.topology_graphs.topology_graph.construction_state
+   stk.molecular.topology_graphs.topology_graph.optimizers
    stk.molecular.topology_graphs.topology_graph.topology_graph
 
 Submodules

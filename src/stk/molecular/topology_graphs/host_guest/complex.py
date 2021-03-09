@@ -5,7 +5,7 @@ Host Guest Complex
 """
 
 from .vertices import _HostVertex, _GuestVertex
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class Complex(TopologyGraph):
@@ -43,6 +43,13 @@ class Complex(TopologyGraph):
             ),
         )
 
+    *Suggested Optimization*
+
+    For :class:`.Complex` topologies, there is no need to use an
+    optimizer, so stick with :class:`.NullOptimizer`. However, it is
+    recommended that all building blocks be optimized prior to
+    construction.
+
     *Changing the Position of the Guest*
 
     You can change the position and orientation of the guest, as well
@@ -75,6 +82,7 @@ class Complex(TopologyGraph):
         guest_target=None,
         displacement=(0, 0, 0),
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize an instance of :class:`.Complex`.
@@ -101,6 +109,10 @@ class Complex(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         Raises
         ------
@@ -142,6 +154,7 @@ class Complex(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=optimizer,
             edge_groups=(),
         )
 

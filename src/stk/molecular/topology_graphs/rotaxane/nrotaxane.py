@@ -7,7 +7,7 @@
 import numpy as np
 
 from .vertices import _AxleVertex, _CycleVertex
-from ..topology_graph import TopologyGraph
+from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class NRotaxane(TopologyGraph):
@@ -62,6 +62,13 @@ class NRotaxane(TopologyGraph):
                 num_repeating_units=3,
             ),
         )
+
+    *Suggested Optimization*
+
+    For :class:`.NRotaxane` topologies, there is no need to use an
+    optimizer, so stick with :class:`.NullOptimizer`. However, it is
+    recommended that all building blocks be optimized prior to
+    construction.
 
     *Defining the Orientation of Each Building Block*
 
@@ -203,7 +210,8 @@ class NRotaxane(TopologyGraph):
         num_repeating_units,
         orientations=None,
         random_seed=None,
-        num_processes=1
+        num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`NRotaxane` instance.
@@ -251,6 +259,10 @@ class NRotaxane(TopologyGraph):
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
             :meth:`construct`.
+
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
 
         Raises
         ------
@@ -313,6 +325,7 @@ class NRotaxane(TopologyGraph):
             reaction_factory=None,
             construction_stages=(),
             num_processes=num_processes,
+            optimizer=optimizer,
             edge_groups=None,
         )
 

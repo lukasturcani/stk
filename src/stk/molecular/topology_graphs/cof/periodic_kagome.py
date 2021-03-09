@@ -8,7 +8,7 @@ import numpy as np
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
-from ..topology_graph import Edge
+from ..topology_graph import Edge, NullOptimizer
 from ...periodic_info import PeriodicInfo
 
 
@@ -28,6 +28,9 @@ class PeriodicKagome(Cof):
         | 4-functional groups: 0 to 2
         | 2-functional groups: 3 to 8
 
+    Note that :class:`.Optimizer` does not optimize the
+    :class:`.PeriodicInfo`.
+
     See :class:`.Cof` for more details and examples.
 
     """
@@ -39,6 +42,7 @@ class PeriodicKagome(Cof):
         vertex_alignments=None,
         reaction_factory=GenericReactionFactory(),
         num_processes=1,
+        optimizer=NullOptimizer(),
     ):
         """
         Initialize a :class:`.PeriodicKagome` instance.
@@ -81,6 +85,10 @@ class PeriodicKagome(Cof):
             The number of parallel processes to create during
             :meth:`construct`.
 
+        optimizer : :class:`.Optimizer`, optional
+            Used to optimize the structure of the constructed
+            molecule.
+
         Raises
         ------
         :class:`AssertionError`
@@ -111,6 +119,7 @@ class PeriodicKagome(Cof):
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
+            optimizer=optimizer,
         )
 
     def get_periodic_info(self):
