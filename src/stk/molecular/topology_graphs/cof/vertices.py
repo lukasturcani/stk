@@ -1,9 +1,6 @@
 import numpy as np
 from scipy.spatial.distance import euclidean
-from stk.utilities import (
-    get_acute_vector,
-    normalize_vector,
-)
+from stk.utilities import get_acute_vector
 
 from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
@@ -42,6 +39,19 @@ class _CofVertex(Vertex):
         super().__init__(id, position)
         self._aligner_edge = aligner_edge
         self._cell = np.array(cell)
+
+    def get_aligner_edge(self):
+        """
+        Return the aligner edge of the vertex.
+
+        Returns
+        -------
+        :class:`int`
+            The aligner edge.
+
+        """
+
+        return self._aligner_edge
 
     def get_cell(self):
         return np.array(self._cell)
@@ -181,6 +191,24 @@ class _LinearCofVertex(_CofVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
+
+        # Align the normal of the plane of best fit, defined by
+        # all atoms in the building block, with the z axis.
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
+        normal = building_block.get_plane_normal()
+        normal = get_acute_vector(
+            reference=core_centroid - self._position,
+            vector=normal,
+        )
+        building_block = building_block.with_rotation_between_vectors(
+            start=normal,
+            target=[0, 0, 1],
+            origin=self._position,
+        )
+
+        # Rotate to place fg-fg vector along edge-edge vector.
         fg, = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(fg.get_placer_ids())
         target = edges[0].get_position() - edges[1].get_position()
@@ -191,15 +219,7 @@ class _LinearCofVertex(_CofVertex):
             target=target,
             origin=self._position,
         )
-        core_centroid = building_block.get_centroid(
-            atom_ids=building_block.get_core_atom_ids(),
-        )
-        return building_block.with_rotation_to_minimize_angle(
-            start=core_centroid - self._position,
-            target=[0, 0, 1],
-            axis=normalize_vector(target),
-            origin=self._position,
-        ).get_position_matrix()
+        return building_block.get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
         fg, = building_block.get_functional_groups(0)
@@ -276,3 +296,79 @@ class _NonLinearCofVertex(_CofVertex):
                 edge_sorter.get_items(),
             )
         }
+
+
+class _UnaligningVertex(_CofVertex):
+    """
+    Just places a building block, does not align.
+
+    """
+
+    def __init__(self, vertex):
+        super().__init__(
+            id=vertex.get_id(),
+            position=vertex.get_position(),
+            aligner_edge=vertex.get_aligner_edge(),
+            cell=vertex.get_cell(),
+        )
+
+    def place_building_block(self, building_block, edges):
+        return building_block.with_centroid(
+            position=self._position,
+            atom_ids=building_block.get_placer_ids(),
+        ).get_position_matrix()
+
+    def map_functional_groups_to_edges(self, building_block, edges):
+
+        return {
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+        }
+
+    @classmethod
+    def init_at_center(
+        cls,
+        id,
+        vertices,
+        aligner_edge=0,
+        cell=(0, 0, 0),
+    ):
+
+        vertex = cls.__new__(cls)
+        vertex._id = id
+        vertex._position = (
+            sum(vertex.get_position() for vertex in vertices)
+            / len(vertices)
+        )
+        vertex._cell = np.array(cell)
+        vertex._aligner_edge = aligner_edge
+        return vertex
+
+    @classmethod
+    def init_at_shifted_center(
+        cls,
+        id,
+        vertices,
+        cell_shifts,
+        lattice_constants,
+        aligner_edge=0,
+        cell=(0, 0, 0),
+    ):
+        new_vertex = cls.__new__(cls)
+        new_vertex._id = id
+
+        positions = []
+        for vertex, cell_shift in zip(vertices, cell_shifts):
+            shift = sum(
+                dim_shift*constant
+                for dim_shift, constant
+                in zip(cell_shift, lattice_constants)
+            )
+            positions.append(vertex.get_position() + shift)
+
+        new_vertex._position = np.divide(
+            np.sum(positions, axis=0),
+            len(positions),
+        )
+        new_vertex._cell = np.array(cell)
+        new_vertex._aligner_edge = aligner_edge
+        return new_vertex

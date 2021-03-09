@@ -33,6 +33,7 @@ from functools import partial
 from operator import getitem
 
 from ..topology_graph import TopologyGraph, NullOptimizer, EdgeGroup
+from .vertices import _UnaligningVertex
 from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
 
@@ -337,6 +338,10 @@ class Cof(TopologyGraph):
                 )
             )
 
+        building_block_vertices = self._with_unaligning_vertices(
+            building_block_vertices=building_block_vertices,
+        )
+
         self._check_building_block_vertices(
             num_vertices=(
                 np.product(lattice_size)*len(self._vertex_prototypes)
@@ -352,6 +357,20 @@ class Cof(TopologyGraph):
             optimizer=optimizer,
             edge_groups=self._get_edge_groups(edges),
         )
+
+    @staticmethod
+    def _with_unaligning_vertices(building_block_vertices):
+        clone = dict(building_block_vertices)
+        for building_block, vertices in clone.items():
+            # Building blocks with 1 placer, cannot be aligned and
+            # must therefore use an UnaligningVertex.
+            if len(set(building_block.get_placer_ids())) == 1:
+                clone[building_block] = tuple(map(
+                    _UnaligningVertex,
+                    vertices,
+                ))
+
+        return clone
 
     @classmethod
     def _check_building_block_vertices(
