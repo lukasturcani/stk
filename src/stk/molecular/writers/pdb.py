@@ -31,7 +31,7 @@ class PdbWriter:
         writer = stk.PdbWriter()
         writer.write(
             molecule=cof,
-            file='cof.pdb',
+            path='cof.pdb',
             periodic_info=topology_graph.get_periodic_info()
         )
 

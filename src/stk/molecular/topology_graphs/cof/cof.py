@@ -131,6 +131,14 @@ class Cof(TopologyGraph):
         alpha = periodic_info.get_alpha()
         beta = periodic_info.get_beta()
         gamma = periodic_info.get_gamma()
+        # Write to .pdb file.
+        writer = stk.PdbWriter()
+        writer.write(
+            molecule=cof,
+            path='cof.pdb',
+            periodic_info=periodic_info,
+        )
+
 
     *Structural Isomer Construction*
 
