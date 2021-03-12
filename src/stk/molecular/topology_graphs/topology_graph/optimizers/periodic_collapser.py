@@ -1,16 +1,17 @@
 """
-Collapser
+PeriodicCollapser
 =========
 
 """
 
-from .optimizer import Optimizer
+import numpy as np
+from .collapser import Collapser
 from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
 
 import mchammer as mch
 
 
-class Collapser(Optimizer):
+class PeriodicCollapser(Collapser):
     """
     Performs rigid-body collapse of molecule [1]_.
 
@@ -18,23 +19,18 @@ class Collapser(Optimizer):
     --------
     *Structure Optimization*
 
-    Using :class:`.Collapser` will lead to :class:`.ConstructedMolecule`
-    structures without long bonds.
+    Using :class:`.PeriodicCollapser` will lead to
+    :class:`.ConstructedMolecule` structures without long bonds and
+    match the unit-cell to the new structure.
 
     .. code-block:: python
 
-        polymer = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
-                repeating_unit='AB',
-                optimizer=stk.Collapser(),
-            ),
-        )
-        polymer.write(f'polymer_opt.mol')
+        FILL IN WITH TESTING.py
 
     Optimisation with :mod:`stk` simply collects the final position
-    matrix. The optimisation's trajectory can be output using the
-    :mod:`MCHammer` implementation if required by the user [1]_.
+    matrix and periodic info. The optimisation's trajectory can be
+    output using the :mod:`MCHammer` implementation if required by the
+    user [1]_.
 
     The open-source optimization code :mod:`MCHammer` specializes in
     the `collapsing` of molecules with long bonds like those
@@ -54,7 +50,7 @@ class Collapser(Optimizer):
         scale_steps=True,
     ):
         """
-        Initialize an instance of :class:`.Collapser`.
+        Initialize an instance of :class:`.PeriodicCollapser`.
 
         Parameters
         ----------
@@ -97,6 +93,47 @@ class Collapser(Optimizer):
             bond_pair_ids=tuple(get_long_bond_ids(state)),
             subunits=get_subunits(state),
         )
+
+        print(result)
+
+        old_pos_mat = state.get_position_matrix()
+        new_pos_mat = mch_mol.get_position_matrix()
+        print(old_pos_mat)
+        print(new_pos_mat)
+        old_x_extent = abs(
+            max(old_pos_mat[:, 0])-min(old_pos_mat[:, 0])
+        )
+        old_y_extent = abs(
+            max(old_pos_mat[:, 1])-min(old_pos_mat[:, 1])
+        )
+        old_z_extent = abs(
+            max(old_pos_mat[:, 2])-min(old_pos_mat[:, 2])
+        )
+        print(old_x_extent, old_y_extent, old_z_extent)
+        new_x_extent = abs(
+            max(new_pos_mat[:, 0])-min(new_pos_mat[:, 0])
+        )
+        new_y_extent = abs(
+            max(new_pos_mat[:, 1])-min(new_pos_mat[:, 1])
+        )
+        new_z_extent = abs(
+            max(new_pos_mat[:, 2])-min(new_pos_mat[:, 2])
+        )
+        print(new_x_extent, new_y_extent, new_z_extent)
+        x_ratio = new_x_extent/old_x_extent
+        y_ratio = new_y_extent/old_y_extent
+        z_ratio = new_z_extent/old_z_extent
+        print(x_ratio, y_ratio, z_ratio)
+        old_lattice = state.get_lattice_constants()
+        print(old_lattice)
+        new_lattice = np.array([
+            old_lattice[0]*x_ratio,
+            old_lattice[1]*y_ratio,
+            old_lattice[2]*z_ratio,
+        ])
+        print(new_lattice)
+        state = state.with_lattice_constants(new_lattice)
+
         return state.with_position_matrix(
             position_matrix=mch_mol.get_position_matrix()
         )

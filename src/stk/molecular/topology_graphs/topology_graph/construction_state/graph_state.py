@@ -152,6 +152,7 @@ class _GraphState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
+        clone._lattice_constants = self._lattice_constants
         return clone
 
     def get_building_block(self, vertex_id):
@@ -243,6 +244,19 @@ class _GraphState:
 
         return len(self._edges)
 
+    def get_lattice_constants(self):
+        """
+        Get the number of edges in the topology graph.
+
+        Returns
+        -------
+        :class:`int`
+            The number of edges.
+
+        """
+
+        return self._lattice_constants
+
     def get_edges(self, vertex_id):
         """
         Get the edges connect to a vertex.
@@ -289,3 +303,30 @@ class _GraphState:
         """
 
         return self.clone()._with_vertices(vertices)
+
+    def _with_lattice_constants(self, lattice_constants):
+        """
+        Modify the instance.
+
+        """
+
+        self._lattice_constants = lattice_constants
+        return self
+
+    def with_lattice_constants(self, lattice_constants):
+        """
+        Returns a clone holding `vertices`.
+
+        Parameters
+        ----------
+        vertices : :class:`iterable` of :class:`.Vertex`
+            The vertices the clone should hold.
+
+        Returns
+        -------
+        :class:`._GraphState`
+            The clone. Has the same type as the original instance.
+
+        """
+
+        return self.clone()._with_lattice_constants(lattice_constants)

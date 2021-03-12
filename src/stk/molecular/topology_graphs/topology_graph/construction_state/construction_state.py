@@ -127,6 +127,19 @@ class ConstructionState:
             results=results,
         )
 
+    def get_lattice_constants(self):
+        """
+        Get the building block to be placed on a given vertex.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
+        """
+
+        return self._graph_state.get_lattice_constants()
+
     def get_building_block(self, vertex_id):
         """
         Get the building block to be placed on a given vertex.
@@ -284,6 +297,39 @@ class ConstructionState:
         """
 
         return self.clone()._with_reaction_results(reactions, results)
+
+    def _with_lattice_constants(self, lattice_constants):
+        """
+        Modify the instance.
+
+        """
+
+        self._graph_state = (
+            self._graph_state.with_lattice_constants(
+                lattice_constants=lattice_constants,
+            )
+        )
+        return self
+
+    def with_lattice_constants(self, lattice_constants):
+        """
+        Return a clone holding the `position_matrix`.
+
+        Parameters
+        ----------
+        position_matrix : :class:`numpy.ndarray`
+            The position matrix of the clone. The shape of the matrix
+            is ``(n, 3)``.
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The clone holding the new position matrix. Has the same
+            type as the original instance.
+
+        """
+
+        return self.clone()._with_lattice_constants(lattice_constants)
 
     def _with_position_matrix(self, position_matrix):
         """
