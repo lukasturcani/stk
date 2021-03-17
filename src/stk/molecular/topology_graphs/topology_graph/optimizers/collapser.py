@@ -18,8 +18,8 @@ class Collapser(Optimizer):
     --------
     *Structure Optimization*
 
-    Using :class:`.Collapser` will lead to :class:`.ConstructedMolecule`
-    structures without long bonds.
+    Using :class:`.Collapser` will lead to
+    :class:`.ConstructedMolecule` structures without long bonds.
 
     .. code-block:: python
 

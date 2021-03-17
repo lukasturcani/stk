@@ -4,7 +4,6 @@ PeriodicCollapser
 
 """
 
-import numpy as np
 from .collapser import Collapser
 from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
 
@@ -104,7 +103,7 @@ class PeriodicCollapser(Collapser):
             abs(max(new_pos_mat[:, i])-min(new_pos_mat[:, i]))
             for i in range(3)
         )
-        ratios = (new/old for new, old in zip(new_extents, old_extents))
+        ratios = (n/o for n, o in zip(new_extents, old_extents))
         old_lattice = state.get_lattice_constants()
         new_lattice = tuple(
             old_lattice[i]*ratio for i, ratio in enumerate(ratios)
