@@ -246,12 +246,12 @@ class _GraphState:
 
     def get_lattice_constants(self):
         """
-        Get the number of edges in the topology graph.
+        Get the lattice constants of the state.
 
         Returns
         -------
-        :class:`int`
-            The number of edges.
+        :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants.
 
         """
 
@@ -315,17 +315,19 @@ class _GraphState:
 
     def with_lattice_constants(self, lattice_constants):
         """
-        Returns a clone holding `vertices`.
+        Return a clone holding the `lattice_constants`.
 
         Parameters
         ----------
-        vertices : :class:`iterable` of :class:`.Vertex`
-            The vertices the clone should hold.
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants of the clone. Requires 3 arrays of
+            size``(3, )``.
 
         Returns
         -------
         :class:`._GraphState`
-            The clone. Has the same type as the original instance.
+            The clone holding the new lattice constants. Has the same
+            type as the original instance.
 
         """
 

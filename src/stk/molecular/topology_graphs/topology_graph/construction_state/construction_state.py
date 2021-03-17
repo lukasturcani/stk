@@ -129,12 +129,12 @@ class ConstructionState:
 
     def get_lattice_constants(self):
         """
-        Get the building block to be placed on a given vertex.
+        Get the lattice constants of the state.
 
         Returns
         -------
-        :class:`.BuildingBlock`
-            The building block.
+        :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants.
 
         """
 
@@ -313,18 +313,18 @@ class ConstructionState:
 
     def with_lattice_constants(self, lattice_constants):
         """
-        Return a clone holding the `position_matrix`.
+        Return a clone holding the `lattice_constants`.
 
         Parameters
         ----------
-        position_matrix : :class:`numpy.ndarray`
-            The position matrix of the clone. The shape of the matrix
-            is ``(n, 3)``.
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants of the clone. Requires 3 arrays of
+            size``(3, )``.
 
         Returns
         -------
         :class:`.ConstructionState`
-            The clone holding the new position matrix. Has the same
+            The clone holding the new lattice constants. Has the same
             type as the original instance.
 
         """
