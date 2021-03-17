@@ -136,15 +136,9 @@ class PeriodicHoneycomb(Cof):
         lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
-            vector_1=(
-                lattice_constants[0]*self._lattice_size[0]*self._scale
-            ),
-            vector_2=(
-                lattice_constants[1]*self._lattice_size[1]*self._scale
-            ),
-            vector_3=(
-                lattice_constants[2]*self._lattice_size[2]*self._scale
-            ),
+            vector_1=lattice_constants[0],
+            vector_2=lattice_constants[1],
+            vector_3=lattice_constants[2],
         )
 
     def construct(self):

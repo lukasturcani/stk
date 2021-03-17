@@ -94,46 +94,22 @@ class PeriodicCollapser(Collapser):
             subunits=get_subunits(state),
         )
 
-        print(result)
-
         old_pos_mat = state.get_position_matrix()
         new_pos_mat = mch_mol.get_position_matrix()
-        print(old_pos_mat)
-        print(new_pos_mat)
-        old_x_extent = abs(
-            max(old_pos_mat[:, 0])-min(old_pos_mat[:, 0])
+        old_extents = (
+            abs(max(old_pos_mat[:, i])-min(old_pos_mat[:, i]))
+            for i in range(3)
         )
-        old_y_extent = abs(
-            max(old_pos_mat[:, 1])-min(old_pos_mat[:, 1])
+        new_extents = (
+            abs(max(new_pos_mat[:, i])-min(new_pos_mat[:, i]))
+            for i in range(3)
         )
-        old_z_extent = abs(
-            max(old_pos_mat[:, 2])-min(old_pos_mat[:, 2])
-        )
-        print(old_x_extent, old_y_extent, old_z_extent)
-        new_x_extent = abs(
-            max(new_pos_mat[:, 0])-min(new_pos_mat[:, 0])
-        )
-        new_y_extent = abs(
-            max(new_pos_mat[:, 1])-min(new_pos_mat[:, 1])
-        )
-        new_z_extent = abs(
-            max(new_pos_mat[:, 2])-min(new_pos_mat[:, 2])
-        )
-        print(new_x_extent, new_y_extent, new_z_extent)
-        x_ratio = new_x_extent/old_x_extent
-        y_ratio = new_y_extent/old_y_extent
-        z_ratio = new_z_extent/old_z_extent
-        print(x_ratio, y_ratio, z_ratio)
+        ratios = (new/old for new, old in zip(new_extents, old_extents))
         old_lattice = state.get_lattice_constants()
-        print(old_lattice)
-        new_lattice = np.array([
-            old_lattice[0]*x_ratio,
-            old_lattice[1]*y_ratio,
-            old_lattice[2]*z_ratio,
-        ])
-        print(new_lattice)
+        new_lattice = tuple(
+            old_lattice[i]*ratio for i, ratio in enumerate(ratios)
+        )
         state = state.with_lattice_constants(new_lattice)
-
         return state.with_position_matrix(
             position_matrix=mch_mol.get_position_matrix()
         )
