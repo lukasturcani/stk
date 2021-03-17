@@ -29,7 +29,7 @@ class PeriodicHexagonal(Cof):
         | 6-functional groups: 0 to 3
         | 2-functional groups: 4 to 15
 
-    Note that :class:`.Optimizer` does not optimize the
+    Note that only :class:`.PeriodicCollapser` optimizes the
     :class:`.PeriodicInfo`.
 
     See :class:`.Cof` for more details and examples.

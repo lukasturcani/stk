@@ -95,10 +95,12 @@ class Cof(TopologyGraph):
 
     For :class:`.Cof` topologies, it is recommend to use the
     :class:`.Collapser` optimizer if using the nonperiodic form.
-    However, no optimizer is valid for periodic systems currently.
+    For periodic systems, the :class:`PeriodicCollapser` is
+    recommended.
 
     .. code-block:: python
 
+        # Nonperiodic.
         cof = stk.ConstructedMolecule(
             topology_graph=stk.cof.Honeycomb(
                 building_blocks=(bb1, bb2),
@@ -106,6 +108,17 @@ class Cof(TopologyGraph):
                 # Setting scale_steps to False tends to lead to a
                 # better structure.
                 optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+
+        # Periodic.
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.PeriodicHoneycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+                # Setting scale_steps to False tends to lead to a
+                # better structure.
+                optimizer=stk.PeriodicCollapser(scale_steps=False),
             ),
         )
 

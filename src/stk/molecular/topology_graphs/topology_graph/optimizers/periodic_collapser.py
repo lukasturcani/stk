@@ -24,7 +24,23 @@ class PeriodicCollapser(Collapser):
 
     .. code-block:: python
 
-        FILL IN WITH TESTING.py
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+        topology_graph = stk.cof.PeriodicHoneycomb(
+            building_blocks=(bb1, bb2),
+            lattice_size=(1, 2, 3),
+            optimizer=stk.PeriodicCollapser(scale_steps=False),
+        )
+        cof = stk.ConstructedMolecule(topology_graph)
+        periodic_info = topology_graph.get_periodic_info()
+        stk.PdbWriter().write(
+            molecule=cof,
+            path='temp.pdb',
+            periodic_info=periodic_info,
+        )
 
     Optimisation with :mod:`stk` simply collects the final position
     matrix and periodic info. The optimisation's trajectory can be
