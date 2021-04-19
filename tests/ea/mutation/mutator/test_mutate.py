@@ -1,5 +1,6 @@
 from tests.utilities import is_equivalent
 
+
 def test_mutate(case_data):
     """
     Test :meth:`mutate`.
