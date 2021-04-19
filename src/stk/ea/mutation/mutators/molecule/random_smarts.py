@@ -11,10 +11,7 @@ from .mutator import MoleculeMutator
 from ...records import MutationRecord
 from ....molecule_records import MoleculeRecord
 from rdkit import Chem
-from rdkit.Chem.rdchem import BondType
 from .....molecular import BuildingBlock
-from rdkit import Chem
-import stk
 
 
 class RandomSmarts(MoleculeMutator):
