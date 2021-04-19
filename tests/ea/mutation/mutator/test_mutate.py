@@ -1,5 +1,4 @@
 from tests.utilities import is_equivalent
-from rdkit import Chem
 
 def test_mutate(case_data):
     """
@@ -49,10 +48,6 @@ def _test_mutate(mutator, record, mutation_record):
     assert (
         result.get_mutator_name() == mutation_record.get_mutator_name()
     )
-    print('Mutated')
-    print(Chem.MolToSmiles(result.get_molecule_record().get_molecule().to_rdkit_mol()))
-    print('Correct')
-    print(Chem.MolToSmiles(mutation_record.get_molecule_record().get_molecule().to_rdkit_mol()))
     is_equivalent(
         result.get_molecule_record().get_molecule().with_canonical_atom_ordering(),
         mutation_record.get_molecule_record().get_molecule().with_canonical_atom_ordering(),
