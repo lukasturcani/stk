@@ -1,5 +1,5 @@
 """
-Random Functional Group
+Random Smarts
 =====================
 
 """
