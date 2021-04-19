@@ -57,7 +57,7 @@ class RandomSmarts(MoleculeMutator):
 
         replacement_specifier : :class:`str`, optional
             Specifies the number of SMARTS replacements to make.
-            If `all`, all matching SMARTS Swill be replacemed.
+            If `all`, all matching SMARTS will be replacemed.
             If `one`, a single random SMARTS replacement will occur.
 
         replacement_fgs : :class:`list` of
