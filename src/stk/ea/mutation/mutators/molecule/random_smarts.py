@@ -23,7 +23,8 @@ class RandomSmarts(MoleculeMutator):
     the existing building blocks with ones containing
     new functionalities, as given in the SMARTS strings.
     Atoms in functional groups cannot be adjusted as these are used to
-    construct the :class: `ConstructedMolecule`.
+    construct the :class: `ConstructedMolecule`, and will
+    result in an error being raised.
     Only external functionalities can be replaced.
     """
     def __init__(
@@ -31,7 +32,7 @@ class RandomSmarts(MoleculeMutator):
         query_smarts,
         replacement_smarts,
         is_replaceable,
-        replacement_count='all',
+        replacement_specifier='all',
         name='RandomFunctionalGroup',
         random_seed=None,
     ):
@@ -54,12 +55,10 @@ class RandomSmarts(MoleculeMutator):
             Building blocks which returned ``True`` are liable for
             substitution by one of the molecules in `building_blocks`.
 
-
-        replacement_count : :class:`str` or :class:`int`, optional
-            Specifies the number of functional groups in a building
-            block to relpace.
-            If `all`, all functional groups within the building block
-            to replace.
+        replacement_specifier : :class:`str`, optional
+            Specifies the number of SMARTS replacements to make.
+            If `all`, all matching SMARTS Swill be replacemed.
+            If `one`, a single random SMARTS replacement will occur.
 
         name : :class:`str`, optional
             A name to help identify the mutator instance.
@@ -72,7 +71,7 @@ class RandomSmarts(MoleculeMutator):
         self._replacement_smarts = replacement_smarts
         self._is_replaceable = is_replaceable
         self._name = name
-        self._replacement_count = replacement_count
+        self._replacement_specifier = replacement_specifier
         self._generator = np.random.RandomState(random_seed)
 
     def mutate(self, record):
@@ -84,14 +83,21 @@ class RandomSmarts(MoleculeMutator):
             a=replaceable_building_blocks,
         )
         rdmol = replaced_building_block.to_rdkit_mol()
-        rdquery = Chem.MolFromSmarts(self._query_smarts)
-        rdreplacement = Chem.MolFromSmarts(self._replacement_smarts)
-        if self._replacement_count == 'all':
-            new_rdmol = Chem.rdmolops.ReplaceSubstructs(rdmol, rdquery, rdreplacement, replaceAll=True)
-        elif self._replacement_count == 'one':
-            
+        query = Chem.MolFromSmarts(self._query_smarts)
+        replacer_smarts = Chem.MolFromSmarts(self._replacement_smarts)
+        if self._replacement_specifier == 'all':
+            new_rdmol = Chem.rdmolops.ReplaceSubstructs(rdmol, query, replacer_smarts, replaceAll=True)
+        elif self._replacement_specifier == 'one':
+            new_rdmols = Chem.rdmolops.ReplaceSubstructs(rdmol, query, replacer_smarts, replaceAll=True)
+            new_rdmol = self._generator.choice(
+                new_rdmols
+            )
+        else:
+            raise RuntimeError('Invalid argument for replacement_specifier received')
+        # Create new BuildingBlock
+        replacement = BuildingBlock._init_from_rdkit_mol(new_rdmol)
         graph = record.get_topology_graph().with_building_blocks({
-            replaced_building_block: replacement
+            replaced_building_block: replacement,
         })
         return MutationRecord(
             molecule_record=MoleculeRecord(graph),
