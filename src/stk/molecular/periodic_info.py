@@ -94,54 +94,6 @@ class PeriodicInfo:
         )
         return clone
 
-    @classmethod
-    def _update_periodic_info(cls, vector_1, vector_2, vector_3):
-        """
-        Return clone of :class:`.UnitCell` with new parameters.
-
-        """
-
-        clone = cls.__new__(cls)
-        PeriodicInfo.__init__(
-            self=clone,
-            vector_1=vector_1,
-            vector_2=vector_2,
-            vector_3=vector_3,
-        )
-
-        return clone
-
-    def with_cell_from_vectors(self, vector_1, vector_2, vector_3):
-        """
-        Update cell.
-
-        Parameters
-        ----------
-        vector_1 : :class:`numpy.ndarray`
-            First cell lattice vector of shape (3, ) in
-            Angstrom.
-
-        vector_2 : :class:`numpy.ndarray`
-            Second cell lattice vector of shape (3, ) in
-            Angstrom.
-
-        vector_3 : :class:`numpy.ndarray`
-            Third cell lattice vector of shape (3, ) in
-            Angstrom.
-
-        Returns
-        -------
-        :class:`.UnitCell`
-            Clone with updated cell parameters.
-
-        """
-
-        return self.__class__._update_periodic_info(
-            vector_1=vector_1,
-            vector_2=vector_2,
-            vector_3=vector_3,
-        )
-
     def get_vector_1(self):
         """
         Get *x* vector.
