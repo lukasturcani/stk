@@ -9,6 +9,7 @@ from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
 from ..topology_graph import Edge, NullOptimizer
+from ..construction_result import PeriodicConstructionResult
 from ...periodic_info import PeriodicInfo
 
 
@@ -146,6 +147,37 @@ class PeriodicHoneycomb(Cof):
                 lattice_constants[2]*self._lattice_size[2]*self._scale
             ),
         )
+
+    def construct(self):
+        """
+        Construct a :class:`.ConstructedMolecule`.
+
+        Returns
+        -------
+        :class:`.PeriodicConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
+
+        """
+
+        return super().construct()
+
+    def _get_construction_result(self, state):
+        """
+        Get the result of the construction.
+
+        Parameters
+        ----------
+        state : :class:`.ConstructionState`
+            The state of the molecule being constructed.
+
+        Returns
+        -------
+        :class:`.PeriodicConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
+
+        """
+
+        return PeriodicConstructionResult(state)
 
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
