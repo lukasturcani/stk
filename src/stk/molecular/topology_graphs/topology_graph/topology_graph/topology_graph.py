@@ -404,6 +404,24 @@ class TopologyGraph:
         state = self._place_building_blocks(state)
         state = self._run_reactions(state)
         state = self._optimizer.optimize(state)
+        return self._get_construction_result(state)
+
+    def _get_construction_result(self, state):
+        """
+        Get the result of the construction.
+
+        Parameters
+        ----------
+        state : :class:`.ConstructionState`
+            The state of the molecule being constructed.
+
+        Returns
+        -------
+        :class:`.ConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
+
+        """
+
         return ConstructionResult(state)
 
     def _get_construction_state(self):
