@@ -54,7 +54,10 @@ class _GraphState:
             for vertex in vertices
         }
         self._edges = edges
-        self._lattice_constants = lattice_constants
+        self._lattice_constants = tuple(map(
+            np.array,
+            lattice_constants,
+        ))
         self._vertex_edges = self._get_vertex_edges()
 
     def _get_vertex_edges(self):
@@ -152,7 +155,10 @@ class _GraphState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
-        clone._lattice_constants = self._lattice_constants
+        clone._lattice_constants = tuple(map(
+            np.array,
+            self._lattice_constants,
+        ))
         return clone
 
     def get_building_block(self, vertex_id):
@@ -255,7 +261,7 @@ class _GraphState:
 
         """
 
-        return self._lattice_constants
+        return tuple(map(np.array, self._lattice_constants))
 
     def get_edges(self, vertex_id):
         """
@@ -310,7 +316,10 @@ class _GraphState:
 
         """
 
-        self._lattice_constants = lattice_constants
+        self._lattice_constants = tuple(map(
+            np.array,
+            lattice_constants,
+        ))
         return self
 
     def with_lattice_constants(self, lattice_constants):

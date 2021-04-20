@@ -8,7 +8,7 @@ import numpy as np
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
-from ..topology_graph import Edge, NullOptimizer, ConstructionResult
+from ..topology_graph import Edge, NullOptimizer
 from ...periodic_info import PeriodicInfo
 
 
@@ -136,19 +136,16 @@ class PeriodicSquare(Cof):
         lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
-            vector_1=lattice_constants[0],
-            vector_2=lattice_constants[1],
-            vector_3=lattice_constants[2],
+            vector_1=(
+                lattice_constants[0]*self._lattice_size[0]*self._scale
+            ),
+            vector_2=(
+                lattice_constants[1]*self._lattice_size[1]*self._scale
+            ),
+            vector_3=(
+                lattice_constants[2]*self._lattice_size[2]*self._scale
+            ),
         )
-
-    def construct(self):
-
-        state = self._get_construction_state()
-        state = self._place_building_blocks(state)
-        state = self._run_reactions(state)
-        state = self._optimizer.optimize(state)
-        self._lattice_constants = state.get_lattice_constants()
-        return ConstructionResult(state)
 
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),

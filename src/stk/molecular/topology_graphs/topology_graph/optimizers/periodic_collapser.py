@@ -12,7 +12,7 @@ import mchammer as mch
 
 class PeriodicCollapser(Collapser):
     """
-    Performs rigid-body collapse of molecule [1]_.
+    Performs rigid-body collapse of molecules [1]_.
 
     Examples
     --------
