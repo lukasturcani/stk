@@ -62,7 +62,7 @@ from ...case_data import CaseData
                 '[C+2][C+]3C4=C([C+]=N4)[C+]4[C+2][C+](C5=C(N=[C+]5)[C'
                 '+]5[C+2][C+](C6=C(Br)[C+]=N6)[C+](F)C6(N=[C+]C56[H])C'
                 '5=C([C+]=N5)[C+]5[C+2][C+](C6=C([C+]7[C+2][C+](C8=C(B'
-                'r)[C+]=N8)C8([H])[C+]=NC8(C8=C(Br)[C+]=N8)[C+]7F)[C+]'
+                'r)N=[C+]8)C8([H])[C+]=NC8(C8=C(Br)N=[C+]8)[C+]7F)[C+]'
                 '=N6)[C+](F)C6(N=[C+]C56[H])C5=C(N=[C+]5)[C+]5[C+2][C+'
                 '](C6=C([C+]=N6)[C+]6[C+2][C+](Br)[C+](F)C7(N=[C+]C67['
                 'H])C6=C(N=[C+]6)C6(N=[C+]C26[H])[C+]3F)C2([H])[C+]=NC'
