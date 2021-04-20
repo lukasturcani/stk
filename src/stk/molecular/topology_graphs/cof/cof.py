@@ -95,7 +95,7 @@ class Cof(TopologyGraph):
 
     For :class:`.Cof` topologies, it is recommend to use the
     :class:`.Collapser` optimizer if using the nonperiodic form.
-    For periodic systems, the :class:`PeriodicCollapser` is
+    For periodic systems, the :class:`.PeriodicCollapser` is
     recommended.
 
     .. code-block:: python
@@ -327,11 +327,6 @@ class Cof(TopologyGraph):
         lattice = self._get_lattice(self._vertex_alignments)
         edges = self._get_edges(lattice)
         vertices = self._get_vertices(lattice)
-
-        self._lattice_constants = tuple(
-            self._get_lattice_constants()[i]*self._lattice_size[i]
-            for i in range(3)
-        )
 
         if isinstance(building_blocks, dict):
             for building_block in building_blocks:
