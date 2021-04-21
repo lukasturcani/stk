@@ -3,7 +3,7 @@ import numpy as np
 
 def test_get_periodic_info(periodic_case):
     """
-    Test collection of periodic cell from `.TopologyGraph`.
+    Test the collection of the periodic cell from a `.TopologyGraph`.
 
     Parameters
     ----------
@@ -47,4 +47,19 @@ def _test_get_periodic_info(topology_graph, cell):
     assert np.all(np.array([
         np.allclose(i, j, atol=1e-4)
         for i, j in zip(actual_cell, cell)
+    ]))
+
+
+def test_get_periodic_info_2(periodic_case):
+    """
+
+    """
+
+    construction_result = periodic_case.construct()
+    actual_cell = (
+        construction_result.get_periodic_info().get_cell_matrix()
+    )
+    assert np.all(np.array([
+        np.allclose(i, j, atol=1e-4)
+        for i, j in zip(actual_cell, periodic_case.cell)
     ]))

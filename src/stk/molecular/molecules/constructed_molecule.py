@@ -132,6 +132,28 @@ class ConstructedMolecule(Molecule):
         molecule._num_building_blocks = dict(num_building_blocks)
         return molecule
 
+    @classmethod
+    def init_from_construction_result(
+        cls,
+        topology_graph,
+        construction_result,
+    ):
+        obj = cls.__new__(cls)
+        Molecule.__init__(
+            self=obj,
+            atoms=construction_result.get_atoms(),
+            bonds=construction_result.get_bonds(),
+            position_matrix=construction_result.get_position_matrix(),
+        )
+        obj._atom_infos = construction_result.get_atom_infos()
+        obj._bond_infos = construction_result.get_bond_infos()
+        obj._num_building_blocks = {
+            building_block:
+                topology_graph.get_num_building_block(building_block)
+            for building_block in topology_graph.get_building_blocks()
+        }
+        return obj
+
     def clone(self):
         clone = super().clone()
         clone._atom_infos = self._atom_infos
