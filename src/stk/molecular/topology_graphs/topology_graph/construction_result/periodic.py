@@ -5,7 +5,7 @@ Periodic Construction Result
 """
 
 from .construction_result import ConstructionResult
-from ...periodic_info import PeriodicInfo
+from ....periodic_info import PeriodicInfo
 
 
 class PeriodicConstructionResult(ConstructionResult):

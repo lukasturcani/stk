@@ -5,11 +5,16 @@ Periodic Honeycomb
 """
 
 import numpy as np
+import warnings
+
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
-from ..topology_graph import Edge, NullOptimizer
-from ..construction_result import PeriodicConstructionResult
+from ..topology_graph import (
+    Edge,
+    NullOptimizer,
+    PeriodicConstructionResult,
+)
 from ...periodic_info import PeriodicInfo
 
 
@@ -134,6 +139,15 @@ class PeriodicHoneycomb(Cof):
 
         """
 
+        warnings.warn(
+            'You called get_periodic_info() on a topology graph '
+            'instance. This method will be removed in any version '
+            'of stk released on, or after, 21/10/21. Please call '
+            'the construct() method instead. This will return a '
+            'PeriodicConstructionResult which provides the new '
+            'get_periodic_info() method.'
+        )
+
         lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
@@ -162,21 +176,6 @@ class PeriodicHoneycomb(Cof):
         return super().construct()
 
     def _get_construction_result(self, state):
-        """
-        Get the result of the construction.
-
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The state of the molecule being constructed.
-
-        Returns
-        -------
-        :class:`.PeriodicConstructionResult`
-            The data describing the :class:`.ConstructedMolecule`.
-
-        """
-
         return PeriodicConstructionResult(state)
 
     _lattice_constants = _a, _b, _c = (

@@ -5,10 +5,16 @@ Periodic Kagome
 """
 
 import numpy as np
+import warnings
+
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
-from ..topology_graph import Edge, NullOptimizer
+from ..topology_graph import (
+    Edge,
+    NullOptimizer,
+    PeriodicConstructionResult,
+)
 from ...periodic_info import PeriodicInfo
 
 
@@ -133,6 +139,15 @@ class PeriodicKagome(Cof):
 
         """
 
+        warnings.warn(
+            'You called get_periodic_info() on a topology graph '
+            'instance. This method will be removed in any version '
+            'of stk released on, or after, 21/10/21. Please call '
+            'the construct() method instead. This will return a '
+            'PeriodicConstructionResult which provides the new '
+            'get_periodic_info() method.'
+        )
+
         lattice_constants = self._get_lattice_constants()
 
         return PeriodicInfo(
@@ -146,6 +161,22 @@ class PeriodicKagome(Cof):
                 lattice_constants[2]*self._lattice_size[2]*self._scale
             ),
         )
+
+    def construct(self):
+        """
+        Construct a :class:`.ConstructedMolecule`.
+
+        Returns
+        -------
+        :class:`.PeriodicConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
+
+        """
+
+        return super().construct()
+
+    def _get_construction_result(self, state):
+        return PeriodicConstructionResult(state)
 
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
