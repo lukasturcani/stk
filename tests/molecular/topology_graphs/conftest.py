@@ -21,14 +21,6 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
                 np.array([0., 0., 210.33234855])
             ),
         ),
-        CaseData(
-            topology_graph=stk.cof.Honeycomb(
-                building_blocks=(bb1, bb2),
-                lattice_size=(3, 3, 1),
-                periodic=False,
-            ),
-            cell=None,
-        ),
     ),
 )
 def periodic_case(request):

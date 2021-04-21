@@ -41,16 +41,10 @@ def _test_get_periodic_info(topology_graph, cell):
 
     """
 
-    try:
-        if not topology_graph._periodic:
-            assert cell is None
-    except AttributeError:
-        # Topology must be a PeriodicClass to access periodic info.
-        assert hasattr(topology_graph, '_internal')
-        test_cell = (
-            topology_graph.get_periodic_info().get_cell_matrix()
-        )
-        assert np.all(np.array([
-            np.allclose(i, j, atol=1e-4)
-            for i, j in zip(test_cell, cell)
-        ]))
+    actual_cell = (
+        topology_graph.get_periodic_info().get_cell_matrix()
+    )
+    assert np.all(np.array([
+        np.allclose(i, j, atol=1e-4)
+        for i, j in zip(actual_cell, cell)
+    ]))
