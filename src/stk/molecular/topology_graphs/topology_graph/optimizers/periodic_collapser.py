@@ -62,7 +62,7 @@ class PeriodicCollapser(Collapser):
         self,
         step_size=0.1,
         distance_threshold=1.5,
-        scale_steps=True,
+        scale_steps=False,
     ):
         """
         Initialize an instance of :class:`.PeriodicCollapser`.
