@@ -703,7 +703,7 @@ class Cof(TopologyGraph):
         return super().construct()
 
     def _get_construction_result(self, state):
-        return PeriodicConstructionResult(state)
+        return PeriodicConstructionResult(state, self._lattice_size)
 
     def _get_scale(self, building_block_vertices):
         return 5*max(
