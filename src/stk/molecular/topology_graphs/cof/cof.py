@@ -32,7 +32,12 @@ import numpy as np
 from functools import partial
 from operator import getitem
 
-from ..topology_graph import TopologyGraph, NullOptimizer, EdgeGroup
+from ..topology_graph import (
+    TopologyGraph,
+    NullOptimizer,
+    EdgeGroup,
+    ConstructionState,
+)
 from .vertices import _UnaligningVertex
 from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
@@ -683,6 +688,19 @@ class Cof(TopologyGraph):
 
     def _get_lattice_constants(self):
         return self._lattice_constants
+
+    def _get_construction_state(self):
+        return ConstructionState(
+            building_block_vertices=self._building_block_vertices,
+            edges=self._edges,
+            lattice_constants=tuple(
+                np.array(constant, dtype=np.float64)*self._scale*dim
+                for constant, dim in zip(
+                    self._get_lattice_constants(),
+                    self._lattice_size,
+                )
+            ),
+        )
 
     def _get_scale(self, building_block_vertices):
         return 5*max(

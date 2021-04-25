@@ -52,10 +52,21 @@ def _test_get_periodic_info(topology_graph, cell):
 
 def test_get_periodic_info_2(periodic_case):
     """
+    Test getting of :class:`.PeriodicInfo`.
+
+    Parameters
+    ----------
+    periodic_case : :class:`.CaseData`
+        The test case. Includes the topology graph and the expected
+        cell.
+
+    Returns
+    -------
+    None : :class:`NoneType`
 
     """
 
-    construction_result = periodic_case.construct()
+    construction_result = periodic_case.topology_graph.construct()
     actual_cell = (
         construction_result.get_periodic_info().get_cell_matrix()
     )
