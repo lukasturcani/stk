@@ -18,7 +18,11 @@ class PeriodicConstructionResult(ConstructionResult):
         '_periodic_info',
     ]
 
-    def __init__(self, construction_state):
+    def __init__(
+        self,
+        construction_state,
+        lattice_size,
+    ):
         """
         Initialize a :class:`.ConstructionResult`.
 
@@ -27,11 +31,20 @@ class PeriodicConstructionResult(ConstructionResult):
         construction_state : :class:`.ConstructionState`
             The state from which the result is initialized.
 
+        lattice_size : :class:`tuple` of :class:`int`
+            The size of the lattice in the x, y and z directions.
+
         """
 
         super().__init__(construction_state)
         self._periodic_info = PeriodicInfo(
-            *construction_state.get_lattice_constants()
+            *(
+                lattice_constant*dim
+                for lattice_constant, dim in zip(
+                    construction_state.get_lattice_constants(),
+                    lattice_size,
+                )
+            )
         )
 
     def get_periodic_info(self):
