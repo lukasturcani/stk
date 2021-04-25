@@ -32,7 +32,12 @@ import numpy as np
 from functools import partial
 from operator import getitem
 
-from ..topology_graph import TopologyGraph, NullOptimizer, EdgeGroup
+from ..topology_graph import (
+    TopologyGraph,
+    NullOptimizer,
+    EdgeGroup,
+    PeriodicConstructionResult,
+)
 from .vertices import _UnaligningVertex
 from .edge import _CofEdge
 from ...reactions import GenericReactionFactory
@@ -683,6 +688,22 @@ class Cof(TopologyGraph):
 
     def _get_lattice_constants(self):
         return self._lattice_constants
+
+    def construct(self):
+        """
+        Construct a :class:`.ConstructedMolecule`.
+
+        Returns
+        -------
+        :class:`.PeriodicConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
+
+        """
+
+        return super().construct()
+
+    def _get_construction_result(self, state):
+        return PeriodicConstructionResult(state)
 
     def _get_scale(self, building_block_vertices):
         return 5*max(

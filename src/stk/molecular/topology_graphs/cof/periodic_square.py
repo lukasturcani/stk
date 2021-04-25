@@ -161,22 +161,6 @@ class PeriodicSquare(Cof):
             ),
         )
 
-    def construct(self):
-        """
-        Construct a :class:`.ConstructedMolecule`.
-
-        Returns
-        -------
-        :class:`.PeriodicConstructionResult`
-            The data describing the :class:`.ConstructedMolecule`.
-
-        """
-
-        return super().construct()
-
-    def _get_construction_result(self, state):
-        return PeriodicConstructionResult(state)
-
     _lattice_constants = _a, _b, _c = (
         np.array([1., 0., 0.]),
         np.array([0., 1., 0.]),
