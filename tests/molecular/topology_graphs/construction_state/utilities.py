@@ -76,7 +76,7 @@ def is_clone(construction_state, clone):
     assert all(
         np.all(np.equal(actual_constant, expected_constant))
         for actual_constant, expected_constant
-        in zip(
+        in it.zip_longest(
             construction_state.get_lattice_constants(),
             clone.get_lattice_constants(),
         )
