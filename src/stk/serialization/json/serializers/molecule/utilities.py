@@ -1,3 +1,10 @@
+"""
+JSON Serialization Utilities for Molecules
+==========================================
+
+"""
+
+
 def atom_to_json(atom):
     """
     Return a JSON representation of `atom`.
