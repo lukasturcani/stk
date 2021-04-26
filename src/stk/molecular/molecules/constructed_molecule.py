@@ -154,6 +154,27 @@ class ConstructedMolecule(Molecule):
         obj,
         construction_result,
     ):
+        """
+        Initialize a :class:`.ConstructedMolecule`.
+
+        This modifies `obj`.
+
+        Parameters
+        ----------
+        obj : :class:`.ConstructedMolecule`
+            The constructed molecule to initialize.
+
+        construction_result : :class:`.ConstructionResult`
+            The result of a construction, from which the
+            :class:`.ConstructedMolecule` should be initialized.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The `obj` instance.
+
+        """
+
         super(ConstructedMolecule, obj).__init__(
             atoms=construction_result.get_atoms(),
             bonds=construction_result.get_bonds(),
