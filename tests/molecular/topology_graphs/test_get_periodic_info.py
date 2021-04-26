@@ -1,4 +1,5 @@
 import numpy as np
+import itertools
 
 
 def test_get_periodic_info(periodic_case):
@@ -46,7 +47,7 @@ def _test_get_periodic_info(topology_graph, cell):
     )
     assert np.all(np.array([
         np.allclose(i, j, atol=1e-4)
-        for i, j in zip(actual_cell, cell)
+        for i, j in itertools.zip_longest(actual_cell, cell)
     ]))
 
 
@@ -72,5 +73,8 @@ def test_get_periodic_info_2(periodic_case):
     )
     assert np.all(np.array([
         np.allclose(i, j, atol=1e-4)
-        for i, j in zip(actual_cell, periodic_case.cell)
+        for i, j in itertools.zip_longest(
+            actual_cell,
+            periodic_case.cell,
+        )
     ]))
