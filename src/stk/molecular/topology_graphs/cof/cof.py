@@ -121,9 +121,7 @@ class Cof(TopologyGraph):
             topology_graph=stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 3, 1),
-                # Setting scale_steps to False tends to lead to a
-                # better structure.
-                optimizer=stk.PeriodicCollapser(scale_steps=False),
+                optimizer=stk.PeriodicCollapser(),
             ),
         )
 
