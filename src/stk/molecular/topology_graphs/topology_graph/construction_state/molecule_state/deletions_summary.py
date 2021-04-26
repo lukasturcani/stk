@@ -1,3 +1,9 @@
+"""
+Deletions Summary
+=================
+
+"""
+
 import numpy as np
 
 from .....atoms import AtomInfo

@@ -1,3 +1,9 @@
+"""
+Serial Topology Graph
+=====================
+
+"""
+
 from .utilities import _Placement
 
 

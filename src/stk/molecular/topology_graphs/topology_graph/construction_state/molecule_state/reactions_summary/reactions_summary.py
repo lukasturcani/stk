@@ -1,3 +1,9 @@
+"""
+Reactions Summary
+=================
+
+"""
+
 from typing import NamedTuple
 
 from .atom_batch import _AtomBatch

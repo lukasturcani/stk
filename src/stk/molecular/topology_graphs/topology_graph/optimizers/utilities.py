@@ -1,4 +1,7 @@
 """
+Optimizer Utilities
+===================
+
 This module defines utilities for optimizers.
 
 """

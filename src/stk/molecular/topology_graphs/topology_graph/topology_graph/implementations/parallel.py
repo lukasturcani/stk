@@ -1,3 +1,9 @@
+"""
+Parallel Topology Graph
+=======================
+
+"""
+
 import pathos
 
 from .utilities import _Placement
