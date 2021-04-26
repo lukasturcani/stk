@@ -1,4 +1,7 @@
 """
+Molecular Utilities
+===================
+
 This module defines utilities for molecules.
 
 """

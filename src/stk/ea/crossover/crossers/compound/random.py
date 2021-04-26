@@ -47,9 +47,9 @@ class RandomCrosser:
             :class:`.CrossoverRecord`.
 
         weights : :class:`tuple` of :class:`float`, optional
-            For each mutator, the probability that it will be chosen
-            whenever :meth:`.mutate` is called.
-            If ``None`` all `mutators` will have equal chance of being
+            For each crosser, the probability that it will be chosen
+            whenever :meth:`.cross` is called.
+            If ``None`` all `crossers` will have equal chance of being
             selected.
 
         random_seed : :class:`int`, optional
