@@ -1,6 +1,6 @@
 """
-Collapser
-=========
+Periodic Collapser
+==================
 
 """
 
@@ -10,31 +10,44 @@ from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
 import mchammer as mch
 
 
-class Collapser(Optimizer):
+class PeriodicCollapser(Optimizer):
     """
-    Performs rigid-body collapse of molecule [1]_.
+    Performs rigid-body collapse of molecules [1]_.
+
+    This :class:`.Optimizer` will also update the `.PeriodicInfo`.
 
     Examples
     --------
     *Structure Optimization*
 
-    Using :class:`.Collapser` will lead to
-    :class:`.ConstructedMolecule` structures without long bonds.
+    Using :class:`.PeriodicCollapser` will lead to
+    :class:`.ConstructedMolecule` structures without long bonds and
+    match the unit-cell to the new structure.
 
     .. code-block:: python
 
-        polymer = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
-                repeating_unit='AB',
-                optimizer=stk.Collapser(),
-            ),
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+        topology_graph = stk.cof.PeriodicHoneycomb(
+            building_blocks=(bb1, bb2),
+            lattice_size=(1, 2, 3),
+            optimizer=stk.PeriodicCollapser(),
         )
-        polymer.write(f'polymer_opt.mol')
+        cof = stk.ConstructedMolecule(topology_graph)
+        periodic_info = topology_graph.get_periodic_info()
+        stk.PdbWriter().write(
+            molecule=cof,
+            path='temp.pdb',
+            periodic_info=periodic_info,
+        )
 
     Optimisation with :mod:`stk` simply collects the final position
-    matrix. The optimisation's trajectory can be output using the
-    :mod:`MCHammer` implementation if required by the user [1]_.
+    matrix and periodic info. The optimisation's trajectory can be
+    output using the :mod:`MCHammer` implementation if required by the
+    user [1]_.
 
     The open-source optimization code :mod:`MCHammer` specializes in
     the `collapsing` of molecules with long bonds like those
@@ -51,10 +64,10 @@ class Collapser(Optimizer):
         self,
         step_size=0.1,
         distance_threshold=1.5,
-        scale_steps=True,
+        scale_steps=False,
     ):
         """
-        Initialize an instance of :class:`.Collapser`.
+        Initialize an instance of :class:`.PeriodicCollapser`.
 
         Parameters
         ----------
@@ -79,7 +92,6 @@ class Collapser(Optimizer):
         )
 
     def optimize(self, state):
-        # Define MCHammer molecule to optimize.
         mch_mol = mch.Molecule(
             atoms=(
                 mch.Atom(
@@ -91,12 +103,28 @@ class Collapser(Optimizer):
             position_matrix=state.get_position_matrix(),
         )
 
-        # Run optimization.
         mch_mol, result = self._optimizer.get_result(
             mol=mch_mol,
             bond_pair_ids=tuple(get_long_bond_ids(state)),
             subunits=get_subunits(state),
         )
+
+        old_pos_mat = state.get_position_matrix()
+        new_pos_mat = mch_mol.get_position_matrix()
+        old_extents = (
+            abs(max(old_pos_mat[:, i])-min(old_pos_mat[:, i]))
+            for i in range(3)
+        )
+        new_extents = (
+            abs(max(new_pos_mat[:, i])-min(new_pos_mat[:, i]))
+            for i in range(3)
+        )
+        ratios = (n/o for n, o in zip(new_extents, old_extents))
+        old_lattice = state.get_lattice_constants()
+        new_lattice = tuple(
+            old_lattice[i]*ratio for i, ratio in enumerate(ratios)
+        )
+        state = state.with_lattice_constants(new_lattice)
         return state.with_position_matrix(
             position_matrix=mch_mol.get_position_matrix()
         )

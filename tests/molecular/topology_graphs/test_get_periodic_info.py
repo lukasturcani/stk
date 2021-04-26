@@ -1,9 +1,10 @@
 import numpy as np
+import itertools
 
 
-def test_get_periodic_info(periodic_case):
+def test_get_periodic_info(unscaled_periodic_case):
     """
-    Test collection of periodic cell from `.TopologyGraph`.
+    Test the collection of the periodic cell from a `.TopologyGraph`.
 
     Parameters
     ----------
@@ -17,8 +18,8 @@ def test_get_periodic_info(periodic_case):
     """
 
     _test_get_periodic_info(
-        topology_graph=periodic_case.topology_graph,
-        cell=periodic_case.cell,
+        topology_graph=unscaled_periodic_case.topology_graph,
+        cell=unscaled_periodic_case.cell,
     )
 
 
@@ -41,16 +42,41 @@ def _test_get_periodic_info(topology_graph, cell):
 
     """
 
-    try:
-        if not topology_graph._periodic:
-            assert cell is None
-    except AttributeError:
-        # Topology must be a PeriodicClass to access periodic info.
-        assert hasattr(topology_graph, '_internal')
-        test_cell = (
-            topology_graph.get_periodic_info().get_cell_matrix()
+    actual_cell = (
+        topology_graph.get_periodic_info().get_cell_matrix()
+    )
+    assert np.all(np.array([
+        np.allclose(i, j, atol=1e-4)
+        for i, j in itertools.zip_longest(actual_cell, cell)
+    ]))
+
+
+def test_get_periodic_info_2(scaled_periodic_case):
+    """
+    Test getting of :class:`.PeriodicInfo`.
+
+    Parameters
+    ----------
+    periodic_case : :class:`.CaseData`
+        The test case. Includes the topology graph and the expected
+        cell.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    construction_result = (
+        scaled_periodic_case.topology_graph.construct()
+    )
+    actual_cell = (
+        construction_result.get_periodic_info().get_cell_matrix()
+    )
+    assert np.all(np.array([
+        np.allclose(i, j, atol=1e-4)
+        for i, j in itertools.zip_longest(
+            actual_cell,
+            scaled_periodic_case.cell,
         )
-        assert np.all(np.array([
-            np.allclose(i, j, atol=1e-4)
-            for i, j in zip(test_cell, cell)
-        ]))
+    ]))

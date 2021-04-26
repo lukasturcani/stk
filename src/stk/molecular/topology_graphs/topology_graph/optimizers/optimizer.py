@@ -9,6 +9,11 @@ Optimizer
 stk.molecular.topology_graphs.topology_graph.optimizers.collapser\
 >
 
+    Periodic Collapser <\
+stk.molecular.topology_graphs.topology_graph.optimizers.\
+periodic_collapser\
+>
+
     MCHammer <\
 stk.molecular.topology_graphs.topology_graph.optimizers.mchammer\
 >
