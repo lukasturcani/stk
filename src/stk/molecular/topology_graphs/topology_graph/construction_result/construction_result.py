@@ -126,7 +126,7 @@ class ConstructionResult:
         -------
         :class:`int`
             The number of times `building_block` is present in the
-            topology graph.
+            constructed molecule.
 
         """
 
@@ -137,10 +137,10 @@ class ConstructionResult:
         Yield the building blocks.
 
         Building blocks are yielded in an order based on their
-        position in the topology graph. For two equivalent
-        topology graphs, but with different building blocks,
-        equivalently positioned building blocks will be yielded at the
-        same time.
+        position in the constructed molecule. For two topologically
+        equivalent constructed molecules, but with different building
+        blocks, equivalently positioned building blocks will be
+        yielded at the same time.
 
         Yields
         ------
