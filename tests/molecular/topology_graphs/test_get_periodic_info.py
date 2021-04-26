@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 
 
-def test_get_periodic_info(periodic_case):
+def test_get_periodic_info(unscaled_periodic_case):
     """
     Test the collection of the periodic cell from a `.TopologyGraph`.
 
@@ -18,8 +18,8 @@ def test_get_periodic_info(periodic_case):
     """
 
     _test_get_periodic_info(
-        topology_graph=periodic_case.topology_graph,
-        cell=periodic_case.cell,
+        topology_graph=unscaled_periodic_case.topology_graph,
+        cell=unscaled_periodic_case.cell,
     )
 
 
@@ -51,7 +51,7 @@ def _test_get_periodic_info(topology_graph, cell):
     ]))
 
 
-def test_get_periodic_info_2(periodic_case):
+def test_get_periodic_info_2(scaled_periodic_case):
     """
     Test getting of :class:`.PeriodicInfo`.
 
@@ -67,7 +67,9 @@ def test_get_periodic_info_2(periodic_case):
 
     """
 
-    construction_result = periodic_case.topology_graph.construct()
+    construction_result = (
+        scaled_periodic_case.topology_graph.construct()
+    )
     actual_cell = (
         construction_result.get_periodic_info().get_cell_matrix()
     )
@@ -75,6 +77,6 @@ def test_get_periodic_info_2(periodic_case):
         np.allclose(i, j, atol=1e-4)
         for i, j in itertools.zip_longest(
             actual_cell,
-            periodic_case.cell,
+            scaled_periodic_case.cell,
         )
     ]))
