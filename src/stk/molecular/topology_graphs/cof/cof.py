@@ -129,11 +129,6 @@ class Cof(TopologyGraph):
 
     *Accessing the Periodic Unit Cell*
 
-    The same :class:`.Cof` instance can be built as a periodic
-    structure, which has a unit cell (assuming as P1 space group) that
-    can be accessed at any time from the :class:`.TopologyGraph`
-    instance.
-
     When building periodic :class:`.Cof` instances, the periodic
     information, such as the unit cell, can be accessed if you use the
     :class:`.PeriodicConstructionResult` returned by calling
