@@ -72,3 +72,12 @@ def is_clone(construction_state, clone):
     assert (counts1.keys() | counts2.keys()) == counts1.keys()
     for building_block, count1 in counts1.items():
         assert count1 == counts2[building_block]
+
+    assert all(
+        np.all(np.equal(actual_constant, expected_constant))
+        for actual_constant, expected_constant
+        in zip(
+            construction_state.get_lattice_constants(),
+            clone.get_lattice_constants(),
+        )
+    )
