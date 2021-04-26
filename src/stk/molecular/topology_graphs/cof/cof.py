@@ -132,7 +132,7 @@ class Cof(TopologyGraph):
     When building periodic :class:`.Cof` instances, the periodic
     information, such as the unit cell, can be accessed if you use the
     :class:`.PeriodicConstructionResult` returned by calling
-    :class:`.Cof.construct`
+    :meth:`.Cof.construct`
 
     .. code-block:: python
 
