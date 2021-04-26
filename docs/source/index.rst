@@ -63,13 +63,6 @@
    Crossover <crossover>
    Plotting <plotters>
 
-.. toctree::
-   :hidden:
-   :caption: Developer Guide
-   :maxdepth: 2
-
-   Software Architecture <software_architecture>
-
 
 ============
 Introduction
