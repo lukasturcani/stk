@@ -8,5 +8,5 @@ python:
         - requirements: docs/requirements.txt
         - method: pip
           path: .
-          extra-requirements:
+          extra_requirements:
             - --no-deps
