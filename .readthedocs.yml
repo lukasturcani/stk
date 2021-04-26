@@ -6,4 +6,5 @@ sphinx:
 python:
     install:
         - requirements: docs/requirements.txt
-          extra-requirements: --no-deps
+          extra-requirements:
+            - --no-deps
