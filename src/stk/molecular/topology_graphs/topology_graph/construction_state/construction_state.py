@@ -455,3 +455,42 @@ class ConstructionState:
         """
 
         yield from self._molecule_state.get_bond_infos()
+
+    def get_num_building_block(self, building_block):
+        """
+        Get the number of times `building_block` is present.
+
+        Parameters
+        ----------
+        building_block : :class:`.BuildingBlock`
+            The building block whose frequency in the topology graph
+            is desired.
+
+        Returns
+        -------
+        :class:`int`
+            The number of times `building_block` is present in the
+            topology graph.
+
+        """
+
+        return self._graph_state.get_num_building_block(building_block)
+
+    def get_building_blocks(self):
+        """
+        Yield the building blocks.
+
+        Building blocks are yielded in an order based on their
+        position in the topology graph. For two equivalent
+        topology graphs, but with different building blocks,
+        equivalently positioned building blocks will be yielded at the
+        same time.
+
+        Yields
+        ------
+        :class:`.BuildingBlock`
+            A building block of the topology graph.
+
+        """
+
+        yield from self._graph_state.get_building_blocks()

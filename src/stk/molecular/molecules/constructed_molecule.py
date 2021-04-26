@@ -70,19 +70,10 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        construction_result = topology_graph.construct()
-        super().__init__(
-            atoms=construction_result.get_atoms(),
-            bonds=construction_result.get_bonds(),
-            position_matrix=construction_result.get_position_matrix(),
+        self._init_from_construction_result(
+            obj=self,
+            construction_result=topology_graph.construct(),
         )
-        self._atom_infos = construction_result.get_atom_infos()
-        self._bond_infos = construction_result.get_bond_infos()
-        self._num_building_blocks = {
-            building_block:
-                topology_graph.get_num_building_block(building_block)
-            for building_block in topology_graph.get_building_blocks()
-        }
 
     @classmethod
     def init(
@@ -135,12 +126,19 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init_from_construction_result(
         cls,
-        topology_graph,
         construction_result,
     ):
-        obj = cls.__new__(cls)
-        Molecule.__init__(
-            self=obj,
+        return cls._init_from_construction_result(
+            obj=cls.__new__(cls),
+            construction_result=construction_result,
+        )
+
+    @staticmethod
+    def _init_from_construction_result(
+        obj,
+        construction_result,
+    ):
+        super(ConstructedMolecule, obj).__init__(
             atoms=construction_result.get_atoms(),
             bonds=construction_result.get_bonds(),
             position_matrix=construction_result.get_position_matrix(),
@@ -148,9 +146,11 @@ class ConstructedMolecule(Molecule):
         obj._atom_infos = construction_result.get_atom_infos()
         obj._bond_infos = construction_result.get_bond_infos()
         obj._num_building_blocks = {
-            building_block:
-                topology_graph.get_num_building_block(building_block)
-            for building_block in topology_graph.get_building_blocks()
+            building_block: construction_result.get_num_building_block(
+                building_block=building_block,
+            )
+            for building_block
+            in construction_result.get_building_blocks()
         }
         return obj
 
