@@ -4,13 +4,13 @@ Periodic Collapser
 
 """
 
-from .collapser import Collapser
+from .optimizer import Optimizer
 from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
 
 import mchammer as mch
 
 
-class PeriodicCollapser(Collapser):
+class PeriodicCollapser(Optimizer):
     """
     Performs rigid-body collapse of molecules [1]_.
 
