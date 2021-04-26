@@ -119,14 +119,14 @@ class ConstructionResult:
         Parameters
         ----------
         building_block : :class:`.BuildingBlock`
-            The building block whose frequency in the topology graph
-            is desired.
+            The building block whose frequency in the constructed
+            molecule is desired.
 
         Returns
         -------
         :class:`int`
-            The number of times `building_block` is present in the
-            constructed molecule.
+            The number of times `building_block` was used in the
+            construction of the constructed molecule.
 
         """
 
