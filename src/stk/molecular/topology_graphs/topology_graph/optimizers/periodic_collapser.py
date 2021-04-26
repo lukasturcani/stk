@@ -1,6 +1,6 @@
 """
-PeriodicCollapser
-=========
+Periodic Collapser
+==================
 
 """
 
