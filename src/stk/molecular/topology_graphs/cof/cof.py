@@ -127,7 +127,7 @@ class Cof(TopologyGraph):
             ),
         )
 
-    *Accessing the Periodic Unit Cell*
+    *Accessing the Periodic Information*
 
     When building periodic :class:`.Cof` instances, the periodic
     information, such as the unit cell, can be accessed if you use the
