@@ -134,14 +134,22 @@ class Cof(TopologyGraph):
     can be accessed at any time from the :class:`.TopologyGraph`
     instance.
 
+    When building periodic :class:`.Cof` instances, the periodic
+    information, such as the unit cell, can be accessed if you use the
+    :class:`.PeriodicConstructionResult` returned by calling
+    :class:`.Cof.construct`
+
     .. code-block:: python
 
         topology_graph = stk.cof.PeriodicHoneycomb(
             building_blocks=(bb1, bb2),
             lattice_size=(3, 3, 1),
         )
-        cof = stk.ConstructedMolecule(topology_graph)
-        periodic_info = topology.get_periodic_info()
+        construction_result = topology_graph.construct()
+        cof = stk.ConstructedMolecule.init_from_construction_result(
+            construction_result=construction_result,
+        )
+        periodic_info = construction_result.get_periodic_info()
         cell_matrix = periodic_info.get_cell_matrix()
         # Can access all unit-cell parameters.
         a = periodic_info.get_a()
@@ -157,7 +165,6 @@ class Cof(TopologyGraph):
             path='cof.pdb',
             periodic_info=periodic_info,
         )
-
 
     *Structural Isomer Construction*
 
