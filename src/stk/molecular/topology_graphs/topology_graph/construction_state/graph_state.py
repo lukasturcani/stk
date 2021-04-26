@@ -14,6 +14,7 @@ class _GraphState:
         '_edges',
         '_lattice_constants',
         '_vertex_edges',
+        '_num_building_blocks',
     ]
 
     def __init__(
@@ -164,6 +165,7 @@ class _GraphState:
             np.array,
             self._lattice_constants,
         ))
+        clone._num_building_blocks = dict(self._num_building_blocks)
         return clone
 
     def get_building_block(self, vertex_id):
