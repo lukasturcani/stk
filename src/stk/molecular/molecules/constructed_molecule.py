@@ -128,6 +128,22 @@ class ConstructedMolecule(Molecule):
         cls,
         construction_result,
     ):
+        """
+        Initialize a :class:`.ConstructedMolecule`.
+
+        Parameters
+        ----------
+        construction_result : :class:`.ConstructionResult`
+            The result of a construction, from which the
+            :class:`.ConstructedMolecule` should be initialized.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The constructed molecule.
+
+        """
+
         return cls._init_from_construction_result(
             obj=cls.__new__(cls),
             construction_result=construction_result,
