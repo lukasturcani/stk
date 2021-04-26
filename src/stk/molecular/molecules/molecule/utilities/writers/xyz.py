@@ -1,3 +1,10 @@
+"""
+XYZ Writing Utilities
+=====================
+
+"""
+
+
 def _write_xyz_file(self, path, atom_ids):
     """
     Write to a ``.xyz`` file.
