@@ -14,6 +14,8 @@ class PeriodicCollapser(Optimizer):
     """
     Performs rigid-body collapse of molecules [1]_.
 
+    This :class:`.Optimizer` will also update the `.PeriodicInfo`.
+
     Examples
     --------
     *Structure Optimization*

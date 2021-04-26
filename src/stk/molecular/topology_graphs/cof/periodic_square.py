@@ -9,11 +9,7 @@ import warnings
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _LinearCofVertex, _NonLinearCofVertex
-from ..topology_graph import (
-    Edge,
-    NullOptimizer,
-    PeriodicConstructionResult,
-)
+from ..topology_graph import Edge, NullOptimizer
 from ...periodic_info import PeriodicInfo
 
 
@@ -33,8 +29,8 @@ class PeriodicSquare(Cof):
         | 4-functional groups: 0
         | 2-functional groups: 1 to 2
 
-    Note that only :class:`.PeriodicCollapser` optimizes the
-    :class:`.PeriodicInfo`.
+    Note that optimizers may not optimize the :class:`.PeriodicInfo`.
+    The documentation of the optimizer will state if it does.
 
     See :class:`.Cof` for more details and examples.
 

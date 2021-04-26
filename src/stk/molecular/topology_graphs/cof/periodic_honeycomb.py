@@ -30,8 +30,8 @@ class PeriodicHoneycomb(Cof):
         | 3-functional groups: 0 to 1
         | 2-functional groups: 2 to 4
 
-    Note that only :class:`.PeriodicCollapser` optimizes the
-    :class:`.PeriodicInfo`.
+    Note that optimizers may not optimize the :class:`.PeriodicInfo`.
+    The documentation of the optimizer will state if it does.
 
     See :class:`.Cof` for more details and examples.
 
