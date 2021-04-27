@@ -4,4 +4,4 @@ from .serialization import *  # noqa
 from .databases import *  # noqa
 from .ea import *  # noqa
 
-__version__ = '2021.04.26.0'
+__version__ = '2021.04.27.0'
