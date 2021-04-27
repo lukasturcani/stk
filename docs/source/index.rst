@@ -63,6 +63,13 @@
    Crossover <crossover>
    Plotting <plotters>
 
+.. toctree::
+   :hidden:
+   :caption: Modules
+   :maxdepth: 1
+
+   Modules <modules.rst>
+
 
 ============
 Introduction
