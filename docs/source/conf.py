@@ -89,6 +89,7 @@ def setup(app):
 
 add_module_names = False
 # numpydoc_show_class_members = False
+numpydoc_class_members_toctree = False
 
 
 # Add any paths that contain templates here, relative to this
