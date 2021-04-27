@@ -1,3 +1,9 @@
+"""
+Parallel Evolutionary Algorithm
+===============================
+
+"""
+
 import pathos
 
 from .implementation import Implementation

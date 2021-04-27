@@ -22,11 +22,12 @@ class ValueDatabase:
     :mod:`molecule_value_database <.databases.value>`,
     can serve as good examples.
 
-    *Iterating Through Entries in Database*
+    *Iterating Through Entries in the Database*
 
-    The :meth:`.get_all` method of a molecule database instance can
-    be used to iterate through entries, the keys of which can be used
-    to access values.
+    The :meth:`.MoleculeDatabase.get_all` and
+    :meth:`.ConstructedMoleculeDatabase.get_all` methods  can be used
+    to iterate through all of the database's entries, which can then
+    be used to access values in the :class:`.ValueDatabase`
 
     .. code-block:: python
 

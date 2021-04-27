@@ -1,3 +1,9 @@
+"""
+Null Optimizer
+==============
+
+"""
+
 from .optimizer import Optimizer
 
 

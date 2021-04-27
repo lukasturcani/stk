@@ -66,8 +66,8 @@ class Reaction:
     --------
     *Subclass Implementation*
 
-    The source code of the subclasses, listed in :mod:`.reaction`, can
-    serve as good examples.
+    The source code of the subclasses, listed in
+    :mod:`~.reaction.reaction`, can serve as good examples.
 
     """
 

@@ -1,3 +1,9 @@
+"""
+Sorter
+======
+
+"""
+
 import numpy as np
 
 from stk.utilities import vector_angle

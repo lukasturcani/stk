@@ -1,3 +1,9 @@
+"""
+Edge Sorter
+===========
+
+"""
+
 from .sorter import _Sorter
 
 

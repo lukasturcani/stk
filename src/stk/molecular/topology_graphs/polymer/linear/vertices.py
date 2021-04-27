@@ -1,3 +1,9 @@
+"""
+Linear Polymer Vertices
+=======================
+
+"""
+
 import logging
 
 from ...topology_graph import Vertex

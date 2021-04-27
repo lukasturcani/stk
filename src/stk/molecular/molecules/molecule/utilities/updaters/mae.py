@@ -1,3 +1,10 @@
+"""
+MAE Updating Utilities
+======================
+
+"""
+
+
 from stk.utilities import mol_from_mae_file
 
 

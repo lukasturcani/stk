@@ -1,3 +1,10 @@
+"""
+MDL Writing Utilities
+=====================
+
+"""
+
+
 def _write_mdl_mol_file(self, path, atom_ids):
     """
     Write to a V3000 ``.mol`` file.

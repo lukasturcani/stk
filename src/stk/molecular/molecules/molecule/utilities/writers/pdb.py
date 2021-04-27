@@ -1,3 +1,10 @@
+"""
+PDB Writing Utilities
+=====================
+
+"""
+
+
 def _write_pdb_file(self, path, atom_ids):
     """
     Write to a ``.pdb`` file.

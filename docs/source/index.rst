@@ -65,10 +65,10 @@
 
 .. toctree::
    :hidden:
-   :caption: Developer Guide
-   :maxdepth: 2
+   :caption: Modules
+   :maxdepth: 1
 
-   Software Architecture <software_architecture>
+   Modules <modules.rst>
 
 
 ============

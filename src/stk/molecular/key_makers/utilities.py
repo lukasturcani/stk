@@ -1,3 +1,9 @@
+"""
+Key Maker Utilities
+===================
+
+"""
+
 import rdkit.Chem.AllChem as rdkit
 
 

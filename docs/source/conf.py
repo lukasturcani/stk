@@ -65,18 +65,19 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'numpydoc'
-    ]
+    'numpydoc',
+]
 
 autodoc_default_options = {
     'special-members': '__init__',
     'inherited-members': True,
     'show-inheritance': True,
+    'ignore-module-all': True,
 }
 
 
 def skip(app, what, name, obj, would_skip, options):
-    # Skip init default Python init methods.
+    # Skip default Python init methods.
     if '__init__' in name and not isinstance(obj, types.FunctionType):
         return True
     return would_skip
@@ -87,7 +88,7 @@ def setup(app):
 
 
 add_module_names = False
-# numpydoc_show_class_members = False
+numpydoc_class_members_toctree = False
 
 
 # Add any paths that contain templates here, relative to this
@@ -105,7 +106,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'stk'
-copyright = '2018, Lukas Turcani'
+copyright = '2021, Lukas Turcani'
 author = 'Lukas Turcani'
 
 # The version info for the project you're documenting, acts as
@@ -155,7 +156,7 @@ html_theme_options = {
 # here, relative to this directory. They are copied after the builtin
 # static files, so a file named "default.css" will overwrite the
 # builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document
 # names to template names.

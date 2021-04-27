@@ -1,3 +1,9 @@
+"""
+Serial Evolutionary Algorithm
+=============================
+
+"""
+
 from .implementation import Implementation
 
 

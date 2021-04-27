@@ -1,3 +1,9 @@
+"""
+Atom Batch
+==========
+
+"""
+
 from ......atoms import AtomInfo
 
 

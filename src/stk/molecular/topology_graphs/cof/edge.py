@@ -1,3 +1,9 @@
+"""
+COF Edge
+========
+
+"""
+
 from ..topology_graph import Edge
 
 
