@@ -50,7 +50,6 @@ jobs:
               uses: EndBug/add-and-commit@v7
               with:
                 add: docs/source
-                cwd: stk
                 message: Update rst files
 
     pytest-stable-linux:
