@@ -41,5 +41,4 @@ class FitnessCalculator:
 
         """
 
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         raise NotImplementedError()
