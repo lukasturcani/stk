@@ -65,8 +65,8 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'numpydoc'
-    ]
+    'numpydoc',
+]
 
 autodoc_default_options = {
     'special-members': '__init__',
@@ -88,7 +88,6 @@ def setup(app):
 
 
 add_module_names = False
-# numpydoc_show_class_members = False
 numpydoc_class_members_toctree = False
 
 
