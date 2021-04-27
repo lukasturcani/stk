@@ -27,5 +27,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   stk.molecular.new
    stk.molecular.periodic_info
