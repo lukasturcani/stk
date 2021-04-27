@@ -1,12 +1,6 @@
 Related Issues: <!-- Add related issues here, e.g. #121 #341 -->
 Requested Reviewers: @lukasturcani <!-- Add other reviewers here -->
-*Note for Reviewers: If you accept the review request add a :+1: to
-this post*
-
-<!--
-The suggested PR outline is taken from
-https://joshuatauberer.medium.com/write-joyous-git-commit-messages-2f98891114c4
--->
+*Note for Reviewers: If you accept the review request add a :+1: to this post*
 
 <!--
 Talk about what a user would see (a big, a new feature) and what
@@ -41,4 +35,9 @@ Use bullet points, e.g.
 <!--
 Give evidence that the commit works. Did you visually inspect any
 changes to molecular structures yourself?
+-->
+
+<!--
+The suggested PR outline is taken from
+https://joshuatauberer.medium.com/write-joyous-git-commit-messages-2f98891114c4
 -->
