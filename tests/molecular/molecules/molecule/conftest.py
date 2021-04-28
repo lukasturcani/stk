@@ -1,4 +1,5 @@
 import pytest
+import pymongo
 import re
 import os
 from pytest_lazyfixture import lazy_fixture
@@ -298,6 +299,52 @@ def case_data(request):
         )
 
     return request.param.with_position_matrix(path)
+
+
+@pytest.fixture(
+    scope='session',
+)
+def molecule_db():
+    """
+    A :class:`.MoleculeDatabase` instance.
+
+    """
+
+    return stk.MoleculeMongoDb(
+        mongo_client=pymongo.MongoClient(),
+        database='_stk_pytest_database',
+        jsonizer=stk.MoleculeJsonizer(
+            key_makers=(
+                stk.Smiles(),
+            ),
+        ),
+        indices=(
+            stk.Smiles().get_key_name(),
+        ),
+    )
+
+
+@pytest.fixture(
+    scope='session',
+)
+def name_db():
+    """
+    A :class:`.ValueDatabase` for holding the names of molecules.
+
+    """
+
+    return stk.ValueMongoDb(
+        mongo_client=pymongo.MongoClient(),
+        database='_stk_pytest_database',
+        collection='name',
+        key_makers=(
+            stk.Smiles(),
+        ),
+        indices=(
+            stk.Smiles().get_key_name(),
+        ),
+
+    )
 
 
 def _get_filename(request):
