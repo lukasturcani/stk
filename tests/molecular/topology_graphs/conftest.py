@@ -36,6 +36,16 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
     ),
 )
 def unscaled_periodic_case(request):
+    """
+    A :class:`.CaseData` instance.
+
+    The instance produced by this fixture is unscaled because the
+    expected cell constants are not scaled, even if the molecule
+    is used with an optimizer. This is used for testing
+    :meth:`.TopologyGraph.get_periodic_info`, which does not scale
+    the cell constants.
+
+    """
 
     return request.param
 
@@ -68,5 +78,15 @@ def unscaled_periodic_case(request):
     ),
 )
 def scaled_periodic_case(request):
+    """
+    A :class:`.CaseData` instance.
+
+    The instance produced by this fixture is scaled because the
+    expected cell constants are scaled, assuming the collapser
+    performs scaling on the unit cell. This is used for testing
+    :meth:`.PeriodicConstructionResult.get_periodic_info`, which
+    returns scaled cell constants.
+
+    """
 
     return request.param
