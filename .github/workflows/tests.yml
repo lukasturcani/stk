@@ -64,6 +64,7 @@ jobs:
             - name: Dump the database
               run:
                 mongodump -d _stk_pytest_database -o database-dump
+
                 tar -czf database-dump.tar.gz database-dump
 
             - name: Upload the database dump
