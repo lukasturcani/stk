@@ -64,12 +64,15 @@ jobs:
     basic-ea:
         runs-on: ubuntu-latest
 
+        services:
+            MongoDB:
+                image: mongo
+                ports:
+                    - 27017:27017
+
         steps:
             - name: Git checkout
               uses: actions/checkout@v2
-
-            - name: Start MongoDB
-              uses: supercharge/mongodb-github-action@1.3.0
 
             - name: Add conda to system path
               run:
@@ -107,12 +110,15 @@ jobs:
     intermediate-ea:
         runs-on: ubuntu-latest
 
+        services:
+            MongoDB:
+                image: mongo
+                ports:
+                    - 27017:27017
+
         steps:
             - name: Git checkout
               uses: actions/checkout@v2
-
-            - name: Start MongoDB
-              uses: supercharge/mongodb-github-action@1.3.0
 
             - name: Add conda to system path
               run:
