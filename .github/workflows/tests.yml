@@ -51,11 +51,9 @@ jobs:
 
                 bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -b
 
-                PATH="/root/miniconda3/bin:$PATH"
-
             - name: Install dependencies
               run:
-                conda env update
+                /root/miniconda3/bin/conda env update
                     --name base
                     --file tests/environment.yml
 
