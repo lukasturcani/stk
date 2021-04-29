@@ -51,7 +51,7 @@ jobs:
 
                 bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -b
 
-                PATH="/root/minconda3/bin:$PATH"
+                PATH="/root/miniconda3/bin:$PATH"
 
             - name: Install dependencies
               run:
