@@ -63,7 +63,9 @@ jobs:
 
             - name: Dump the database
               run:
-                mongodump -d _stk_pytest_database -o database-dump
+                mongodump
+                    -d _stk_pytest_database
+                    -o database-dump/database-dump
 
             - name: Upload the database dump
               uses: actions/upload-artifact@v2
