@@ -1,0 +1,13 @@
+{ "url": "mongodb://localhost:27017"
+, "moleculeKey": "SMILES"
+, "database": "_stk_pytest_database"
+, "moleculeCollection": "molecules"
+, "constructedMoleculeCollection": "constructed_molecules"
+, "positionMatrixCollection": "position_matrices"
+, "buildingBlockPositionMatrixCollection": "building_block_position_matrices"
+, "numEntriesPerPage": 34
+, "selectBuildingBlocks": true
+, "selectConstructedMolecules": true
+, "twoDViewer": false
+, "threeDViewer": true
+}
