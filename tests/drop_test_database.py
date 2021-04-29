@@ -1,8 +1,8 @@
 """
-A utility for dropping the database running the tests creates.
+A utility for dropping the databases created by running the tests.
 
 This script is not part of the test suite. It is meant to the run
-manually by developers.
+manually by developers when they feel the need to.
 
 """
 
@@ -11,7 +11,13 @@ import pymongo
 
 
 def main():
-    pymongo.MongoClient().drop_database('_stk_pytest_database')
+    databases_to_drop = (
+        '_stk_pytest_database',
+        '_stk_test_database_for_testing',
+    )
+    client = pymongo.MongoClient()
+    for database in databases_to_drop:
+        client.drop_database(database)
 
 
 if __name__ == '__main__':
