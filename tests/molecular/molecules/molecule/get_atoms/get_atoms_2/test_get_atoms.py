@@ -1,32 +1,12 @@
 import rdkit.Chem.AllChem as rdkit
 
 
-def test_get_atoms(
-    request,
-    tmp_path,
-    molecule_db,
-    name_db,
-    case_data,
-):
+def test_get_atoms(case_data):
     """
     Test :meth:`.Molecule.get_atoms`.
 
     Parameters
     ----------
-    request : :class:`pytest.FixtureRequest`
-        Holds information about the requesting test function.
-
-    tmp_path : :class:`pathlib2.Path`
-        A path into which the structure of the molecule being tested
-        is saved.
-
-    molecule_db : :class:`.MoleculeDatabase`
-        A database into which the molecule being tested is saved.
-
-    name_db : :class:`.ValueDatabase`
-        A database into which name the molecule being tested is
-        saved.
-
     case_data : :class:`.CaseData`
         A test case. Holds the molecule to test and the correct
         SMILES.
@@ -37,10 +17,6 @@ def test_get_atoms(
 
     """
 
-    # Visual inspection of the molecule can be useful.
-    case_data.molecule.write(tmp_path / 'molecule.mol')
-    molecule_db.put(case_data.molecule)
-    name_db.put(case_data.molecule, request.node.name)
     _test_get_atoms(case_data.molecule, case_data.smiles)
 
 
