@@ -1,7 +1,7 @@
 """
 A utility for dropping the databases created by running the tests.
 
-This script is not part of the test suite. It is meant to the run
+This script is not part of the test suite. It is meant to be run
 manually by developers when they feel the need to.
 
 """
