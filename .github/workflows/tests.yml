@@ -65,13 +65,11 @@ jobs:
               run:
                 mongodump -d _stk_pytest_database -o database-dump
 
-                tar -czf database-dump.tar.gz database-dump
-
             - name: Upload the database dump
               uses: actions/upload-artifact@v2
               with:
                 name: database-dump
-                path: database-dump.tar.gz
+                path: database-dump
 
 
     basic-ea:
