@@ -343,7 +343,6 @@ def name_db():
         indices=(
             stk.Smiles().get_key_name(),
         ),
-
     )
 
 
