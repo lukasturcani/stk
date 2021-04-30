@@ -11,7 +11,21 @@ but the two most common ways are direct creation through SMILES
 strings and loading them from molecule structure files.
 
 
-.. code-block:: python
+.. testsetup::
+
+    import stk
+    import os
+    import pathlib
+
+    path = pathlib.Path('path/to/file.mol')
+    os.makedirs(path.parent, exist_ok=True)
+    stk.MolWriter().write(
+        molecule=stk.BuildingBlock('NCCCN'),
+        path=str(path),
+    )
+
+
+.. testcode::
 
     import stk
 

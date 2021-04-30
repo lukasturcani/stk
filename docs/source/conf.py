@@ -21,6 +21,7 @@
 import sys
 import types
 from unittest.mock import MagicMock
+import os
 
 
 class Mock(MagicMock):
@@ -49,7 +50,9 @@ MOCK_MODULES = [
     'pathos',
     'seaborn',
 ]
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+if os.environ.get('MOCK_MODULES', 'TRUE') != 'FALSE':
+    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration --------------------------------------------
 
@@ -65,6 +68,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx.ext.doctest',
     'numpydoc',
 ]
 
