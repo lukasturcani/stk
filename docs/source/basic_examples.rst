@@ -396,7 +396,7 @@ Molecules and Building Blocks
 
 To place molecules into the database, first create the database
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
     import stk
     import pymongo
@@ -412,7 +412,7 @@ To place molecules into the database, first create the database
 You then create and place a molecule into the database,
 for example, a :class:`.BuildingBlock`
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
     bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
     # Note that as soon as put() is called, the molecule is placed
@@ -427,7 +427,7 @@ To retrieve a molecule from the database, by default, you would
 provide the InChIKey. To first thing you might want to do is write a
 function which turns the SMILES of a molecule into the InChIKey
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
     import rdkit.Chem.AllChem as rdkit
 
@@ -437,11 +437,17 @@ function which turns the SMILES of a molecule into the InChIKey
 Now we can load the molecule from the database, by providing the
 SMILES of the molecule
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
     loaded = db.get({
         'InChIKey': get_inchi_key('BrCCBr'),
     })
+
+.. testcode:: placing-and-retrieving-molecules-from-a-database
+   :hide:
+
+   smiles = stk.Smiles()
+   assert smiles.get_key(bb) == smiles.get_key(loaded)
 
 However, this step can be customized. For example, the documentation of
 :class:`.MoleculeMongoDb`, shows how you can use SMILES to retrieve
@@ -452,12 +458,22 @@ The ``loaded`` molecule is only a :class:`.Molecule` instance,
 and not a :class:`.BuildingBlock` instance, which means that it lacks
 functional groups. You can restore your functional groups however
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
     loaded_bb = stk.BuildingBlock.init_from_molecule(
         molecule=loaded,
         functional_groups=[stk.BromoFactory()],
     )
+
+
+.. testcode:: placing-and-retrieving-molecules-from-a-database
+   :hide:
+
+   assert all(
+       isinstance(fg, stk.Bromo)
+       for fg in loaded_bb.get_functional_groups()
+   )
+   assert loaded_bb.get_num_functional_groups() == 2
 
 Constructed Molecules
 ---------------------
