@@ -481,20 +481,27 @@ Constructed Molecules
 You can use the same database for placing
 :class:`.ConstructedMolecule` instances
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear((bb, ), 'A', 2),
-    )
-    db.put(polymer)
+   polymer = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear((bb, ), 'A', 2),
+   )
+   db.put(polymer)
 
 and restore them in the same way
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
-    loaded = db.get({
-        'InChIKey': get_inchi_key('BrCCCCBr'),
-    })
+   loaded = db.get({
+       'InChIKey': get_inchi_key('BrCCCCBr'),
+   })
+
+
+.. testcode:: placing-and-retrieving-molecules-from-a-database
+   :hide:
+
+   smiles = stk.Smiles()
+   assert smiles.get_key(polymer) == smiles.get_key(loaded)
 
 However, once again, ``loaded`` will only be a :class:`.Molecule`
 instance, and not a :class:`.ConstructedMolecule` instance.
@@ -502,13 +509,17 @@ instance, and not a :class:`.ConstructedMolecule` instance.
 If you want to store and retrieve :class:`.ConstructedMolecule`
 instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecules-from-a-database
 
-    constructed_db = stk.ConstructedMoleculeMongoDb(client)
-    constructed_db.put(polymer)
-    loaded_polymer = constructed_db.get({
-        'InChIKey': get_inchi_key('BrCCCCBr'),
-    })
+   constructed_db = stk.ConstructedMoleculeMongoDb(client)
+   constructed_db.put(polymer)
+   loaded_polymer = constructed_db.get({
+       'InChIKey': get_inchi_key('BrCCCCBr'),
+   })
+
+.. testcode:: placing-and-retrieving-molecules-from-a-database
+
+   assert smiles.get_key(polymer) == smiles.get_key(loaded_polymer)
 
 Unlike ``loaded``, ``loaded_polymer`` is a
 :class:`.ConstructedMolecule` instance.
