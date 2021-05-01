@@ -35,7 +35,7 @@ strings and loading them from molecule structure files.
 .. testcode:: creating-building-blocks
    :hide:
 
-   assert stk.Smiles().get_key(bb1) != 'NCCCN'
+   assert stk.Smiles().get_key(bb1) == 'NCCCN'
    assert stk.Smiles().get_key(bb2) == 'NCCCN'
 
 .. testcleanup:: creating-building-blocks
