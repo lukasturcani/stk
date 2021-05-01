@@ -336,8 +336,8 @@ This works with any :class:`.Molecule`, including both the
 .. testcode:: writing-molecular-files
    :hide:
 
-   loaded_bb = stk.BuildingBlock.init_from_file('bb.mol')
-   assert stk.Smiles().get_key(loaded_bb) == 'BrCCI'
+   _loaded_bb = stk.BuildingBlock.init_from_file('bb.mol')
+   assert stk.Smiles().get_key(_loaded_bb) == 'BrCCI'
 
 
 and the :class:`.ConstructedMolecule`
@@ -353,9 +353,9 @@ and the :class:`.ConstructedMolecule`
 .. testcode:: writing-molecular-files
    :hide:
 
-   loaded_polymer = stk.BuildingBlock.init_from_file('polymer.mol')
+   _loaded_polymer = stk.BuildingBlock.init_from_file('polymer.mol')
    assert (
-       stk.Smiles().get_key(loaded_polymer) == 'Br' + 'CC' * 10 + 'I'
+       stk.Smiles().get_key(_loaded_polymer) == 'Br' + 'CC' * 10 + 'I'
    )
 
 .. testcleanup:: writing-molecular-files
@@ -446,8 +446,8 @@ SMILES of the molecule
 .. testcode:: placing-and-retrieving-molecules-from-a-database
    :hide:
 
-   smiles = stk.Smiles()
-   assert smiles.get_key(bb) == smiles.get_key(loaded)
+   _smiles = stk.Smiles()
+   assert _smiles.get_key(bb) == _smiles.get_key(loaded)
 
 However, this step can be customized. For example, the documentation of
 :class:`.MoleculeMongoDb`, shows how you can use SMILES to retrieve
@@ -500,8 +500,8 @@ and restore them in the same way
 .. testcode:: placing-and-retrieving-molecules-from-a-database
    :hide:
 
-   smiles = stk.Smiles()
-   assert smiles.get_key(polymer) == smiles.get_key(loaded)
+   _smiles = stk.Smiles()
+   assert _smiles.get_key(polymer) == _smiles.get_key(loaded)
 
 However, once again, ``loaded`` will only be a :class:`.Molecule`
 instance, and not a :class:`.ConstructedMolecule` instance.
@@ -520,7 +520,7 @@ instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
 .. testcode:: placing-and-retrieving-molecules-from-a-database
    :hide:
 
-   assert smiles.get_key(polymer) == smiles.get_key(loaded_polymer)
+   assert _smiles.get_key(polymer) == _smiles.get_key(loaded_polymer)
 
 Unlike ``loaded``, ``loaded_polymer`` is a
 :class:`.ConstructedMolecule` instance.
@@ -708,9 +708,9 @@ you only want to use one during construction
 .. testcode:: specifying-functional-groups-individually
    :hide:
 
-   fg, = bb.get_functional_groups()
-   assert type(fg) is stk.Bromo
-   assert set(fg.get_atom_ids()) == {0, 1}
+   _fg, = bb.get_functional_groups()
+   assert type(_fg) is stk.Bromo
+   assert set(_fg.get_atom_ids()) == {0, 1}
 
 When creating a :class:`.Bromo` functional group, you have to
 specify things like which atoms have bonds added during construction,
@@ -750,15 +750,15 @@ treated as a leaving group. This is what
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
    :hide:
 
-   for fg in bb.get_functional_groups():
-       assert isinstance(fg, stk.CarboxylicAcid)
+   for _fg in bb.get_functional_groups():
+       assert isinstance(_fg, stk.CarboxylicAcid)
 
-       bonder, = fg.get_bonders()
-       assert isinstance(bonder, stk.C)
+       _bonder, = _fg.get_bonders()
+       assert isinstance(_bonder, stk.C)
 
-       deleter1, deleter2 = fg.get_deleters()
-       assert type(deleter1) is not type(deleter2)
-       assert {type(deleter1), type(deleter2)} == {stk.O, stk.H}
+       _deleter1, _deleter2 = _fg.get_deleters()
+       assert type(_deleter1) is not type(_deleter2)
+       assert {type(_deleter1), type(_deleter2)} == {stk.O, stk.H}
 
 Here, ``bb`` will have two :class:`.CarboxylicAcid` functional groups.
 In each, the deleter atoms will be the oxygen and hydrogen atom of
@@ -793,14 +793,14 @@ instances of this kind
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
    :hide:
 
-   for fg in bb2.get_functional_groups():
-       assert isinstance(fg, stk.CarboxylicAcid)
+   for _fg in bb2.get_functional_groups():
+       assert isinstance(_fg, stk.CarboxylicAcid)
 
-       bonder, = fg.get_bonders()
-       assert isinstance(bonder, stk.O)
+       _bonder, = _fg.get_bonders()
+       assert isinstance(_bonder, stk.O)
 
-       deleter, = fg.get_deleters()
-       assert isinstance(deleter, stk.H)
+       _deleter, = _fg.get_deleters()
+       assert isinstance(_deleter, stk.H)
 
 Here, ``bb2`` will also have two :class:`.CarboxylicAcid` functional
 groups. In each, the deleter atom will be the hydrogen of the
@@ -893,7 +893,7 @@ implemented in SMILES, the SMILES string makes a
 useful key for metal-containing molecules. You can use the
 :class:`.Smiles` key maker for this purpose
 
-.. code-block:: python
+.. testcode:: making-keys-for-molecules-with-dative-bonds
 
     import stk
     import pymongo
@@ -910,6 +910,12 @@ useful key for metal-containing molecules. You can use the
     # to make sure it has canonical atom ordering.
     canonical_smiles = stk.Smiles().get_key(bb)
     retrieved_bb = db.get({'SMILES': canonical_smiles})
+
+.. testcode:: making-keys-for-molecules-with-dative-bonds
+   :hide:
+
+   _smiles = stk.Smiles()
+   assert _smiles.get_key(bb) == _smiles.get_key(retrieved_bb)
 
 Extending stk
 =============
