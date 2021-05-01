@@ -259,44 +259,62 @@ after construction. One easy way to do is, is with the
 :mod:`rdkit` library. You can optimize any :mod:`stk`
 :class:`.Molecule`, such as a :class:`.BuildingBlock`
 
-.. code-block:: python
+.. testcode:: using-rdkit-to-optimize-molecular-structures
 
-    import stk
-    import rdkit.Chem.AllChem as rdkit
+   import stk
+   import rdkit.Chem.AllChem as rdkit
 
-    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+   bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 
-    # Optimize with the MMFF force field.
+   # Optimize with the MMFF force field.
 
-    rdkit_bb = bb.to_rdkit_mol()
-    rdkit.SanitizeMol(rdkit_bb)
-    rdkit.MMFFOptimizeMolecule(rdkit_bb)
+   rdkit_bb = bb.to_rdkit_mol()
+   rdkit.SanitizeMol(rdkit_bb)
+   rdkit.MMFFOptimizeMolecule(rdkit_bb)
 
-    # stk molecules are immutable. with_position_matrix returns a
-    # a clone, holding the new position matrix.
-    bb = bb.with_position_matrix(
-        position_matrix=rdkit_bb.GetConformer().GetPositions(),
-    )
+   # stk molecules are immutable. with_position_matrix returns a
+   # a clone, holding the new position matrix.
+   bb = bb.with_position_matrix(
+       position_matrix=rdkit_bb.GetConformer().GetPositions(),
+   )
+
+.. testcode:: using-rdkit-to-optimize-molecular-structures
+   :hide:
+
+   import numpy as np
+
+   assert np.all(np.equal(
+        bb.get_position_matrix(),
+        rdkit_bb.GetConformer().GetPositions(),
+    ))
 
 or a :class:`.ConstructedMolecule`
 
-.. code-block:: python
+.. testcode:: using-rdkit-to-optimize-molecular-structures
 
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
-    )
+   polymer = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
+   )
 
-    # Optimize with the MMFF force field.
+   # Optimize with the MMFF force field.
 
-    rdkit_polymer = polymer.to_rdkit_mol()
-    rdkit.SanitizeMol(rdkit_polymer)
-    rdkit.MMFFOptimizeMolecule(rdkit_polymer)
+   rdkit_polymer = polymer.to_rdkit_mol()
+   rdkit.SanitizeMol(rdkit_polymer)
+   rdkit.MMFFOptimizeMolecule(rdkit_polymer)
 
-    # stk molecules are immutable. with_position_matrix returns a
-    # a clone, holding the new position matrix.
-    polymer = polymer.with_position_matrix(
-        position_matrix=rdkit_polymer.GetConformer().GetPositions(),
-    )
+   # stk molecules are immutable. with_position_matrix returns a
+   # a clone, holding the new position matrix.
+   polymer = polymer.with_position_matrix(
+       position_matrix=rdkit_polymer.GetConformer().GetPositions(),
+   )
+
+.. testcode:: using-rdkit-to-optimize-molecular-structures
+   :hide:
+
+   assert np.all(np.equal(
+       polymer.get_position_matrix(),
+       rdkit_polymer.GetConformer().GetPositions(),
+   ))
 
 Writing Molecular Files
 =======================
