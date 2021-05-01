@@ -123,39 +123,62 @@ To construct molecules, you need to create a new
 a :class:`.TopologyGraph`, which, in turn,  requires
 :class:`.BuildingBlock` instances.
 
-.. code-block:: python
+.. testcode:: constructing-molecules
 
-    import stk
+   import stk
 
-    # React the amine functional groups during construction.
-    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-    # React the aldehyde functional groups during construction.
-    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
-    # Build a polymer.
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear(
-            building_blocks=(bb1, bb2),
-            repeating_unit='AB',
-            num_repeating_units=12,
-        ),
-    )
+   # React the amine functional groups during construction.
+   bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+   # React the aldehyde functional groups during construction.
+   bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+   # Build a polymer.
+   polymer = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear(
+           building_blocks=(bb1, bb2),
+           repeating_unit='AB',
+           num_repeating_units=12,
+       ),
+   )
 
-    # Build a longer polymer.
-    longer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear(
-            building_blocks=(bb1, bb2),
-            repeating_unit='AB',
-            num_repeating_units=23,
-        ),
-    )
+   # Build a longer polymer.
+   longer = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear(
+           building_blocks=(bb1, bb2),
+           repeating_unit='AB',
+           num_repeating_units=23,
+       ),
+   )
+
+
+.. testcode:: constructing-molecules
+   :hide:
+
+   assert polymer.get_num_building_block(bb1) == 12
+   assert polymer.get_num_building_block(bb2) == 12
+   assert longer.get_num_building_block(bb1) == 23
+   assert longer.get_num_building_block(bb2) == 23
 
 Each topology graph requires different input parameters.
 For example, organic cage topology graphs only require the
 :class:`.BuildingBlock` instances.
 
-.. code-block:: python
+.. testcode:: constructing-molecules
 
-    cage = stk.ConstructedMolecule(stk.cage.FourPlusSix((bb1, bb2)))
+   # The cage requires a building block with 3 functional groups.
+   cage_bb2 = stk.BuildingBlock(
+       smiles='O=CC(C=O)CC=O',
+       functional_groups=[stk.AldehydeFactory()],
+    )
+   cage = stk.ConstructedMolecule(
+       topology_graph=stk.cage.FourPlusSix((bb1, cage_bb2)),
+    )
+
+
+.. testcode:: constructing-molecules
+   :hide:
+
+   assert cage.get_num_building_block(bb1) == 6
+   assert cage.get_num_building_block(cage_bb2) == 4
 
 
 Read the documentation for each kind of :class:`.TopologyGraph`, for
