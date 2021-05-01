@@ -738,7 +738,7 @@ to add a bond to the carbon atom, and delete the ``OH`` group, which is
 treated as a leaving group. This is what
 :class:`.CarboxylicAcidFactory` will do by default
 
-.. code-block:: python
+.. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
 
     import stk
 
@@ -746,6 +746,17 @@ treated as a leaving group. This is what
         smiles='O=C(O)CCC(=O)O',
         functional_groups=[stk.CarboxylicAcidFactory()],
     )
+
+.. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
+   :hide:
+
+   for fg in bb.get_functional_groups():
+       bonder, = fg.get_bonders()
+       assert isinstance(bonder, stk.C)
+
+       deleter1, deleter2 = fg.get_deleters()
+       assert type(deleter1) is not type(deleter2)
+       assert {type(deleter1), type(deleter2)} == {stk.O, stk.H}
 
 Here, ``bb`` will have two :class:`.CarboxylicAcid` functional groups.
 In each, the deleter atoms will be the oxygen and hydrogen atom of
@@ -759,7 +770,7 @@ the oxygen atom is the bonder atom. You can tell the
 :class:`.CarboxylicAcidFactory` to create :class:`.CarboxylicAcid`
 instances of this kind
 
-.. code-block:: python
+.. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
 
     bb2 = stk.BuildingBlock(
         smiles='O=C(O)CCC(=O)O',
