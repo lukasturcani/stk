@@ -684,7 +684,7 @@ created, you can provide them directly to the :class:`.BuildingBlock`.
 For example, if you have multiple bromo groups on a molecule, but
 you only want to use one during construction
 
-.. code-block:: python
+.. testcode:: specifying-functional-groups-individually
 
     import stk
 
@@ -704,6 +704,13 @@ you only want to use one during construction
             ),
         ],
     )
+
+.. testcode:: specifying-functional-groups-individually
+   :hide:
+
+   fg, = bb.get_functional_groups()
+   assert type(fg) is stk.Bromo
+   assert set(fg.get_atom_ids()) == {0, 1}
 
 When creating a :class:`.Bromo` functional group, you have to
 specify things like which atoms have bonds added during construction,
