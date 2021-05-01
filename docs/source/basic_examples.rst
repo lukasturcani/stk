@@ -11,27 +11,38 @@ but the two most common ways are direct creation through SMILES
 strings and loading them from molecule structure files.
 
 
-.. testsetup::
+.. testsetup:: creating-building-blocks
 
-    import stk
-    import os
-    import pathlib
+   import stk
+   import os
+   import pathlib
 
-    path = pathlib.Path('path/to/file.mol')
-    os.makedirs(path.parent, exist_ok=True)
-    stk.MolWriter().write(
-        molecule=stk.BuildingBlock('NCCCN'),
-        path=str(path),
-    )
+   path = pathlib.Path('path/to/file.mol')
+   os.makedirs(path.parent, exist_ok=True)
+   stk.MolWriter().write(
+       molecule=stk.BuildingBlock('NCCCN'),
+       path=str(path),
+   )
 
 
-.. testcode::
+.. testcode:: creating-building-blocks
 
-    import stk
+   import stk
 
-    bb1 = stk.BuildingBlock('NCCCN')
-    bb2 = stk.BuildingBlock.init_from_file('path/to/file.mol')
+   bb1 = stk.BuildingBlock('NCCCN')
+   bb2 = stk.BuildingBlock.init_from_file('path/to/file.mol')
 
+.. testcode:: creating-building-blocks
+   :hide:
+
+   assert stk.Smiles().get_key(bb1) == 'NCCCN'
+   assert stk.Smiles().get_key(bb2) == 'NCCCN'
+
+.. testcleanup:: creating-building-blocks
+
+   import shutil
+
+   shutil.rmtree('path')
 
 Look at the documentation of :class:`.BuildingBlock` to see other
 available initialization methods. They are easy to find, as they all
