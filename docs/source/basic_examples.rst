@@ -629,6 +629,10 @@ into the database, for example
     atom_count_db = stk.ValueMongoDb(client, 'atom_counts')
     atom_count_db.put(polymer, polymer.get_num_atoms())
 
+.. testcode:: placing-and-retrieving-molecular-property-values
+   :hide:
+
+   assert atom_count_db.get(polymer) == polymer.get_num_atoms()
 
 These values will also be accessible in a later session
 
@@ -647,6 +651,12 @@ These values will also be accessible in a later session
     bb_energy = energy_db.get(bb)
     bb_atom_count = atom_count_db.get(bb)
 
+.. testcode:: placing-and-retrieving-molecular-property-values
+   :hide:
+
+   assert bb_energy == energy
+   assert bb_atom_count == polymer.get_num_atoms()
+
 Finally, you can also store, and retrieve, a :class:`tuple` of values
 from the database. For example,
 
@@ -658,6 +668,13 @@ from the database. For example,
 
     # Retrieve the centroid.
     centroid = centroid_db.get(bb)
+
+.. testcode:: placing-and-retrieving-molecular-property-values
+   :hide:
+
+   import numpy as np
+
+   assert np.all(np.equal(centroid, bb.get_centroid()))
 
 Specifying Functional Groups Individually
 =========================================
