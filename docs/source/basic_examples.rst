@@ -323,7 +323,7 @@ The simplest way to save molecules is to write them to a file.
 This works with any :class:`.Molecule`, including both the
 :class:`.BuildingBlock`
 
-.. code-block:: python
+.. testcode:: writing-molecular-files
 
     import stk
 
@@ -333,15 +333,37 @@ This works with any :class:`.Molecule`, including both the
     )
     bb.write('bb.mol')
 
+.. testcode:: writing-molecular-files
+   :hide:
+
+   loaded_bb = stk.BuildingBlock.init_from_file('bb.mol')
+   assert stk.Smiles().get_key(loaded_bb) == 'BrCCI'
+
 
 and the :class:`.ConstructedMolecule`
 
-.. code-block:: python
+.. testcode:: writing-molecular-files
 
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear((bb, ), 'A', 10),
     )
     polymer.write('polymer.mol')
+
+
+.. testcode:: writing-molecular-files
+   :hide:
+
+   loaded_polymer = stk.BuildingBlock.init_from_file('polymer.mol')
+   assert (
+       stk.Smiles().get_key(loaded_polymer) == 'Br' + 'CC' * 10 + 'I'
+   )
+
+.. testcleanup:: writing-molecular-files
+
+   import os
+
+   os.remove('bb.mol')
+   os.remove('polymer.mol')
 
 You can see what file formats are supported by reading the
 documentation for :meth:`~.Molecule.write`.
