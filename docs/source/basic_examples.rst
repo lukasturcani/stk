@@ -740,17 +740,19 @@ treated as a leaving group. This is what
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
 
-    import stk
+   import stk
 
-    bb = stk.BuildingBlock(
-        smiles='O=C(O)CCC(=O)O',
-        functional_groups=[stk.CarboxylicAcidFactory()],
-    )
+   bb = stk.BuildingBlock(
+       smiles='O=C(O)CCC(=O)O',
+       functional_groups=[stk.CarboxylicAcidFactory()],
+   )
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
    :hide:
 
    for fg in bb.get_functional_groups():
+       assert isinstance(fg, stk.CarboxylicAcid)
+
        bonder, = fg.get_bonders()
        assert isinstance(bonder, stk.C)
 
@@ -772,21 +774,33 @@ instances of this kind
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
 
-    bb2 = stk.BuildingBlock(
-        smiles='O=C(O)CCC(=O)O',
-        functional_groups=[
-            stk.CarboxylicAcidFactory(
-                # Atom number 3 corresponds to the OH oxygen atom in a
-                # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
-                # THE MOLECULE.
-                bonders=(3, ),
-                # Atom number 4 corresponds to the hydrogen atom in a
-                # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
-                # THE MOLECULE.
-                deleters=(4, ),
-            ),
-        ],
-    )
+   bb2 = stk.BuildingBlock(
+       smiles='O=C(O)CCC(=O)O',
+       functional_groups=[
+           stk.CarboxylicAcidFactory(
+               # Atom number 3 corresponds to the OH oxygen atom in a
+               # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
+               # THE MOLECULE.
+               bonders=(3, ),
+               # Atom number 4 corresponds to the hydrogen atom in a
+               # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
+               # THE MOLECULE.
+               deleters=(4, ),
+           ),
+       ],
+   )
+
+.. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
+   :hide:
+
+   for fg in bb2.get_functional_groups():
+       assert isinstance(fg, stk.CarboxylicAcid)
+
+       bonder, = fg.get_bonders()
+       assert isinstance(bonder, stk.O)
+
+       deleter, = fg.get_deleters()
+       assert isinstance(deleter, stk.H)
 
 Here, ``bb2`` will also have two :class:`.CarboxylicAcid` functional
 groups. In each, the deleter atom will be the hydrogen of the
