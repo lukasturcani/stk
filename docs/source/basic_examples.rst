@@ -197,16 +197,26 @@ their `expanded` form. No optimization will be performed with the
 toward the centroid of the :class:`.ConstructedMolecule` until steric
 clashes occur.
 
-.. code-block:: python
+.. testcode:: using-built-in-optimizers-during-construction
 
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear(
-            building_blocks=(bb1, bb2),
-            repeating_unit='AB',
-            num_repeating_units=3,
-            optimizer=stk.Collapser(),
-        ),
-    )
+   import stk
+
+   bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+   bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+   polymer = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear(
+           building_blocks=(bb1, bb2),
+           repeating_unit='AB',
+           num_repeating_units=3,
+           optimizer=stk.Collapser(),
+       ),
+   )
+
+.. testcode:: using-built-in-optimizers-during-construction
+   :hide:
+
+   assert polymer.get_num_building_block(bb1) == 3
+   assert polymer.get_num_building_block(bb2) == 3
 
 Similarly, :class:`.MCHammer` performs rigid translations of the
 building blocks either toward the centroid of the
@@ -215,16 +225,22 @@ construction following a Metropolis Monte Carlo algorithm with
 simplified potential energy terms for the long bonds and nonbonded
 interactions.
 
-.. code-block:: python
+.. testcode:: using-built-in-optimizers-during-construction
 
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear(
-            building_blocks=(bb1, bb2),
-            repeating_unit='AB',
-            num_repeating_units=3,
-            optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
-        ),
-    )
+   polymer2 = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear(
+           building_blocks=(bb1, bb2),
+           repeating_unit='AB',
+           num_repeating_units=3,
+           optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
+       ),
+   )
+
+.. testcode:: using-built-in-optimizers-during-construction
+   :hide:
+
+   assert polymer.get_num_building_block(bb1) == 3
+   assert polymer.get_num_building_block(bb2) == 3
 
 See also
     The :class:`.Collapser` and :class:`.MCHammer` optimizers use the
