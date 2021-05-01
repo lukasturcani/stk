@@ -518,6 +518,7 @@ instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
    })
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
+   :hide:
 
    assert smiles.get_key(polymer) == smiles.get_key(loaded_polymer)
 
