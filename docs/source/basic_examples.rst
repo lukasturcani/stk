@@ -61,31 +61,56 @@ the pain of creating function groups one by one, you can use a
 with bromo groups, and you want the bromo groups to be modified
 during construction, you would use a :class:`.BromoFactory`
 
-.. code-block:: python
+.. testcode:: specifying-multiple-functional-groups
 
-    import stk
+   import stk
 
-    bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+   bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+.. testcode:: specifying-multiple-functional-groups
+   :hide:
+
+   assert all(
+       isinstance(fg, stk.Bromo) for fg in bb.get_functional_groups()
+   )
+   assert bb.get_num_functional_groups() == 2
 
 The ``bb``, in the example above, would have two :class:`.Bromo`
 functional groups. Similarly, if you have a building block with
 aldehyde groups
 
-.. code-block:: python
+.. testcode:: specifying-multiple-functional-groups
 
-    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+   bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+
+.. testcode:: specifying-multiple-functional-groups
+   :hide:
+
+   assert all(
+       isinstance(fg, stk.Aldehyde)
+       for fg in bb2.get_functional_groups()
+   )
+   assert bb2.get_num_functional_groups() == 2
 
 In this example, ``bb2`` will have two :class:`.Aldehyde` functional
 groups. Finally, if you have both aldehyde and bromo groups on a
 molecule, and you want both to be modified during construction,
 you would use both of the factories
 
-.. code-block:: python
+.. testcode:: specifying-multiple-functional-groups
 
-    bb3 = stk.BuildingBlock(
-        smiles='O=CCCBr',
-        functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
-    )
+   bb3 = stk.BuildingBlock(
+       smiles='O=CCCBr',
+       functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
+   )
+
+.. testcode:: specifying-multiple-functional-groups
+   :hide:
+
+   assert (
+       set(map(type, bb3.get_functional_groups()))
+       == {stk.Aldehyde, stk.Bromo}
+   )
 
 In the example above, ``bb3`` has one :class:`.Bromo` and one
 :class:`.Aldehyde` functional group.
