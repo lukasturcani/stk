@@ -541,7 +541,7 @@ Unlike the previous example, you can deposit values for both
 a :class:`.BuildingBlock` and a :class:`.ConstructedMolecule` in the
 same database. First, lets create one
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     import stk
     import pymongo
@@ -558,7 +558,7 @@ same database. First, lets create one
 Here, ``energy_db`` will store energy values. Lets create a function
 to calculate the energy of a molecule.
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     import rdkit.Chem.AllChem as rdkit
 
@@ -570,7 +570,7 @@ to calculate the energy of a molecule.
 
 Now we can deposit the energy value into the database
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     bb = stk.BuildingBlock('BrCCCCBr')
     # Note that as soon as put() is called, the value is placed into
@@ -584,15 +584,19 @@ committed to the database.
 To retrieve a value from the database, you provide the molecule,
 whose value you are interested in
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     energy = energy_db.get(bb)
 
+.. testcode:: placing-and-retrieving-molecular-property-values
+   :hide:
+
+   assert energy == get_energy(bb)
 
 If we make the same molecule in some other way, for example we
 can make ``BrCCCCBr`` as a constructed molecule
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear(
@@ -606,17 +610,21 @@ can make ``BrCCCCBr`` as a constructed molecule
 
 we can still retrieve the value
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     # You get the correct energy out, because polymer and bb are
     # actually the same molecule.
     bb_energy = energy_db.get(polymer)
 
+.. testcode:: placing-and-retrieving-molecular-property-values
+   :hide:
+
+   assert bb_energy == get_energy(bb)
 
 You can also use a :class:`.ConstructedMolecule` to deposit values
 into the database, for example
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     atom_count_db = stk.ValueMongoDb(client, 'atom_counts')
     atom_count_db.put(polymer, polymer.get_num_atoms())
@@ -624,7 +632,7 @@ into the database, for example
 
 These values will also be accessible in a later session
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     # Assume this a new Python session.
     import stk
@@ -642,7 +650,7 @@ These values will also be accessible in a later session
 Finally, you can also store, and retrieve, a :class:`tuple` of values
 from the database. For example,
 
-.. code-block:: python
+.. testcode:: placing-and-retrieving-molecular-property-values
 
     centroid_db = stk.ValueMongoDb(client, 'centroids')
     # Centroid is a position, and therefore a tuple of 3 floats.
