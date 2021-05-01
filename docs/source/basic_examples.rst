@@ -831,32 +831,54 @@ may fail, because the ETKDG algorithm is liable to fail in these cases.
 In cases like this, you probably want to set the position matrix
 explicitly, which will mean that ETKDG will not be used.
 
-.. code-block:: python
+.. testcode:: handling-molecules-with-metal-atoms-and-dative-bonds
 
     import stk
 
     bb = stk.BuildingBlock('[Fe+2]', position_matrix=[[0., 0., 0.]])
 
+.. testcode:: handling-molecules-with-metal-atoms-and-dative-bonds
+   :hide:
+
+   import numpy as np
+
+   assert stk.Smiles().get_key(bb) == '[Fe+2]'
+   assert np.all(np.equal(
+       bb.get_position_matrix(),
+       [[0., 0., 0.]]
+   ))
+
+
 If you want to get a more complex position matrix, defining a
 function may be a good idea
 
-.. code-block:: python
+.. testcode:: handling-molecules-with-metal-atoms-and-dative-bonds
 
     import rdkit.Chem.AllChem as rdkit
 
 
     def get_position_matrix(smiles):
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-        rdkit.EmbedMolecule(molecule)
+        rdkit.EmbedMolecule(molecule, randomSeed=12)
         rdkit.UFFOptimizeMolecule(molecule)
         return molecule.GetConformer().GetPositions()
 
 
     smiles = 'CCCO->[Fe+2]'
-    bb = stk.BuildingBlock(
+    bb2 = stk.BuildingBlock(
         smiles=smiles,
         position_matrix=get_position_matrix(smiles),
     )
+
+.. testcode:: handling-molecules-with-metal-atoms-and-dative-bonds
+   :hide:
+
+   assert stk.Smiles().get_key(bb2) == smiles
+   assert np.all(np.equal(
+       bb2.get_position_matrix(),
+       get_position_matrix(smiles),
+   ))
+
 
 Finally, :mod:`stk` will also read bonds from ``.mol`` files,
 which have a bond order of 9, as dative.
