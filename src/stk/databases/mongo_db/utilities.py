@@ -7,14 +7,17 @@ MongoDB Utilities
 
 class HashableDict(dict):
     def __hash__(self):
-        print((
-            frozenset(self),
-            frozenset(_to_hashable(self.values())),
-        ))
-        return hash((
-            frozenset(self),
-            frozenset(_to_hashable(self.values())),
-        ))
+        try:
+            return hash((
+                frozenset(self),
+                frozenset(_to_hashable(self.values())),
+            ))
+        except Exception:
+            print((
+                frozenset(self),
+                frozenset(_to_hashable(self.values())),
+            ))
+            raise
 
     def __eq__(self, other):
         return super().__eq__(other)
