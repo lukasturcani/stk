@@ -62,7 +62,7 @@ jobs:
 
             - name: Run pytest
               run:
-                conda activate && pytest
+                /github/home/miniconda3/bin/conda activate && pytest
 
             - name: Dump the database
               run:
