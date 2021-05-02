@@ -42,7 +42,10 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
        # contaminated.
        _test_database = '_stk_doctest_database'
        _old_init = stk.ConstructedMoleculeMongoDb
-       stk.ConstructedMoleculeMongoDb = _old_init
+       stk.ConstructedMoleculeMongoDb = lambda mongo_client: _old_init(
+           mongo_client=mongo_client,
+           database=_test_database,
+       )
 
     .. testcode:: storing-and-retrieving-constructed-molecules
 
@@ -154,6 +157,23 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     .. testcode:: using-alternative-keys-for-retrieving-molecules
 
        import stk
+
+       # Change the database used, so that when a developer
+       # runs the doctests locally, their "stk" database is not
+       # contaminated.
+       _test_database = '_stk_doctest_database'
+       _old_init = stk.ConstructedMoleculeMongoDb
+       stk.ConstructedMoleculeMongoDb = (
+           lambda mongo_client, jsonizer: _old_init(
+               mongo_client=mongo_client,
+               database=_test_database,
+               jsonizer=jsonizer,
+           )
+       )
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+
+       import stk
        import pymongo
 
        db = stk.ConstructedMoleculeMongoDb(
@@ -193,53 +213,66 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
-    SMILES of the molecule. You can still retrieve it.
+    SMILES of the molecule. You can still retrieve it
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-        import rdkit.Chem.AllChem as rdkit
+       import rdkit.Chem.AllChem as rdkit
 
-        retrieved = db.get(
-            'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCCCBr'))
-        )
+       retrieved2 = db.get({
+           'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCCCBr')),
+       })
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+       :hide:
+
+       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved2)
 
     As long as you have the name of the key, and the expected value
     of the key, you can retrieve your molecule from the database.
 
     Note that you can create your own keys and add them to the database
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-        import rdkit.Chem.AllChem as rdkit
+       # Create your own key. This one is called "SMILES" and the
+       # value is the SMILES of the molecule.
+       class Smiles(stk.MoleculeKeyMaker):
+           def __init__(self):
+               return
 
-        # Create your own key. This one is called "SMILES" and the
-        # value is the SMILES of the molecule.
-        class Smiles(stk.MoleculeKeyMaker):
-            def __init__(self):
-                return
+           def get_key_name(self):
+               return 'SMILES'
 
-            def get_key_name(self):
-                return 'SMILES'
+           def get_key(self, molecule):
+               return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
-            def get_key(self, molecule):
-                return rdkit.MolToSmiles(molecule.to_rdkit_mol())
+       db = stk.ConstructedMoleculeMongoDb(
+           mongo_client=pymongo.MongoClient(),
+           jsonizer=stk.ConstructedMoleculeJsonizer(
+               # Include your own custom key maker in the JSON
+               # representation.
+               key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
+           ),
+       )
 
-        db = stk.ConstructedMoleculeMongoDb(
-            mongo_client=client,
-            jsonizer=stk.ConstructedMoleculeJsonizer(
-                # Include your own custom key maker in the JSON
-                # representation.
-                key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
-            ),
-        )
+       # Place the JSON of your molecule into the database. In this
+       # case the JSON will include a key called "SMILES" and
+       # the value will be the SMILES of the molecule.
+       db.put(polymer)
 
-        # Place the JSON of your molecule into the database. In this
-        # case the JSON will include a key called "SMILES" and
-        # the value will be the SMILES of the molecule.
-        db.put(polymer)
+       # You can now find your molecule by using SMILES as the key,
+       def normalize_smiles(smiles):
+           return rdkit.MolToSmiles(
+               mol=rdkit.AddHs(rdkit.MolFromSmiles(smiles)),
+           )
 
-        # You can now find your molecule by using SMILES as the key.
-        retrieved = db.get({'SMILES': 'BrCCCCBr'})
+       retrieved3 = db.get({'SMILES': normalize_smiles('BrCCCCBr')})
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+       :hide:
+
+       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved3)
 
     Often, it is unnecessary to create a whole subclass for a your
     custom key
@@ -256,6 +289,11 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             jsonizer=stk.ConstructedMoleculeJsonizer(
             key_makers=(stk.InchiKey(), smiles),
         )
+
+    .. testcleanup:: using-alternative-keys-for-retrieving-molecules
+
+       pymongo.MongoClient().drop_database(_test_database)
+       stk.ConstructedMoleculeMongoDb = _old_init
 
     Note that the key you use to get the molecule back from the
     database should be unique. In other words, there should always just
