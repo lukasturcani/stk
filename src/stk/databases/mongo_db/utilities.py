@@ -16,9 +16,8 @@ class HashableDict(dict):
         return super().__eq__(other)
 
 
-def _to_hashable(iterable):
-    for item in iterable:
-        if isinstance(item, list):
-            yield tuple(_to_hashable(subitem) for subitem in item)
-        else:
-            yield item
+def _to_hashable(item):
+    if isinstance(item, list):
+        return tuple(_to_hashable(subitem) for subitem in item)
+    else:
+        return item
