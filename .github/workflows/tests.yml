@@ -54,6 +54,8 @@ jobs:
 
                 bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -b
 
+                /github/home/miniconda3/bin/conda init bash
+
             - name: Install dependencies
               run:
                 /github/home/miniconda3/bin/conda env update
