@@ -15,7 +15,7 @@ class FitnessFunction(FitnessCalculator):
     --------
     *Calculating Fitness Values*
 
-    .. code-block:: python
+    .. testcode:: calculating-fitness-values
 
         import stk
 
@@ -34,6 +34,11 @@ class FitnessFunction(FitnessCalculator):
         value1 = fitness_calculator.get_fitness_value(
             molecule=stk.BuildingBlock('BrCCBr'),
         )
+
+    .. testcode:: calculating-fitness-values
+       :hide:
+
+       assert value1 == stk.BuildingBlock('BrCCBr').get_num_atoms()
 
     *Storing Fitness Values in a Database*
 
