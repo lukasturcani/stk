@@ -20,28 +20,40 @@ To use :mod:`stk` you only have to choose which building blocks and
 topology graph you wish to use and :mod:`stk` will take care of everything
 else, take for example the construction of a linear polymer
 
-.. code-block:: python
+.. testcode:: introduction
 
-    import stk
+   import stk
 
-    polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear(
-            building_blocks=(
-                stk.BuildingBlock(
-                    smiles='Brc1ccc(Br)cc1',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-                stk.BuildingBlock(
-                    smiles='BrC#CBr',
-                    functional_groups=[stk.BromoFactory()],
-                ),
-            ),
-            repeating_unit='ABBA',
-            num_repeating_units=1,
-        )
-    )
-    # You can write the molecule to a file if you want to view it.
-    polymer.write('polymer.mol')
+   polymer = stk.ConstructedMolecule(
+       topology_graph=stk.polymer.Linear(
+           building_blocks=(
+               stk.BuildingBlock(
+                   smiles='Brc1ccc(Br)cc1',
+                   functional_groups=[stk.BromoFactory()],
+               ),
+               stk.BuildingBlock(
+                   smiles='BrC#CBr',
+                   functional_groups=[stk.BromoFactory()],
+               ),
+           ),
+           repeating_unit='ABBA',
+           num_repeating_units=1,
+       )
+   )
+   # You can write the molecule to a file if you want to view it.
+   polymer.write('polymer.mol')
+
+.. testcode:: introduction
+   :hide:
+
+   import os
+
+   assert sum(1 for _ in polymer.get_building_blocks()) == 2
+   assert os.path.exists('polymer.mol')
+
+.. testcleanup:: introduction
+
+   os.remove('polymer.mol')
 
 which will produce:
 
