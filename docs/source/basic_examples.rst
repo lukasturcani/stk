@@ -63,17 +63,17 @@ during construction, you would use a :class:`.BromoFactory`
 
 .. testcode:: specifying-multiple-functional-groups
 
-   import stk
+    import stk
 
-   bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+    bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
 
 .. testcode:: specifying-multiple-functional-groups
-   :hide:
+    :hide:
 
-   assert all(
-       isinstance(fg, stk.Bromo) for fg in bb.get_functional_groups()
-   )
-   assert bb.get_num_functional_groups() == 2
+    assert all(
+        isinstance(fg, stk.Bromo) for fg in bb.get_functional_groups()
+    )
+    assert bb.get_num_functional_groups() == 2
 
 The ``bb``, in the example above, would have two :class:`.Bromo`
 functional groups. Similarly, if you have a building block with
@@ -81,16 +81,16 @@ aldehyde groups
 
 .. testcode:: specifying-multiple-functional-groups
 
-   bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
 
 .. testcode:: specifying-multiple-functional-groups
-   :hide:
+    :hide:
 
-   assert all(
-       isinstance(fg, stk.Aldehyde)
-       for fg in bb2.get_functional_groups()
-   )
-   assert bb2.get_num_functional_groups() == 2
+    assert all(
+        isinstance(fg, stk.Aldehyde)
+        for fg in bb2.get_functional_groups()
+    )
+    assert bb2.get_num_functional_groups() == 2
 
 In this example, ``bb2`` will have two :class:`.Aldehyde` functional
 groups. Finally, if you have both aldehyde and bromo groups on a
@@ -99,18 +99,18 @@ you would use both of the factories
 
 .. testcode:: specifying-multiple-functional-groups
 
-   bb3 = stk.BuildingBlock(
-       smiles='O=CCCBr',
-       functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
-   )
+    bb3 = stk.BuildingBlock(
+        smiles='O=CCCBr',
+        functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
+    )
 
 .. testcode:: specifying-multiple-functional-groups
-   :hide:
+    :hide:
 
-   assert (
-       set(map(type, bb3.get_functional_groups()))
-       == {stk.Aldehyde, stk.Bromo}
-   )
+    assert (
+        set(map(type, bb3.get_functional_groups()))
+        == {stk.Aldehyde, stk.Bromo}
+    )
 
 In the example above, ``bb3`` has one :class:`.Bromo` and one
 :class:`.Aldehyde` functional group.
@@ -125,38 +125,38 @@ a :class:`.TopologyGraph`, which, in turn,  requires
 
 .. testcode:: constructing-molecules
 
-   import stk
+    import stk
 
-   # React the amine functional groups during construction.
-   bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-   # React the aldehyde functional groups during construction.
-   bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
-   # Build a polymer.
-   polymer = stk.ConstructedMolecule(
-       topology_graph=stk.polymer.Linear(
-           building_blocks=(bb1, bb2),
-           repeating_unit='AB',
-           num_repeating_units=12,
-       ),
-   )
+    # React the amine functional groups during construction.
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    # React the aldehyde functional groups during construction.
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+    # Build a polymer.
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=12,
+        ),
+    )
 
-   # Build a longer polymer.
-   longer = stk.ConstructedMolecule(
-       topology_graph=stk.polymer.Linear(
-           building_blocks=(bb1, bb2),
-           repeating_unit='AB',
-           num_repeating_units=23,
-       ),
-   )
+    # Build a longer polymer.
+    longer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=23,
+        ),
+    )
 
 
 .. testcode:: constructing-molecules
-   :hide:
+    :hide:
 
-   assert polymer.get_num_building_block(bb1) == 12
-   assert polymer.get_num_building_block(bb2) == 12
-   assert longer.get_num_building_block(bb1) == 23
-   assert longer.get_num_building_block(bb2) == 23
+    assert polymer.get_num_building_block(bb1) == 12
+    assert polymer.get_num_building_block(bb2) == 12
+    assert longer.get_num_building_block(bb1) == 23
+    assert longer.get_num_building_block(bb2) == 23
 
 Each topology graph requires different input parameters.
 For example, organic cage topology graphs only require the
@@ -164,21 +164,21 @@ For example, organic cage topology graphs only require the
 
 .. testcode:: constructing-molecules
 
-   # The cage requires a building block with 3 functional groups.
-   cage_bb2 = stk.BuildingBlock(
-       smiles='O=CC(C=O)CC=O',
-       functional_groups=[stk.AldehydeFactory()],
+    # The cage requires a building block with 3 functional groups.
+    cage_bb2 = stk.BuildingBlock(
+        smiles='O=CC(C=O)CC=O',
+        functional_groups=[stk.AldehydeFactory()],
     )
-   cage = stk.ConstructedMolecule(
-       topology_graph=stk.cage.FourPlusSix((bb1, cage_bb2)),
+    cage = stk.ConstructedMolecule(
+        topology_graph=stk.cage.FourPlusSix((bb1, cage_bb2)),
     )
 
 
 .. testcode:: constructing-molecules
-   :hide:
+    :hide:
 
-   assert cage.get_num_building_block(bb1) == 6
-   assert cage.get_num_building_block(cage_bb2) == 4
+    assert cage.get_num_building_block(bb1) == 6
+    assert cage.get_num_building_block(cage_bb2) == 4
 
 
 Read the documentation for each kind of :class:`.TopologyGraph`, for
@@ -199,24 +199,24 @@ clashes occur.
 
 .. testcode:: using-built-in-optimizers-during-construction
 
-   import stk
+    import stk
 
-   bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-   bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
-   polymer = stk.ConstructedMolecule(
-       topology_graph=stk.polymer.Linear(
-           building_blocks=(bb1, bb2),
-           repeating_unit='AB',
-           num_repeating_units=3,
-           optimizer=stk.Collapser(),
-       ),
-   )
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=3,
+            optimizer=stk.Collapser(),
+        ),
+    )
 
 .. testcode:: using-built-in-optimizers-during-construction
-   :hide:
+    :hide:
 
-   assert polymer.get_num_building_block(bb1) == 3
-   assert polymer.get_num_building_block(bb2) == 3
+    assert polymer.get_num_building_block(bb1) == 3
+    assert polymer.get_num_building_block(bb2) == 3
 
 Similarly, :class:`.MCHammer` performs rigid translations of the
 building blocks either toward the centroid of the
@@ -227,20 +227,20 @@ interactions.
 
 .. testcode:: using-built-in-optimizers-during-construction
 
-   polymer2 = stk.ConstructedMolecule(
-       topology_graph=stk.polymer.Linear(
-           building_blocks=(bb1, bb2),
-           repeating_unit='AB',
-           num_repeating_units=3,
-           optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
-       ),
-   )
+    polymer2 = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=3,
+            optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
+        ),
+    )
 
 .. testcode:: using-built-in-optimizers-during-construction
-   :hide:
+    :hide:
 
-   assert polymer.get_num_building_block(bb1) == 3
-   assert polymer.get_num_building_block(bb2) == 3
+    assert polymer.get_num_building_block(bb1) == 3
+    assert polymer.get_num_building_block(bb2) == 3
 
 See also
     The :class:`.Collapser` and :class:`.MCHammer` optimizers use the
@@ -261,22 +261,22 @@ after construction. One easy way to do is, is with the
 
 .. testcode:: using-rdkit-to-optimize-molecular-structures
 
-   import stk
-   import rdkit.Chem.AllChem as rdkit
+    import stk
+    import rdkit.Chem.AllChem as rdkit
 
-   bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 
-   # Optimize with the MMFF force field.
+    # Optimize with the MMFF force field.
 
-   rdkit_bb = bb.to_rdkit_mol()
-   rdkit.SanitizeMol(rdkit_bb)
-   rdkit.MMFFOptimizeMolecule(rdkit_bb)
+    rdkit_bb = bb.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_bb)
+    rdkit.MMFFOptimizeMolecule(rdkit_bb)
 
-   # stk molecules are immutable. with_position_matrix returns a
-   # a clone, holding the new position matrix.
-   bb = bb.with_position_matrix(
-       position_matrix=rdkit_bb.GetConformer().GetPositions(),
-   )
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    bb = bb.with_position_matrix(
+        position_matrix=rdkit_bb.GetConformer().GetPositions(),
+    )
 
 .. testcode:: using-rdkit-to-optimize-molecular-structures
    :hide:
@@ -292,29 +292,29 @@ or a :class:`.ConstructedMolecule`
 
 .. testcode:: using-rdkit-to-optimize-molecular-structures
 
-   polymer = stk.ConstructedMolecule(
-       topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
-   )
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
+    )
 
-   # Optimize with the MMFF force field.
+    # Optimize with the MMFF force field.
 
-   rdkit_polymer = polymer.to_rdkit_mol()
-   rdkit.SanitizeMol(rdkit_polymer)
-   rdkit.MMFFOptimizeMolecule(rdkit_polymer)
+    rdkit_polymer = polymer.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_polymer)
+    rdkit.MMFFOptimizeMolecule(rdkit_polymer)
 
-   # stk molecules are immutable. with_position_matrix returns a
-   # a clone, holding the new position matrix.
-   polymer = polymer.with_position_matrix(
-       position_matrix=rdkit_polymer.GetConformer().GetPositions(),
-   )
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    polymer = polymer.with_position_matrix(
+        position_matrix=rdkit_polymer.GetConformer().GetPositions(),
+    )
 
 .. testcode:: using-rdkit-to-optimize-molecular-structures
-   :hide:
+    :hide:
 
-   assert np.all(np.equal(
-       polymer.get_position_matrix(),
-       rdkit_polymer.GetConformer().GetPositions(),
-   ))
+    assert np.all(np.equal(
+        polymer.get_position_matrix(),
+        rdkit_polymer.GetConformer().GetPositions(),
+    ))
 
 Writing Molecular Files
 =======================
@@ -334,10 +334,10 @@ This works with any :class:`.Molecule`, including both the
     bb.write('bb.mol')
 
 .. testcode:: writing-molecular-files
-   :hide:
+    :hide:
 
-   _loaded_bb = stk.BuildingBlock.init_from_file('bb.mol')
-   assert stk.Smiles().get_key(_loaded_bb) == 'BrCCI'
+    _loaded_bb = stk.BuildingBlock.init_from_file('bb.mol')
+    assert stk.Smiles().get_key(_loaded_bb) == 'BrCCI'
 
 
 and the :class:`.ConstructedMolecule`
@@ -351,19 +351,19 @@ and the :class:`.ConstructedMolecule`
 
 
 .. testcode:: writing-molecular-files
-   :hide:
+    :hide:
 
-   _loaded_polymer = stk.BuildingBlock.init_from_file('polymer.mol')
-   assert (
-       stk.Smiles().get_key(_loaded_polymer) == 'Br' + 'CC' * 10 + 'I'
-   )
+    _loaded_polymer = stk.BuildingBlock.init_from_file('polymer.mol')
+    assert (
+        stk.Smiles().get_key(_loaded_polymer) == 'Br' + 'CC' * 10 + 'I'
+    )
 
 .. testcleanup:: writing-molecular-files
 
-   import os
+    import os
 
-   os.remove('bb.mol')
-   os.remove('polymer.mol')
+    os.remove('bb.mol')
+    os.remove('polymer.mol')
 
 You can see what file formats are supported by reading the
 documentation for :meth:`~.Molecule.write`.
@@ -398,23 +398,23 @@ To place molecules into the database, first create the database
 
 .. testsetup:: placing-and-retrieving-molecules-from-a-database
 
-   import stk
+    import stk
 
-   # Change the default database used, so that when a developer runs
-   # the doctests locally, their "stk" database is not contaminated.
-   _test_database = '_stk_doctest_database'
-   _old_molecule_init = stk.MoleculeMongoDb
-   stk.MoleculeMongoDb = lambda mongo_client: _old_molecule_init(
-       mongo_client=mongo_client,
-       database=_test_database,
-   )
-   _old_constructed_molecule_init = stk.ConstructedMoleculeMongoDb
-   stk.ConstructedMoleculeMongoDb = lambda mongo_client: (
-       _old_constructed_molecule_init(
-           mongo_client=mongo_client,
-           database=_test_database,
-       )
-   )
+    # Change the default database used, so that when a developer runs
+    # the doctests locally, their "stk" database is not contaminated.
+    _test_database = '_stk_doctest_database'
+    _old_molecule_init = stk.MoleculeMongoDb
+    stk.MoleculeMongoDb = lambda mongo_client: _old_molecule_init(
+        mongo_client=mongo_client,
+        database=_test_database,
+    )
+    _old_constructed_molecule_init = stk.ConstructedMoleculeMongoDb
+    stk.ConstructedMoleculeMongoDb = lambda mongo_client: (
+        _old_constructed_molecule_init(
+            mongo_client=mongo_client,
+            database=_test_database,
+        )
+    )
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
 
@@ -463,10 +463,10 @@ SMILES of the molecule
     })
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
-   :hide:
+    :hide:
 
-   _smiles = stk.Smiles()
-   assert _smiles.get_key(bb) == _smiles.get_key(loaded)
+    _smiles = stk.Smiles()
+    assert _smiles.get_key(bb) == _smiles.get_key(loaded)
 
 However, this step can be customized. For example, the documentation of
 :class:`.MoleculeMongoDb`, shows how you can use SMILES to retrieve
@@ -485,13 +485,13 @@ functional groups. You can restore your functional groups however
     )
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
-   :hide:
+    :hide:
 
-   assert all(
-       isinstance(fg, stk.Bromo)
-       for fg in loaded_bb.get_functional_groups()
-   )
-   assert loaded_bb.get_num_functional_groups() == 2
+    assert all(
+        isinstance(fg, stk.Bromo)
+        for fg in loaded_bb.get_functional_groups()
+    )
+    assert loaded_bb.get_num_functional_groups() == 2
 
 Constructed Molecules
 ---------------------
@@ -501,25 +501,25 @@ You can use the same database for placing
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
 
-   polymer = stk.ConstructedMolecule(
-       topology_graph=stk.polymer.Linear((bb, ), 'A', 2),
-   )
-   db.put(polymer)
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 2),
+    )
+    db.put(polymer)
 
 and restore them in the same way
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
 
-   loaded = db.get({
-       'InChIKey': get_inchi_key('BrCCCCBr'),
-   })
+    loaded = db.get({
+        'InChIKey': get_inchi_key('BrCCCCBr'),
+    })
 
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
-   :hide:
+    :hide:
 
-   _smiles = stk.Smiles()
-   assert _smiles.get_key(polymer) == _smiles.get_key(loaded)
+    _smiles = stk.Smiles()
+    assert _smiles.get_key(polymer) == _smiles.get_key(loaded)
 
 However, once again, ``loaded`` will only be a :class:`.Molecule`
 instance, and not a :class:`.ConstructedMolecule` instance.
@@ -529,22 +529,22 @@ instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
 
-   constructed_db = stk.ConstructedMoleculeMongoDb(client)
-   constructed_db.put(polymer)
-   loaded_polymer = constructed_db.get({
-       'InChIKey': get_inchi_key('BrCCCCBr'),
-   })
+    constructed_db = stk.ConstructedMoleculeMongoDb(client)
+    constructed_db.put(polymer)
+    loaded_polymer = constructed_db.get({
+        'InChIKey': get_inchi_key('BrCCCCBr'),
+    })
 
 .. testcode:: placing-and-retrieving-molecules-from-a-database
-   :hide:
+    :hide:
 
-   assert _smiles.get_key(polymer) == _smiles.get_key(loaded_polymer)
+    assert _smiles.get_key(polymer) == _smiles.get_key(loaded_polymer)
 
 .. testcleanup:: placing-and-retrieving-molecules-from-a-database
 
-   stk.MoleculeMongoDb = _old_molecule_init
-   stk.ConstructedMoleculeMongoDb = _old_constructed_molecule_init
-   pymongo.MongoClient().drop_database(_test_database)
+    stk.MoleculeMongoDb = _old_molecule_init
+    stk.ConstructedMoleculeMongoDb = _old_constructed_molecule_init
+    pymongo.MongoClient().drop_database(_test_database)
 
 Unlike ``loaded``, ``loaded_polymer`` is a
 :class:`.ConstructedMolecule` instance.
@@ -567,18 +567,18 @@ same database. First, lets create one
 
 .. testsetup:: placing-and-retrieving-molecular-property-values
 
-   import stk
+    import stk
 
-   # Change the default database used, so that when a developer runs
-   # the doctests locally, their "stk" database is not contaminated.
-   _test_database = '_stk_doctest_database'
-   _old_value_init = stk.ValueMongoDb
-   stk.ValueMongoDb = lambda mongo_client, collection: (
-       _old_value_init(
-           mongo_client=mongo_client,
-           collection=collection,
-           database=_test_database,
-       )
+    # Change the default database used, so that when a developer runs
+    # the doctests locally, their "stk" database is not contaminated.
+    _test_database = '_stk_doctest_database'
+    _old_value_init = stk.ValueMongoDb
+    stk.ValueMongoDb = lambda mongo_client, collection: (
+        _old_value_init(
+            mongo_client=mongo_client,
+            collection=collection,
+            database=_test_database,
+        )
     )
 
 .. testcode:: placing-and-retrieving-molecular-property-values
@@ -629,9 +629,9 @@ whose value you are interested in
     energy = energy_db.get(bb)
 
 .. testcode:: placing-and-retrieving-molecular-property-values
-   :hide:
+    :hide:
 
-   assert energy == get_energy(bb)
+    assert energy == get_energy(bb)
 
 If we make the same molecule in some other way, for example we
 can make ``BrCCCCBr`` as a constructed molecule
@@ -657,9 +657,9 @@ we can still retrieve the value
     bb_energy = energy_db.get(polymer)
 
 .. testcode:: placing-and-retrieving-molecular-property-values
-   :hide:
+    :hide:
 
-   assert bb_energy == get_energy(bb)
+    assert bb_energy == get_energy(bb)
 
 You can also use a :class:`.ConstructedMolecule` to deposit values
 into the database, for example
@@ -670,9 +670,9 @@ into the database, for example
     atom_count_db.put(polymer, polymer.get_num_atoms())
 
 .. testcode:: placing-and-retrieving-molecular-property-values
-   :hide:
+    :hide:
 
-   assert atom_count_db.get(polymer) == polymer.get_num_atoms()
+    assert atom_count_db.get(polymer) == polymer.get_num_atoms()
 
 These values will also be accessible in a later session
 
@@ -692,10 +692,10 @@ These values will also be accessible in a later session
     bb_atom_count = atom_count_db.get(bb)
 
 .. testcode:: placing-and-retrieving-molecular-property-values
-   :hide:
+    :hide:
 
-   assert bb_energy == energy
-   assert bb_atom_count == polymer.get_num_atoms()
+    assert bb_energy == energy
+    assert bb_atom_count == polymer.get_num_atoms()
 
 Finally, you can also store, and retrieve, a :class:`tuple` of values
 from the database. For example,
@@ -710,16 +710,16 @@ from the database. For example,
     centroid = centroid_db.get(bb)
 
 .. testcode:: placing-and-retrieving-molecular-property-values
-   :hide:
+    :hide:
 
-   import numpy as np
+    import numpy as np
 
-   assert np.all(np.equal(centroid, bb.get_centroid()))
+    assert np.all(np.equal(centroid, bb.get_centroid()))
 
 .. testcleanup:: placing-and-retrieving-molecular-property-values
 
-   stk.ValueMongoDb = _old_value_init
-   pymongo.MongoClient().drop_database(_test_database)
+    stk.ValueMongoDb = _old_value_init
+    pymongo.MongoClient().drop_database(_test_database)
 
 Specifying Functional Groups Individually
 =========================================
@@ -751,11 +751,11 @@ you only want to use one during construction
     )
 
 .. testcode:: specifying-functional-groups-individually
-   :hide:
+    :hide:
 
-   _fg, = bb.get_functional_groups()
-   assert type(_fg) is stk.Bromo
-   assert set(_fg.get_atom_ids()) == {0, 1}
+    _fg, = bb.get_functional_groups()
+    assert type(_fg) is stk.Bromo
+    assert set(_fg.get_atom_ids()) == {0, 1}
 
 When creating a :class:`.Bromo` functional group, you have to
 specify things like which atoms have bonds added during construction,
@@ -785,25 +785,25 @@ treated as a leaving group. This is what
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
 
-   import stk
+    import stk
 
-   bb = stk.BuildingBlock(
-       smiles='O=C(O)CCC(=O)O',
-       functional_groups=[stk.CarboxylicAcidFactory()],
-   )
+    bb = stk.BuildingBlock(
+        smiles='O=C(O)CCC(=O)O',
+        functional_groups=[stk.CarboxylicAcidFactory()],
+    )
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
-   :hide:
+    :hide:
 
-   for _fg in bb.get_functional_groups():
-       assert isinstance(_fg, stk.CarboxylicAcid)
+    for _fg in bb.get_functional_groups():
+        assert isinstance(_fg, stk.CarboxylicAcid)
 
-       _bonder, = _fg.get_bonders()
-       assert isinstance(_bonder, stk.C)
+        _bonder, = _fg.get_bonders()
+        assert isinstance(_bonder, stk.C)
 
-       _deleter1, _deleter2 = _fg.get_deleters()
-       assert type(_deleter1) is not type(_deleter2)
-       assert {type(_deleter1), type(_deleter2)} == {stk.O, stk.H}
+        _deleter1, _deleter2 = _fg.get_deleters()
+        assert type(_deleter1) is not type(_deleter2)
+        assert {type(_deleter1), type(_deleter2)} == {stk.O, stk.H}
 
 Here, ``bb`` will have two :class:`.CarboxylicAcid` functional groups.
 In each, the deleter atoms will be the oxygen and hydrogen atom of
@@ -819,33 +819,33 @@ instances of this kind
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
 
-   bb2 = stk.BuildingBlock(
-       smiles='O=C(O)CCC(=O)O',
-       functional_groups=[
-           stk.CarboxylicAcidFactory(
-               # Atom number 3 corresponds to the OH oxygen atom in a
-               # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
-               # THE MOLECULE.
-               bonders=(3, ),
-               # Atom number 4 corresponds to the hydrogen atom in a
-               # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
-               # THE MOLECULE.
-               deleters=(4, ),
-           ),
-       ],
-   )
+    bb2 = stk.BuildingBlock(
+        smiles='O=C(O)CCC(=O)O',
+        functional_groups=[
+            stk.CarboxylicAcidFactory(
+                # Atom number 3 corresponds to the OH oxygen atom in a
+                # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
+                # THE MOLECULE.
+                bonders=(3, ),
+                # Atom number 4 corresponds to the hydrogen atom in a
+                # carboxylic acid group. THIS IS NOT THE ATOM'S ID IN
+                # THE MOLECULE.
+                deleters=(4, ),
+            ),
+        ],
+    )
 
 .. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
-   :hide:
+    :hide:
 
-   for _fg in bb2.get_functional_groups():
-       assert isinstance(_fg, stk.CarboxylicAcid)
+    for _fg in bb2.get_functional_groups():
+        assert isinstance(_fg, stk.CarboxylicAcid)
 
-       _bonder, = _fg.get_bonders()
-       assert isinstance(_bonder, stk.O)
+        _bonder, = _fg.get_bonders()
+        assert isinstance(_bonder, stk.O)
 
-       _deleter, = _fg.get_deleters()
-       assert isinstance(_deleter, stk.H)
+        _deleter, = _fg.get_deleters()
+        assert isinstance(_deleter, stk.H)
 
 Here, ``bb2`` will also have two :class:`.CarboxylicAcid` functional
 groups. In each, the deleter atom will be the hydrogen of the
@@ -883,15 +883,15 @@ explicitly, which will mean that ETKDG will not be used.
     bb = stk.BuildingBlock('[Fe+2]', position_matrix=[[0., 0., 0.]])
 
 .. testcode:: handling-molecules-with-metal-atoms-and-dative-bonds
-   :hide:
+    :hide:
 
-   import numpy as np
+    import numpy as np
 
-   assert stk.Smiles().get_key(bb) == '[Fe+2]'
-   assert np.all(np.equal(
-       bb.get_position_matrix(),
-       [[0., 0., 0.]]
-   ))
+    assert stk.Smiles().get_key(bb) == '[Fe+2]'
+    assert np.all(np.equal(
+        bb.get_position_matrix(),
+        [[0., 0., 0.]]
+    ))
 
 
 If you want to get a more complex position matrix, defining a
@@ -916,13 +916,13 @@ function may be a good idea
     )
 
 .. testcode:: handling-molecules-with-metal-atoms-and-dative-bonds
-   :hide:
+    :hide:
 
-   assert stk.Smiles().get_key(bb2) == smiles
-   assert np.all(np.equal(
-       bb2.get_position_matrix(),
-       get_position_matrix(smiles),
-   ))
+    assert stk.Smiles().get_key(bb2) == smiles
+    assert np.all(np.equal(
+        bb2.get_position_matrix(),
+        get_position_matrix(smiles),
+    ))
 
 
 Finally, :mod:`stk` will also read bonds from ``.mol`` files,
@@ -940,19 +940,19 @@ useful key for metal-containing molecules. You can use the
 
 .. testsetup:: making-keys-for-molecules-with-dative-bonds
 
-   import stk
+    import stk
 
-   # Change the default database used, so that when a developer runs
-   # the doctests locally, their "stk" database is not contaminated.
-   _test_database = '_stk_doctest_database'
-   _old_molecule_init = stk.MoleculeMongoDb
-   stk.MoleculeMongoDb = lambda mongo_client, jsonizer: (
-       _old_molecule_init(
-           mongo_client=mongo_client,
-           jsonizer=jsonizer,
-           database=_test_database,
-       )
-   )
+    # Change the default database used, so that when a developer runs
+    # the doctests locally, their "stk" database is not contaminated.
+    _test_database = '_stk_doctest_database'
+    _old_molecule_init = stk.MoleculeMongoDb
+    stk.MoleculeMongoDb = lambda mongo_client, jsonizer: (
+        _old_molecule_init(
+            mongo_client=mongo_client,
+            jsonizer=jsonizer,
+            database=_test_database,
+        )
+    )
 
 .. testcode:: making-keys-for-molecules-with-dative-bonds
 
@@ -973,15 +973,15 @@ useful key for metal-containing molecules. You can use the
     retrieved_bb = db.get({'SMILES': canonical_smiles})
 
 .. testcode:: making-keys-for-molecules-with-dative-bonds
-   :hide:
+    :hide:
 
-   _smiles = stk.Smiles()
-   assert _smiles.get_key(bb) == _smiles.get_key(retrieved_bb)
+    _smiles = stk.Smiles()
+    assert _smiles.get_key(bb) == _smiles.get_key(retrieved_bb)
 
 .. testcleanup:: making-keys-for-molecules-with-dative-bonds
 
-   pymongo.MongoClient().drop_database(_test_database)
-   stk.MoleculeMongoDb = _old_molecule_init
+    pymongo.MongoClient().drop_database(_test_database)
+    stk.MoleculeMongoDb = _old_molecule_init
 
 Extending stk
 =============
