@@ -30,33 +30,58 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     Examples
     --------
-    *Storing and Retrieving Constructed Molecules*
+    *Storing and Retrieving Molecules*
 
     You want to store and retrieve a molecule from the database
 
-    .. code-block:: python
+    .. testsetup:: storing-and-retrieving-molecules
 
-        import stk
-        import pymongo
+       import stk
 
-        # Connect to a MongoDB. This example connects to a local
-        # MongoDB, but you can connect to a remote DB too with
-        # MongoClient() - read the documentation for pymongo to see how
-        # to do that.
-        client = pymongo.MongoClient()
-        db = stk.MoleculeMongoDb(client)
+       # Change the database used, so that when a developer
+       # runs the doctests locally, their "stk" database is not
+       # contaminated.
+       _test_database = '_stk_doctest_database'
+       _old_init = stk.MoleculeMongoDb
+       stk.MoleculeMongoDb = lambda mongo_client: _old_init(
+           mongo_client=mongo_client,
+           database=_test_database,
+       )
 
-        # Create a molecule.
-        molecule = stk.BuildingBlock('NCCN')
+    .. testcode:: storing-and-retrieving-molecules
 
-        # Place it into the database.
-        db.put(molecule)
+       import stk
+       import pymongo
 
-        # Retrieve it from the database.
-        key_maker = stk.InchiKey()
-        retrieved = db.get({
-            key_maker.get_key_name(): key_maker.get_key(molecule)
-        })
+       # Connect to a MongoDB. This example connects to a local
+       # MongoDB, but you can connect to a remote DB too with
+       # MongoClient() - read the documentation for pymongo to see how
+       # to do that.
+       client = pymongo.MongoClient()
+       db = stk.MoleculeMongoDb(client)
+
+       # Create a molecule.
+       molecule = stk.BuildingBlock('NCCN')
+
+       # Place it into the database.
+       db.put(molecule)
+
+       # Retrieve it from the database.
+       key_maker = stk.InchiKey()
+       retrieved = db.get({
+           key_maker.get_key_name(): key_maker.get_key(molecule)
+       })
+
+    .. testcode:: storing-and-retrieving-molecules
+       :hide:
+
+       _smiles = stk.Smiles()
+       assert _smiles.get_key(molecule) == _smiles.get_key(retrieved)
+
+    .. testcleanup:: storing-and-retrieving-molecules
+
+       stk.MoleculeMongoDb = _old_init
+       pymongo.MongoClient().drop_database(_test_database)
 
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
@@ -72,8 +97,8 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     .. code-block:: python
 
-        for entry in db.get_all():
-            # Do something to entry.
+       for entry in db.get_all():
+           # Do something to entry.
 
     *Using Alternative Keys for Retrieving Molecules*
 
@@ -83,24 +108,24 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     .. code-block:: python
 
-        db = stk.MoleculeMongoDb(
-            mongo_client=client,
-            # Store the InChI and the InChIKey of molecules in
-            # the JSON representation.
-            jsonizer=stk.MoleculeJsonizer(
-                key_makers=(stk.Inchi(), stk.InchiKey()),
-            )
-        )
-        # Places the JSON of the molecule into the database. In this
-        # case, the JSON includes both the InChI and the InChIKey.
-        db.put(molecule)
+       db = stk.MoleculeMongoDb(
+           mongo_client=client,
+           # Store the InChI and the InChIKey of molecules in
+           # the JSON representation.
+           jsonizer=stk.MoleculeJsonizer(
+               key_makers=(stk.Inchi(), stk.InchiKey()),
+           )
+       )
+       # Places the JSON of the molecule into the database. In this
+       # case, the JSON includes both the InChI and the InChIKey.
+       db.put(molecule)
 
-        # You can now use the InChI or the InChIKey to retrieve the
-        # molecule from the database.
-        key_maker = stk.Inchi()
-        retrieved = db.get({
-            key_maker.get_key_name(): key_maker.get_key(molecule),
-        })
+       # You can now use the InChI or the InChIKey to retrieve the
+       # molecule from the database.
+       key_maker = stk.Inchi()
+       retrieved = db.get({
+           key_maker.get_key_name(): key_maker.get_key(molecule),
+       })
 
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
@@ -108,11 +133,11 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     .. code-block:: python
 
-        import rdkit.Chem.AllChem as rdkit
+       import rdkit.Chem.AllChem as rdkit
 
-        retrieved = db.get(
-            'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('NCCN'))
-        )
+       retrieved = db.get(
+           'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('NCCN'))
+       )
 
     As long as you have the name of the key, and the expected value
     of the key, you can retrieve your molecule from the database.
@@ -121,55 +146,53 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     .. code-block:: python
 
-        import rdkit.Chem.AllChem as rdkit
+       # Create your own key. This one is called "SMILES" and the
+       # value is the SMILES of the molecule.
+       class Smiles(stk.MoleculeKeyMaker):
+           def __init__(self):
+               return
 
-        # Create your own key. This one is called "SMILES" and the
-        # value is the SMILES of the molecule.
-        class Smiles(stk.MoleculeKeyMaker):
-            def __init__(self):
-                return
+           def get_key_name(self):
+               return 'SMILES'
 
-            def get_key_name(self):
-                return 'SMILES'
+           def get_key(self, molecule):
+               return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
-            def get_key(self, molecule):
-                return rdkit.MolToSmiles(molecule.to_rdkit_mol())
+       db = stk.MoleculeMongoDb(
+           mongo_client=client,
+           jsonizer=stk.MoleculeJsonizer(
+               # Include your own custom key maker in the JSON
+               # representation.
+               key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
+           ),
+       )
 
-        db = stk.MoleculeMongoDb(
-            mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(
-                # Include your own custom key maker in the JSON
-                # representation.
-                key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
-            ),
-        )
+       molecule = stk.BuildingBlock('BrBr')
 
-        molecule = stk.BuildingBlock('BrBr')
+       # Place the JSON of your molecule into the database. In this
+       # case the JSON will include a key called "SMILES" and
+       # the value will be the SMILES of the molecule.
+       db.put(molecule)
 
-        # Place the JSON of your molecule into the database. In this
-        # case the JSON will include a key called "SMILES" and
-        # the value will be the SMILES of the molecule.
-        db.put(molecule)
-
-        # You can now find your molecule by using SMILES as the key.
-        retrieved = db.get({'SMILES': 'BrBr'})
+       # You can now find your molecule by using SMILES as the key.
+       retrieved = db.get({'SMILES': 'BrBr'})
 
     Often, it is unnecessary to create a whole subclass for a your
     custom key
 
     .. code-block:: python
 
-        smiles = stk.MoleculeKeyMaker(
-            key_name='SMILES',
-            get_key=lambda molecule:
-                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
-        )
-        db = stk.MoleculeMongoDb(
-            mongo_client=client,
-            jsonizer=stk.MoleculeJsonizer(
-                key_makers=(stk.InchiKey(), smiles),
-            ),
-        )
+       smiles = stk.MoleculeKeyMaker(
+           key_name='SMILES',
+           get_key=lambda molecule:
+               rdkit.MolToSmiles(molecule.to_rdkit_mol()),
+       )
+       db = stk.MoleculeMongoDb(
+           mongo_client=client,
+           jsonizer=stk.MoleculeJsonizer(
+               key_makers=(stk.InchiKey(), smiles),
+           ),
+       )
 
     Note that the key you use to get the molecule back from the
     database should be unique. In other words, there should always just
