@@ -35,17 +35,19 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testsetup:: storing-and-retrieving-constructed-molecules
 
-       import stk
+        import stk
 
-       # Change the default database used, so that when a developer
-       # runs the doctests locally, their "stk" database is not
-       # contaminated.
-       _test_database = '_stk_doctest_database'
-       _old_init = stk.ConstructedMoleculeMongoDb
-       stk.ConstructedMoleculeMongoDb = lambda mongo_client: _old_init(
-           mongo_client=mongo_client,
-           database=_test_database,
-       )
+        # Change the default database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ConstructedMoleculeMongoDb
+        stk.ConstructedMoleculeMongoDb = lambda mongo_client: (
+            _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+            )
+        )
 
     .. testcode:: storing-and-retrieving-constructed-molecules
 
@@ -80,15 +82,15 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         })
 
     .. testcode:: storing-and-retrieving-constructed-molecules
-       :hide:
+        :hide:
 
-       _smiles = stk.Smiles()
-       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
+        _smiles = stk.Smiles()
+        assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
 
     .. testcleanup:: storing-and-retrieving-constructed-molecules
 
-       pymongo.MongoClient().drop_database(_test_database)
-       stk.ConstructedMoleculeMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
+        stk.ConstructedMoleculeMongoDb = _old_init
 
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
@@ -104,47 +106,47 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testsetup:: iterating-over-all-entries-in-the-database
 
-       import stk
-       import pymongo
+        import stk
+        import pymongo
 
-       # Change the database used, so that when a developer
-       # runs the doctests locally, their "stk" database is not
-       # contaminated.
-       _test_database = '_stk_doctest_database'
-       client = pymongo.MongoClient()
-       db = stk.ConstructedMoleculeMongoDb(
-           mongo_client=client,
-           database=_test_database,
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        client = pymongo.MongoClient()
+        db = stk.ConstructedMoleculeMongoDb(
+            mongo_client=client,
+            database=_test_database,
+         )
+
+        # Create a molecule.
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2,
+            ),
         )
 
-       # Create a molecule.
-       polymer = stk.ConstructedMolecule(
-           topology_graph=stk.polymer.Linear(
-               building_blocks=(
-                   stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-               ),
-               repeating_unit='A',
-               num_repeating_units=2,
-           ),
-       )
-
-       # Place it into the database.
-       db.put(polymer)
+        # Place it into the database.
+        db.put(polymer)
 
     .. testcode:: iterating-over-all-entries-in-the-database
 
-       for entry in db.get_all():
-           # Do something to the entry.
-           print(stk.Smiles().get_key(entry))
+        for entry in db.get_all():
+            # Do something to the entry.
+            print(stk.Smiles().get_key(entry))
 
     .. testoutput:: iterating-over-all-entries-in-the-database
-       :hide:
+        :hide:
 
-       BrCCCCBr
+        BrCCCCBr
 
     .. testcleanup:: iterating-over-all-entries-in-the-database
 
-       pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient().drop_database(_test_database)
 
     *Using Alternative Keys for Retrieving Molecules*
 
@@ -155,60 +157,60 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testsetup:: using-alternative-keys-for-retrieving-molecules
 
-       import stk
+        import stk
 
-       # Change the database used, so that when a developer
-       # runs the doctests locally, their "stk" database is not
-       # contaminated.
-       _test_database = '_stk_doctest_database'
-       _old_init = stk.ConstructedMoleculeMongoDb
-       stk.ConstructedMoleculeMongoDb = (
-           lambda mongo_client, jsonizer: _old_init(
-               mongo_client=mongo_client,
-               database=_test_database,
-               jsonizer=jsonizer,
-           )
-       )
-
-    .. testcode:: using-alternative-keys-for-retrieving-molecules
-
-       import stk
-       import pymongo
-
-       db = stk.ConstructedMoleculeMongoDb(
-           mongo_client=pymongo.MongoClient(),
-           # Store the InChI and the InChIKey of molecules in
-           # the JSON representation.
-           jsonizer=stk.ConstructedMoleculeJsonizer(
-               key_makers=(stk.Inchi(), stk.InchiKey()),
-           ),
-       )
-       # Create a molecule.
-       polymer = stk.ConstructedMolecule(
-           topology_graph=stk.polymer.Linear(
-               building_blocks=(
-                   stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-               ),
-               repeating_unit='A',
-               num_repeating_units=2,
-           ),
-       )
-       # Places the JSON of the molecule into the database. In this
-       # case, the JSON includes both the InChI and the InChIKey.
-       db.put(polymer)
-
-       # You can now use the InChI or the InChIKey to retrieve the
-       # molecule from the database.
-       key_maker = stk.Inchi()
-       retrieved = db.get({
-           key_maker.get_key_name(): key_maker.get_key(polymer),
-       })
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ConstructedMoleculeMongoDb
+        stk.ConstructedMoleculeMongoDb = (
+            lambda mongo_client, jsonizer: _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                jsonizer=jsonizer,
+            )
+        )
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
-       :hide:
 
-       _smiles = stk.Smiles()
-       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
+        import stk
+        import pymongo
+
+        db = stk.ConstructedMoleculeMongoDb(
+            mongo_client=pymongo.MongoClient(),
+            # Store the InChI and the InChIKey of molecules in
+            # the JSON representation.
+            jsonizer=stk.ConstructedMoleculeJsonizer(
+                key_makers=(stk.Inchi(), stk.InchiKey()),
+            ),
+        )
+        # Create a molecule.
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2,
+            ),
+        )
+        # Places the JSON of the molecule into the database. In this
+        # case, the JSON includes both the InChI and the InChIKey.
+        db.put(polymer)
+
+        # You can now use the InChI or the InChIKey to retrieve the
+        # molecule from the database.
+        key_maker = stk.Inchi()
+        retrieved = db.get({
+            key_maker.get_key_name(): key_maker.get_key(polymer),
+        })
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+        :hide:
+
+        _smiles = stk.Smiles()
+        assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
 
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
@@ -216,16 +218,16 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-       import rdkit.Chem.AllChem as rdkit
+        import rdkit.Chem.AllChem as rdkit
 
-       retrieved2 = db.get({
-           'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCCCBr')),
-       })
+        retrieved2 = db.get({
+            'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('BrCCCCBr')),
+        })
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
-       :hide:
+        :hide:
 
-       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved2)
+        assert _smiles.get_key(polymer) == _smiles.get_key(retrieved2)
 
     As long as you have the name of the key, and the expected value
     of the key, you can retrieve your molecule from the database.
@@ -234,73 +236,73 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-       # Create your own key. This one is called "SMILES" and the
-       # value is the SMILES of the molecule.
-       class Smiles(stk.MoleculeKeyMaker):
-           def __init__(self):
-               return
+        # Create your own key. This one is called "SMILES" and the
+        # value is the SMILES of the molecule.
+        class Smiles(stk.MoleculeKeyMaker):
+            def __init__(self):
+                return
 
-           def get_key_name(self):
-               return 'SMILES'
+            def get_key_name(self):
+                return 'SMILES'
 
-           def get_key(self, molecule):
-               return rdkit.MolToSmiles(molecule.to_rdkit_mol())
+            def get_key(self, molecule):
+                return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
-       db = stk.ConstructedMoleculeMongoDb(
-           mongo_client=pymongo.MongoClient(),
-           jsonizer=stk.ConstructedMoleculeJsonizer(
-               # Include your own custom key maker in the JSON
-               # representation.
-               key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
-           ),
-       )
+        db = stk.ConstructedMoleculeMongoDb(
+            mongo_client=pymongo.MongoClient(),
+            jsonizer=stk.ConstructedMoleculeJsonizer(
+                # Include your own custom key maker in the JSON
+                # representation.
+                key_makers = (stk.Inchi(), stk.InchiKey(), Smiles()),
+            ),
+        )
 
-       # Place the JSON of your molecule into the database. In this
-       # case the JSON will include a key called "SMILES" and
-       # the value will be the SMILES of the molecule.
-       db.put(polymer)
+        # Place the JSON of your molecule into the database. In this
+        # case the JSON will include a key called "SMILES" and
+        # the value will be the SMILES of the molecule.
+        db.put(polymer)
 
-       # You can now find your molecule by using SMILES as the key,
-       def normalize_smiles(smiles):
-           return rdkit.MolToSmiles(
-               mol=rdkit.AddHs(rdkit.MolFromSmiles(smiles)),
-           )
+        # You can now find your molecule by using SMILES as the key,
+        def normalize_smiles(smiles):
+            return rdkit.MolToSmiles(
+                mol=rdkit.AddHs(rdkit.MolFromSmiles(smiles)),
+            )
 
-       retrieved3 = db.get({'SMILES': normalize_smiles('BrCCCCBr')})
+        retrieved3 = db.get({'SMILES': normalize_smiles('BrCCCCBr')})
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
-       :hide:
+        :hide:
 
-       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved3)
+        assert _smiles.get_key(polymer) == _smiles.get_key(retrieved3)
 
     Often, it is unnecessary to create a whole subclass for a your
     custom key
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-       smiles = stk.MoleculeKeyMaker(
-           key_name='SMILES',
-           get_key=lambda molecule:
-               rdkit.MolToSmiles(molecule.to_rdkit_mol()),
-       )
-       db = stk.ConstructedMoleculeMongoDb(
-           mongo_client=pymongo.MongoClient(),
-           jsonizer=stk.ConstructedMoleculeJsonizer(
-               key_makers=(stk.InchiKey(), smiles),
-           )
-       )
+        smiles = stk.MoleculeKeyMaker(
+            key_name='SMILES',
+            get_key=lambda molecule:
+                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
+        )
+        db = stk.ConstructedMoleculeMongoDb(
+            mongo_client=pymongo.MongoClient(),
+            jsonizer=stk.ConstructedMoleculeJsonizer(
+                key_makers=(stk.InchiKey(), smiles),
+            )
+        )
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
-       :hide:
+        :hide:
 
-       db.put(polymer)
-       _retrieved4 = db.get({'SMILES': smiles.get_key(polymer)})
-       assert _smiles.get_key(polymer) == _smiles.get_key(_retrieved4)
+        db.put(polymer)
+        _retrieved4 = db.get({'SMILES': smiles.get_key(polymer)})
+        assert _smiles.get_key(polymer) == _smiles.get_key(_retrieved4)
 
     .. testcleanup:: using-alternative-keys-for-retrieving-molecules
 
-       pymongo.MongoClient().drop_database(_test_database)
-       stk.ConstructedMoleculeMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
+        stk.ConstructedMoleculeMongoDb = _old_init
 
     Note that the key you use to get the molecule back from the
     database should be unique. In other words, there should always just
