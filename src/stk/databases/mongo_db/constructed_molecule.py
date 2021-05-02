@@ -154,7 +154,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     in the database by using a different
     :class:`.ConstructedMoleculeJsonizer`
 
-    .. testcode:: using-alternative-keys-for-retrieving-molecules
+    .. testsetup:: using-alternative-keys-for-retrieving-molecules
 
        import stk
 
