@@ -277,18 +277,26 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     Often, it is unnecessary to create a whole subclass for a your
     custom key
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-        smiles = stk.MoleculeKeyMaker(
-            key_name='SMILES',
-            get_key=lambda molecule:
-                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
-        )
-        db = stk.ConstructedMoleculeMongoDb(
-            mongo_client=client,
-            jsonizer=stk.ConstructedMoleculeJsonizer(
-            key_makers=(stk.InchiKey(), smiles),
-        )
+       smiles = stk.MoleculeKeyMaker(
+           key_name='SMILES',
+           get_key=lambda molecule:
+               rdkit.MolToSmiles(molecule.to_rdkit_mol()),
+       )
+       db = stk.ConstructedMoleculeMongoDb(
+           mongo_client=pymongo.MongoClient(),
+           jsonizer=stk.ConstructedMoleculeJsonizer(
+               key_makers=(stk.InchiKey(), smiles),
+           )
+       )
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+       :hide:
+
+       db.put(polymer)
+       _retrieved4 = db.get({'SMILES': smiles.get_key(polymer)})
+       assert _smiles.get_key(polymer) == _smiles.get_key(_retrieved4)
 
     .. testcleanup:: using-alternative-keys-for-retrieving-molecules
 
