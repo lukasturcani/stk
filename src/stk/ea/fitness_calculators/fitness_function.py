@@ -99,7 +99,7 @@ class FitnessFunction(FitnessCalculator):
     .. testcode:: storing-fitness-values-in-a-database
         :hide:
 
-        assert value1 == value
+        assert value == value1
 
     .. testcleanup:: storing-fitness-values-in-a-database
 
