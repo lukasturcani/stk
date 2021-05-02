@@ -54,8 +54,6 @@ jobs:
 
                 bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -b
 
-                /github/home/miniconda3/bin/conda init bash
-
             - name: Install dependencies
               run:
                 /github/home/miniconda3/bin/conda env update
@@ -64,7 +62,7 @@ jobs:
 
             - name: Run pytest
               run:
-                /github/home/miniconda3/bin/conda activate && pytest
+                /github/home/miniconda3/bin/conda run -n base pytest
 
             - name: Dump the database
               run:
