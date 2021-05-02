@@ -14,8 +14,8 @@ class HashableDict(dict):
             ))
         except Exception:
             print((
-                frozenset(self),
-                frozenset(_to_hashable(self.values())),
+                (self, ),
+                _to_hashable(self.values()),
             ))
             raise
 
