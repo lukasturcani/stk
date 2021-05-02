@@ -18,6 +18,8 @@ class ValueMongoDb(ValueDatabase):
 
     Examples
     --------
+    See also examples in :class:`.ValueDatabase`.
+
     *Storing Molecular Properties in a Database*
 
     You want to store property values in a database.
