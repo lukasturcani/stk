@@ -196,7 +196,21 @@ class PropertyVector(FitnessCalculator):
         self._output_database = output_database
 
     def get_fitness_value(self, molecule):
-        return tuple(
-            property_function(molecule)
-            for property_function in self._property_functions
-        )
+        if self._input_database is not None:
+            try:
+                fitness_value = self._input_database.get(molecule)
+            except KeyError:
+                fitness_value = tuple(
+                    property_function(molecule)
+                    for property_function in self._property_functions
+                )
+        else:
+            fitness_value = tuple(
+                property_function(molecule)
+                for property_function in self._property_functions
+            )
+
+        if self._output_database is not None:
+            self._output_database.put(molecule, fitness_value)
+
+        return fitness_value
