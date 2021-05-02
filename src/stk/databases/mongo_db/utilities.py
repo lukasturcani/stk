@@ -7,6 +7,10 @@ MongoDB Utilities
 
 class HashableDict(dict):
     def __hash__(self):
+        print((
+            frozenset(self),
+            frozenset(_to_hashable(self.values())),
+        ))
         return hash((
             frozenset(self),
             frozenset(_to_hashable(self.values())),
