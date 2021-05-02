@@ -120,7 +120,24 @@ class FitnessFunction(FitnessCalculator):
     see if the value already exists, while the `output_database` has
     the calculated fitness value deposited into it.
 
-    .. code-block:: python
+    .. testsetup:: caching-fitness-values
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ValueMongoDb
+        stk.ValueMongoDb = lambda mongo_client, collection: (
+            _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                collection=collection,
+            )
+        )
+
+    .. testcode:: caching-fitness-values
 
         import stk
         import pymongo
@@ -158,6 +175,16 @@ class FitnessFunction(FitnessCalculator):
         value2 = fitness_calculator.get_fitness_value(
             molecule=stk.BuildingBlock('BrCCBr'),
         )
+
+    .. testcode:: caching-fitness-values
+        :hide:
+
+        assert value1 == value2
+
+    .. testcleanup:: caching-fitness-values
+
+        stk.ValueMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
 
     """
 
