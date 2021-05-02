@@ -246,7 +246,7 @@ class MoleculeMongoDb(MoleculeDatabase):
     Often, it is unnecessary to create a whole subclass for a your
     custom key
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
        smiles = stk.MoleculeKeyMaker(
            key_name='SMILES',
@@ -254,10 +254,19 @@ class MoleculeMongoDb(MoleculeDatabase):
                rdkit.MolToSmiles(molecule.to_rdkit_mol()),
        )
        db = stk.MoleculeMongoDb(
-           mongo_client=client,
+           mongo_client=pymongo.MongoClient(),
            jsonizer=stk.MoleculeJsonizer(
                key_makers=(stk.InchiKey(), smiles),
            ),
+       )
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+       :hide:
+
+       db.put(molecule)
+       _retrieved4 = db.get({'SMILES': 'BrBr'})
+       assert (
+           _smiles.get_key(molecule2) == _smiles.get_key(_retrieved4)
        )
 
     .. testcleanup:: using-alternative-keys-for-retrieving-molecules
