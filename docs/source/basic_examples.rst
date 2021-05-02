@@ -396,11 +396,30 @@ Molecules and Building Blocks
 
 To place molecules into the database, first create the database
 
+.. testsetup:: placing-and-retrieving-molecules-from-a-database
+
+   import stk
+
+   # Change the default database used, so that when a developer runs
+   # the doctests locally, their "stk" database is not contaminated.
+   _test_database = '_stk_doctest_database'
+   _old_molecule_init = stk.MoleculeMongoDb
+   stk.MoleculeMongoDb = lambda client: _old_molecule_init(
+       mongo_client=client,
+       database=_test_database,
+   )
+   _old_constructed_molecule_init = stk.ConstructedMoleculeMongoDb
+   stk.ConstructedMoleculeMongoDb = lambda client: (
+       _old_constructed_molecule_init(
+           mongo_client=client,
+           database=_test_database,
+       )
+   )
+
 .. testcode:: placing-and-retrieving-molecules-from-a-database
 
     import stk
     import pymongo
-
 
     # Connect to a MongoDB. This example connects to a local
     # MongoDB, but you can connect to a remote DB too with
@@ -465,7 +484,6 @@ functional groups. You can restore your functional groups however
         functional_groups=[stk.BromoFactory()],
     )
 
-
 .. testcode:: placing-and-retrieving-molecules-from-a-database
    :hide:
 
@@ -521,6 +539,12 @@ instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
    :hide:
 
    assert _smiles.get_key(polymer) == _smiles.get_key(loaded_polymer)
+
+.. testcleanup:: placing-and-retrieving-molecules-from-a-database
+
+   stk.MoleculeMongoDb = _old_molecule_init
+   stk.ConstructedMoleculeMongoDb = _old_constructed_molecule_init
+   pymongo.MongoClient().drop_database(_test_database)
 
 Unlike ``loaded``, ``loaded_polymer`` is a
 :class:`.ConstructedMolecule` instance.

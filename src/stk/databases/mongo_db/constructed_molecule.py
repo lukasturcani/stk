@@ -33,7 +33,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     You want to store and retrieve a :class:`.ConstructedMolecule`
     from the database
 
-    .. code-block:: python
+    .. testcode:: storing-and-retrieving-constructed-molecules
 
         import stk
         import pymongo
@@ -65,6 +65,12 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             key_maker.get_key_name(): key_maker.get_key(polymer),
         })
 
+    .. testcode:: storing-and-retrieving-constructed-molecules
+       :hide:
+
+       _smiles = stk.Smiles()
+       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
+
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
     molecule will have the same structure, the order of the atoms
@@ -77,10 +83,46 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     All entries in a database can be iterated over very simply
 
-    .. code-block:: python
+    .. testcode:: iterating-over-all-entries-in-the-database
+       :hide:
 
-        for entry in db.get_all():
-            # Do something to entry.
+       import stk
+       import pymongo
+
+       _test_database = '_stk_doctest_database'
+       client = pymongo.MongoClient()
+       db = stk.ConstructedMoleculeMongoDb(
+           mongo_client=client,
+           database=_test_database,
+        )
+
+       # Create a molecule.
+       polymer = stk.ConstructedMolecule(
+           topology_graph=stk.polymer.Linear(
+               building_blocks=(
+                   stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+               ),
+               repeating_unit='A',
+               num_repeating_units=2,
+           ),
+       )
+
+       # Place it into the database.
+       db.put(polymer)
+
+    .. testcode:: iterating-over-all-entries-in-the-database
+
+       for entry in db.get_all():
+           # Do something to entry.
+           print(stk.Smiles().get_key(entry))
+
+    .. testoutput:: iterating-over-all-entries-in-the-database
+
+       BrCCCCBr
+
+    .. testcleanup:: iterating-over-all-entries-in-the-database
+
+       pymongo.MongoClient().drop_database(_test_database)
 
     *Using Alternative Keys for Retrieving Molecules*
 
