@@ -942,6 +942,8 @@ useful key for metal-containing molecules. You can use the
 
    import stk
 
+   # Change the default database used, so that when a developer runs
+   # the doctests locally, their "stk" database is not contaminated.
    _test_database = '_stk_doctest_database'
    _old_molecule_init = stk.MoleculeMongoDb
    stk.MoleculeMongoDb = lambda mongo_client, jsonizer: (

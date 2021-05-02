@@ -33,6 +33,17 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     You want to store and retrieve a :class:`.ConstructedMolecule`
     from the database
 
+    .. testsetup:: storing-and-retrieving-constructed-molecules
+
+       import stk
+
+       # Change the default database used, so that when a developer
+       # runs the doctests locally, their "stk" database is not
+       # contaminated.
+       _test_database = '_stk_doctest_database'
+       _old_init = stk.ConstructedMoleculeMongoDb
+       stk.ConstructedMoleculeMongoDb = _old_init
+
     .. testcode:: storing-and-retrieving-constructed-molecules
 
         import stk
@@ -71,6 +82,11 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
        _smiles = stk.Smiles()
        assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
 
+    .. testcleanup:: storing-and-retrieving-constructed-molecules
+
+       pymongo.MongoClient().drop_database(_test_database)
+       stk.ConstructedMoleculeMongoDb = _old_init
+
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
     molecule will have the same structure, the order of the atoms
@@ -89,6 +105,9 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
        import stk
        import pymongo
 
+       # Change the database used, so that when a developer
+       # runs the doctests locally, their "stk" database is not
+       # contaminated.
        _test_database = '_stk_doctest_database'
        client = pymongo.MongoClient()
        db = stk.ConstructedMoleculeMongoDb(
@@ -117,6 +136,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
            print(stk.Smiles().get_key(entry))
 
     .. testoutput:: iterating-over-all-entries-in-the-database
+       :hide:
 
        BrCCCCBr
 
@@ -131,26 +151,45 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     in the database by using a different
     :class:`.ConstructedMoleculeJsonizer`
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
-        db = stk.ConstructedMoleculeMongoDb(
-            mongo_client=client,
-            # Store the InChI and the InChIKey of molecules in
-            # the JSON representation.
-            jsonizer=stk.ConstructedMoleculeJsonizer(
-                key_makers=(stk.Inchi(), stk.InchiKey()),
-            ),
-        )
-        # Places the JSON of the molecule into the database. In this
-        # case, the JSON includes both the InChI and the InChIKey.
-        db.put(polymer)
+       import stk
+       import pymongo
 
-        # You can now use the InChI or the InChIKey to retrieve the
-        # molecule from the database.
-        key_maker = stk.Inchi()
-        retrieved = db.get({
-            key_maker.get_key_name(): key_maker.get_key(polymer),
-        })
+       db = stk.ConstructedMoleculeMongoDb(
+           mongo_client=pymongo.MongoClient(),
+           # Store the InChI and the InChIKey of molecules in
+           # the JSON representation.
+           jsonizer=stk.ConstructedMoleculeJsonizer(
+               key_makers=(stk.Inchi(), stk.InchiKey()),
+           ),
+       )
+       # Create a molecule.
+       polymer = stk.ConstructedMolecule(
+           topology_graph=stk.polymer.Linear(
+               building_blocks=(
+                   stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+               ),
+               repeating_unit='A',
+               num_repeating_units=2,
+           ),
+       )
+       # Places the JSON of the molecule into the database. In this
+       # case, the JSON includes both the InChI and the InChIKey.
+       db.put(polymer)
+
+       # You can now use the InChI or the InChIKey to retrieve the
+       # molecule from the database.
+       key_maker = stk.Inchi()
+       retrieved = db.get({
+           key_maker.get_key_name(): key_maker.get_key(polymer),
+       })
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+       :hide:
+
+       _smiles = stk.Smiles()
+       assert _smiles.get_key(polymer) == _smiles.get_key(retrieved)
 
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
