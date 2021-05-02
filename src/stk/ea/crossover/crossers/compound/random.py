@@ -142,8 +142,8 @@ class RandomCrosser:
 
        def _get_smiles(item):
            if isinstance(item, stk.ConstructedMolecule):
-              return stk.InchiKey().get_key(item)
-           return stk.InchiKey().get_key(
+              return stk.Smiles().get_key(item)
+           return stk.Smiles().get_key(
                molecule=item.get_molecule_record().get_molecule(),
             )
 

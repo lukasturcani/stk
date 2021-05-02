@@ -114,7 +114,7 @@ class GeneticRecombination(MoleculeCrosser):
 
     Note that any number of parents can be used for the crossover
 
-    .. code-block:: python
+    .. testcode:: crossing-constructed-molecules
 
         import stk
 
@@ -124,7 +124,7 @@ class GeneticRecombination(MoleculeCrosser):
         bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
         graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
         polymer1  = stk.ConstructedMolecule(graph1)
-        record1 = stk.MoleculeRecord(polymer1, graph1)
+        record1 = stk.MoleculeRecord(graph1)
 
         bb3 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
         bb4 = stk.BuildingBlock(
@@ -133,13 +133,13 @@ class GeneticRecombination(MoleculeCrosser):
         )
         graph2 = stk.polymer.Linear((bb3, bb4), 'AB', 2)
         polymer2  = stk.ConstructedMolecule(graph2)
-        record2 = stk.MoleculeRecord(polymer2, graph2)
+        record2 = stk.MoleculeRecord(graph2)
 
         # Create the crosser.
 
         def get_functional_group_type(building_block):
             fg, = building_block.get_functional_groups(0)
-            return fg.__class__
+            return type(fg)
 
         recombination = stk.GeneticRecombination(
             get_gene=get_functional_group_type,
@@ -150,6 +150,39 @@ class GeneticRecombination(MoleculeCrosser):
         cohort1 = tuple(recombination.cross(
             records=(record1, record2),
         ))
+
+    .. testcode:: crossing-constructed-molecules
+       :hide:
+
+       _expected_cohort = (
+           polymer1,
+           polymer2,
+           stk.ConstructedMolecule(
+               topology_graph=stk.polymer.Linear(
+                   building_blocks=(bb1, bb4),
+                   repeating_unit='AB',
+                   num_repeating_units=2,
+               ),
+           ),
+           stk.ConstructedMolecule(
+               topology_graph=stk.polymer.Linear(
+                   building_blocks=(bb2, bb3),
+                   repeating_unit='AB',
+                   num_repeating_units=2,
+               ),
+           ),
+       )
+
+       def _get_smiles(item):
+           if isinstance(item, stk.ConstructedMolecule):
+              return stk.Smiles().get_key(item)
+           return stk.Smiles().get_key(
+               molecule=item.get_molecule_record().get_molecule(),
+            )
+
+       _expected_smiles = set(map(_get_smiles, _expected_cohort))
+       _cohort_smiles = set(map(_get_smiles, cohort1))
+       assert _expected_smiles == _cohort_smiles
 
     """
 
