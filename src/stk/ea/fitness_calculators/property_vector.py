@@ -15,7 +15,7 @@ class PropertyVector(FitnessCalculator):
     --------
     *Calculating Fitness Values*
 
-    .. code-block:: python
+    .. testcode:: calculating-fitness-values
 
         import stk
 
@@ -44,6 +44,16 @@ class PropertyVector(FitnessCalculator):
         # bonds and the diameter of the molecule.
         value = fitness_calculator.get_fitness_value(
             molecule=stk.BuildingBlock('BrCCBr'),
+        )
+
+    .. testcode:: calculating-fitness-values
+        :hide:
+
+        _bb = stk.BuildingBlock('BrCCBr')
+        assert value == (
+            _bb.get_num_atoms(),
+            _bb.get_num_bonds(),
+            _bb.get_maximum_diameter(),
         )
 
     *Storing Fitness Values in a Database*
