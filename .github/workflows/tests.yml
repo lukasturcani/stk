@@ -56,7 +56,7 @@ jobs:
 
             - name: Install dependencies
               run:
-                /root/miniconda3//bin/conda env update
+                /root/miniconda3/bin/conda env update
                     --name base
                     --file tests/environment.yml
 
