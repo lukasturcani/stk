@@ -172,7 +172,7 @@ class PropertyVector(FitnessCalculator):
 
         Parameters
         ----------
-        property_fns : :class:`tuple` of :class:`callable`
+        property_functions: :class:`tuple` of :class:`callable`
             A group of :class:`function`, each of which is used to
             calculate a single property of the molecule. Each function
             must take one parameter, `mol`, which accepts
