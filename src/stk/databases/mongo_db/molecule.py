@@ -204,7 +204,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     Note that you can create your own keys and add them to the database
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
        # Create your own key. This one is called "SMILES" and the
        # value is the SMILES of the molecule.
@@ -219,7 +219,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
        db = stk.MoleculeMongoDb(
-           mongo_client=client,
+           mongo_client=pymongo.MongoClient(),
            jsonizer=stk.MoleculeJsonizer(
                # Include your own custom key maker in the JSON
                # representation.
@@ -227,15 +227,21 @@ class MoleculeMongoDb(MoleculeDatabase):
            ),
        )
 
-       molecule = stk.BuildingBlock('BrBr')
+       molecule2 = stk.BuildingBlock('BrBr')
 
        # Place the JSON of your molecule into the database. In this
        # case the JSON will include a key called "SMILES" and
        # the value will be the SMILES of the molecule.
-       db.put(molecule)
+       db.put(molecule2)
 
        # You can now find your molecule by using SMILES as the key.
-       retrieved = db.get({'SMILES': 'BrBr'})
+       retrieved3 = db.get({'SMILES': 'BrBr'})
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+       :hide:
+
+       _smiles = stk.Smiles()
+       assert _smiles.get_key(molecule2) == _smiles.get_key(retrieved3)
 
     Often, it is unnecessary to create a whole subclass for a your
     custom key
