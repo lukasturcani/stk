@@ -404,14 +404,14 @@ To place molecules into the database, first create the database
    # the doctests locally, their "stk" database is not contaminated.
    _test_database = '_stk_doctest_database'
    _old_molecule_init = stk.MoleculeMongoDb
-   stk.MoleculeMongoDb = lambda client: _old_molecule_init(
-       mongo_client=client,
+   stk.MoleculeMongoDb = lambda mongo_client: _old_molecule_init(
+       mongo_client=mongo_client,
        database=_test_database,
    )
    _old_constructed_molecule_init = stk.ConstructedMoleculeMongoDb
-   stk.ConstructedMoleculeMongoDb = lambda client: (
+   stk.ConstructedMoleculeMongoDb = lambda mongo_client: (
        _old_constructed_molecule_init(
-           mongo_client=client,
+           mongo_client=mongo_client,
            database=_test_database,
        )
    )
@@ -565,6 +565,22 @@ Unlike the previous example, you can deposit values for both
 a :class:`.BuildingBlock` and a :class:`.ConstructedMolecule` in the
 same database. First, lets create one
 
+.. testsetup:: placing-and-retrieving-molecular-property-values
+
+   import stk
+
+   # Change the default database used, so that when a developer runs
+   # the doctests locally, their "stk" database is not contaminated.
+   _test_database = '_stk_doctest_database'
+   _old_value_init = stk.ValueMongoDb
+   stk.ValueMongoDb = lambda mongo_client, collection: (
+       _old_value_init(
+           mongo_client=mongo_client,
+           collection=collection,
+           database=_test_database,
+       )
+    )
+
 .. testcode:: placing-and-retrieving-molecular-property-values
 
     import stk
@@ -699,6 +715,11 @@ from the database. For example,
    import numpy as np
 
    assert np.all(np.equal(centroid, bb.get_centroid()))
+
+.. testcleanup:: placing-and-retrieving-molecular-property-values
+
+   stk.ValueMongoDb = _old_value_init
+   pymongo.MongoClient().drop_database(_test_database)
 
 Specifying Functional Groups Individually
 =========================================
@@ -917,6 +938,20 @@ implemented in SMILES, the SMILES string makes a
 useful key for metal-containing molecules. You can use the
 :class:`.Smiles` key maker for this purpose
 
+.. testsetup:: making-keys-for-molecules-with-dative-bonds
+
+   import stk
+
+   _test_database = '_stk_doctest_database'
+   _old_molecule_init = stk.MoleculeMongoDb
+   stk.MoleculeMongoDb = lambda mongo_client, jsonizer: (
+       _old_molecule_init(
+           mongo_client=mongo_client,
+           jsonizer=jsonizer,
+           database=_test_database,
+       )
+   )
+
 .. testcode:: making-keys-for-molecules-with-dative-bonds
 
     import stk
@@ -940,6 +975,11 @@ useful key for metal-containing molecules. You can use the
 
    _smiles = stk.Smiles()
    assert _smiles.get_key(bb) == _smiles.get_key(retrieved_bb)
+
+.. testcleanup:: making-keys-for-molecules-with-dative-bonds
+
+   pymongo.MongoClient().drop_database(_test_database)
+   stk.MoleculeMongoDb = _old_molecule_init
 
 Extending stk
 =============
