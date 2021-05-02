@@ -41,6 +41,8 @@ jobs:
         services:
             MongoDB:
                 image: mongo
+                ports:
+                    - 27017:27017
 
         steps:
             - name: Git checkout
