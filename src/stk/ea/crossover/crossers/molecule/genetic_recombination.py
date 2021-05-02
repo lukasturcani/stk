@@ -37,30 +37,41 @@ class GeneticRecombination(MoleculeCrosser):
     building block an allele of? To answer that, let's first construct
     a couple of building block molecules
 
-    .. code-block:: python
+    .. testcode:: genetic-recombination
 
-        bb1 = stk.BuildingBlock(
-            smiles='NCC(N)CN',
-            functional_groups=[stk.PrimaryAminoFactory()],
-        )
-        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-        bb3 = stk.BuildingBlock(
-            smiles='O=CCNC(C=O)C=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        bb4 = stk.BuildingBlock(
-            smiles='NCOCN',
-            functional_groups=[stk.PrimaryAminoFactory()],
-        )
+       import stk
+
+       bb1 = stk.BuildingBlock(
+           smiles='NCC(N)CN',
+           functional_groups=[stk.PrimaryAminoFactory()],
+       )
+       bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+       bb3 = stk.BuildingBlock(
+           smiles='O=CCNC(C=O)C=O',
+           functional_groups=[stk.AldehydeFactory()],
+       )
+       bb4 = stk.BuildingBlock(
+           smiles='NCOCN',
+           functional_groups=[stk.PrimaryAminoFactory()],
+       )
 
     We can define a function which analyzes a building block
     molecule and returns the gene it belongs to, for example
 
-    .. code-block:: python
+    .. testcode:: genetic-recombination
 
-        def get_gene(building_block):
-            fg, = building_block.get_functional_groups(0)
-            return fg.__class__
+       def get_gene(building_block):
+           fg, = building_block.get_functional_groups(0)
+           return type(fg)
+
+    .. testcode:: genetic-recombination
+       :hide:
+
+       assert get_gene(bb1) == stk.PrimaryAmino
+       assert get_gene(bb2) == stk.Aldehyde
+       assert get_gene(bb3) == stk.Aldehyde
+       assert get_gene(bb4) == stk.PrimaryAmino
+
 
     Here, we can see that the gene, to which each building block
     molecule belongs, is given by the class of its first functional
@@ -70,10 +81,18 @@ class GeneticRecombination(MoleculeCrosser):
 
     Alternatively, we could have defined a function such as
 
-    .. code-block:: python
+    .. testcode:: genetic-recombination
 
-        def get_gene(building_block):
+        def get_gene2(building_block):
             return building_block.get_num_functional_groups()
+
+    .. testcode:: genetic-recombination
+       :hide:
+
+       assert get_gene2(bb1) == 3
+       assert get_gene2(bb2) == 2
+       assert get_gene2(bb3) == 3
+       assert get_gene2(bb4) == 2
 
     Now we can see that we end up with the gene called
     ``3``, which has two alleles ``bb1`` and ``bb3``,
