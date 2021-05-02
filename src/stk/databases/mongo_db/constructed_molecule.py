@@ -102,8 +102,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     All entries in a database can be iterated over very simply
 
-    .. testcode:: iterating-over-all-entries-in-the-database
-       :hide:
+    .. testsetup:: iterating-over-all-entries-in-the-database
 
        import stk
        import pymongo
@@ -135,7 +134,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     .. testcode:: iterating-over-all-entries-in-the-database
 
        for entry in db.get_all():
-           # Do something to entry.
+           # Do something to the entry.
            print(stk.Smiles().get_key(entry))
 
     .. testoutput:: iterating-over-all-entries-in-the-database

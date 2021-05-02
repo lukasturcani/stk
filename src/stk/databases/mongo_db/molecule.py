@@ -95,10 +95,37 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     All entries in a database can be iterated over very simply
 
-    .. code-block:: python
+    .. testsetup:: iterating-over-all-entries-in-the-database
+
+       import stk
+       import pymongo
+
+       # Change the database used, so that when a developer
+       # runs the doctests locally, their "stk" database is not
+       # contaminated.
+       _test_database = '_stk_doctest_database'
+       client = pymongo.MongoClient()
+       db = stk.MoleculeMongoDb(
+           mongo_client=client,
+           database=_test_database,
+        )
+
+       # Create a molecule.
+       molecule = stk.BuildingBlock('NCCN')
+
+       # Place it into the database.
+       db.put(molecule)
+
+    .. testcode:: iterating-over-all-entries-in-the-database
 
        for entry in db.get_all():
-           # Do something to entry.
+           # Do something to the entry.
+           print(stk.Smiles().get_key(entry))
+
+    .. testoutput:: iterating-over-all-entries-in-the-database
+
+       NCCN
+
 
     *Using Alternative Keys for Retrieving Molecules*
 
