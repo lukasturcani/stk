@@ -62,7 +62,7 @@ jobs:
 
             - name: Run pytest
               run:
-                pytest
+                conda activate && pytest
 
             - name: Dump the database
               run:
