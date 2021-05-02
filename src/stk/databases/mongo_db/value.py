@@ -22,39 +22,66 @@ class ValueMongoDb(ValueDatabase):
 
     You want to store property values in a database.
 
-    .. code-block:: python
+    .. testsetup:: storing-molecular-properties-in-a-database
 
-        import stk
-        import pymongo
+       import stk
 
-        # Connect to a MongoDB. This example connects to a local
-        # MongoDB, but you can connect to a remote DB too with
-        # MongoClient() - read the documentation for pymongo to see how
-        # to do that.
-        client = pymongo.MongoClient()
-        db = stk.ValueMongoDb(
-            mongo_client=client,
-            collection='atom_counts',
-        )
+       # Change the database used, so that when a developer
+       # runs the doctests locally, their "stk" database is not
+       # contaminated.
+       _test_database = '_stk_doctest_database'
+       _old_init = stk.ValueMongoDb
+       stk.ValueMongoDb = lambda mongo_client, collection: (
+           _old_init(
+               mongo_client=mongo_client,
+               database=_test_database,
+               collection=collection,
+           )
+       )
 
-        molecule = stk.BuildingBlock('BrCCBr')
-        # Add the value to the database.
-        db.put(molecule, molecule.get_num_atoms())
-        # Retrieve the value from the database.
-        num_atoms = db.get(molecule)
+    .. testcode:: storing-molecular-properties-in-a-database
 
-        # Works with constructed molecules too.
-        polymer = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                ),
-                repeating_unit='A',
-                num_repeating_units=2',
-            ),
-        )
-        db.put(polymer, polymer.get_num_atoms())
-        num_polymer_atoms = db.get(polymer)
+       import stk
+       import pymongo
+
+       # Connect to a MongoDB. This example connects to a local
+       # MongoDB, but you can connect to a remote DB too with
+       # MongoClient() - read the documentation for pymongo to see how
+       # to do that.
+       client = pymongo.MongoClient()
+       db = stk.ValueMongoDb(
+           mongo_client=client,
+           collection='atom_counts',
+       )
+
+       molecule = stk.BuildingBlock('BrCCBr')
+       # Add the value to the database.
+       db.put(molecule, molecule.get_num_atoms())
+       # Retrieve the value from the database.
+       num_atoms = db.get(molecule)
+
+       # Works with constructed molecules too.
+       polymer = stk.ConstructedMolecule(
+           topology_graph=stk.polymer.Linear(
+               building_blocks=(
+                   stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+               ),
+               repeating_unit='A',
+               num_repeating_units=2,
+           ),
+       )
+       db.put(polymer, polymer.get_num_atoms())
+       num_polymer_atoms = db.get(polymer)
+
+    .. testcode:: storing-molecular-properties-in-a-database
+       :hide:
+
+       assert num_polymer_atoms == polymer.get_num_atoms()
+
+    .. testcleanup:: storing-molecular-properties-in-a-database
+
+       stk.ValueMongoDb = _old_init
+       pymongo.MongoClient().drop_database(_test_database)
 
     """
 
