@@ -53,6 +53,7 @@ jobs:
 
             - name: Install dependencies
               run:
+                PYTHONHASHSEED=0
                 conda env update
                     --name base
                     --file tests/environment.yml
@@ -72,7 +73,6 @@ jobs:
               with:
                 name: database-dump
                 path: database-dump
-
 
     basic-ea:
         runs-on: ubuntu-latest
@@ -95,6 +95,7 @@ jobs:
 
             - name: Install dependencies
               run:
+                PYTHONHASHSEED=0
                 conda env update
                     --name base
                     --file tests/environment.yml
@@ -118,8 +119,6 @@ jobs:
                 name: basic-ea-rotatable-bonds-plot
                 path: rotatable_bonds_progress.png
 
-
-
     intermediate-ea:
         runs-on: ubuntu-latest
 
@@ -141,6 +140,7 @@ jobs:
 
             - name: Install dependencies
               run:
+                PYTHONHASHSEED=0
                 conda env update
                     --name base
                     --file tests/environment.yml
