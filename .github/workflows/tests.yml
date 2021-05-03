@@ -95,6 +95,7 @@ jobs:
 
             - name: Install dependencies
               run:
+                PYTHONHASHSEED=0
                 conda env update
                     --name base
                     --file tests/environment.yml
@@ -139,6 +140,7 @@ jobs:
 
             - name: Install dependencies
               run:
+                PYTHONHASHSEED=0
                 conda env update
                     --name base
                     --file tests/environment.yml
