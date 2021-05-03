@@ -35,9 +35,6 @@ jobs:
     pytest-stable-linux:
         runs-on: ubuntu-latest
 
-        container:
-            image: ubuntu:20.04
-
         services:
             MongoDB:
                 image: mongo
@@ -48,23 +45,21 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
+            - name: Add conda to system path
+              run:
+                # $CONDA is an environment variable pointing to the
+                # root of the miniconda directory
+                echo $CONDA/bin >> $GITHUB_PATH
+
             - name: Install dependencies
               run:
-                apt update && apt install -y wget
-
-                wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh
-
-                bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -b
-
-            - name: Install dependencies
-              run:
-                /github/home/miniconda3/bin/conda env update
+                conda env update
                     --name base
                     --file tests/environment.yml
 
             - name: Run pytest
               run:
-                /github/home/miniconda3/bin/conda run -n base pytest
+                pytest
 
             - name: Dump the database
               run:
