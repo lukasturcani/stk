@@ -98,7 +98,7 @@ class RandomSmarts(MoleculeMutator):
 
         elif self._replacement_specifier == 'one':
             new_rdmols = Chem.rdmolops.ReplaceSubstructs(
-                rdmol, query, replacer_smarts, replaceAll=True
+                rdmol, query, replacer_smarts, replaceAll=False
             )
             new_rdmol = self._generator.choice(
                 new_rdmols
