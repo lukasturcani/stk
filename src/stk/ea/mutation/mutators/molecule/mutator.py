@@ -46,8 +46,15 @@ class MoleculeMutator:
         :class:`.MutationRecord`
             A record of the mutation.
 
-        None : :class:`NoneType`
-            If `record` cannot be mutated.
+        Raises
+        ------
+        :class:`.MutationPreconditionViolation`
+            If the molecule which is meant to be mutated cannot be,
+            because it does not satisfy the necessary preconditions for
+            the mutation operation. Reading the documentation of
+            :class:`.MutationPreconditionViolation`
+            is strongly strongly recommended for understanding why
+            you might want to raise this error.
 
         """
 

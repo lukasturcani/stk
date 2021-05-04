@@ -106,6 +106,21 @@ class RandomBuildingBlock(MoleculeMutator):
         self._generator = np.random.RandomState(random_seed)
 
     def mutate(self, record):
+        """
+        Return a mutant of `record`.
+
+        Parameters
+        ----------
+        record : :class:`.MoleculeRecord`
+            The molecule to be mutated.
+
+        Returns
+        -------
+        :class:`.MutationRecord`
+            A record of the mutation.
+
+        """
+
         # Choose the building block which undergoes mutation.
         replaceable_building_blocks = tuple(filter(
             self._is_replaceable,
