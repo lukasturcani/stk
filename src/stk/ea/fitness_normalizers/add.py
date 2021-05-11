@@ -76,9 +76,36 @@ class Add(FitnessNormalizer):
     You can use the `filter` parameter to exclude records from the
     normalization
 
-    .. code-block:: python
+    .. testcode:: incrementing-fitness-values-by-a-set-of-values
 
         import stk
+        import numpy as np
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(0, 0, 0),
+                normalized=False,
+            ),
+            # This will have a fitness value of None.
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ),
+        )
 
         normalizer = stk.Add(
             number=(1, 2, 3),
@@ -87,6 +114,19 @@ class Add(FitnessNormalizer):
                 record.get_fitness_value() is not None,
         )
         normalized = tuple(normalizer.normalize(population))
+
+        # Calling normalizer.normalize() will return a new
+        # population holding the molecule records with normalized
+        # fitness values.
+        normalized_population = tuple(normalizer.normalize(
+            population=population,
+        ))
+        normalized_record1, normalized_record2 = normalized_population
+        assert np.all(np.equal(
+            normalized_record1.get_fitness_value(),
+            (1, 2, 3),
+        ))
+        assert normalized_record2.get_fitness_value() is None
 
     """
 
