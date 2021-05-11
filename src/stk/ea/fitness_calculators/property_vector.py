@@ -125,7 +125,7 @@ class PropertyVector(FitnessCalculator):
     .. testcode:: storing-fitness-values-in-a-database
         :hide:
 
-        assert value == value1
+        assert value == tuple(value1)
 
     .. testcleanup:: storing-fitness-values-in-a-database
 
