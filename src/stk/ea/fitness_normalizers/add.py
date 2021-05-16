@@ -113,7 +113,6 @@ class Add(FitnessNormalizer):
             filter=lambda population, record:
                 record.get_fitness_value() is not None,
         )
-        normalized = tuple(normalizer.normalize(population))
 
         # Calling normalizer.normalize() will return a new
         # population holding the molecule records with normalized
