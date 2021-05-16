@@ -118,7 +118,7 @@ class Power(FitnessNormalizer):
     You can use the `filter` parameter to exclude records from the
     normalization
 
-    .. testcode:: selectivley-normalizing-fitness-values
+    .. testcode:: selectively-normalizing-fitness-values
 
         import stk
         import numpy as np
