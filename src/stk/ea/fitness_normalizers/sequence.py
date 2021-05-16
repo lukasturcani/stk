@@ -8,6 +8,11 @@ from .fitness_normalizer import FitnessNormalizer
 
 
 class NormalizerSequence(FitnessNormalizer):
+    """
+    Applies other normalizers in sequence.
+
+    """
+
     def __init__(self, fitness_normalizers):
         self._fitness_normalizers = fitness_normalizers
 

@@ -38,7 +38,6 @@ class ShiftUp(FitnessNormalizer):
             [1, -5, 5]
             [3, -10, 2]
             [2, 20, 1]
-        }
 
     After normalization the fitness values will be.
 
@@ -60,17 +59,52 @@ class ShiftUp(FitnessNormalizer):
     To ensure that the final sum is positive, each component must
     also be positive.
 
-    .. code-block:: python
+    .. testcode:: ensuring-positive-fitness-values
+
+        import stk
+        import numpy as np
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(1, -2, 3),
+                normalized=False,
+            ),
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(4, 5, -6),
+                normalized=False,
+            ),
+        )
 
         # Create the normalizer.
-        shifter = ShiftUp()
+        shifter = stk.ShiftUp()
 
-        # Normalize the fitness values. Assume the fitness values in
-        # population are (1, -2, 3), (4, 5, -6), (7, 8, 9).
-        normalized = tuple(shifter.normalize(population))
-
-        # Fitness values in normalized are
-        # (1, 1, 10), (4, 8, 1), (7, 11, 16).
+        normalized_population = tuple(shifter.normalize(population))
+        normalized_record1, normalized_record2 = normalized_population
+        assert np.all(np.equal(
+            normalized_record1.get_fitness_value(),
+            (1, 1, 10),
+        ))
+        assert np.all(np.equal(
+            normalized_record2.get_fitness_value(),
+            (4, 8, 1),
+        ))
 
     """
 
