@@ -20,9 +20,35 @@ class ReplaceFitness(FitnessNormalizer):
     may be ``None`` because the fitness calculation failed for some
     reason.
 
-    .. code-block:: python
+    .. testcode:: giving-a-fitness-value-to-failed-calculations
 
         import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=2,
+                normalized=False,
+            ),
+            # This will have a fitness value of None.
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ),
+        )
 
         def get_minimum_fitness_value(population):
             return min(
@@ -41,7 +67,10 @@ class ReplaceFitness(FitnessNormalizer):
         )
 
         # Use the replacer.
-        normalized = tuple(replacer.normalize(population))
+        normalized_population = tuple(replacer.normalize(population))
+        normalized_record1, normalized_record2 = normalized_population
+        assert normalized_record1.get_fitness_value() == 2
+        assert normalized_record2.get_fitness_value() == 1
 
     """
 
