@@ -18,12 +18,14 @@ class IodoFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.Iodo`
     functional groups. You want the non-iodine atom in those
     functional groups to be the *bonder* atom, and the iodine atom
     to be the *deleter* atom.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -31,6 +33,16 @@ class IodoFactory(FunctionalGroupFactory):
             smiles='ICCCI',
             functional_groups=(stk.IodoFactory(), ),
         )
+
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Iodo)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
 
     See Also
     --------
