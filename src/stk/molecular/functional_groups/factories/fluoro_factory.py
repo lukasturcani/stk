@@ -18,12 +18,14 @@ class FluoroFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.Fluoro`
     functional groups. You want the non-fluorine atom in those
     functional groups to be the *bonder* atom, and the fluorine atom
     to be the *deleter* atom.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -31,6 +33,16 @@ class FluoroFactory(FunctionalGroupFactory):
             smiles='FCCCF',
             functional_groups=(stk.FluoroFactory(), ),
         )
+
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Fluoro)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
 
     See Also
     --------
