@@ -95,7 +95,7 @@ class RandomBuildingBlock(MoleculeMutator):
         name : :class:`str`, optional
             A name to help identify the mutator instance.
 
-        random_seed : :class:`bool`, optional
+        random_seed : :class:`int`, optional
             The random seed to use.
 
         """
