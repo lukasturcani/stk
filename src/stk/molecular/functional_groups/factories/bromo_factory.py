@@ -18,11 +18,13 @@ class BromoFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.Bromo`
     functional groups. You want the atom bonded to the bromine to be
     the *bonder* atom, and the bromine atom to be the *deleter* atom.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -30,6 +32,16 @@ class BromoFactory(FunctionalGroupFactory):
             smiles='BrCCCBr',
             functional_groups=(stk.BromoFactory(), ),
         )
+
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Bromo)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
 
     See Also
     --------

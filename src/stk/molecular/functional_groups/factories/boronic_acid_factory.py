@@ -18,12 +18,14 @@ class BoronicAcidFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.BoronicAcid`
     functional groups. You want the boron atom in those functional
     groups to be the *bonder* atom and the OH groups to be *deleter*
     atoms.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -32,12 +34,24 @@ class BoronicAcidFactory(FunctionalGroupFactory):
             functional_groups=(stk.BoronicAcidFactory(), ),
         )
 
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.BoronicAcid)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
+
+    *Changing the Bonder and Deleter Atoms*
+
     You want to create a building block which has :class:`.BoronicAcid`
     functional groups. You want the oxygen atoms to be treated as
     *bonder* atoms, and the hydrogen atoms to be treated as *deleter*
     atoms.
 
-    .. code-block:: python
+    .. testcode:: changing-the-bonder-and-deleter-atoms
 
         import stk
 
@@ -52,6 +66,30 @@ class BoronicAcidFactory(FunctionalGroupFactory):
         building_block = stk.BuildingBlock(
             smiles='OB(O)CCCB(O)O',
             functional_groups=(boronic_acid_factory, ),
+        )
+
+    .. testcode:: changing-the-bonder-and-deleter-atoms
+        :hide:
+
+        fg1, fg2 = building_block.get_functional_groups()
+        assert fg1.get_num_bonders() == 2
+        assert sum(1 for _ in fg1.get_deleters()) == 2
+        assert fg2.get_num_bonders() == 2
+        assert sum(1 for _ in fg2.get_deleters()) == 2
+
+        assert all(
+            isinstance(atom, stk.O)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
+        assert all(
+            isinstance(atom, stk.H)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_deleters()
         )
 
 
