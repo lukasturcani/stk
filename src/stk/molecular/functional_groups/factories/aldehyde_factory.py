@@ -18,6 +18,8 @@ class AldehydeFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.Aldehyde`
     functional groups. You want the carbon atom in those functional
     groups to be the bonder atom, and the oxygen atom to be the
