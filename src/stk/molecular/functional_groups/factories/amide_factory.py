@@ -91,7 +91,6 @@ class AmideFactory(FunctionalGroupFactory):
             in functional_group.get_deleters()
         )
 
-
     See Also
     --------
     :class:`.GenericFunctionalGroup`
