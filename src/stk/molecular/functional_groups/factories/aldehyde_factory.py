@@ -25,7 +25,6 @@ class AldehydeFactory(FunctionalGroupFactory):
     groups to be the bonder atom, and the oxygen atom to be the
     deleter atom.
 
-
     .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
