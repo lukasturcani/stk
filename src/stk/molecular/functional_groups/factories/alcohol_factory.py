@@ -25,7 +25,7 @@ class AlcoholFactory(FunctionalGroupFactory):
     groups to be the bonder atom, and the hydrogen atom to be the
     deleter atom.
 
-    .. testcode:: creating-alcohol-functional-groups-with-the-factory
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -34,7 +34,7 @@ class AlcoholFactory(FunctionalGroupFactory):
             functional_groups=(stk.AlcoholFactory(), ),
         )
 
-    .. testcode:: creating-alcohol-functional-groups-with-the-factory
+    .. testcode:: creating-functional-groups-with-the-factory
         :hide:
 
         assert all(
