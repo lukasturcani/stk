@@ -30,7 +30,7 @@ class M4L6Tetrahedron(Cage):
 
     Examples
     --------
-    *Building Metal-Organic Tetrahedron*
+    *Building a Metal-Organic Tetrahedron*
 
     Many metal-organic cages are built using a process called
     subcomponent self-assembly, which is a complex chemical process
@@ -43,12 +43,12 @@ class M4L6Tetrahedron(Cage):
     added a bromine atom at the disconnection to perform the cage
     reaction.
 
-    .. code-block:: python
+    .. testcode:: building-a-metal-organic-tetrahedron
 
         import stk
 
         # Define coordinating ligand with dummy bromine groups and
-        # metal coordianting functional groups.
+        # metal coordinating functional groups.
         bb1 = stk.BuildingBlock(
             smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
@@ -69,7 +69,7 @@ class M4L6Tetrahedron(Cage):
     process completes all metal-ligand reactions performed during the
     subcomponent self-assembly process.
 
-    .. code-block:: python
+    .. testcode:: building-a-metal-organic-tetrahedron
 
         # Produce a Fe+2 atom with 6 functional groups.
         iron_atom = stk.BuildingBlock(
@@ -93,7 +93,7 @@ class M4L6Tetrahedron(Cage):
     bromine functional groups, which becomes the metal-based
     building block of any cage formed by this process.
 
-    .. code-block:: python
+    .. testcode:: building-a-metal-organic-tetrahedron
 
         # Assign Bromo functional groups to the metal complex.
         iron_oct_delta = stk.BuildingBlock.init_from_molecule(
@@ -104,7 +104,7 @@ class M4L6Tetrahedron(Cage):
     Finally, we build the :class:`M4L6Tetrahedron` cage using this
     building block.
 
-    .. code-block:: python
+    .. testcode:: building-a-metal-organic-tetrahedron
 
         # Build an M4L6 Tetrahedron.
         cage2 = stk.ConstructedMolecule(
