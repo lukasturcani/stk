@@ -163,7 +163,7 @@ class Cage(TopologyGraph):
     :class:`.Cage` instances can be made by providing the building
     block molecules only (using :class:`.FourPlusSix` as an example)
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         import stk
 
@@ -172,7 +172,7 @@ class Cage(TopologyGraph):
             smiles='O=CC(C=O)C=O',
             functional_groups=[stk.AldehydeFactory()],
         )
-        cage1 = stk.ConstructedMolecule(
+        cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
         )
 
@@ -185,9 +185,17 @@ class Cage(TopologyGraph):
     :class:`.Collapser` optimizer.
 
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
 
-        cage1 = stk.ConstructedMolecule(
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+
+        cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks=(bb1, bb2),
                 optimizer=stk.MCHammer(),
@@ -199,9 +207,17 @@ class Cage(TopologyGraph):
     Different structural isomers of cages can be made by using the
     `vertex_alignments` optional parameter
 
-    .. code-block:: python
+    .. testcode:: structural-isomer-construction
 
-        cage2 = stk.ConstructedMolecule(
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+
+        cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks=(bb1, bb2),
                 vertex_alignments={0: 1, 1: 1, 2: 2},
@@ -223,7 +239,9 @@ class Cage(TopologyGraph):
     of functional groups, you have to assign each building block to the
     vertex you want to place it on
 
-    .. code-block:: python
+    .. testcode:: multi-building-block-cage-construction
+
+        import stk
 
         bb1 = stk.BuildingBlock(
             smiles='O=CC(C=O)C=O',
@@ -240,7 +258,7 @@ class Cage(TopologyGraph):
         )
         bb5 = stk.BuildingBlock('NCCCCN', [stk.PrimaryAminoFactory()])
 
-        cage = stk.ConstructedMolecule(
+        cage1 = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 # building_blocks is now a dict, which maps building
                 # blocks to the id of the vertices it should be placed
@@ -257,9 +275,9 @@ class Cage(TopologyGraph):
 
     You can combine this with the `vertex_alignments` parameter
 
-    .. code-block:: python
+    .. testcode:: multi-building-block-cage-construction
 
-        cage = stk.ConstructedMolecule(
+        cage2 = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks={
                     bb1: range(2),
@@ -268,8 +286,8 @@ class Cage(TopologyGraph):
                     bb4: 5,
                     bb5: range(6, 10),
                 },
+                vertex_alignments={0: 1, 1: 1, 2: 2},
             ),
-            vertex_alignments={0: 1, 1: 1, 2: 2},
         )
 
     *Metal-Organic Cage Construction*
