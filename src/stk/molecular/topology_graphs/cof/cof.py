@@ -86,7 +86,7 @@ class Cof(TopologyGraph):
     block molecules and lattice size only (using :class:`.Honeycomb`
     as an example)
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         import stk
 
@@ -103,7 +103,12 @@ class Cof(TopologyGraph):
     For periodic systems, the :class:`.PeriodicCollapser` is
     recommended.
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
         # Nonperiodic.
         cof = stk.ConstructedMolecule(
@@ -132,7 +137,12 @@ class Cof(TopologyGraph):
     :class:`.PeriodicConstructionResult` returned by calling
     :meth:`.Cof.construct`
 
-    .. code-block:: python
+    .. testcode:: accessing-the-periodic-information
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
         topology_graph = stk.cof.PeriodicHoneycomb(
             building_blocks=(bb1, bb2),
@@ -158,6 +168,12 @@ class Cof(TopologyGraph):
             path='cof.pdb',
             periodic_info=periodic_info,
         )
+
+    .. testcleanup:: accessing-the-periodic-information
+
+        import os
+        os.remove('cof.pdb')
+
 
     *Structural Isomer Construction*
 
