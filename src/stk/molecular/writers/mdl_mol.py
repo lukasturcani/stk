@@ -22,11 +22,15 @@ class MolWriter:
         writer = stk.MolWriter()
         writer.write(molecule=bb1, path='bb1.mol')
 
-    .. testcleanup:: writing-to-a-file
+    .. testcode:: writing-to-a-file
+        :hide:
 
         import os
 
         assert os.path.exists('bb1.mol')
+
+    .. testcleanup:: writing-to-a-file
+
         os.remove('bb1.mol')
 
     """
