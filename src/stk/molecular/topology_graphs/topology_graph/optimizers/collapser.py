@@ -21,16 +21,21 @@ class Collapser(Optimizer):
     Using :class:`.Collapser` will lead to
     :class:`.ConstructedMolecule` structures without long bonds.
 
-    .. code-block:: python
+    .. testcode:: structure-optimization
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
 
         polymer = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2),
                 repeating_unit='AB',
+                num_repeating_units=2,
                 optimizer=stk.Collapser(),
             ),
         )
-        polymer.write(f'polymer_opt.mol')
 
     Optimisation with :mod:`stk` simply collects the final position
     matrix. The optimisation's trajectory can be output using the
