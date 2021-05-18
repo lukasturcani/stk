@@ -13,7 +13,7 @@ class MolWriter:
     --------
     *Writing to a File*
 
-    .. code-block:: python
+    .. testcode:: writing-to-a-file
 
         import stk
 
@@ -21,6 +21,13 @@ class MolWriter:
 
         writer = stk.MolWriter()
         writer.write(molecule=bb1, path='bb1.mol')
+
+    .. testcleanup:: writing-to-a-file
+
+        import os
+
+        assert os.path.exists('bb1.mol')
+        os.remove('bb1.mol')
 
     """
 
