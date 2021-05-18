@@ -27,7 +27,7 @@ class ConstructedMolecule(Molecule):
     :class:`.TopologyGraph`, which is typically initialized from some
     :class:`.BuildingBlock` instances.
 
-    .. code-block:: python
+    .. testcode:: initialization
 
         import stk
 
@@ -37,20 +37,32 @@ class ConstructedMolecule(Molecule):
             functional_groups=[stk.AldehydeFactory()],
         )
         tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
-        cage1 = stk.ConstructedMolecule(tetrahedron)
+        cage = stk.ConstructedMolecule(tetrahedron)
+
+    *Hierarchical Construction*
 
     A :class:`ConstructedMolecule` may be used to construct other
     :class:`ConstructedMolecule` instances, though you will probably
     have to convert it to a :class:`.BuildingBlock` first
 
-    .. code-block:: python
+    .. testcode:: hierarchical-construction
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)CC=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
+        cage = stk.ConstructedMolecule(tetrahedron)
 
         benzene = stk.BuildingBlock('c1ccccc1')
         cage_complex = stk.host_guest.Complex(
-            host=stk.BuildingBlock.init_from_molecule(cage1),
+            host=stk.BuildingBlock.init_from_molecule(cage),
             guest=benzene,
         )
-        cage_complex = stk.ConstructedMolecule(host_guest_complex)
+        cage_complex = stk.ConstructedMolecule(cage_complex)
 
     Obviously, the initialization of the :class:`.ConstructedMolecule`
     depends mostly on the specifics of the :class:`.TopologyGraph`
