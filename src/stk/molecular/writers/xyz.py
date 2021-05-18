@@ -13,7 +13,7 @@ class XyzWriter:
     --------
     *Writing to a File*
 
-    .. code-block:: python
+    .. testcode:: writing-to-a-file
 
         import stk
 
@@ -21,6 +21,17 @@ class XyzWriter:
 
         writer = stk.XyzWriter()
         writer.write(molecule=bb1, path='bb1.xyz')
+
+    .. testcode:: writing-to-a-file
+        :hide:
+
+        import os
+
+        assert os.path.exists('bb1.xyz')
+
+    .. testcleanup:: writing-to-a-file
+
+        os.remove('bb1.xyz')
 
     """
 
