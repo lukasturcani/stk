@@ -108,6 +108,70 @@ class FunctionalGroup:
     The source code of the subclasses, listed in
     :mod:`.functional_group`, can serve as good examples.
 
+    *Changing the Atoms of a Functional Group*
+
+    You want to substitute the atoms in the functional group for other
+    atoms. You can do this by using :meth:`.with_atoms` to create a
+    clone of the functional group, which holds the replacement atoms
+
+    .. testcode:: changing-the-atoms-of-a-functional-group
+
+        import stk
+
+        c, n, h1, h2 = stk.C(0), stk.N(1), stk.H(2), stk.H(3)
+        amine = stk.PrimaryAmino(
+            nitrogen=n,
+            hydrogen1=h1,
+            hydrogen2=h2,
+            atom=c,
+            bonders=(n, ),
+            deleters=(h1, h2),
+        )
+
+        n20 = stk.N(20)
+        h100 = stk.H(100)
+
+        # amine_clone is a clone of amine, except that instead of
+        # holding n, amine_clone holds n20, and instead of holding h1
+        # amine_clone holds h100. amine_clone continues to hold h2.
+        amine_clone = amine.with_atoms({
+            n.get_id(): n20,
+            h1.get_id(): h100,
+        })
+
+    .. testcode:: changing-the-atoms-of-a-functional-group
+        :hide:
+
+        _atoms = set(amine.get_atom_ids())
+        assert n.get_id() in _atoms
+        assert n20.get_id() not in _atoms
+        assert h1.get_id() in _atoms
+        assert h100.get_id()  not in _atoms
+
+        _clone_atoms = set(amine_clone.get_atom_ids())
+        assert n.get_id() not in _clone_atoms
+        assert n20.get_id() in _clone_atoms
+        assert h1.get_id() not in _clone_atoms
+        assert h100.get_id() in _clone_atoms
+
+        _bonders = set(amine.get_bonder_ids())
+        assert n.get_id() in _bonders
+        assert n20.get_id() not in _bonders
+
+        _clone_bonders = set(amine_clone.get_bonder_ids())
+        assert n.get_id() not in _clone_bonders
+        assert n20.get_id() in _clone_bonders
+
+        _deleters = set(amine.get_deleter_ids())
+        assert h1.get_id() in _deleters
+        assert h2.get_id() in _deleters
+        assert h100.get_id() not in _deleters
+
+        _clone_deleters = set(amine_clone.get_deleter_ids())
+        assert h1.get_id() not in _clone_deleters
+        assert h2.get_id() in _clone_deleters
+        assert h100.get_id() in _clone_deleters
+
     """
 
     def __init__(self, atoms, placers, core_atoms):
@@ -227,33 +291,6 @@ class FunctionalGroup:
         :class:`.FunctionalGroup`
             The clone. Has the same type as the original functional
             group.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            import stk
-
-            n, h1, h2 = stk.N(0), stk.H(1), stk.H(2)
-            amine = stk.PrimaryAmino(
-                nitrogen=n,
-                hydrogen1=h1,
-                hydrogen2=h2,
-                bonders=(n, ),
-                deleters=(h1, h2),
-            )
-
-            n20 = stk.N(20)
-            h100 = stk.H(100)
-
-            # fg_clone is a clone of fg, except that instead of holding
-            # n, fg_clone holds n20, and instead of holding h1
-            # fg_clone holds h100. fg_clone continues to hold h2.
-            fg_clone = fg.with_atoms({
-                n.get_id(): n20,
-                h1.get_id(): h100,
-            })
-
 
         """
 
