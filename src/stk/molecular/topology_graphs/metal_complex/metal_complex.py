@@ -70,7 +70,7 @@ class MetalComplex(TopologyGraph):
     need to define a metal :class:`.BuildingBlock`, consisting of
     1 atom and multiple functional groups
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         import stk
 
@@ -85,7 +85,7 @@ class MetalComplex(TopologyGraph):
 
     We also need to define an organic ligand :class:`.BuildingBlock`
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         # Define an organic linker with two functional groups.
         bidentate = stk.BuildingBlock(
@@ -106,7 +106,7 @@ class MetalComplex(TopologyGraph):
 
     Finally, we can create the :class:`.MetalComplex`.
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         complex = stk.ConstructedMolecule(
             topology_graph=stk.metal_complex.OctahedralLambda(
@@ -120,7 +120,34 @@ class MetalComplex(TopologyGraph):
     For :class:`.MetalComplex` topologies, it is recommend to use the
     :class:`.MCHammer` optimizer.
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
+
+        import stk
+
+        metal = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bidentate = stk.BuildingBlock(
+            smiles='C=NC/C=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
 
         complex = stk.ConstructedMolecule(
             topology_graph=stk.metal_complex.OctahedralLambda(
@@ -137,7 +164,34 @@ class MetalComplex(TopologyGraph):
     specify the exact vertex each metal or ligand needs to be placed
     on.
 
-    .. code-block:: python
+    .. testcode:: construction-with-multiple-metals-and-ligands
+
+        import stk
+
+        metal = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bidentate1 = stk.BuildingBlock(
+            smiles='C=NC/C=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
 
         # Define a second organic linker with two functional groups.
         bidentate2 = stk.BuildingBlock(
@@ -161,7 +215,7 @@ class MetalComplex(TopologyGraph):
             stk.metal_complex.OctahedralLambda(
                 metals=metal,
                 ligands={
-                    bidentate: (0, 1),
+                    bidentate1: (0, 1),
                     bidentate2: (2, ),
                 },
             )
@@ -182,7 +236,7 @@ class MetalComplex(TopologyGraph):
     here we show how to build a square planar
     palladium(II) complex with two open metal sites.
 
-    .. code-block:: python
+    .. testcode:: leaving-unsubstituted-sites
 
         import stk
 
@@ -210,7 +264,7 @@ class MetalComplex(TopologyGraph):
         # Construct a cis-protected square planar metal complex.
         complex = stk.ConstructedMolecule(
             stk.metal_complex.CisProtectedSquarePlanar(
-                metals=pd_metal,
+                metals=pd,
                 ligands=bidentate_ligand,
             )
         )
