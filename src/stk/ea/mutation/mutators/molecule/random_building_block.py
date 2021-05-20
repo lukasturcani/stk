@@ -23,7 +23,7 @@ class RandomBuildingBlock(MoleculeMutator):
     --------
     *Constructed Molecule Mutation*
 
-    .. code-block:: python
+    .. testcode:: constructed-molecule-mutation
 
         import stk
 
