@@ -26,7 +26,7 @@ class Tournament(Selector):
     Yielding molecules one at a time. For example, if molecules need
     to be selected for mutation or the next generation.
 
-    .. code-block:: python
+    .. testcode:: yielding-single-molecule-batches
 
         import stk
 
@@ -36,11 +36,26 @@ class Tournament(Selector):
             batch_size=1
         )
 
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(100)
+        )
+
         # Select the molecules.
         for selected, in tournament.select(population):
-            # Do stuff with each selected molecule, like apply a
-            # mutation to it to generate a mutant.
-            mutation_record = mutator.mutate(selected)
+            # Do stuff with each selected molecule.
+            pass
 
     """
 
