@@ -245,7 +245,7 @@ class Macrocycle(TopologyGraph):
         if len(orientations) == len(repeating_unit):
             orientations = orientations*num_repeating_units
 
-        chain_length = len(repeating_unit)*num_repeating_units
+        chain_length = len(repeating_unit)*num_repeating_units*1*2/2
         if chain_length == 2:
             warnings.warn(
                 'The orientation of macrocycles with chain length '
