@@ -16,6 +16,7 @@ class RemoveMolecules(Selector):
     *Removing Molecules From Selection*
 
     .. code-block:: python
+    .. testcode:: removing-molecules-from-selection
 
         import stk
 
@@ -26,11 +27,26 @@ class RemoveMolecules(Selector):
             # Select the ret of the molecules using roulette.
             selector=stk.Roulette(num_batches=20, batch_size=3),
         )
-
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(10)
+        )
         for batch in selector.select(population):
             # Do stuff with batch. The batch is guaranteed not to
             # contain any molecules which are found in the best 5
             # batches of size 3.
+            pass
 
     """
 
