@@ -102,7 +102,7 @@ class AboveAverage(Selector):
 
         # Select the molecules.
         for selected1, selected2 in above_avg.select(population):
-            # Do stuff with the selected molecules
+            # Do stuff with the selected molecules.
             pass
 
     """

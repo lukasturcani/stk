@@ -36,35 +36,67 @@ class Roulette(Selector):
     Yielding molecules one at a time. For example, if molecules need
     to be selected for mutation or the next generation
 
-    .. code-block:: python
+    .. testcode:: yielding-single-molecule-batches
 
         import stk
 
         # Make the selector.
-        roulette = stk.Roulette()
+        roulette = stk.Roulette(num_batches=5)
+
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(100)
+        )
 
         # Select the molecules.
         for selected, in roulette.select(population):
-            # Do stuff with each selected molecule, like apply a
-            # mutation to it to generate a mutant.
-            mutation_record = mutator.mutate(selected)
+            # Do stuff with each selected molecule.
+            pass
+
 
     *Yielding Batches Holding Multiple Molecules*
 
     Yielding multiple molecules at once. For example, if molecules need
     to be selected for crossover
 
-    .. code-block:: python
+    .. testcode:: yielding-batches-holding-multiple-molecules
+
+        import stk
 
         # Make the selector.
-        roulette = stk.Roulette(batch_size=2)
+        roulette = stk.Roulette(num_batches=5, batch_size=2)
+
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(100)
+        )
 
         # Select the molecules.
-        for selected in roulette.select(population):
-            # selected is a tuple of length 2, holding the selected
-            # molecules. You can do stuff with the selected molecules
-            # Like apply crossover operations on them.
-            crossover_records = tuple(crosser.cross(selected))
+        for selected1, selected2 in roulette.select(population):
+            # Do stuff to the molecules.
+            pass
 
     """
 

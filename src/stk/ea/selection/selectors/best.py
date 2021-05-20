@@ -101,7 +101,7 @@ class Best(Selector):
 
         # Select the molecules.
         for selected1, selected2 in best.select(population):
-            # Do stuff with the selected molecules
+            # Do stuff with the selected molecules.
             pass
 
     """
