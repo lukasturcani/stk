@@ -214,28 +214,40 @@ def flatten(iterable, excluded_types=None):
     """
     Transforms an nested iterable into a flat one.
 
-    For example
+    Examples
+    --------
+    *Flattening a Deeply Nested Structure*
 
-    .. code-block:: python
+    .. testcode:: flattening-a-deeply-nested-structure
 
-        [[1,2,3], [[4], [5],[[6]], 7]
+        import stk
 
-    becomes
+        nested = [[1, 2, 3], [[4], [5], [[6]], 7]]
+        print(list(stk.flatten(nested)))
 
-    .. code-block:: python
+    gives
 
-        [1,2,3,4,5,6,7]
+    .. testoutput:: flattening-a-deeply-nested-structure
+
+        [1, 2, 3, 4, 5, 6, 7]
+
+    *Avoiding Flattening of Some Types*
 
     If a type is found in `excluded_types` it will not be yielded from.
-    For example if ``str`` is in `excluded_types`
+    For example, ``str`` is in `excluded_types` by default, so
 
-    .. code-block:: python
+    .. testcode:: avoiding-flattening-of-some-types
 
-        a = ["abcd", ["efgh"]]
+        import stk
 
-    "abcd" and "efgh" are yielded if `a` is passed to `iterable`. If
-    `str` was not in `excluded_types` then "a", "b", "c", "d", "e",
-    "f", "g" and "h" would all be yielded individually.
+        nested = ['abcd', ['efgh']]
+        print(list(stk.flatten(nested)))
+
+    gives
+
+    .. testoutput:: avoiding-flattening-of-some-types
+
+        ['abcd', 'efgh']
 
     Parameters
     ----------
@@ -714,19 +726,59 @@ def tar_output():
         tar.add('output')
 
 
+def _printer(time_taken):
+    m, s = divmod(time_taken, 60)
+    h, m = divmod(m, 60)
+    print(f'\nTime taken was {int(h)} : {int(m)} : {int(s)}.\n\n')
+
+
 @contextmanager
-def time_it():
+def time_it(output=_printer):
     """
     Times the code executed within the indent.
 
+    Parameters
+    ----------
+    output : :class:`callable`, optional
+        A function which takes the time taken for the code block to
+        execute as its only input. Can be used to redirect or format
+        the output.
+
+    Examples
+    --------
+    *Timing the Execution of a Function*
+
     This is a context manager so it should be used as:
 
-    .. code-block:: python
+    .. testsetup:: timing-the-execution-of-a-function
 
-        with time_it():
-            something1()
-            something2()
-            something3()
+        import stk
+        # Do not print the output in the test because the time taken
+        # is expected to vary wildy.
+        _time_it = stk.time_it
+        stk.time_it = lambda: _time_it(
+            output=lambda time_taken: print('test'),
+        )
+
+    .. testcode:: timing-the-execution-of-a-function
+
+        import stk
+
+        with stk.time_it():
+            print('a')
+            print('b')
+            print('c')
+
+    .. testoutput:: timing-the-execution-of-a-function
+
+        a
+        b
+        c
+        test
+
+    .. testcleanup:: timing-the-execution-of-a-function
+
+        stk.time_it = _time_it
 
     After all 3 functions are finished and the nested block is exited
     the time taken to process the entire block is printed.
@@ -735,10 +787,7 @@ def time_it():
 
     start = time.time()
     yield
-    time_taken = time.time() - start
-    m, s = divmod(time_taken, 60)
-    h, m = divmod(m, 60)
-    print(f'\nTime taken was {int(h)} : {int(m)} : {int(s)}.\n\n')
+    output(time.time() - start)
 
 
 def vector_angle(vector1, vector2):
