@@ -22,14 +22,64 @@ class ProgressPlotter:
 
     Examples
     --------
-    *Plotting How Fitness Value Changes Across Generations*
+    *Plotting How Fitness Values Change Across Generations*
 
-    .. code-block:: python
+    .. testcode:: plotting-how-fitness-values-change-across-generations
 
         import stk
 
         # Initialize an EA somehow.
-        ea = stk.EvolutionaryAlgorithm(...)
+        ea = stk.EvolutionaryAlgorithm(
+            initial_population=(
+                stk.MoleculeRecord(
+                    topology_graph=stk.polymer.Linear(
+                        building_blocks=(
+                            stk.BuildingBlock(
+                                smiles='BrCCBr',
+                                functional_groups=[stk.BromoFactory()],
+                            ),
+                        ),
+                        repeating_unit='A',
+                        num_repeating_units=i,
+                    ),
+                )
+                for i in range(2, 22)
+            ),
+            fitness_calculator=stk.FitnessFunction(
+                fitness_function=lambda molecule:
+                    molecule.get_num_atoms(),
+            ),
+            mutator=stk.RandomBuildingBlock(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrC[Si]CCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrCCCCCCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                is_replaceable=lambda building_block: True
+            ),
+            crosser=stk.GeneticRecombination(
+                get_gene=lambda building_block: 0
+            ),
+            generation_selector=stk.Best(
+                num_batches=22,
+                duplicate_molecules=False,
+            ),
+            mutation_selector=stk.Roulette(
+                num_batches=5,
+                random_seed=10,
+            ),
+            crossover_selector=stk.Roulette(
+                num_batches=5,
+                batch_size=2,
+                random_seed=10,
+            ),
+            num_processes=1,
+        )
 
         generations = []
         for generation in ea.get_generations(10):
@@ -43,6 +93,14 @@ class ProgressPlotter:
             y_label='Fitness'
         )
         progress.write('fitness_plot.png')
+
+    .. testcode:: plotting-how-fitness-values-change-across-generations
+        :hide:
+
+        import os
+
+        assert os.path.exists('fitness_plot.png')
+        os.remove('fitness_plot.png')
 
     *Plotting How a Molecular Property Changes Across Generations*
 
