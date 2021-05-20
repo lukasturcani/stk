@@ -12,7 +12,7 @@ import mchammer as mch
 
 class MCHammer(Optimizer):
     """
-    Performs Monte Carlo optimisation of long-bonds in molecule [1]_.
+    Performs Monte Carlo optimisation of long-bonds in molecules [1]_.
 
     Examples
     --------
