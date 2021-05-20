@@ -5,6 +5,7 @@ Macrocycle
 """
 
 import numpy as np
+import warnings
 
 from .vertices import _CycleVertex
 from ..topology_graph import TopologyGraph, NullOptimizer, Edge
@@ -245,6 +246,13 @@ class Macrocycle(TopologyGraph):
             orientations = orientations*num_repeating_units
 
         chain_length = len(repeating_unit)*num_repeating_units
+        if chain_length == 2:
+            warnings.warn(
+                'The orientation of macrocycles with chain length '
+                f'{chain_length} is not expected to provide robust '
+                'alignment and bonding.'
+            )
+
         if len(orientations) != chain_length:
             raise ValueError(
                 'The length of orientations must match either '
