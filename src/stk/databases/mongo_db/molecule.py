@@ -318,7 +318,7 @@ class MoleculeMongoDb(MoleculeDatabase):
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
             the cache. When ``None``, defaults to
-            'building_block_position_matrices`.
+            ``'building_block_position_matrices'``.
 
         jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
