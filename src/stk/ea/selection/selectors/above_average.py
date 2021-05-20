@@ -22,35 +22,88 @@ class AboveAverage(Selector):
     Yielding molecules one at a time. For example, if molecules need
     to be selected for mutation or the next generation
 
-    .. code-block:: python
+    .. testcode:: yielding-single-molecule-batches
 
         import stk
 
         # Make the selector.
         above_avg = stk.AboveAverage()
 
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(1),
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(2)
+        )
+
         # Select the molecules.
         for selected, in above_avg.select(population):
-            # Do stuff with each selected molecule, like apply a
-            # mutation to it to generate a mutant.
-            mutation_record = mutator.mutate(selected)
+            # Do stuff with each selected molecule.
+            pass
 
     *Yielding Batches Holding Multiple Molecules*
 
     Yielding multiple molecules at once. For example, if molecules need
     to be selected for crossover.
 
-    .. code-block:: python
+    .. testcode:: yielding-batches-holding-multiple-molecules
 
         import stk
 
         # Make the selector.
         above_avg = stk.AboveAverage(batch_size=2)
 
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(1),
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(2)
+        )
+
         # Select the molecules.
-        for selected in above_avg.select(population):
-            # selected holds 2 molecules.
-            crossover_records = tuple(crosser.cross(selected))
+        for selected1, selected2 in above_avg.select(population):
+            # Do stuff with the selected molecules
+            pass
 
     """
 
