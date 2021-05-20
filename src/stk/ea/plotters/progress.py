@@ -192,7 +192,7 @@ class ProgressPlotter:
     make. For example, If the fitness calculation failed on a
     molecule, you not want to include in a plot of fitness.
 
-    .. code-block:: python
+    .. testcode:: excluding-molecules-from-the-plot
 
         import stk
 
@@ -258,13 +258,21 @@ class ProgressPlotter:
         progress = stk.ProgressPlotter(
             generations=generations,
             get_property=lambda record: record.get_fitness_value(),
-            y_label='Fitness'
+            y_label='Fitness',
             # Only plot records whose unnormalized fitness value is not
             # None, which means the fitness calculation did not fail.
             filter=lambda record:
                 record.get_fitness_value(normalized=False) is not None,
         )
         progress.write('fitness_plot.png')
+
+    .. testcode:: excluding-molecules-from-the-plot
+        :hide:
+
+        import os
+
+        assert os.path.exists('fitness_plot.png')
+        os.remove('fitness_plot.png')
 
     """
 
