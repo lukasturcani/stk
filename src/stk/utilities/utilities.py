@@ -249,6 +249,12 @@ def flatten(iterable, excluded_types=None):
 
         ['abcd', 'efgh']
 
+    instead of
+
+    .. code-block::
+
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+
     Parameters
     ----------
     iterable : :class:`iterable`
@@ -770,6 +776,7 @@ def time_it(output=_printer):
             print('c')
 
     .. testoutput:: timing-the-execution-of-a-function
+        :hide:
 
         a
         b
