@@ -71,9 +71,13 @@ class SelectionPlotter:
         import os
 
         assert os.path.exists('roulette_counter_1.png')
+        assert os.path.exists('roulette_counter_1.csv')
         assert os.path.exists('roulette_counter_2.png')
+        assert os.path.exists('roulette_counter_2.csv')
         os.remove('roulette_counter_1.png')
+        os.remove('roulette_counter_1.csv')
         os.remove('roulette_counter_2.png')
+        os.remove('roulette_counter_2.csv')
 
     """
 
