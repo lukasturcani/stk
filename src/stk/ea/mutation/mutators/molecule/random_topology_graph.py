@@ -19,18 +19,18 @@ class RandomTopologyGraph(MoleculeMutator):
     --------
     *Constructed Molecule Mutation*
 
-    .. code-block:: python
+    .. testcode:: constructed-molecule-mutation
 
         import stk
 
         # Create a molecule which is to be mutated.
         bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
         bb2 = stk.BuildingBlock(
-            smiles='O=CCC(=O)CC=O',
+            smiles='O=CCC(C=O)CC=O',
             functional_groups=[stk.AldehydeFactory()],
         )
         cage = stk.MoleculeRecord(
-            topology_graph=stk.cage.FourPlusSix((bb1, bb2),
+            topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
         )
 
         # Create functions which replace the topology graph.

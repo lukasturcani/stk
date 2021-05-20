@@ -54,7 +54,7 @@ class RandomBuildingBlock(MoleculeMutator):
 
         def has_primary_amino_group(building_block):
             fg, = building_block.get_functional_groups(0)
-            return fg.__class__ is stk.PrimaryAmino
+            return type(fg) is stk.PrimaryAmino
 
         random_bb = stk.RandomBuildingBlock(
             building_blocks=building_blocks,
