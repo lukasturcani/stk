@@ -15,7 +15,6 @@ class RemoveMolecules(Selector):
     --------
     *Removing Molecules From Selection*
 
-    .. code-block:: python
     .. testcode:: removing-molecules-from-selection
 
         import stk
