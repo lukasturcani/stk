@@ -8,7 +8,7 @@ jobs:
     remake-rst-files:
         runs-on: ubuntu-20.04
         container:
-            image: lukasturcani/stk-test-environment
+            image: ghcr.io/lukasturcani/stk-test-environment
 
         steps:
             - name: Git checkout
