@@ -4,7 +4,9 @@ on: [push, pull_request]
 
 jobs:
     lint:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
+        container:
+            image: stk-test-environment
 
         steps:
             - name: Git checkout
@@ -29,7 +31,9 @@ jobs:
                     --statistics
 
     pytest-stable-linux:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
+        container:
+            image: stk-test-environment
 
         services:
             MongoDB:
@@ -71,7 +75,9 @@ jobs:
                 path: database-dump
 
     doctests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
+        container:
+            image: stk-test-environment
 
         services:
             MongoDB:
@@ -102,7 +108,9 @@ jobs:
                 MOCK_MODULES='FALSE' make -C docs doctest
 
     basic-ea:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
+        container:
+            image: stk-test-environment
 
         services:
             MongoDB:
@@ -147,7 +155,9 @@ jobs:
                 path: rotatable_bonds_progress.png
 
     intermediate-ea:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
+        container:
+            image: stk-test-environment
 
         services:
             MongoDB:
