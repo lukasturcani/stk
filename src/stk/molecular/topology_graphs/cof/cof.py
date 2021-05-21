@@ -86,7 +86,7 @@ class Cof(TopologyGraph):
     block molecules and lattice size only (using :class:`.Honeycomb`
     as an example)
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         import stk
 
@@ -103,7 +103,12 @@ class Cof(TopologyGraph):
     For periodic systems, the :class:`.PeriodicCollapser` is
     recommended.
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
         # Nonperiodic.
         cof = stk.ConstructedMolecule(
@@ -132,7 +137,12 @@ class Cof(TopologyGraph):
     :class:`.PeriodicConstructionResult` returned by calling
     :meth:`.Cof.construct`
 
-    .. code-block:: python
+    .. testcode:: accessing-the-periodic-information
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
         topology_graph = stk.cof.PeriodicHoneycomb(
             building_blocks=(bb1, bb2),
@@ -159,12 +169,23 @@ class Cof(TopologyGraph):
             periodic_info=periodic_info,
         )
 
+    .. testcleanup:: accessing-the-periodic-information
+
+        import os
+        os.remove('cof.pdb')
+
+
     *Structural Isomer Construction*
 
     Different structural isomers of COFs can be made by using the
     `vertex_alignments` optional parameter
 
-    .. code-block:: python
+    .. testcode:: structural-isomer-construction
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
         cof2 = stk.ConstructedMolecule(
             topology_graph=stk.cof.Honeycomb(
@@ -189,7 +210,9 @@ class Cof(TopologyGraph):
     functional groups, you have to assign each building block to the
     vertex you want to place it on
 
-    .. code-block:: python
+    .. testcode:: multi-building-block-cof-construction
+
+        import stk
 
         bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
         bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
@@ -213,7 +236,7 @@ class Cof(TopologyGraph):
 
     You can combine this with the `vertex_alignments` parameter
 
-    .. code-block:: python
+    .. testcode:: multi-building-block-cof-construction
 
         cof2 = stk.ConstructedMolecule(
             topology_graph=stk.cof.Honeycomb(

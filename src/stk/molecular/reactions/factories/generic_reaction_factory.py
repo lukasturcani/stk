@@ -124,12 +124,14 @@ class GenericReactionFactory(ReactionFactory):
             1 will be used for their reactions. If `bond_orders` is
             ``None``, the following :class:`dict` will be used
 
-            .. code-block:: python
+            .. testcode:: init
+
+                import stk
 
                 bond_orders = {
-                    frozenset({stk.Amine, stk.Aldehyde}): 2,
-                    frozenset({stk.Amide, stk.Aldehyde}): 2,
-                    frozenset({stk.Amide, stk.Amine}): 2,
+                    frozenset({stk.PrimaryAmino, stk.Aldehyde}): 2,
+                    frozenset({stk.PrimaryAmino, stk.Aldehyde}): 2,
+                    frozenset({stk.Amide, stk.PrimaryAmino}): 2,
                     frozenset({stk.Alkene}): 2,
                     frozenset({stk.Alkyne}): 2,
                 }

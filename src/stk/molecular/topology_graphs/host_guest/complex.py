@@ -21,7 +21,7 @@ class Complex(TopologyGraph):
     You can use :class:`.ConstructedMolecule` instances as the host,
     but you should turn them into a :class:`.BuildingBlock` first
 
-    .. code-block:: python
+    .. testcode:: construction
 
         import stk
 
@@ -36,7 +36,7 @@ class Complex(TopologyGraph):
                 ),
             ),
         )
-        complex1 = stk.ConstructedMolecule(
+        complex = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
                 host=stk.BuildingBlock.init_from_molecule(host),
                 guest=stk.BuildingBlock('[Br][Br]'),
@@ -55,10 +55,23 @@ class Complex(TopologyGraph):
     You can change the position and orientation of the guest, as well
     as its displacement
 
-    .. code-block:: python
+    .. testcode:: changing-the-position-of-the-guest
 
+        import stk
+
+        host = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock(
+                        smiles='BrCC(Br)CBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+        )
         guest = stk.BuildingBlock('[Br][Br]')
-        complex2 = stk.ConstructedMolecule(
+        complex = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
                 host=stk.BuildingBlock.init_from_molecule(host),
                 guest=guest,

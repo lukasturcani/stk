@@ -26,20 +26,24 @@ class MoleculeJsonizer:
 
     Examples
     --------
+    *Converting a Molecule to JSON*
+
     You want to create a JSON representation of a molecule
 
-    .. code-block:: python
+    .. testcode:: converting-a-molecule-to-json
 
         import stk
 
         jsonizer = stk.MoleculeJsonizer()
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
+    *Adding Additional Molecular Keys*
+
     Apart from atoms, bonds and the position matrix, the JSON
     representation holds additional fields, one for each
     :class:`.MoleculeKeyMaker` provided to the initializer
 
-    .. code-block:: python
+    .. testcode:: adding-additional-molecular-keys
 
         import stk
 

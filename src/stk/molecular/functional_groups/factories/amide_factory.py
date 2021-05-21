@@ -18,12 +18,14 @@ class AmideFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.Amide`
     functional groups. You want the carbon atom in those functional
     groups to be the bonder atom, and the amino group to be a leaving
     group.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -32,11 +34,23 @@ class AmideFactory(FunctionalGroupFactory):
             functional_groups=(stk.AmideFactory(), ),
         )
 
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Amide)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
+
+    *Changing the Bonder and Deleter Atoms*
+
     You want to create a building block which has :class:`.Amide`
     functional groups. You want the carbon atom to be the bonder
     atom and the oxygen atom to be the deleter atom.
 
-    .. code-block:: python
+    .. testcode:: changing-the-bonder-and-deleter-atoms
 
         import stk
 
@@ -53,6 +67,29 @@ class AmideFactory(FunctionalGroupFactory):
             functional_groups=(amide_factory, ),
         )
 
+    .. testcode:: changing-the-bonder-and-deleter-atoms
+        :hide:
+
+        fg1, fg2 = building_block.get_functional_groups()
+        assert fg1.get_num_bonders() == 1
+        assert sum(1 for _ in fg1.get_deleters()) == 1
+        assert fg2.get_num_bonders() == 1
+        assert sum(1 for _ in fg2.get_deleters()) == 1
+
+        assert all(
+            isinstance(atom, stk.C)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
+        assert all(
+            isinstance(atom, stk.O)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_deleters()
+        )
 
     See Also
     --------

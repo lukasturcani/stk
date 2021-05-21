@@ -24,12 +24,29 @@ class SelectionPlotter:
     --------
     *Plotting Which Molecule Records Got Selected*
 
-    .. code-block:: python
+    .. testcode:: plotting-which-molecule-records-got-selected
 
         import stk
 
         # Make a selector.
-        roulette = stk.Roulette(num=10)
+        roulette = stk.Roulette(num_batches=10)
+
+        # Make a population.
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(100)
+        )
 
         # Make a plotter. You do not have to assign it to a variable.
         stk.SelectionPlotter('roulette_counter', roulette)
@@ -47,6 +64,20 @@ class SelectionPlotter:
         # which shows a graph of all the selected molecules.
 
         # And so on every time you use "roulette.select()".
+
+    .. testcode:: plotting-which-molecule-records-got-selected
+        :hide:
+
+        import os
+
+        assert os.path.exists('roulette_counter_1.png')
+        assert os.path.exists('roulette_counter_1.csv')
+        assert os.path.exists('roulette_counter_2.png')
+        assert os.path.exists('roulette_counter_2.csv')
+        os.remove('roulette_counter_1.png')
+        os.remove('roulette_counter_1.csv')
+        os.remove('roulette_counter_2.png')
+        os.remove('roulette_counter_2.csv')
 
     """
 

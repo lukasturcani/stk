@@ -29,7 +29,33 @@ class ValueDatabase:
     to iterate through all of the database's entries, which can then
     be used to access values in the :class:`.ValueDatabase`
 
-    .. code-block:: python
+    .. testsetup:: iterating-through-entries-in-the-database
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+
+        _old_value_init = stk.ValueMongoDb
+        stk.ValueMongoDb = lambda mongo_client, collection: (
+            _old_value_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                collection=collection,
+            )
+        )
+
+        _old_molecule_init = stk.MoleculeMongoDb
+        stk.MoleculeMongoDb = lambda mongo_client: _old_molecule_init(
+            mongo_client=mongo_client,
+            database=_test_database,
+        )
+
+    .. testcode:: iterating-through-entries-in-the-database
+
+        import pymongo
 
         client = pymongo.MongoClient()
         molecule_db = stk.MoleculeMongoDb(client)
@@ -39,12 +65,28 @@ class ValueDatabase:
             collection='atom_counts',
         )
 
+        molecule = stk.BuildingBlock('BrBr')
+        molecule_db.put(molecule)
+        value_db.put(molecule, molecule.get_num_atoms())
+
+
         for molecule in molecule_db.get_all():
             try:
                 value = value_db.get(molecule)
+                print(value)
             except KeyError:
                 # In case molecule is not in value_db.
                 pass
+
+    .. testoutput:: iterating-through-entries-in-the-database
+
+        2
+
+    .. testcleanup:: iterating-through-entries-in-the-database
+
+        stk.ValueMongoDb = _old_value_init
+        stk.MoleculeMongoDb = _old_molecule_init
+        pymongo.MongoClient().drop_database(_test_database)
 
     """
 

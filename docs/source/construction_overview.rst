@@ -20,7 +20,7 @@ To use :mod:`stk` you only have to choose which building blocks and
 topology graph you wish to use and :mod:`stk` will take care of everything
 else, take for example the construction of a linear polymer
 
-.. code-block:: python
+.. testcode:: introduction
 
     import stk
 
@@ -42,6 +42,18 @@ else, take for example the construction of a linear polymer
     )
     # You can write the molecule to a file if you want to view it.
     polymer.write('polymer.mol')
+
+.. testcode:: introduction
+    :hide:
+
+    import os
+
+    assert sum(1 for _ in polymer.get_building_blocks()) == 2
+    assert os.path.exists('polymer.mol')
+
+.. testcleanup:: introduction
+
+    os.remove('polymer.mol')
 
 which will produce:
 
@@ -140,11 +152,19 @@ example, if we want to create
 a :class:`.BuildingBlock`, and you want to react its bromo groups
 during construction, you can use a :class:`.BromoFactory`.
 
-.. code-block:: python
+.. testcode:: building-blocks
 
     import stk
 
     building_block = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+
+
+.. testcode:: building-blocks
+    :hide:
+
+    assert building_block.get_num_functional_groups() == 2
+    for fg in building_block.get_functional_groups():
+        assert isinstance(fg, stk.Bromo)
 
 In the example above, ``building_block`` will have two
 :class:`.Bromo` functional groups. When ``building_block`` is used
@@ -153,20 +173,38 @@ groups, which will be modified. If we have a building block with
 aldehyde functional groups, we could have used an
 :class:`.AldehydeFactory`.
 
-.. code-block:: python
+.. testcode:: building-blocks
 
-    building_block2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()]
+    building_block2 = stk.BuildingBlock(
+        smiles='O=CCC=O',
+        functional_groups=[stk.AldehydeFactory()],
+    )
+
+.. testcode:: building-blocks
+    :hide:
+
+    assert building_block2.get_num_functional_groups() == 2
+    for fg in building_block2.get_functional_groups():
+        assert isinstance(fg, stk.Aldehyde)
 
 Finally, if we had a mix of functional groups, we could have used
 a mix of factories
 
-.. code-block:: python
+.. testcode:: building-blocks
 
-    building_block2 = stk.BuildingBlock(
+    building_block3 = stk.BuildingBlock(
         smiles='O=CCCBr',
         functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
     )
 
+.. testcode:: building-blocks
+    :hide:
+
+    assert building_block3.get_num_functional_groups() == 2
+    assert (
+        set(map(type, building_block3.get_functional_groups()))
+        == {stk.Bromo, stk.Aldehyde}
+     )
 
 Based on the specific functional groups found on an
 edge of the :class:`.TopologyGraph`, :mod:`stk` will select an

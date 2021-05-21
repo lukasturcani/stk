@@ -20,13 +20,15 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has
     :class:`.Alkene` functional groups, but only if they are terminal.
     You want the non-terminal carbon atom in those functional
     groups to be the *bonder* atom, and the terminal CH\ :sub:`2`
     group to be the *deleter* atoms.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -35,12 +37,24 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
             functional_groups=(stk.TerminalAlkeneFactory(), ),
         )
 
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Alkene)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
+
+    *Changing the Bonder and Deleter Atoms*
+
     You want to create a building block which has
     :class:`.Alkene` functional groups, but only if they are terminal.
     You want the carbon atoms to be the *bonder* atoms and you don't
     want any *deleter* atoms.
 
-    .. code-block:: python
+    .. testcode:: changing-the-bonder-and-deleter-atoms
 
         import stk
 
@@ -55,6 +69,22 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
             functional_groups=(terminal_alkene_factory, ),
         )
 
+    .. testcode:: changing-the-bonder-and-deleter-atoms
+        :hide:
+
+        fg1, fg2 = building_block.get_functional_groups()
+        assert fg1.get_num_bonders() == 2
+        assert sum(1 for _ in fg1.get_deleters()) == 0
+        assert fg2.get_num_bonders() == 2
+        assert sum(1 for _ in fg2.get_deleters()) == 0
+
+        assert all(
+            isinstance(atom, stk.C)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
 
     See Also
     --------

@@ -18,12 +18,14 @@ class DiolFactory(FunctionalGroupFactory):
 
     Examples
     --------
+    *Creating Functional Groups with the Factory*
+
     You want to create a building block which has :class:`.Diol`
     functional groups. You want the carbon atoms in those functional
     groups to be the *bonder* atoms, and the OH groups to be a leaving
     groups.
 
-    .. code-block:: python
+    .. testcode:: creating-functional-groups-with-the-factory
 
         import stk
 
@@ -32,11 +34,23 @@ class DiolFactory(FunctionalGroupFactory):
             functional_groups=(stk.DiolFactory(), ),
         )
 
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Diol)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 1
+
+    *Changing the Bonder and Deleter Atoms*
+
     You want to create a building block which has :class:`.Diol`
     functional groups. You want the oxygen atoms to be the *bonder*
     atoms and the hydrogen atoms to be the *deleter* atoms.
 
-    .. code-block:: python
+    .. testcode:: changing-the-bonder-and-deleter-atoms
 
         import stk
 
@@ -53,6 +67,27 @@ class DiolFactory(FunctionalGroupFactory):
             functional_groups=(diol_factory, ),
         )
 
+    .. testcode:: changing-the-bonder-and-deleter-atoms
+        :hide:
+
+        fg, = building_block.get_functional_groups()
+        assert fg.get_num_bonders() == 2
+        assert sum(1 for _ in fg.get_deleters()) == 2
+
+        assert all(
+            isinstance(atom, stk.O)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
+        assert all(
+            isinstance(atom, stk.H)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_deleters()
+        )
 
     See Also
     --------

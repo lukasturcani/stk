@@ -25,7 +25,7 @@ class Linear(TopologyGraph):
 
     Linear polymers require building blocks with two functional groups
 
-    .. code-block:: python
+    .. testcode:: construction
 
         import stk
 
@@ -44,7 +44,12 @@ class Linear(TopologyGraph):
     For :class:`.Linear` topologies, it is recommend to use the
     :class:`.Collapser` optimizer.
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
 
         polymer = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
@@ -62,9 +67,14 @@ class Linear(TopologyGraph):
     Building blocks with a single functional group can
     also be provided as capping units
 
-    .. code-block:: python
+    .. testcode:: construction-with-capping-units
 
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
         bb3 = stk.BuildingBlock('CCN', [stk.PrimaryAminoFactory()])
+
         polymer = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2, bb3),
@@ -78,86 +88,95 @@ class Linear(TopologyGraph):
     The `orientations` parameter allows the direction of each building
     block along to the chain to be flipped
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        bb4 = stk.BuildingBlock('NCNCCN', [stk.PrimaryAminoFactory()])
+        import stk
 
-        p3 = stk.ConstructedMolecule(
+        bb1 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+        bb2 = stk.BuildingBlock('NCNCCN', [stk.PrimaryAminoFactory()])
+
+        p1 = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
-                building_blocks=(bb2, bb4),
+                building_blocks=(bb1, bb2),
                 repeating_unit='AB',
                 num_repeating_units=5,
                 orientations=(1, 0.5),
             ),
         )
 
-    In the above example, ``bb2`` is guaranteed to be flipped,
-    ``bb4`` has a 50% chance of being flipped, each time it is placed
+    In the above example, ``bb1`` is guaranteed to be flipped,
+    ``bb2`` has a 50% chance of being flipped, each time it is placed
     on a node.
 
     Note that whether a building block will be flipped or not
     is decided during the initialization of :class:`.Linear`
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
         # chain will always construct the same polymer.
         chain = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
         )
-        # p4 and p5 are guaranteed to be the same as they used the same
+        # p2 and p3 are guaranteed to be the same as they used the same
         # topology graph.
-        p4 = stk.ConstructedMolecule(chain)
-        p5 = stk.ConstructedMolecule(chain)
+        p2 = stk.ConstructedMolecule(chain)
+        p3 = stk.ConstructedMolecule(chain)
 
         # chain2 may lead to a different polymer than chain, despite
         # being initialized with the same parameters.
         chain2 = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45)
         )
 
-        # p6 and p7 are guaranteed to be the same because they used
+        # p4 and p5 are guaranteed to be the same because they used
         # the same topology graph. However, they may be different to
-        # p4 and p5.
-        p6 = stk.ConstructedMolecule(chain2)
-        p7 = stk.ConstructedMolecule(chain2)
+        # p2 and p3.
+        p4 = stk.ConstructedMolecule(chain2)
+        p5 = stk.ConstructedMolecule(chain2)
 
     The `random_seed` parameter can be used to get reproducible results
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        # p8 and p9 are guaranteed to be the same, because chain3 and
+        # p6 and p7 are guaranteed to be the same, because chain3 and
         # chain4 used the same random seed.
 
         chain3 = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p8 = stk.ConstructedMolecule(chain3)
+        p6 = stk.ConstructedMolecule(chain3)
 
         chain4 = stk.polymer.Linear(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p9 = stk.ConstructedMolecule(chain4)
+        p7 = stk.ConstructedMolecule(chain4)
 
     *Using Numbers to Define the Repeating Unit*
 
     The repeating unit can also be specified through the indices of
     the building blocks
 
-    .. code-block:: python
+    .. testcode:: using-numbers-to-define-the-repeating-unit
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+        bb3 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
 
         # p1 and p2 are different ways to write the same thing.
         p1 = stk.ConstructedMolecule(

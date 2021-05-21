@@ -70,6 +70,37 @@ jobs:
                 name: database-dump
                 path: database-dump
 
+    doctests:
+        runs-on: ubuntu-latest
+
+        services:
+            MongoDB:
+                image: mongo
+                ports:
+                    - 27017:27017
+
+        steps:
+            - name: Git checkout
+              uses: actions/checkout@v2
+
+            - name: Add conda to system path
+              run:
+                # $CONDA is an environment variable pointing to the
+                # root of the miniconda directory
+                echo $CONDA/bin >> $GITHUB_PATH
+
+            - name: Install dependencies
+              run:
+                conda env update
+                    --name base
+                    --file tests/environment.yml
+
+                pip install -r docs/requirements.txt
+
+            - name: Run doctests
+              run:
+                MOCK_MODULES='FALSE' make -C docs doctest
+
     basic-ea:
         runs-on: ubuntu-latest
 

@@ -27,7 +27,7 @@ class SimilarBuildingBlock(MoleculeMutator):
     --------
     *Constructed Molecule Mutation*
 
-    .. code-block:: python
+    .. testcode:: constructed-molecule-mutation
 
         import stk
 
@@ -58,7 +58,7 @@ class SimilarBuildingBlock(MoleculeMutator):
 
         def has_primary_amino_group(building_block):
             fg, = building_block.get_functional_groups(0)
-            return fg.__class__ is stk.PrimaryAmino
+            return type(fg) is stk.PrimaryAmino
 
         similar_bb = stk.SimilarBuildingBlock(
             building_blocks=building_blocks,
@@ -66,10 +66,10 @@ class SimilarBuildingBlock(MoleculeMutator):
         )
 
         # Mutate a molecule.
-        mutation_record1 = random_bb.mutate(polymer)
+        mutation_record1 = similar_bb.mutate(polymer)
 
         # Mutate the molecule a second time.
-        mutation_record2 = random_bb.mutate(polymer)
+        mutation_record2 = similar_bb.mutate(polymer)
 
     """
 

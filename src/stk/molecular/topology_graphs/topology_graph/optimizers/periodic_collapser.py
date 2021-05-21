@@ -24,7 +24,7 @@ class PeriodicCollapser(Optimizer):
     :class:`.ConstructedMolecule` structures without long bonds and
     match the unit-cell to the new structure.
 
-    .. code-block:: python
+    .. testcode:: structure-optimization
 
         import stk
 
@@ -37,12 +37,6 @@ class PeriodicCollapser(Optimizer):
             optimizer=stk.PeriodicCollapser(),
         )
         cof = stk.ConstructedMolecule(topology_graph)
-        periodic_info = topology_graph.get_periodic_info()
-        stk.PdbWriter().write(
-            molecule=cof,
-            path='temp.pdb',
-            periodic_info=periodic_info,
-        )
 
     Optimisation with :mod:`stk` simply collects the final position
     matrix and periodic info. The optimisation's trajectory can be

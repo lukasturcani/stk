@@ -17,7 +17,7 @@ class PdbWriter:
     cell included for periodic molecules. Note that this always assumes
     P1 space group.
 
-    .. code-block:: python
+    .. testcode:: writing-to-a-file-with-a-unit-cell
 
         import stk
 
@@ -34,6 +34,17 @@ class PdbWriter:
             path='cof.pdb',
             periodic_info=topology_graph.get_periodic_info()
         )
+
+    .. testcode:: writing-to-a-file-with-a-unit-cell
+        :hide:
+
+        import os
+
+        assert os.path.exists('cof.pdb')
+
+    .. testcleanup:: writing-to-a-file-with-a-unit-cell
+
+        os.remove('cof.pdb')
 
     """
 

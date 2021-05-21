@@ -18,7 +18,7 @@ class RemoveBatches(Selector):
     You want to use :class:`.Roulette` selection on all but the
     5 :class:`.Worst` batches
 
-    .. code-block:: python
+    .. testcode:: removing-batches-from-selection
 
         import stk
 
@@ -26,9 +26,25 @@ class RemoveBatches(Selector):
             remover=stk.Worst(5),
             selector=stk.Roulette(20),
         )
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(100)
+        )
         for batch in selector.select(population):
             # Do stuff with batch. It was selected with roulette
             # selection and is not one of the worst 5 batches.
+            pass
 
     """
 

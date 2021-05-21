@@ -18,11 +18,30 @@ class ValueMongoDb(ValueDatabase):
 
     Examples
     --------
+    See also examples in :class:`.ValueDatabase`.
+
     *Storing Molecular Properties in a Database*
 
     You want to store property values in a database.
 
-    .. code-block:: python
+    .. testsetup:: storing-molecular-properties-in-a-database
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ValueMongoDb
+        stk.ValueMongoDb = lambda mongo_client, collection: (
+            _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                collection=collection,
+            )
+        )
+
+    .. testcode:: storing-molecular-properties-in-a-database
 
         import stk
         import pymongo
@@ -50,11 +69,21 @@ class ValueMongoDb(ValueDatabase):
                     stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
                 ),
                 repeating_unit='A',
-                num_repeating_units=2',
+                num_repeating_units=2,
             ),
         )
         db.put(polymer, polymer.get_num_atoms())
         num_polymer_atoms = db.get(polymer)
+
+    .. testcode:: storing-molecular-properties-in-a-database
+        :hide:
+
+        assert num_polymer_atoms == polymer.get_num_atoms()
+
+    .. testcleanup:: storing-molecular-properties-in-a-database
+
+        stk.ValueMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
 
     """
 

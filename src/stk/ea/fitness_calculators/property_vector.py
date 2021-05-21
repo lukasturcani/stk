@@ -15,7 +15,7 @@ class PropertyVector(FitnessCalculator):
     --------
     *Calculating Fitness Values*
 
-    .. code-block:: python
+    .. testcode:: calculating-fitness-values
 
         import stk
 
@@ -46,12 +46,39 @@ class PropertyVector(FitnessCalculator):
             molecule=stk.BuildingBlock('BrCCBr'),
         )
 
+    .. testcode:: calculating-fitness-values
+        :hide:
+
+        _bb = stk.BuildingBlock('BrCCBr')
+        assert value == (
+            _bb.get_num_atoms(),
+            _bb.get_num_bonds(),
+            _bb.get_maximum_diameter(),
+        )
+
     *Storing Fitness Values in a Database*
 
     Sometimes you want to store fitness values in a database, you
     can do this by providing the `output_database` parameter.
 
-    .. code-block:: python
+    .. testsetup:: storing-fitness-values-in-a-database
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ValueMongoDb
+        stk.ValueMongoDb = lambda mongo_client, collection: (
+            _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                collection=collection,
+            )
+        )
+
+    .. testcode:: storing-fitness-values-in-a-database
 
         import stk
         import pymongo
@@ -93,7 +120,17 @@ class PropertyVector(FitnessCalculator):
         )
 
         # You can retrieve the fitness values from the database.
-        value = fitness_db.get(stk.BuildingBlock('BrCCBr'))
+        value2 = fitness_db.get(stk.BuildingBlock('BrCCBr'))
+
+    .. testcode:: storing-fitness-values-in-a-database
+        :hide:
+
+        assert value1 == tuple(value2)
+
+    .. testcleanup:: storing-fitness-values-in-a-database
+
+        stk.ValueMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
 
     *Caching Fitness Values*
 
@@ -109,7 +146,24 @@ class PropertyVector(FitnessCalculator):
     see if the value already exists, while the `output_database` has
     the calculated fitness value deposited into it.
 
-    .. code-block:: python
+    .. testsetup:: caching-fitness-values
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ValueMongoDb
+        stk.ValueMongoDb = lambda mongo_client, collection: (
+            _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                collection=collection,
+            )
+        )
+
+    .. testcode:: caching-fitness-values
 
         import stk
         import pymongo
@@ -157,6 +211,19 @@ class PropertyVector(FitnessCalculator):
         value2 = fitness_calculator.get_fitness_value(
             molecule=stk.BuildingBlock('BrCCBr'),
         )
+
+    .. testcode:: caching-fitness-values
+        :hide:
+
+        value3 = fitness_calculator.get_fitness_value(
+            molecule=stk.BuildingBlock('BrCCBr'),
+        )
+        assert value2 is value3
+
+    .. testcleanup:: caching-fitness-values
+
+        stk.ValueMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
 
     """
 

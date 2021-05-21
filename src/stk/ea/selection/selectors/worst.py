@@ -20,13 +20,29 @@ class Worst(Selector):
 
     Select the worst 5 batches of size 3
 
-    .. code-block:: python
+    .. testcode:: yielding-batches-holding-multiple-molecules
 
         import stk
 
         worst = stk.Worst(num_batches=5, batch_size=3)
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(10)
+        )
         for batch in worst.select(population):
             # Do stuff with batch.
+            pass
 
     """
 

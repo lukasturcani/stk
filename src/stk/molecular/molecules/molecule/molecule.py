@@ -37,6 +37,61 @@ class Molecule:
     or overridden, when implementing subclasses. Any private methods
     are implementation details of these default implementations.
 
+    Examples
+    --------
+    *Aligning a Molecule with a Vector*
+
+    You want to rotate a molecule, such that it is aligned along
+    with a specific direction.
+
+    .. testcode:: aligning-a-molecule-with-a-vector
+
+        import stk
+        import numpy as np
+
+        molecule1 = stk.BuildingBlock('CCCCC')
+        # Align molecule1 along x-axis.
+        molecule1 = molecule1.with_rotation_between_vectors(
+            start=molecule1.get_direction(),
+            target=np.array([1., 0., 0.]),
+            origin=molecule1.get_centroid(),
+        )
+
+        molecule2 = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCCCBr',
+                        functional_groups=(stk.BromoFactory(), ),
+                    ),
+                ),
+                repeating_unit='A',
+                num_repeating_units=15,
+            ),
+        )
+        # Align molecule2 along the [1, 4, -3] vector.
+        molecule2 = molecule2.with_rotation_between_vectors(
+            start=molecule2.get_direction(),
+            target=np.array([1., 4., -3.]),
+            origin=molecule2.get_centroid(),
+        )
+
+    *Aligning a Molecule along a Plane*
+
+    You want to place the benzene flat along the xy plane.
+
+    .. testcode:: aligning-a-molecule-along-a-plane
+
+        import stk
+        import numpy as np
+
+        benzene = stk.BuildingBlock('c1ccccc1')
+        benzene = benzene.with_rotation_between_vectors(
+            start=benzene.get_plane_normal(),
+            target=np.array([0., 0., 1.]),
+            origin=benzene.get_centroid(),
+        )
+
     """
 
     def __init__(self, atoms, bonds, position_matrix):
@@ -204,55 +259,6 @@ class Molecule:
         :class:`.Molecule`
             A rotated clone. Has the same type as the original
             molecule.
-
-        Examples
-        --------
-        You want to rotate a molecule, such that it is aligned along
-        with a specific direction.
-
-        .. code-block:: python
-
-            import stk
-
-            molecule1 = stk.BuildingBlock('CCCCC')
-            # Align molecule1 along x-axis.
-            molecule1 = molecule1.with_rotation_between_vectors(
-                start=molecule1.get_direction(),
-                target=np.array([1., 0., 0.]),
-                origin=molecule1.get_centroid(),
-            )
-
-            molecule2 = stk.ConstructedMolecule(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCCBr',
-                            functional_groups=(stk.BromoFactory(), ),
-                        ),
-                    ),
-                    repeating_unit='A',
-                    num_repeating_units=15,
-                ),
-            )
-            # Align molecule2 along the [1, 4, -3] vector.
-            molecule2 = molecule2.with_rotation_between_vectors(
-                start=molecule2.get_direction(),
-                target=np.array([1., 4., -3.]),
-                origin=molecule2.get_centroid(),
-            )
-
-        You want to place the benzene flat along the xy plane.
-
-        .. code-block:: python
-
-            import stk
-
-            benzene = stk.BuildingBlock('c1ccccc1')
-            benzene = benzene.with_rotation_between_vectors(
-                start=benzene.get_plane_normal(),
-                target=np.array([0., 0., 1.]),
-                origin=benzene.get_centroid(),
-            )
 
         """
 
