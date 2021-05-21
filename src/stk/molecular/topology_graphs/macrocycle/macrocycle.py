@@ -257,7 +257,8 @@ class Macrocycle(TopologyGraph):
             warnings.warn(
                 'The orientation of macrocycles with chain length '
                 f'{chain_length} is not expected to provide robust '
-                'alignment and bonding.'
+                'alignment and bonding.',
+                RuntimeWarning,
             )
 
         if len(orientations) != chain_length:
