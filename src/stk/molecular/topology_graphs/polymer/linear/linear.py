@@ -386,7 +386,7 @@ class Linear(TopologyGraph):
                 flip=generator.choice(
                     a=choices,
                     p=[head_orientation, 1-head_orientation],
-                )
+                ),
             ),
         ]
         edges = []
