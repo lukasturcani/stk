@@ -261,6 +261,12 @@ class Linear(TopologyGraph):
             length of `orientations` must be equal to
             ``len(repeating_unit)*num_repeating_units``.
 
+            If there is only one building block in the constructed
+            polymer i.e. the `repeating_unit` has a length of 1 and
+            `num_repeating_units` is 1, the building block will not
+            be re-oriented, even if you provide a value to
+            `orientations`.
+
         random_seed : :class:`int`, optional
             The random seed to use when choosing random orientations.
 
