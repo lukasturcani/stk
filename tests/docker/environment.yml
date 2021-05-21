@@ -104,4 +104,3 @@ dependencies:
     - scipy==1.6.3
     - seaborn==0.11.1
     - toml==0.10.2
-    - -e ..
