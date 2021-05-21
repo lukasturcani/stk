@@ -12,16 +12,6 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
-            - name: Add conda to system path
-              run:
-                # $CONDA is an environment variable pointing to the
-                # root of the miniconda directory
-                echo $CONDA/bin >> $GITHUB_PATH
-
-            - name: Install dependencies
-              run:
-                conda install flake8
-
             - name: Lint with flake8
               run:
                 flake8 .
@@ -44,19 +34,6 @@ jobs:
         steps:
             - name: Git checkout
               uses: actions/checkout@v2
-
-            - name: Add conda to system path
-              run:
-                # $CONDA is an environment variable pointing to the
-                # root of the miniconda directory
-                echo $CONDA/bin >> $GITHUB_PATH
-
-            - name: Install dependencies
-              run:
-                PYTHONHASHSEED=0
-                conda env update
-                    --name base
-                    --file tests/environment.yml
 
             - name: Run pytest
               run:
@@ -89,20 +66,6 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
-            - name: Add conda to system path
-              run:
-                # $CONDA is an environment variable pointing to the
-                # root of the miniconda directory
-                echo $CONDA/bin >> $GITHUB_PATH
-
-            - name: Install dependencies
-              run:
-                conda env update
-                    --name base
-                    --file tests/environment.yml
-
-                pip install -r docs/requirements.txt
-
             - name: Run doctests
               run:
                 MOCK_MODULES='FALSE' make -C docs doctest
@@ -122,19 +85,8 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
-            - name: Add conda to system path
-              run:
-                # $CONDA is an environment variable pointing to the
-                # root of the miniconda directory
-                echo $CONDA/bin >> $GITHUB_PATH
-
             - name: Install dependencies
               run:
-                PYTHONHASHSEED=0
-                conda env update
-                    --name base
-                    --file tests/environment.yml
-
                 git clone https://github.com/lukasturcani/basic_ea
                     --depth 1
 
@@ -169,19 +121,8 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
-            - name: Add conda to system path
-              run:
-                # $CONDA is an environment variable pointing to the
-                # root of the miniconda directory
-                echo $CONDA/bin >> $GITHUB_PATH
-
             - name: Install dependencies
               run:
-                PYTHONHASHSEED=0
-                conda env update
-                    --name base
-                    --file tests/environment.yml
-
                 git clone
                     https://github.com/lukasturcani/intermediate_ea
                     --depth 1
