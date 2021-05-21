@@ -5,7 +5,6 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
-import warnings
 
 from stk.serialization import (
     MoleculeJsonizer,
@@ -291,10 +290,9 @@ class MoleculeMongoDb(MoleculeDatabase):
         mongo_client,
         database='stk',
         molecule_collection='molecules',
-        position_matrix_collection=None,
+        position_matrix_collection='building_block_position_matrices',
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
-        lru_cache_size='',
         put_lru_cache_size=128,
         get_lru_cache_size=128,
         indices=('InChIKey', ),
@@ -317,8 +315,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         position_matrix_collection : :class:`str`
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
-            the cache. When ``None``, defaults to
-            ``'building_block_position_matrices'``.
+            the database.
 
         jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -327,17 +324,6 @@ class MoleculeMongoDb(MoleculeDatabase):
         dejsonizer : :class:`.MoleculeDejsonizer`
             Used to create :class:`.Molecule` instances from their
             JSON representations.
-
-        lru_cache_size : :class:`int`, optional
-            This argument is deprecated and will be removed in any
-            version of :mod:`stk` released on, or after, 01/01/21.
-            Use the `put_lru_cache_size` and `get_lru_cache_size`
-            arguments instead.
-
-            A RAM-based least recently used cache is used to avoid
-            reading and writing to the database repeatedly. This sets
-            the number of values which fit into the LRU cache. If
-            ``None``, the cache size will be unlimited.
 
         put_lru_cache_size : :class:`int`, optional
             A RAM-based least recently used cache is used to avoid
@@ -356,37 +342,6 @@ class MoleculeMongoDb(MoleculeDatabase):
             created, in order to minimize lookup time.
 
         """
-
-        if position_matrix_collection is None:
-            position_matrix_collection = (
-                'building_block_position_matrices'
-            )
-            warnings.warn(
-                "The default value of the position_matrix_collection "
-                "parameter in MoleculeMongoDb has changed from "
-                "'position_matrices' "
-                "to 'building_block_position_matrices'! To remove "
-                "this warning, set the position_matrix_collection "
-                "parameter explicitly. You can still use the default "
-                "value, for example, position_matrix_collection='"
-                "building_block_position_matrices' will remove the "
-                "warning but use the default value. "
-                "This warning will be removed "
-                "in any version of stk released on, or after, "
-                "1/03/21.",
-                UserWarning,
-            )
-
-        if lru_cache_size != '':
-            warnings.warn(
-                'The lru_cache_size argument is deprecated and will '
-                'be removed in any version of stk released on, or '
-                'after, 01/01/21. Use the put_lru_cache_size and '
-                'get_lru_cache_size arguments instead.',
-                FutureWarning,
-            )
-            put_lru_cache_size = lru_cache_size
-            get_lru_cache_size = lru_cache_size
 
         database = mongo_client[database]
         self._molecules = database[molecule_collection]
