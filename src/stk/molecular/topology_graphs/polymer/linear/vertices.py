@@ -190,7 +190,7 @@ class _TailVertex(_TerminalVertex):
     _cap_direction = -1
 
 
-class _UnaligningVertex(Vertex):
+class _UnaligningVertex(_LinearVertex):
     """
     Just places a building block, does not align.
 
