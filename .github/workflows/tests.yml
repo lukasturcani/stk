@@ -6,7 +6,7 @@ jobs:
     lint:
         runs-on: ubuntu-20.04
         container:
-            image: stk-test-environment
+            image: lukasturcani/stk-test-environment
 
         steps:
             - name: Git checkout
@@ -33,7 +33,7 @@ jobs:
     pytest-stable-linux:
         runs-on: ubuntu-20.04
         container:
-            image: stk-test-environment
+            image: lukasturcani/stk-test-environment
 
         services:
             MongoDB:
@@ -77,7 +77,7 @@ jobs:
     doctests:
         runs-on: ubuntu-20.04
         container:
-            image: stk-test-environment
+            image: lukasturcani/stk-test-environment
 
         services:
             MongoDB:
@@ -110,7 +110,7 @@ jobs:
     basic-ea:
         runs-on: ubuntu-20.04
         container:
-            image: stk-test-environment
+            image: lukasturcani/stk-test-environment
 
         services:
             MongoDB:
@@ -157,7 +157,7 @@ jobs:
     intermediate-ea:
         runs-on: ubuntu-20.04
         container:
-            image: stk-test-environment
+            image: lukasturcani/stk-test-environment
 
         services:
             MongoDB:
