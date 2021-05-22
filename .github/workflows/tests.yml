@@ -34,7 +34,8 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Run pytest
-              run: pytest
+              run: conda run -n stk
+                pytest
 
             - name: Dump the database
               run: mongodump
@@ -61,7 +62,8 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Run doctests
-              run: MOCK_MODULES='FALSE' make -C docs doctest
+              run: conda run -n stk
+                MOCK_MODULES='FALSE' make -C docs doctest
 
     basic-ea:
         runs-on: ubuntu-20.04
@@ -81,7 +83,8 @@ jobs:
                 --depth 1
 
             - name: Run the EA
-              run: python basic_ea/basic_ea.py
+              run: conda run -n stk
+                python basic_ea/basic_ea.py
 
             - name: Upload fitness plot
               uses: actions/upload-artifact@v2
@@ -114,7 +117,8 @@ jobs:
                 --depth 1
 
             - name: Run the EA
-              run: python intermediate_ea/intermediate_ea.py
+              run: conda run -n stk
+                python intermediate_ea/intermediate_ea.py
 
             - name: Upload fitness plot
               uses: actions/upload-artifact@v2
