@@ -33,6 +33,10 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
+
             - name: Run pytest
               run: conda run -n stk
                 pytest
@@ -61,6 +65,10 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
+
             - name: Run doctests
               run: conda run -n stk
                 MOCK_MODULES='FALSE' make -C docs doctest
@@ -77,6 +85,10 @@ jobs:
         steps:
             - name: Git checkout
               uses: actions/checkout@v2
+
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
 
             - name: Install dependencies
               run: git clone https://github.com/lukasturcani/basic_ea
@@ -110,6 +122,10 @@ jobs:
         steps:
             - name: Git checkout
               uses: actions/checkout@v2
+
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
 
             - name: Install dependencies
               run: git clone
