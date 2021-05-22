@@ -6,6 +6,7 @@ Linear
 
 from dataclasses import dataclass
 import numpy as np
+from typing import Tuple
 
 from .vertices import (
     _HeadVertex,
@@ -457,5 +458,5 @@ class Linear(TopologyGraph):
 
 @dataclass(frozen=True)
 class VerticesAndEdges:
-    vertices: tuple[Vertex]
-    edges: tuple[Edge]
+    vertices: Tuple[Vertex]
+    edges: Tuple[Edge]
