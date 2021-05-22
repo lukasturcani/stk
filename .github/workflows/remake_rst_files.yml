@@ -14,10 +14,6 @@ jobs:
             - name: Git checkout
               uses: actions/checkout@v2
 
-            - name: Install dependencies
-              run:
-                pip install -r docs/requirements.txt .
-
             - name: Remake rst files
               run: docs/remake_modules.bash
 
