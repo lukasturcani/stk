@@ -20,7 +20,7 @@ class CrossoverRecord:
 
     def __init__(self, molecule_record, crosser_name):
         """
-        Initialize a :class:`.CrossoverRecord` instance. aaaaaaaaaaaaaaaaaaaa
+        Initialize a :class:`.CrossoverRecord` instance.
 
         Parameters
         ----------
