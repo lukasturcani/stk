@@ -7,15 +7,17 @@ dependencies:
   - boost=1.74.0=py39h5472131_3
   - boost-cpp=1.74.0=hc6e9bd1_2
   - bzip2=1.0.8=h7f98852_4
-  - ca-certificates=2020.12.5=ha878542_0
+  - ca-certificates=2021.4.13=h06a4308_1
   - cairo=1.16.0=h6cf1ce9_1008
-  - certifi=2020.12.5=py39hf3d152e_1
+  - certifi=2020.12.5=py39h06a4308_0
   - cycler=0.10.0=py_2
+  - flake8=3.9.2=pyhd3eb1b0_0
   - fontconfig=2.13.1=hba837de_1005
   - freetype=2.10.4=h0708190_1
   - gettext=0.19.8.1=h0b5b191_1005
   - greenlet=1.0.0=py39he80948d_0
   - icu=68.1=h58526e2_0
+  - importlib-metadata=3.10.0=py39h06a4308_0
   - jpeg=9d=h36c2ea0_0
   - kiwisolver=1.3.1=py39h1a9c180_1
   - lcms2=2.12=hddcbb42_0
@@ -40,11 +42,12 @@ dependencies:
   - libxml2=2.9.10=h72842e0_4
   - lz4-c=1.9.3=h9c3ff4c_0
   - matplotlib-base=3.4.1=py39h2fa2bec_0
+  - mccabe=0.6.1=py39h06a4308_1
   - ncurses=6.2=h58526e2_4
   - numpy=1.20.2=py39hdbf815f_0
   - olefile=0.46=pyh9f0ad1d_1
   - openjpeg=2.4.0=hf7af979_0
-  - openssl=1.1.1k=h7f98852_0
+  - openssl=1.1.1k=h27cfd23_0
   - pandas=1.2.4=py39hde0f152_0
   - pcre=8.44=he1b5a44_0
   - pillow=8.1.2=py39hf95b381_1
@@ -52,6 +55,8 @@ dependencies:
   - pixman=0.40.0=h36c2ea0_0
   - pthread-stubs=0.4=h36c2ea0_1001
   - pycairo=1.20.0=py39hedcb9fc_1
+  - pycodestyle=2.7.0=pyhd3eb1b0_0
+  - pyflakes=2.3.1=pyhd3eb1b0_0
   - pyparsing=2.4.7=pyh9f0ad1d_0
   - python=3.9.2=hffdb5ce_0_cpython
   - python-dateutil=2.8.1=py_0
@@ -80,6 +85,7 @@ dependencies:
   - xorg-xextproto=7.3.0=h7f98852_1002
   - xorg-xproto=7.0.31=h7f98852_1007
   - xz=5.2.5=h516909a_1
+  - zipp=3.4.1=pyhd3eb1b0_0
   - zlib=1.2.11=h516909a_1010
   - zstd=1.4.9=ha95c52a_0
   - pip:
