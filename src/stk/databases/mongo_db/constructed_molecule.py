@@ -48,6 +48,18 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             )
         )
 
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
     .. testcode:: storing-and-retrieving-constructed-molecules
 
         import stk
@@ -90,6 +102,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         pymongo.MongoClient().drop_database(_test_database)
         stk.ConstructedMoleculeMongoDb = _old_init
+        pymongo.MongoClient = _mongo_client
 
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
@@ -132,6 +145,18 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         # Place it into the database.
         db.put(polymer)
 
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
     .. testcode:: iterating-over-all-entries-in-the-database
 
         for entry in db.get_all():
@@ -146,6 +171,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     .. testcleanup:: iterating-over-all-entries-in-the-database
 
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     *Using Alternative Keys for Retrieving Molecules*
 
@@ -170,6 +196,18 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 jsonizer=jsonizer,
             )
         )
+
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
 
@@ -302,6 +340,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         pymongo.MongoClient().drop_database(_test_database)
         stk.ConstructedMoleculeMongoDb = _old_init
+        pymongo.MongoClient = _mongo_client
 
     Note that the key you use to get the molecule back from the
     database should be unique. In other words, there should always just
