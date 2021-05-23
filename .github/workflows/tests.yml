@@ -45,6 +45,7 @@ jobs:
               run: mongodump
                 -d _stk_pytest_database
                 -o database-dump/database-dump
+                mongodb://MongoDB:27017/
 
             - name: Upload the database dump
               uses: actions/upload-artifact@v2
