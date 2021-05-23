@@ -208,7 +208,6 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         _smiles = stk.Smiles()
         assert _smiles.get_key(molecule) == _smiles.get_key(retrieved)
-        pymongo.MongoClient = _mongo_client
 
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
