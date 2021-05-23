@@ -1,4 +1,8 @@
-def pytest_add_option(parser):
+import pytest
+import pymongo
+
+
+def pytest_addoption(parser):
     parser.addoption(
         '--mongodb_uri',
         action='store',
@@ -6,7 +10,6 @@ def pytest_add_option(parser):
     )
 
 
-def pytest_generate_tests(metafunc):
-    mongodb_uri = metafunc.config.option.mongodb_uri
-    if 'mongodb_uri' in metafunc.fixturenames:
-        metafunc.parametrize('mongodb_uri', [mongodb_uri])
+@pytest.fixture
+def mongo_client(pytestconfig):
+    return pymongo.MongoClient(pytestconfig.getoption('mongodb_uri'))
