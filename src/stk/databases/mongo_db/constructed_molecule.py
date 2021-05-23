@@ -167,7 +167,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testcleanup:: iterating-over-all-entries-in-the-database
 
-        pymongo.MongoClient(_mongo_uri).drop_database(_test_database)
+        pymongo.MongoClient(_mongodb_uri).drop_database(_test_database)
 
     *Using Alternative Keys for Retrieving Molecules*
 
