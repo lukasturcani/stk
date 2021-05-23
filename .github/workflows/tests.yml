@@ -74,7 +74,9 @@ jobs:
 
             - name: Run doctests
               run: conda run -n stk
-                MOCK_MODULES='FALSE' make -C docs doctest
+                MOCK_MODULES='FALSE'
+                MONGODB_URI='mongodb://MongoDB:27017/'
+                make -C docs doctest
 
     basic-ea:
         runs-on: ubuntu-20.04
