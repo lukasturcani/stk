@@ -7,7 +7,8 @@ RUN \
     && apt-get install -y \
     curl \
     git \
-    make
+    make \
+    mongo-tools
 
 RUN \
     curl \
