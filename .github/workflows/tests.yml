@@ -39,7 +39,7 @@ jobs:
 
             - name: Run pytest
               run: conda run -n stk
-              pytest --mongodb_uri='mongodb://MongoDB:27017/'
+                pytest --mongodb_uri='mongodb://MongoDB:27017/'
 
             - name: Dump the database
               run: mongodump
