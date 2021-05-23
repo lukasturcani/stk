@@ -96,6 +96,7 @@ dependencies:
     - iniconfig==1.1.1
     - mchammer==1.0.2
     - multiprocess==0.70.11.1
+    - numpydoc==1.1.0
     - networkx==2.5.1
     - packaging==20.9
     - pathos==0.2.7
@@ -109,4 +110,6 @@ dependencies:
     - pytest-lazy-fixture==0.6.3
     - scipy==1.6.3
     - seaborn==0.11.1
+    - sphinx==3.5.4
+    - sphinx_rtd_theme==0.5.2
     - toml==0.10.2
