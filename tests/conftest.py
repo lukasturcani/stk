@@ -10,6 +10,8 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture
+@pytest.fixture(
+    scope='session',
+)
 def mongo_client(pytestconfig):
     return pymongo.MongoClient(pytestconfig.getoption('mongodb_uri'))

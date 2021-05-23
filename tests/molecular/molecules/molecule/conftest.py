@@ -1,5 +1,4 @@
 import pytest
-import pymongo
 import re
 import os
 from pytest_lazyfixture import lazy_fixture
