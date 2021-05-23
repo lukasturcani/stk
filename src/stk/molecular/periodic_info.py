@@ -43,10 +43,15 @@ class PeriodicInfo:
         .. [1] https://pymatgen.org/_modules/pymatgen/core/lattice.html
 
         """
-        self._vector_1 = vector_1
-        self._vector_2 = vector_2
-        self._vector_3 = vector_3
-        self._cell_matrix = (vector_1, vector_2, vector_3)
+
+        self._vector_1 = np.array(vector_1)
+        self._vector_2 = np.array(vector_2)
+        self._vector_3 = np.array(vector_3)
+        self._cell_matrix = (
+            self._vector_1,
+            self._vector_2,
+            self._vector_3,
+        )
 
         a, b, c = tuple(
             np.sqrt(np.sum(i ** 2)).tolist() for i in self._cell_matrix
@@ -106,7 +111,7 @@ class PeriodicInfo:
 
         """
 
-        return self._vector_1
+        return np.array(self._vector_1)
 
     def get_vector_2(self):
         """
@@ -120,7 +125,7 @@ class PeriodicInfo:
 
         """
 
-        return self._vector_2
+        return np.array(self._vector_2)
 
     def get_vector_3(self):
         """
@@ -134,7 +139,7 @@ class PeriodicInfo:
 
         """
 
-        return self._vector_3
+        return np.array(self._vector_3)
 
     def get_cell_matrix(self):
         """
@@ -148,7 +153,7 @@ class PeriodicInfo:
 
         """
 
-        return self._cell_matrix
+        return tuple(map(np.array, self._cell_matrix))
 
     def get_a(self):
         """

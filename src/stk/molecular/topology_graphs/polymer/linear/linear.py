@@ -4,11 +4,28 @@ Linear
 
 """
 
+from dataclasses import dataclass
 import numpy as np
+from typing import Tuple
 
-from .vertices import _HeadVertex, _TailVertex, _LinearVertex
-from ...topology_graph import TopologyGraph, Edge, NullOptimizer
+from .vertices import (
+    _HeadVertex,
+    _TailVertex,
+    _LinearVertex,
+    _UnaligningVertex,
+)
+from ...topology_graph import (
+    TopologyGraph,
+    Edge,
+    NullOptimizer,
+    Vertex,
+)
 from ....reactions import GenericReactionFactory
+
+
+__all__ = [
+    'Linear',
+]
 
 
 class Linear(TopologyGraph):
@@ -245,6 +262,12 @@ class Linear(TopologyGraph):
             length of `orientations` must be equal to
             ``len(repeating_unit)*num_repeating_units``.
 
+            If there is only one building block in the constructed
+            polymer i.e. the `repeating_unit` has a length of 1 and
+            `num_repeating_units` is 1, the building block will not
+            be re-oriented, even if you provide a value to
+            `orientations`.
+
         random_seed : :class:`int`, optional
             The random seed to use when choosing random orientations.
 
@@ -284,28 +307,94 @@ class Linear(TopologyGraph):
                 'total number of vertices.'
             )
 
-        generator = np.random.RandomState(random_seed)
-
         # Keep these for __repr__.
         self._repeating_unit = self._normalize_repeating_unit(
             repeating_unit=repeating_unit
         )
         self._num_repeating_units = num_repeating_units
 
-        head, *body, tail = orientations
+        try:
+            head, *body, tail = orientations
+            vertices_and_edges = self._get_vertices_and_edges(
+                head_orientation=head,
+                body_orientations=body,
+                tail_orientation=tail,
+                random_seed=random_seed,
+            )
+            vertices = vertices_and_edges.vertices
+            edges = vertices_and_edges.edges
+
+        except ValueError:
+            vertices = (
+                _UnaligningVertex(0, (0., 0., 0.), False),
+            )
+            edges = ()
+
+        # Save the chosen orientations for __repr__.
+        self._orientations = tuple(int(v.get_flip()) for v in vertices)
+
+        super().__init__(
+            building_block_vertices=self._get_building_block_vertices(
+                building_blocks=building_blocks,
+                vertices=vertices,
+            ),
+            edges=edges,
+            reaction_factory=reaction_factory,
+            construction_stages=(),
+            optimizer=optimizer,
+            num_processes=num_processes,
+        )
+
+    @staticmethod
+    def _get_vertices_and_edges(
+        head_orientation,
+        body_orientations,
+        tail_orientation,
+        random_seed,
+    ):
+        """
+        Get the vertices and edges of the topology graph.
+
+        Parameters
+        ----------
+        head_orientation : :class:`float`
+            The probability that the head vertex will do flipping.
+
+        body_orientations : :class:`iterable` of :class:`float`
+            For each body vertex, the probability that it will do
+            flipping.
+
+        tail_orientation : :class:`float`
+            The probability that the tail vertex will do flipping.
+
+        random_seed : :class:`int`
+            The random seed to use.
+
+        Returns
+        -------
+        :class:`.VerticesAndEdges`
+            The vertices and edges of the topology graph.
+
+        """
+
+        generator = np.random.RandomState(random_seed)
+
         choices = [True, False]
         vertices = [
             _HeadVertex(
                 id=0,
                 position=np.array([0, 0, 0]),
-                flip=generator.choice(choices, p=[head, 1-head])
+                flip=generator.choice(
+                    a=choices,
+                    p=[head_orientation, 1-head_orientation],
+                ),
             ),
         ]
         edges = []
-        for i, p in enumerate(body, 1):
+        for i, p in enumerate(body_orientations, 1):
             flip = generator.choice(choices, p=[p, 1-p])
             vertices.append(
-                _LinearVertex(i, np.array([i, 0, 0]), flip)
+                _LinearVertex(i, np.array([i, 0, 0]), flip),
             )
             edges.append(Edge(len(edges), vertices[i-1], vertices[i]))
 
@@ -313,24 +402,18 @@ class Linear(TopologyGraph):
             _TailVertex(
                 id=len(vertices),
                 position=np.array([len(vertices), 0, 0]),
-                flip=generator.choice(choices, p=[tail, 1-tail])),
+                flip=generator.choice(
+                    a=choices,
+                    p=[tail_orientation, 1-tail_orientation],
+                ),
+            ),
         )
-
-        # Save the chosen orientations for __repr__.
-        self._orientations = tuple(int(v.get_flip()) for v in vertices)
 
         edges.append(Edge(len(edges), vertices[-2], vertices[-1]))
 
-        super().__init__(
-            building_block_vertices=self._get_building_block_vertices(
-                building_blocks=building_blocks,
-                vertices=vertices,
-            ),
+        return VerticesAndEdges(
+            vertices=tuple(vertices),
             edges=tuple(edges),
-            reaction_factory=reaction_factory,
-            construction_stages=(),
-            optimizer=optimizer,
-            num_processes=num_processes,
         )
 
     def clone(self):
@@ -371,3 +454,9 @@ class Linear(TopologyGraph):
             f'{self._num_repeating_units!r}, '
             f'{self._orientations!r})'
         )
+
+
+@dataclass(frozen=True)
+class VerticesAndEdges:
+    vertices: Tuple[Vertex]
+    edges: Tuple[Edge]
