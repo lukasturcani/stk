@@ -120,12 +120,21 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         import stk
         import pymongo
+        import os
 
         # Change the database used, so that when a developer
         # runs the doctests locally, their "stk" database is not
         # contaminated.
         _test_database = '_stk_doctest_database'
-        client = pymongo.MongoClient()
+
+        # Change the database MongoClient will connect to.
+
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        client = pymongo.MongoClient(_mongodb_uri)
+
         db = stk.ConstructedMoleculeMongoDb(
             mongo_client=client,
             database=_test_database,
@@ -145,18 +154,6 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         # Place it into the database.
         db.put(polymer)
 
-        # Change the database MongoClient will connect to.
-
-        import os
-        import pymongo
-
-        _mongo_client = pymongo.MongoClient
-        _mongodb_uri = os.environ.get(
-            'MONGODB_URI',
-            'mongodb://localhost:27017/'
-        )
-        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
-
     .. testcode:: iterating-over-all-entries-in-the-database
 
         for entry in db.get_all():
@@ -170,8 +167,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     .. testcleanup:: iterating-over-all-entries-in-the-database
 
-        pymongo.MongoClient().drop_database(_test_database)
-        pymongo.MongoClient = _mongo_client
+        pymongo.MongoClient(_mongo_uri).drop_database(_test_database)
 
     *Using Alternative Keys for Retrieving Molecules*
 
