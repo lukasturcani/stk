@@ -55,7 +55,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         _mongo_client = pymongo.MongoClient
         _mongodb_uri = os.environ.get(
             'MONGODB_URI',
-            'mongodb://localhost:27017/'
+            'mongodb://localhost:27017/',
         )
         pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
 
@@ -111,12 +111,17 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         import stk
         import pymongo
+        import os
 
         # Change the database used, so that when a developer
         # runs the doctests locally, their "stk" database is not
         # contaminated.
         _test_database = '_stk_doctest_database'
-        client = pymongo.MongoClient()
+        _mongo_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/',
+        )
+        client = pymongo.MongoClient(_mongo_uri)
         db = stk.MoleculeMongoDb(
             mongo_client=client,
             database=_test_database,
