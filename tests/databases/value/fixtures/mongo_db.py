@@ -33,7 +33,7 @@ class CaseDataData:
 
 @pytest.fixture(
     params=(
-        CaseData(
+        CaseDataData(
             get_database=lambda mongo_client: stk.ValueMongoDb(
                 mongo_client=mongo_client,
                 collection='values',
@@ -44,7 +44,7 @@ class CaseDataData:
             molecule=stk.BuildingBlock('BrCCBr'),
             value=12,
         ),
-        CaseData(
+        CaseDataData(
             get_database=lambda mongo_client: stk.ValueMongoDb(
                 mongo_client=mongo_client,
                 collection='values',
@@ -62,4 +62,4 @@ def mongo_db(request, mongo_client):
             database=request.param.get_database(mongo_client),
             molecule=request.param.molecule,
             value=request.param.value,
-        ),
+        )
