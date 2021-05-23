@@ -62,6 +62,18 @@ class FitnessFunction(FitnessCalculator):
             )
         )
 
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
     .. testcode:: storing-fitness-values-in-a-database
 
         import stk
@@ -105,6 +117,7 @@ class FitnessFunction(FitnessCalculator):
 
         stk.ValueMongoDb = _old_init
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     *Caching Fitness Values*
 
@@ -136,6 +149,18 @@ class FitnessFunction(FitnessCalculator):
                 collection=collection,
             )
         )
+
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
 
     .. testcode:: caching-fitness-values
 
@@ -185,6 +210,7 @@ class FitnessFunction(FitnessCalculator):
 
         stk.ValueMongoDb = _old_init
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     """
 
