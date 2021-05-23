@@ -1,6 +1,5 @@
 import pytest
 import stk
-import pymongo
 
 from .utilities import Counter
 from ..case_data import CaseData
@@ -9,9 +8,14 @@ from ..case_data import CaseData
 _counter = Counter()
 
 
-def _get_case_data():
+def _get_case_data(mongo_client):
     """
     Get a :class:`.CaseData` instance.
+
+    Parameters
+    ----------
+    mongo_client : :class:`pymongo.MongoClient`
+        The mongo client the database should connect to.
 
     """
 
@@ -23,7 +27,7 @@ def _get_case_data():
     # returned as the fitness value.
 
     db = stk.ValueMongoDb(
-        mongo_client=pymongo.MongoClient(),
+        mongo_client=mongo_client,
         collection='test_caching',
         database='_stk_pytest_database',
     )
@@ -47,8 +51,8 @@ def _get_case_data():
 
 @pytest.fixture(
     params=(
-        _get_case_data(),
+        _get_case_data,
     ),
 )
-def property_vector(request):
-    return request.param
+def property_vector(request, mongo_client):
+    return request.param(mongo_client)

@@ -304,14 +304,14 @@ def case_data(request):
 @pytest.fixture(
     scope='session',
 )
-def molecule_db():
+def molecule_db(mongo_client):
     """
     A :class:`.MoleculeDatabase` instance.
 
     """
 
     return stk.MoleculeMongoDb(
-        mongo_client=pymongo.MongoClient(),
+        mongo_client=mongo_client,
         database='_stk_pytest_database',
         jsonizer=stk.MoleculeJsonizer(
             key_makers=(
@@ -327,14 +327,14 @@ def molecule_db():
 @pytest.fixture(
     scope='session',
 )
-def name_db():
+def name_db(mongo_client):
     """
     A :class:`.ValueDatabase` for holding the names of molecules.
 
     """
 
     return stk.ValueMongoDb(
-        mongo_client=pymongo.MongoClient(),
+        mongo_client=mongo_client,
         database='_stk_pytest_database',
         collection='name',
         key_makers=(
