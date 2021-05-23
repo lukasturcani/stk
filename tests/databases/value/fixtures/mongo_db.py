@@ -16,7 +16,9 @@ class CaseDataData:
     Attributes
     ----------
     get_database : :class:`callable`
-        Creates the database to test.
+        Creates the database to test. Takes a
+        :class:`pymongo.MongoClient` as input and returns a
+        :class:`.ValueMongoDb` instance.
 
     molecule : :class:`.Molecule`
         The molecule to test.
