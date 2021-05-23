@@ -31,7 +31,7 @@ class CaseDataData:
 
     get_database: Callable[[pymongo.MongoClient], stk.ValueMongoDb]
     molecule: stk.Molecule
-    value: object
+    key: object
 
 
 @pytest.fixture(
@@ -164,5 +164,9 @@ class CaseDataData:
         ),
     ),
 )
-def constructed_molecule_mongo_db(request):
-    return request.param
+def constructed_molecule_mongo_db(request, mongo_client):
+    return CaseData(
+        database=request.param.get_database(mongo_client),
+        molecule=request.param.molecule,
+        key=request.param.key,
+    )
