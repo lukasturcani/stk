@@ -100,6 +100,7 @@ jobs:
             - name: Run the EA
               run: conda run -n stk
                 python basic_ea/basic_ea.py
+                    --mongodb_uri mongodb://MongoDB:27017
 
             - name: Upload fitness plot
               uses: actions/upload-artifact@v2
@@ -138,6 +139,7 @@ jobs:
             - name: Run the EA
               run: conda run -n stk
                 python intermediate_ea/intermediate_ea.py
+                    --mongodb_uri mongodb://MongoDB:27017
 
             - name: Upload fitness plot
               uses: actions/upload-artifact@v2
