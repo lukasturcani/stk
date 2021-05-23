@@ -47,6 +47,18 @@ class MoleculeMongoDb(MoleculeDatabase):
             database=_test_database,
         )
 
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
     .. testcode:: storing-and-retrieving-molecules
 
         import stk
@@ -81,6 +93,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         stk.MoleculeMongoDb = _old_init
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
@@ -125,7 +138,6 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         NCCN
 
-
     *Using Alternative Keys for Retrieving Molecules*
 
     By default, the only molecular key the database stores, is the
@@ -146,6 +158,18 @@ class MoleculeMongoDb(MoleculeDatabase):
             database=_test_database,
             jsonizer=jsonizer,
         )
+
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
 
     .. testcode:: using-alternative-keys-for-retrieving-molecules
 
@@ -179,6 +203,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         _smiles = stk.Smiles()
         assert _smiles.get_key(molecule) == _smiles.get_key(retrieved)
+        pymongo.MongoClient = _mongo_client
 
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
@@ -274,6 +299,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         stk.MoleculeMongoDb = _old_init
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     Note that the key you use to get the molecule back from the
     database should be unique. In other words, there should always just
