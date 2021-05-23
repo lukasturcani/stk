@@ -17,9 +17,6 @@ class PropertyVector(FitnessCalculator):
 
     .. testcode:: calculating-fitness-values
 
-        import os
-        print(os.environ['MONGODB_URI'])
-
         import stk
 
         # First, create the functions which calculate the properties
