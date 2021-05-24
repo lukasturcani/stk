@@ -40,6 +40,18 @@ class ValueMongoDb(ValueDatabase):
             )
         )
 
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
     .. testcode:: storing-molecular-properties-in-a-database
 
         import stk
@@ -83,6 +95,7 @@ class ValueMongoDb(ValueDatabase):
 
         stk.ValueMongoDb = _old_init
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     """
 

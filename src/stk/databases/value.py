@@ -53,6 +53,18 @@ class ValueDatabase:
             database=_test_database,
         )
 
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
     .. testcode:: iterating-through-entries-in-the-database
 
         import pymongo
@@ -87,6 +99,7 @@ class ValueDatabase:
         stk.ValueMongoDb = _old_value_init
         stk.MoleculeMongoDb = _old_molecule_init
         pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     """
 

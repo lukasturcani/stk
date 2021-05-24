@@ -416,6 +416,18 @@ To place molecules into the database, first create the database
         )
     )
 
+    # Change the database MongoClient will connect to.
+
+    import os
+    import pymongo
+
+    _mongo_client = pymongo.MongoClient
+    _mongodb_uri = os.environ.get(
+        'MONGODB_URI',
+        'mongodb://localhost:27017/'
+    )
+    pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
 .. testcode:: placing-and-retrieving-molecules-from-a-database
 
     import stk
@@ -545,6 +557,7 @@ instances, you have to create a :class:`.ConstructedMoleculeMongoDb`
     stk.MoleculeMongoDb = _old_molecule_init
     stk.ConstructedMoleculeMongoDb = _old_constructed_molecule_init
     pymongo.MongoClient().drop_database(_test_database)
+    pymongo.MongoClient = _mongo_client
 
 Unlike ``loaded``, ``loaded_polymer`` is a
 :class:`.ConstructedMolecule` instance.
@@ -580,6 +593,18 @@ same database. First, lets create one
             database=_test_database,
         )
     )
+
+    # Change the database MongoClient will connect to.
+
+    import os
+    import pymongo
+
+    _mongo_client = pymongo.MongoClient
+    _mongodb_uri = os.environ.get(
+        'MONGODB_URI',
+        'mongodb://localhost:27017/'
+    )
+    pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
 
 .. testcode:: placing-and-retrieving-molecular-property-values
 
@@ -720,6 +745,7 @@ from the database. For example,
 
     stk.ValueMongoDb = _old_value_init
     pymongo.MongoClient().drop_database(_test_database)
+    pymongo.MongoClient = _mongo_client
 
 Specifying Functional Groups Individually
 =========================================
@@ -954,6 +980,18 @@ useful key for metal-containing molecules. You can use the
         )
     )
 
+    # Change the database MongoClient will connect to.
+
+    import os
+    import pymongo
+
+    _mongo_client = pymongo.MongoClient
+    _mongodb_uri = os.environ.get(
+        'MONGODB_URI',
+        'mongodb://localhost:27017/'
+    )
+    pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
 .. testcode:: making-keys-for-molecules-with-dative-bonds
 
     import stk
@@ -982,6 +1020,7 @@ useful key for metal-containing molecules. You can use the
 
     pymongo.MongoClient().drop_database(_test_database)
     stk.MoleculeMongoDb = _old_molecule_init
+    pymongo.MongoClient = _mongo_client
 
 Extending stk
 =============

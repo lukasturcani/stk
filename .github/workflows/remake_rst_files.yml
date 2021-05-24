@@ -6,18 +6,21 @@ on:
 
 jobs:
     remake-rst-files:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
+        container:
+            image: ghcr.io/lukasturcani/stk-test-environment
 
         steps:
             - name: Git checkout
               uses: actions/checkout@v2
 
-            - name: Install dependencies
-              run:
-                pip install -r docs/requirements.txt .
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
 
             - name: Remake rst files
-              run: docs/remake_modules.bash
+              run: conda run -n stk
+                docs/remake_modules.bash
 
             - name: Commit changes
               uses: EndBug/add-and-commit@v7

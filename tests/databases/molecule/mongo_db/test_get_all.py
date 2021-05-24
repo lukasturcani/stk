@@ -1,24 +1,22 @@
 import stk
-import pymongo
 
 from tests.utilities import is_equivalent_molecule
 
 
-def test_get_all():
+def test_get_all(mongo_client):
     """
     Test iteration over all entries.
 
     """
 
     database_name = '_test_get_entries_molecule'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     key_maker = stk.Inchi()
     jsonizer = stk.MoleculeJsonizer(key_makers=(key_maker, ))
 
     database = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         jsonizer=jsonizer,
         put_lru_cache_size=0,

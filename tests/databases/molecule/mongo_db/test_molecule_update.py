@@ -1,6 +1,5 @@
 import stk
 import numpy as np
-import pymongo
 
 from .utilities import get_database_state
 from ...utilities import (
@@ -18,18 +17,17 @@ def to_hashable(json):
     }
 
 
-def test_update_1():
+def test_update_1(mongo_client):
     """
     Test that existing entries are updated.
 
     """
 
     database_name = '_test_update_1'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     database = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
@@ -65,7 +63,7 @@ def test_update_1():
     )
 
 
-def test_update_2():
+def test_update_2(mongo_client):
     """
     Test that existing entries are updated.
 
@@ -76,12 +74,11 @@ def test_update_2():
     """
 
     database_name = '_test_update_2'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     jsonizer1 = stk.MoleculeJsonizer()
     database1 = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
@@ -94,7 +91,7 @@ def test_update_2():
         ),
     )
     database2 = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
@@ -108,7 +105,7 @@ def test_update_2():
         ),
     )
     database3 = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
@@ -160,7 +157,7 @@ def test_update_2():
     )
 
 
-def test_update_3():
+def test_update_3(mongo_client):
     """
     Test that existing entries are updated.
 
@@ -171,8 +168,7 @@ def test_update_3():
     """
 
     database_name = '_test_update_3'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     jsonizer1 = stk.MoleculeJsonizer(
         key_makers=(
@@ -181,7 +177,7 @@ def test_update_3():
         ),
     )
     database1 = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
@@ -190,7 +186,7 @@ def test_update_3():
 
     jsonizer2 = stk.MoleculeJsonizer()
     database2 = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
@@ -203,7 +199,7 @@ def test_update_3():
         ),
     )
     database3 = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,

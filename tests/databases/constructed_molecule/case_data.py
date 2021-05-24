@@ -11,7 +11,8 @@ class CaseData:
         The molecule to put and get from the :attr:`.database`.
 
     key : :class:`object`
-        The key used to retrieve :attr:`.molecule` from the database.
+        The key used to retrieve the :attr:`.molecule` from the
+        database.
 
     """
 
@@ -28,7 +29,7 @@ class CaseData:
             The molecule to put and get from the `database`.
 
         key : :class:`object`
-            The key used to retrieve `molecule` from the database.
+            The key used to retrieve the `molecule` from the database.
 
         """
 
