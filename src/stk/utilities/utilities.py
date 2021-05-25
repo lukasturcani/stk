@@ -843,7 +843,7 @@ def get_acute_vector(reference, vector):
 
 def get_plane_normal(points):
     centroid = points.sum(axis=0) / len(points)
-    return np.linalg.svd(points - centroid)[-1][2, :]
+    return np.around(np.linalg.svd(points - centroid)[-1][2, :], 14)
 
 
 def cap_absolute_value(value, max_absolute_value=1):

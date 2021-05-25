@@ -558,7 +558,10 @@ class Molecule:
             raise ValueError('atom_ids was of length 0.')
 
         pos = self._position_matrix[:, atom_ids].T
-        return np.linalg.svd(pos - pos.mean(axis=0))[-1][0]
+        return np.around(
+            a=np.linalg.svd(pos - pos.mean(axis=0))[-1][0],
+            decimals=14,
+        )
 
     def get_maximum_diameter(self, atom_ids=None):
         """
