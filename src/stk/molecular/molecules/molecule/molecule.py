@@ -639,7 +639,7 @@ class Molecule:
 
         pos = self._position_matrix[:, atom_ids].T
         centroid = self.get_centroid(atom_ids)
-        return np.linalg.svd(pos - centroid)[-1][2, :]
+        return np.around(np.linalg.svd(pos - centroid)[-1][2, :], 14)
 
     def get_position_matrix(self):
         """
