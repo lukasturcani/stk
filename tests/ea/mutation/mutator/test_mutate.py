@@ -52,6 +52,6 @@ def _test_mutate(mutator, record, mutation_record):
     original_mol = result.get_molecule_record().get_molecule()
     mutated_mol = mutation_record.get_molecule_record().get_molecule()
     is_equivalent(
-        original_mol.with_canonical_atom_ordering(),
-        mutated_mol.with_canonical_atom_ordering(),
+        molecule1=original_mol.with_canonical_atom_ordering(),
+        molecule2=mutated_mol.with_canonical_atom_ordering(),
     )

@@ -5,7 +5,7 @@ from ..case_data import CaseData
 
 def has_bromo(building_block):
     fg, = building_block.get_functional_groups(0)
-    return fg.__class__ is stk.Bromo
+    return type(fg) is stk.Bromo
 
 
 bb1 = stk.BuildingBlock('BrCC(Cl)CBr', [stk.BromoFactory()])
@@ -18,17 +18,17 @@ graph2 = stk.polymer.Linear((bb2, ), 'A', 2)
 @pytest.fixture(
     params=(
         CaseData(
-                mutator=stk.RandomSmarts(
-                    query_smarts='Cl',
-                    replacement_smarts='F',
-                    is_replaceable=has_bromo,
-                    replacement_fgs=[stk.BromoFactory()],
-                ),
-                record=stk.MoleculeRecord(graph1),
-                mutation_record=stk.MutationRecord(
-                    molecule_record=stk.MoleculeRecord(graph2),
-                    mutator_name='RandomSmarts'
-                ),
+            mutator=stk.RandomSmarts(
+                query_smarts='Cl',
+                replacement_smarts='F',
+                is_replaceable=has_bromo,
+                replacement_fgs=[stk.BromoFactory()],
+            ),
+            record=stk.MoleculeRecord(graph1),
+            mutation_record=stk.MutationRecord(
+                molecule_record=stk.MoleculeRecord(graph2),
+                mutator_name='RandomSmarts'
+            ),
         ),
     ),
 )

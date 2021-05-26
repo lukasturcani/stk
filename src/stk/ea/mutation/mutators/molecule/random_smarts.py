@@ -1,5 +1,5 @@
 """
-Random Smarts
+Random SMARTS
 =============
 
 """
@@ -10,7 +10,7 @@ import numpy as np
 from .mutator import MoleculeMutator
 from ...records import MutationRecord
 from ....molecule_records import MoleculeRecord
-from rdkit import Chem
+import rdkit.Chem.AllChem as rdkit
 from .....molecular import BuildingBlock
 
 
@@ -18,11 +18,11 @@ class RandomSmarts(MoleculeMutator):
     """
     Substitutes functional groups within building blocks.
 
-    This mutator takes a :class:`ConstructedMolecule` and substitutes
+    This mutator takes a :class:`.ConstructedMolecule` and substitutes
     the existing building blocks with ones containing
     new functionalities, as specified in the SMARTS strings.
     Atoms in functional groups cannot be adjusted as these are used to
-    construct the :class: `ConstructedMolecule`, and will
+    construct the :class: `.ConstructedMolecule`, and will
     result in an error being raised.
     Only external functionalities can be replaced.
     """
@@ -89,15 +89,15 @@ class RandomSmarts(MoleculeMutator):
             a=replaceable_building_blocks,
         )
         rdmol = replaced_building_block.to_rdkit_mol()
-        query = Chem.MolFromSmarts(self._query_smarts)
-        replacer_smarts = Chem.MolFromSmarts(self._replacement_smarts)
+        query = rdkit.MolFromSmarts(self._query_smarts)
+        replacer_smarts = rdkit.MolFromSmarts(self._replacement_smarts)
         if self._replacement_specifier == 'all':
-            new_rdmol = Chem.rdmolops.ReplaceSubstructs(
+            new_rdmol = rdkit.rdmolops.ReplaceSubstructs(
                 rdmol, query, replacer_smarts, replaceAll=True
             )[0]
 
         elif self._replacement_specifier == 'one':
-            new_rdmols = Chem.rdmolops.ReplaceSubstructs(
+            new_rdmols = rdkit.rdmolops.ReplaceSubstructs(
                 rdmol, query, replacer_smarts, replaceAll=False
             )
             new_rdmol = self._generator.choice(
