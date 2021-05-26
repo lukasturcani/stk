@@ -26,7 +26,7 @@ class NRotaxane(TopologyGraph):
     --------
     *Construction*
 
-    .. code-block:: python
+    .. testcode:: construction
 
         import stk
 
@@ -75,13 +75,58 @@ class NRotaxane(TopologyGraph):
     The `orientations` parameter allows the direction of each cycle
     along the axle to be flipped
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        r3 = stk.ConstructedMolecule(
+        import stk
+
+        cycle1 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrCNCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+        cycle2 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrCCNCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+        axle = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2,
+            ),
+        )
+        rotaxane1 = stk.ConstructedMolecule(
             topology_graph=stk.rotaxane.NRotaxane(
                 axle=stk.BuildingBlock.init_from_molecule(axle),
                 cycles=(
-                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle1),
                     stk.BuildingBlock.init_from_molecule(cycle2),
                 ),
                 repeating_unit='AB',
@@ -90,37 +135,37 @@ class NRotaxane(TopologyGraph):
             ),
         )
 
-    In the above example, ``cycle`` is guaranteed to be flipped,
+    In the above example, ``cycle1`` is guaranteed to be flipped,
     ``cycle2`` has a 50% chance of being flipped, each time it is
     placed on a node.
 
     Note that whether a building block will be flipped or not
     is decided during the initialization of :class:`.NRotaxane`
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        # rotaxane1 will always construct the same [n]rotaxane.
-        rotaxane1 = stk.rotaxane.NRotaxane(
+        # graph1 will always construct the same [n]rotaxane.
+        graph1 = stk.rotaxane.NRotaxane(
             axle=stk.BuildingBlock.init_from_molecule(axle),
             cycles=(
-                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle1),
                 stk.BuildingBlock.init_from_molecule(cycle2),
             ),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
         )
-        # r4 and r5 are guaranteed to be the same as they used the same
-        # topology graph.
-        r4 = stk.ConstructedMolecule(rotaxane1)
-        r5 = stk.ConstructedMolecule(rotaxane1)
+        # rotaxane2 and rotaxane3 are guaranteed to be the same as they
+        # used the same topology graph.
+        rotaxane2 = stk.ConstructedMolecule(graph1)
+        rotaxane3 = stk.ConstructedMolecule(graph1)
 
-        # rotaxane2 may lead to a different [n]rotaxane, despite
+        # graph2 may lead to a different [n]rotaxane, despite
         # being initialized with the same parameters.
-        rotaxane2 = stk.rotaxane.NRotaxane(
+        graph2 = stk.rotaxane.NRotaxane(
             axle=stk.BuildingBlock.init_from_molecule(axle),
             cycles=(
-                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle1),
                 stk.BuildingBlock.init_from_molecule(cycle2),
             ),
             repeating_unit='AB',
@@ -128,23 +173,23 @@ class NRotaxane(TopologyGraph):
             orientations=(0.65, 0.45)
         )
 
-        # r6 and r7 are guaranteed to be the same because they used the
-        # same topology graph. However, they may be different to r4 and
-        # r5.
-        r6 = stk.ConstructedMolecule(rotaxane2)
-        r7 = stk.ConstructedMolecule(rotaxane2)
+        # rotaxane4 and rotaxane5 are guaranteed to be the same because
+        # they used the same topology graph. However, they may be
+        # different to rotaxane2 and rotaxane3.
+        rotaxane4 = stk.ConstructedMolecule(graph2)
+        rotaxane5 = stk.ConstructedMolecule(graph2)
 
     The `random_seed` parameter can be used to get reproducible results
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        # r8 and r9 are guaranteed to be the same, because chain3 and
-        # chain4 used the same random seed.
+        # rotaxane6 and rotaxane7 are guaranteed to be the same,
+        # because graph3 and graph4 used the same random seed.
 
-        rotaxane3 = stk.rotaxane.NRotaxane(
+        graph3 = stk.rotaxane.NRotaxane(
             axle=stk.BuildingBlock.init_from_molecule(axle),
             cycles=(
-                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle1),
                 stk.BuildingBlock.init_from_molecule(cycle2),
             ),
             repeating_unit='AB',
@@ -152,12 +197,12 @@ class NRotaxane(TopologyGraph):
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p8 = stk.ConstructedMolecule(rotaxane3)
+        rotaxane6 = stk.ConstructedMolecule(graph3)
 
-        rotaxane4 = stk.rotaxane.NRotaxane(
+        graph4 = stk.rotaxane.NRotaxane(
             axle=stk.BuildingBlock.init_from_molecule(axle),
             cycles=(
-                stk.BuildingBlock.init_from_molecule(cycle),
+                stk.BuildingBlock.init_from_molecule(cycle1),
                 stk.BuildingBlock.init_from_molecule(cycle2),
             ),
             repeating_unit='AB',
@@ -165,21 +210,84 @@ class NRotaxane(TopologyGraph):
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        p9 = stk.ConstructedMolecule(rotaxane4)
+        rotaxane7 = stk.ConstructedMolecule(graph4)
 
     *Using Numbers to Define the Repeating Unit*
 
     The repeating unit can also be specified through the indices of
     the building blocks
 
-    .. code-block:: python
+    .. testcode:: using-numbers-to-define-the-repeating-unit
+
+        import stk
+
+        cycle1 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrCNCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+        cycle2 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCCCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrCCNCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+        cycle3 = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='BrCCNNCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='BrCCNNNCBr',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+        axle = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=2,
+            ),
+        )
 
         # r1 and r2 are different ways to write the same thing.
         r1 = stk.ConstructedMolecule(
             topology_graph=stk.rotaxane.NRotaxane(
                 axle=stk.BuildingBlock.init_from_molecule(axle),
                 cycles=(
-                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle1),
                     stk.BuildingBlock.init_from_molecule(cycle2),
                     stk.BuildingBlock.init_from_molecule(cycle3),
                 ),
@@ -191,7 +299,7 @@ class NRotaxane(TopologyGraph):
             topology_graph=stk.rotaxane.NRotaxane(
                 axle=stk.BuildingBlock.init_from_molecule(axle),
                 cycles=(
-                    stk.BuildingBlock.init_from_molecule(cycle),
+                    stk.BuildingBlock.init_from_molecule(cycle1),
                     stk.BuildingBlock.init_from_molecule(cycle2),
                     stk.BuildingBlock.init_from_molecule(cycle3),
                 ),

@@ -16,22 +16,143 @@ class RandomCrosser:
     --------
     *Use One of Several Crossers at Random*
 
-    .. code-block:: python
+    .. testcode:: use-one-of-several-crossers-at-random
 
         import stk
 
+        def get_functional_group_type(building_block):
+            fg, = building_block.get_functional_groups(0)
+            return type(fg)
+
+        def get_num_functional_groups(building_block):
+           return building_block.get_num_functional_groups()
+
         crosser = stk.RandomCrosser(
             crossers=(
-                # Assume each crosser crosses in a different way.
-                stk.GeneticRecombination(...),
-                stk.GeneticRecombination(...),
+                stk.GeneticRecombination(get_functional_group_type),
+                stk.GeneticRecombination(get_num_functional_groups),
+            ),
+            random_seed=12,
+        )
+
+        record1 = stk.MoleculeRecord(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='O=CC(C=O)CC=O',
+                        functional_groups=[stk.AldehydeFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='NCCN',
+                        functional_groups=[stk.PrimaryAminoFactory()],
+                    ),
+                ),
             ),
         )
+        record2 = stk.MoleculeRecord(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='O=CNC(C=O)CC=O',
+                        functional_groups=[stk.AldehydeFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles='NCNCN',
+                        functional_groups=[stk.PrimaryAminoFactory()],
+                    ),
+                ),
+            ),
+        )
+
         # Use one of the component crossers at random.
-        crossover_record1 = crosser.cross(record)
+        crossover_records1 = tuple(crosser.cross((record1, record2)))
         # A different crosser may get selected at random the second,
         # third, etc, time.
-        crossover_record2 = crosser.cross(record)
+        crossover_records2 = tuple(crosser.cross((record1, record2)))
+
+    .. testcode:: use-one-of-several-crossers-at-random
+        :hide:
+
+        _expected_results = (
+            stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='O=CNC(C=O)CC=O',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='NCNCN',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                    ),
+                ),
+            ),
+            stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='O=CC(C=O)CC=O',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='NCCN',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                    ),
+                ),
+            ),
+            stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='O=CNC(C=O)CC=O',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='NCCN',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                    ),
+                ),
+            ),
+            stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='O=CC(C=O)CC=O',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='NCNCN',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        def _get_smiles(item):
+            if isinstance(item, stk.ConstructedMolecule):
+               return stk.Smiles().get_key(item)
+            return stk.Smiles().get_key(
+                molecule=item.get_molecule_record().get_molecule(),
+             )
+
+        _expected_smiles = set(map(_get_smiles, _expected_results))
+
+        _crossover_smiles1 = set(map(_get_smiles, crossover_records1))
+        _crossover_smiles2 = set(map(_get_smiles, crossover_records2))
+        assert _expected_smiles == _crossover_smiles1
+        assert _expected_smiles == _crossover_smiles2
 
     """
 
@@ -47,9 +168,9 @@ class RandomCrosser:
             :class:`.CrossoverRecord`.
 
         weights : :class:`tuple` of :class:`float`, optional
-            For each mutator, the probability that it will be chosen
-            whenever :meth:`.mutate` is called.
-            If ``None`` all `mutators` will have equal chance of being
+            For each crosser, the probability that it will be chosen
+            whenever :meth:`.cross` is called.
+            If ``None`` all `crossers` will have equal chance of being
             selected.
 
         random_seed : :class:`int`, optional

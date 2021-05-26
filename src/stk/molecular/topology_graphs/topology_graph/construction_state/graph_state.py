@@ -1,3 +1,9 @@
+"""
+Graph State
+===========
+
+"""
+
 import numpy as np
 from collections import defaultdict
 
@@ -14,6 +20,7 @@ class _GraphState:
         '_edges',
         '_lattice_constants',
         '_vertex_edges',
+        '_num_building_blocks',
     ]
 
     def __init__(
@@ -48,13 +55,21 @@ class _GraphState:
             in building_block_vertices.items()
             for vertex in vertices
         }
+        self._num_building_blocks = {
+            building_block: len(vertices)
+            for building_block, vertices
+            in building_block_vertices.items()
+        }
         self._vertices = {
             vertex.get_id(): vertex
             for vertices in building_block_vertices.values()
             for vertex in vertices
         }
         self._edges = edges
-        self._lattice_constants = lattice_constants
+        self._lattice_constants = tuple(map(
+            np.array,
+            lattice_constants,
+        ))
         self._vertex_edges = self._get_vertex_edges()
 
     def _get_vertex_edges(self):
@@ -152,6 +167,11 @@ class _GraphState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
+        clone._lattice_constants = tuple(map(
+            np.array,
+            self._lattice_constants,
+        ))
+        clone._num_building_blocks = dict(self._num_building_blocks)
         return clone
 
     def get_building_block(self, vertex_id):
@@ -243,6 +263,19 @@ class _GraphState:
 
         return len(self._edges)
 
+    def get_lattice_constants(self):
+        """
+        Get the lattice constants of the state.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants.
+
+        """
+
+        return tuple(map(np.array, self._lattice_constants))
+
     def get_edges(self, vertex_id):
         """
         Get the edges connect to a vertex.
@@ -289,3 +322,79 @@ class _GraphState:
         """
 
         return self.clone()._with_vertices(vertices)
+
+    def _with_lattice_constants(self, lattice_constants):
+        """
+        Modify the instance.
+
+        """
+
+        self._lattice_constants = tuple(map(
+            np.array,
+            lattice_constants,
+        ))
+        return self
+
+    def with_lattice_constants(self, lattice_constants):
+        """
+        Return a clone holding the `lattice_constants`.
+
+        Parameters
+        ----------
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants of the clone. Requires 3 arrays of
+            size``(3, )``.
+
+        Returns
+        -------
+        :class:`._GraphState`
+            The clone holding the new lattice constants. Has the same
+            type as the original instance.
+
+        """
+
+        return self.clone()._with_lattice_constants(lattice_constants)
+
+    def get_num_building_block(self, building_block):
+        """
+        Get the number of times `building_block` is present.
+
+        Parameters
+        ----------
+        building_block : :class:`.BuildingBlock`
+            The building block whose frequency in the topology graph
+            is desired.
+
+        Returns
+        -------
+        :class:`int`
+            The number of times `building_block` is present in the
+            topology graph.
+
+        """
+
+        return self._num_building_blocks[building_block]
+
+    def get_building_blocks(self):
+        """
+        Yield the building blocks.
+
+        Building blocks are yielded in an order based on their
+        position in the topology graph. For two equivalent
+        topology graphs, but with different building blocks,
+        equivalently positioned building blocks will be yielded at the
+        same time.
+
+        Yields
+        ------
+        :class:`.BuildingBlock`
+            A building block of the topology graph.
+
+        """
+
+        yielded = set()
+        for vertex_id in range(max(self._vertex_building_blocks)+1):
+            building_block = self._vertex_building_blocks[vertex_id]
+            if building_block not in yielded:
+                yielded.add(building_block)
+                yield building_block

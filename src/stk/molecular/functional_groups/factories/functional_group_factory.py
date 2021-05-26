@@ -84,33 +84,43 @@ class FunctionalGroupFactory:
     You have a building block with two functional groups, but you want
     to use just one.
 
-    .. code-block:: python
+    .. testcode:: using-a-single-functional-group-factory
 
         import stk
 
         amino_factory = stk.PrimaryAminoFactory()
         building_block = stk.BuildingBlock('NCCN')
-        amino_group, = amino_factory.get_functional_groups(
+        amino_group1, *rest = amino_factory.get_functional_groups(
             molecule=building_block,
         )
         building_block = building_block.with_functional_groups(
-            functional_groups=(amino_group, ),
+            functional_groups=(amino_group1, ),
         )
+
+    .. testcode:: using-a-single-functional-group-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.PrimaryAmino)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 1
 
     *Using a Subset of Functional Groups From a Factory*
 
     You have multiple functional groups, but you want the building
     block to use a specific subset.
 
-    .. code-block:: python
+    .. testcode:: using-a-subset-of-functional-groups-from-a-factory
 
         import stk
 
         bromo_factory = stk.BromoFactory()
         building_block = stk.BuildingBlock('BrCC(Br)CC(Br)CC(Br)CCBr')
-        bromo_groups = tuple(
-            bromo_factory.get_functional_groups(molecule)
-        )
+        bromo_groups = tuple(bromo_factory.get_functional_groups(
+            molecule=building_block,
+        ))
         building_block = building_block.with_functional_groups(
             functional_groups=(
                 bromo_groups[0],
@@ -118,6 +128,16 @@ class FunctionalGroupFactory:
                 bromo_groups[4],
             ),
         )
+
+    .. testcode:: using-a-subset-of-functional-groups-from-a-factory
+        :hide:
+
+        assert all(
+            isinstance(functional_group, stk.Bromo)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 3
 
     More usage examples can be found in the docstrings of the
     various subclasses.

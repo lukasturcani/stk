@@ -23,7 +23,7 @@ class Atom:
     The atom can be initialized through the :class:`.Atom` class or
     through the class representing the element.
 
-    .. code-block:: python
+    .. testcode:: initialization
 
         import stk
 
@@ -33,10 +33,10 @@ class Atom:
         # h1 is also an instance of the H class.
         h1 = stk.H(id=1)
 
-    When the class correspnding to the element is used directly, the
+    When the class corresponding to the element is used directly, the
     ``atomic_number`` is not provided. Here are a few more examples.
 
-    .. code-block:: python
+    .. testcode:: initialization
 
         # Both he0 and he1 are instances of the He class.
         he0 = stk.Atom(id=2, atomic_number=2)

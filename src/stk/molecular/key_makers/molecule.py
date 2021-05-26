@@ -41,7 +41,7 @@ class MoleculeKeyMaker:
     :class:`.MoleculeKeyMaker` can be used directly , if you don't
     feel like writing a subclass
 
-    .. code-block:: python
+    .. testcode:: creating-a-new-key-maker-directly
 
         import stk
 
@@ -58,6 +58,12 @@ class MoleculeKeyMaker:
         )
         # Get the JSON representation of a molecule.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+
+    .. testcode:: creating-a-new-key-maker-directly
+        :hide:
+
+        assert json['molecule']['num_atoms'] == 12
+        assert json['matrix']['num_atoms'] == 12
 
     """
 

@@ -16,4 +16,5 @@ Submodules
    stk.molecular.topology_graphs.topology_graph.optimizers.mchammer
    stk.molecular.topology_graphs.topology_graph.optimizers.null
    stk.molecular.topology_graphs.topology_graph.optimizers.optimizer
+   stk.molecular.topology_graphs.topology_graph.optimizers.periodic_collapser
    stk.molecular.topology_graphs.topology_graph.optimizers.utilities

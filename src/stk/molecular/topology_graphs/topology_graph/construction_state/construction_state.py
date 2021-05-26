@@ -127,6 +127,19 @@ class ConstructionState:
             results=results,
         )
 
+    def get_lattice_constants(self):
+        """
+        Get the lattice constants of the state.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants.
+
+        """
+
+        return self._graph_state.get_lattice_constants()
+
     def get_building_block(self, vertex_id):
         """
         Get the building block to be placed on a given vertex.
@@ -285,6 +298,39 @@ class ConstructionState:
 
         return self.clone()._with_reaction_results(reactions, results)
 
+    def _with_lattice_constants(self, lattice_constants):
+        """
+        Modify the instance.
+
+        """
+
+        self._graph_state = (
+            self._graph_state.with_lattice_constants(
+                lattice_constants=lattice_constants,
+            )
+        )
+        return self
+
+    def with_lattice_constants(self, lattice_constants):
+        """
+        Return a clone holding the `lattice_constants`.
+
+        Parameters
+        ----------
+        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
+            The lattice constants of the clone. Requires 3 arrays of
+            size``(3, )``.
+
+        Returns
+        -------
+        :class:`.ConstructionState`
+            The clone holding the new lattice constants. Has the same
+            type as the original instance.
+
+        """
+
+        return self.clone()._with_lattice_constants(lattice_constants)
+
     def _with_position_matrix(self, position_matrix):
         """
         Modify the instance.
@@ -409,3 +455,42 @@ class ConstructionState:
         """
 
         yield from self._molecule_state.get_bond_infos()
+
+    def get_num_building_block(self, building_block):
+        """
+        Get the number of times `building_block` is present.
+
+        Parameters
+        ----------
+        building_block : :class:`.BuildingBlock`
+            The building block whose frequency in the topology graph
+            is desired.
+
+        Returns
+        -------
+        :class:`int`
+            The number of times `building_block` is present in the
+            topology graph.
+
+        """
+
+        return self._graph_state.get_num_building_block(building_block)
+
+    def get_building_blocks(self):
+        """
+        Yield the building blocks.
+
+        Building blocks are yielded in an order based on their
+        position in the topology graph. For two equivalent
+        topology graphs, but with different building blocks,
+        equivalently positioned building blocks will be yielded at the
+        same time.
+
+        Yields
+        ------
+        :class:`.BuildingBlock`
+            A building block of the topology graph.
+
+        """
+
+        yield from self._graph_state.get_building_blocks()

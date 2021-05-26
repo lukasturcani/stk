@@ -18,7 +18,7 @@ class FilterBatches(Selector):
     You only want the :class:`.Best` 10 batches to participate in
     :class:`.Roulette`
 
-    .. code-block:: python
+    .. testcode:: using-a-selection-algorithm-on-a-subset-of-batches
 
         import stk
 
@@ -28,9 +28,27 @@ class FilterBatches(Selector):
             filter=stk.Best(10),
             selector=stk.Roulette(7),
         )
+
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(100)
+        )
+
         for batch in selector.select(population):
             # Do stuff with batch. It is one of the 10 best batches and
             # was selected using roulette selection.
+            pass
 
     """
 

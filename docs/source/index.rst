@@ -65,10 +65,10 @@
 
 .. toctree::
    :hidden:
-   :caption: Developer Guide
-   :maxdepth: 2
+   :caption: Modules
+   :maxdepth: 1
 
-   Software Architecture <software_architecture>
+   Modules <modules.rst>
 
 
 ============
@@ -87,7 +87,7 @@ To get :mod:`.stk`, you can install it with pip::
 
 Make sure you also install :mod:`rdkit`, which is a dependency::
 
-    $ conda install -c rdkit rdkit=2020
+    $ conda install -c conda-forge rdkit
 
 
 Overview

@@ -15,7 +15,7 @@ class FilterMolecules(Selector):
     --------
     *Using a Selection Algorithm on a Subset of Batches*
 
-    .. code-block:: python
+    .. testcode:: using-a-selection-algorithm-on-a-subset-of-batches
 
         import stk
 
@@ -25,10 +25,28 @@ class FilterMolecules(Selector):
             # Select from those molecules using roulette selection.
             selector=stk.Roulette(num_batches=20, batch_size=3),
         )
+
+        population = tuple(
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(i)
+            for i in range(10)
+        )
+
         for batch in selector.select(population):
             # Do stuff with batch. All the molecules in the batch
             # belong to the top 5 batches of size 3. The batch
             # was selected using roulette selection.
+            pass
 
     """
 

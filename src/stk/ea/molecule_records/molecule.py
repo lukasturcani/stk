@@ -77,13 +77,8 @@ class MoleculeRecord:
 
         Returns
         -------
-        :class:`float`
-            If `normalized` is ``True`` and a fitness value has been
-            assigned, it is guaranteed to be a float.
-
         :class:`object`
-            If `normalized` is ``False`` and a fitness value has been
-            assigned,any object may be returned.
+            The fitness value.
 
         None : :class:`NoneType`
             If a fitness value has not been assigned to the record.
@@ -122,9 +117,8 @@ class MoleculeRecord:
 
         Parameters
         ----------
-        fitness_value : :class:`object` or :class:`float`
-            The fitness value of the clone. If `normalized` is
-            ``True``, this value must be a :class:`float`.
+        fitness_value : :class:`object`
+            The fitness value of the clone.
 
         normalized : :class:`bool`, optional
             Toggles if the normalized or unnormalized fitness value is

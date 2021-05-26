@@ -1,3 +1,9 @@
+"""
+Cage Construction State
+=======================
+
+"""
+
 from ..topology_graph import ConstructionState
 
 

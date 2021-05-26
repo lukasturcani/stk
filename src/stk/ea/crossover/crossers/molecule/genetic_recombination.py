@@ -37,7 +37,9 @@ class GeneticRecombination(MoleculeCrosser):
     building block an allele of? To answer that, let's first construct
     a couple of building block molecules
 
-    .. code-block:: python
+    .. testcode:: genetic-recombination
+
+        import stk
 
         bb1 = stk.BuildingBlock(
             smiles='NCC(N)CN',
@@ -56,11 +58,20 @@ class GeneticRecombination(MoleculeCrosser):
     We can define a function which analyzes a building block
     molecule and returns the gene it belongs to, for example
 
-    .. code-block:: python
+    .. testcode:: genetic-recombination
 
         def get_gene(building_block):
             fg, = building_block.get_functional_groups(0)
-            return fg.__class__
+            return type(fg)
+
+    .. testcode:: genetic-recombination
+        :hide:
+
+        assert get_gene(bb1) == stk.PrimaryAmino
+        assert get_gene(bb2) == stk.Aldehyde
+        assert get_gene(bb3) == stk.Aldehyde
+        assert get_gene(bb4) == stk.PrimaryAmino
+
 
     Here, we can see that the gene, to which each building block
     molecule belongs, is given by the class of its first functional
@@ -70,10 +81,18 @@ class GeneticRecombination(MoleculeCrosser):
 
     Alternatively, we could have defined a function such as
 
-    .. code-block:: python
+    .. testcode:: genetic-recombination
 
-        def get_gene(building_block):
+        def get_gene2(building_block):
             return building_block.get_num_functional_groups()
+
+    .. testcode:: genetic-recombination
+        :hide:
+
+        assert get_gene2(bb1) == 3
+        assert get_gene2(bb2) == 2
+        assert get_gene2(bb3) == 3
+        assert get_gene2(bb4) == 2
 
     Now we can see that we end up with the gene called
     ``3``, which has two alleles ``bb1`` and ``bb3``,
@@ -95,7 +114,7 @@ class GeneticRecombination(MoleculeCrosser):
 
     Note that any number of parents can be used for the crossover
 
-    .. code-block:: python
+    .. testcode:: crossing-constructed-molecules
 
         import stk
 
@@ -105,7 +124,7 @@ class GeneticRecombination(MoleculeCrosser):
         bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
         graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
         polymer1  = stk.ConstructedMolecule(graph1)
-        record1 = stk.MoleculeRecord(polymer1, graph1)
+        record1 = stk.MoleculeRecord(graph1)
 
         bb3 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
         bb4 = stk.BuildingBlock(
@@ -114,13 +133,13 @@ class GeneticRecombination(MoleculeCrosser):
         )
         graph2 = stk.polymer.Linear((bb3, bb4), 'AB', 2)
         polymer2  = stk.ConstructedMolecule(graph2)
-        record2 = stk.MoleculeRecord(polymer2, graph2)
+        record2 = stk.MoleculeRecord(graph2)
 
         # Create the crosser.
 
         def get_functional_group_type(building_block):
             fg, = building_block.get_functional_groups(0)
-            return fg.__class__
+            return type(fg)
 
         recombination = stk.GeneticRecombination(
             get_gene=get_functional_group_type,
@@ -131,6 +150,39 @@ class GeneticRecombination(MoleculeCrosser):
         cohort1 = tuple(recombination.cross(
             records=(record1, record2),
         ))
+
+    .. testcode:: crossing-constructed-molecules
+        :hide:
+
+        _expected_cohort = (
+            polymer1,
+            polymer2,
+            stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(bb1, bb4),
+                    repeating_unit='AB',
+                    num_repeating_units=2,
+                ),
+            ),
+            stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(bb2, bb3),
+                    repeating_unit='AB',
+                    num_repeating_units=2,
+                ),
+            ),
+        )
+
+        def _get_smiles(item):
+            if isinstance(item, stk.ConstructedMolecule):
+               return stk.Smiles().get_key(item)
+            return stk.Smiles().get_key(
+                molecule=item.get_molecule_record().get_molecule(),
+             )
+
+        _expected_smiles = set(map(_get_smiles, _expected_cohort))
+        _cohort_smiles = set(map(_get_smiles, cohort1))
+        assert _expected_smiles == _cohort_smiles
 
     """
 

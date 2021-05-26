@@ -1,3 +1,9 @@
+"""
+JSON Deserialization Utilities
+==============================
+
+"""
+
 from stk.molecular import Atom, Bond, AtomInfo, BondInfo
 
 

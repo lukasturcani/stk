@@ -1,3 +1,9 @@
+"""
+PDB Updating Utilities
+======================
+
+"""
+
 import rdkit.Chem.AllChem as rdkit
 
 from stk.utilities import remake

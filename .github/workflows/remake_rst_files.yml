@@ -1,0 +1,29 @@
+name: remake-rst-files
+
+on:
+    push:
+        branches: [master]
+
+jobs:
+    remake-rst-files:
+        runs-on: ubuntu-20.04
+        container:
+            image: ghcr.io/lukasturcani/stk-test-environment
+
+        steps:
+            - name: Git checkout
+              uses: actions/checkout@v2
+
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
+
+            - name: Remake rst files
+              run: conda run -n stk
+                docs/remake_modules.bash
+
+            - name: Commit changes
+              uses: EndBug/add-and-commit@v7
+              with:
+                  add: docs/source
+                  message: Update rst files

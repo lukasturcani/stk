@@ -107,6 +107,32 @@ class TopologyGraph:
     :mod:`~.topology_graph.topology_graph.topology_graph`, can serve
     as good examples.
 
+    *Changing the Building Blocks of a Topology Graph*
+
+    To change the building blocks used by a topology graph you
+    can use :meth:`.with_building_blocks` to get a clone of the
+    topology graph holding the new building blocks
+
+    .. testcode:: changing-the-building-blocks-of-a-topology-graph
+
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+        linear = stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='A',
+            num_repeating_units=15,
+        )
+
+        bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+        # All bb1 instances are replaced by bb3, but bb2 remains
+        # in place.
+        clone = linear.with_building_blocks({
+            bb1: bb3,
+        })
+
     """
 
     def __init__(
@@ -264,28 +290,6 @@ class TopologyGraph:
             The clone. Has the same type as the original topology
             graph.
 
-        Examples
-        --------
-        .. code-block:: python
-
-            import stk
-
-            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-            bb2 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
-
-            linear = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
-                repeating_unit='A',
-                num_repeating_units=15,
-            )
-
-            bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
-            # All bb1 instances are replaced by bb3, but bb2 remains
-            # in place.
-            clone = linear.with_building_blocks({
-                bb1: bb3,
-            })
-
         """
 
         return self.clone()._with_building_blocks(building_block_map)
@@ -404,6 +408,24 @@ class TopologyGraph:
         state = self._place_building_blocks(state)
         state = self._run_reactions(state)
         state = self._optimizer.optimize(state)
+        return self._get_construction_result(state)
+
+    def _get_construction_result(self, state):
+        """
+        Get the result of the construction.
+
+        Parameters
+        ----------
+        state : :class:`.ConstructionState`
+            The state of the molecule being constructed.
+
+        Returns
+        -------
+        :class:`.ConstructionResult`
+            The data describing the :class:`.ConstructedMolecule`.
+
+        """
+
         return ConstructionResult(state)
 
     def _get_construction_state(self):

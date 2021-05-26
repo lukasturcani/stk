@@ -1,3 +1,9 @@
+"""
+Evolutionary Algorithm Implementation
+=====================================
+
+"""
+
 import itertools as it
 
 from stk.utilities import dedupe

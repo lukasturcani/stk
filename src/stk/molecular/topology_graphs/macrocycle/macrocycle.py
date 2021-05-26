@@ -5,6 +5,7 @@ Macrocycle
 """
 
 import numpy as np
+import warnings
 
 from .vertices import _CycleVertex
 from ..topology_graph import TopologyGraph, NullOptimizer, Edge
@@ -26,7 +27,7 @@ class Macrocycle(TopologyGraph):
     the ends, hence the constructor parameters allows you to specify
     the chain
 
-    .. code-block:: python
+    .. testcode:: construction
 
         import stk
 
@@ -46,7 +47,9 @@ class Macrocycle(TopologyGraph):
     For :class:`.Macrocycle` topologies, it is recommended to use the
     :class:`.MCHammer` optimizer.
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
+
+        import stk
 
         macrocycle = stk.ConstructedMolecule(
             topology_graph=stk.macrocycle.Macrocycle(
@@ -65,86 +68,91 @@ class Macrocycle(TopologyGraph):
     The `orientations` parameter allows the direction of each building
     block along to the chain to be flipped
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        bb4 = stk.BuildingBlock('BrCOCCBr', [stk.BromoFactory()])
+        import stk
 
-        c3 = stk.ConstructedMolecule(
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCOCCBr', [stk.BromoFactory()])
+
+        c1 = stk.ConstructedMolecule(
             topology_graph=stk.macrocycle.Macrocycle(
-                building_blocks=(bb2, bb4),
+                building_blocks=(bb1, bb2),
                 repeating_unit='AB',
                 num_repeating_units=5,
                 orientations=(1, 0.5),
             ),
         )
 
-    In the above example, ``bb2`` is guaranteed to be flipped,
-    ``bb4`` has a 50% chance of being flipped, each time it is placed
+    In the above example, ``bb1`` is guaranteed to be flipped,
+    ``bb2`` has a 50% chance of being flipped, each time it is placed
     on a node.
 
     Note that whether a building block will be flipped or not
     is decided during the initialization of :class:`.Macrocycle`
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
         # cycle will always construct the same macrocycle.
         cycle = stk.macrocycle.Macrocycle(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
         )
-        # c4 and c5 are guaranteed to be the same as they used the same
+        # c2 and c3 are guaranteed to be the same as they used the same
         # topology graph.
-        c4 = stk.ConstructedMolecule(cycle)
-        c5 = stk.ConstructedMolecule(cycle)
+        c2 = stk.ConstructedMolecule(cycle)
+        c3 = stk.ConstructedMolecule(cycle)
 
         # cycle2 may lead to a different polymer than chain, despite
         # being initialized with the same parameters.
         cycle2 = stk.macrocycle.Macrocycle(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45)
         )
 
-        # c6 and c7 are guaranteed to be the same because they used
+        # c4 and c5 are guaranteed to be the same because they used
         # the same topology graph. However, they may be different to
-        # c4 and c5.
-        c6 = stk.ConstructedMolecule(cycle2)
-        c7 = stk.ConstructedMolecule(cycle2)
+        # c2 and c3.
+        c4 = stk.ConstructedMolecule(cycle2)
+        c5 = stk.ConstructedMolecule(cycle2)
 
     The `random_seed` parameter can be used to get reproducible results
 
-    .. code-block:: python
+    .. testcode:: defining-the-orientation-of-each-building-block
 
-        # c8 and c9 are guaranteed to be the same, because cycle3 and
+        # c6 and c7 are guaranteed to be the same, because cycle3 and
         # cycle4 used the same random seed.
 
         cycle3 = stk.macrocycle.Macrocycle(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        c8 = stk.ConstructedMolecule(cycle3)
+        c6 = stk.ConstructedMolecule(cycle3)
 
         cycle4 = stk.macrocycle.Macrocycle(
-            building_blocks=(bb2, bb4),
+            building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=5,
             orientations=(0.65, 0.45),
             random_seed=4,
         )
-        c9 = stk.ConstructedMolecule(cycle4)
+        c7 = stk.ConstructedMolecule(cycle4)
 
     *Using Numbers to Define the Repeating Unit*
 
     The repeating unit can also be specified through the indices of
     the building blocks
 
-    .. code-block:: python
+    .. testcode:: using-numbers-to-define-the-repeating-unit
+
+        import stk
 
         bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
         bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
@@ -245,6 +253,13 @@ class Macrocycle(TopologyGraph):
             orientations = orientations*num_repeating_units
 
         chain_length = len(repeating_unit)*num_repeating_units
+        if chain_length == 2:
+            warnings.warn(
+                'The orientation of macrocycles with chain length '
+                f'{chain_length} is not expected to provide robust '
+                'alignment and bonding.'
+            )
+
         if len(orientations) != chain_length:
             raise ValueError(
                 'The length of orientations must match either '

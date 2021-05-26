@@ -5,7 +5,6 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
-import warnings
 
 from stk.serialization import (
     MoleculeJsonizer,
@@ -30,11 +29,37 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     Examples
     --------
-    *Storing and Retrieving Constructed Molecules*
+    *Storing and Retrieving Molecules*
 
     You want to store and retrieve a molecule from the database
 
-    .. code-block:: python
+    .. testsetup:: storing-and-retrieving-molecules
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.MoleculeMongoDb
+        stk.MoleculeMongoDb = lambda mongo_client: _old_init(
+            mongo_client=mongo_client,
+            database=_test_database,
+        )
+
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/',
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
+    .. testcode:: storing-and-retrieving-molecules
 
         import stk
         import pymongo
@@ -58,6 +83,18 @@ class MoleculeMongoDb(MoleculeDatabase):
             key_maker.get_key_name(): key_maker.get_key(molecule)
         })
 
+    .. testcode:: storing-and-retrieving-molecules
+        :hide:
+
+        _smiles = stk.Smiles()
+        assert _smiles.get_key(molecule) == _smiles.get_key(retrieved)
+
+    .. testcleanup:: storing-and-retrieving-molecules
+
+        stk.MoleculeMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
+
     Note that the molecule retrieved from that database can have
     a different atom ordering than the one put into it. So while the
     molecule will have the same structure, the order of the atoms
@@ -70,10 +107,41 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     All entries in a database can be iterated over very simply
 
-    .. code-block:: python
+    .. testsetup:: iterating-over-all-entries-in-the-database
+
+        import stk
+        import pymongo
+        import os
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _mongo_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/',
+        )
+        client = pymongo.MongoClient(_mongo_uri)
+        db = stk.MoleculeMongoDb(
+            mongo_client=client,
+            database=_test_database,
+         )
+
+        # Create a molecule.
+        molecule = stk.BuildingBlock('NCCN')
+
+        # Place it into the database.
+        db.put(molecule)
+
+    .. testcode:: iterating-over-all-entries-in-the-database
 
         for entry in db.get_all():
-            # Do something to entry.
+            # Do something to the entry.
+            print(stk.Smiles().get_key(entry))
+
+    .. testoutput:: iterating-over-all-entries-in-the-database
+
+        NCCN
 
     *Using Alternative Keys for Retrieving Molecules*
 
@@ -81,16 +149,49 @@ class MoleculeMongoDb(MoleculeDatabase):
     InChIKey. However, additional keys can be added to the JSON stored
     in the database by using a different :class:`.MoleculeJsonizer`
 
-    .. code-block:: python
+    .. testsetup:: using-alternative-keys-for-retrieving-molecules
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.MoleculeMongoDb
+        stk.MoleculeMongoDb = lambda mongo_client, jsonizer: _old_init(
+            mongo_client=mongo_client,
+            database=_test_database,
+            jsonizer=jsonizer,
+        )
+
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+
+        import pymongo
 
         db = stk.MoleculeMongoDb(
-            mongo_client=client,
+            mongo_client=pymongo.MongoClient(),
             # Store the InChI and the InChIKey of molecules in
             # the JSON representation.
             jsonizer=stk.MoleculeJsonizer(
                 key_makers=(stk.Inchi(), stk.InchiKey()),
             )
         )
+
+        # Create a molecule.
+        molecule = stk.BuildingBlock('NCCN')
+
         # Places the JSON of the molecule into the database. In this
         # case, the JSON includes both the InChI and the InChIKey.
         db.put(molecule)
@@ -102,26 +203,36 @@ class MoleculeMongoDb(MoleculeDatabase):
             key_maker.get_key_name(): key_maker.get_key(molecule),
         })
 
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+        :hide:
+
+        _smiles = stk.Smiles()
+        assert _smiles.get_key(molecule) == _smiles.get_key(retrieved)
+
     Obviously, most of the time, you won't have the molecule you are
     trying to retrieve from the database. Maybe you only have the
     SMILES of the molecule. You can still retrieve it.
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
         import rdkit.Chem.AllChem as rdkit
 
-        retrieved = db.get(
-            'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('NCCN'))
-        )
+        retrieved2 = db.get({
+            'InChI': rdkit.MolToInchi(rdkit.MolFromSmiles('NCCN')),
+        })
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+        :hide:
+
+        _smiles = stk.Smiles()
+        assert _smiles.get_key(molecule) == _smiles.get_key(retrieved2)
 
     As long as you have the name of the key, and the expected value
     of the key, you can retrieve your molecule from the database.
 
     Note that you can create your own keys and add them to the database
 
-    .. code-block:: python
-
-        import rdkit.Chem.AllChem as rdkit
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
         # Create your own key. This one is called "SMILES" and the
         # value is the SMILES of the molecule.
@@ -136,7 +247,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                 return rdkit.MolToSmiles(molecule.to_rdkit_mol())
 
         db = stk.MoleculeMongoDb(
-            mongo_client=client,
+            mongo_client=pymongo.MongoClient(),
             jsonizer=stk.MoleculeJsonizer(
                 # Include your own custom key maker in the JSON
                 # representation.
@@ -144,20 +255,28 @@ class MoleculeMongoDb(MoleculeDatabase):
             ),
         )
 
-        molecule = stk.BuildingBlock('BrBr')
+        molecule2 = stk.BuildingBlock('BrBr')
 
         # Place the JSON of your molecule into the database. In this
         # case the JSON will include a key called "SMILES" and
         # the value will be the SMILES of the molecule.
-        db.put(molecule)
+        db.put(molecule2)
 
         # You can now find your molecule by using SMILES as the key.
-        retrieved = db.get({'SMILES': 'BrBr'})
+        retrieved3 = db.get({'SMILES': 'BrBr'})
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+        :hide:
+
+        _smiles = stk.Smiles()
+        assert (
+            _smiles.get_key(molecule2) == _smiles.get_key(retrieved3)
+        )
 
     Often, it is unnecessary to create a whole subclass for a your
     custom key
 
-    .. code-block:: python
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
 
         smiles = stk.MoleculeKeyMaker(
             key_name='SMILES',
@@ -165,11 +284,26 @@ class MoleculeMongoDb(MoleculeDatabase):
                 rdkit.MolToSmiles(molecule.to_rdkit_mol()),
         )
         db = stk.MoleculeMongoDb(
-            mongo_client=client,
+            mongo_client=pymongo.MongoClient(),
             jsonizer=stk.MoleculeJsonizer(
                 key_makers=(stk.InchiKey(), smiles),
             ),
         )
+
+    .. testcode:: using-alternative-keys-for-retrieving-molecules
+        :hide:
+
+        db.put(molecule)
+        _retrieved4 = db.get({'SMILES': 'BrBr'})
+        assert (
+            _smiles.get_key(molecule2) == _smiles.get_key(_retrieved4)
+        )
+
+    .. testcleanup:: using-alternative-keys-for-retrieving-molecules
+
+        stk.MoleculeMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     Note that the key you use to get the molecule back from the
     database should be unique. In other words, there should always just
@@ -186,10 +320,9 @@ class MoleculeMongoDb(MoleculeDatabase):
         mongo_client,
         database='stk',
         molecule_collection='molecules',
-        position_matrix_collection=None,
+        position_matrix_collection='building_block_position_matrices',
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
-        lru_cache_size='',
         put_lru_cache_size=128,
         get_lru_cache_size=128,
         indices=('InChIKey', ),
@@ -212,8 +345,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         position_matrix_collection : :class:`str`
             The name of the collection which stores the position
             matrices of the molecules put into and retrieved from
-            the cache. When ``None``, defaults to
-            'building_block_position_matrices`.
+            the database.
 
         jsonizer : :class:`.MoleculeJsonizer`
             Used to create the JSON representations of molecules
@@ -222,17 +354,6 @@ class MoleculeMongoDb(MoleculeDatabase):
         dejsonizer : :class:`.MoleculeDejsonizer`
             Used to create :class:`.Molecule` instances from their
             JSON representations.
-
-        lru_cache_size : :class:`int`, optional
-            This argument is deprecated and will be removed in any
-            version of :mod:`stk` released on, or after, 01/01/21.
-            Use the `put_lru_cache_size` and `get_lru_cache_size`
-            arguments instead.
-
-            A RAM-based least recently used cache is used to avoid
-            reading and writing to the database repeatedly. This sets
-            the number of values which fit into the LRU cache. If
-            ``None``, the cache size will be unlimited.
 
         put_lru_cache_size : :class:`int`, optional
             A RAM-based least recently used cache is used to avoid
@@ -251,37 +372,6 @@ class MoleculeMongoDb(MoleculeDatabase):
             created, in order to minimize lookup time.
 
         """
-
-        if position_matrix_collection is None:
-            position_matrix_collection = (
-                'building_block_position_matrices'
-            )
-            warnings.warn(
-                "The default value of the position_matrix_collection "
-                "parameter in MoleculeMongoDb has changed from "
-                "'position_matrices' "
-                "to 'building_block_position_matrices'! To remove "
-                "this warning, set the position_matrix_collection "
-                "parameter explicitly. You can still use the default "
-                "value, for example, position_matrix_collection='"
-                "building_block_position_matrices' will remove the "
-                "warning but use the default value. "
-                "This warning will be removed "
-                "in any version of stk released on, or after, "
-                "1/03/21.",
-                UserWarning,
-            )
-
-        if lru_cache_size != '':
-            warnings.warn(
-                'The lru_cache_size argument is deprecated and will '
-                'be removed in any version of stk released on, or '
-                'after, 01/01/21. Use the put_lru_cache_size and '
-                'get_lru_cache_size arguments instead.',
-                FutureWarning,
-            )
-            put_lru_cache_size = lru_cache_size
-            get_lru_cache_size = lru_cache_size
 
         database = mongo_client[database]
         self._molecules = database[molecule_collection]

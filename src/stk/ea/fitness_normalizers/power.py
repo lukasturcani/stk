@@ -22,15 +22,43 @@ class Power(FitnessNormalizer):
     :class:`.Power` to raise it to the power of -1 to get your
     final fitness value
 
-    .. code-block:: python
+    .. testcode:: raising-fitness-values-to-a-power
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=1,
+                normalized=False,
+            ),
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=2,
+                normalized=False,
+            ),
+        )
 
         normalizer = stk.Power(-1)
-        # Assuming that population holds molecule record instances
-        # with the following fitness values: 1, 2, 3
-        # normalized will hold fitness values of
-        # 1, o.5, 1/3
-        normalized = tuple(normalizer.normalize(population))
-
+        normalized_population = tuple(normalizer.normalize(population))
+        normalized_record1, normalized_record2 = normalized_population
+        assert normalized_record1.get_fitness_value() == 1
+        assert normalized_record2.get_fitness_value() == 0.5
 
     *Raising Fitness Values by a Set of Powers*
 
@@ -51,17 +79,36 @@ class Power(FitnessNormalizer):
 
     Giving a concrete example
 
-    .. code-block:: python
+    .. testcode:: raising-fitness-values-by-a-set-of-powers
 
         import stk
+        import numpy as np
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(2, 2, 2),
+                normalized=False,
+            ),
+        )
 
         normalizer = stk.Power((1, -1, 2))
-        # Assuming that population holds molecule record instances
-        # with the following fitness values
-        # (1, 1, 1), (2, 2, 2), (3, 3, 3)
-        # normalized will hold fitness values of
-        # (1, 1, 1), (2, 0.5, 4), (3, 1/3, 9)
-        normalized = tuple(normalizer.normalize(population))
+        normalized_population = tuple(normalizer.normalize(population))
+        normalized_record, = normalized_population
+        assert np.all(np.equal(
+            normalized_record.get_fitness_value(),
+            (2, 0.5, 4),
+        ))
 
     *Selectively Normalizing Fitness Values*
 
@@ -71,17 +118,55 @@ class Power(FitnessNormalizer):
     You can use the `filter` parameter to exclude records from the
     normalization
 
-    .. code-block:: python
+    .. testcode:: selectively-normalizing-fitness-values
 
         import stk
+        import numpy as np
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(2, 2, 2),
+                normalized=False,
+            ),
+            # This will have a fitness value of None.
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ),
+        )
 
         normalizer = stk.Power(
-            power=(1, 2, 3),
+            power=(1, -1, 2),
             # Only normalize values which are not None.
             filter=lambda population, record:
                 record.get_fitness_value() is not None,
         )
-        normalized = tuple(normalizer.normalize(population))
+        # Calling normalizer.normalize() will return a new
+        # population holding the molecule records with normalized
+        # fitness values.
+        normalized_population = tuple(normalizer.normalize(
+            population=population,
+        ))
+        normalized_record1, normalized_record2 = normalized_population
+        assert np.all(np.equal(
+            normalized_record1.get_fitness_value(),
+            (2, 0.5, 4),
+        ))
+        assert normalized_record2.get_fitness_value() is None
 
     """
 

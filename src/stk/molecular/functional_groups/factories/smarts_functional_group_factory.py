@@ -23,7 +23,7 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
     You want the ``C`` atom to be the *bonder* atom, and the
     ``Br`` atom to be the *deleter* atom.
 
-    .. code-block:: python
+    .. testcode:: using-smarts-to-define-functional-groups
 
         import stk
 
@@ -36,6 +36,30 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
                     deleters=(0, ),
                 ),
             ),
+        )
+
+    .. testcode:: using-smarts-to-define-functional-groups
+        :hide:
+
+        fg1, fg2 = building_block.get_functional_groups()
+        assert fg1.get_num_bonders() == 1
+        assert sum(1 for _ in fg1.get_deleters()) == 1
+        assert fg2.get_num_bonders() == 1
+        assert sum(1 for _ in fg2.get_deleters()) == 1
+
+        assert all(
+            isinstance(atom, stk.C)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
+        assert all(
+            isinstance(atom, stk.Br)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_deleters()
         )
 
     See Also

@@ -1,3 +1,9 @@
+"""
+Linear Polymer Vertices
+=======================
+
+"""
+
 import logging
 
 from ...topology_graph import Vertex
@@ -182,3 +188,21 @@ class _TailVertex(_TerminalVertex):
     # The direction to use if the building block placed on the
     # vertex only has 1 FunctionalGroup.
     _cap_direction = -1
+
+
+class _UnaligningVertex(_LinearVertex):
+    """
+    Just places a building block, does not align.
+
+    """
+
+    def place_building_block(self, building_block, edges):
+        return building_block.with_centroid(
+            position=self._position,
+            atom_ids=building_block.get_placer_ids(),
+        ).get_position_matrix()
+
+    def map_functional_groups_to_edges(self, building_block, edges):
+        return {
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+        }

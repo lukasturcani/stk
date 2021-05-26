@@ -19,7 +19,7 @@ class InchiKey(MoleculeKeyMaker):
     You want to use the InChIKey as part of a JSON representation of a
     molecule
 
-    .. code-block:: python
+    .. testcode:: adding-inchikey-to-a-molecules-json
 
         import stk
 
@@ -28,6 +28,18 @@ class InchiKey(MoleculeKeyMaker):
         )
         # Get the JSON representation, including an InChIKey.
         json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+
+    .. testcode:: adding-inchikey-to-a-molecules-json
+        :hide:
+
+        assert (
+            json['molecule']['InChIKey']
+            == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
+        )
+        assert (
+            json['molecule']['InChIKey']
+            == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
+        )
 
     """
 

@@ -5,6 +5,8 @@ Periodic Linkerless Honeycomb
 """
 
 import numpy as np
+import warnings
+
 from ...reactions import GenericReactionFactory
 from .cof import Cof
 from .vertices import _NonLinearCofVertex
@@ -27,8 +29,8 @@ class PeriodicLinkerlessHoneycomb(Cof):
 
         | 3-functional groups: 0 to 1
 
-    Note that :class:`.Optimizer` does not optimize the
-    :class:`.PeriodicInfo`.
+    Note that optimizers may not optimize the :class:`.PeriodicInfo`.
+    The documentation of the optimizer will state if it does.
 
     See :class:`.Cof` for more details and examples.
 
@@ -131,6 +133,15 @@ class PeriodicLinkerlessHoneycomb(Cof):
             Periodic cell information.
 
         """
+
+        warnings.warn(
+            'You called get_periodic_info() on a topology graph '
+            'instance. This method will be removed in any version '
+            'of stk released on, or after, 21/10/21. Please call '
+            'the construct() method instead. This will return a '
+            'PeriodicConstructionResult which provides the new '
+            'get_periodic_info() method.'
+        )
 
         lattice_constants = self._get_lattice_constants()
 

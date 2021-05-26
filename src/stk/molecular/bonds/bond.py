@@ -9,6 +9,29 @@ class Bond:
     """
     Represents an atomic bond.
 
+    Examples
+    --------
+    *Changing the Atoms of a Bond*
+
+    You want to substitute the atoms in the bond for other atoms. You
+    can do this by using :meth:`.with_atoms` to create a clone of the
+    bond, which holds the replacement atoms
+
+    .. testcode:: changing-the-atoms-of-a-bond
+
+        import stk
+        bond = stk.Bond(stk.C(0), stk.C(12), 2)
+        # Replace C(0) with H(13) but keep C(12).
+        clone = bond.with_atoms({0: stk.H(13)})
+
+    .. testcode:: changing-the-atoms-of-a-bond
+        :hide:
+
+        assert clone.get_atom1().get_id() == 13
+        assert isinstance(clone.get_atom1(), stk.H)
+        assert clone.get_atom2().get_id() == 12
+        assert isinstance(clone.get_atom2(), stk.C)
+
     """
 
     def __init__(self, atom1, atom2, order, periodicity=(0, 0, 0)):
@@ -145,15 +168,6 @@ class Bond:
         -------
         :class:`.Bond`
             The clone.
-
-        Examples
-        --------
-        .. code-block:: python
-
-            import stk
-            bond = stk.Bond(stk.C(0), stk.C(12), 2)
-            # Replace C(0) with H(13) but keep C(12).
-            clone = bond.with_atoms({0: stk.H(13)})
 
         """
 

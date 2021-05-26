@@ -1,3 +1,10 @@
+"""
+Host Guest Complex Vertices
+===========================
+
+"""
+
+
 import numpy as np
 
 from ..topology_graph import Vertex

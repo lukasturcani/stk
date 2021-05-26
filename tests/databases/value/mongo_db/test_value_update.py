@@ -1,5 +1,4 @@
 import stk
-import pymongo
 
 from .utilities import (
     get_database_state,
@@ -11,7 +10,7 @@ from ...utilities import (
 )
 
 
-def test_update_1():
+def test_update_1(mongo_client):
     """
     Test that existing entries are updated.
 
@@ -19,11 +18,10 @@ def test_update_1():
 
     collection = '_test_update_1'
     database_name = '_test_update_1'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     database = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,
@@ -55,7 +53,7 @@ def test_update_1():
     )
 
 
-def test_update_2():
+def test_update_2(mongo_client):
     """
     Test that existing entries are updated.
 
@@ -67,11 +65,10 @@ def test_update_2():
 
     collection = '_test_update_2'
     database_name = '_test_update_2'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     database1 = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,
@@ -81,7 +78,7 @@ def test_update_2():
         ),
     )
     database2 = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,
@@ -91,7 +88,7 @@ def test_update_2():
         ),
     )
     database3 = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,
@@ -145,7 +142,7 @@ def test_update_2():
     )
 
 
-def test_update_3():
+def test_update_3(mongo_client):
     """
     Test that existing entries are updated.
 
@@ -157,11 +154,10 @@ def test_update_3():
 
     collection = '_test_update_3'
     database_name = '_test_update_3'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     database1 = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,
@@ -172,7 +168,7 @@ def test_update_3():
         ),
     )
     database2 = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,
@@ -182,7 +178,7 @@ def test_update_3():
         ),
     )
     database3 = stk.ValueMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         collection=collection,
         database=database_name,
         put_lru_cache_size=0,

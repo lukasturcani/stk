@@ -29,29 +29,76 @@ class ConstructedMoleculeJsonizer:
 
     Examples
     --------
+    *Converting a Constructed Molecule to JSON*
+
     You want get a JSON representation of a
     :class:`.ConstructedMolecule`
 
-    .. code-block:: python
+    .. testcode:: converting-a-molecule-to-json
 
         import stk
 
         # Make the molecule you want jsonize.
-
-        polymer_topology_graph = stk.polymer.Linear(
-            building_blocks=(
-                stk.BuildingBlock('BrCCBr', [stk.BromoFactory()],),
-            ),
-            repeating_unit='A',
-            num_repeating_units=3,
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=3,
+            )
         )
-        polymer = stk.ConstructedMolecule(polymer_topology_graph)
-
 
         # Make a JSONizer.
         jsonizer = stk.ConstructedMoleculeJsonizer()
         # Get the JSON.
         json = jsonizer.to_json(polymer)
+
+    *Adding Additional Molecular Keys*
+
+    Apart from atoms, bonds and the position matrix, the JSON
+    representation holds additional fields, one for each
+    :class:`.MoleculeKeyMaker` provided to the initializer
+
+    .. testcode:: adding-additional-molecular-keys
+
+        import stk
+
+        # Make the molecule you want jsonize.
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='A',
+                num_repeating_units=3,
+            )
+        )
+
+        # Make a JSONizer.
+        jsonizer = stk.ConstructedMoleculeJsonizer()
+        # Get the JSON.
+        json = jsonizer.to_json(polymer)
+
+    In this case, ``json`` will look something like
+
+    .. code-block:: python
+
+        {
+            # A tuple of JSON atom representations.
+            'atoms': (...),
+
+            # A tuple of JSON bond representations.
+            'bonds': (...),
+
+            'InChI': 'The InChI of the molecule',
+            'InChIKey': 'The InChIKey of the molecule',
+        }
+
+    For every :class:`.MoleculeKeyMaker` provided to `key_makers`,
+    a new key will be added to the JSON representation, with its name
+    given by :meth:`.MoleculeKeyMaker.get_key_name` and the value
+    given by :meth:`.MoleculeKeyMaker.get_key`.
 
     """
 

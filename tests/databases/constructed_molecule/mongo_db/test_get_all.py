@@ -1,18 +1,16 @@
 import stk
-import pymongo
 
 from tests.utilities import is_equivalent_constructed_molecule
 
 
-def test_get_all():
+def test_get_all(mongo_client):
     """
     Test iteration over all molecules.
 
     """
 
     database_name = '_test_get_entries_constructed_molecule'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     key_maker = stk.Inchi()
     jsonizer = stk.ConstructedMoleculeJsonizer(
@@ -20,7 +18,7 @@ def test_get_all():
     )
 
     database = stk.ConstructedMoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         jsonizer=jsonizer,
         put_lru_cache_size=0,

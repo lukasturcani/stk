@@ -1,3 +1,9 @@
+"""
+Rotaxane Vertices
+=================
+
+"""
+
 import rdkit.Chem.AllChem as rdkit
 
 from ..topology_graph import Vertex

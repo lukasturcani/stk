@@ -5,7 +5,6 @@ Value MongoDB
 """
 
 from functools import lru_cache
-import warnings
 
 from stk.molecular import InchiKey
 from .utilities import HashableDict
@@ -18,11 +17,42 @@ class ValueMongoDb(ValueDatabase):
 
     Examples
     --------
+    See also examples in :class:`.ValueDatabase`.
+
     *Storing Molecular Properties in a Database*
 
     You want to store property values in a database.
 
-    .. code-block:: python
+    .. testsetup:: storing-molecular-properties-in-a-database
+
+        import stk
+
+        # Change the database used, so that when a developer
+        # runs the doctests locally, their "stk" database is not
+        # contaminated.
+        _test_database = '_stk_doctest_database'
+        _old_init = stk.ValueMongoDb
+        stk.ValueMongoDb = lambda mongo_client, collection: (
+            _old_init(
+                mongo_client=mongo_client,
+                database=_test_database,
+                collection=collection,
+            )
+        )
+
+        # Change the database MongoClient will connect to.
+
+        import os
+        import pymongo
+
+        _mongo_client = pymongo.MongoClient
+        _mongodb_uri = os.environ.get(
+            'MONGODB_URI',
+            'mongodb://localhost:27017/'
+        )
+        pymongo.MongoClient = lambda: _mongo_client(_mongodb_uri)
+
+    .. testcode:: storing-molecular-properties-in-a-database
 
         import stk
         import pymongo
@@ -50,11 +80,22 @@ class ValueMongoDb(ValueDatabase):
                     stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
                 ),
                 repeating_unit='A',
-                num_repeating_units=2',
+                num_repeating_units=2,
             ),
         )
         db.put(polymer, polymer.get_num_atoms())
         num_polymer_atoms = db.get(polymer)
+
+    .. testcode:: storing-molecular-properties-in-a-database
+        :hide:
+
+        assert num_polymer_atoms == polymer.get_num_atoms()
+
+    .. testcleanup:: storing-molecular-properties-in-a-database
+
+        stk.ValueMongoDb = _old_init
+        pymongo.MongoClient().drop_database(_test_database)
+        pymongo.MongoClient = _mongo_client
 
     """
 
@@ -64,7 +105,6 @@ class ValueMongoDb(ValueDatabase):
         collection,
         database='stk',
         key_makers=(InchiKey(), ),
-        lru_cache_size='',
         put_lru_cache_size=128,
         get_lru_cache_size=128,
         indices=('InChIKey', ),
@@ -90,17 +130,6 @@ class ValueMongoDb(ValueDatabase):
             are associated with. If two molecules have the same
             key, they will return the same value from the database.
 
-        lru_cache_size : :class:`int`, optional
-            This argument is deprecated and will be removed in any
-            version of :mod:`stk` released on, or after, 01/01/21.
-            Use the `put_lru_cache_size` and `get_lru_cache_size`
-            arguments instead.
-
-            A RAM-based least recently used cache is used to avoid
-            reading and writing to the database repeatedly. This sets
-            the number of values which fit into the LRU cache. If
-            ``None``, the cache size will be unlimited.
-
         put_lru_cache_size : :class:`int`, optional
             A RAM-based least recently used cache is used to avoid
             writing to the database repeatedly. This sets
@@ -118,17 +147,6 @@ class ValueMongoDb(ValueDatabase):
             created, in order to minimize lookup time.
 
         """
-
-        if lru_cache_size != '':
-            warnings.warn(
-                'The lru_cache_size argument is deprecated and will '
-                'be removed in any version of stk released on, or '
-                'after, 01/01/21. Use the put_lru_cache_size and '
-                'get_lru_cache_size arguments instead.',
-                FutureWarning,
-            )
-            put_lru_cache_size = lru_cache_size
-            get_lru_cache_size = lru_cache_size
 
         self._values = mongo_client[database][collection]
         self._key_makers = key_makers

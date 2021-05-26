@@ -300,6 +300,51 @@ def case_data(request):
     return request.param.with_position_matrix(path)
 
 
+@pytest.fixture(
+    scope='session',
+)
+def molecule_db(mongo_client):
+    """
+    A :class:`.MoleculeDatabase` instance.
+
+    """
+
+    return stk.MoleculeMongoDb(
+        mongo_client=mongo_client,
+        database='_stk_pytest_database',
+        jsonizer=stk.MoleculeJsonizer(
+            key_makers=(
+                stk.Smiles(),
+            ),
+        ),
+        indices=(
+            stk.Smiles().get_key_name(),
+        ),
+    )
+
+
+@pytest.fixture(
+    scope='session',
+)
+def name_db(mongo_client):
+    """
+    A :class:`.ValueDatabase` for holding the names of molecules.
+
+    """
+
+    return stk.ValueMongoDb(
+        mongo_client=mongo_client,
+        database='_stk_pytest_database',
+        collection='name',
+        key_makers=(
+            stk.Smiles(),
+        ),
+        indices=(
+            stk.Smiles().get_key_name(),
+        ),
+    )
+
+
 def _get_filename(request):
     """
     Get the filename for a position matrix of a molecule.

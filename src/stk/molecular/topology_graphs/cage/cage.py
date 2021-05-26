@@ -163,7 +163,7 @@ class Cage(TopologyGraph):
     :class:`.Cage` instances can be made by providing the building
     block molecules only (using :class:`.FourPlusSix` as an example)
 
-    .. code-block:: python
+    .. testcode:: basic-construction
 
         import stk
 
@@ -172,7 +172,7 @@ class Cage(TopologyGraph):
             smiles='O=CC(C=O)C=O',
             functional_groups=[stk.AldehydeFactory()],
         )
-        cage1 = stk.ConstructedMolecule(
+        cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
         )
 
@@ -185,9 +185,17 @@ class Cage(TopologyGraph):
     :class:`.Collapser` optimizer.
 
 
-    .. code-block:: python
+    .. testcode:: suggested-optimization
 
-        cage1 = stk.ConstructedMolecule(
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+
+        cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks=(bb1, bb2),
                 optimizer=stk.MCHammer(),
@@ -199,9 +207,17 @@ class Cage(TopologyGraph):
     Different structural isomers of cages can be made by using the
     `vertex_alignments` optional parameter
 
-    .. code-block:: python
+    .. testcode:: structural-isomer-construction
 
-        cage2 = stk.ConstructedMolecule(
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+
+        cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks=(bb1, bb2),
                 vertex_alignments={0: 1, 1: 1, 2: 2},
@@ -223,7 +239,9 @@ class Cage(TopologyGraph):
     of functional groups, you have to assign each building block to the
     vertex you want to place it on
 
-    .. code-block:: python
+    .. testcode:: multi-building-block-cage-construction
+
+        import stk
 
         bb1 = stk.BuildingBlock(
             smiles='O=CC(C=O)C=O',
@@ -240,7 +258,7 @@ class Cage(TopologyGraph):
         )
         bb5 = stk.BuildingBlock('NCCCCN', [stk.PrimaryAminoFactory()])
 
-        cage = stk.ConstructedMolecule(
+        cage1 = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 # building_blocks is now a dict, which maps building
                 # blocks to the id of the vertices it should be placed
@@ -257,9 +275,9 @@ class Cage(TopologyGraph):
 
     You can combine this with the `vertex_alignments` parameter
 
-    .. code-block:: python
+    .. testcode:: multi-building-block-cage-construction
 
-        cage = stk.ConstructedMolecule(
+        cage2 = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks={
                     bb1: range(2),
@@ -268,8 +286,8 @@ class Cage(TopologyGraph):
                     bb4: 5,
                     bb5: range(6, 10),
                 },
+                vertex_alignments={0: 1, 1: 1, 2: 2},
             ),
-            vertex_alignments={0: 1, 1: 1, 2: 2},
         )
 
     *Metal-Organic Cage Construction*
@@ -281,7 +299,7 @@ class Cage(TopologyGraph):
     specific vertices reserved for the metal atoms or complexes,
     which are listed in their documentation.
 
-    .. code-block:: python
+    .. testcode:: metal-organic-cage-construction
 
         import stk
 
@@ -341,7 +359,9 @@ class Cage(TopologyGraph):
     with the appropriate stereochemistry and dummy reactive groups
     (bromine in the following example)
 
-    .. code-block:: python
+    .. testcode:: controlling-metal-complex-stereochemistry
+
+        import stk
 
         # Produce a Fe+2 atom with 6 functional groups.
         iron_atom = stk.BuildingBlock(
@@ -354,7 +374,7 @@ class Cage(TopologyGraph):
         )
 
         # Define coordinating ligand with dummy bromine groups and
-        # metal coordianting functional groups.
+        # metal coordinating functional groups.
         bb2 = stk.BuildingBlock(
             smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
@@ -379,12 +399,11 @@ class Cage(TopologyGraph):
             )
         )
 
-    Then the metal complexes
-    can be placed on the appropriate :class:`.Cage` topology
-    to produce a structure with the desired stereochemistry at all
-    metal centres.
+    Then the metal complexes can be placed on the appropriate
+    :class:`.Cage` topology to produce a structure with the desired
+    stereochemistry at all metal centres.
 
-    .. code-block:: python
+    .. testcode:: controlling-metal-complex-stereochemistry
 
         # Assign Bromo functional groups to the metal complex.
         iron_oct_delta = stk.BuildingBlock.init_from_molecule(
@@ -430,14 +449,14 @@ class Cage(TopologyGraph):
     By default, :mod:`stk` may create overlapping functional
     groups, which may lead to a lack of an appropriate number
     of *placer* atoms, leading to a :class:`.BuildingBlock`
-    being unalinged. However, the user can manually set the
+    being unaligned. However, the user can manually set the
     *placer* atoms of functional groups, so that not all of the
     *placer* atoms appear in multiple functional groups, which
     leads to proper alignment.
 
     First we build a metal complex
 
-    .. code-block:: python
+    .. testcode:: aligning-metal-complex-building-blocks
 
         import stk
 
@@ -472,7 +491,7 @@ class Cage(TopologyGraph):
     taking care to define functional groups which do not have
     overlapping *placer* atoms
 
-    .. code-block:: python
+    .. testcode:: aligning-metal-complex-building-blocks
 
         metal_complex = stk.BuildingBlock.init_from_molecule(
             molecule=metal_complex,
@@ -490,7 +509,7 @@ class Cage(TopologyGraph):
 
     We load in the organic linker of the cage as normal
 
-    .. code-block:: python
+    .. testcode:: aligning-metal-complex-building-blocks
 
         linker = stk.BuildingBlock(
             smiles='C1=NC=CC(C2=CC=NC=C2)=C1',
@@ -506,7 +525,7 @@ class Cage(TopologyGraph):
     And finally, we build the cage with a
     :class:`DativeReactionFactory` instance to produce dative bonds.
 
-    .. code-block:: python
+    .. testcode:: aligning-metal-complex-building-blocks
 
         cage = stk.ConstructedMolecule(
             stk.cage.M4L4Square(

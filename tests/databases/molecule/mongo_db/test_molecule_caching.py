@@ -1,15 +1,13 @@
 import stk
 import numpy as np
-import pymongo
 
 
-def test_put_caching():
+def test_put_caching(mongo_client):
     database_name = '_test_put_caching'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     database = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         jsonizer=stk.MoleculeJsonizer(
             key_makers=(
@@ -35,13 +33,12 @@ def test_put_caching():
     assert cache_info.misses == 2
 
 
-def test_get_caching():
+def test_get_caching(mongo_client):
     database_name = '_test_get_caching'
-    client = pymongo.MongoClient()
-    client.drop_database(database_name)
+    mongo_client.drop_database(database_name)
 
     database = stk.MoleculeMongoDb(
-        mongo_client=client,
+        mongo_client=mongo_client,
         database=database_name,
         jsonizer=stk.MoleculeJsonizer(
             key_makers=(

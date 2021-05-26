@@ -92,10 +92,96 @@ class CofData:
         }
         self.building_blocks = building_blocks
 
+    @classmethod
+    def init_from_construction_result(
+        cls,
+        topology_graph,
+        building_blocks,
+        lattice_size,
+        vertex_alignments,
+        num_new_atoms,
+        num_new_bonds,
+        num_building_blocks,
+    ):
+        """
+        Initialize a :class:`.CofData` instance.
+
+        This method creates the constructed molecule using
+        :meth:`.ConstructedMolecule.init_from_construction_result`.
+
+        Parameters
+        ----------
+        topology_graph : :class:`type`
+            A COF class.
+
+        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
+            The building blocks of the COF.
+
+        lattice_size : :class:`tuple` of :class:`int`
+            The size of the lattice.
+
+        vertex_alignments : :class:`dict`
+            Passed to the `vertex_alignments` parameter of the COF
+            initializer.
+
+        num_new_atoms : :class:`int`
+            The number of new atoms added by the construction process.
+
+        num_new_bonds : :class:`int`
+            The number of new bonds added by the construction process.
+
+        num_building_blocks : :class:`dict`
+            For each building block in `building_blocks`, maps its
+            index to the number of times its used in the construction
+            of the COF.
+
+        """
+
+        obj = cls.__new__(cls)
+        topology_graph_instance = topology_graph(
+            building_blocks=building_blocks,
+            lattice_size=lattice_size,
+            vertex_alignments=vertex_alignments,
+        )
+        construction_result = topology_graph_instance.construct()
+        obj.constructed_molecule = (
+            stk.ConstructedMolecule.init_from_construction_result(
+                construction_result=construction_result,
+            )
+        )
+        obj.num_new_atoms = num_new_atoms
+        obj.num_new_bonds = num_new_bonds
+        obj.num_building_blocks = {
+            building_blocks[index]: num
+            for index, num in num_building_blocks.items()
+        }
+        obj.building_blocks = building_blocks
+        return obj
+
 
 @pytest.fixture(
     params=(
         CofData(
+            topology_graph=stk.cof.Honeycomb,
+            building_blocks=(
+                stk.BuildingBlock(
+                    smiles=(
+                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                    ),
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='Br[C+]=NC#CBr',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+            ),
+            lattice_size=(2, 2, 1),
+            vertex_alignments=None,
+            num_new_atoms=0,
+            num_new_bonds=20,
+            num_building_blocks={0: 8, 1: 12},
+        ),
+        CofData.init_from_construction_result(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(

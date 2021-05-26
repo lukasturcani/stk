@@ -25,14 +25,6 @@ from ...case_data import CaseData
             ),
             smiles='BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1',
         ),
-    ),
-)
-def polymer_linear(request):
-    return request.param
-
-
-@pytest.fixture(
-    params=(
         CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -48,12 +40,27 @@ def polymer_linear(request):
                     ),
                     repeating_unit='AB',
                     num_repeating_units=2,
-                    optimizer=stk.Collapser(scale_steps=False)
+                    optimizer=stk.Collapser(scale_steps=False),
                 ),
             ),
             smiles='BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1',
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC1=C(Br)N=[C+]1',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
+            ),
+            smiles='BrC1=C(Br)N=[C+]1',
+        ),
     ),
 )
-def polymer_linear_opt(request):
+def polymer_linear(request):
     return request.param

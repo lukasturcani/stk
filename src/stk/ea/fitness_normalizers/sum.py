@@ -22,17 +22,38 @@ class Sum(FitnessNormalizer):
     combines these fitness value components into a single number, by
     taking their sum.
 
-    .. code-block:: python
+    .. testcode:: combining-fitness-value-components
+
+        import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(1, -2, 3),
+                normalized=False,
+            ),
+        )
 
         # Create the normalizer.
         sum_normalizer = stk.Sum()
 
-        # Normalize the fitness values. Assume the fitness values in
-        # population are
-        # (1, 2, 3), (4, 5, 6), (7, 8, 9).
-        normalized = tuple(sum_normalizer.normalize(pop))
+        normalized_population = tuple(sum_normalizer.normalize(
+            population=population,
+        ))
+        normalized_record, = normalized_population
 
-        # Fitness values in normalized are 6, 15 and 24.
+        assert normalized_record.get_fitness_value() == 2
+
 
     *Selectively Normalizing Fitness Values*
 
@@ -42,16 +63,46 @@ class Sum(FitnessNormalizer):
     You can use the `filter` parameter to exclude records from the
     normalization
 
-    .. code-block:: python
+    .. testcode:: selectively-normalizing-fitness-values
 
         import stk
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(1, -2, 3),
+                normalized=False,
+            ),
+            # This will have a fitness value of None.
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ),
+        )
 
         normalizer = stk.Sum(
             # Only normalize values which are not None.
             filter=lambda population, record:
                 record.get_fitness_value() is not None,
         )
-        normalized = tuple(normalizer.normalize(population))
+        normalized_population = tuple(normalizer.normalize(population))
+        normalized_record1, normalized_record2 = normalized_population
+        assert normalized_record1.get_fitness_value() == 2
+        assert normalized_record2.get_fitness_value() is None
+
 
     """
 

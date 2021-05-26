@@ -1,3 +1,9 @@
+"""
+COF Vertices
+============
+
+"""
+
 import numpy as np
 from scipy.spatial.distance import euclidean
 from stk.utilities import get_acute_vector

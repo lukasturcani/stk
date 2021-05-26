@@ -16,22 +16,90 @@ class RandomMutator:
     --------
     *Use One of Several Mutators at Random*
 
-    .. code-block:: python
+    .. testcode:: use-one-of-several-mutators-at-random
 
         import stk
 
+        random_seed = 12
         mutator = stk.RandomMutator(
             mutators=(
-                stk.RandomBuildingBlock(...),
-                stk.SimilarBuildingBlock(...),
-                stk.RandomBuildingBlock(...),
+                stk.RandomBuildingBlock(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    is_replaceable=lambda building_block: True,
+                    random_seed=random_seed,
+                ),
+                stk.SimilarBuildingBlock(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCCCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    is_replaceable=lambda building_block: True,
+                    random_seed=random_seed,
+                ),
+                stk.RandomBuildingBlock(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCNCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCNCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    is_replaceable=lambda building_block: True,
+                    random_seed=random_seed,
+                ),
+            ),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='BrCNNCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+        record = stk.MoleculeRecord(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(building_block, ),
+                repeating_unit='A',
+                num_repeating_units=2,
             ),
         )
         # Use one of the component mutators at random.
-        mutation_record = mutator.mutate(record)
+        mutation_record1 = mutator.mutate(record)
         # A different mutator may get selected at random the second,
         # third, etc, time.
         mutation_record2 = mutator.mutate(record)
+
+    .. testcode:: use-one-of-several-mutators-at-random
+        :hide:
+
+        _smiles = stk.Smiles()
+        assert _smiles.get_key(record.get_molecule()) == 'BrCNNCCNNCBr'
+
+        _molecule1 = (
+            mutation_record1.get_molecule_record().get_molecule()
+        )
+        assert _smiles.get_key(_molecule1) != 'BrCNNCNNCBr'
+
+        _molecule2 = (
+            mutation_record2.get_molecule_record().get_molecule()
+        )
+        assert _smiles.get_key(_molecule2) != 'BrCNNCNNCBr'
+
 
     """
 

@@ -47,16 +47,53 @@ class DivideByMean(FitnessNormalizer):
     ``None``, you would want to ignore these records from the
     normalization
 
-    .. code-block:: python
+    .. testcode:: selectively-normalizing-fitness-values
 
         import stk
+        import numpy as np
+
+        building_block = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        population = (
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ).with_fitness_value(
+                fitness_value=(1., 2., 3.),
+                normalized=False,
+            ),
+            # This will have a fitness value of None.
+            stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            ),
+        )
 
         mean_scaler = stk.DivideByMean(
             # Only normalize values which are not None.
             filter=lambda population, record:
                 record.get_fitness_value() is not None
         )
-        normalized = tuple(mean_scaler.normalize(population))
+        # Calling mean_scaler.normalize() will return a new
+        # population holding the molecule records with normalized
+        # fitness values.
+        normalized_population = tuple(mean_scaler.normalize(
+            population=population,
+        ))
+        normalized_record1, normalized_record2 = normalized_population
+        assert np.all(np.equal(
+            normalized_record1.get_fitness_value(),
+            (1, 1, 1),
+        ))
 
     """
 

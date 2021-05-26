@@ -27,7 +27,7 @@ class ConstructedMolecule(Molecule):
     :class:`.TopologyGraph`, which is typically initialized from some
     :class:`.BuildingBlock` instances.
 
-    .. code-block:: python
+    .. testcode:: initialization
 
         import stk
 
@@ -37,20 +37,32 @@ class ConstructedMolecule(Molecule):
             functional_groups=[stk.AldehydeFactory()],
         )
         tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
-        cage1 = stk.ConstructedMolecule(tetrahedron)
+        cage = stk.ConstructedMolecule(tetrahedron)
+
+    *Hierarchical Construction*
 
     A :class:`ConstructedMolecule` may be used to construct other
     :class:`ConstructedMolecule` instances, though you will probably
     have to convert it to a :class:`.BuildingBlock` first
 
-    .. code-block:: python
+    .. testcode:: hierarchical-construction
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)CC=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
+        cage = stk.ConstructedMolecule(tetrahedron)
 
         benzene = stk.BuildingBlock('c1ccccc1')
         cage_complex = stk.host_guest.Complex(
-            host=stk.BuildingBlock.init_from_molecule(cage1),
+            host=stk.BuildingBlock.init_from_molecule(cage),
             guest=benzene,
         )
-        cage_complex = stk.ConstructedMolecule(host_guest_complex)
+        cage_complex = stk.ConstructedMolecule(cage_complex)
 
     Obviously, the initialization of the :class:`.ConstructedMolecule`
     depends mostly on the specifics of the :class:`.TopologyGraph`
@@ -70,19 +82,10 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        construction_result = topology_graph.construct()
-        super().__init__(
-            atoms=construction_result.get_atoms(),
-            bonds=construction_result.get_bonds(),
-            position_matrix=construction_result.get_position_matrix(),
+        self._init_from_construction_result(
+            obj=self,
+            construction_result=topology_graph.construct(),
         )
-        self._atom_infos = construction_result.get_atom_infos()
-        self._bond_infos = construction_result.get_bond_infos()
-        self._num_building_blocks = {
-            building_block:
-                topology_graph.get_num_building_block(building_block)
-            for building_block in topology_graph.get_building_blocks()
-        }
 
     @classmethod
     def init(
@@ -131,6 +134,74 @@ class ConstructedMolecule(Molecule):
         molecule._bond_infos = bond_infos
         molecule._num_building_blocks = dict(num_building_blocks)
         return molecule
+
+    @classmethod
+    def init_from_construction_result(
+        cls,
+        construction_result,
+    ):
+        """
+        Initialize a :class:`.ConstructedMolecule`.
+
+        Parameters
+        ----------
+        construction_result : :class:`.ConstructionResult`
+            The result of a construction, from which the
+            :class:`.ConstructedMolecule` should be initialized.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The constructed molecule.
+
+        """
+
+        return cls._init_from_construction_result(
+            obj=cls.__new__(cls),
+            construction_result=construction_result,
+        )
+
+    @staticmethod
+    def _init_from_construction_result(
+        obj,
+        construction_result,
+    ):
+        """
+        Initialize a :class:`.ConstructedMolecule`.
+
+        This modifies `obj`.
+
+        Parameters
+        ----------
+        obj : :class:`.ConstructedMolecule`
+            The constructed molecule to initialize.
+
+        construction_result : :class:`.ConstructionResult`
+            The result of a construction, from which the
+            :class:`.ConstructedMolecule` should be initialized.
+
+        Returns
+        -------
+        :class:`.ConstructedMolecule`
+            The `obj` instance.
+
+        """
+
+        super(ConstructedMolecule, obj).__init__(
+            atoms=construction_result.get_atoms(),
+            bonds=construction_result.get_bonds(),
+            position_matrix=construction_result.get_position_matrix(),
+        )
+        obj._atom_infos = construction_result.get_atom_infos()
+        obj._bond_infos = construction_result.get_bond_infos()
+        obj._num_building_blocks = {
+            building_block: construction_result.get_num_building_block(
+                building_block=building_block,
+            )
+            for building_block
+            in construction_result.get_building_blocks()
+        }
+        return obj
 
     def clone(self):
         clone = super().clone()
