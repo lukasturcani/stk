@@ -108,11 +108,11 @@ __ https://pubs.rsc.org/ko/content/articlehtml/2019/sc/c8sc05710a
 __ https://pubs.rsc.org/en/content/articlelanding/2018/sc/c8sc03560a#!divAbstract
 __ https://chemrxiv.org/articles/An_Evolutionary_Algorithm_for_the_Discovery_of_Porous_Organic_Cages/6954557
 
-* `Machine Learning for Organic Cage Property Prediction`__ | chemrxiv__
+* `Machine Learning for Organic Cage Property Prediction`__
+  | chemrxiv__
 
 __ https://pubs.acs.org/doi/10.1021/acs.chemmater.8b03572
 __ https://chemrxiv.org/articles/Machine_Learning_for_Organic_Cage_Property_Prediction/6995018
-
 
 * `A High-Throughput Screening Approach for the Optoelectronic
   Properties of Conjugated Polymers`__ | chemrxiv__
