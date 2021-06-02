@@ -60,7 +60,8 @@ Publications
 about stk
 ---------
 
-* `stk: An Extendable Python Framework for Automated Molecular and Supramolecular Structure Assembly and Discovery`__
+* `stk: An Extendable Python Framework for Automated Molecular and
+  Supramolecular Structure Assembly and Discovery`__
 
 __ https://aip.scitation.org/doi/10.1063/5.0049708
 
