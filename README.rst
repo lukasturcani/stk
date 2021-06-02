@@ -51,7 +51,7 @@ If you use ``stk`` please cite
 
 and
 
-    https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
+    https://aip.scitation.org/doi/10.1063/5.0049708
 
 
 Publications
@@ -60,14 +60,24 @@ Publications
 about stk
 ---------
 
-* `stk: A Python Toolkit for Supramolecular Assembly`_ | chemrxiv__
+* `stk: An extendable Python framework for automated molecular and
+  structure assembly and discovery`__
+
+* (Out of date) `stk: A Python Toolkit for Supramolecular Assembly`_ | chemrxiv__
 
 __ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
+__ https://aip.scitation.org/doi/10.1063/5.0049708
 
 .. _`stk: A Python Toolkit for Supramolecular Assembly`: https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
 
 using stk
 ---------
+
+* `Accelerated Discvoery of Organic Polymer Photocatalysts for Hydrogen
+  Evolution from Water through the Integration of Experiment and
+  Theory`__
+
+__ https://pubs.acs.org/doi/abs/10.1021/jacs.9b03591
 
 * `An Evolutionary Algorithm for the Discovery of Porous Organic Cages`_ | chemrxiv__
 
