@@ -1,29 +1,29 @@
 Video Tutorials
 ===============
 
-Basics of :mod:`.stk`
----------------------
+Basics of *stk*
+---------------
 
 
-Functional Groups in :mod:`.stk`
---------------------------------
+Functional Groups in *stk*
+--------------------------
 
 
 Cage Building
 -------------
 
 
-Hierarchical Construction with :mod:`.stk`
-------------------------------------------
+Hierarchical Construction with *stk*
+------------------------------------
 
 
-Using :mod:`stko` with :mod:`.stk`
-----------------------------------
+Using *stko* with *stk*
+-----------------------
 
 
-Databases and :mod:`stk-vis` in :mod:`.stk`
--------------------------------------------
+Databases and *stk-vis* in *stk*
+--------------------------------
 
 
-Host-Guest Conformers with :mod:`.stk`
---------------------------------------
+Host-Guest Conformers with *stk*
+--------------------------------
