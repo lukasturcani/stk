@@ -95,3 +95,46 @@ __ https://pubs.acs.org/doi/abs/10.1021/jacs.9b03591
 
 * `Structurally Diverse Covalent Triazine-Based Framework Materials for
   Photocatalytic Hydrogen Evolution from Water`
+
+__ https://pubs.acs.org/doi/full/10.1021/acs.chemmater.9b02825
+
+* `Mapping Binary Copolymer Property Space with Neural Networks`__
+
+__ https://pubs.rsc.org/ko/content/articlehtml/2019/sc/c8sc05710a
+
+* `An Evolutionary Algorithm for the Discovery of Porous Organic
+  Cages`__ | chemrxiv__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2018/sc/c8sc03560a#!divAbstract
+__ https://chemrxiv.org/articles/An_Evolutionary_Algorithm_for_the_Discovery_of_Porous_Organic_Cages/6954557
+
+* `Machine Learning for Organic Cage Property Prediction`__ | chemrxiv__
+
+__ https://pubs.acs.org/doi/10.1021/acs.chemmater.8b03572
+__ https://chemrxiv.org/articles/Machine_Learning_for_Organic_Cage_Property_Prediction/6995018
+
+
+* `A High-Throughput Screening Approach for the Optoelectronic
+  Properties of Conjugated Polymers`__ | chemrxiv__
+
+__ https://pubs.acs.org/doi/abs/10.1021/acs.jcim.8b00256
+__ https://chemrxiv.org/articles/A_High-Throughput_Screening_Approach_for_the_Optoelectronic_Properties_of_Conjugated_Polymers/6181841
+
+* `Computationally-Inspired Discovery of an Unsymmetrical Porous
+  Organic Cage`__ | chemrxiv__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2018/nr/c8nr06868b#!divAbstract
+__ https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
+
+* `Maximising the Hydrogen Evolution Activity in Organic Photocatalysts
+  by co-Polymerisation`__
+
+__ https://pubs.rsc.org/en/Content/ArticleLanding/TA/2018/C8TA04186E#!divAbstract
+
+
+Acknowledgements
+================
+
+I began developing this code when I was working in the Jelfs group,
+http://www.jelfs-group.org/, whose members often provide me with
+very valuable feedback, which I gratefully acknowledge.
