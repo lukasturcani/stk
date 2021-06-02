@@ -69,7 +69,7 @@ __ https://aip.scitation.org/doi/10.1063/5.0049708
   | chemrxiv__
 
 __ https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
-__ `https://chemrxiv.org/articles/\
+__ `https://chemrxiv.org/articles/
 STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826`
 
 using stk
