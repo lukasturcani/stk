@@ -14,8 +14,8 @@ Overview
 
 ``stk`` is a Python library which allows construction and
 manipulation of complex molecules, as well as automatic
-molecular design, and the creation of molecular, and molecular property,
-databases.
+molecular design, and the creation of molecular, and molecular
+property, databases.
 
 Installation
 ============
@@ -69,42 +69,67 @@ __ https://aip.scitation.org/doi/10.1063/5.0049708
   | chemrxiv__
 
 __ https://onlinelibrary.wiley.com/doi/abs/10.1002/jcc.25377
-__ `https://chemrxiv.org/articles/
-STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826`
+__ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
 
 using stk
 ---------
 
-* `Accelerated Discvoery of Organic Polymer Photocatalysts for Hydrogen
+* `Forecasting System of Computational Time of DFT/TDDFT Calculations
+  under the Multiverse Ansatz via Machine Learning and
+  Cheminformatics`__
+
+__ https://pubs.acs.org/doi/full/10.1021/acsomega.0c04981
+
+* `Using High-throughput Virtual Screening to Explore the
+  Optoelectronic Property Space of Organic Dyes; Finding
+  Diketopyrrolopyrrole Dyes for Dye-sensitized Water Splitting and
+  Solar Cells`__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2021/SE/D0SE00985G#!divAbstract
+
+* `Accelerated Discovery of Organic Polymer Photocatalysts for Hydrogen
   Evolution from Water through the Integration of Experiment and
   Theory`__
 
 __ https://pubs.acs.org/doi/abs/10.1021/jacs.9b03591
 
-* `An Evolutionary Algorithm for the Discovery of Porous Organic Cages`_ | chemrxiv__
+* `Structurally Diverse Covalent Triazine-Based Framework Materials for
+  Photocatalytic Hydrogen Evolution from Water`
 
+__ https://pubs.acs.org/doi/full/10.1021/acs.chemmater.9b02825
+
+* `Mapping Binary Copolymer Property Space with Neural Networks`__
+
+__ https://pubs.rsc.org/ko/content/articlehtml/2019/sc/c8sc05710a
+
+* `An Evolutionary Algorithm for the Discovery of Porous Organic
+  Cages`__ | chemrxiv__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2018/sc/c8sc03560a#!divAbstract
 __ https://chemrxiv.org/articles/An_Evolutionary_Algorithm_for_the_Discovery_of_Porous_Organic_Cages/6954557
-.. _`An Evolutionary Algorithm for the Discovery of Porous Organic Cages`: https://pubs.rsc.org/en/content/articlelanding/2018/sc/c8sc03560a#!divAbstract
 
-* `Machine Learning for Organic Cage Property Prediction`_ | chemrxiv__
+* `Machine Learning for Organic Cage Property Prediction`__ | chemrxiv__
 
+__ https://pubs.acs.org/doi/10.1021/acs.chemmater.8b03572
 __ https://chemrxiv.org/articles/Machine_Learning_for_Organic_Cage_Property_Prediction/6995018
-.. _`Machine Learning for Organic Cage Property Prediction`: https://pubs.acs.org/doi/10.1021/acs.chemmater.8b03572
 
 
-* `A High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers`_ | chemrxiv__
+* `A High-Throughput Screening Approach for the Optoelectronic
+  Properties of Conjugated Polymers`__ | chemrxiv__
 
+__ https://pubs.acs.org/doi/abs/10.1021/acs.jcim.8b00256
 __ https://chemrxiv.org/articles/A_High-Throughput_Screening_Approach_for_the_Optoelectronic_Properties_of_Conjugated_Polymers/6181841
-.. _`A High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers`: https://pubs.acs.org/doi/abs/10.1021/acs.jcim.8b00256
 
-* `Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`_ | chemrxiv__
+* `Computationally-Inspired Discovery of an Unsymmetrical Porous
+  Organic Cage`__ | chemrxiv__
 
+__ https://pubs.rsc.org/en/content/articlelanding/2018/nr/c8nr06868b#!divAbstract
 __ https://chemrxiv.org/articles/Computationally-Inspired_Discovery_of_an_Unsymmetrical_Porous_Organic_Cage/6863684
-.. _`Computationally-Inspired Discovery of an Unsymmetrical Porous Organic Cage`: https://pubs.rsc.org/en/content/articlelanding/2018/nr/c8nr06868b#!divAbstract
 
-* `Maximising the Hydrogen Evolution Activity in Organic Photocatalysts by co-Polymerisation`_
+* `Maximising the Hydrogen Evolution Activity in Organic Photocatalysts
+  by co-Polymerisation`__
 
-.. _`Maximising the Hydrogen Evolution Activity in Organic Photocatalysts by co-Polymerisation`: https://pubs.rsc.org/en/Content/ArticleLanding/TA/2018/C8TA04186E#!divAbstract
+__ https://pubs.rsc.org/en/Content/ArticleLanding/TA/2018/C8TA04186E#!divAbstract
 
 
 Acknowledgements
