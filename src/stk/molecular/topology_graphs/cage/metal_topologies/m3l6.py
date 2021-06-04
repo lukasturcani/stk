@@ -7,7 +7,7 @@ M3L6
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import NonLinearCageVertex, LinearCageVertex
+from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
 
 
@@ -37,11 +37,11 @@ class M3L6(Cage):
     _R, _theta = 1, 0
 
     _vertex_prototypes = (
-        NonLinearCageVertex(
+        NonLinearVertex(
             id=0,
             position=[_R*np.cos(_theta), _R*np.sin(_theta), 0]
         ),
-        NonLinearCageVertex(
+        NonLinearVertex(
             id=1,
             position=[
                 _R*np.cos(_theta+(4*np.pi/3)),
@@ -49,7 +49,7 @@ class M3L6(Cage):
                 0
             ]
         ),
-        NonLinearCageVertex(
+        NonLinearVertex(
             id=2,
             position=[
                 _R*np.cos(_theta+(2*np.pi/3)),
@@ -58,7 +58,7 @@ class M3L6(Cage):
             ]
         ),
 
-        LinearCageVertex(
+        LinearVertex(
             id=3,
             position=[
                 _R*np.cos((_theta+np.pi/4)),
@@ -67,7 +67,7 @@ class M3L6(Cage):
             ],
             use_neighbor_placement=False
         ),
-        LinearCageVertex(
+        LinearVertex(
             id=4,
             position=[
                 _R*np.cos((_theta+1*np.pi/3)),
@@ -77,7 +77,7 @@ class M3L6(Cage):
             use_neighbor_placement=False
         ),
 
-        LinearCageVertex(
+        LinearVertex(
             id=5,
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
@@ -86,7 +86,7 @@ class M3L6(Cage):
             ],
             use_neighbor_placement=False
         ),
-        LinearCageVertex(
+        LinearVertex(
             id=6,
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
@@ -96,7 +96,7 @@ class M3L6(Cage):
             use_neighbor_placement=False
         ),
 
-        LinearCageVertex(
+        LinearVertex(
             id=7,
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
@@ -105,7 +105,7 @@ class M3L6(Cage):
             ],
             use_neighbor_placement=False
         ),
-        LinearCageVertex(
+        LinearVertex(
             id=8,
             position=[
                 _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),

@@ -12,7 +12,7 @@ from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
 
 
-class CofVertex(Vertex):
+class _CofVertex(Vertex):
     """
     A :class:`.CofVertex` .
 
@@ -184,7 +184,7 @@ class CofVertex(Vertex):
         )
 
 
-class LinearCofVertex(CofVertex):
+class LinearVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -240,7 +240,7 @@ class LinearCofVertex(CofVertex):
         }
 
 
-class NonLinearCofVertex(CofVertex):
+class NonLinearVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -304,7 +304,7 @@ class NonLinearCofVertex(CofVertex):
         }
 
 
-class UnaligningVertex(CofVertex):
+class UnaligningVertex(_CofVertex):
     """
     Just places a building block, does not align.
 

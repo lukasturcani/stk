@@ -72,8 +72,8 @@ def position(request):
 
 @pytest.fixture(
     params=(
-        vertices.LinearCageVertex,
-        vertices.NonLinearCageVertex,
+        vertices.LinearVertex,
+        vertices.NonLinearVertex,
     ),
 )
 def cls(request):
@@ -82,8 +82,8 @@ def cls(request):
 
 @pytest.fixture(
     params=(
-        vertices.LinearCageVertex.init_at_center,
-        vertices.NonLinearCageVertex.init_at_center,
+        vertices.LinearVertex.init_at_center,
+        vertices.NonLinearVertex.init_at_center,
         vertices.UnaligningVertex.init_at_center,
     ),
 )

@@ -27,8 +27,8 @@ def cof3(init_at_shifted_center, id, aligner_edge, cell, shift_params):
 
 @pytest.fixture(
     params=(
-        vertices1.LinearCofVertex.init_at_shifted_center,
-        vertices1.NonLinearCofVertex.init_at_shifted_center,
+        vertices1.LinearVertex.init_at_shifted_center,
+        vertices1.NonLinearVertex.init_at_shifted_center,
         vertices2.UnaligningVertex.init_at_shifted_center,
     ),
 )

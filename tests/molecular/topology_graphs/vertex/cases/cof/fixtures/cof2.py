@@ -21,8 +21,8 @@ def cof2(init_at_center, id, vertices_, aligner_edge, cell):
 
 @pytest.fixture(
     params=(
-        vertices.LinearCofVertex.init_at_center,
-        vertices.NonLinearCofVertex.init_at_center,
+        vertices.LinearVertex.init_at_center,
+        vertices.NonLinearVertex.init_at_center,
         vertices2.UnaligningVertex.init_at_center,
     ),
 )

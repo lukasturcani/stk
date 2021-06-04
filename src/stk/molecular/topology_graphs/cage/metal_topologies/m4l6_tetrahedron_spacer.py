@@ -7,7 +7,7 @@ M4L6 Tetrahedron with Spacer
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import NonLinearCageVertex, LinearCageVertex
+from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
 
 
@@ -50,36 +50,36 @@ class M4L6TetrahedronSpacer(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearCageVertex(0, [0, 0, np.sqrt(6)/2]),
-        NonLinearCageVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearCageVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearCageVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
+        NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
+        NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
+        NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
+        NonLinearVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
 
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=4,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=5,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=6,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[3]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=7,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=8,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=9,
             vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
         ),

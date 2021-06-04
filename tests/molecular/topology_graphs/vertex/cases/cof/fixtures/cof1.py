@@ -41,8 +41,8 @@ def unaligned_cof1(cls, id, position, aligner_edge, cell):
 
 @pytest.fixture(
     params=(
-        vertices.LinearCofVertex,
-        vertices.NonLinearCofVertex,
+        vertices.LinearVertex,
+        vertices.NonLinearVertex,
     ),
 )
 def cls(request):

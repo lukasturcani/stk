@@ -7,7 +7,7 @@ Two Plus Three
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import LinearCageVertex, NonLinearCageVertex
+from ..vertices import LinearVertex, NonLinearVertex
 from ...topology_graph import Edge
 
 
@@ -35,12 +35,12 @@ class TwoPlusThree(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearCageVertex(0, [0, 0, 1]),
-        NonLinearCageVertex(1, [0, 0, -1]),
+        NonLinearVertex(0, [0, 0, 1]),
+        NonLinearVertex(1, [0, 0, -1]),
 
-        LinearCageVertex(2, [-1, -0.5*np.sqrt(3), 0], False),
-        LinearCageVertex(3, [1, -0.5*np.sqrt(3), 0], False),
-        LinearCageVertex(4, [0, 0.5*np.sqrt(3), 0], False),
+        LinearVertex(2, [-1, -0.5*np.sqrt(3), 0], False),
+        LinearVertex(3, [1, -0.5*np.sqrt(3), 0], False),
+        LinearVertex(4, [0, 0.5*np.sqrt(3), 0], False),
 
     )
 

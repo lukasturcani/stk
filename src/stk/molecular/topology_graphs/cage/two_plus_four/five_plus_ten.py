@@ -7,7 +7,7 @@ Five Plus Ten
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import LinearCageVertex, NonLinearCageVertex
+from ..vertices import LinearVertex, NonLinearVertex
 from ...topology_graph import Edge
 
 
@@ -40,27 +40,27 @@ class FivePlusTen(Cage):
     _s2 = np.sin(4*np.pi/5)
 
     _vertex_prototypes = (
-        NonLinearCageVertex(0, [0, 1, 0], False),
-        NonLinearCageVertex(1, [_s1, _c1, 0], False),
-        NonLinearCageVertex(2, [_s2, -_c2, 0], False),
+        NonLinearVertex(0, [0, 1, 0], False),
+        NonLinearVertex(1, [_s1, _c1, 0], False),
+        NonLinearVertex(2, [_s2, -_c2, 0], False),
 
-        NonLinearCageVertex(3, [-_s2, -_c2, 0], False),
-        NonLinearCageVertex(4, [-_s1, _c1, 0], False),
+        NonLinearVertex(3, [-_s2, -_c2, 0], False),
+        NonLinearVertex(4, [-_s1, _c1, 0], False),
 
-        LinearCageVertex(5, [_s1, 1+_c1, 0.5], False),
-        LinearCageVertex(6, [_s1, 1+_c1, -0.5], False),
+        LinearVertex(5, [_s1, 1+_c1, 0.5], False),
+        LinearVertex(6, [_s1, 1+_c1, -0.5], False),
 
-        LinearCageVertex(7, [_s1+_s2, _c1-_c2, 0.5], False),
-        LinearCageVertex(8, [_s1+_s2, _c1-_c2, -0.5], False),
+        LinearVertex(7, [_s1+_s2, _c1-_c2, 0.5], False),
+        LinearVertex(8, [_s1+_s2, _c1-_c2, -0.5], False),
 
-        LinearCageVertex(9, [0, -2*_c2, 0.5], False),
-        LinearCageVertex(10, [0, -2*_c2, -0.5], False),
+        LinearVertex(9, [0, -2*_c2, 0.5], False),
+        LinearVertex(10, [0, -2*_c2, -0.5], False),
 
-        LinearCageVertex(11, [-_s2-_s1, -_c2+_c1, 0.5], False),
-        LinearCageVertex(12, [-_s2-_s1, -_c2+_c1, -0.5], False),
+        LinearVertex(11, [-_s2-_s1, -_c2+_c1, 0.5], False),
+        LinearVertex(12, [-_s2-_s1, -_c2+_c1, -0.5], False),
 
-        LinearCageVertex(13, [-_s1, 1+_c1, 0.5], False),
-        LinearCageVertex(14, [-_s1, 1+_c1, -0.5], False),
+        LinearVertex(13, [-_s1, 1+_c1, 0.5], False),
+        LinearVertex(14, [-_s1, 1+_c1, -0.5], False),
 
     )
 

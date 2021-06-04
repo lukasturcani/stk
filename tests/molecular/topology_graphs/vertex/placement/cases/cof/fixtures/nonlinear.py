@@ -131,7 +131,7 @@ def _nonlinear(position, aligner_edge, building_block):
         get_normal: np.array([0, 0, 1]),
     }
 
-    vertex = vertices.NonLinearCofVertex(
+    vertex = vertices.NonLinearVertex(
         id=0,
         position=position,
         aligner_edge=aligner_edge,

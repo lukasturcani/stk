@@ -16,7 +16,7 @@ from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
 
 
-class CageVertex(Vertex):
+class _CageVertex(Vertex):
     """
     Represents a vertex of a :class:`.Cage`.
 
@@ -154,7 +154,7 @@ class CageVertex(Vertex):
         )
 
 
-class LinearCageVertex(CageVertex):
+class LinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -206,7 +206,7 @@ class LinearCageVertex(CageVertex):
         }
 
 
-class NonLinearCageVertex(CageVertex):
+class NonLinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -284,7 +284,7 @@ class NonLinearCageVertex(CageVertex):
         }
 
 
-class UnaligningVertex(CageVertex):
+class UnaligningVertex(_CageVertex):
     """
     Just places a building block, does not align.
 

@@ -8,7 +8,7 @@ import numpy as np
 import warnings
 from ...reactions import GenericReactionFactory
 from .cof import Cof
-from .vertices import LinearCofVertex, NonLinearCofVertex
+from .vertices import LinearVertex, NonLinearVertex
 from ..topology_graph import Edge, NullOptimizer
 from ...periodic_info import PeriodicInfo
 
@@ -164,17 +164,17 @@ class PeriodicSquare(Cof):
     )
 
     _vertex_prototypes = (
-        NonLinearCofVertex(0, (0.5)*_a + (0.5)*_b + (0.5)*_c),
+        NonLinearVertex(0, (0.5)*_a + (0.5)*_b + (0.5)*_c),
     )
     _vertex_prototypes = (
         *_vertex_prototypes,
-        LinearCofVertex.init_at_shifted_center(
+        LinearVertex.init_at_shifted_center(
             id=1,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[0]),
             cell_shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants,
         ),
-        LinearCofVertex.init_at_shifted_center(
+        LinearVertex.init_at_shifted_center(
             id=2,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[0]),
             cell_shifts=((0, 0, 0), (0, 1, 0)),

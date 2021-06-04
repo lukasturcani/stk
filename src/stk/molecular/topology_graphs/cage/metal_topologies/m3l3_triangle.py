@@ -7,7 +7,7 @@ M3L3 Triangle
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import LinearCageVertex
+from ..vertices import LinearVertex
 from ...topology_graph import Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
@@ -111,23 +111,23 @@ class M3L3Triangle(Cage):
     _x = 2*np.sqrt(3)/4
     _y = 2
     _vertex_prototypes = (
-        LinearCageVertex(0, [0, _x, 0]),
-        LinearCageVertex(1, [_y/2, -_x, 0]),
-        LinearCageVertex(2, [-_y/2, -_x, 0]),
+        LinearVertex(0, [0, _x, 0]),
+        LinearVertex(1, [_y/2, -_x, 0]),
+        LinearVertex(2, [-_y/2, -_x, 0]),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
 
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=3,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=4,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
         ),
-        LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=5,
             vertices=(_vertex_prototypes[2], _vertex_prototypes[0]),
         ),

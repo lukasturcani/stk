@@ -7,12 +7,12 @@ One Plus One
 import numpy as np
 
 from stk.utilities import get_acute_vector
-from ..vertices import NonLinearCageVertex
+from ..vertices import NonLinearVertex
 from ..cage import Cage
 from ...topology_graph import Edge
 
 
-class OnePlusOneVertex(NonLinearCageVertex):
+class OnePlusOneVertex(NonLinearVertex):
     def __init__(
         self,
         id,

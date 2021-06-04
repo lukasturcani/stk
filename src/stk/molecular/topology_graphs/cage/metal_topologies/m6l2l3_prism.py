@@ -7,7 +7,7 @@ M6L2L3 Prism
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import NonLinearCageVertex
+from ..vertices import NonLinearVertex
 from ...topology_graph import Edge
 
 
@@ -36,19 +36,19 @@ class M6L2L3Prism(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearCageVertex(0, [-1, -1/np.sqrt(3), 1]),
-        NonLinearCageVertex(1, [1, -1/np.sqrt(3), 1]),
-        NonLinearCageVertex(2, [0, 2/np.sqrt(3), 1]),
+        NonLinearVertex(0, [-1, -1/np.sqrt(3), 1]),
+        NonLinearVertex(1, [1, -1/np.sqrt(3), 1]),
+        NonLinearVertex(2, [0, 2/np.sqrt(3), 1]),
 
-        NonLinearCageVertex(3, [-1, -1/np.sqrt(3), -1]),
-        NonLinearCageVertex(4, [1, -1/np.sqrt(3), -1]),
-        NonLinearCageVertex(5, [0, 2/np.sqrt(3), -1]),
+        NonLinearVertex(3, [-1, -1/np.sqrt(3), -1]),
+        NonLinearVertex(4, [1, -1/np.sqrt(3), -1]),
+        NonLinearVertex(5, [0, 2/np.sqrt(3), -1]),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
 
-        NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=6,
             vertices=(
                 _vertex_prototypes[0],
@@ -56,7 +56,7 @@ class M6L2L3Prism(Cage):
                 _vertex_prototypes[2],
             ),
         ),
-        NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=7,
             vertices=(
                 _vertex_prototypes[3],
@@ -65,7 +65,7 @@ class M6L2L3Prism(Cage):
             ),
         ),
 
-        NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=8,
             vertices=(
                 _vertex_prototypes[0],
@@ -74,7 +74,7 @@ class M6L2L3Prism(Cage):
                 _vertex_prototypes[4],
             ),
         ),
-        NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=9,
             vertices=(
                 _vertex_prototypes[1],
@@ -83,7 +83,7 @@ class M6L2L3Prism(Cage):
                 _vertex_prototypes[5],
             ),
         ),
-        NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=10,
             vertices=(
                 _vertex_prototypes[2],
