@@ -5,7 +5,7 @@ Square Planar
 """
 
 from ..metal_complex import MetalComplex
-from ..vertices import _MetalVertex, _MonoDentateLigandVertex
+from ..vertices import MetalVertex, MonoDentateLigandVertex
 from ...topology_graph import Edge
 
 
@@ -31,13 +31,13 @@ class SquarePlanar(MetalComplex):
     """
 
     _metal_vertex_prototypes = (
-        _MetalVertex(0, [0, 0, 0]),
+        MetalVertex(0, [0, 0, 0]),
     )
     _ligand_vertex_prototypes = (
-        _MonoDentateLigandVertex(1, [2.5, 0, 0]),
-        _MonoDentateLigandVertex(2, [0, 2.5, 0]),
-        _MonoDentateLigandVertex(3, [-2.5, 0, 0]),
-        _MonoDentateLigandVertex(4, [0, -2.5, 0]),
+        MonoDentateLigandVertex(1, [2.5, 0, 0]),
+        MonoDentateLigandVertex(2, [0, 2.5, 0]),
+        MonoDentateLigandVertex(3, [-2.5, 0, 0]),
+        MonoDentateLigandVertex(4, [0, -2.5, 0]),
     )
 
     _edge_prototypes = (

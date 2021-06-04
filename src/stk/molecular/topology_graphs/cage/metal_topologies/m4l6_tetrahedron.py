@@ -7,7 +7,7 @@ M4L6 Tetrahedron
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex
+from ..vertices import NonLinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -126,10 +126,10 @@ class M4L6Tetrahedron(Cage):
     _x = 1/(2*np.sqrt(2))
     _y = 0.5
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [_y, 0, -_x]),
-        _NonLinearCageVertex(1, [-_y, 0, -_x]),
-        _NonLinearCageVertex(2, [0, _y, _x]),
-        _NonLinearCageVertex(3, [0, -_y, _x]),
+        NonLinearCageVertex(0, [_y, 0, -_x]),
+        NonLinearCageVertex(1, [-_y, 0, -_x]),
+        NonLinearCageVertex(2, [0, _y, _x]),
+        NonLinearCageVertex(3, [0, -_y, _x]),
     )
 
     _edge_prototypes = (

@@ -27,7 +27,7 @@ def get_direction(building_block):
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._GuestVertex(
+            vertex=vertices.GuestVertex(
                 id=0,
                 position=(1, 2, 3),
                 start=(1, 2, 3),

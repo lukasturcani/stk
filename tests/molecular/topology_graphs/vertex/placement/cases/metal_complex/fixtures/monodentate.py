@@ -28,7 +28,7 @@ def monodentate(position, building_block_1):
             point=get_core_position(building_block),
         )
 
-    vertex = vertices._MonoDentateLigandVertex(
+    vertex = vertices.MonoDentateLigandVertex(
         id=0,
         position=position,
     )

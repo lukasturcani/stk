@@ -16,7 +16,7 @@ from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
 
 
-class _CageVertex(Vertex):
+class CageVertex(Vertex):
     """
     Represents a vertex of a :class:`.Cage`.
 
@@ -30,7 +30,7 @@ class _CageVertex(Vertex):
         aligner_edge=0,
     ):
         """
-        Initialize a :class:`._CageVertex`.
+        Initialize a :class:`.CageVertex`.
 
         Parameters
         ----------
@@ -83,7 +83,7 @@ class _CageVertex(Vertex):
 
         Returns
         -------
-        :class:`._CageVertex`
+        :class:`.CageVertex`
             The clone. Has the same type as the original instance.
 
         """
@@ -108,7 +108,7 @@ class _CageVertex(Vertex):
     @classmethod
     def init_at_center(cls, id, vertices):
         """
-        Initialize a :class:`._CageVertex` in the middle of `vertices`.
+        Initialize a :class:`.CageVertex` in the middle of `vertices`.
 
         Parameters
         ----------
@@ -120,7 +120,7 @@ class _CageVertex(Vertex):
 
         Returns
         -------
-        :class:`._CageVertex`
+        :class:`.CageVertex`
             The new vertex.
 
         """
@@ -154,7 +154,7 @@ class _CageVertex(Vertex):
         )
 
 
-class _LinearCageVertex(_CageVertex):
+class LinearCageVertex(CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -206,7 +206,7 @@ class _LinearCageVertex(_CageVertex):
         }
 
 
-class _NonLinearCageVertex(_CageVertex):
+class NonLinearCageVertex(CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -284,7 +284,7 @@ class _NonLinearCageVertex(_CageVertex):
         }
 
 
-class _UnaligningVertex(_CageVertex):
+class UnaligningVertex(CageVertex):
     """
     Just places a building block, does not align.
 

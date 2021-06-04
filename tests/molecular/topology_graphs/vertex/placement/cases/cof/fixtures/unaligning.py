@@ -10,8 +10,8 @@ vertices = stk.cof.vertices
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._UnaligningVertex(
-                vertex=vertices._CofVertex(0, (1, 2, 3)),
+            vertex=vertices.UnaligningVertex(
+                vertex=vertices.CofVertex(0, (1, 2, 3)),
             ),
             edges=(),
             building_block=stk.BuildingBlock(

@@ -29,7 +29,7 @@ def linear(position, linear_aligner_edge, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._LinearCageVertex(
+    vertex = vertices.LinearCageVertex(
         id=0,
         position=position,
         aligner_edge=linear_aligner_edge,

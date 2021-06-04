@@ -5,7 +5,7 @@ Four Plus Four
 """
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex
+from ..vertices import NonLinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -30,15 +30,15 @@ class FourPlusFour(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [-_x, _x, -_x], False),
-        _NonLinearCageVertex(1, [-_x, -_x, -_x], False),
-        _NonLinearCageVertex(2, [_x, _x, -_x], False),
-        _NonLinearCageVertex(3, [_x, -_x, -_x], False),
+        NonLinearCageVertex(0, [-_x, _x, -_x], False),
+        NonLinearCageVertex(1, [-_x, -_x, -_x], False),
+        NonLinearCageVertex(2, [_x, _x, -_x], False),
+        NonLinearCageVertex(3, [_x, -_x, -_x], False),
 
-        _NonLinearCageVertex(4, [-_x, _x, _x], False),
-        _NonLinearCageVertex(5, [-_x, -_x, _x], False),
-        _NonLinearCageVertex(6, [_x, _x, _x], False),
-        _NonLinearCageVertex(7, [_x, -_x, _x], False)
+        NonLinearCageVertex(4, [-_x, _x, _x], False),
+        NonLinearCageVertex(5, [-_x, -_x, _x], False),
+        NonLinearCageVertex(6, [_x, _x, _x], False),
+        NonLinearCageVertex(7, [_x, -_x, _x], False)
     )
 
     _edge_prototypes = (

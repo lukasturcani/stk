@@ -1,6 +1,6 @@
 import pytest
 import stk
-from stk.molecular.topology_graphs.cof.edge import _CofEdge as Edge
+from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
 from functools import partial
 from scipy.spatial.distance import euclidean
 
@@ -30,7 +30,7 @@ def linear(position, linear_aligner_edge, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._LinearCofVertex(
+    vertex = vertices.LinearCofVertex(
         id=0,
         position=position,
         aligner_edge=linear_aligner_edge,

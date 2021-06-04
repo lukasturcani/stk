@@ -12,7 +12,7 @@ from ...topology_graph import Vertex
 logger = logging.getLogger(__name__)
 
 
-class _LinearVertex(Vertex):
+class LinearVertex(Vertex):
     """
     Represents a vertex in the middle of a linear polymer chain.
 
@@ -20,7 +20,7 @@ class _LinearVertex(Vertex):
 
     def __init__(self, id, position, flip):
         """
-        Initialize a :class:`._LinearVertex` instance.
+        Initialize a :class:`.LinearVertex` instance.
 
         Parameters
         ----------
@@ -119,12 +119,12 @@ class _LinearVertex(Vertex):
         )
 
 
-class _TerminalVertex(_LinearVertex):
+class TerminalVertex(LinearVertex):
     """
     Represents a vertex at the end of a polymer chain.
 
-    Do not instantiate this class directly, use :class:`._HeadVertex`
-    or :class:`._TailVertex` instead.
+    Do not instantiate this class directly, use :class:`.HeadVertex`
+    or :class:`.TailVertex` instead.
 
     """
 
@@ -168,7 +168,7 @@ class _TerminalVertex(_LinearVertex):
             )
 
 
-class _HeadVertex(_TerminalVertex):
+class HeadVertex(TerminalVertex):
     """
     Represents a vertex at the head of a polymer chain.
 
@@ -179,7 +179,7 @@ class _HeadVertex(_TerminalVertex):
     _cap_direction = 1
 
 
-class _TailVertex(_TerminalVertex):
+class TailVertex(TerminalVertex):
     """
     Represents a vertex at the tail of a polymer chain.
 
@@ -190,7 +190,7 @@ class _TailVertex(_TerminalVertex):
     _cap_direction = -1
 
 
-class _UnaligningVertex(_LinearVertex):
+class UnaligningVertex(LinearVertex):
     """
     Just places a building block, does not align.
 

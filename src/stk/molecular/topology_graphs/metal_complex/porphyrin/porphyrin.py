@@ -5,7 +5,7 @@ Porphyrin
 """
 
 from ..metal_complex import MetalComplex
-from ..vertices import _MetalVertex
+from ..vertices import MetalVertex
 from ...topology_graph import Edge
 
 
@@ -30,8 +30,8 @@ class Porphyrin(MetalComplex):
 
     """
 
-    _metal_vertex_prototypes = (_MetalVertex(0, [0, 0, 0]), )
-    _ligand_vertex_prototypes = (_MetalVertex(1, [0, 0, 0]), )
+    _metal_vertex_prototypes = (MetalVertex(0, [0, 0, 0]), )
+    _ligand_vertex_prototypes = (MetalVertex(1, [0, 0, 0]), )
 
     _edge_prototypes = (
         Edge(

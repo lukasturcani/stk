@@ -7,7 +7,7 @@ Two Plus Two
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex
+from ..vertices import NonLinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -32,10 +32,10 @@ class TwoPlusTwo(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [_x, 0, -_x/np.sqrt(2)], False),
-        _NonLinearCageVertex(1, [-_x, 0, -_x/np.sqrt(2)], False),
-        _NonLinearCageVertex(2, [0, _x, _x/np.sqrt(2)], False),
-        _NonLinearCageVertex(3, [0, -_x, _x/np.sqrt(2)], False)
+        NonLinearCageVertex(0, [_x, 0, -_x/np.sqrt(2)], False),
+        NonLinearCageVertex(1, [-_x, 0, -_x/np.sqrt(2)], False),
+        NonLinearCageVertex(2, [0, _x, _x/np.sqrt(2)], False),
+        NonLinearCageVertex(3, [0, -_x, _x/np.sqrt(2)], False)
     )
 
     _edge_prototypes = (

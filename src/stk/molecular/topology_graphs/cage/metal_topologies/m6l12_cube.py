@@ -7,7 +7,7 @@ M6L12 Cube
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex, _LinearCageVertex
+from ..vertices import NonLinearCageVertex, LinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -36,25 +36,25 @@ class M6L12Cube(Cage):
 
     _x = np.sqrt(2)
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [_x, 0, 0]),
-        _NonLinearCageVertex(1, [0, _x, 0]),
-        _NonLinearCageVertex(2, [-_x, 0, 0]),
-        _NonLinearCageVertex(3, [0, -_x, 0]),
-        _NonLinearCageVertex(4, [0, 0, _x]),
-        _NonLinearCageVertex(5, [0, 0, -_x]),
+        NonLinearCageVertex(0, [_x, 0, 0]),
+        NonLinearCageVertex(1, [0, _x, 0]),
+        NonLinearCageVertex(2, [-_x, 0, 0]),
+        NonLinearCageVertex(3, [0, -_x, 0]),
+        NonLinearCageVertex(4, [0, 0, _x]),
+        NonLinearCageVertex(5, [0, 0, -_x]),
 
-        _LinearCageVertex(6, [1, 1, 0], False),
-        _LinearCageVertex(7, [1, -1, 0], False),
-        _LinearCageVertex(8, [1, 0, 1], False),
-        _LinearCageVertex(9, [1, 0, -1], False),
-        _LinearCageVertex(10, [-1, 1, 0], False),
-        _LinearCageVertex(11, [-1, -1, 0], False),
-        _LinearCageVertex(12, [-1, 0, 1], False),
-        _LinearCageVertex(13, [-1, 0, -1], False),
-        _LinearCageVertex(14, [0, 1, 1], False),
-        _LinearCageVertex(15, [0, 1, -1], False),
-        _LinearCageVertex(16, [0, -1, 1], False),
-        _LinearCageVertex(17, [0, -1, -1], False),
+        LinearCageVertex(6, [1, 1, 0], False),
+        LinearCageVertex(7, [1, -1, 0], False),
+        LinearCageVertex(8, [1, 0, 1], False),
+        LinearCageVertex(9, [1, 0, -1], False),
+        LinearCageVertex(10, [-1, 1, 0], False),
+        LinearCageVertex(11, [-1, -1, 0], False),
+        LinearCageVertex(12, [-1, 0, 1], False),
+        LinearCageVertex(13, [-1, 0, -1], False),
+        LinearCageVertex(14, [0, 1, 1], False),
+        LinearCageVertex(15, [0, 1, -1], False),
+        LinearCageVertex(16, [0, -1, 1], False),
+        LinearCageVertex(17, [0, -1, -1], False),
     )
 
     _edge_prototypes = (

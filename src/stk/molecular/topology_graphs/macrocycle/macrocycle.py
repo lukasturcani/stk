@@ -7,7 +7,7 @@ Macrocycle
 import numpy as np
 import warnings
 
-from .vertices import _CycleVertex
+from .vertices import CycleVertex
 from ..topology_graph import TopologyGraph, NullOptimizer, Edge
 from ...reactions import GenericReactionFactory
 
@@ -283,7 +283,7 @@ class Macrocycle(TopologyGraph):
         for vertex_id, flip_chance in enumerate(orientations):
             theta = vertex_id*angle_diff
             vertices.append(
-                _CycleVertex(
+                CycleVertex(
                     id=vertex_id,
                     position=[np.cos(theta), np.sin(theta), 0],
                     flip=generator.choice(

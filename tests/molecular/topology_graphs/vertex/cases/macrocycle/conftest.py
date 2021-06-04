@@ -10,7 +10,7 @@ vertices = stk.macrocycle.vertices
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._CycleVertex(0, (1, 2, 3), True, np.pi),
+            vertex=vertices.CycleVertex(0, (1, 2, 3), True, np.pi),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),

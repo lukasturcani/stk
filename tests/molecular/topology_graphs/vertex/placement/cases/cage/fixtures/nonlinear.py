@@ -133,7 +133,7 @@ def _nonlinear(position, aligner_edge, building_block):
         ),
     }
 
-    vertex = vertices._NonLinearCageVertex(
+    vertex = vertices.NonLinearCageVertex(
         id=0,
         position=position,
         aligner_edge=aligner_edge,

@@ -5,7 +5,7 @@ Four Plus Eight
 """
 
 from ..cage import Cage
-from ..vertices import _LinearCageVertex, _NonLinearCageVertex
+from ..vertices import LinearCageVertex, NonLinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -33,23 +33,23 @@ class FourPlusEight(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [-1, -1, 0], False),
-        _NonLinearCageVertex(1, [-1, 1, 0], False),
+        NonLinearCageVertex(0, [-1, -1, 0], False),
+        NonLinearCageVertex(1, [-1, 1, 0], False),
 
-        _NonLinearCageVertex(2, [1, -1, 0], False),
-        _NonLinearCageVertex(3, [1, 1, 0], False),
+        NonLinearCageVertex(2, [1, -1, 0], False),
+        NonLinearCageVertex(3, [1, 1, 0], False),
 
-        _LinearCageVertex(4, [-2, 0, 1], False),
-        _LinearCageVertex(5, [-2, 0, -1], False),
+        LinearCageVertex(4, [-2, 0, 1], False),
+        LinearCageVertex(5, [-2, 0, -1], False),
 
-        _LinearCageVertex(6, [0, 2, 1], False),
-        _LinearCageVertex(7, [0, 2, -1], False),
+        LinearCageVertex(6, [0, 2, 1], False),
+        LinearCageVertex(7, [0, 2, -1], False),
 
-        _LinearCageVertex(8, [0, -2, 1], False),
-        _LinearCageVertex(9, [0, -2, -1], False),
+        LinearCageVertex(8, [0, -2, 1], False),
+        LinearCageVertex(9, [0, -2, -1], False),
 
-        _LinearCageVertex(10, [2, 0, 1], False),
-        _LinearCageVertex(11, [2, 0, -1], False),
+        LinearCageVertex(10, [2, 0, 1], False),
+        LinearCageVertex(11, [2, 0, -1], False),
 
     )
 

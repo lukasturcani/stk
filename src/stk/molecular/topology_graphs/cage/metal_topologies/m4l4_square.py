@@ -5,7 +5,7 @@ M4L4 Square
 """
 
 from ..cage import Cage
-from ..vertices import _LinearCageVertex
+from ..vertices import LinearCageVertex
 from ...topology_graph import Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
 
@@ -107,15 +107,15 @@ class M4L4Square(Cage):
         )
 
     _vertex_prototypes = (
-        _LinearCageVertex(0, [1, 1, 0]),
-        _LinearCageVertex(1, [1, -1, 0]),
-        _LinearCageVertex(2, [-1, -1, 0]),
-        _LinearCageVertex(3, [-1, 1, 0]),
+        LinearCageVertex(0, [1, 1, 0]),
+        LinearCageVertex(1, [1, -1, 0]),
+        LinearCageVertex(2, [-1, -1, 0]),
+        LinearCageVertex(3, [-1, 1, 0]),
 
-        _LinearCageVertex(4, [1, 0, 0], False),
-        _LinearCageVertex(5, [0, -1, 0], False),
-        _LinearCageVertex(6, [-1, 0, 0], False),
-        _LinearCageVertex(7, [0, 1, 0], False),
+        LinearCageVertex(4, [1, 0, 0], False),
+        LinearCageVertex(5, [0, -1, 0], False),
+        LinearCageVertex(6, [-1, 0, 0], False),
+        LinearCageVertex(7, [0, 1, 0], False),
     )
 
     _edge_prototypes = (

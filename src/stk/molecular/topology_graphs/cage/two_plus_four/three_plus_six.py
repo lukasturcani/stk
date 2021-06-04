@@ -7,7 +7,7 @@ Three Plus Six
 import numpy as np
 
 from ..cage import Cage
-from ..vertices import _LinearCageVertex, _NonLinearCageVertex
+from ..vertices import LinearCageVertex, NonLinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -36,18 +36,18 @@ class ThreePlusSix(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [-2*_x, -_x*np.sqrt(3), 0], False),
-        _NonLinearCageVertex(1, [2*_x, -_x*np.sqrt(3), 0], False),
-        _NonLinearCageVertex(2, [0, _x*np.sqrt(3), 0], False),
+        NonLinearCageVertex(0, [-2*_x, -_x*np.sqrt(3), 0], False),
+        NonLinearCageVertex(1, [2*_x, -_x*np.sqrt(3), 0], False),
+        NonLinearCageVertex(2, [0, _x*np.sqrt(3), 0], False),
 
-        _LinearCageVertex(3, [0, -2*_x*np.sqrt(3), _x], False),
-        _LinearCageVertex(4, [0, -2*_x*np.sqrt(3), -_x], False),
+        LinearCageVertex(3, [0, -2*_x*np.sqrt(3), _x], False),
+        LinearCageVertex(4, [0, -2*_x*np.sqrt(3), -_x], False),
 
-        _LinearCageVertex(5, [2*_x, 0, _x], False),
-        _LinearCageVertex(6, [2*_x, 0, -_x], False),
+        LinearCageVertex(5, [2*_x, 0, _x], False),
+        LinearCageVertex(6, [2*_x, 0, -_x], False),
 
-        _LinearCageVertex(7, [-2*_x, 0, _x], False),
-        _LinearCageVertex(8, [-2*_x, 0, -_x], False),
+        LinearCageVertex(7, [-2*_x, 0, _x], False),
+        LinearCageVertex(8, [-2*_x, 0, -_x], False),
     )
 
     _edge_prototypes = (

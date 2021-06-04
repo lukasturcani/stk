@@ -7,7 +7,7 @@ Kagome
 import numpy as np
 
 from .cof import Cof
-from .vertices import _LinearCofVertex, _NonLinearCofVertex
+from .vertices import LinearCofVertex, NonLinearCofVertex
 from ..topology_graph import Edge
 
 
@@ -38,38 +38,38 @@ class Kagome(Cof):
     )
 
     _vertex_prototypes = (
-        _NonLinearCofVertex(0, (1/4)*_a + (3/4)*_b + (0.5)*_c),
-        _NonLinearCofVertex(1, (3/4)*_a + (3/4)*_b + (1/2)*_c),
-        _NonLinearCofVertex(2, (3/4)*_a + (1/4)*_b + (1/2)*_c),
+        NonLinearCofVertex(0, (1/4)*_a + (3/4)*_b + (0.5)*_c),
+        NonLinearCofVertex(1, (3/4)*_a + (3/4)*_b + (1/2)*_c),
+        NonLinearCofVertex(2, (3/4)*_a + (1/4)*_b + (1/2)*_c),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
-        _LinearCofVertex.init_at_center(
+        LinearCofVertex.init_at_center(
             id=3,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
-        _LinearCofVertex.init_at_center(
+        LinearCofVertex.init_at_center(
             id=4,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
         ),
-        _LinearCofVertex.init_at_center(
+        LinearCofVertex.init_at_center(
             id=5,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
         ),
-        _LinearCofVertex.init_at_shifted_center(
+        LinearCofVertex.init_at_shifted_center(
             id=6,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants
         ),
-        _LinearCofVertex.init_at_shifted_center(
+        LinearCofVertex.init_at_shifted_center(
             id=7,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
             cell_shifts=((0, 0, 0), (-1, 1, 0)),
             lattice_constants=_lattice_constants
         ),
-        _LinearCofVertex.init_at_shifted_center(
+        LinearCofVertex.init_at_shifted_center(
             id=8,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
             cell_shifts=((0, 0, 0), (0, 1, 0)),

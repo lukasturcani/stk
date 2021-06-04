@@ -10,7 +10,7 @@ from scipy.spatial.distance import euclidean
 from ..topology_graph import Vertex
 
 
-class _CycleVertex(Vertex):
+class CycleVertex(Vertex):
     """
     Represents a vertex in a macrocycle.
 
@@ -18,7 +18,7 @@ class _CycleVertex(Vertex):
 
     def __init__(self, id, position, flip, angle):
         """
-        Initialize a :class:`._CycleVertex` instance.
+        Initialize a :class:`.CycleVertex` instance.
 
         Parameters
         ----------

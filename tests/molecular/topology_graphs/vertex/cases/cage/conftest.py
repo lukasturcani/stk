@@ -51,8 +51,8 @@ def cage2(init_at_center, vertices_):
 @pytest.fixture
 def cage3(position):
     return CaseData(
-        vertex=vertices._UnaligningVertex(
-            vertex=vertices._CageVertex(0, position),
+        vertex=vertices.UnaligningVertex(
+            vertex=vertices.CageVertex(0, position),
         ),
         id=0,
         position=position,
@@ -72,8 +72,8 @@ def position(request):
 
 @pytest.fixture(
     params=(
-        vertices._LinearCageVertex,
-        vertices._NonLinearCageVertex,
+        vertices.LinearCageVertex,
+        vertices.NonLinearCageVertex,
     ),
 )
 def cls(request):
@@ -82,9 +82,9 @@ def cls(request):
 
 @pytest.fixture(
     params=(
-        vertices._LinearCageVertex.init_at_center,
-        vertices._NonLinearCageVertex.init_at_center,
-        vertices._UnaligningVertex.init_at_center,
+        vertices.LinearCageVertex.init_at_center,
+        vertices.NonLinearCageVertex.init_at_center,
+        vertices.UnaligningVertex.init_at_center,
     ),
 )
 def init_at_center(request):

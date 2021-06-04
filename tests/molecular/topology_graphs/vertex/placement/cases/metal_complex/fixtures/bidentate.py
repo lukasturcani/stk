@@ -28,7 +28,7 @@ def bidentate(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._BiDentateLigandVertex(
+    vertex = vertices.BiDentateLigandVertex(
         id=0,
         position=position,
     )

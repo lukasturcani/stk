@@ -10,7 +10,7 @@ vertices = stk.rotaxane.vertices
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._AxleVertex(0, (1, 2, 3)),
+            vertex=vertices.AxleVertex(0, (1, 2, 3)),
             edges=(),
             building_block=stk.BuildingBlock('BrCCBr'),
             position=np.array([1, 2, 3], dtype=np.float64),

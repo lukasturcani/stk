@@ -10,7 +10,7 @@ vertices = stk.host_guest.vertices
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._HostVertex(
+            vertex=vertices.HostVertex(
                 id=0,
                 position=(1, 2, 3),
             ),

@@ -31,7 +31,7 @@ def flip(position, building_block_2, angle):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._CycleVertex(0, position, True, angle+np.pi/2)
+    vertex = vertices.CycleVertex(0, position, True, angle+np.pi/2)
     return CaseData(
         vertex=vertex,
         edges=tuple(get_edges(vertex, angle)),

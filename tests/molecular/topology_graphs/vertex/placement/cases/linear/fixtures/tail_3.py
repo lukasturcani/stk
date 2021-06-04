@@ -27,7 +27,7 @@ def tail_3(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._TailVertex(0, position, True)
+    vertex = vertices.TailVertex(0, position, True)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),

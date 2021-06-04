@@ -5,7 +5,7 @@ Two Plus Four
 """
 
 from ..cage import Cage
-from ..vertices import _LinearCageVertex, _NonLinearCageVertex
+from ..vertices import LinearCageVertex, NonLinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -33,13 +33,13 @@ class TwoPlusFour(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [0, 0, -1]),
-        _NonLinearCageVertex(1, [0, 0, 1]),
+        NonLinearCageVertex(0, [0, 0, -1]),
+        NonLinearCageVertex(1, [0, 0, 1]),
 
-        _LinearCageVertex(2, [2, 0, 0], False),
-        _LinearCageVertex(3, [-2, 0, 0], False),
-        _LinearCageVertex(4, [0, 2, 0], False),
-        _LinearCageVertex(5, [0, -2, 0], False),
+        LinearCageVertex(2, [2, 0, 0], False),
+        LinearCageVertex(3, [-2, 0, 0], False),
+        LinearCageVertex(4, [0, 2, 0], False),
+        LinearCageVertex(5, [0, -2, 0], False),
     )
 
     _edge_prototypes = (

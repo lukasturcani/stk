@@ -26,7 +26,7 @@ def head_2(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices._HeadVertex(0, position, False)
+    vertex = vertices.HeadVertex(0, position, False)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),

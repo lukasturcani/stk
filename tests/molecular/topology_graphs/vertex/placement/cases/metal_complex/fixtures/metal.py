@@ -14,7 +14,7 @@ single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._MetalVertex(
+            vertex=vertices.MetalVertex(
                 id=0,
                 position=(1, 2, 3),
             ),

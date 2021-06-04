@@ -10,19 +10,19 @@ vertices = stk.metal_complex.vertices
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._MetalVertex(0, (1, 2, 3)),
+            vertex=vertices.MetalVertex(0, (1, 2, 3)),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),
         ),
         CaseData(
-            vertex=vertices._MonoDentateLigandVertex(0, (1, 2, 3)),
+            vertex=vertices.MonoDentateLigandVertex(0, (1, 2, 3)),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),
         ),
         CaseData(
-            vertex=vertices._BiDentateLigandVertex(0, (1, 2, 3)),
+            vertex=vertices.BiDentateLigandVertex(0, (1, 2, 3)),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),

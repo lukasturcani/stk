@@ -45,7 +45,7 @@ def get_plane_normal(building_block):
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._CycleVertex(0, (1, 2, 3), False),
+            vertex=vertices.CycleVertex(0, (1, 2, 3), False),
             edges=(),
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=macrocycle,
@@ -59,7 +59,7 @@ def get_plane_normal(building_block):
             position_ids=macrocycle_ids,
         ),
         CaseData(
-            vertex=vertices._CycleVertex(0, (1, 2, 3), True),
+            vertex=vertices.CycleVertex(0, (1, 2, 3), True),
             edges=(),
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=macrocycle,

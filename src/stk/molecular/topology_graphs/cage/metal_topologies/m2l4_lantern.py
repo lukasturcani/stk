@@ -5,7 +5,7 @@ M2L4 Lantern
 """
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex, _LinearCageVertex
+from ..vertices import NonLinearCageVertex, LinearCageVertex
 from ...topology_graph import Edge
 
 
@@ -33,13 +33,13 @@ class M2L4Lantern(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [0, 0.5, 0]),
-        _NonLinearCageVertex(1, [0, -0.5, 0]),
+        NonLinearCageVertex(0, [0, 0.5, 0]),
+        NonLinearCageVertex(1, [0, -0.5, 0]),
 
-        _LinearCageVertex(2, [1, 0, 0], False),
-        _LinearCageVertex(3, [0, 0, 1], False),
-        _LinearCageVertex(4, [-1, 0, 0], False),
-        _LinearCageVertex(5, [0, 0, -1], False),
+        LinearCageVertex(2, [1, 0, 0], False),
+        LinearCageVertex(3, [0, 0, 1], False),
+        LinearCageVertex(4, [-1, 0, 0], False),
+        LinearCageVertex(5, [0, 0, -1], False),
     )
 
     _edge_prototypes = (

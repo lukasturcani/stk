@@ -12,15 +12,15 @@ from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
 
 
-class _CofVertex(Vertex):
+class CofVertex(Vertex):
     """
-    A :class:`.Cof` vertex.
+    A :class:`.CofVertex` .
 
     """
 
     def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
         """
-        Initialize a :class:`._Cof` vertex.
+        Initialize a :class:`.CofVertex`.
 
         Parameters
         ----------
@@ -71,7 +71,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`._CofVertex` in the middle of `vertices`.
+        Initialize a :class:`.CofVertex` in the middle of `vertices`.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`._CofVertex`
+        :class:`.CofVertex`
             The new vertex.
 
         """
@@ -184,7 +184,7 @@ class _CofVertex(Vertex):
         )
 
 
-class _LinearCofVertex(_CofVertex):
+class LinearCofVertex(CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -240,7 +240,7 @@ class _LinearCofVertex(_CofVertex):
         }
 
 
-class _NonLinearCofVertex(_CofVertex):
+class NonLinearCofVertex(CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -304,7 +304,7 @@ class _NonLinearCofVertex(_CofVertex):
         }
 
 
-class _UnaligningVertex(_CofVertex):
+class UnaligningVertex(CofVertex):
     """
     Just places a building block, does not align.
 

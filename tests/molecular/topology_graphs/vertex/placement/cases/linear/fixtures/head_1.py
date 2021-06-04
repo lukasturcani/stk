@@ -20,7 +20,7 @@ def head_1(position, flip, building_block_1):
             point=get_centroid(building_block),
         )
 
-    vertex = vertices._HeadVertex(0, position, flip)
+    vertex = vertices.HeadVertex(0, position, flip)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),

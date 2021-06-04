@@ -23,7 +23,7 @@ def case_data(request):
 @pytest.fixture
 def center(id, position, flip):
     return CaseData(
-        vertex=vertices._LinearVertex(id, position, flip),
+        vertex=vertices.LinearVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -33,7 +33,7 @@ def center(id, position, flip):
 @pytest.fixture
 def head(id, position, flip):
     return CaseData(
-        vertex=vertices._HeadVertex(id, position, flip),
+        vertex=vertices.HeadVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -43,7 +43,7 @@ def head(id, position, flip):
 @pytest.fixture
 def tail(id, position, flip):
     return CaseData(
-        vertex=vertices._TailVertex(id, position, flip),
+        vertex=vertices.TailVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
