@@ -1022,6 +1022,23 @@ useful key for metal-containing molecules. You can use the
     stk.MoleculeMongoDb = _old_molecule_init
     pymongo.MongoClient = _mongo_client
 
+Accessing Vertex classes
+========================
+
+The vertex classes that make up toplogy graphs in :mod:`stk` can be
+accessed if required.
+
+.. testcode:: accessing-vertex-classes
+
+    import stk
+
+    base_vertex = stk.Vertex(0, [0, 0, 0])
+
+    linear_cage_vertex = stk.cage.LinearVertex(...)
+    linear_cof_vertex = stk.cof.LinearVertex(...)
+    cycle_vertex = stk.macrocycle.CycleVertex(...)
+
+
 Extending stk
 =============
 
