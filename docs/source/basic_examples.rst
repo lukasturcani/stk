@@ -1022,21 +1022,37 @@ useful key for metal-containing molecules. You can use the
     stk.MoleculeMongoDb = _old_molecule_init
     pymongo.MongoClient = _mongo_client
 
-Accessing Vertex classes
+Accessing Vertex Classes
 ========================
 
 The vertex classes that make up toplogy graphs in :mod:`stk` can be
-accessed if required.
+accessed if required. For example, this allows the user to define a
+new topology graph.
 
 .. testcode:: accessing-vertex-classes
 
     import stk
 
-    base_vertex = stk.Vertex(0, [0, 0, 0])
+    class NewCageTopology(stk.cage.Cage):
 
-    linear_cage_vertex = stk.cage.LinearVertex(0, [0, 0, 0])
-    linear_cof_vertex = stk.cof.LinearVertex(0, [0, 0, 0])
-    cycle_vertex = stk.macrocycle.CycleVertex(0, [0, 0, 0], False, 0)
+        _vertex_prototypes = (
+            stk.cage.LinearVertex(0, [0, 0, 0]),
+            stk.cage.LinearVertex(1, [0, 1, 0]),
+        )
+
+        # Define Edges below.
+        _edge_prototypes = ()
+
+    class NewMetalComplexTopology(stk.cage.Cage):
+
+        _vertex_prototypes = (
+            stk.metal_complex.MonoDentateLigandVertex(0, [1, 0, 0]),
+            stk.metal_complex.MetalVertex(1, [0, 0, 0]),
+            stk.metal_complex.MonoDentateLigandVertex(2, [-1, 0, 0]),
+        )
+
+        # Define Edges below.
+        _edge_prototypes = ()
 
 
 Extending stk
