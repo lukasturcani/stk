@@ -11,7 +11,7 @@ vertices = stk.cof.vertices
     params=(
         CaseData(
             vertex=vertices.UnaligningVertex(
-                vertex=vertices.CofVertex(0, (1, 2, 3)),
+                vertex=vertices._CofVertex(0, (1, 2, 3)),
             ),
             edges=(),
             building_block=stk.BuildingBlock(

@@ -14,13 +14,13 @@ from ..topology_graph import Vertex
 
 class _CofVertex(Vertex):
     """
-    A :class:`.CofVertex` .
+    A :class:`._CofVertex` .
 
     """
 
     def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
         """
-        Initialize a :class:`.CofVertex`.
+        Initialize a :class:`._CofVertex`.
 
         Parameters
         ----------
@@ -71,7 +71,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`.CofVertex` in the middle of `vertices`.
+        Initialize a :class:`._CofVertex` in the middle of `vertices`.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`.CofVertex`
+        :class:`._CofVertex`
             The new vertex.
 
         """
@@ -119,7 +119,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`.CofVertex` at the center of `vertices`.
+        Initialize a :class:`._CofVertex` at the center of `vertices`.
 
         The `vertices` are shifted according to the lattice constants
         and cell shifts.
