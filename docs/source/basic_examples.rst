@@ -1034,9 +1034,9 @@ accessed if required.
 
     base_vertex = stk.Vertex(0, [0, 0, 0])
 
-    linear_cage_vertex = stk.cage.LinearVertex(...)
-    linear_cof_vertex = stk.cof.LinearVertex(...)
-    cycle_vertex = stk.macrocycle.CycleVertex(...)
+    linear_cage_vertex = stk.cage.LinearVertex(0, [0, 0, 0])
+    linear_cof_vertex = stk.cof.LinearVertex(0, [0, 0, 0])
+    cycle_vertex = stk.macrocycle.CycleVertex(0, [0, 0, 0], False, 0)
 
 
 Extending stk
