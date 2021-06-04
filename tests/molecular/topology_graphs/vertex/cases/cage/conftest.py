@@ -52,7 +52,7 @@ def cage2(init_at_center, vertices_):
 def cage3(position):
     return CaseData(
         vertex=vertices.UnaligningVertex(
-            vertex=vertices.CageVertex(0, position),
+            vertex=vertices._CageVertex(0, position),
         ),
         id=0,
         position=position,

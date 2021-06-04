@@ -30,7 +30,7 @@ class _CageVertex(Vertex):
         aligner_edge=0,
     ):
         """
-        Initialize a :class:`.CageVertex`.
+        Initialize a :class:`._CageVertex`.
 
         Parameters
         ----------
@@ -83,7 +83,7 @@ class _CageVertex(Vertex):
 
         Returns
         -------
-        :class:`.CageVertex`
+        :class:`._CageVertex`
             The clone. Has the same type as the original instance.
 
         """

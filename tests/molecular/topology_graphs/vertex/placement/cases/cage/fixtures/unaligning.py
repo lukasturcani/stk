@@ -11,7 +11,7 @@ vertices = stk.cage.vertices
     params=(
         CaseData(
             vertex=vertices.UnaligningVertex(
-                vertex=vertices.CageVertex(0, (1, 2, 3)),
+                vertex=vertices._CageVertex(0, (1, 2, 3)),
             ),
             edges=(),
             building_block=stk.BuildingBlock(
