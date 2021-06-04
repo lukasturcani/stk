@@ -108,7 +108,7 @@ class _CageVertex(Vertex):
     @classmethod
     def init_at_center(cls, id, vertices):
         """
-        Initialize a :class:`.CageVertex` in the middle of `vertices`.
+        Initialize a :class:`._CageVertex` in the middle of `vertices`.
 
         Parameters
         ----------
@@ -120,7 +120,7 @@ class _CageVertex(Vertex):
 
         Returns
         -------
-        :class:`.CageVertex`
+        :class:`._CageVertex`
             The new vertex.
 
         """
