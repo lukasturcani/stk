@@ -1022,14 +1022,13 @@ useful key for metal-containing molecules. You can use the
     stk.MoleculeMongoDb = _old_molecule_init
     pymongo.MongoClient = _mongo_client
 
-Accessing Vertex Classes
-========================
+Creating New Topology Graphs with Existing Vertices
+===================================================
 
-The vertex classes that make up toplogy graphs in :mod:`stk` can be
-accessed if required. For example, this allows the user to define a
-new topology graph.
+The vertex classes that make up toplogy graphs in :mod:`.stk` can be
+accessed to speed up the implemention of new topology graphs.
 
-.. testcode:: accessing-vertex-classes
+.. testcode:: creating-new-topology-graphs-with-existing-vertices
 
     import stk
 
