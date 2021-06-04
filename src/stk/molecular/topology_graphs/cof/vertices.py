@@ -150,7 +150,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`.CofVertex`
+        :class:`._CofVertex`
             The new vertex.
 
         """
