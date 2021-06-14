@@ -38,13 +38,13 @@ Jupyter notebook is available here__.
 __ https://www.youtube.com/watch?v=sc1Kf6vzTSA&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=3
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
 
-
 Hierarchical Construction with *stk*
 ------------------------------------
 
 `Video 4`__ expands on the use of hierarchical construction in
 :mod:`.stk`. It includes an implementation of the example from the
 2021 publication and the construction of a rotaxane/cage hybrid!
+The Jupyter notebbok is available here__.
 
 __ https://www.youtube.com/watch?v=WB9oAqA8m4o&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=4
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
@@ -59,7 +59,6 @@ notebook is available here__.
 __ https://www.youtube.com/watch?v=1BBhPeIRV_E&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=7
 __ https://github.com/JelfsMaterialsGroup/stko
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
-
 
 Databases and *stk-vis* in *stk*
 --------------------------------
