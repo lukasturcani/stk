@@ -6,8 +6,6 @@ from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
-vertices = stk.cage.vertices
-
 
 @pytest.fixture
 def linear(position, linear_aligner_edge, building_block_2):
@@ -29,7 +27,7 @@ def linear(position, linear_aligner_edge, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices.LinearVertex(
+    vertex = stk.cage.LinearVertex(
         id=0,
         position=position,
         aligner_edge=linear_aligner_edge,

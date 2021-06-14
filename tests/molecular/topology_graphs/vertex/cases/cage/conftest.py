@@ -6,9 +6,6 @@ import stk
 from ...case_data import CaseData
 
 
-vertices = stk.cage.vertices
-
-
 @pytest.fixture(
     params=(
         lazy_fixture('cage1'),
@@ -51,8 +48,8 @@ def cage2(init_at_center, vertices_):
 @pytest.fixture
 def cage3(position):
     return CaseData(
-        vertex=vertices.UnaligningVertex(
-            vertex=vertices._CageVertex(0, position),
+        vertex=stk.cage.UnaligningVertex(
+            vertex=stk.cage.vertices._CageVertex(0, position),
         ),
         id=0,
         position=position,
@@ -72,8 +69,8 @@ def position(request):
 
 @pytest.fixture(
     params=(
-        vertices.LinearVertex,
-        vertices.NonLinearVertex,
+        stk.cage.LinearVertex,
+        stk.cage.NonLinearVertex,
     ),
 )
 def cls(request):
@@ -82,9 +79,9 @@ def cls(request):
 
 @pytest.fixture(
     params=(
-        vertices.LinearVertex.init_at_center,
-        vertices.NonLinearVertex.init_at_center,
-        vertices.UnaligningVertex.init_at_center,
+        stk.cage.LinearVertex.init_at_center,
+        stk.cage.NonLinearVertex.init_at_center,
+        stk.cage.UnaligningVertex.init_at_center,
     ),
 )
 def init_at_center(request):

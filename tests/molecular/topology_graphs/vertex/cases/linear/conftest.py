@@ -6,9 +6,6 @@ from pytest_lazyfixture import lazy_fixture
 from ...case_data import CaseData
 
 
-vertices = stk.polymer.vertices
-
-
 @pytest.fixture(
     params=(
         lazy_fixture('center'),
@@ -23,7 +20,7 @@ def case_data(request):
 @pytest.fixture
 def center(id, position, flip):
     return CaseData(
-        vertex=vertices.LinearVertex(id, position, flip),
+        vertex=stk.polymer.LinearVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -33,7 +30,7 @@ def center(id, position, flip):
 @pytest.fixture
 def head(id, position, flip):
     return CaseData(
-        vertex=vertices.HeadVertex(id, position, flip),
+        vertex=stk.polymer.HeadVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -43,7 +40,7 @@ def head(id, position, flip):
 @pytest.fixture
 def tail(id, position, flip):
     return CaseData(
-        vertex=vertices.TailVertex(id, position, flip),
+        vertex=stk.polymer.TailVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),

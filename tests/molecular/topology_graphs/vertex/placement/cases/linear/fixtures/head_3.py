@@ -4,8 +4,6 @@ import stk
 from .utilities import get_closest_point, get_fg_position, get_edges
 from ....case_data import CaseData
 
-vertices = stk.polymer.linear
-
 
 @pytest.fixture
 def head_3(position, building_block_2):
@@ -26,7 +24,7 @@ def head_3(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices.HeadVertex(0, position, True)
+    vertex = stk.polymer.linear.HeadVertex(0, position, True)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),

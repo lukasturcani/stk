@@ -9,8 +9,6 @@ from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
-vertices = stk.cof.vertices
-
 
 @pytest.fixture(
     params=(
@@ -131,7 +129,7 @@ def _nonlinear(position, aligner_edge, building_block):
         get_normal: np.array([0, 0, 1]),
     }
 
-    vertex = vertices.NonLinearVertex(
+    vertex = stk.cof.NonLinearVertex(
         id=0,
         position=position,
         aligner_edge=aligner_edge,

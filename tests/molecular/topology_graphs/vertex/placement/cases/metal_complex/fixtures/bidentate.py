@@ -5,8 +5,6 @@ from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
-vertices = stk.metal_complex.vertices
-
 
 @pytest.fixture
 def bidentate(position, building_block_2):
@@ -28,7 +26,7 @@ def bidentate(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices.BiDentateLigandVertex(
+    vertex = stk.metal_complex.BiDentateLigandVertex(
         id=0,
         position=position,
     )

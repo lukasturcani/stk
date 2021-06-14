@@ -5,7 +5,6 @@ from rdkit.Chem import AllChem as rdkit
 
 from ....case_data import CaseData
 
-vertices = stk.metal_complex.vertices
 
 single_atom = rdkit.MolFromSmiles('[Fe]')
 single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
@@ -14,7 +13,7 @@ single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices.MetalVertex(
+            vertex=stk.metal_complex.MetalVertex(
                 id=0,
                 position=(1, 2, 3),
             ),

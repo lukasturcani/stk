@@ -4,19 +4,17 @@ import stk
 
 from ...case_data import CaseData
 
-vertices = stk.host_guest.vertices
-
 
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices.HostVertex(0, (1, 2, 3)),
+            vertex=stk.host_guest.HostVertex(0, (1, 2, 3)),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),
         ),
         CaseData(
-            vertex=vertices.GuestVertex(
+            vertex=stk.host_guest.GuestVertex(
                 id=0,
                 position=(1, 2, 3),
                 start=(4, 5, 6),

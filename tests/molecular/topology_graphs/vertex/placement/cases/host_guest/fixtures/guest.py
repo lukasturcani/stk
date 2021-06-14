@@ -4,8 +4,6 @@ import stk
 
 from ....case_data import CaseData
 
-vertices = stk.host_guest.vertices
-
 
 def get_aligned_building_block(building_block, target):
     return building_block.with_rotation_between_vectors(
@@ -27,7 +25,7 @@ def get_direction(building_block):
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices.GuestVertex(
+            vertex=stk.host_guest.GuestVertex(
                 id=0,
                 position=(1, 2, 3),
                 start=(1, 2, 3),

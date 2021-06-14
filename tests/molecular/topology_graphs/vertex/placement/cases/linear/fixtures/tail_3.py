@@ -5,9 +5,6 @@ from .utilities import get_closest_point, get_fg_position, get_edges
 from ....case_data import CaseData
 
 
-vertices = stk.polymer.linear
-
-
 @pytest.fixture
 def tail_3(position, building_block_2):
     point1, point2 = points = (
@@ -27,7 +24,7 @@ def tail_3(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = vertices.TailVertex(0, position, True)
+    vertex = stk.polymer.linear.TailVertex(0, position, True)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[0], ),
