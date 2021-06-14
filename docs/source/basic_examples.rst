@@ -1068,7 +1068,7 @@ read the documentation of :class:`.MetalComplex`.
             stk.SingleAtom(stk.Fe(0, charge=2))
             for i in range(2)
         ),
-        position_matrix=[[0, 0, 0]],
+        position_matrix=np.array([[0, 0, 0]]),
     )
     complex = stk.ConstructedMolecule(
         topology_graph=NewMetalComplexTopology(
