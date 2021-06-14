@@ -1052,7 +1052,7 @@ of :class:`.Cage`.
 
         _vertex_prototypes = (
             stk.metal_complex.MonoDentateLigandVertex(0, (1., 0., 0.)),
-            stk.metal_complex.MetalVertex(1, (0., 0., 0.)),a
+            stk.metal_complex.MetalVertex(1, (0., 0., 0.)),
             stk.metal_complex.MonoDentateLigandVertex(2, (-1., 0., 0.)),
         )
 
