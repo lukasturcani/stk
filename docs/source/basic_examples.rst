@@ -1026,27 +1026,15 @@ Creating New Topology Graphs with Existing Vertices
 ===================================================
 
 The vertex classes that make up topology graphs in :mod:`.stk` can be
-accessed to speed up the implemention of new topology graphs. The
-exact details of how vertices can be used to implement new topology
-graphs depends on the topology graph, so read that documentation
-for further examples. For cages, you would read the documentation
-of :class:`.Cage`.
+accessed to speed up the implemention of new and arbitrary topology
+graphs (as shown below). The exact details of how vertices can be used
+to implement new topology graphs depends on the topology graph, so read
+that documentation for further examples. For cages, you would read the
+documentation of :class:`.Cage`.
 
 .. testcode:: creating-new-topology-graphs-with-existing-vertices
 
     import stk
-
-    class NewCageTopology(stk.cage.Cage):
-
-        _vertex_prototypes = (
-            stk.cage.LinearVertex(0, (0., 0., 0.)),
-            stk.cage.LinearVertex(1, (0., 1., 0.)),
-        )
-
-        # Define Edges below.
-        _edge_prototypes = (
-            stk.Edge(0, _vertex_prototypes[0], _vertex_prototypes[1]),
-        )
 
     class NewMetalComplexTopology(stk.metal_complex.MetalComplex):
 
@@ -1080,10 +1068,6 @@ of :class:`.Cage`.
             for i in range(2)
         ),
         position_matrix=[[0, 0, 0]],
-    )
-    ligand = stk.BuildingBlock(
-        smiles='NCC',
-        functional_groups=[stk.PrimaryAminoFactory()],
     )
     complex = stk.ConstructedMolecule(
         topology_graph=NewMetalComplexTopology(
