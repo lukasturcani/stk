@@ -1050,17 +1050,54 @@ of :class:`.Cage`.
 
     class NewMetalComplexTopology(stk.metal_complex.MetalComplex):
 
-        _vertex_prototypes = (
-            stk.metal_complex.MonoDentateLigandVertex(0, (1., 0., 0.)),
-            stk.metal_complex.MetalVertex(1, (0., 0., 0.)),
-            stk.metal_complex.MonoDentateLigandVertex(2, (-1., 0., 0.)),
+        _metal_vertex_prototypes = (
+            stk.metal_complex.MetalVertex(0, (0.5, 0., 0.)),
+        )
+        _ligand_vertex_prototypes = (
+            stk.metal_complex.MonoDentateLigandVertex(1, (1., 0., 0.)),
+            stk.metal_complex.MonoDentateLigandVertex(2, (0., 0., 0.)),
         )
 
         # Define Edges below.
         _edge_prototypes = (
-            stk.Edge(0, _vertex_prototypes[0], _vertex_prototypes[1]),
-            stk.Edge(1, _vertex_prototypes[2], _vertex_prototypes[1]),
+            stk.Edge(
+                id=0,
+                vertex1=_metal_vertex_prototypes[0],
+                vertex2=_ligand_vertex_prototypes[0],
+            ),
+            stk.Edge(
+                id=1,
+                vertex1=_metal_vertex_prototypes[0],
+                vertex2=_ligand_vertex_prototypes[1],
+            ),
         )
+
+    # Build new metal complex.
+    metal = stk.BuildingBlock(
+        smiles='[Fe+2]',
+        functional_groups=(
+            stk.SingleAtom(stk.Fe(0, charge=2))
+            for i in range(2)
+        ),
+        position_matrix=[[0, 0, 0]],
+    )
+    ligand = stk.BuildingBlock(
+        smiles='NCC',
+        functional_groups=[stk.PrimaryAminoFactory()],
+    )
+    complex = stk.ConstructedMolecule(
+        topology_graph=NewMetalComplexTopology(
+            metals=metal,
+            ligands=ligand,
+        )
+    )
+
+.. testcode:: creating-new-topology-graphs-with-existing-vertices
+    :hide:
+
+    assert complex.get_num_atoms() == (
+        (ligand.get_num_atoms()-2)*2 + 1
+    )
 
 
 Extending stk
