@@ -1029,8 +1029,8 @@ The vertex classes that make up topology graphs in :mod:`.stk` can be
 accessed to speed up the implemention of new and arbitrary topology
 graphs (as shown below). The exact details of how vertices can be used
 to implement new topology graphs depends on the topology graph, so read
-that documentation for further examples. For cages, you would read the
-documentation of :class:`.Cage`.
+that documentation for further examples. For metal complexes, you would
+read the documentation of :class:`.MetalComplex`.
 
 .. testcode:: creating-new-topology-graphs-with-existing-vertices
 
