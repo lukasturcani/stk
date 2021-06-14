@@ -1025,8 +1025,12 @@ useful key for metal-containing molecules. You can use the
 Creating New Topology Graphs with Existing Vertices
 ===================================================
 
-The vertex classes that make up toplogy graphs in :mod:`.stk` can be
-accessed to speed up the implemention of new topology graphs.
+The vertex classes that make up topology graphs in :mod:`.stk` can be
+accessed to speed up the implemention of new topology graphs. The 
+exact details of how vertices can be used to implement new topology 
+graphs depends on the topology graph, so read that documentation 
+for further examples. For cages, you would read the documentation 
+of :class:`.Cage`.
 
 .. testcode:: creating-new-topology-graphs-with-existing-vertices
 
@@ -1035,8 +1039,8 @@ accessed to speed up the implemention of new topology graphs.
     class NewCageTopology(stk.cage.Cage):
 
         _vertex_prototypes = (
-            stk.cage.LinearVertex(0, [0, 0, 0]),
-            stk.cage.LinearVertex(1, [0, 1, 0]),
+            stk.cage.LinearVertex(0, (0., 0., 0.)),
+            stk.cage.LinearVertex(1, (0., 1., 0.)),
         )
 
         # Define Edges below.
@@ -1047,9 +1051,9 @@ accessed to speed up the implemention of new topology graphs.
     class NewMetalComplexTopology(stk.cage.Cage):
 
         _vertex_prototypes = (
-            stk.metal_complex.MonoDentateLigandVertex(0, [1, 0, 0]),
-            stk.metal_complex.MetalVertex(1, [0, 0, 0]),
-            stk.metal_complex.MonoDentateLigandVertex(2, [-1, 0, 0]),
+            stk.metal_complex.MonoDentateLigandVertex(0, (1., 0., 0.)),
+            stk.metal_complex.MetalVertex(1, (0., 0., 0.)),a
+            stk.metal_complex.MonoDentateLigandVertex(2, (-1., 0., 0.)),
         )
 
         # Define Edges below.
