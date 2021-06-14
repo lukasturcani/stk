@@ -1040,7 +1040,9 @@ accessed to speed up the implemention of new topology graphs.
         )
 
         # Define Edges below.
-        _edge_prototypes = ()
+        _edge_prototypes = (
+            stk.Edge(0, _vertex_prototypes[0], _vertex_prototypes[1]),
+        )
 
     class NewMetalComplexTopology(stk.cage.Cage):
 
@@ -1051,7 +1053,10 @@ accessed to speed up the implemention of new topology graphs.
         )
 
         # Define Edges below.
-        _edge_prototypes = ()
+        _edge_prototypes = (
+            stk.Edge(0, _vertex_prototypes[0], _vertex_prototypes[1]),
+            stk.Edge(1, _vertex_prototypes[2], _vertex_prototypes[1]),
+        )
 
 
 Extending stk
