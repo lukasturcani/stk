@@ -20,7 +20,7 @@ def case_data(request):
 @pytest.fixture
 def center(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.LinearVertex(id, position, flip),
+        vertex=stk.polymer.linear.LinearVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -30,7 +30,7 @@ def center(id, position, flip):
 @pytest.fixture
 def head(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.HeadVertex(id, position, flip),
+        vertex=stk.polymer.linear.HeadVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -40,7 +40,7 @@ def head(id, position, flip):
 @pytest.fixture
 def tail(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.TailVertex(id, position, flip),
+        vertex=stk.polymer.linear.TailVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
