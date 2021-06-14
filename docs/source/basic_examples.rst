@@ -1061,6 +1061,7 @@ read the documentation of :class:`.MetalComplex`.
         )
 
     # Build new metal complex.
+    ligand = stk.BuildingBlock('NCC', [stk.PrimaryAminoFactory()])
     metal = stk.BuildingBlock(
         smiles='[Fe+2]',
         functional_groups=(
