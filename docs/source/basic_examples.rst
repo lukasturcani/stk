@@ -1026,10 +1026,10 @@ Creating New Topology Graphs with Existing Vertices
 ===================================================
 
 The vertex classes that make up topology graphs in :mod:`.stk` can be
-accessed to speed up the implemention of new topology graphs. The 
-exact details of how vertices can be used to implement new topology 
-graphs depends on the topology graph, so read that documentation 
-for further examples. For cages, you would read the documentation 
+accessed to speed up the implemention of new topology graphs. The
+exact details of how vertices can be used to implement new topology
+graphs depends on the topology graph, so read that documentation
+for further examples. For cages, you would read the documentation
 of :class:`.Cage`.
 
 .. testcode:: creating-new-topology-graphs-with-existing-vertices
@@ -1048,7 +1048,7 @@ of :class:`.Cage`.
             stk.Edge(0, _vertex_prototypes[0], _vertex_prototypes[1]),
         )
 
-    class NewMetalComplexTopology(stk.cage.Cage):
+    class NewMetalComplexTopology(stk.metal_complex.MetalComplex):
 
         _vertex_prototypes = (
             stk.metal_complex.MonoDentateLigandVertex(0, (1., 0., 0.)),
