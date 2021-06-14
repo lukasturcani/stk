@@ -56,7 +56,7 @@ Using *stko* with *stk*
 calculate the properties of :mod:`.stk` molecules. The Jupyter
 notebook is available here__.
 
-__ https://www.youtube.com/watch?v=1BBhPeIRV_E&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=7
+__ https://www.youtube.com/watch?v=vvmS43dVPe4&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=5
 __ https://github.com/JelfsMaterialsGroup/stko
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
 
@@ -77,6 +77,6 @@ Host-Guest Conformers with *stk*
 host-guest complexes using the software SpinDry__. The Jupyter
 notebook is available here__.
 
-__ https://www.youtube.com/watch?v=vvmS43dVPe4&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=5
+__ https://www.youtube.com/watch?v=1BBhPeIRV_E&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=7
 __ https://github.com/andrewtarzia/SpinDry
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
