@@ -1039,10 +1039,10 @@ read the documentation of :class:`.MetalComplex`.
     class NewMetalComplexTopology(stk.metal_complex.MetalComplex):
 
         _metal_vertex_prototypes = (
-            stk.metal_complex.MetalVertex(0, (0.5, 0., 0.)),
+            stk.metal_complex.MetalVertex(0, (1., 0., 0.)),
         )
         _ligand_vertex_prototypes = (
-            stk.metal_complex.MonoDentateLigandVertex(1, (1., 0., 0.)),
+            stk.metal_complex.MonoDentateLigandVertex(1, (2., 0., 0.)),
             stk.metal_complex.MonoDentateLigandVertex(2, (0., 0., 0.)),
         )
 
