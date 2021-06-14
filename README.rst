@@ -74,6 +74,11 @@ __ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembl
 using stk
 ---------
 
+* `High-throughput Computational Evaluation of Low Symmetry Pd2L4
+  Cages to Aid in System Design`__
+
+__ https://chemrxiv.org/articles/preprint/High-throughput_Computational_Evaluation_of_Low_Symmetry_Pd2L4_Cages_to_Aid_in_System_Design/14604294
+
 * `Forecasting System of Computational Time of DFT/TDDFT Calculations
   under the Multiverse Ansatz via Machine Learning and
   Cheminformatics`__
