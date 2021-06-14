@@ -1035,6 +1035,7 @@ read the documentation of :class:`.MetalComplex`.
 .. testcode:: creating-new-topology-graphs-with-existing-vertices
 
     import stk
+    import numpy as np
 
     class NewMetalComplexTopology(stk.metal_complex.MetalComplex):
 
