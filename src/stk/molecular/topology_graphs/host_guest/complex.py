@@ -4,7 +4,7 @@ Host Guest Complex
 
 """
 
-from .vertices import _HostVertex, _GuestVertex
+from .vertices import HostVertex, GuestVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
 
 
@@ -158,9 +158,9 @@ class Complex(TopologyGraph):
 
         super().__init__(
             building_block_vertices={
-                host: (_HostVertex(0, [0, 0, 0]), ),
+                host: (HostVertex(0, [0, 0, 0]), ),
                 guest: (
-                    _GuestVertex(1, displacement, start, target),
+                    GuestVertex(1, displacement, start, target),
                 ),
             },
             edges=(),

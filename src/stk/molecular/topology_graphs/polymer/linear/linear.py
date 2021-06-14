@@ -9,10 +9,10 @@ import numpy as np
 from typing import Tuple
 
 from .vertices import (
-    _HeadVertex,
-    _TailVertex,
-    _LinearVertex,
-    _UnaligningVertex,
+    HeadVertex,
+    TailVertex,
+    LinearVertex,
+    UnaligningVertex,
 )
 from ...topology_graph import (
     TopologyGraph,
@@ -326,7 +326,7 @@ class Linear(TopologyGraph):
 
         except ValueError:
             vertices = (
-                _UnaligningVertex(0, (0., 0., 0.), False),
+                UnaligningVertex(0, (0., 0., 0.), False),
             )
             edges = ()
 
@@ -381,7 +381,7 @@ class Linear(TopologyGraph):
 
         choices = [True, False]
         vertices = [
-            _HeadVertex(
+            HeadVertex(
                 id=0,
                 position=np.array([0, 0, 0]),
                 flip=generator.choice(
@@ -394,12 +394,12 @@ class Linear(TopologyGraph):
         for i, p in enumerate(body_orientations, 1):
             flip = generator.choice(choices, p=[p, 1-p])
             vertices.append(
-                _LinearVertex(i, np.array([i, 0, 0]), flip),
+                LinearVertex(i, np.array([i, 0, 0]), flip),
             )
             edges.append(Edge(len(edges), vertices[i-1], vertices[i]))
 
         vertices.append(
-            _TailVertex(
+            TailVertex(
                 id=len(vertices),
                 position=np.array([len(vertices), 0, 0]),
                 flip=generator.choice(

@@ -154,7 +154,7 @@ class _CageVertex(Vertex):
         )
 
 
-class _LinearCageVertex(_CageVertex):
+class LinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -206,7 +206,7 @@ class _LinearCageVertex(_CageVertex):
         }
 
 
-class _NonLinearCageVertex(_CageVertex):
+class NonLinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -284,7 +284,7 @@ class _NonLinearCageVertex(_CageVertex):
         }
 
 
-class _UnaligningVertex(_CageVertex):
+class UnaligningVertex(_CageVertex):
     """
     Just places a building block, does not align.
 

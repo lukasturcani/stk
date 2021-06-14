@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from .vertices import _AxleVertex, _CycleVertex
+from .vertices import AxleVertex, CycleVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
 
 
@@ -403,12 +403,12 @@ class NRotaxane(TopologyGraph):
         )
         self._num_repeating_units = num_repeating_units
 
-        vertices = [_AxleVertex(0, [0, 0, 0])]
+        vertices = [AxleVertex(0, [0, 0, 0])]
         distance = 1 / (chain_length+1)
         choices = [True, False]
         for vertex_id, flip_chance in enumerate(orientations, 1):
             vertices.append(
-                _CycleVertex(
+                CycleVertex(
                     id=vertex_id,
                     position=[vertex_id*distance-0.5, 0, 0],
                     flip=generator.choice(

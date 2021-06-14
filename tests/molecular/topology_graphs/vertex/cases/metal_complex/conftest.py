@@ -4,25 +4,29 @@ import stk
 
 from ...case_data import CaseData
 
-vertices = stk.metal_complex.vertices
-
 
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._MetalVertex(0, (1, 2, 3)),
+            vertex=stk.metal_complex.MetalVertex(0, (1, 2, 3)),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),
         ),
         CaseData(
-            vertex=vertices._MonoDentateLigandVertex(0, (1, 2, 3)),
+            vertex=stk.metal_complex.MonoDentateLigandVertex(
+                id=0,
+                position=(1, 2, 3),
+            ),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),
         ),
         CaseData(
-            vertex=vertices._BiDentateLigandVertex(0, (1, 2, 3)),
+            vertex=stk.metal_complex.BiDentateLigandVertex(
+                id=0,
+                position=(1, 2, 3),
+            ),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),

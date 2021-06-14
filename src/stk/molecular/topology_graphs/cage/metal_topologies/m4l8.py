@@ -5,7 +5,7 @@ M4L8
 """
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex, _LinearCageVertex
+from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
 
 
@@ -33,22 +33,22 @@ class M4L8(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [1, 0, 0]),
-        _NonLinearCageVertex(1, [0, 1, 0]),
-        _NonLinearCageVertex(2, [-1, 0, 0]),
-        _NonLinearCageVertex(3, [0, -1, 0]),
+        NonLinearVertex(0, [1, 0, 0]),
+        NonLinearVertex(1, [0, 1, 0]),
+        NonLinearVertex(2, [-1, 0, 0]),
+        NonLinearVertex(3, [0, -1, 0]),
 
-        _LinearCageVertex(4, [1, 1, 0.5], False),
-        _LinearCageVertex(5, [1, 1, -0.5], False),
+        LinearVertex(4, [1, 1, 0.5], False),
+        LinearVertex(5, [1, 1, -0.5], False),
 
-        _LinearCageVertex(6, [1, -1, 0.5], False),
-        _LinearCageVertex(7, [1, -1, -0.5], False),
+        LinearVertex(6, [1, -1, 0.5], False),
+        LinearVertex(7, [1, -1, -0.5], False),
 
-        _LinearCageVertex(8, [-1, -1, 0.5], False),
-        _LinearCageVertex(9, [-1, -1, -0.5], False),
+        LinearVertex(8, [-1, -1, 0.5], False),
+        LinearVertex(9, [-1, -1, -0.5], False),
 
-        _LinearCageVertex(10, [-1, 1, 0.5], False),
-        _LinearCageVertex(11, [-1, 1, -0.5], False),
+        LinearVertex(10, [-1, 1, 0.5], False),
+        LinearVertex(11, [-1, 1, -0.5], False),
     )
 
     _edge_prototypes = (

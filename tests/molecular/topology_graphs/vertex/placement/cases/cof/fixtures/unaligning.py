@@ -4,14 +4,12 @@ import stk
 
 from ....case_data import CaseData
 
-vertices = stk.cof.vertices
-
 
 @pytest.fixture(
     params=(
         CaseData(
-            vertex=vertices._UnaligningVertex(
-                vertex=vertices._CofVertex(0, (1, 2, 3)),
+            vertex=stk.cof.UnaligningVertex(
+                vertex=stk.cof.vertices._CofVertex(0, (1, 2, 3)),
             ),
             edges=(),
             building_block=stk.BuildingBlock(

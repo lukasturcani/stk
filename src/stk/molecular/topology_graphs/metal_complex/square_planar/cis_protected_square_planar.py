@@ -5,7 +5,7 @@ Cis Protected Square Planar
 """
 
 from ..metal_complex import MetalComplex
-from ..vertices import _MetalVertex, _BiDentateLigandVertex
+from ..vertices import MetalVertex, BiDentateLigandVertex
 from ...topology_graph import Edge
 
 
@@ -31,10 +31,10 @@ class CisProtectedSquarePlanar(MetalComplex):
     """
 
     _metal_vertex_prototypes = (
-        _MetalVertex(0, [0, 0, 0]),
+        MetalVertex(0, [0, 0, 0]),
     )
     _ligand_vertex_prototypes = (
-        _BiDentateLigandVertex(1, [2.5, 2.5, 0]),
+        BiDentateLigandVertex(1, [2.5, 2.5, 0]),
     )
 
     _edge_prototypes = (

@@ -7,7 +7,7 @@ Linkerless Honeycomb
 import numpy as np
 
 from .cof import Cof
-from .vertices import _NonLinearCofVertex
+from .vertices import NonLinearVertex
 from ..topology_graph import Edge
 
 
@@ -37,8 +37,8 @@ class LinkerlessHoneycomb(Cof):
     )
 
     _vertex_prototypes = (
-        _NonLinearCofVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
-        _NonLinearCofVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
+        NonLinearVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
+        NonLinearVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
     )
 
     _edge_prototypes = (
