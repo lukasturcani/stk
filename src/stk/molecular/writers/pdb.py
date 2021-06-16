@@ -1,5 +1,5 @@
 """
-Pdb Writer
+PDB Writer
 ==========
 
 """
