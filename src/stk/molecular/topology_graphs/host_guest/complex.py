@@ -57,9 +57,9 @@ class Complex(TopologyGraph):
         complex = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
                 host=stk.BuildingBlock.init_from_molecule(host),
-                guest=(stk.host_guest.Guest(
+                guests=stk.host_guest.Guest(
                     building_block=stk.BuildingBlock('[Br][Br]'),
-                ), ),
+                ),
             ),
         )
 
@@ -90,18 +90,22 @@ class Complex(TopologyGraph):
                 ),
             ),
         )
-        guest = stk.host_guest.Guest(stk.BuildingBlock('[Br][Br]'))
+
+        guest_building_block = stk.BuildingBlock('[Br][Br]')
+        guest = stk.host_guest.Guest(
+            building_block=guest_building_block,
+            # Apply a rotation onto the guest molecule such that
+            # the vector returned by get_direction() has the same
+            # direction as [1, 1, 1].
+            start_vector=guest_building_block.get_direction(),
+            end_vector=[1, 1, 1],
+            # Change the displacement of the guest.
+            displacement=[5.3, 2.1, 7.1],
+        )
         complex = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
                 host=stk.BuildingBlock.init_from_molecule(host),
-                guests=(guest, ),
-                # Apply a rotation onto the guest molecule such that
-                # the vector returned by get_direction() has the same
-                # direction as [1, 1, 1].
-                guest_start=guest.get_direction(),
-                guest_target=[1, 1, 1],
-                # Change the displacement of the guest.
-                displacement=[5.3, 2.1, 7.1],
+                guests=guest,
             ),
         )
 
@@ -151,6 +155,9 @@ class Complex(TopologyGraph):
             is not.
 
         """
+
+        if isinstance(guests, Guest):
+            guests = (guests, )
 
         building_block_vertices = {host: (HostVertex(0, [0, 0, 0]), )}
         guest_vertices = {

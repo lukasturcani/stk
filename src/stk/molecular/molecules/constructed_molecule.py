@@ -60,7 +60,7 @@ class ConstructedMolecule(Molecule):
         benzene = stk.BuildingBlock('c1ccccc1')
         cage_complex = stk.host_guest.Complex(
             host=stk.BuildingBlock.init_from_molecule(cage),
-            guest=benzene,
+            guests=benzene,
         )
         cage_complex = stk.ConstructedMolecule(cage_complex)
 

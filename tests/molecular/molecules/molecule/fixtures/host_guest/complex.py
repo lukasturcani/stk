@@ -40,8 +40,8 @@ _cage = stk.ConstructedMolecule(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.host_guest.Complex(
                     host=stk.BuildingBlock.init_from_molecule(_cage),
-                    guests=(
-                        stk.host_guest.Guest(stk.BuildingBlock('C#N')),
+                    guests=stk.host_guest.Guest(
+                        building_block=stk.BuildingBlock('C#N')
                     ),
                 )
             ),
