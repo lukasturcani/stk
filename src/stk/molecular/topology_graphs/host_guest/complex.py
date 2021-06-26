@@ -13,8 +13,8 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Guest:
     building_block: BuildingBlock
-    start_vector: tuple = None
-    end_vector: tuple = None
+    start_vector: tuple = (1., 0., 0.)
+    end_vector: tuple = (1., 0., 0.)
     displacement: tuple = (0., 0., 0.)
 
     def __repr__(self):
