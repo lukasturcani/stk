@@ -4,84 +4,25 @@ Host Guest Complex
 
 """
 
+from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
+from dataclasses import dataclass
 
 
-class Guest(TopologyGraph):
-
-    def __init__(
-        self,
-        guest,
-        guest_start=None,
-        guest_target=None,
-        num_processes=1,
-        displacement=(0, 0, 0),
-    ):
-
-        num_nones = sum(
-            1 for vector in (guest_start, guest_target)
-            if vector is None
-        )
-        if num_nones == 1:
-            raise TypeError(
-                'If guest_start or guest_target is defined, '
-                'the other must be too.'
-            )
-
-        if guest_start is None:
-            start = target = (1., 0., 0.)
-        else:
-            start = guest_start = tuple(guest_start)
-            target = guest_target = tuple(guest_target)
-
-        # Save the values as None, for __repr__.
-        self._guest_start = guest_start
-        self._guest_target = guest_target
-        self._displacement = displacement
-
-        super().__init__(
-            building_block_vertices={
-                guest: (
-                    GuestVertex(0, displacement, start, target),
-                ),
-            },
-            edges=(),
-            reaction_factory=None,
-            construction_stages=(),
-            num_processes=num_processes,
-            optimizer=NullOptimizer(),
-            edge_groups=(),
-        )
-
-    def get_guest_start(self):
-        return self._guest_start
-
-    def get_guest_target(self):
-        return self._guest_target
-
-    def get_displacement(self):
-        return self._displacement
-
-    def clone(self):
-        clone = super().clone()
-        clone._guest_start = self._guest_start
-        clone._guest_target = self._guest_target
-        clone._displacement = self._displacement
-        return clone
-
-    def _run_reactions(self, state):
-        return state
-
-    def _get_scale(self, building_block_vertices):
-        return 1
+@dataclass(frozen=True)
+class Guest:
+    building_block: BuildingBlock
+    start_vector: tuple = None
+    end_vector: tuple = None
+    displacement: tuple = (0., 0., 0.)
 
     def __repr__(self):
         return (
-            f'host_guest.Guest('
-            f'guest_start={self._guest_start!r}, '
-            f'guest_target={self._guest_target!r}, '
-            f'displacement={self._displacement!r})'
+            f'{self.__class__.__name__}('
+            f'guest_start={self.start_vector!r}, '
+            f'guest_target={self.end_vector!r}, '
+            f'displacement={self.displacement!r})'
         )
 
 
@@ -211,13 +152,13 @@ class Complex(TopologyGraph):
 
         building_block_vertices = {host: (HostVertex(0, [0, 0, 0]), )}
         guest_vertices = {
-            next(topology.get_building_blocks()): (GuestVertex(
+            guest.building_block: (GuestVertex(
                 id=i+1,
-                position=topology.get_displacement(),
-                start=topology.get_guest_start(),
-                target=topology.get_guest_target(),
+                position=guest.displacement,
+                start=guest.start_vector,
+                target=guest.end_vector,
             ), )
-            for i, topology in enumerate(guests)
+            for i, guest in enumerate(guests)
         }
         building_block_vertices.update(guest_vertices)
 
@@ -243,7 +184,7 @@ class Complex(TopologyGraph):
 
     def __repr__(self):
         return (
-            f'host_guest.Complex('
+            'host_guest.Complex('
             # f'guest_start={self._guest_start!r}, '
             # f'guest_target={self._guest_target!r}, '
             # f'displacement={self._displacement!r})'
