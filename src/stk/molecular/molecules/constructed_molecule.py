@@ -57,7 +57,7 @@ class ConstructedMolecule(Molecule):
         tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
         cage = stk.ConstructedMolecule(tetrahedron)
 
-        benzene = stk.BuildingBlock('c1ccccc1')
+        benzene = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
         cage_complex = stk.host_guest.Complex(
             host=stk.BuildingBlock.init_from_molecule(cage),
             guests=benzene,
