@@ -228,9 +228,11 @@ class Complex(TopologyGraph):
 
         """
 
-        if guests is not None and len({
-            guest, displacement, guest_start, guest_target
-        }) > 1:
+        if guests is not None and (
+            guest is not None or len({
+                displacement, guest_start, guest_target
+            }) > 1
+        ):
             raise ValueError(
                 'You are attempting to use the old API with the new '
                 'API. Use the stk.host_guest.Guest API and `guests`.'
@@ -249,7 +251,8 @@ class Complex(TopologyGraph):
                 'This API will be removed from any version of stk '
                 'released on, or after, 01/01/22. Please use the '
                 '`guests` argument and the `stk.host_guest.Guest` '
-                'dataclass to define all necessary attributes.'
+                'dataclass to define all necessary attributes.',
+                category=FutureWarning,
             )
             building_block_vertices = self._get_vertices_from_guest(
                 host=host,
@@ -278,14 +281,14 @@ class Complex(TopologyGraph):
             guests = (guests, )
 
         building_block_vertices = {
-            host: (HostVertex(0, [0, 0, 0]), )
+            host: (HostVertex(0, (0., 0., 0.)), )
         }
         guest_vertices = {
-            guest.building_block: (GuestVertex(
+            guest.get_building_block(): (GuestVertex(
                 id=i+1,
-                position=guest.displacement,
-                start=guest.start_vector,
-                target=guest.end_vector,
+                position=guest.get_displacement(),
+                start=guest.get_start_vector(),
+                target=guest.get_end_vector(),
             ), )
             for i, guest in enumerate(guests)
         }
@@ -313,18 +316,20 @@ class Complex(TopologyGraph):
             )
 
         if guest_start is None:
-            start = target = (1., 0., 0.)
-        else:
-            start = guest_start = tuple(guest_start)
-            target = guest_target = tuple(guest_target)
+            guest_start = guest_target = (1., 0., 0.)
 
         if displacement is None:
-            displacement = (0, 0, 0)
+            displacement = (0., 0., 0.)
 
         building_block_vertices = {
-            host: (HostVertex(0, (0, 0, 0)), ),
+            host: (HostVertex(0, (0., 0., 0.)), ),
             guest: (
-                GuestVertex(1, displacement, start, target),
+                GuestVertex(
+                    id=1,
+                    position=displacement,
+                    start=guest_start,
+                    target=guest_target,
+                ),
             ),
         }
 
