@@ -151,20 +151,29 @@ class Complex(TopologyGraph):
             instance if only one guest is being used.
 
         guest : :class:`.BuildingBlock`, optional
-            The guest molecule. This is the old API.
+            The guest molecule. This API is deprecated and will be
+            removed in any :mod:`.stk` version released on, or after,
+            01/01/2022. Use the `guests` parameter instead.
 
         guest_start : :class:`tuple` of :class:`float`, optional
             A direction vector which gets aligned with `guest_target`.
-            This is the old API.
+            This API is deprecated and will be removed in any
+            :mod:`.stk` version released on, or after, 01/01/2022.
+            Use the `guests` parameter instead.
 
         guest_target : :class:`tuple` of :class:`float`, optional
             A direction vector which determines the rotation applied to
             the `guest`. A rotation such that `guest_start` is
-            transformed into `guest_target` is applied. This is the old
-            API.
+            transformed into `guest_target` is applied. This API is
+            deprecated and will be removed in any :mod:`.stk` version
+            released on, or after, 01/01/2022. Use the `guests`
+            parameter instead.
 
         displacement : :class:`tuple` of :class:`float`, optional
-            The translational offset of the guest. This is the old API.
+            The translational offset of the guest. This API is
+            deprecated and will be removed in any :mod:`.stk` version
+            released on, or after, 01/01/2022. Use the `guests`
+            parameter instead.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -188,32 +197,12 @@ class Complex(TopologyGraph):
 
         """
 
-        if guests is not None and guest is not None:
+        if guests is not None and len({
+            guest, displacement, guest_start, guest_target
+        }) > 1:
             raise ValueError(
                 'You are attempting to use the old API with the new '
-                'API. Either use the stk.host_guest.Guest API and '
-                '`guests`, or the old API.'
-            )
-
-        if guests is not None and displacement is not None:
-            raise ValueError(
-                'You are attempting to use the old API with the new '
-                'API. Either use the stk.host_guest.Guest API and '
-                '`guests`, or the old API.'
-            )
-
-        if guests is not None and guest_start is not None:
-            raise ValueError(
-                'You are attempting to use the old API with the new '
-                'API. Either use the stk.host_guest.Guest API and '
-                '`guests`, or the old API.'
-            )
-
-        if guests is not None and guest_target is not None:
-            raise ValueError(
-                'You are attempting to use the old API with the new '
-                'API. Either use the stk.host_guest.Guest API and '
-                '`guests`, or the old API.'
+                'API. Use the stk.host_guest.Guest API and `guests`.'
             )
 
         if guests is not None:
