@@ -72,6 +72,27 @@ _cage = stk.ConstructedMolecule(
                 '.[H]C#C[H].[H]C#N'
             ),
         ),
+        CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(_cage),
+                    guests=(
+                        stk.host_guest.Guest(stk.BuildingBlock('C#N')),
+                        stk.host_guest.Guest(stk.BuildingBlock('C#C')),
+                    ),
+                    optimizer=stk.Spinner(),
+                )
+            ),
+            smiles=(
+                'F[C+]1[C+2]C23[C+2][C+]4[C+2][C+](C5=C(N=[C+]5)[C+]5'
+                '[C+2][C+]6[C+2]C7([C+2][CH+][C+]57)C5=C([C+]=[C+]5)['
+                'C+]5[C+2][C+]([C+2]C7([C+2][CH+][C+]57)C5=C2[C+]=[C+'
+                ']5)C2=C([C+]=[C+]2)[C+]2[C+2][C+](C5=C4[C+]=[C+]5)[C'
+                '+]4[CH+][C+2]C4([C+2]2)C2=C6[C+]=[C+]2)[C+]13'
+                '.[H]C#C[H].[H]C#N'
+            ),
+        ),
+
     ),
 )
 def host_guest_complex(request):
