@@ -9,6 +9,7 @@ from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
 from dataclasses import dataclass
+import warnings
 
 
 @dataclass(frozen=True)
@@ -136,7 +137,11 @@ class Complex(TopologyGraph):
     def __init__(
         self,
         host,
-        guests,
+        guest=None,
+        guest_start=None,
+        guest_target=None,
+        displacement=None,
+        guests=None,
         num_processes=1,
         optimizer=NullOptimizer(),
     ):
@@ -148,19 +153,24 @@ class Complex(TopologyGraph):
         host : :class:`.BuildingBlock`
             The host molecule.
 
-        guest : :class:`.BuildingBlock`
-            The guest molecule.
+        guests : :class:`tuple` of :class:`.Guest`, optional
+            The guest molecules.
+
+        guest : :class:`.BuildingBlock`, optional
+            The guest molecule. This is the old API.
 
         guest_start : :class:`tuple` of :class:`float`, optional
             A direction vector which gets aligned with `guest_target`.
+            This is the old API.
 
         guest_target : :class:`tuple` of :class:`float`, optional
             A direction vector which determines the rotation applied to
             the `guest`. A rotation such that `guest_start` is
-            transformed into `guest_target` is applied.
+            transformed into `guest_target` is applied. This is the old
+            API.
 
         displacement : :class:`tuple` of :class:`float`, optional
-            The translational offset of the guest.
+            The translational offset of the guest. This is the old API.
 
         num_processes : :class:`int`, optional
             The number of parallel processes to create during
@@ -176,22 +186,95 @@ class Complex(TopologyGraph):
             If `guest_start` or `guest_target` is defined but the other
             is not.
 
+        :class:`ValueError`
+            If the old API and new API are used simultaneously.
+
         """
 
-        if isinstance(guests, Guest):
-            guests = (guests, )
+        if guests is not None and guest is not None:
+            raise ValueError(
+                'You are attempting to use the old API with the new '
+                'API. Either use the stk.host_guest.Guest API and '
+                '`guests`, or the old API.'
+            )
 
-        building_block_vertices = {host: (HostVertex(0, [0, 0, 0]), )}
-        guest_vertices = {
-            guest.building_block: (GuestVertex(
-                id=i+1,
-                position=guest.displacement,
-                start=guest.start_vector,
-                target=guest.end_vector,
-            ), )
-            for i, guest in enumerate(guests)
-        }
-        building_block_vertices.update(guest_vertices)
+        if guests is not None and displacement is not None:
+            raise ValueError(
+                'You are attempting to use the old API with the new '
+                'API. Either use the stk.host_guest.Guest API and '
+                '`guests`, or the old API.'
+            )
+
+        if guests is not None and guest_start is not None:
+            raise ValueError(
+                'You are attempting to use the old API with the new '
+                'API. Either use the stk.host_guest.Guest API and '
+                '`guests`, or the old API.'
+            )
+
+        if guests is not None and guest_target is not None:
+            raise ValueError(
+                'You are attempting to use the old API with the new '
+                'API. Either use the stk.host_guest.Guest API and '
+                '`guests`, or the old API.'
+            )
+
+        if guests is not None:
+            if isinstance(guests, Guest):
+                guests = (guests, )
+
+            building_block_vertices = {
+                host: (HostVertex(0, [0, 0, 0]), )
+            }
+            guest_vertices = {
+                guest.building_block: (GuestVertex(
+                    id=i+1,
+                    position=guest.displacement,
+                    start=guest.start_vector,
+                    target=guest.end_vector,
+                ), )
+                for i, guest in enumerate(guests)
+            }
+            building_block_vertices.update(guest_vertices)
+        elif guest is not None:
+            warnings.warn(
+                'You defined a Complex topology graph using the old '
+                'API (by defining `guest` and any optional arguments: '
+                '`guest_start`, `guest_target` and `displacement`). '
+                'This API will be removed from any version of stk '
+                'released on, or after, 01/01/22. Please use the '
+                '`guests` argument and the `stk.host_guest.Guest` '
+                'dataclass to define all necessary attributes.'
+            )
+            num_nones = sum(
+                1 for vector in (guest_start, guest_target)
+                if vector is None
+            )
+            if num_nones == 1:
+                raise TypeError(
+                    'If guest_start or guest_target is defined, '
+                    'the other must be too.'
+                )
+
+            if guest_start is None:
+                start = target = (1., 0., 0.)
+            else:
+                start = guest_start = tuple(guest_start)
+                target = guest_target = tuple(guest_target)
+
+            if displacement is None:
+                displacement = (0, 0, 0)
+
+            # Save the values as None, for __repr__.
+            self._guest_start = guest_start
+            self._guest_target = guest_target
+            self._displacement = displacement
+            building_block_vertices = {
+                host: (HostVertex(0, [0, 0, 0]), ),
+                guest: (
+                    GuestVertex(1, displacement, start, target),
+                ),
+            }
 
         super().__init__(
             building_block_vertices=building_block_vertices,
@@ -214,9 +297,4 @@ class Complex(TopologyGraph):
         return 1
 
     def __repr__(self):
-        return (
-            'host_guest.Complex('
-            # f'guest_start={self._guest_start!r}, '
-            # f'guest_target={self._guest_target!r}, '
-            # f'displacement={self._displacement!r})'
-        )
+        return 'host_guest.Complex()'
