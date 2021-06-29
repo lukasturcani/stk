@@ -18,17 +18,18 @@ class Guest:
     Holds the data defining the placement of a guest molecule.
 
     Attributes
-    -------------
+    ----------
     building_block : :class:`.BuildingBlock`
         The guest molecule.
 
     start_vector : :class:`tuple` of :class:`float`, optional
-        A direction vector which gets aligned with `end_vector`.
+        A direction vector which gets aligned with :attr:`end_vector`.
 
     end_vector : :class:`tuple` of :class:`float`, optional
         A direction vector which determines the rotation applied to
-        the `building_block`. A rotation such that `start_vector` is
-        transformed into `end_vector` is applied.
+        the :attr:`building_block`. A rotation such that
+        :attr:`start_vector` is transformed into :attr:`end_vector`
+        is applied.
 
     displacement : :class:`tuple` of :class:`float`, optional
         The translational offset of the guest.
@@ -39,14 +40,6 @@ class Guest:
     start_vector: Tuple[float] = (1., 0., 0.)
     end_vector: Tuple[float] = (1., 0., 0.)
     displacement: Tuple[float] = (0., 0., 0.)
-
-    def __repr__(self):
-        return (
-            f'{self.__class__.__name__}('
-            f'start_vector={self.start_vector!r}, '
-            f'end_vector={self.end_vector!r}, '
-            f'displacement={self.displacement!r})'
-        )
 
 
 class Complex(TopologyGraph):
