@@ -4,6 +4,7 @@ Host Guest Complex
 
 """
 
+from typing import Tuple
 from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
@@ -12,16 +13,37 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Guest:
+    """
+    Holds the data defining the placement of a guest molecule.
+
+    Attributes
+    -------------
+    building_block : :class:`.BuildingBlock`
+        The guest molecule.
+
+    start_vector : :class:`tuple` of :class:`float`, optional
+        A direction vector which gets aligned with `end_vector`.
+
+    end_vector : :class:`tuple` of :class:`float`, optional
+        A direction vector which determines the rotation applied to
+        the `building_block`. A rotation such that `start_vector` is
+        transformed into `end_vector` is applied.
+
+    displacement : :class:`tuple` of :class:`float`, optional
+        The translational offset of the guest.
+
+    """
+
     building_block: BuildingBlock
-    start_vector: tuple = (1., 0., 0.)
-    end_vector: tuple = (1., 0., 0.)
-    displacement: tuple = (0., 0., 0.)
+    start_vector: Tuple[float] = (1., 0., 0.)
+    end_vector: Tuple[float] = (1., 0., 0.)
+    displacement: Tuple[float] = (0., 0., 0.)
 
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('
-            f'guest_start={self.start_vector!r}, '
-            f'guest_target={self.end_vector!r}, '
+            f'start_vector={self.start_vector!r}, '
+            f'end_vector={self.end_vector!r}, '
             f'displacement={self.displacement!r})'
         )
 
