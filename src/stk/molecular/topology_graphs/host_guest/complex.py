@@ -23,12 +23,12 @@ class Guest:
         The guest molecule.
 
     start_vector : :class:`tuple` of :class:`float`, optional
-        A direction vector which gets aligned with :attr:`end_vector`.
+        A direction vector which gets aligned with :attr:`.end_vector`.
 
     end_vector : :class:`tuple` of :class:`float`, optional
         A direction vector which determines the rotation applied to
-        the :attr:`building_block`. A rotation such that
-        :attr:`start_vector` is transformed into :attr:`end_vector`
+        the :attr:`.building_block`. A rotation such that
+        :attr:`.start_vector` is transformed into :attr:`.end_vector`
         is applied.
 
     displacement : :class:`tuple` of :class:`float`, optional
