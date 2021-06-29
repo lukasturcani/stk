@@ -147,7 +147,8 @@ class Complex(TopologyGraph):
             The host molecule.
 
         guests : :class:`tuple` of :class:`.Guest`, optional
-            The guest molecules.
+            The guest molecules. Can be a single :class:`.Guest`
+            instance if only one guest is being used.
 
         guest : :class:`.BuildingBlock`, optional
             The guest molecule. This is the old API.
@@ -182,6 +183,9 @@ class Complex(TopologyGraph):
         :class:`ValueError`
             If the old API and new API are used simultaneously.
 
+        :class:`RuntimeError:
+            If no guests are provided.
+
         """
 
         if guests is not None and guest is not None:
@@ -213,22 +217,10 @@ class Complex(TopologyGraph):
             )
 
         if guests is not None:
-            if isinstance(guests, Guest):
-                guests = (guests, )
-
-            building_block_vertices = {
-                host: (HostVertex(0, [0, 0, 0]), )
-            }
-            guest_vertices = {
-                guest.building_block: (GuestVertex(
-                    id=i+1,
-                    position=guest.displacement,
-                    start=guest.start_vector,
-                    target=guest.end_vector,
-                ), )
-                for i, guest in enumerate(guests)
-            }
-            building_block_vertices.update(guest_vertices)
+            building_block_vertices = self._get_vertices_from_guests(
+                host=host,
+                guests=guests,
+            )
         elif guest is not None:
             warnings.warn(
                 'You defined a Complex topology graph using the old '
@@ -239,35 +231,17 @@ class Complex(TopologyGraph):
                 '`guests` argument and the `stk.host_guest.Guest` '
                 'dataclass to define all necessary attributes.'
             )
-            num_nones = sum(
-                1 for vector in (guest_start, guest_target)
-                if vector is None
+            building_block_vertices = self._get_vertices_from_guest(
+                host=host,
+                guest=guest,
+                guest_start=guest_start,
+                guest_target=guest_target,
+                displacement=displacement,
             )
-            if num_nones == 1:
-                raise TypeError(
-                    'If guest_start or guest_target is defined, '
-                    'the other must be too.'
-                )
-
-            if guest_start is None:
-                start = target = (1., 0., 0.)
-            else:
-                start = guest_start = tuple(guest_start)
-                target = guest_target = tuple(guest_target)
-
-            if displacement is None:
-                displacement = (0, 0, 0)
-
-            # Save the values as None, for __repr__.
-            self._guest_start = guest_start
-            self._guest_target = guest_target
-            self._displacement = displacement
-            building_block_vertices = {
-                host: (HostVertex(0, [0, 0, 0]), ),
-                guest: (
-                    GuestVertex(1, displacement, start, target),
-                ),
-            }
+        else:
+            raise RuntimeError(
+                'The `guests` parameter must be provided.'
+            )
 
         super().__init__(
             building_block_vertices=building_block_vertices,
@@ -278,6 +252,63 @@ class Complex(TopologyGraph):
             optimizer=optimizer,
             edge_groups=(),
         )
+
+    def _get_vertices_from_guests(self, host, guests):
+        if isinstance(guests, Guest):
+            guests = (guests, )
+
+        building_block_vertices = {
+            host: (HostVertex(0, [0, 0, 0]), )
+        }
+        guest_vertices = {
+            guest.building_block: (GuestVertex(
+                id=i+1,
+                position=guest.displacement,
+                start=guest.start_vector,
+                target=guest.end_vector,
+            ), )
+            for i, guest in enumerate(guests)
+        }
+        building_block_vertices.update(guest_vertices)
+
+        return building_block_vertices
+
+    def _get_vertices_from_guest(
+        self,
+        host,
+        guest,
+        guest_start,
+        guest_target,
+        displacement,
+    ):
+
+        num_nones = sum(
+            1 for vector in (guest_start, guest_target)
+            if vector is None
+        )
+        if num_nones == 1:
+            raise TypeError(
+                'If guest_start or guest_target is defined, '
+                'the other must be too.'
+            )
+
+        if guest_start is None:
+            start = target = (1., 0., 0.)
+        else:
+            start = guest_start = tuple(guest_start)
+            target = guest_target = tuple(guest_target)
+
+        if displacement is None:
+            displacement = (0, 0, 0)
+
+        building_block_vertices = {
+            host: (HostVertex(0, (0, 0, 0)), ),
+            guest: (
+                GuestVertex(1, displacement, start, target),
+            ),
+        }
+
+        return building_block_vertices
 
     def clone(self):
         clone = super().clone()
