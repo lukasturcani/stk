@@ -4,42 +4,73 @@ Host Guest Complex
 
 """
 
-from typing import Tuple
-from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
-from dataclasses import dataclass
 import warnings
 
 
-@dataclass(frozen=True)
 class Guest:
     """
     Holds the data defining the placement of a guest molecule.
 
-    Attributes
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The guest molecule.
-
-    start_vector : :class:`tuple` of :class:`float`, optional
-        A direction vector which gets aligned with :attr:`.end_vector`.
-
-    end_vector : :class:`tuple` of :class:`float`, optional
-        A direction vector which determines the rotation applied to
-        the :attr:`.building_block`. A rotation such that
-        :attr:`.start_vector` is transformed into :attr:`.end_vector`
-        is applied.
-
-    displacement : :class:`tuple` of :class:`float`, optional
-        The translational offset of the guest.
-
     """
 
-    building_block: BuildingBlock
-    start_vector: Tuple[float] = (1., 0., 0.)
-    end_vector: Tuple[float] = (1., 0., 0.)
-    displacement: Tuple[float] = (0., 0., 0.)
+    def __init__(
+        self,
+        building_block,
+        start_vector=(1., 0., 0.),
+        end_vector=(1., 0., 0.),
+        displacement=(1., 0., 0.),
+    ):
+        """
+        Initialize a :class:`.Guest` instance.
+
+
+        Parameters
+        ----------
+        building_block : :class:`.BuildingBlock`
+            The guest molecule.
+
+        start_vector : :class:`tuple` of :class:`float`, optional
+            A direction vector which gets aligned with `end_vector`.
+
+        end_vector : :class:`tuple` of :class:`float`, optional
+            A direction vector which determines the rotation applied to
+            the `building_block`. A rotation such that
+            `start_vector` is transformed into `end_vector`
+            is applied.
+
+        displacement : :class:`tuple` of :class:`float`, optional
+            The translational offset of the guest.
+
+
+        """
+
+        self._building_block = building_block
+        self._start_vector = start_vector
+        self._end_vector = end_vector
+        self._displacement = displacement
+
+    def get_building_block(self):
+        return self._building_block
+
+    def get_start_vector(self):
+        return self._start_vector
+
+    def get_end_vector(self):
+        return self._end_vector
+
+    def get_displacement(self):
+        return self._displacement
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._building_block!r}, '
+            f'start_vector={self._start_vector!r}, '
+            f'end_vector={self._end_vector!r}, '
+            f'displacement={self._displacement!r})'
+        )
 
 
 class Complex(TopologyGraph):
