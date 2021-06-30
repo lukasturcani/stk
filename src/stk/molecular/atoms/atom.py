@@ -56,7 +56,7 @@ class Atom:
     _elements: Dict[int, Type['Atom']] = {}
     _atomic_number: ClassVar[int]
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls: Type['Atom'], **kwargs) -> None:
         # Replace the default __init__() method of the subclass with
         # _subclass_init(). This is because the default __init__()
         # method takes an atomic_number parameter, but
