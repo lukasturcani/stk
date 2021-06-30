@@ -4,10 +4,10 @@ Host Guest Complex
 
 """
 
-from typing import Tuple
+from typing import Optional, Tuple, Iterable
 from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
-from ..topology_graph import TopologyGraph, NullOptimizer
+from ..topology_graph import TopologyGraph, NullOptimizer, Optimizer
 import warnings
 
 
@@ -47,52 +47,44 @@ class Guest:
         self._end_vector = end_vector
         self._displacement = displacement
 
-    def get_building_block(self):
+    def get_building_block(self) -> BuildingBlock:
         """
         Return the building block.
 
-        Returns
-        -------
-        :class:`.BuildingBlock`
+        Returns:
             The building block.
 
         """
 
         return self._building_block
 
-    def get_start_vector(self):
+    def get_start_vector(self) -> Tuple[float]:
         """
         Return the start vector.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`float`
+        Returns:
             The start vector.
 
         """
 
         return self._start_vector
 
-    def get_end_vector(self):
+    def get_end_vector(self) -> Tuple[float]:
         """
         Return the end vector.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`float`
+        Returns:
             The end vector.
 
         """
 
         return self._end_vector
 
-    def get_displacement(self):
+    def get_displacement(self) -> Tuple[float]:
         """
         Return the displacement.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`float`
+        Returns:
             The displacement.
 
         """
@@ -220,71 +212,60 @@ class Complex(TopologyGraph):
 
     def __init__(
         self,
-        host,
-        guest=None,
-        guest_start=None,
-        guest_target=None,
-        displacement=None,
-        guests=None,
-        num_processes=1,
-        optimizer=NullOptimizer(),
+        host: BuildingBlock,
+        guest: Optional[BuildingBlock] = None,
+        guest_start: Optional[Tuple[float]] = None,
+        guest_target: Optional[Tuple[float]] = None,
+        displacement: Optional[Tuple[float]] = None,
+        guests: Optional[Iterable[Guest]] = None,
+        num_processes: int = 1,
+        optimizer: Optimizer = NullOptimizer(),
     ):
         """
         Initialize an instance of :class:`.Complex`.
 
-        Parameters
-        ----------
-        host : :class:`.BuildingBlock`
-            The host molecule.
+        Parameters:
+            host: The host molecule.
 
-        guests : :class:`iterable` of :class:`.Guest`, optional
-            The guest molecules. Can be a single :class:`.Guest`
-            instance if only one guest is being used.
+            guests: The guest molecules. Can be a single
+                :class:`.Guest` instance if only one guest is being
+                used.
 
-        guest : :class:`.BuildingBlock`, optional
-            The guest molecule. This API is deprecated and will be
-            removed in any :mod:`.stk` version released on, or after,
-            01/01/2022. Use the `guests` parameter instead.
+            guest: The guest molecule. This API is deprecated and will
+                be removed in any :mod:`.stk` version released on, or
+                after, 01/01/2022. Use the `guests` parameter instead.
 
-        guest_start : :class:`tuple` of :class:`float`, optional
-            A direction vector which gets aligned with `guest_target`.
-            This API is deprecated and will be removed in any
-            :mod:`.stk` version released on, or after, 01/01/2022.
-            Use the `guests` parameter instead.
+            guest_start: A direction vector which gets aligned with
+                `guest_target`. This API is deprecated and will be
+                removed in any :mod:`.stk` version released on, or
+                after, 01/01/2022. Use the `guests` parameter instead.
 
-        guest_target : :class:`tuple` of :class:`float`, optional
-            A direction vector which determines the rotation applied to
-            the `guest`. A rotation such that `guest_start` is
-            transformed into `guest_target` is applied. This API is
-            deprecated and will be removed in any :mod:`.stk` version
-            released on, or after, 01/01/2022. Use the `guests`
-            parameter instead.
+            guest_target: A direction vector which determines the
+                rotation applied to the `guest`. A rotation such that
+                `guest_start` is transformed into `guest_target` is
+                applied. This API is deprecated and will be removed in
+                any :mod:`.stk` version released on, or after,
+                01/01/2022. Use the `guests` parameter instead.
 
-        displacement : :class:`tuple` of :class:`float`, optional
-            The translational offset of the guest. This API is
-            deprecated and will be removed in any :mod:`.stk` version
-            released on, or after, 01/01/2022. Use the `guests`
-            parameter instead.
+            displacement: The translational offset of the guest. This
+                API is deprecated and will be removed in any
+                :mod:`.stk` version released on, or after, 01/01/2022.
+                Use the `guests` parameter instead.
 
-        num_processes : :class:`int`, optional
-            The number of parallel processes to create during
-            :meth:`construct`.
+            num_processes: The number of parallel processes to create
+                during :meth:`construct`.
 
-        optimizer : :class:`.Optimizer`, optional
-            Used to optimize the structure of the constructed
-            molecule.
+            optimizer: Used to optimize the structure of the
+                constructed molecule.
 
-        Raises
-        ------
-        :class:`TypeError`
-            If `guest_start` or `guest_target` is defined but the other
-            is not.
+        Raises:
+            :class:`TypeError`: If `guest_start` or `guest_target` is
+                defined but the other is not.
 
-        :class:`ValueError`
-            If the old API and new API are used simultaneously.
+            :class:`ValueError`: If the old API and new API are used
+                simultaneously.
 
-        :class:`RuntimeError:
-            If no guests are provided.
+            :class:`RuntimeError:: If no guests are provided.
 
         """
 
