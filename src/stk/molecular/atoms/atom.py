@@ -15,37 +15,38 @@ class Atom:
     Atoms of a particular element can be made with this
     class or with the subclass representing that element.
 
-    Examples
-    --------
-    *Initialization.*
+    Examples:
 
-    Initialization of an :class:`.Atom` can happen in one of two ways.
-    The atom can be initialized through the :class:`.Atom` class or
-    through the class representing the element.
+        *Initialization.*
 
-    .. testcode:: initialization
+        Initialization of an :class:`.Atom` can happen in one of two
+        ways. The atom can be initialized through the :class:`.Atom`
+        class or through the class representing the element.
 
-        import stk
+        .. testcode:: initialization
 
-        # h0 is an instance of the H class.
-        h0 = stk.Atom(id=0, atomic_number=1)
+            import stk
 
-        # h1 is also an instance of the H class.
-        h1 = stk.H(id=1)
+            # h0 is an instance of the H class.
+            h0 = stk.Atom(id=0, atomic_number=1)
 
-    When the class corresponding to the element is used directly, the
-    ``atomic_number`` is not provided. Here are a few more examples.
+            # h1 is also an instance of the H class.
+            h1 = stk.H(id=1)
 
-    .. testcode:: initialization
+        When the class corresponding to the element is used directly,
+        the ``atomic_number`` is not provided. Here are a few more
+        examples.
 
-        # Both he0 and he1 are instances of the He class.
-        he0 = stk.Atom(id=2, atomic_number=2)
-        he1 = stk.He(id=3)
+        .. testcode:: initialization
 
-        # Both c0 and c1 are instances of the
-        # C class.
-        c0 = stk.Atom(id=4, atomic_number=6)
-        c1 = stk.C(id=5)
+            # Both he0 and he1 are instances of the He class.
+            he0 = stk.Atom(id=2, atomic_number=2)
+            he1 = stk.He(id=3)
+
+            # Both c0 and c1 are instances of the
+            # C class.
+            c0 = stk.Atom(id=4, atomic_number=6)
+            c1 = stk.C(id=5)
 
     """
 
@@ -61,17 +62,19 @@ class Atom:
         cls._elements[cls._atomic_number] = cls
 
     @staticmethod
-    def _subclass_init(self, id, charge=0):
+    def _subclass_init(
+        self,
+        id: int,
+        charge: int = 0,
+    ) -> None:
         """
         Initialize an atom of the element.
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the atom.
+        Parameters:
 
-        charge : :class:`int`
-            The formal charge.
+            id: The id of the atom.
+
+            charge: The formal charge.
 
         """
 
@@ -100,20 +103,18 @@ class Atom:
         self._id = id
         self._charge = charge
 
-    def get_id(self):
+    def get_id(self) -> int:
         """
         Get the id of the atom.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
             The id.
 
         """
 
         return self._id
 
-    def _with_id(self, id):
+    def _with_id(self, id: int) -> 'Atom':
         """
         Modify the atom.
 
@@ -122,13 +123,14 @@ class Atom:
         self._id = id
         return self
 
-    def with_id(self, id):
+    def with_id(self, id: int) -> 'Atom':
         """
         Get a clone but with a different id.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Parameters:
+            id: The id of the clone.
+
+        Returns:
             A clone with a new id. Has the same type as the original
             atom.
 
@@ -136,26 +138,22 @@ class Atom:
 
         return self.clone()._with_id(id)
 
-    def get_atomic_number(self):
+    def get_atomic_number(self) -> int:
         """
         Get the atomic number of the atom.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
             The atomic number.
 
         """
 
         return self._atomic_number
 
-    def get_charge(self):
+    def get_charge(self) -> int:
         """
         Get the charge of the atom.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
             The charge.
 
         """
@@ -171,13 +169,11 @@ class Atom:
     def __str__(self):
         return repr(self)
 
-    def clone(self):
+    def clone(self) -> 'Atom':
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
             The clone. It has the same type as the original atom.
 
         """
