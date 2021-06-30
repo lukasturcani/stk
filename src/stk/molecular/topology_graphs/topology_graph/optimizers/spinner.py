@@ -5,6 +5,7 @@ Spinner
 """
 
 from .optimizer import Optimizer
+from ..construction_state import ConstructionState
 
 import spindry as spd
 
@@ -117,7 +118,7 @@ class Spinner(Optimizer):
             random_seed=random_seed,
         )
 
-    def optimize(self, state):
+    def optimize(self, state: ConstructionState) -> ConstructionState:
         # Define SpinDry supramolecule to optimize.
         supramolecule = spd.SupraMolecule(
             atoms=(
