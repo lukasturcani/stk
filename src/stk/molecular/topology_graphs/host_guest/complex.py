@@ -216,7 +216,7 @@ class Complex(TopologyGraph):
         host : :class:`.BuildingBlock`
             The host molecule.
 
-        guests : :class:`tuple` of :class:`.Guest`, optional
+        guests : :class:`iterable` of :class:`.Guest`, optional
             The guest molecules. Can be a single :class:`.Guest`
             instance if only one guest is being used.
 
