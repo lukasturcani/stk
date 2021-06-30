@@ -4,6 +4,8 @@ Atom
 
 """
 
+from typing import ClassVar, Dict, Type
+
 
 class Atom:
     """
@@ -51,7 +53,8 @@ class Atom:
     """
 
     # Maps each atomic number (int) to the relevant Atom subclass.
-    _elements = {}
+    _elements: Dict[int, Type['Atom']] = {}
+    _atomic_number: ClassVar[int]
 
     def __init_subclass__(cls, **kwargs):
         # Replace the default __init__() method of the subclass with
