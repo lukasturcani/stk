@@ -18,6 +18,10 @@ periodic_collapser\
 stk.molecular.topology_graphs.topology_graph.optimizers.mchammer\
 >
 
+    Spinner <\
+stk.molecular.topology_graphs.topology_graph.optimizers.spinner\
+>
+
     NullOptimizer <\
 stk.molecular.topology_graphs.topology_graph.optimizers.null\
 >
