@@ -151,10 +151,34 @@ class Complex(TopologyGraph):
 
     *Suggested Optimization*
 
-    For :class:`.Complex` topologies, there is no need to use an
-    optimizer, so stick with :class:`.NullOptimizer`. However, it is
-    recommended that all building blocks be optimized prior to
-    construction.
+    For :class:`.Complex` topologies, it is recommended to use the
+    :class:`.Spinner` optimizer. It is also recommended that the
+    building blocks are already optimized prior to construction.
+
+    .. testcode:: suggested-optimization
+
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        guest = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(bb1, bb2),
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.host_guest.Complex(
+                host=stk.BuildingBlock.init_from_molecule(host),
+                guests=guest,
+                optimizer=stk.Spinner(),
+            ),
+        )
 
     *Changing the Position of the Guest*
 
