@@ -33,10 +33,10 @@ _cage = stk.ConstructedMolecule(
     ),
 )
 
-_guest_list = [
+_guests = (
     stk.host_guest.Guest(stk.BuildingBlock('C#N')),
     stk.host_guest.Guest(stk.BuildingBlock('C#C')),
-]
+)
 
 
 @pytest.fixture(
@@ -62,7 +62,7 @@ _guest_list = [
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.host_guest.Complex(
                     host=stk.BuildingBlock.init_from_molecule(_cage),
-                    guests=_guest_list,
+                    guests=_guests,
                 )
             ),
             smiles=(
@@ -78,7 +78,7 @@ _guest_list = [
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.host_guest.Complex(
                     host=stk.BuildingBlock.init_from_molecule(_cage),
-                    guests=(i for i in _guest_list),
+                    guests=(i for i in _guests),
                 )
             ),
             smiles=(
