@@ -4,10 +4,17 @@ Host Guest Complex
 
 """
 
-from typing import Optional, Tuple, Iterable
+from typing import Dict, Optional, Tuple, Iterable
+
 from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
-from ..topology_graph import TopologyGraph, NullOptimizer, Optimizer
+from ..topology_graph import (
+    TopologyGraph,
+    NullOptimizer,
+    Optimizer,
+    ConstructionState,
+    Vertex,
+)
 import warnings
 
 
@@ -58,7 +65,7 @@ class Guest:
 
         return self._building_block
 
-    def get_start_vector(self) -> Tuple[float]:
+    def get_start_vector(self) -> Tuple[float, float, float]:
         """
         Return the start vector.
 
@@ -69,7 +76,7 @@ class Guest:
 
         return self._start_vector
 
-    def get_end_vector(self) -> Tuple[float]:
+    def get_end_vector(self) -> Tuple[float, float, float]:
         """
         Return the end vector.
 
@@ -80,7 +87,7 @@ class Guest:
 
         return self._end_vector
 
-    def get_displacement(self) -> Tuple[float]:
+    def get_displacement(self) -> Tuple[float, float, float]:
         """
         Return the displacement.
 
@@ -91,7 +98,7 @@ class Guest:
 
         return self._displacement
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._building_block!r}, '
@@ -274,7 +281,7 @@ class Complex(TopologyGraph):
             :class:`ValueError`: If the old API and new API are used
                 simultaneously.
 
-            :class:`RuntimeError:: If no guests are provided.
+            :class:`RuntimeError`: If no guests are provided.
 
         """
 
@@ -326,7 +333,11 @@ class Complex(TopologyGraph):
             edge_groups=(),
         )
 
-    def _get_vertices_from_guests(self, host, guests):
+    def _get_vertices_from_guests(
+        self,
+        host: BuildingBlock,
+        guests: Iterable[Guest],
+    ) -> Dict[BuildingBlock, Vertex]:
         if isinstance(guests, Guest):
             guests = (guests, )
 
@@ -348,12 +359,12 @@ class Complex(TopologyGraph):
 
     def _get_vertices_from_guest(
         self,
-        host,
-        guest,
-        guest_start,
-        guest_target,
-        displacement,
-    ):
+        host: BuildingBlock,
+        guest: BuildingBlock,
+        guest_start: Tuple[float, float, float],
+        guest_target: Tuple[float, float, float],
+        displacement: Tuple[float, float, float],
+    ) -> Dict[BuildingBlock, Vertex]:
 
         num_nones = sum(
             1 for vector in (guest_start, guest_target)
@@ -385,15 +396,21 @@ class Complex(TopologyGraph):
 
         return building_block_vertices
 
-    def clone(self):
+    def clone(self) -> 'Complex':
         clone = super().clone()
         return clone
 
-    def _run_reactions(self, state):
+    def _run_reactions(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         return state
 
-    def _get_scale(self, building_block_vertices):
-        return 1
+    def _get_scale(
+        self,
+        building_block_vertices: Dict[BuildingBlock, Vertex],
+    ) -> float:
+        return 1.
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'host_guest.Complex()'
