@@ -163,13 +163,13 @@ class Atom:
 
         return self._charge
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         charge = (
             f', charge={self._charge}' if self._charge != 0 else ''
         )
         return f'{self.__class__.__name__}({self._id}{charge})'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
     def clone(self) -> 'Atom':
