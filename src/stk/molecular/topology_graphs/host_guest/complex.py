@@ -4,6 +4,8 @@ Host Guest Complex
 
 """
 
+from typing import Tuple
+from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
 from ..topology_graph import TopologyGraph, NullOptimizer
 import warnings
@@ -17,31 +19,26 @@ class Guest:
 
     def __init__(
         self,
-        building_block,
-        start_vector=(1., 0., 0.),
-        end_vector=(1., 0., 0.),
-        displacement=(1., 0., 0.),
+        building_block: BuildingBlock,
+        start_vector: Tuple[float] = (1., 0., 0.),
+        end_vector: Tuple[float] = (1., 0., 0.),
+        displacement: Tuple[float] = (1., 0., 0.),
     ):
         """
         Initialize a :class:`.Guest` instance.
 
+        Parameters:
+            building_block: The guest molecule.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The guest molecule.
+            start_vector: A direction vector which gets aligned with
+                `end_vector`.
 
-        start_vector : :class:`tuple` of :class:`float`, optional
-            A direction vector which gets aligned with `end_vector`.
+            end_vector: A direction vector which determines the
+                rotation applied to the `building_block`. A rotation
+                such that `start_vector` is transformed into
+                `end_vector` is applied.
 
-        end_vector : :class:`tuple` of :class:`float`, optional
-            A direction vector which determines the rotation applied to
-            the `building_block`. A rotation such that
-            `start_vector` is transformed into `end_vector`
-            is applied.
-
-        displacement : :class:`tuple` of :class:`float`, optional
-            The translational offset of the guest.
+            displacement: The translational offset of the guest.
 
         """
 
