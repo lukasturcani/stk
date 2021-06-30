@@ -111,5 +111,6 @@ dependencies:
     - scipy==1.6.3
     - seaborn==0.11.1
     - sphinx==3.5.4
+    - spindry==0.0.3
     - sphinx_rtd_theme==0.5.2
     - toml==0.10.2
