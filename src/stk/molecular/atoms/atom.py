@@ -61,7 +61,7 @@ class Atom:
         # _subclass_init(). This is because the default __init__()
         # method takes an atomic_number parameter, but
         # _subclass_init() does not.
-        cls.__init__ = cls._subclass_init
+        cls.__init__ = cls._subclass_init  # type: ignore
         cls._elements[cls._atomic_number] = cls
 
     @staticmethod
