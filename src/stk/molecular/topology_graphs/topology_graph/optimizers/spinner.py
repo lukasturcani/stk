@@ -13,45 +13,52 @@ class Spinner(Optimizer):
     """
     Performs Monte Carlo optimisation of host-guest complexes [1]_.
 
-    Examples
-    --------
-    *Structure Optimization*
+    Examples:
+        *Structure Optimization*
 
-    Using :class:`.Spinner` will lead to :class:`.ConstructedMolecule`
-    structures with better host-guest structures. Especially useful
-    for multiple-guest systems and removing overlap.
+        Using :class:`.Spinner` will lead to
+        :class:`.ConstructedMolecule` structures with better host-guest
+        structures. Especially useful for multiple-guest systems and
+        removing overlap.
 
-    .. testcode:: structure-optimization
+        .. testcode:: structure-optimization
 
-        import stk
+            import stk
 
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock(
-            smiles='O=CC(C=O)C=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        guest1 = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
-        guest2 = stk.host_guest.Guest(stk.BuildingBlock('C1CCCCC1'))
-        cage = stk.ConstructedMolecule(
-            topology_graph=stk.cage.FourPlusSix(
-                building_blocks=(bb1, bb2),
-                optimizer=stk.MCHammer(),
-            ),
-        )
+            bb1 = stk.BuildingBlock(
+                smiles='NCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock(
+                smiles='O=CC(C=O)C=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+            guest1 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('c1ccccc1'),
+            )
+            guest2 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('C1CCCCC1'),
+            )
+            cage = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(bb1, bb2),
+                    optimizer=stk.MCHammer(),
+                ),
+            )
 
-        complex = stk.ConstructedMolecule(
-            topology_graph=stk.host_guest.Complex(
-                host=stk.BuildingBlock.init_from_molecule(cage),
-                guests=(guest1, guest2),
-                optimizer=stk.Spinner(),
-            ),
-        )
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(cage),
+                    guests=(guest1, guest2),
+                    optimizer=stk.Spinner(),
+                ),
+            )
 
-    Optimisation with :mod:`stk` simply collects the final position
-    matrix. The optimisation's trajectory can be output using the
-    :mod:`SpinDry` implementation if required by the user [1]_.
-    This code is entirely nonphysical and is, therefore, completely
-    general to any chemistry.
+        Optimisation with :mod:`stk` simply collects the final position
+        matrix. The optimisation's trajectory can be output using the
+        :mod:`SpinDry` implementation if required by the user [1]_.
+        This code is entirely nonphysical and is, therefore, completely
+        general to any chemistry.
 
     References
     ----------
@@ -69,7 +76,7 @@ class Spinner(Optimizer):
         nonbond_sigma: float = 1.2,
         beta: float = 2.,
         random_seed: int = 1000,
-    ):
+    ) -> None:
         """
         Initialize an instance of :class:`.Spinner`.
 

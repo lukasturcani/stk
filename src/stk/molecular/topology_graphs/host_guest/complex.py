@@ -20,10 +20,10 @@ class Guest:
     def __init__(
         self,
         building_block: BuildingBlock,
-        start_vector: Tuple[float] = (1., 0., 0.),
-        end_vector: Tuple[float] = (1., 0., 0.),
-        displacement: Tuple[float] = (1., 0., 0.),
-    ):
+        start_vector: Tuple[float, float, float] = (1., 0., 0.),
+        end_vector: Tuple[float, float, float] = (1., 0., 0.),
+        displacement: Tuple[float, float, float] = (1., 0., 0.),
+    ) -> None:
         """
         Initialize a :class:`.Guest` instance.
 
@@ -107,106 +107,115 @@ class Complex(TopologyGraph):
 
     Host and guest building blocks do not require functional groups.
 
-    Examples
-    --------
-    *Construction*
+    Examples:
+        *Construction*
 
-    You can use :class:`.ConstructedMolecule` instances as the host,
-    but you should turn them into a :class:`.BuildingBlock` first
+        You can use :class:`.ConstructedMolecule` instances as the
+        host, but you should turn them into a :class:`.BuildingBlock`
+        first
 
-    .. testcode:: construction
+        .. testcode:: construction
 
-        import stk
+            import stk
 
-        host = stk.ConstructedMolecule(
-            topology_graph=stk.cage.FourPlusSix(
-                building_blocks=(
-                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                    stk.BuildingBlock(
-                        smiles='BrCC(Br)CBr',
-                        functional_groups=[stk.BromoFactory()],
+            host = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCC(Br)CBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
                 ),
-            ),
-        )
-        complex = stk.ConstructedMolecule(
-            topology_graph=stk.host_guest.Complex(
-                host=stk.BuildingBlock.init_from_molecule(host),
-                guests=stk.host_guest.Guest(
-                    building_block=stk.BuildingBlock('[Br][Br]'),
-                ),
-            ),
-        )
-
-    *Suggested Optimization*
-
-    For :class:`.Complex` topologies, it is recommended to use the
-    :class:`.Spinner` optimizer. It is also recommended that the
-    building blocks are already optimized prior to construction.
-
-    .. testcode:: suggested-optimization
-
-        import stk
-
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock(
-            smiles='O=CC(C=O)C=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        guest = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
-        cage = stk.ConstructedMolecule(
-            topology_graph=stk.cage.FourPlusSix(
-                building_blocks=(bb1, bb2),
-                optimizer=stk.MCHammer(),
-            ),
-        )
-
-        complex = stk.ConstructedMolecule(
-            topology_graph=stk.host_guest.Complex(
-                host=stk.BuildingBlock.init_from_molecule(cage),
-                guests=guest,
-                optimizer=stk.Spinner(),
-            ),
-        )
-
-    *Changing the Position of the Guest*
-
-    You can change the position and orientation of the guest, as well
-    as its displacement
-
-    .. testcode:: changing-the-position-of-the-guest
-
-        import stk
-
-        host = stk.ConstructedMolecule(
-            topology_graph=stk.cage.FourPlusSix(
-                building_blocks=(
-                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-                    stk.BuildingBlock(
-                        smiles='BrCC(Br)CBr',
-                        functional_groups=[stk.BromoFactory()],
+            )
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(host),
+                    guests=stk.host_guest.Guest(
+                        building_block=stk.BuildingBlock('[Br][Br]'),
                     ),
                 ),
-            ),
-        )
+            )
 
-        guest_building_block = stk.BuildingBlock('[Br][Br]')
-        guest = stk.host_guest.Guest(
-            building_block=guest_building_block,
-            # Apply a rotation onto the guest molecule such that
-            # the vector returned by get_direction() has the same
-            # direction as [1, 1, 1].
-            start_vector=guest_building_block.get_direction(),
-            end_vector=[1, 1, 1],
-            # Change the displacement of the guest.
-            displacement=[5.3, 2.1, 7.1],
-        )
-        complex = stk.ConstructedMolecule(
-            topology_graph=stk.host_guest.Complex(
-                host=stk.BuildingBlock.init_from_molecule(host),
-                guests=guest,
-            ),
-        )
+        *Suggested Optimization*
+
+        For :class:`.Complex` topologies, it is recommended to use the
+        :class:`.Spinner` optimizer. It is also recommended that the
+        building blocks are already optimized prior to construction.
+
+        .. testcode:: suggested-optimization
+
+            import stk
+
+            bb1 = stk.BuildingBlock(
+                smiles='NCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock(
+                smiles='O=CC(C=O)C=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+            guest = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
+            cage = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(bb1, bb2),
+                    optimizer=stk.MCHammer(),
+                ),
+            )
+
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(cage),
+                    guests=guest,
+                    optimizer=stk.Spinner(),
+                ),
+            )
+
+        *Changing the Position of the Guest*
+
+        You can change the position and orientation of the guest, as
+        well as its displacement
+
+        .. testcode:: changing-the-position-of-the-guest
+
+            import stk
+
+            host = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCC(Br)CBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                ),
+            )
+
+            guest_building_block = stk.BuildingBlock('[Br][Br]')
+            guest = stk.host_guest.Guest(
+                building_block=guest_building_block,
+                # Apply a rotation onto the guest molecule such that
+                # the vector returned by get_direction() has the same
+                # direction as [1, 1, 1].
+                start_vector=guest_building_block.get_direction(),
+                end_vector=[1, 1, 1],
+                # Change the displacement of the guest.
+                displacement=[5.3, 2.1, 7.1],
+            )
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(host),
+                    guests=guest,
+                ),
+            )
 
     """
 
@@ -214,13 +223,13 @@ class Complex(TopologyGraph):
         self,
         host: BuildingBlock,
         guest: Optional[BuildingBlock] = None,
-        guest_start: Optional[Tuple[float]] = None,
-        guest_target: Optional[Tuple[float]] = None,
-        displacement: Optional[Tuple[float]] = None,
+        guest_start: Optional[Tuple[float, float, float]] = None,
+        guest_target: Optional[Tuple[float, float, float]] = None,
+        displacement: Optional[Tuple[float, float, float]] = None,
         guests: Optional[Iterable[Guest]] = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
-    ):
+    ) -> None:
         """
         Initialize an instance of :class:`.Complex`.
 
