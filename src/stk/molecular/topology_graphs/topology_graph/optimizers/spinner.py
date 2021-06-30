@@ -38,9 +38,10 @@ class Spinner(Optimizer):
                 optimizer=stk.MCHammer(),
             ),
         )
+
         complex = stk.ConstructedMolecule(
             topology_graph=stk.host_guest.Complex(
-                host=stk.BuildingBlock.init_from_molecule(host),
+                host=stk.BuildingBlock.init_from_molecule(cage),
                 guests=(guest1, guest2),
                 optimizer=stk.Spinner(),
             ),
