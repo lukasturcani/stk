@@ -43,7 +43,6 @@ class Guest:
         displacement : :class:`tuple` of :class:`float`, optional
             The translational offset of the guest.
 
-
         """
 
         self._building_block = building_block
@@ -52,15 +51,55 @@ class Guest:
         self._displacement = displacement
 
     def get_building_block(self):
+        """
+        Return the building block.
+
+        Returns
+        -------
+        :class:`.BuildingBlock`
+            The building block.
+
+        """
+
         return self._building_block
 
     def get_start_vector(self):
+        """
+        Return the start vector.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`float`
+            The start vector.
+
+        """
+
         return self._start_vector
 
     def get_end_vector(self):
+        """
+        Return the end vector.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`float`
+            The end vector.
+
+        """
+
         return self._end_vector
 
     def get_displacement(self):
+        """
+        Return the displacement.
+
+        Returns
+        -------
+        :class:`tuple` of :class:`float`
+            The displacement.
+
+        """
+
         return self._displacement
 
     def __repr__(self):
@@ -228,14 +267,14 @@ class Complex(TopologyGraph):
 
         """
 
-        if guests is not None and (
-            guest is not None or len({
-                displacement, guest_start, guest_target
-            }) > 1
+        old_params = (guest, displacement, guest_start, guest_target)
+
+        if guests is not None and any(
+            param is not None for param in old_params
         ):
             raise ValueError(
                 'You are attempting to use the old API with the new '
-                'API. Use the stk.host_guest.Guest API and `guests`.'
+                'API. Use the stk.host_guest.Guest API and "guests".'
             )
 
         if guests is not None:
@@ -246,12 +285,12 @@ class Complex(TopologyGraph):
         elif guest is not None:
             warnings.warn(
                 'You defined a Complex topology graph using the old '
-                'API (by defining `guest` and any optional arguments: '
-                '`guest_start`, `guest_target` and `displacement`). '
+                'API (by defining "guest" and any optional arguments: '
+                '"guest_start", "guest_target" and "displacement"). '
                 'This API will be removed from any version of stk '
                 'released on, or after, 01/01/22. Please use the '
-                '`guests` argument and the `stk.host_guest.Guest` '
-                'dataclass to define all necessary attributes.',
+                '"guests" argument and the stk.host_guest.Guest '
+                'class to define all necessary attributes.',
                 category=FutureWarning,
             )
             building_block_vertices = self._get_vertices_from_guest(
@@ -263,7 +302,7 @@ class Complex(TopologyGraph):
             )
         else:
             raise RuntimeError(
-                'The `guests` parameter must be provided.'
+                'The "guests" parameter must be provided.'
             )
 
         super().__init__(
@@ -311,7 +350,7 @@ class Complex(TopologyGraph):
         )
         if num_nones == 1:
             raise TypeError(
-                'If guest_start or guest_target is defined, '
+                'If "guest_start" or "guest_target" is defined, '
                 'the other must be too.'
             )
 
