@@ -60,50 +60,41 @@ class Spinner(Optimizer):
 
     def __init__(
         self,
-        step_size=1.5,
-        rotation_step_size=5,
-        num_conformers=50,
-        max_attempts=1000,
-        nonbond_epsilon=5,
-        nonbond_sigma=1.2,
-        beta=2,
-        random_seed=1000,
+        step_size: float = 1.5,
+        rotation_step_size: float = 5.,
+        num_conformers: int = 50,
+        max_attempts: int = 1000,
+        nonbond_epsilon: float = 5.,
+        nonbond_sigma: float = 1.2,
+        beta: float = 2.,
+        random_seed: int = 1000,
     ):
         """
         Initialize an instance of :class:`.Spinner`.
 
-        Parameters
-        ----------
-        step_size : :class:`float`
-            The relative size of the step to take during step.
+        Parameters:
+            step_size: The relative size of the step to take during
+                step.
 
-        rotation_step_size : :class:`float`
-            The relative size of the rotation to take during step.
+            rotation_step_size: The relative size of the rotation to
+                take during step.
 
-        num_conformers : :class:`int`
-            Number of conformers to extract.
+            num_conformers: Number of conformers to extract.
 
-        max_attempts : :class:`int`
-            Maximum number of MC moves to try to generate conformers.
+            max_attempts: Maximum number of MC moves to try to generate
+                conformers.
 
-        nonbond_epsilon : :class:`float`, optional
-            Value of epsilon used in the nonbond potential in MC moves.
-            Determines strength of the nonbond potential.
-            Defaults to 20.
+            nonbond_epsilon: Value of epsilon used in the nonbond
+                potential in MC moves. Determines strength of the
+                nonbond potential.
 
-        nonbond_sigma : :class:`float`, optional
-            Value of sigma used in the nonbond potential in MC moves.
-            Defaults to 1.2.
+            nonbond_sigma: Value of sigma used in the nonbond potential
+                in MC moves.
 
-        beta : :class:`float`, optional
-            Value of beta used in the in MC moves. Beta takes the
-            place of the inverse boltzmann temperature.
-            Defaults to 2.
+            beta: Value of beta used in the in MC moves. Beta takes the
+                place of the inverse boltzmann temperature.
 
-        random_seed : :class:`int` or :class:`NoneType`, optional
-            Random seed to use for MC algorithm. Should only be set to
-            ``None`` if system-based random seed is desired. Defaults
-            to 1000.
+            random_seed: Random seed to use for MC algorithm.
 
         """
 
