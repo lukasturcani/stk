@@ -77,20 +77,22 @@ class Atom:
 
         Atom.__init__(self, id, self._atomic_number, charge)
 
-    def __init__(self, id, atomic_number, charge=0):
+    def __init__(
+        self,
+        id: int,
+        atomic_number: int,
+        charge: int = 0,
+    ) -> None:
         """
         Initialize an :class:`Atom`.
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the atom.
+        Parameters:
 
-        atomic_number : :class:`int`
-            The atomic number.
+            id: The id of the atom.
 
-        charge : :class:`int`
-            The formal charge.
+            atomic_number: The atomic number.
+
+            charge: The formal charge.
 
         """
 
