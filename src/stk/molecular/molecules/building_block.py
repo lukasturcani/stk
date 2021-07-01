@@ -5,13 +5,17 @@ Building Block
 """
 
 
+from __future__ import annotations
+
+
+from typing import Iterable, Union, Optional
 import logging
 import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
 
-from ..functional_groups import FunctionalGroup
+from ..functional_groups import FunctionalGroup, FunctionalGroupFactory
 from ..atoms import Atom
 from ..bonds import Bond
 from .molecule import Molecule
@@ -19,6 +23,13 @@ from ...utilities import remake, flatten
 
 
 logger = logging.getLogger(__name__)
+
+
+FunctionalGroups = Union[
+    FunctionalGroup,
+    FunctionalGroupFactory,
+    Iterable[Union[FunctionalGroup, FunctionalGroupFactory]],
+]
 
 
 class BuildingBlock(Molecule):
@@ -59,62 +70,60 @@ class BuildingBlock(Molecule):
     def __init__(
         self,
         smiles,
-        functional_groups=(),
-        placer_ids=None,
-        position_matrix=None,
-    ):
+        functional_groups: FunctionalGroups = (),
+        placer_ids: Optional[tuple[int, ...]] = None,
+        position_matrix: Optional[np.ndarray] = None,
+    ) -> None:
         """
         Initialize a :class:`.BuildingBlock`.
 
-        Notes
-        -----
-        The molecule is given 3D coordinates with
-        :func:`rdkit.ETKDGv2`.
+        Notes:
+            The molecule is given 3D coordinates with
+            :func:`rdkit.ETKDGv2`.
 
-        Parameters
-        ----------
-        smiles : :class:`str`
-            A SMILES string of the molecule.
+        Parameters:
 
-        functional_groups : :class:`iterable`, optional
-            An :class:`iterable` of :class:`.FunctionalGroup` or
-            :class:`.FunctionalGroupFactory` or both.
-            :class:`.FunctionalGroup` instances are added to the
-            building block and :class:`.FunctionalGroupFactory`
-            instances are used to create :class:`.FunctionalGroup`
-            instances the building block should hold.
-            :class:`.FunctionalGroup` instances are used to identify
-            which atoms are modified during
-            :class:`.ConstructedMolecule` construction.
+            smiles:
+                A SMILES string of the molecule.
 
-        placer_ids : :class:`tuple` of :class:`int`, optional
-            The ids of *placer* atoms. These are the atoms which should
-            be used for calculating the position of the building block.
-            Depending on the values passed to `placer_ids`,
-            and the functional groups in the building block, different
-            *placer* ids will be used by the building block.
+            functional_groups:
+                :class:`.FunctionalGroup` which are to be added to the
+                building block and :class:`.FunctionalGroupFactory`
+                instances which are used to create
+                :class:`.FunctionalGroup` instances which are added
+                to the building block. :class:`.FunctionalGroup`
+                instances are used to identify which atoms are modified
+                during :class:`.ConstructedMolecule` construction.
 
-            #. `placer_ids` is passed to the initializer: the passed
-               *placer* ids will be used by the building block.
+            placer_ids:
+                The ids of *placer* atoms. These are the atoms which
+                should be used for calculating the position of the
+                building block. Depending on the values passed to
+                `placer_ids`, and the functional groups in the building
+                block, different *placer* ids will be used by the
+                building block.
 
-            #. `placer_ids` is ``None`` and the building block has
-               functional groups: The *placer* ids of the functional
-               groups will be used as the *placer* ids of the building
-               block.
+                #. `placer_ids` is passed to the initializer: the
+                   passed *placer* ids will be used by the building
+                   block.
 
-            #. `placer_ids` is ``None`` and `functional_groups` is
-               empty. All atoms of the molecule will be used for
-               *placer* ids.
+                #. `placer_ids` is ``None`` and the building block has
+                   functional groups: The *placer* ids of the
+                   functional groups will be used as the *placer* ids
+                   of the building block.
 
-        position_matrix : :class:`numpy.ndarray`, optional
-            The position matrix the building block should use. If
-            ``None``, :func:`rdkit.ETKDGv2` will be used to calculate
-            it.
+                #. `placer_ids` is ``None`` and `functional_groups` is
+                   empty. All atoms of the molecule will be used for
+                   *placer* ids.
 
-        Raises
-        ------
-        :class:`RuntimeError`
-            If embedding the molecule fails.
+            position_matrix:
+                The position matrix the building block should use. If
+                ``None``, :func:`rdkit.ETKDGv2` will be used to
+                calculate it.
+
+        Raises:
+
+            :class:`RuntimeError`: If embedding the molecule fails.
 
         """
 
@@ -149,51 +158,50 @@ class BuildingBlock(Molecule):
     @classmethod
     def init_from_molecule(
         cls,
-        molecule,
-        functional_groups=(),
+        molecule: Molecule,
+        functional_groups: FunctionalGroups = (),
         placer_ids=None,
-    ):
+    ) -> BuildingBlock:
         """
         Initialize from a :class:`.Molecule`.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            The molecule to initialize from.
+        Parameters:
 
-        functional_groups : :class:`iterable`, optional
-            An :class:`iterable` of :class:`.FunctionalGroup` or
-            :class:`.FunctionalGroupFactory` or both.
-            :class:`.FunctionalGroup` instances are added to the
-            building block and :class:`.FunctionalGroupFactory`
-            instances are used to create :class:`.FunctionalGroup`
-            instances the building block should hold.
-            :class:`.FunctionalGroup` instances are used to identify
-            which atoms are modified during
-            :class:`.ConstructedMolecule` construction.
+            molecule:
+                The molecule to initialize from.
 
-        placer_ids : :class:`tuple` of :class:`int`, optional
-            The ids of *placer* atoms. These are the atoms which should
-            be used for calculating the position of the building block.
-            Depending on the values passed to `placer_ids`,
-            and the functional groups in the building block, different
-            *placer* ids will be used by the building block.
+            functional_groups:
+                :class:`.FunctionalGroup` which are to be added to the
+                building block and :class:`.FunctionalGroupFactory`
+                instances which are used to create
+                :class:`.FunctionalGroup` instances which are added
+                to the building block. :class:`.FunctionalGroup`
+                instances are used to identify which atoms are modified
+                during :class:`.ConstructedMolecule` construction.
 
-            #. `placer_ids` is passed to the initializer: the passed
-               *placer* ids will be used by the building block.
+            placer_ids:
 
-            #. `placer_ids` is ``None`` and the building block has
-               functional groups: The *placer* ids of the functional
-               groups will be used as the *placer* ids of the building
-               block.
+                The ids of *placer* atoms. These are the atoms which
+                should be used for calculating the position of the
+                building block. Depending on the values passed to
+                `placer_ids`, and the functional groups in the building
+                block, different *placer* ids will be used by the
+                building block.
 
-            #. `placer_ids` is ``None`` and `functional_groups` is
-               empty. All atoms of the molecule will be used for
-               *placer* ids.
+                #. `placer_ids` is passed to the initializer: the
+                   passed *placer* ids will be used by the building
+                   block.
 
-        Returns
-        -------
-        :class:`.BuildingBlock`
+                #. `placer_ids` is ``None`` and the building block has
+                   functional groups: The *placer* ids of the
+                   functional groups will be used as the *placer* ids
+                   of the building block.
+
+                #. `placer_ids` is ``None`` and `functional_groups` is
+                   empty. All atoms of the molecule will be used for
+                   *placer* ids.
+
+        Returns:
              The building block. It will have the same atoms, bonds and
              atomic positions as `molecule`.
 
@@ -322,54 +330,51 @@ class BuildingBlock(Molecule):
     @classmethod
     def init(
         cls,
-        atoms,
-        bonds,
-        position_matrix,
-        functional_groups=(),
-        placer_ids=None,
-    ):
+        atoms: tuple[Atom, ...],
+        bonds: tuple[Bond, ...],
+        position_matrix: np.ndarray,
+        functional_groups: FunctionalGroups = (),
+        placer_ids: Optional[tuple[int, ...]] = None,
+    ) -> BuildingBlock:
         """
         Initialize a :class:`.BuildingBlock` from its components.
 
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms of the building block.
+        Parameters:
+            atoms:
+                The atoms of the building block.
 
-        bonds : :class:`tuple` of :class:`.Bond`
-            The bonds of the building block.
+            bonds:
+                The bonds of the building block.
 
-        position_matrix : :class:`numpy.ndarray`
-            An ``(n, 3)`` position matrix of the building block.
+            position_matrix:
+                An ``(n, 3)`` position matrix of the building block.
 
-        functional_groups : :class:`iterable`, optional
-            An :class:`iterable` holding the :class:`.FunctionalGroup`
-            instances the building block should have, and / or
-            :class:`.FunctionalGroupFactory` instances used for
-            creating them.
+            functional_groups:
+                An :class:`iterable` holding the :class:`.FunctionalGroup`
+                instances the building block should have, and / or
+                :class:`.FunctionalGroupFactory` instances used for
+                creating them.
 
-        placer_ids : :class:`tuple` of :class:`int`, optional
-            The ids of *placer* atoms. These are the atoms which should
-            be used for calculating the position of the building block.
-            Depending on the values passed to `placer_ids`,
-            and the functional groups in the building block, different
-            *placer* ids will be used by the building block.
+            placer_ids:
+                The ids of *placer* atoms. These are the atoms which should
+                be used for calculating the position of the building block.
+                Depending on the values passed to `placer_ids`,
+                and the functional groups in the building block, different
+                *placer* ids will be used by the building block.
 
-            #. `placer_ids` is passed to the initializer: the passed
-               *placer* ids will be used by the building block.
+                #. `placer_ids` is passed to the initializer: the passed
+                   *placer* ids will be used by the building block.
 
-            #. `placer_ids` is ``None`` and the building block has
-               functional groups: The *placer* ids of the functional
-               groups will be used as the *placer* ids of the building
-               block.
+                #. `placer_ids` is ``None`` and the building block has
+                   functional groups: The *placer* ids of the functional
+                   groups will be used as the *placer* ids of the building
+                   block.
 
-            #. `placer_ids` is ``None`` and `functional_groups` is
-               empty. All atoms of the molecule will be used for
-               *placer* ids.
+                #. `placer_ids` is ``None`` and `functional_groups` is
+                   empty. All atoms of the molecule will be used for
+                   *placer* ids.
 
-        Returns
-        -------
-        :class:`.BuildingBlock`
+        Returns:
             The building block.
 
         """
