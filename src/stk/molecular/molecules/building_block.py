@@ -24,6 +24,7 @@ from ...utilities import remake, flatten
 
 logger = logging.getLogger(__name__)
 
+AtomPosition = tuple[float, float, float]
 
 FunctionalGroups = Union[
     FunctionalGroup,
@@ -69,10 +70,10 @@ class BuildingBlock(Molecule):
 
     def __init__(
         self,
-        smiles,
+        smiles: str,
         functional_groups: FunctionalGroups = (),
         placer_ids: Optional[tuple[int, ...]] = None,
-        position_matrix=None,
+        position_matrix: Optional[tuple[AtomPosition, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.BuildingBlock`.
@@ -139,14 +140,12 @@ class BuildingBlock(Molecule):
                 )
             rdkit.Kekulize(molecule)
         else:
-            # Make sure the position matrix always holds floats.
-            position_matrix = np.array(
-                position_matrix,
-                dtype=np.float64,
-            )
             conformer = rdkit.Conformer(molecule.GetNumAtoms())
             for atom_id, position in enumerate(position_matrix):
-                conformer.SetAtomPosition(atom_id, position)
+                conformer.SetAtomPosition(
+                    atom_id,
+                    np.array(position, dtype=np.float64),
+                )
             molecule.AddConformer(conformer)
 
         self._init_from_rdkit_mol(
@@ -160,7 +159,7 @@ class BuildingBlock(Molecule):
         cls,
         molecule: Molecule,
         functional_groups: FunctionalGroups = (),
-        placer_ids=None,
+        placer_ids: Optional[tuple[int, ...]] = None,
     ) -> BuildingBlock:
         """
         Initialize from a :class:`.Molecule`.
