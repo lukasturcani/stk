@@ -72,7 +72,7 @@ class BuildingBlock(Molecule):
         smiles,
         functional_groups: FunctionalGroups = (),
         placer_ids: Optional[tuple[int, ...]] = None,
-        position_matrix: Optional[np.ndarray] = None,
+        position_matrix=None,
     ) -> None:
         """
         Initialize a :class:`.BuildingBlock`.
@@ -332,7 +332,7 @@ class BuildingBlock(Molecule):
         cls,
         atoms: tuple[Atom, ...],
         bonds: tuple[Bond, ...],
-        position_matrix: np.ndarray,
+        position_matrix,
         functional_groups: FunctionalGroups = (),
         placer_ids: Optional[tuple[int, ...]] = None,
     ) -> BuildingBlock:
