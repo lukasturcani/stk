@@ -5,7 +5,6 @@ Atom
 """
 
 from __future__ import annotations
-from typing import ClassVar
 
 
 class Atom:
@@ -55,10 +54,6 @@ class Atom:
 
     # Maps each atomic number (int) to the relevant Atom subclass.
     _elements: dict[int, type[Atom]] = {}
-    _atomic_number: ClassVar[int]
-
-    def __init_subclass__(cls: type[Atom], **kwargs) -> None:
-        cls._elements[cls._atomic_number] = cls
 
     def __init__(
         self,
@@ -79,9 +74,8 @@ class Atom:
 
         """
 
+        self._elements[atomic_number].__init__(self, id, charge)
         self.__class__ = self._elements[atomic_number]
-        self._id = id
-        self._charge = charge
 
     def get_id(self) -> int:
         """
@@ -92,16 +86,7 @@ class Atom:
 
         """
 
-        return self._id
-
-    def _with_id(self, id: int) -> Atom:
-        """
-        Modify the atom.
-
-        """
-
-        self._id = id
-        return self
+        raise NotImplementedError()
 
     def with_id(self, id: int) -> Atom:
         """
@@ -116,7 +101,7 @@ class Atom:
 
         """
 
-        return self.clone()._with_id(id)
+        raise NotImplementedError()
 
     def get_atomic_number(self) -> int:
         """
@@ -127,7 +112,7 @@ class Atom:
 
         """
 
-        return self._atomic_number
+        raise NotImplementedError()
 
     def get_charge(self) -> int:
         """
@@ -138,27 +123,15 @@ class Atom:
 
         """
 
-        return self._charge
-
-    def __repr__(self) -> str:
-        charge = (
-            f', charge={self._charge}' if self._charge != 0 else ''
-        )
-        return f'{self.__class__.__name__}({self._id}{charge})'
-
-    def __str__(self) -> str:
-        return repr(self)
+        raise NotImplementedError()
 
     def clone(self) -> Atom:
         """
         Return a clone.
 
         Returns:
-            The clone. It has the same type as the original atom.
+            The clone.
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
-        clone._id = self._id
-        clone._charge = self._charge
-        return clone
+        raise NotImplementedError()
