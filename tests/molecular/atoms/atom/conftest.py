@@ -10,8 +10,8 @@ from .case_data import CaseData
     params=[
         cls for cls in stk.__dict__.values()
         if isinstance(cls, type)
-        and issubclass(cls, stk.Atom)
-        and cls is not stk.Atom
+        and issubclass(cls, stk.AtomImpl)
+        and cls is not stk.AtomImpl
     ],
 )
 def cls(request):
