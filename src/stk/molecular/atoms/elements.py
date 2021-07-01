@@ -146,7 +146,7 @@ class O(AtomImpl):  # noqa
     def clone(self) -> O:  # noqa
         return type(self)(self._id, self._charge)
 
-    def with_id(self, id: int) -> O:
+    def with_id(self, id: int) -> O:  # noqa
         return self._with_id(id)
 
 
@@ -597,7 +597,7 @@ class I(AtomImpl):  # noqa
     def clone(self) -> I:  # noqa
         return type(self)(self._id, self._charge)
 
-    def with_id(self, id: int) -> I:
+    def with_id(self, id: int) -> I:  # noqa
         return self._with_id(id)
 
 
