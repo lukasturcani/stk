@@ -96,8 +96,7 @@ class Atom:
             id: The id of the clone.
 
         Returns:
-            A clone with a new id. Has the same type as the original
-            atom.
+            A clone with a new id.
 
         """
 
