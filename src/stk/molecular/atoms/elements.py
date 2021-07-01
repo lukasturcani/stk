@@ -9,475 +9,490 @@ Defines an :class:`.Atom` class for each element.
 from .atom import Atom
 
 
-class H(Atom):
+class AtomImpl(Atom):
+    """
+    A partial implementation of the :class:`.Atom` interface.
+
+    """
+
+    def __init__(
+        self,
+        id: int,
+        charge: int = 0,
+    ) -> None:
+
+        Atom.__init__(self, id, self._atomic_number, charge)
+
+
+class H(AtomImpl):
     _atomic_number = 1
 
 
-class He(Atom):
+class He(AtomImpl):
     _atomic_number = 2
 
 
-class Li(Atom):
+class Li(AtomImpl):
     _atomic_number = 3
 
 
-class Be(Atom):
+class Be(AtomImpl):
     _atomic_number = 4
 
 
-class B(Atom):
+class B(AtomImpl):
     _atomic_number = 5
 
 
-class C(Atom):
+class C(AtomImpl):
     _atomic_number = 6
 
 
-class N(Atom):
+class N(AtomImpl):
     _atomic_number = 7
 
 
 # "O" is a valid elemental symbol.
-class O(Atom):  # noqa
+class O(AtomImpl):  # noqa
     _atomic_number = 8
 
 
-class F(Atom):
+class F(AtomImpl):
     _atomic_number = 9
 
 
-class Ne(Atom):
+class Ne(AtomImpl):
     _atomic_number = 10
 
 
-class Na(Atom):
+class Na(AtomImpl):
     _atomic_number = 11
 
 
-class Mg(Atom):
+class Mg(AtomImpl):
     _atomic_number = 12
 
 
-class Al(Atom):
+class Al(AtomImpl):
     _atomic_number = 13
 
 
-class Si(Atom):
+class Si(AtomImpl):
     _atomic_number = 14
 
 
-class P(Atom):
+class P(AtomImpl):
     _atomic_number = 15
 
 
-class S(Atom):
+class S(AtomImpl):
     _atomic_number = 16
 
 
-class Cl(Atom):
+class Cl(AtomImpl):
     _atomic_number = 17
 
 
-class Ar(Atom):
+class Ar(AtomImpl):
     _atomic_number = 18
 
 
-class K(Atom):
+class K(AtomImpl):
     _atomic_number = 19
 
 
-class Ca(Atom):
+class Ca(AtomImpl):
     _atomic_number = 20
 
 
-class Sc(Atom):
+class Sc(AtomImpl):
     _atomic_number = 21
 
 
-class Ti(Atom):
+class Ti(AtomImpl):
     _atomic_number = 22
 
 
-class V(Atom):
+class V(AtomImpl):
     _atomic_number = 23
 
 
-class Cr(Atom):
+class Cr(AtomImpl):
     _atomic_number = 24
 
 
-class Mn(Atom):
+class Mn(AtomImpl):
     _atomic_number = 25
 
 
-class Fe(Atom):
+class Fe(AtomImpl):
     _atomic_number = 26
 
 
-class Co(Atom):
+class Co(AtomImpl):
     _atomic_number = 27
 
 
-class Ni(Atom):
+class Ni(AtomImpl):
     _atomic_number = 28
 
 
-class Cu(Atom):
+class Cu(AtomImpl):
     _atomic_number = 29
 
 
-class Zn(Atom):
+class Zn(AtomImpl):
     _atomic_number = 30
 
 
-class Ga(Atom):
+class Ga(AtomImpl):
     _atomic_number = 31
 
 
-class Ge(Atom):
+class Ge(AtomImpl):
     _atomic_number = 32
 
 
-class As(Atom):
+class As(AtomImpl):
     _atomic_number = 33
 
 
-class Se(Atom):
+class Se(AtomImpl):
     _atomic_number = 34
 
 
-class Br(Atom):
+class Br(AtomImpl):
     _atomic_number = 35
 
 
-class Kr(Atom):
+class Kr(AtomImpl):
     _atomic_number = 36
 
 
-class Rb(Atom):
+class Rb(AtomImpl):
     _atomic_number = 37
 
 
-class Sr(Atom):
+class Sr(AtomImpl):
     _atomic_number = 38
 
 
-class Y(Atom):
+class Y(AtomImpl):
     _atomic_number = 39
 
 
-class Zr(Atom):
+class Zr(AtomImpl):
     _atomic_number = 40
 
 
-class Nb(Atom):
+class Nb(AtomImpl):
     _atomic_number = 41
 
 
-class Mo(Atom):
+class Mo(AtomImpl):
     _atomic_number = 42
 
 
-class Tc(Atom):
+class Tc(AtomImpl):
     _atomic_number = 43
 
 
-class Ru(Atom):
+class Ru(AtomImpl):
     _atomic_number = 44
 
 
-class Rh(Atom):
+class Rh(AtomImpl):
     _atomic_number = 45
 
 
-class Pd(Atom):
+class Pd(AtomImpl):
     _atomic_number = 46
 
 
-class Ag(Atom):
+class Ag(AtomImpl):
     _atomic_number = 47
 
 
-class Cd(Atom):
+class Cd(AtomImpl):
     _atomic_number = 48
 
 
-class In(Atom):
+class In(AtomImpl):
     _atomic_number = 49
 
 
-class Sn(Atom):
+class Sn(AtomImpl):
     _atomic_number = 50
 
 
-class Sb(Atom):
+class Sb(AtomImpl):
     _atomic_number = 51
 
 
-class Te(Atom):
+class Te(AtomImpl):
     _atomic_number = 52
 
 
 # "I" is a valid elemental symbol.
-class I(Atom):  # noqa
+class I(AtomImpl):  # noqa
     _atomic_number = 53
 
 
-class Xe(Atom):
+class Xe(AtomImpl):
     _atomic_number = 54
 
 
-class Cs(Atom):
+class Cs(AtomImpl):
     _atomic_number = 55
 
 
-class Ba(Atom):
+class Ba(AtomImpl):
     _atomic_number = 56
 
 
-class La(Atom):
+class La(AtomImpl):
     _atomic_number = 57
 
 
-class Ce(Atom):
+class Ce(AtomImpl):
     _atomic_number = 58
 
 
-class Pr(Atom):
+class Pr(AtomImpl):
     _atomic_number = 59
 
 
-class Nd(Atom):
+class Nd(AtomImpl):
     _atomic_number = 60
 
 
-class Pm(Atom):
+class Pm(AtomImpl):
     _atomic_number = 61
 
 
-class Sm(Atom):
+class Sm(AtomImpl):
     _atomic_number = 62
 
 
-class Eu(Atom):
+class Eu(AtomImpl):
     _atomic_number = 63
 
 
-class Gd(Atom):
+class Gd(AtomImpl):
     _atomic_number = 64
 
 
-class Tb(Atom):
+class Tb(AtomImpl):
     _atomic_number = 65
 
 
-class Dy(Atom):
+class Dy(AtomImpl):
     _atomic_number = 66
 
 
-class Ho(Atom):
+class Ho(AtomImpl):
     _atomic_number = 67
 
 
-class Er(Atom):
+class Er(AtomImpl):
     _atomic_number = 68
 
 
-class Tm(Atom):
+class Tm(AtomImpl):
     _atomic_number = 69
 
 
-class Yb(Atom):
+class Yb(AtomImpl):
     _atomic_number = 70
 
 
-class Lu(Atom):
+class Lu(AtomImpl):
     _atomic_number = 71
 
 
-class Hf(Atom):
+class Hf(AtomImpl):
     _atomic_number = 72
 
 
-class Ta(Atom):
+class Ta(AtomImpl):
     _atomic_number = 73
 
 
-class W(Atom):
+class W(AtomImpl):
     _atomic_number = 74
 
 
-class Re(Atom):
+class Re(AtomImpl):
     _atomic_number = 75
 
 
-class Os(Atom):
+class Os(AtomImpl):
     _atomic_number = 76
 
 
-class Ir(Atom):
+class Ir(AtomImpl):
     _atomic_number = 77
 
 
-class Pt(Atom):
+class Pt(AtomImpl):
     _atomic_number = 78
 
 
-class Au(Atom):
+class Au(AtomImpl):
     _atomic_number = 79
 
 
-class Hg(Atom):
+class Hg(AtomImpl):
     _atomic_number = 80
 
 
-class Tl(Atom):
+class Tl(AtomImpl):
     _atomic_number = 81
 
 
-class Pb(Atom):
+class Pb(AtomImpl):
     _atomic_number = 82
 
 
-class Bi(Atom):
+class Bi(AtomImpl):
     _atomic_number = 83
 
 
-class Po(Atom):
+class Po(AtomImpl):
     _atomic_number = 84
 
 
-class At(Atom):
+class At(AtomImpl):
     _atomic_number = 85
 
 
-class Rn(Atom):
+class Rn(AtomImpl):
     _atomic_number = 86
 
 
-class Fr(Atom):
+class Fr(AtomImpl):
     _atomic_number = 87
 
 
-class Ra(Atom):
+class Ra(AtomImpl):
     _atomic_number = 88
 
 
-class Ac(Atom):
+class Ac(AtomImpl):
     _atomic_number = 89
 
 
-class Th(Atom):
+class Th(AtomImpl):
     _atomic_number = 90
 
 
-class Pa(Atom):
+class Pa(AtomImpl):
     _atomic_number = 91
 
 
-class U(Atom):
+class U(AtomImpl):
     _atomic_number = 92
 
 
-class Np(Atom):
+class Np(AtomImpl):
     _atomic_number = 93
 
 
-class Pu(Atom):
+class Pu(AtomImpl):
     _atomic_number = 94
 
 
-class Am(Atom):
+class Am(AtomImpl):
     _atomic_number = 95
 
 
-class Cm(Atom):
+class Cm(AtomImpl):
     _atomic_number = 96
 
 
-class Bk(Atom):
+class Bk(AtomImpl):
     _atomic_number = 97
 
 
-class Cf(Atom):
+class Cf(AtomImpl):
     _atomic_number = 98
 
 
-class Es(Atom):
+class Es(AtomImpl):
     _atomic_number = 99
 
 
-class Fm(Atom):
+class Fm(AtomImpl):
     _atomic_number = 100
 
 
-class Md(Atom):
+class Md(AtomImpl):
     _atomic_number = 101
 
 
-class No(Atom):
+class No(AtomImpl):
     _atomic_number = 102
 
 
-class Lr(Atom):
+class Lr(AtomImpl):
     _atomic_number = 103
 
 
-class Rf(Atom):
+class Rf(AtomImpl):
     _atomic_number = 104
 
 
-class Db(Atom):
+class Db(AtomImpl):
     _atomic_number = 105
 
 
-class Sg(Atom):
+class Sg(AtomImpl):
     _atomic_number = 106
 
 
-class Bh(Atom):
+class Bh(AtomImpl):
     _atomic_number = 107
 
 
-class Hs(Atom):
+class Hs(AtomImpl):
     _atomic_number = 108
 
 
-class Mt(Atom):
+class Mt(AtomImpl):
     _atomic_number = 109
 
 
-class Ds(Atom):
+class Ds(AtomImpl):
     _atomic_number = 110
 
 
-class Rg(Atom):
+class Rg(AtomImpl):
     _atomic_number = 111
 
 
-class Cn(Atom):
+class Cn(AtomImpl):
     _atomic_number = 112
 
 
-class Nh(Atom):
+class Nh(AtomImpl):
     _atomic_number = 113
 
 
-class Fl(Atom):
+class Fl(AtomImpl):
     _atomic_number = 114
 
 
-class Mc(Atom):
+class Mc(AtomImpl):
     _atomic_number = 115
 
 
-class Lv(Atom):
+class Lv(AtomImpl):
     _atomic_number = 116
 
 
-class Ts(Atom):
+class Ts(AtomImpl):
     _atomic_number = 117
 
 
-class Og(Atom):
+class Og(AtomImpl):
     _atomic_number = 118

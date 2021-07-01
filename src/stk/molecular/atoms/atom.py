@@ -4,7 +4,8 @@ Atom
 
 """
 
-from typing import ClassVar, Dict, Type
+from __future__ import annotations
+from typing import ClassVar
 
 
 class Atom:
@@ -53,35 +54,11 @@ class Atom:
     """
 
     # Maps each atomic number (int) to the relevant Atom subclass.
-    _elements: Dict[int, Type['Atom']] = {}
+    _elements: dict[int, type[Atom]] = {}
     _atomic_number: ClassVar[int]
 
-    def __init_subclass__(cls: Type['Atom'], **kwargs) -> None:
-        # Replace the default __init__() method of the subclass with
-        # _subclass_init(). This is because the default __init__()
-        # method takes an atomic_number parameter, but
-        # _subclass_init() does not.
-        cls.__init__ = cls._subclass_init  # type: ignore
+    def __init_subclass__(cls: type[Atom], **kwargs) -> None:
         cls._elements[cls._atomic_number] = cls
-
-    @staticmethod
-    def _subclass_init(
-        self,
-        id: int,
-        charge: int = 0,
-    ) -> None:
-        """
-        Initialize an atom of the element.
-
-        Parameters:
-
-            id: The id of the atom.
-
-            charge: The formal charge.
-
-        """
-
-        Atom.__init__(self, id, self._atomic_number, charge)
 
     def __init__(
         self,
@@ -117,7 +94,7 @@ class Atom:
 
         return self._id
 
-    def _with_id(self, id: int) -> 'Atom':
+    def _with_id(self, id: int) -> Atom:
         """
         Modify the atom.
 
@@ -126,7 +103,7 @@ class Atom:
         self._id = id
         return self
 
-    def with_id(self, id: int) -> 'Atom':
+    def with_id(self, id: int) -> Atom:
         """
         Get a clone but with a different id.
 
@@ -172,7 +149,7 @@ class Atom:
     def __str__(self) -> str:
         return repr(self)
 
-    def clone(self) -> 'Atom':
+    def clone(self) -> Atom:
         """
         Return a clone.
 
