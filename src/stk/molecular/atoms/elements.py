@@ -7,9 +7,12 @@ Defines an :class:`.Atom` class for each element.
 """
 
 from __future__ import annotations
-from typing import ClassVar
+from typing import ClassVar, TypeVar
 
 from .atom import Atom
+
+
+_T = TypeVar('_T', bound='AtomImpl')
 
 
 class AtomImpl(Atom):
@@ -35,7 +38,7 @@ class AtomImpl(Atom):
     def get_id(self) -> int:
         return self._id
 
-    def _with_id(self, id: int) -> Atom:
+    def _with_id(self: _T, id: int) -> _T:
         """
         Modify the atom.
 
@@ -44,8 +47,8 @@ class AtomImpl(Atom):
         self._id = id
         return self
 
-    def with_id(self, id: int) -> Atom:
-        return self.clone()._with_id(id)
+    def with_id(self, id: int) -> AtomImpl:
+        return self._with_id(id)
 
     def get_atomic_number(self) -> int:
         return self._atomic_number
@@ -72,12 +75,18 @@ class H(AtomImpl):
     def clone(self) -> H:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> H:
+        return self._with_id(id)
+
 
 class He(AtomImpl):
     _atomic_number = 2
 
     def clone(self) -> He:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> He:
+        return self._with_id(id)
 
 
 class Li(AtomImpl):
@@ -86,12 +95,18 @@ class Li(AtomImpl):
     def clone(self) -> Li:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Li:
+        return self._with_id(id)
+
 
 class Be(AtomImpl):
     _atomic_number = 4
 
     def clone(self) -> Be:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Be:
+        return self._with_id(id)
 
 
 class B(AtomImpl):
@@ -100,6 +115,9 @@ class B(AtomImpl):
     def clone(self) -> B:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> B:
+        return self._with_id(id)
+
 
 class C(AtomImpl):
     _atomic_number = 6
@@ -107,12 +125,18 @@ class C(AtomImpl):
     def clone(self) -> C:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> C:
+        return self._with_id(id)
+
 
 class N(AtomImpl):
     _atomic_number = 7
 
     def clone(self) -> N:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> N:
+        return self._with_id(id)
 
 
 # "O" is a valid elemental symbol.
@@ -122,12 +146,18 @@ class O(AtomImpl):  # noqa
     def clone(self) -> O:  # noqa
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> O:
+        return self._with_id(id)
+
 
 class F(AtomImpl):
     _atomic_number = 9
 
     def clone(self) -> F:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> F:
+        return self._with_id(id)
 
 
 class Ne(AtomImpl):
@@ -136,12 +166,18 @@ class Ne(AtomImpl):
     def clone(self) -> Ne:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ne:
+        return self._with_id(id)
+
 
 class Na(AtomImpl):
     _atomic_number = 11
 
     def clone(self) -> Na:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Na:
+        return self._with_id(id)
 
 
 class Mg(AtomImpl):
@@ -150,12 +186,18 @@ class Mg(AtomImpl):
     def clone(self) -> Mg:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Mg:
+        return self._with_id(id)
+
 
 class Al(AtomImpl):
     _atomic_number = 13
 
     def clone(self) -> Al:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Al:
+        return self._with_id(id)
 
 
 class Si(AtomImpl):
@@ -164,12 +206,18 @@ class Si(AtomImpl):
     def clone(self) -> Si:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Si:
+        return self._with_id(id)
+
 
 class P(AtomImpl):
     _atomic_number = 15
 
     def clone(self) -> P:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> P:
+        return self._with_id(id)
 
 
 class S(AtomImpl):
@@ -178,12 +226,18 @@ class S(AtomImpl):
     def clone(self) -> S:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> S:
+        return self._with_id(id)
+
 
 class Cl(AtomImpl):
     _atomic_number = 17
 
     def clone(self) -> Cl:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Cl:
+        return self._with_id(id)
 
 
 class Ar(AtomImpl):
@@ -192,12 +246,18 @@ class Ar(AtomImpl):
     def clone(self) -> Ar:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ar:
+        return self._with_id(id)
+
 
 class K(AtomImpl):
     _atomic_number = 19
 
     def clone(self) -> K:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> K:
+        return self._with_id(id)
 
 
 class Ca(AtomImpl):
@@ -206,12 +266,18 @@ class Ca(AtomImpl):
     def clone(self) -> Ca:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ca:
+        return self._with_id(id)
+
 
 class Sc(AtomImpl):
     _atomic_number = 21
 
     def clone(self) -> Sc:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Sc:
+        return self._with_id(id)
 
 
 class Ti(AtomImpl):
@@ -220,12 +286,18 @@ class Ti(AtomImpl):
     def clone(self) -> Ti:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ti:
+        return self._with_id(id)
+
 
 class V(AtomImpl):
     _atomic_number = 23
 
     def clone(self) -> V:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> V:
+        return self._with_id(id)
 
 
 class Cr(AtomImpl):
@@ -234,12 +306,18 @@ class Cr(AtomImpl):
     def clone(self) -> Cr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Cr:
+        return self._with_id(id)
+
 
 class Mn(AtomImpl):
     _atomic_number = 25
 
     def clone(self) -> Mn:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Mn:
+        return self._with_id(id)
 
 
 class Fe(AtomImpl):
@@ -248,12 +326,18 @@ class Fe(AtomImpl):
     def clone(self) -> Fe:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Fe:
+        return self._with_id(id)
+
 
 class Co(AtomImpl):
     _atomic_number = 27
 
     def clone(self) -> Co:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Co:
+        return self._with_id(id)
 
 
 class Ni(AtomImpl):
@@ -262,12 +346,18 @@ class Ni(AtomImpl):
     def clone(self) -> Ni:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ni:
+        return self._with_id(id)
+
 
 class Cu(AtomImpl):
     _atomic_number = 29
 
     def clone(self) -> Cu:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Cu:
+        return self._with_id(id)
 
 
 class Zn(AtomImpl):
@@ -276,12 +366,18 @@ class Zn(AtomImpl):
     def clone(self) -> Zn:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Zn:
+        return self._with_id(id)
+
 
 class Ga(AtomImpl):
     _atomic_number = 31
 
     def clone(self) -> Ga:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Ga:
+        return self._with_id(id)
 
 
 class Ge(AtomImpl):
@@ -290,12 +386,18 @@ class Ge(AtomImpl):
     def clone(self) -> Ge:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ge:
+        return self._with_id(id)
+
 
 class As(AtomImpl):
     _atomic_number = 33
 
     def clone(self) -> As:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> As:
+        return self._with_id(id)
 
 
 class Se(AtomImpl):
@@ -304,12 +406,18 @@ class Se(AtomImpl):
     def clone(self) -> Se:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Se:
+        return self._with_id(id)
+
 
 class Br(AtomImpl):
     _atomic_number = 35
 
     def clone(self) -> Br:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Br:
+        return self._with_id(id)
 
 
 class Kr(AtomImpl):
@@ -318,12 +426,18 @@ class Kr(AtomImpl):
     def clone(self) -> Kr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Kr:
+        return self._with_id(id)
+
 
 class Rb(AtomImpl):
     _atomic_number = 37
 
     def clone(self) -> Rb:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Rb:
+        return self._with_id(id)
 
 
 class Sr(AtomImpl):
@@ -332,12 +446,18 @@ class Sr(AtomImpl):
     def clone(self) -> Sr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Sr:
+        return self._with_id(id)
+
 
 class Y(AtomImpl):
     _atomic_number = 39
 
     def clone(self) -> Y:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Y:
+        return self._with_id(id)
 
 
 class Zr(AtomImpl):
@@ -346,12 +466,18 @@ class Zr(AtomImpl):
     def clone(self) -> Zr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Zr:
+        return self._with_id(id)
+
 
 class Nb(AtomImpl):
     _atomic_number = 41
 
     def clone(self) -> Nb:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Nb:
+        return self._with_id(id)
 
 
 class Mo(AtomImpl):
@@ -360,12 +486,18 @@ class Mo(AtomImpl):
     def clone(self) -> Mo:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Mo:
+        return self._with_id(id)
+
 
 class Tc(AtomImpl):
     _atomic_number = 43
 
     def clone(self) -> Tc:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Tc:
+        return self._with_id(id)
 
 
 class Ru(AtomImpl):
@@ -374,12 +506,18 @@ class Ru(AtomImpl):
     def clone(self) -> Ru:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ru:
+        return self._with_id(id)
+
 
 class Rh(AtomImpl):
     _atomic_number = 45
 
     def clone(self) -> Rh:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Rh:
+        return self._with_id(id)
 
 
 class Pd(AtomImpl):
@@ -388,12 +526,18 @@ class Pd(AtomImpl):
     def clone(self) -> Pd:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Pd:
+        return self._with_id(id)
+
 
 class Ag(AtomImpl):
     _atomic_number = 47
 
     def clone(self) -> Ag:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Ag:
+        return self._with_id(id)
 
 
 class Cd(AtomImpl):
@@ -402,12 +546,18 @@ class Cd(AtomImpl):
     def clone(self) -> Cd:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Cd:
+        return self._with_id(id)
+
 
 class In(AtomImpl):
     _atomic_number = 49
 
     def clone(self) -> In:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> In:
+        return self._with_id(id)
 
 
 class Sn(AtomImpl):
@@ -416,6 +566,9 @@ class Sn(AtomImpl):
     def clone(self) -> Sn:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Sn:
+        return self._with_id(id)
+
 
 class Sb(AtomImpl):
     _atomic_number = 51
@@ -423,12 +576,18 @@ class Sb(AtomImpl):
     def clone(self) -> Sb:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Sb:
+        return self._with_id(id)
+
 
 class Te(AtomImpl):
     _atomic_number = 52
 
     def clone(self) -> Te:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Te:
+        return self._with_id(id)
 
 
 # "I" is a valid elemental symbol.
@@ -438,12 +597,18 @@ class I(AtomImpl):  # noqa
     def clone(self) -> I:  # noqa
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> I:
+        return self._with_id(id)
+
 
 class Xe(AtomImpl):
     _atomic_number = 54
 
     def clone(self) -> Xe:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Xe:
+        return self._with_id(id)
 
 
 class Cs(AtomImpl):
@@ -452,12 +617,18 @@ class Cs(AtomImpl):
     def clone(self) -> Cs:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Cs:
+        return self._with_id(id)
+
 
 class Ba(AtomImpl):
     _atomic_number = 56
 
     def clone(self) -> Ba:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Ba:
+        return self._with_id(id)
 
 
 class La(AtomImpl):
@@ -466,12 +637,18 @@ class La(AtomImpl):
     def clone(self) -> La:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> La:
+        return self._with_id(id)
+
 
 class Ce(AtomImpl):
     _atomic_number = 58
 
     def clone(self) -> Ce:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Ce:
+        return self._with_id(id)
 
 
 class Pr(AtomImpl):
@@ -480,12 +657,18 @@ class Pr(AtomImpl):
     def clone(self) -> Pr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Pr:
+        return self._with_id(id)
+
 
 class Nd(AtomImpl):
     _atomic_number = 60
 
     def clone(self) -> Nd:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Nd:
+        return self._with_id(id)
 
 
 class Pm(AtomImpl):
@@ -494,12 +677,18 @@ class Pm(AtomImpl):
     def clone(self) -> Pm:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Pm:
+        return self._with_id(id)
+
 
 class Sm(AtomImpl):
     _atomic_number = 62
 
     def clone(self) -> Sm:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Sm:
+        return self._with_id(id)
 
 
 class Eu(AtomImpl):
@@ -508,12 +697,18 @@ class Eu(AtomImpl):
     def clone(self) -> Eu:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Eu:
+        return self._with_id(id)
+
 
 class Gd(AtomImpl):
     _atomic_number = 64
 
     def clone(self) -> Gd:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Gd:
+        return self._with_id(id)
 
 
 class Tb(AtomImpl):
@@ -522,12 +717,18 @@ class Tb(AtomImpl):
     def clone(self) -> Tb:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Tb:
+        return self._with_id(id)
+
 
 class Dy(AtomImpl):
     _atomic_number = 66
 
     def clone(self) -> Dy:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Dy:
+        return self._with_id(id)
 
 
 class Ho(AtomImpl):
@@ -536,12 +737,18 @@ class Ho(AtomImpl):
     def clone(self) -> Ho:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ho:
+        return self._with_id(id)
+
 
 class Er(AtomImpl):
     _atomic_number = 68
 
     def clone(self) -> Er:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Er:
+        return self._with_id(id)
 
 
 class Tm(AtomImpl):
@@ -550,12 +757,18 @@ class Tm(AtomImpl):
     def clone(self) -> Tm:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Tm:
+        return self._with_id(id)
+
 
 class Yb(AtomImpl):
     _atomic_number = 70
 
     def clone(self) -> Yb:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Yb:
+        return self._with_id(id)
 
 
 class Lu(AtomImpl):
@@ -564,12 +777,18 @@ class Lu(AtomImpl):
     def clone(self) -> Lu:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Lu:
+        return self._with_id(id)
+
 
 class Hf(AtomImpl):
     _atomic_number = 72
 
     def clone(self) -> Hf:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Hf:
+        return self._with_id(id)
 
 
 class Ta(AtomImpl):
@@ -578,12 +797,18 @@ class Ta(AtomImpl):
     def clone(self) -> Ta:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ta:
+        return self._with_id(id)
+
 
 class W(AtomImpl):
     _atomic_number = 74
 
     def clone(self) -> W:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> W:
+        return self._with_id(id)
 
 
 class Re(AtomImpl):
@@ -592,12 +817,18 @@ class Re(AtomImpl):
     def clone(self) -> Re:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Re:
+        return self._with_id(id)
+
 
 class Os(AtomImpl):
     _atomic_number = 76
 
     def clone(self) -> Os:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Os:
+        return self._with_id(id)
 
 
 class Ir(AtomImpl):
@@ -606,12 +837,18 @@ class Ir(AtomImpl):
     def clone(self) -> Ir:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ir:
+        return self._with_id(id)
+
 
 class Pt(AtomImpl):
     _atomic_number = 78
 
     def clone(self) -> Pt:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Pt:
+        return self._with_id(id)
 
 
 class Au(AtomImpl):
@@ -620,12 +857,18 @@ class Au(AtomImpl):
     def clone(self) -> Au:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Au:
+        return self._with_id(id)
+
 
 class Hg(AtomImpl):
     _atomic_number = 80
 
     def clone(self) -> Hg:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Hg:
+        return self._with_id(id)
 
 
 class Tl(AtomImpl):
@@ -634,12 +877,18 @@ class Tl(AtomImpl):
     def clone(self) -> Tl:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Tl:
+        return self._with_id(id)
+
 
 class Pb(AtomImpl):
     _atomic_number = 82
 
     def clone(self) -> Pb:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Pb:
+        return self._with_id(id)
 
 
 class Bi(AtomImpl):
@@ -648,12 +897,18 @@ class Bi(AtomImpl):
     def clone(self) -> Bi:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Bi:
+        return self._with_id(id)
+
 
 class Po(AtomImpl):
     _atomic_number = 84
 
     def clone(self) -> Po:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Po:
+        return self._with_id(id)
 
 
 class At(AtomImpl):
@@ -662,12 +917,18 @@ class At(AtomImpl):
     def clone(self) -> At:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> At:
+        return self._with_id(id)
+
 
 class Rn(AtomImpl):
     _atomic_number = 86
 
     def clone(self) -> Rn:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Rn:
+        return self._with_id(id)
 
 
 class Fr(AtomImpl):
@@ -676,12 +937,18 @@ class Fr(AtomImpl):
     def clone(self) -> Fr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Fr:
+        return self._with_id(id)
+
 
 class Ra(AtomImpl):
     _atomic_number = 88
 
     def clone(self) -> Ra:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Ra:
+        return self._with_id(id)
 
 
 class Ac(AtomImpl):
@@ -690,12 +957,18 @@ class Ac(AtomImpl):
     def clone(self) -> Ac:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ac:
+        return self._with_id(id)
+
 
 class Th(AtomImpl):
     _atomic_number = 90
 
     def clone(self) -> Th:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Th:
+        return self._with_id(id)
 
 
 class Pa(AtomImpl):
@@ -704,12 +977,18 @@ class Pa(AtomImpl):
     def clone(self) -> Pa:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Pa:
+        return self._with_id(id)
+
 
 class U(AtomImpl):
     _atomic_number = 92
 
     def clone(self) -> U:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> U:
+        return self._with_id(id)
 
 
 class Np(AtomImpl):
@@ -718,12 +997,18 @@ class Np(AtomImpl):
     def clone(self) -> Np:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Np:
+        return self._with_id(id)
+
 
 class Pu(AtomImpl):
     _atomic_number = 94
 
     def clone(self) -> Pu:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Pu:
+        return self._with_id(id)
 
 
 class Am(AtomImpl):
@@ -732,12 +1017,18 @@ class Am(AtomImpl):
     def clone(self) -> Am:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Am:
+        return self._with_id(id)
+
 
 class Cm(AtomImpl):
     _atomic_number = 96
 
     def clone(self) -> Cm:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Cm:
+        return self._with_id(id)
 
 
 class Bk(AtomImpl):
@@ -746,12 +1037,18 @@ class Bk(AtomImpl):
     def clone(self) -> Bk:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Bk:
+        return self._with_id(id)
+
 
 class Cf(AtomImpl):
     _atomic_number = 98
 
     def clone(self) -> Cf:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Cf:
+        return self._with_id(id)
 
 
 class Es(AtomImpl):
@@ -760,12 +1057,18 @@ class Es(AtomImpl):
     def clone(self) -> Es:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Es:
+        return self._with_id(id)
+
 
 class Fm(AtomImpl):
     _atomic_number = 100
 
     def clone(self) -> Fm:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Fm:
+        return self._with_id(id)
 
 
 class Md(AtomImpl):
@@ -774,12 +1077,18 @@ class Md(AtomImpl):
     def clone(self) -> Md:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Md:
+        return self._with_id(id)
+
 
 class No(AtomImpl):
     _atomic_number = 102
 
     def clone(self) -> No:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> No:
+        return self._with_id(id)
 
 
 class Lr(AtomImpl):
@@ -788,12 +1097,18 @@ class Lr(AtomImpl):
     def clone(self) -> Lr:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Lr:
+        return self._with_id(id)
+
 
 class Rf(AtomImpl):
     _atomic_number = 104
 
     def clone(self) -> Rf:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Rf:
+        return self._with_id(id)
 
 
 class Db(AtomImpl):
@@ -802,12 +1117,18 @@ class Db(AtomImpl):
     def clone(self) -> Db:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Db:
+        return self._with_id(id)
+
 
 class Sg(AtomImpl):
     _atomic_number = 106
 
     def clone(self) -> Sg:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Sg:
+        return self._with_id(id)
 
 
 class Bh(AtomImpl):
@@ -816,12 +1137,18 @@ class Bh(AtomImpl):
     def clone(self) -> Bh:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Bh:
+        return self._with_id(id)
+
 
 class Hs(AtomImpl):
     _atomic_number = 108
 
     def clone(self) -> Hs:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Hs:
+        return self._with_id(id)
 
 
 class Mt(AtomImpl):
@@ -830,12 +1157,18 @@ class Mt(AtomImpl):
     def clone(self) -> Mt:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Mt:
+        return self._with_id(id)
+
 
 class Ds(AtomImpl):
     _atomic_number = 110
 
     def clone(self) -> Ds:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Ds:
+        return self._with_id(id)
 
 
 class Rg(AtomImpl):
@@ -844,12 +1177,18 @@ class Rg(AtomImpl):
     def clone(self) -> Rg:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Rg:
+        return self._with_id(id)
+
 
 class Cn(AtomImpl):
     _atomic_number = 112
 
     def clone(self) -> Cn:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Cn:
+        return self._with_id(id)
 
 
 class Nh(AtomImpl):
@@ -858,12 +1197,18 @@ class Nh(AtomImpl):
     def clone(self) -> Nh:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Nh:
+        return self._with_id(id)
+
 
 class Fl(AtomImpl):
     _atomic_number = 114
 
     def clone(self) -> Fl:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Fl:
+        return self._with_id(id)
 
 
 class Mc(AtomImpl):
@@ -872,12 +1217,18 @@ class Mc(AtomImpl):
     def clone(self) -> Mc:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Mc:
+        return self._with_id(id)
+
 
 class Lv(AtomImpl):
     _atomic_number = 116
 
     def clone(self) -> Lv:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Lv:
+        return self._with_id(id)
 
 
 class Ts(AtomImpl):
@@ -886,9 +1237,15 @@ class Ts(AtomImpl):
     def clone(self) -> Ts:
         return type(self)(self._id, self._charge)
 
+    def with_id(self, id: int) -> Ts:
+        return self._with_id(id)
+
 
 class Og(AtomImpl):
     _atomic_number = 118
 
     def clone(self) -> Og:
         return type(self)(self._id, self._charge)
+
+    def with_id(self, id: int) -> Og:
+        return self._with_id(id)
