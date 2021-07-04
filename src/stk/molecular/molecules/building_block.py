@@ -809,7 +809,7 @@ class BuildingBlock(Molecule):
 
     def get_functional_groups(
         self,
-        fg_ids: Optional[Union[int, Iterable[int]] = None,
+        fg_ids: Optional[Union[int, Iterable[int]]] = None,
     ) -> Iterable[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
