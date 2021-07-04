@@ -542,7 +542,7 @@ class BuildingBlock(Molecule):
         Initialize from an :mod:`rdkit` molecule.
 
         Parameters:
-            molecule:
+            molecule: :class:`rdkit.Mol`
                 The molecule.
 
             functional_groups:
