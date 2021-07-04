@@ -220,7 +220,7 @@ class BuildingBlock(Molecule):
     def init_from_vabene_molecule(
         cls,
         molecule,
-        functional_groups=(),
+        functional_groups: FunctionalGroups = (),
         placer_ids=None,
         position_matrix=None,
     ):
