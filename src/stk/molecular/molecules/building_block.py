@@ -879,11 +879,12 @@ class BuildingBlock(Molecule):
         functional group, as well as any atoms in a functional group,
         specifically labelled as core atoms.
 
+        See Also:
+            :meth:`.FunctionalGroup.get_core_atom_ids`
+
         Yields:
             The id of a core atom.
 
-        See Also:
-            :meth:`.FunctionalGroup.get_core_atom_ids`
 
         """
 
