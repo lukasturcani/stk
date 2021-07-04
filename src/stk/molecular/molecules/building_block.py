@@ -24,14 +24,6 @@ from ...utilities import remake, flatten
 
 logger = logging.getLogger(__name__)
 
-AtomPosition = tuple[float, float, float]
-
-FunctionalGroups = Union[
-    FunctionalGroup,
-    FunctionalGroupFactory,
-    Iterable[Union[FunctionalGroup, FunctionalGroupFactory]],
-]
-
 
 class BuildingBlock(Molecule):
     """
@@ -70,10 +62,10 @@ class BuildingBlock(Molecule):
 
     def __init__(
         self,
-        smiles: str,
-        functional_groups: FunctionalGroups = (),
-        placer_ids: Optional[tuple[int, ...]] = None,
-        position_matrix: Optional[tuple[AtomPosition, ...]] = None,
+        smiles,
+        functional_groups=(),
+        placer_ids=None,
+        position_matrix=None,
     ) -> None:
         """
         Initialize a :class:`.BuildingBlock`.
