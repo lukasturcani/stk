@@ -24,6 +24,8 @@ from ...utilities import remake, flatten
 
 logger = logging.getLogger(__name__)
 
+AtomPosition = tuple[float, float, float]
+
 
 class BuildingBlock(Molecule):
     """
