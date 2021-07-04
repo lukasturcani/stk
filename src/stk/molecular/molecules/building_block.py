@@ -26,12 +26,6 @@ logger = logging.getLogger(__name__)
 
 AtomPosition = tuple[float, float, float]
 
-FunctionalGroups = Union[
-    FunctionalGroup,
-    FunctionalGroupFactory,
-    Iterable[Union[FunctionalGroup, FunctionalGroupFactory]],
-]
-
 
 class BuildingBlock(Molecule):
     """
