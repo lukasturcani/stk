@@ -861,11 +861,11 @@ class BuildingBlock(Molecule):
         *Placer* atoms are those, which should be used to calculate
         the position of the building block.
 
-        Yields:
-            The id of a *placer* atom.
-
         See Also:
             :meth:`.FunctionalGroup.get_placer_ids`
+
+        Yields:
+            The id of a *placer* atom.
 
         """
 
