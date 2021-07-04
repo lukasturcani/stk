@@ -8,7 +8,7 @@ Building Block
 from __future__ import annotations
 
 
-from typing import Iterable, Union, Optional, TypeVar
+from typing import Iterable, Union, Optional, TypeVar, Callable
 import logging
 import os
 import rdkit.Chem.AllChem as rdkit
@@ -41,9 +41,11 @@ class BuildingBlock(Molecule):
 
     """
 
+    _functional_groups: tuple[FunctionalGroup, ...]
+
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
-    _init_funcs = {
+    _init_funcs: dict[str, Callable[[str], rdkit.Mol]] = {
         '.mol': partial(
             rdkit.MolFromMolFile,
             sanitize=False,
@@ -331,14 +333,12 @@ class BuildingBlock(Molecule):
                     'failed.'
                 )
         else:
-            # Make sure the position matrix always holds floats.
-            position_matrix = np.array(
-                position_matrix,
-                dtype=np.float64,
-            )
             conformer = rdkit.Conformer(rdkit_molecule.GetNumAtoms())
             for atom_id, position in enumerate(position_matrix):
-                conformer.SetAtomPosition(atom_id, position)
+                conformer.SetAtomPosition(
+                    atom_id,
+                    np.array(position, dtype=np.float64),
+                )
             rdkit_molecule.AddConformer(conformer)
 
         rdkit.Kekulize(rdkit_molecule)
@@ -595,7 +595,7 @@ class BuildingBlock(Molecule):
                     FunctionalGroupFactory,
                 ]],
             ],
-        placer_ids: tuple[int, ...],
+        placer_ids: Optional[tuple[int, ...]],
     ) -> None:
         """
         Initialize from an :mod:`rdkit` molecule.
@@ -666,7 +666,7 @@ class BuildingBlock(Molecule):
     def _normalize_placer_ids(
         self,
         placer_ids: Optional[tuple[int, ...]],
-        functional_groups: tuple[FunctionalGroup],
+        functional_groups: tuple[FunctionalGroup, ...],
     ) -> tuple[int, ...]:
         """
         Get the final *placer* ids.
@@ -709,10 +709,14 @@ class BuildingBlock(Molecule):
     def _extract_functional_groups(
         self,
         functional_groups:
-            Iterable[Union[
+            Union[
                 FunctionalGroup,
                 FunctionalGroupFactory,
-            ]],
+                Iterable[Union[
+                    FunctionalGroup,
+                    FunctionalGroupFactory,
+                ]],
+            ],
     ) -> Iterable[FunctionalGroup]:
         """
         Yield functional groups.
@@ -734,6 +738,10 @@ class BuildingBlock(Molecule):
             by a factory in `functional_groups`.
 
         """
+
+        non_iterable = (FunctionalGroup, FunctionalGroupFactory)
+        if isinstance(functional_groups, non_iterable):
+            functional_groups = (functional_groups, )
 
         for functional_group in functional_groups:
             if isinstance(functional_group, FunctionalGroup):

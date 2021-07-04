@@ -59,6 +59,16 @@ information.
 """
 
 
+from __future__ import annotations
+
+from typing import TypeVar
+
+from ...atoms import Atom
+
+
+_T = TypeVar('_T', bound='FunctionalGroup')
+
+
 class FunctionalGroup:
     """
     An abstract base class for functional groups.
@@ -257,7 +267,10 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._core_atoms)
 
-    def _with_atoms(self, atom_map):
+    def _with_atoms(
+        self: _T,
+        atom_map: dict[int, Atom],
+    ) -> _T:
         """
         Modify the functional group.
 
@@ -274,7 +287,7 @@ class FunctionalGroup:
         )
         return self
 
-    def with_atoms(self, atom_map):
+    def with_atoms(self, atom_map: dict[int, Atom]) -> FunctionalGroup:
         """
         Return a clone holding different atoms.
 
