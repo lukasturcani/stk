@@ -70,10 +70,10 @@ class BuildingBlock(Molecule):
 
     def __init__(
         self,
-        smiles,
-        functional_groups=(),
-        placer_ids=None,
-        position_matrix=None,
+        smiles: str,
+        functional_groups: FunctionalGroups = (),
+        placer_ids: Optional[tuple[int, ...]] = None,
+        position_matrix: Optional[tuple[AtomPosition, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.BuildingBlock`.
