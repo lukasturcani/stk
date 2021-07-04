@@ -115,10 +115,6 @@ class BuildingBlock(Molecule):
                 ``None``, :func:`rdkit.ETKDGv2` will be used to
                 calculate it.
 
-        Raises:
-
-            :class:`RuntimeError`: If embedding the molecule fails.
-
         """
 
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
