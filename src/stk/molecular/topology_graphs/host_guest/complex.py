@@ -179,7 +179,7 @@ class Complex(TopologyGraph):
 
             complex = stk.ConstructedMolecule(
                 topology_graph=stk.host_guest.Complex(
-                    host=host,
+                    host=stk.BuildingBlock.init_from_molecule(host),
                     guests=(guest1, guest2),
                 ),
             )
