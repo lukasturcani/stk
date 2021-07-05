@@ -150,11 +150,46 @@ class Complex(TopologyGraph):
                 ),
             )
 
+        You can also generate complexes with multiple guests.
+
+        .. testcode:: multi-guest-construction
+
+            import stk
+
+            host = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCC(Br)CBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                ),
+            )
+            guest1 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('c1ccccc1'),
+            )
+            guest2 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('C1CCCC1'),
+            )
+
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=host,
+                    guests=(guest1, guest2),
+                ),
+            )
+
         *Suggested Optimization*
 
         For :class:`.Complex` topologies, it is recommended to use the
         :class:`.Spinner` optimizer. It is also recommended that the
         building blocks are already optimized prior to construction.
+        This optimizer will work on multi-guest systems.
 
         .. testcode:: suggested-optimization
 
