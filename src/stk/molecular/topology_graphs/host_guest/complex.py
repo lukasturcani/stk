@@ -4,7 +4,9 @@ Host Guest Complex
 
 """
 
-from typing import Dict, Optional, Tuple, Iterable
+from __future__ import annotations
+
+from typing import Optional, Iterable
 
 from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
@@ -27,9 +29,9 @@ class Guest:
     def __init__(
         self,
         building_block: BuildingBlock,
-        start_vector: Tuple[float, float, float] = (1., 0., 0.),
-        end_vector: Tuple[float, float, float] = (1., 0., 0.),
-        displacement: Tuple[float, float, float] = (1., 0., 0.),
+        start_vector: tuple[float, float, float] = (1., 0., 0.),
+        end_vector: tuple[float, float, float] = (1., 0., 0.),
+        displacement: tuple[float, float, float] = (1., 0., 0.),
     ) -> None:
         """
         Initialize a :class:`.Guest` instance.
@@ -65,7 +67,7 @@ class Guest:
 
         return self._building_block
 
-    def get_start_vector(self) -> Tuple[float, float, float]:
+    def get_start_vector(self) -> tuple[float, float, float]:
         """
         Return the start vector.
 
@@ -76,7 +78,7 @@ class Guest:
 
         return self._start_vector
 
-    def get_end_vector(self) -> Tuple[float, float, float]:
+    def get_end_vector(self) -> tuple[float, float, float]:
         """
         Return the end vector.
 
@@ -87,7 +89,7 @@ class Guest:
 
         return self._end_vector
 
-    def get_displacement(self) -> Tuple[float, float, float]:
+    def get_displacement(self) -> tuple[float, float, float]:
         """
         Return the displacement.
 
@@ -230,9 +232,9 @@ class Complex(TopologyGraph):
         self,
         host: BuildingBlock,
         guest: Optional[BuildingBlock] = None,
-        guest_start: Optional[Tuple[float, float, float]] = None,
-        guest_target: Optional[Tuple[float, float, float]] = None,
-        displacement: Optional[Tuple[float, float, float]] = None,
+        guest_start: Optional[tuple[float, float, float]] = None,
+        guest_target: Optional[tuple[float, float, float]] = None,
+        displacement: Optional[tuple[float, float, float]] = None,
         guests: Optional[Iterable[Guest]] = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -337,7 +339,7 @@ class Complex(TopologyGraph):
         self,
         host: BuildingBlock,
         guests: Iterable[Guest],
-    ) -> Dict[BuildingBlock, Vertex]:
+    ) -> dict[BuildingBlock, Vertex]:
         if isinstance(guests, Guest):
             guests = (guests, )
 
@@ -361,10 +363,10 @@ class Complex(TopologyGraph):
         self,
         host: BuildingBlock,
         guest: BuildingBlock,
-        guest_start: Tuple[float, float, float],
-        guest_target: Tuple[float, float, float],
-        displacement: Tuple[float, float, float],
-    ) -> Dict[BuildingBlock, Vertex]:
+        guest_start: tuple[float, float, float],
+        guest_target: tuple[float, float, float],
+        displacement: tuple[float, float, float],
+    ) -> dict[BuildingBlock, Vertex]:
 
         num_nones = sum(
             1 for vector in (guest_start, guest_target)
@@ -396,7 +398,7 @@ class Complex(TopologyGraph):
 
         return building_block_vertices
 
-    def clone(self) -> 'Complex':
+    def clone(self) -> Complex:
         clone = super().clone()
         return clone
 
@@ -408,7 +410,7 @@ class Complex(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: Dict[BuildingBlock, Vertex],
+        building_block_vertices: dict[BuildingBlock, Vertex],
     ) -> float:
         return 1.
 
