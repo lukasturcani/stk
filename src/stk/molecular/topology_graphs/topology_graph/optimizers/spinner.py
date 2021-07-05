@@ -61,9 +61,8 @@ class Spinner(Optimizer):
         This code is entirely nonphysical and is, therefore, completely
         general to any chemistry.
 
-    References
-    ----------
-    .. [1] https://github.com/andrewtarzia/SpinDry
+    References:
+        .. [1] https://github.com/andrewtarzia/SpinDry
 
     """
 
@@ -93,12 +92,12 @@ class Spinner(Optimizer):
             max_attempts: Maximum number of MC moves to try to generate
                 conformers.
 
-            nonbond_epsilon: Value of epsilon used in the nonbond
+            nonbond_epsilon: Value of epsilon used in the nonbonded
                 potential in MC moves. Determines strength of the
-                nonbond potential.
+                nonbonded potential.
 
-            nonbond_sigma: Value of sigma used in the nonbond potential
-                in MC moves.
+            nonbond_sigma: Value of sigma used in the nonbonded
+                potential in MC moves.
 
             beta: Value of beta used in the in MC moves. Beta takes the
                 place of the inverse boltzmann temperature.
@@ -119,7 +118,6 @@ class Spinner(Optimizer):
         )
 
     def optimize(self, state: ConstructionState) -> ConstructionState:
-        # Define SpinDry supramolecule to optimize.
         supramolecule = spd.SupraMolecule(
             atoms=(
                 spd.Atom(
@@ -139,7 +137,6 @@ class Spinner(Optimizer):
             position_matrix=state.get_position_matrix(),
         )
 
-        # Run optimization.
         conformer = self._optimizer.get_final_conformer(supramolecule)
         return state.with_position_matrix(
             position_matrix=conformer.get_position_matrix(),
