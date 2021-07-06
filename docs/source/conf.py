@@ -18,41 +18,7 @@
 # is relative to the documentation root, use os.path.abspath to make
 # it absolute, like shown here.
 
-import sys
 import types
-from unittest.mock import MagicMock
-import os
-
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-
-MOCK_MODULES = [
-    'rdkit',
-    'rdkit.Chem',
-    'rdkit.Chem.AllChem',
-    'rdkit.Geometry',
-    'numpy',
-    'numpy.linalg',
-    'scipy',
-    'scipy.spatial',
-    'scipy.spatial.distance',
-    'scipy.spatial.transform',
-    'scipy.optimize',
-    'scipy.sparse',
-    'scipy.constants',
-    'matplotlib',
-    'matplotlib.pyplot',
-    'pandas',
-    'pathos',
-    'seaborn',
-]
-
-if os.environ.get('MOCK_MODULES', 'TRUE') != 'FALSE':
-    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration --------------------------------------------
 
