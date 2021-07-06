@@ -8,3 +8,8 @@ sphinx:
 
 conda:
     environment: tests/docker/environment.yml
+
+python:
+    install:
+        - method: pip
+          path: .
