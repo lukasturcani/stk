@@ -8,10 +8,3 @@ sphinx:
 
 conda:
     environment: tests/docker/environment.yml
-
-python:
-    version: 3.9
-    install:
-        - requirements: docs/requirements.txt
-        - method: pip
-          path: .
