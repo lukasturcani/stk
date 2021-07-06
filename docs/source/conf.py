@@ -67,6 +67,7 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
+    'sphinx_autodoc_typehints',
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'numpydoc',
@@ -93,6 +94,7 @@ def setup(app):
 
 add_module_names = False
 numpydoc_class_members_toctree = False
+autodoc_typehints = 'description'
 
 
 # Add any paths that contain templates here, relative to this
