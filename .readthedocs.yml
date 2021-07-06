@@ -6,6 +6,9 @@ build:
 sphinx:
     configuration: docs/source/conf.py
 
+conda:
+    environment: tests/docker/environment.yml
+
 python:
     version: 3.9
     install:
