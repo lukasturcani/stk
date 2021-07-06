@@ -74,6 +74,7 @@ dependencies:
   - sqlite=3.35.5=h74cdb3f_0
   - tk=8.6.10=h21135ba_1
   - tornado=6.1=py39h3811e60_1
+  - typing_extensions=3.10.0.0=pyha770c72_0
   - tzdata=2021a=he74cb21_0
   - wheel=0.36.2=pyhd3deb0d_0
   - xorg-kbproto=1.0.7=h7f98852_1002
@@ -137,5 +138,5 @@ dependencies:
     - sphinxcontrib-serializinghtml==1.1.5
     - spindry==0.0.3
     - toml==0.10.2
-    - typing-extensions==3.10.0.0
     - urllib3==1.26.6
+    - vabene==0.0.5
