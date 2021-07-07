@@ -4,12 +4,15 @@ Building Block
 
 """
 
+from __future__ import annotations
+
 
 import logging
 import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
+from typing import Optional, Iterable
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -741,21 +744,23 @@ class BuildingBlock(Molecule):
 
         return len(self._functional_groups)
 
-    def get_functional_groups(self, fg_ids=None):
+    def get_functional_groups(
+        self,
+        fg_ids: Optional[Iterable[int]] = None,
+    ) -> Iterable[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
 
-        Parameters
-        ----------
-        fg_ids : :class:`iterable` of :class:`int`, optional
-            The ids of functional groups yielded. If ``None``, then
-            all functional groups are yielded. Can be a single
-            :class:`int`, if a single functional group is
-            desired.
+        Parameters:
 
-        Yields
-        ------
-        :class:`.FunctionalGroup`
+            fg_ids:
+                The ids of functional groups yielded. If ``None``, then
+                all functional groups are yielded. Can be a single
+                :class:`int`, if a single functional group is
+                desired.
+
+        Yields:
+
             A functional group of the building block.
 
         """

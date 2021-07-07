@@ -4,7 +4,12 @@ Bond Batch
 
 """
 
-from ......bonds import BondInfo
+from __future__ import annotations
+
+from typing import Iterable
+
+from ......bonds import Bond, BondInfo
+from ......molecules import BuildingBlock
 
 
 class _BondBatch:
@@ -15,67 +20,68 @@ class _BondBatch:
 
     __slots__ = ['_bonds', '_bond_infos']
 
+    _bonds: list[Bond]
+    _bond_infos: list[BondInfo]
+
     def __init__(
         self,
-        bonds,
-        atom_map,
-        building_block,
-        building_block_id,
-    ):
+        bonds: Iterable[Bond],
+        id_map: dict[int, int],
+        building_block: BuildingBlock,
+        building_block_id: int,
+    ) -> None:
         """
         Initialize a :class:`.BondBatch` instance.
 
-        Parameters
-        ----------
-        bonds : :class:`iterable` of :class:`.Bond`
-            The bonds, which should be added to the batch.
+        Parameters:
 
-        atom_map : :class:`dict`
-            Maps the ids of atoms held by `bonds`, to the new atoms,
-            which the bonds in the :class:`.BondBatchData` instance
-            should hold.
+            bonds:
+                The bonds, which should be added to the batch.
 
-        building_block : :class:`.BuildingBlock`
-            The building block from which the bonds originate.
+            id_map:
+                Maps the ids of atoms held by `bonds`, to the new
+                atoms, which the bonds in the :class:`.BondBatch`
+                instance should hold.
 
-        building_block_id : :class:`.int`
-            An id, unique to that building block and placement.
+            building_block:
+                The building block from which the bonds originate.
+
+            building_block_id:
+                An id, unique to that building block and placement.
 
         """
 
-        self._bonds = _bonds = []
-        self._bond_infos = bond_infos = []
+        self._bonds = []
+        self._bond_infos = []
 
         for bond in bonds:
-            _bonds.append(bond.with_atoms(atom_map))
-            bond_infos.append(
+            self._bonds.append(bond.with_ids(id_map))
+            self._bond_infos.append(
                 BondInfo(
-                    bond=_bonds[-1],
+                    bond=self._bonds[-1],
                     building_block=building_block,
                     building_block_id=building_block_id,
                 )
             )
 
-    def get_bonds(self):
+    def get_bonds(self) -> Iterable[Bond]:
         """
         Yield the bonds in the batch.
 
-        Yields
-        ------
-        :class:`.Bond`
+        Yields:
+
             A bond in the batch.
 
         """
 
         yield from self._bonds
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> Iterable[BondInfo]:
         """
         Yield info about the bonds in the batch.
 
-        Yields
-        ------
-        :class:`.BondInfo`
+        Yields:
+
             Info about a bond in the batch.
 
         """
