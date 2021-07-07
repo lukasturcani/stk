@@ -59,6 +59,9 @@ information.
 """
 
 
+from __future__ import annotations
+
+
 class FunctionalGroup:
     """
     An abstract base class for functional groups.
@@ -295,6 +298,53 @@ class FunctionalGroup:
         """
 
         return self.clone()._with_atoms(atom_map)
+
+    def _with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
+        self._atoms = tuple(
+            atom.with_id(
+                id=id_map.get(
+                    atom.get_id(),
+                    atom.get_id(),
+                ),
+            ) for atom in self._atoms
+        )
+        self._placers = tuple(
+            atom.with_id(
+                id=id_map.get(
+                    atom.get_id(),
+                    atom.get_id(),
+                ),
+            ) for atom in self._placers
+        )
+        self._core_atoms = tuple(
+            atom.with_id(
+                id=id_map.get(
+                    atom.get_id(),
+                    atom.get_id(),
+                ),
+            ) for atom in self._core_atoms
+        )
+        return self
+
+    def with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
+        """
+        Return a clone holding different atom ids.
+
+        Parameters:
+
+            id_map:
+                Maps the id of an atom in the functional group to the
+                new id the clone should hold. If the id of an atom in
+                the functional group is not found in `id_map`, the
+                atom will not be replaced in the clone.
+
+        Returns:
+
+            The clone.
+
+        """
+
+        return self.clone()._with_ids(id_map)
 
     def clone(self):
         """
