@@ -7,7 +7,7 @@ from ...utilities import is_clone_functional_group
 
 
 def test_with_ids(
-    functional_group: stk.FunctionalGroup,
+    generic_functional_group: stk.FunctionalGroup,
     get_id_map: Callable[[stk.FunctionalGroup], dict[int, int]],
 ) -> None:
     """
@@ -28,9 +28,9 @@ def test_with_ids(
 
     # Save a clone to ensure that "functional_group" is not changed by
     # the test, because it should be immutable.
-    before = functional_group.clone()
-    _test_with_atoms(functional_group, get_id_map)
-    is_clone_functional_group(before, functional_group)
+    before = generic_functional_group.clone()
+    _test_with_atoms(generic_functional_group, get_id_map)
+    is_clone_functional_group(before, generic_functional_group)
 
 
 def _test_with_atoms(
@@ -59,6 +59,16 @@ def _test_with_atoms(
     is_modified_id_sequence(
         original_ids=functional_group.get_atom_ids(),
         modified_ids=clone.get_atom_ids(),
+        id_map=id_map,
+    )
+    is_modified_id_sequence(
+        original_ids=functional_group.get_bonder_ids(),
+        modified_ids=clone.get_bonder_ids(),
+        id_map=id_map,
+    )
+    is_modified_id_sequence(
+        original_ids=functional_group.get_deleter_ids(),
+        modified_ids=clone.get_deleter_ids(),
         id_map=id_map,
     )
     is_modified_id_sequence(
