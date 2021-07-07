@@ -4,7 +4,15 @@ Generic Functional Group
 
 """
 
+
+from __future__ import annotations
+
+from typing import TypeVar
+
 from .functional_group import FunctionalGroup
+
+
+_T = TypeVar('_T', bound='GenericFunctionalGroup')
 
 
 class GenericFunctionalGroup(FunctionalGroup):
@@ -67,6 +75,26 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         self._deleters = tuple(
             atom_map.get(a.get_id(), a) for a in self._deleters
+        )
+        return self
+
+    def _with_ids(self: _T, id_map: dict[int, int]) -> _T:
+        super()._with_ids(id_map)
+        self._bonders = tuple(
+            bonder.with_id(
+                id=id_map.get(
+                    bonder.get_id(),
+                    bonder.get_id(),
+                )
+            ) for bonder in self._bonders
+        )
+        self._deleters = tuple(
+            deleter.with_id(
+                id=id_map.get(
+                    deleter.get_id(),
+                    deleter.get_id(),
+                ),
+            ) for deleter in self._deleters
         )
         return self
 
