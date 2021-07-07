@@ -20,10 +20,21 @@ def get_id_map_0(
     return dict(zip(functional_group.get_atom_ids(), ids))
 
 
+def get_id_map_1(
+    functional_group: stk.FunctionalGroup,
+) -> dict[int, int]:
+
+    new_id = max(functional_group.get_atom_ids()) + 1
+    num_atoms = sum(1 for _ in functional_group.get_atoms())
+    ids = range(new_id, new_id+num_atoms)
+    return dict(zip(functional_group.get_atom_ids(), ids))
+
+
 @pytest.fixture(
     params=[
         lambda functional_group: {},
         get_id_map_0,
+        get_id_map_1,
     ],
 )
 def get_id_map(

@@ -1,7 +1,7 @@
 import itertools as it
 import stk
 
-from typing import Callable
+from typing import Callable, Iterable
 
 from ...utilities import is_clone_functional_group
 
@@ -57,25 +57,34 @@ def _test_with_atoms(
     clone = functional_group.with_ids(id_map)
 
     is_modified_id_sequence(
-        ids1=functional_group.get_atom_ids(),
-        ids2=clone.get_atom_ids(),
+        original_ids=functional_group.get_atom_ids(),
+        modified_ids=clone.get_atom_ids(),
         id_map=id_map,
     )
     is_modified_id_sequence(
-        ids1=functional_group.get_placer_ids(),
-        ids2=clone.get_placer_ids(),
+        original_ids=functional_group.get_placer_ids(),
+        modified_ids=clone.get_placer_ids(),
         id_map=id_map,
     )
     is_modified_id_sequence(
-        ids1=functional_group.get_core_atom_ids(),
-        ids2=clone.get_core_atom_ids(),
+        original_ids=functional_group.get_core_atom_ids(),
+        modified_ids=clone.get_core_atom_ids(),
         id_map=id_map,
     )
 
 
-def is_modified_id_sequence(ids1, ids2, id_map):
-    for id1, id2 in it.zip_longest(ids1, ids2):
-        if id1 in id_map:
-            assert id2 == id_map[id1]
+def is_modified_id_sequence(
+    original_ids: Iterable[int],
+    modified_ids: Iterable[int],
+    id_map: dict[int, int],
+) -> None:
+
+    for original_id, modified_id in it.zip_longest(
+        original_ids,
+        modified_ids,
+    ):
+        breakpoint()
+        if original_id in id_map:
+            assert modified_id == id_map[original_id]
         else:
-            assert id2 == id1
+            assert original_id == modified_id
