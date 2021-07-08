@@ -654,7 +654,7 @@ The final version of our code is
         )
         building_block.with_position_matrix(
             position_matrix=get_position_matrix(building_block),
-        )
+        ).write(path)
 
 
     def main():
