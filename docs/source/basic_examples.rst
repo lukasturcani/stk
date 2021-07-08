@@ -331,7 +331,7 @@ This works with any :class:`.Molecule`, including both the
         smiles='ICCBr',
         functional_groups=[stk.BromoFactory(), stk.IodoFactory()],
     )
-    bb.write('bb.mol')
+    stk.MolWriter().write(bb, 'bb.mol')
 
 .. testcode:: writing-molecular-files
     :hide:
@@ -347,7 +347,7 @@ and the :class:`.ConstructedMolecule`
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear((bb, ), 'A', 10),
     )
-    polymer.write('polymer.mol')
+    stk.MolWriter().write(polymer, 'polymer.mol')
 
 
 .. testcode:: writing-molecular-files
