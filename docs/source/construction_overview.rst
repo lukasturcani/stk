@@ -41,7 +41,7 @@ else, take for example the construction of a linear polymer
         )
     )
     # You can write the molecule to a file if you want to view it.
-    polymer.write('polymer.mol')
+    stk.MolWriter().write(polymer, 'polymer.mol')
 
 .. testcode:: introduction
     :hide:

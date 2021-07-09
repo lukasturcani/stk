@@ -71,13 +71,15 @@ you can write each molecule in each generation to a file
 .. code-block:: python
 
     # Go through 50 generations of the EA.
+    writer = stk.MolWriter()
     for i, generation in enumerate(ea.get_generations(50)):
         # Go through the molecules in the generation, and write them
         # to a file.
         for molecule_id, molecule_record in enumerate(
             generation.get_molecule_records()
         ):
-            molecule_record.get_molecule().write(
+            writer.write(
+                molecule=molecule_record.get_molecule(),
                 path=f'generation_{i}_molecule_{molecule_id}.mol',
             )
 
