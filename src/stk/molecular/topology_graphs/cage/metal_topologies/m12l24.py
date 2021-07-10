@@ -5,7 +5,7 @@ M12L24
 """
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex, _LinearCageVertex
+from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
 
 
@@ -33,47 +33,47 @@ class M12L24(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [1, 0, 0]),
-        _NonLinearCageVertex(1, [-1, 0, 0]),
-        _NonLinearCageVertex(2, [0, 1, 0]),
-        _NonLinearCageVertex(3, [0, -1, 0]),
-        _NonLinearCageVertex(4, [0.5, 0.5, 0.707]),
-        _NonLinearCageVertex(5, [0.5, -0.5, 0.707]),
-        _NonLinearCageVertex(6, [-0.5, 0.5, 0.707]),
-        _NonLinearCageVertex(7, [-0.5, -0.5, 0.707]),
-        _NonLinearCageVertex(8, [0.5, 0.5, -0.707]),
-        _NonLinearCageVertex(9, [0.5, -0.5, -0.707]),
-        _NonLinearCageVertex(10, [-0.5, 0.5, -0.707]),
-        _NonLinearCageVertex(11, [-0.5, -0.5, -0.707]),
+        NonLinearVertex(0, [1, 0, 0]),
+        NonLinearVertex(1, [-1, 0, 0]),
+        NonLinearVertex(2, [0, 1, 0]),
+        NonLinearVertex(3, [0, -1, 0]),
+        NonLinearVertex(4, [0.5, 0.5, 0.707]),
+        NonLinearVertex(5, [0.5, -0.5, 0.707]),
+        NonLinearVertex(6, [-0.5, 0.5, 0.707]),
+        NonLinearVertex(7, [-0.5, -0.5, 0.707]),
+        NonLinearVertex(8, [0.5, 0.5, -0.707]),
+        NonLinearVertex(9, [0.5, -0.5, -0.707]),
+        NonLinearVertex(10, [-0.5, 0.5, -0.707]),
+        NonLinearVertex(11, [-0.5, -0.5, -0.707]),
 
-        _LinearCageVertex(12, [0.9, 0.31, 0.31], False),
-        _LinearCageVertex(13, [0.9, 0.31, -0.31], False),
-        _LinearCageVertex(14, [0.9, -0.31, 0.31], False),
-        _LinearCageVertex(15, [0.9, -0.31, -0.31], False),
+        LinearVertex(12, [0.9, 0.31, 0.31], False),
+        LinearVertex(13, [0.9, 0.31, -0.31], False),
+        LinearVertex(14, [0.9, -0.31, 0.31], False),
+        LinearVertex(15, [0.9, -0.31, -0.31], False),
 
-        _LinearCageVertex(16, [-0.9, 0.31, 0.31], False),
-        _LinearCageVertex(17, [-0.9, 0.31, -0.31], False),
-        _LinearCageVertex(18, [-0.9, -0.31, 0.31], False),
-        _LinearCageVertex(19, [-0.9, -0.31, -0.31], False),
+        LinearVertex(16, [-0.9, 0.31, 0.31], False),
+        LinearVertex(17, [-0.9, 0.31, -0.31], False),
+        LinearVertex(18, [-0.9, -0.31, 0.31], False),
+        LinearVertex(19, [-0.9, -0.31, -0.31], False),
 
-        _LinearCageVertex(20, [0.31, 0.9, 0.31], False),
-        _LinearCageVertex(21, [0.31, 0.9, -0.31], False),
-        _LinearCageVertex(22, [-0.31, 0.9, 0.31], False),
-        _LinearCageVertex(23, [-0.31, 0.9, -0.31], False),
+        LinearVertex(20, [0.31, 0.9, 0.31], False),
+        LinearVertex(21, [0.31, 0.9, -0.31], False),
+        LinearVertex(22, [-0.31, 0.9, 0.31], False),
+        LinearVertex(23, [-0.31, 0.9, -0.31], False),
 
-        _LinearCageVertex(24, [0.31, -0.9, 0.31], False),
-        _LinearCageVertex(25, [0.31, -0.9, -0.31], False),
-        _LinearCageVertex(26, [-0.31, -0.9, 0.31], False),
-        _LinearCageVertex(27, [-0.31, -0.9, -0.31], False),
+        LinearVertex(24, [0.31, -0.9, 0.31], False),
+        LinearVertex(25, [0.31, -0.9, -0.31], False),
+        LinearVertex(26, [-0.31, -0.9, 0.31], False),
+        LinearVertex(27, [-0.31, -0.9, -0.31], False),
 
-        _LinearCageVertex(28, [0.58, 0, 0.82], False),
-        _LinearCageVertex(29, [-0.58, 0, 0.82], False),
-        _LinearCageVertex(30, [0, 0.58, 0.82], False),
-        _LinearCageVertex(31, [0, -0.58, 0.82], False),
-        _LinearCageVertex(32, [0.58, 0, -0.82], False),
-        _LinearCageVertex(33, [-0.58, 0, -0.82], False),
-        _LinearCageVertex(34, [0, 0.58, -0.82], False),
-        _LinearCageVertex(35, [0, -0.58, -0.82], False),
+        LinearVertex(28, [0.58, 0, 0.82], False),
+        LinearVertex(29, [-0.58, 0, 0.82], False),
+        LinearVertex(30, [0, 0.58, 0.82], False),
+        LinearVertex(31, [0, -0.58, 0.82], False),
+        LinearVertex(32, [0.58, 0, -0.82], False),
+        LinearVertex(33, [-0.58, 0, -0.82], False),
+        LinearVertex(34, [0, 0.58, -0.82], False),
+        LinearVertex(35, [0, -0.58, -0.82], False),
     )
 
     _edge_prototypes = (

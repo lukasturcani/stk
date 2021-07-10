@@ -5,7 +5,7 @@ Six Plus Eight
 """
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex
+from ..vertices import NonLinearVertex
 from ...topology_graph import Edge
 
 
@@ -31,18 +31,18 @@ class SixPlusEight(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [-_x, _x, 0]),
-        _NonLinearCageVertex(1, [-_x, -_x, 0]),
-        _NonLinearCageVertex(2, [_x, _x, 0]),
-        _NonLinearCageVertex(3, [_x, -_x, 0]),
+        NonLinearVertex(0, [-_x, _x, 0]),
+        NonLinearVertex(1, [-_x, -_x, 0]),
+        NonLinearVertex(2, [_x, _x, 0]),
+        NonLinearVertex(3, [_x, -_x, 0]),
 
-        _NonLinearCageVertex(4, [0, 0, _x]),
-        _NonLinearCageVertex(5, [0, 0, -_x]),
+        NonLinearVertex(4, [0, 0, _x]),
+        NonLinearVertex(5, [0, 0, -_x]),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=6,
             vertices=(
                 _vertex_prototypes[0],
@@ -51,7 +51,7 @@ class SixPlusEight(Cage):
             ),
 
         ),
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=7,
             vertices=(
                 _vertex_prototypes[1],
@@ -59,7 +59,7 @@ class SixPlusEight(Cage):
                 _vertex_prototypes[3]
             ),
         ),
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=8,
             vertices=(
                 _vertex_prototypes[4],
@@ -67,7 +67,7 @@ class SixPlusEight(Cage):
                 _vertex_prototypes[2]
             ),
         ),
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=9,
             vertices=(
                 _vertex_prototypes[4],
@@ -76,7 +76,7 @@ class SixPlusEight(Cage):
             ),
         ),
 
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=10,
             vertices=(
                 _vertex_prototypes[0],
@@ -84,7 +84,7 @@ class SixPlusEight(Cage):
                 _vertex_prototypes[1]
             ),
         ),
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=11,
             vertices=(
                 _vertex_prototypes[5],
@@ -92,7 +92,7 @@ class SixPlusEight(Cage):
                 _vertex_prototypes[3]
             ),
         ),
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=12,
             vertices=(
                 _vertex_prototypes[3],
@@ -100,7 +100,7 @@ class SixPlusEight(Cage):
                 _vertex_prototypes[2]
             ),
         ),
-        _NonLinearCageVertex.init_at_center(
+        NonLinearVertex.init_at_center(
             id=13,
             vertices=(
                 _vertex_prototypes[2],

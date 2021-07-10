@@ -4,8 +4,6 @@ import stk
 from .utilities import get_centroid, get_closest_point, get_edges
 from ....case_data import CaseData
 
-vertices = stk.polymer.linear
-
 
 @pytest.fixture
 def head_1(position, flip, building_block_1):
@@ -20,7 +18,7 @@ def head_1(position, flip, building_block_1):
             point=get_centroid(building_block),
         )
 
-    vertex = vertices._HeadVertex(0, position, flip)
+    vertex = stk.polymer.linear.HeadVertex(0, position, flip)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1], ),

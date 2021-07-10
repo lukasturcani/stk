@@ -10,7 +10,7 @@ import numpy as np
 from ..topology_graph import Vertex
 
 
-class _HostVertex(Vertex):
+class HostVertex(Vertex):
     """
     Places the host in a :class:`.Complex`.
 
@@ -26,7 +26,7 @@ class _HostVertex(Vertex):
         return {}
 
 
-class _GuestVertex(Vertex):
+class GuestVertex(Vertex):
     """
     Places the guest in a :class:`.Complex`.
 
@@ -34,7 +34,7 @@ class _GuestVertex(Vertex):
 
     def __init__(self, id, position, start, target):
         """
-        Initialize a :class:`._GuestVertex` instance.
+        Initialize a :class:`.GuestVertex` instance.
 
         Parameters
         ----------

@@ -38,8 +38,8 @@ from ..topology_graph import (
     EdgeGroup,
     PeriodicConstructionResult,
 )
-from .vertices import _UnaligningVertex
-from .edge import _CofEdge
+from .vertices import UnaligningVertex
+from .edge import CofEdge
 from ...reactions import GenericReactionFactory
 
 
@@ -415,7 +415,7 @@ class Cof(TopologyGraph):
             # must therefore use an UnaligningVertex.
             if len(set(building_block.get_placer_ids())) == 1:
                 clone[building_block] = tuple(map(
-                    _UnaligningVertex,
+                    UnaligningVertex,
                     vertices,
                 ))
 
@@ -618,7 +618,7 @@ class Cof(TopologyGraph):
                 dim >= 0 and dim < max_dim
                 for dim, max_dim in dims
             )
-            edge_clones.append(_CofEdge(
+            edge_clones.append(CofEdge(
                 parent_id=edge.get_id(),
                 id=id_,
                 vertex1=lattice[x][y][z][edge.get_vertex1_id()],

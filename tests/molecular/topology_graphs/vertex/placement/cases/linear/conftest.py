@@ -6,8 +6,6 @@ from pytest_lazyfixture import lazy_fixture
 # Fixtures must by visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
 
-vertices = stk.polymer.linear
-
 
 @pytest.fixture(
     params=(

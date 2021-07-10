@@ -7,8 +7,6 @@ from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
-vertices = stk.cage.vertices
-
 
 @pytest.fixture(
     params=(
@@ -133,7 +131,7 @@ def _nonlinear(position, aligner_edge, building_block):
         ),
     }
 
-    vertex = vertices._NonLinearCageVertex(
+    vertex = stk.cage.NonLinearVertex(
         id=0,
         position=position,
         aligner_edge=aligner_edge,

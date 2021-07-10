@@ -5,7 +5,7 @@ Six Plus Twelve
 """
 
 from ..cage import Cage
-from ..vertices import _LinearCageVertex, _NonLinearCageVertex
+from ..vertices import LinearVertex, NonLinearVertex
 from ...topology_graph import Edge
 
 
@@ -33,64 +33,64 @@ class SixPlusTwelve(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(0, [-1, -1, 0]),
-        _NonLinearCageVertex(1, [-1, 1, 0]),
-        _NonLinearCageVertex(2, [1, -1, 0]),
-        _NonLinearCageVertex(3, [1, 1, 0]),
-        _NonLinearCageVertex(4, [0, 0, 1]),
-        _NonLinearCageVertex(5, [0, 0, -1]),
+        NonLinearVertex(0, [-1, -1, 0]),
+        NonLinearVertex(1, [-1, 1, 0]),
+        NonLinearVertex(2, [1, -1, 0]),
+        NonLinearVertex(3, [1, 1, 0]),
+        NonLinearVertex(4, [0, 0, 1]),
+        NonLinearVertex(5, [0, 0, -1]),
     )
 
     _vertex_prototypes = (
         *_vertex_prototypes,
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=6,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=7,
             vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=8,
             vertices=(_vertex_prototypes[3], _vertex_prototypes[2]),
         ),
 
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=9,
             vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=10,
             vertices=(_vertex_prototypes[4], _vertex_prototypes[0]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=11,
             vertices=(_vertex_prototypes[4], _vertex_prototypes[1]),
         ),
 
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=12,
             vertices=(_vertex_prototypes[4], _vertex_prototypes[2]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=13,
             vertices=(_vertex_prototypes[4], _vertex_prototypes[3]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=14,
             vertices=(_vertex_prototypes[5], _vertex_prototypes[0]),
         ),
 
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=15,
             vertices=(_vertex_prototypes[5], _vertex_prototypes[1]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=16,
             vertices=(_vertex_prototypes[5], _vertex_prototypes[2]),
         ),
-        _LinearCageVertex.init_at_center(
+        LinearVertex.init_at_center(
             id=17,
             vertices=(_vertex_prototypes[5], _vertex_prototypes[3]),
         )

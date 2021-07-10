@@ -11,7 +11,7 @@ from stk.utilities import get_projection
 from ..topology_graph import Vertex
 
 
-class _MetalVertex(Vertex):
+class MetalVertex(Vertex):
     """
     Places the metal in a :class:`.MetalComplex`.
 
@@ -30,7 +30,7 @@ class _MetalVertex(Vertex):
         }
 
 
-class _MonoDentateLigandVertex(Vertex):
+class MonoDentateLigandVertex(Vertex):
     """
     Places monodentate ligand in a :class:`.MetalComplex`.
 
@@ -69,7 +69,7 @@ class _MonoDentateLigandVertex(Vertex):
         return {0: edges[0].get_id()}
 
 
-class _BiDentateLigandVertex(Vertex):
+class BiDentateLigandVertex(Vertex):
     """
     Places bidentate ligand in a :class:`.MetalComplex`.
 

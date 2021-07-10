@@ -5,7 +5,7 @@ M8L6 Cube
 """
 
 from ..cage import Cage
-from ..vertices import _NonLinearCageVertex
+from ..vertices import NonLinearVertex
 from ...topology_graph import Edge
 
 
@@ -33,42 +33,42 @@ class M8L6Cube(Cage):
     """
 
     _vertex_prototypes = (
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=0,
             position=[1, 1, 1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=1,
             position=[1, -1, 1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=2,
             position=[-1, -1, 1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=3,
             position=[-1, 1, 1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=4,
             position=[1, 1, -1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=5,
             position=[1, -1, -1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=6,
             position=[-1, -1, -1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=7,
             position=[-1, 1, -1],
             use_neighbor_placement=False,
@@ -78,32 +78,32 @@ class M8L6Cube(Cage):
     _vertex_prototypes = (
         *_vertex_prototypes,
 
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=8,
             position=[0, 0, 1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=9,
             position=[1, 0, 0],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=10,
             position=[0, 1, 0],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=11,
             position=[-1, 0, 0],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=12,
             position=[0, 0, -1],
             use_neighbor_placement=False,
         ),
-        _NonLinearCageVertex(
+        NonLinearVertex(
             id=13,
             position=[0, -1, 0],
             use_neighbor_placement=False,

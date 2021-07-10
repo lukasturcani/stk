@@ -18,12 +18,15 @@ dependencies:
   - greenlet=1.0.0=py39he80948d_0
   - icu=68.1=h58526e2_0
   - importlib-metadata=3.10.0=py39h06a4308_0
+  - jbig=2.1=h7f98852_2003
   - jpeg=9d=h36c2ea0_0
   - kiwisolver=1.3.1=py39h1a9c180_1
   - lcms2=2.12=hddcbb42_0
   - ld_impl_linux-64=2.35.1=hea4e1c9_2
+  - lerc=2.2.1=h9c3ff4c_0
   - libblas=3.9.0=8_openblas
   - libcblas=3.9.0=8_openblas
+  - libdeflate=1.7=h7f98852_5
   - libffi=3.3=h58526e2_2
   - libgcc-ng=9.3.0=h2828fa1_19
   - libgfortran-ng=9.3.0=hff62375_19
@@ -71,6 +74,7 @@ dependencies:
   - sqlite=3.35.5=h74cdb3f_0
   - tk=8.6.10=h21135ba_1
   - tornado=6.1=py39h3811e60_1
+  - typing_extensions=3.10.0.0=pyha770c72_0
   - tzdata=2021a=he74cb21_0
   - wheel=0.36.2=pyhd3deb0d_0
   - xorg-kbproto=1.0.7=h7f98852_1002
@@ -89,27 +93,50 @@ dependencies:
   - zlib=1.2.11=h516909a_1010
   - zstd=1.4.9=ha95c52a_0
   - pip:
+    - alabaster==0.7.12
     - attrs==20.3.0
+    - babel==2.9.1
+    - chardet==4.0.0
     - decorator==4.4.2
     - dill==0.3.3
     - dnspython==1.16.0
+    - docutils==0.16
+    - idna==2.10
+    - imagesize==1.2.0
     - iniconfig==1.1.1
+    - jinja2==3.0.1
+    - markupsafe==2.0.1
     - mchammer==1.0.2
     - multiprocess==0.70.11.1
-    - numpydoc==1.1.0
+    - mypy==0.910
+    - mypy-extensions==0.4.3
     - networkx==2.5.1
+    - numpydoc==1.1.0
     - packaging==20.9
     - pathos==0.2.7
     - pluggy==0.13.1
     - pox==0.2.9
     - ppft==1.6.6.3
     - py==1.10.0
+    - pygments==2.9.0
     - pymongo==3.11.3
     - pytest==6.2.3
     - pytest-datadir==1.3.1
     - pytest-lazy-fixture==0.6.3
+    - requests==2.25.1
     - scipy==1.6.3
     - seaborn==0.11.1
+    - snowballstemmer==2.1.0
     - sphinx==3.5.4
-    - sphinx_rtd_theme==0.5.2
+    - sphinx-autodoc-typehints==1.12.0
+    - sphinx-rtd-theme==0.5.2
+    - sphinxcontrib-applehelp==1.0.2
+    - sphinxcontrib-devhelp==1.0.2
+    - sphinxcontrib-htmlhelp==2.0.0
+    - sphinxcontrib-jsmath==1.0.1
+    - sphinxcontrib-qthelp==1.0.3
+    - sphinxcontrib-serializinghtml==1.1.5
+    - spindry==0.0.3
     - toml==0.10.2
+    - urllib3==1.26.6
+    - vabene==0.0.5

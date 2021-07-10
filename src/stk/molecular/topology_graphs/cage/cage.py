@@ -115,7 +115,7 @@ stk.molecular.topology_graphs.cage.metal_topologies.m24l48\
 from collections import Counter, defaultdict
 from functools import partial
 
-from .vertices import _UnaligningVertex
+from .vertices import UnaligningVertex
 from .cage_construction_state import _CageConstructionState
 from ..topology_graph import TopologyGraph, NullOptimizer
 from ...reactions import GenericReactionFactory
@@ -693,7 +693,7 @@ class Cage(TopologyGraph):
             # must therefore use an UnaligningVertex.
             if len(set(building_block.get_placer_ids())) == 1:
                 clone[building_block] = tuple(map(
-                    _UnaligningVertex,
+                    UnaligningVertex,
                     vertices,
                 ))
 

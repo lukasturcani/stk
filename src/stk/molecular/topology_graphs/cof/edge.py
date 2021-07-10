@@ -7,7 +7,7 @@ COF Edge
 from ..topology_graph import Edge
 
 
-class _CofEdge(Edge):
+class CofEdge(Edge):
     """
     A :class:`.Cof` edge.
 

@@ -28,6 +28,8 @@ setup(
         'pymongo',
         'pymongo[srv]',
         'MCHammer',
+        'SpinDry',
+        'vabene',
     ),
     python_requires='>=3.7',
 )

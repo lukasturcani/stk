@@ -14,13 +14,13 @@ from ..topology_graph import Vertex
 
 class _CofVertex(Vertex):
     """
-    A :class:`.Cof` vertex.
+    A :class:`._CofVertex` .
 
     """
 
     def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
         """
-        Initialize a :class:`._Cof` vertex.
+        Initialize a :class:`._CofVertex`.
 
         Parameters
         ----------
@@ -119,7 +119,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`.CofVertex` at the center of `vertices`.
+        Initialize a :class:`._CofVertex` at the center of `vertices`.
 
         The `vertices` are shifted according to the lattice constants
         and cell shifts.
@@ -150,7 +150,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`.CofVertex`
+        :class:`._CofVertex`
             The new vertex.
 
         """
@@ -184,7 +184,7 @@ class _CofVertex(Vertex):
         )
 
 
-class _LinearCofVertex(_CofVertex):
+class LinearVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -240,7 +240,7 @@ class _LinearCofVertex(_CofVertex):
         }
 
 
-class _NonLinearCofVertex(_CofVertex):
+class NonLinearVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -304,7 +304,7 @@ class _NonLinearCofVertex(_CofVertex):
         }
 
 
-class _UnaligningVertex(_CofVertex):
+class UnaligningVertex(_CofVertex):
     """
     Just places a building block, does not align.
 

@@ -5,8 +5,6 @@ from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
-vertices = stk.metal_complex.vertices
-
 
 @pytest.fixture
 def monodentate(position, building_block_1):
@@ -28,7 +26,7 @@ def monodentate(position, building_block_1):
             point=get_core_position(building_block),
         )
 
-    vertex = vertices._MonoDentateLigandVertex(
+    vertex = stk.metal_complex.MonoDentateLigandVertex(
         id=0,
         position=position,
     )

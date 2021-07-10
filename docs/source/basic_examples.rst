@@ -331,7 +331,7 @@ This works with any :class:`.Molecule`, including both the
         smiles='ICCBr',
         functional_groups=[stk.BromoFactory(), stk.IodoFactory()],
     )
-    bb.write('bb.mol')
+    stk.MolWriter().write(bb, 'bb.mol')
 
 .. testcode:: writing-molecular-files
     :hide:
@@ -347,7 +347,7 @@ and the :class:`.ConstructedMolecule`
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear((bb, ), 'A', 10),
     )
-    polymer.write('polymer.mol')
+    stk.MolWriter().write(polymer, 'polymer.mol')
 
 
 .. testcode:: writing-molecular-files
@@ -1021,6 +1021,70 @@ useful key for metal-containing molecules. You can use the
     pymongo.MongoClient().drop_database(_test_database)
     stk.MoleculeMongoDb = _old_molecule_init
     pymongo.MongoClient = _mongo_client
+
+Creating New Topology Graphs with Existing Vertices
+===================================================
+
+The vertex classes that make up topology graphs in :mod:`.stk` can be
+accessed to speed up the implemention of new and arbitrary topology
+graphs (as shown below). The exact details of how vertices can be used
+to implement new topology graphs depends on the topology graph, so read
+that documentation for further examples. For metal complexes, you would
+read the documentation of :class:`.MetalComplex`.
+
+.. testcode:: creating-new-topology-graphs-with-existing-vertices
+
+    import stk
+    import numpy as np
+
+    class NewMetalComplexTopology(stk.metal_complex.MetalComplex):
+
+        _metal_vertex_prototypes = (
+            stk.metal_complex.MetalVertex(0, (1., 0., 0.)),
+        )
+        _ligand_vertex_prototypes = (
+            stk.metal_complex.MonoDentateLigandVertex(1, (2., 0., 0.)),
+            stk.metal_complex.MonoDentateLigandVertex(2, (0., 0., 0.)),
+        )
+
+        # Define Edges below.
+        _edge_prototypes = (
+            stk.Edge(
+                id=0,
+                vertex1=_metal_vertex_prototypes[0],
+                vertex2=_ligand_vertex_prototypes[0],
+            ),
+            stk.Edge(
+                id=1,
+                vertex1=_metal_vertex_prototypes[0],
+                vertex2=_ligand_vertex_prototypes[1],
+            ),
+        )
+
+    # Build new metal complex.
+    ligand = stk.BuildingBlock('NCC', [stk.PrimaryAminoFactory()])
+    metal = stk.BuildingBlock(
+        smiles='[Fe+2]',
+        functional_groups=(
+            stk.SingleAtom(stk.Fe(0, charge=2))
+            for i in range(2)
+        ),
+        position_matrix=np.array([[0., 0., 0.]]),
+    )
+    complex = stk.ConstructedMolecule(
+        topology_graph=NewMetalComplexTopology(
+            metals=metal,
+            ligands=ligand,
+        )
+    )
+
+.. testcode:: creating-new-topology-graphs-with-existing-vertices
+    :hide:
+
+    assert complex.get_num_atoms() == (
+        (ligand.get_num_atoms()-2)*2 + 1
+    )
+
 
 Extending stk
 =============

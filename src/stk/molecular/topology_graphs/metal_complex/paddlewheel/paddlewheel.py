@@ -5,7 +5,7 @@ Paddlewheel
 """
 
 from ..metal_complex import MetalComplex
-from ..vertices import _MetalVertex, _BiDentateLigandVertex
+from ..vertices import MetalVertex, BiDentateLigandVertex
 from ...topology_graph import Edge
 
 
@@ -31,14 +31,14 @@ class Paddlewheel(MetalComplex):
     """
 
     _metal_vertex_prototypes = (
-        _MetalVertex(0, [0, 1, 0]),
-        _MetalVertex(1, [0, -1, 0]),
+        MetalVertex(0, [0, 1, 0]),
+        MetalVertex(1, [0, -1, 0]),
     )
     _ligand_vertex_prototypes = (
-        _BiDentateLigandVertex(2, [2, 0, 0]),
-        _BiDentateLigandVertex(3, [0, 0, 2]),
-        _BiDentateLigandVertex(4, [-2, 0, 0]),
-        _BiDentateLigandVertex(5, [0, 0, -2]),
+        BiDentateLigandVertex(2, [2, 0, 0]),
+        BiDentateLigandVertex(3, [0, 0, 2]),
+        BiDentateLigandVertex(4, [-2, 0, 0]),
+        BiDentateLigandVertex(5, [0, 0, -2]),
     )
 
     _edge_prototypes = (

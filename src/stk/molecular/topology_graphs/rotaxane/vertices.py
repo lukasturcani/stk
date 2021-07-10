@@ -9,7 +9,7 @@ import rdkit.Chem.AllChem as rdkit
 from ..topology_graph import Vertex
 
 
-class _AxleVertex(Vertex):
+class AxleVertex(Vertex):
     def place_building_block(self, building_block, edges):
         return building_block.with_centroid(
             position=self._position,
@@ -20,7 +20,7 @@ class _AxleVertex(Vertex):
         return {}
 
 
-class _CycleVertex(Vertex):
+class CycleVertex(Vertex):
     """
     Places the cycles in a :class:`NRotaxane`.
 
@@ -28,7 +28,7 @@ class _CycleVertex(Vertex):
 
     def __init__(self, id, position, flip):
         """
-        Initialize a :class:`._CycleVertex` instance.
+        Initialize a :class:`.CycleVertex` instance.
 
         Parameters
         ----------
