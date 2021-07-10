@@ -108,7 +108,7 @@ class RandomSmarts(MoleculeMutator):
         self._is_replaceable = is_replaceable
         self._name = name
         self._generator = np.random.RandomState(random_seed)
-        self.replacement_fgs = tuple(replacement_fgs)
+        self._replacement_fgs = tuple(replacement_fgs)
 
     def mutate(self, record):
         replaceable_building_blocks = tuple(filter(
