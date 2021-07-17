@@ -483,14 +483,16 @@ class MoleculeMongoDb(MoleculeDatabase):
                 {key: value}
                 for key, value in self._get_molecule_keys(entry)
             ]}
-
+            print(query)
+            breakpoint()
             json = self._molecules.find_one(query)
             if json is None:
-                raise KeyError(
-                    'No molecule found in the database associated '
-                    f'with a position matrix with query: {query}. '
-                    'This suggests your database is corrupted.'
-                )
+                continue
+                # raise KeyError(
+                #     'No molecule found in the database associated '
+                #     f'with a position matrix with query: {query}. '
+                #     'This suggests your database is corrupted.'
+                # )
 
             yield self._dejsonizer.from_json({
                 'molecule': json,
