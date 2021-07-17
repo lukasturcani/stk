@@ -756,8 +756,8 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
             for entry in cursor:
                 molecule = {
-                    'a': entry['mol']['a'],
-                    'b': entry['mol']['b'],
+                    'a': entry['mol'][0]['a'],
+                    'b': entry['mol'][0]['b'],
                 }
                 matrix = {'m': entry['posmat'][0]['m']}
 
