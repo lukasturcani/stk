@@ -689,38 +689,86 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 yield key, value
 
     def get_all(self):
-        for entry in self._constructed_molecules.find():
-            # Do 'or' query over all key value pairs.
-            query = {'$or': [
-                {key: value}
-                for key, value in self._get_molecule_keys(entry)
-            ]}
+        # Get all potential indices.
+        pos_mat_indices = self._position_matrices.index_information()
+        molecules_indices = self._molecules.index_information()
+        constmolecules_indices = (
+            self._constructed_molecules.index_information()
+        )
 
-            molecule_json = self._molecules.find_one(query)
-            if molecule_json is None:
-                raise KeyError(
-                    'No molecule found in the database associated '
-                    f'with a constructed molecule with query: {query}.'
-                    ' This suggests your database is corrupted.'
-                )
-
-            position_matrix = self._position_matrices.find_one(query)
-            if position_matrix is None:
-                raise KeyError(
-                    'No position matrix found in the database '
-                    'associated with a constructed molecule with query: '
-                    f'{query}. This suggests your database is '
-                    'corrupted.'
-                )
-
-            yield self._dejsonizer.from_json(
-                json={
-                    'molecule': molecule_json,
-                    'constructedMolecule': entry,
-                    'matrix': position_matrix,
-                    'buildingBlocks': tuple(map(
-                        self._get_building_block,
-                        entry['BB'],
-                    ))
-                },
+        keys = tuple(set((
+            val['key'][0][0]
+            for val in (
+                list(pos_mat_indices.values())
+                + list(molecules_indices.values())
+                + list(constmolecules_indices.values())
             )
+        )))
+
+        # Iterate over potential keys, and aggregate matching position
+        # matrices with molecules and constructedmolecules.
+        for key in keys:
+            cursor = self._constructed_molecules.aggregate([
+                {
+                    '$match': {
+                        key: {
+                            '$exists': True,
+                        },
+                    },
+                },
+                {
+                    '$lookup': {
+                        'from': self._molecules.name,
+                        'localField': key,
+                        'foreignField': key,
+                        'as': 'mol',
+                    },
+                },
+                {
+                    '$lookup': {
+                        'from': self._position_matrices.name,
+                        'localField': key,
+                        'foreignField': key,
+                        'as': 'posmat',
+                    },
+                },
+                {
+                    '$match': {
+                        '$expr': {
+                            '$or': [
+                                {
+                                    '$gt': [
+                                        {'$size': '$mol'},
+                                        0
+                                    ],
+                                },
+                                {
+                                    '$gt': [
+                                        {'$size': '$posmat'},
+                                        0
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            ])
+
+            for entry in cursor:
+                molecule = {
+                    'a': entry['mol']['a'],
+                    'b': entry['mol']['b'],
+                }
+                matrix = {'m': entry['posmat'][0]['m']}
+
+                yield self._dejsonizer.from_json(
+                    json={
+                        'molecule': molecule,
+                        'constructedMolecule': entry,
+                        'matrix': matrix,
+                        'buildingBlocks': tuple(map(
+                            self._get_building_block,
+                            entry['BB'],
+                        ))
+                    },
+                )

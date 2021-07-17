@@ -477,24 +477,57 @@ class MoleculeMongoDb(MoleculeDatabase):
                 yield key, value
 
     def get_all(self):
-        for entry in self._position_matrices.find():
-            # Do 'or' query over all key value pairs.
-            query = {'$or': [
-                {key: value}
-                for key, value in self._get_molecule_keys(entry)
-            ]}
-            print(query)
-            breakpoint()
-            json = self._molecules.find_one(query)
-            if json is None:
-                continue
-                # raise KeyError(
-                #     'No molecule found in the database associated '
-                #     f'with a position matrix with query: {query}. '
-                #     'This suggests your database is corrupted.'
-                # )
+        # Get all potential indices.
+        pos_mat_indices = self._position_matrices.index_information()
+        molecules_indices = self._molecules.index_information()
+        keys = tuple(set((
+            val['key'][0][0]
+            for val in (
+                list(pos_mat_indices.values())
+                + list(molecules_indices.values())
+            )
+        )))
 
-            yield self._dejsonizer.from_json({
-                'molecule': json,
-                'matrix': entry,
-            })
+        # Iterate over potential keys, and aggregate matching position
+        # matrices with molecules.
+        for key in keys:
+            cursor = self._molecules.aggregate([
+                {
+                    '$match': {
+                        key: {
+                            '$exists': True,
+                        },
+                    },
+                },
+                {
+                    '$lookup': {
+                        'from': self._position_matrices.name,
+                        'localField': key,
+                        'foreignField': key,
+                        'as': 'posmat',
+                    },
+                },
+                {
+                    '$match': {
+                        '$expr': {
+                            '$or': [
+                                {
+                                    '$gt': [
+                                        {'$size': '$posmat'},
+                                        0
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                },
+            ])
+
+            for entry in cursor:
+                molecule = {'a': entry['a'], 'b': entry['b']}
+                matrix = {'m': entry['posmat'][0]['m']}
+
+                yield self._dejsonizer.from_json({
+                    'molecule': molecule,
+                    'matrix': matrix,
+                })
