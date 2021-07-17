@@ -700,15 +700,15 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             if molecule_json is None:
                 raise KeyError(
                     'No molecule found in the database associated '
-                    f'with a position matrix with query: {query}. '
-                    'This suggests your database is corrupted.'
+                    f'with a constructed molecule with query: {query}.'
+                    ' This suggests your database is corrupted.'
                 )
 
             position_matrix = self._position_matrices.find_one(query)
             if position_matrix is None:
                 raise KeyError(
                     'No position matrix found in the database '
-                    'associated with a position matrix with query: '
+                    'associated with a constructed molecule with query: '
                     f'{query}. This suggests your database is '
                     'corrupted.'
                 )
