@@ -23,6 +23,7 @@ def test_get_all(mongo_client):
         jsonizer=jsonizer,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
+        indices=('Inchi', ),
     )
 
     molecules = [
