@@ -478,9 +478,9 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     def get_all(self):
         # Get all potential keys.
-
         pos_mat_indices = self._position_matrices.index_information()
         molecules_indices = self._molecules.index_information()
+
         keys = tuple(set((
             val['key'][0][0]
             for val in (
@@ -488,9 +488,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                 + list(molecules_indices.values())
             )
         )))
-        print(keys)
-        import sys
-        sys.exit()
+
         # Iterate over potential keys, and aggregate matching position
         # matrices with molecules.
         for key in keys:
@@ -526,7 +524,6 @@ class MoleculeMongoDb(MoleculeDatabase):
                 },
             ])
             for entry in cursor:
-                print(entry)
                 molecule = {'a': entry['a'], 'b': entry['b']}
                 matrix = {'m': entry['posmat'][0]['m']}
 
