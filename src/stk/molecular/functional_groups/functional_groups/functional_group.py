@@ -71,11 +71,55 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction, as well as specify
     which atoms of the building block should be used for positioning.
 
-    *Should I use :meth:`.with_ids` or :meth:`.with_atoms`?*
+    *Should I use* :meth:`.with_ids` *or* :meth:`.with_atoms`*?*
 
     That depends on your use case, however, it is generally better to
     default to :meth:`.with_ids` unless you need to actually change
-    the atoms held by the functional group.
+    the atoms held by the functional group. This is because
+    :meth:`.with_ids` preserves the most-derived type of the functional
+    group, while :meth:`.with_atoms` does not. To give an example
+
+    .. testcode:: with-atoms-vs-with-ids
+
+        import stk
+
+        bromo = stk.Bromo(
+            bromine=stk.Br(0),
+            atom=stk.C(1),
+            bonders=(stk.C(1), ),
+            deleters=(stk.Br(0), ),
+        )
+
+        bromo2 = bromo.with_ids({
+            0: 10,
+            1: 100,
+        })
+        # bromo2 is still a Bromo functional group.
+        assert isinstance(bromo2, stk.Bromo)
+
+        not_bromo = bromo.with_atoms({
+            0: stk.Br(10),
+            1: stk.C(100),
+        })
+        # not_bromo is not a Bromo functional gorup.
+        assert not isinstance(not_bromo, stk.Bromo)
+        # However, it is still an instance of FunctionalGroup,
+        assert isinstance(not_bromo, stk.FunctionalGroup)
+        # and of GenericFunctionalGroup
+        assert isinstance(not_bromo, stk.GenericFunctionalGroup)
+
+    The reason that :meth:`.with_atoms` does not produce a
+    :class:`.Bromo` instance is to avoid the following pitfall
+
+    .. code-block:: python
+
+        pitfall = bromo.with_atoms({
+            0: stk.F(10),
+            1: stk.C(100),
+        })
+        # If with_atoms() returned a Bromine instance then you could
+        # call get_bromine() on it, but it would hold a F atom!
+        this_is_a_fluorine = pitfall.get_bromine()
 
     *Why would I want to implement a new subclass?*
 
