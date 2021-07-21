@@ -101,13 +101,13 @@ class _PlacementsSummary:
 
         Parameters:
 
-            building_block : :class:`.BuildingBlock`
+            building_block:
                 The building block which was placed.
 
-            building_block_id : :class:`int`
+            building_block_id:
                 A unique for the building block placement.
 
-            result : :class:`._PlacementResult`
+            result:
                 The result of the placement.
 
         """
