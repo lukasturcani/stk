@@ -71,7 +71,7 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction, as well as specify
     which atoms of the building block should be used for positioning.
 
-    *Should I use* :meth:`.with_ids` *or* :meth:`.with_atoms`*?*
+    *Should I use* :meth:`.with_ids` *or* :meth:`.with_atoms` *?*
 
     That depends on your use case, however, it is generally better to
     default to :meth:`.with_ids` unless you need to actually change
@@ -117,7 +117,7 @@ class FunctionalGroup:
             0: stk.F(10),
             1: stk.C(100),
         })
-        # If with_atoms() returned a Bromine instance then you could
+        # If with_atoms() returned a Bromo instance then you could
         # call get_bromine() on it, but it would hold a F atom!
         this_is_a_fluorine = pitfall.get_bromine()
 
