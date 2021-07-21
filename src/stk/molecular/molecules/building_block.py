@@ -12,7 +12,7 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
-from typing import Optional, Iterable
+from typing import Optional, Union, Iterable
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -746,7 +746,7 @@ class BuildingBlock(Molecule):
 
     def get_functional_groups(
         self,
-        fg_ids: Optional[Iterable[int]] = None,
+        fg_ids: Optional[Union[int, Iterable[int]]] = None,
     ) -> Iterable[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
