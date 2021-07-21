@@ -71,6 +71,14 @@ class FunctionalGroup:
     :class:`.ConstructedMolecule` construction, as well as specify
     which atoms of the building block should be used for positioning.
 
+    *Should I use :meth:`.with_ids` or :meth:`.with_atoms`?*
+
+    That depends on your use case, however, it is generally better to
+    default to :meth:`.with_ids` unless you need to actually change
+    the atoms held by the functional group.
+
+    *Why would I want to implement a new subclass?*
+
     The most common reason you would want to implement a new
     :class:`.FunctionalGroup` subclass, is because you want to
     customize the construction of a :class:`.ConstructedMolecule`.
