@@ -89,91 +89,94 @@ class FunctionalGroup:
     :class:`~.polymer.linear.linear.Linear`, and your custom
     modification will take place.
 
-    See Also
-    --------
-    :mod:`.functional_group_factory`
-        Used for automated creation of :class:`.FunctionalGroup`
-        instances.
+    See Also:
 
-    Notes
-    -----
-    You might notice that some of the methods of this abstract base
-    class are implemented. This is purely for convenience when
-    implementing subclasses. The implemented public methods are simply
-    default implementations, which can be safely ignored
-    or overridden, when implementing subclasses. Any private methods
-    are implementation details of these default implementations.
+        :mod:`.functional_group_factory`
+            Used for automated creation of :class:`.FunctionalGroup`
+            instances.
 
-    Examples
-    --------
-    *Subclass Implementation*
+    Notes:
 
-    The source code of the subclasses, listed in
-    :mod:`.functional_group`, can serve as good examples.
+        You might notice that some of the methods of this abstract base
+        class are implemented. This is purely for convenience when
+        implementing subclasses. The implemented public methods are
+        simply default implementations, which can be safely ignored
+        or overridden, when implementing subclasses. Any private
+        methods are implementation details of these default
+        implementations.
 
-    *Changing the Atoms of a Functional Group*
+    Examples:
 
-    You want to substitute the atoms in the functional group for other
-    atoms. You can do this by using :meth:`.with_atoms` to create a
-    clone of the functional group, which holds the replacement atoms
+        *Subclass Implementation*
 
-    .. testcode:: changing-the-atoms-of-a-functional-group
+        The source code of the subclasses, listed in
+        :mod:`.functional_group`, can serve as good examples.
 
-        import stk
+        *Changing the Atoms of a Functional Group*
 
-        c, n, h1, h2 = stk.C(0), stk.N(1), stk.H(2), stk.H(3)
-        amine = stk.PrimaryAmino(
-            nitrogen=n,
-            hydrogen1=h1,
-            hydrogen2=h2,
-            atom=c,
-            bonders=(n, ),
-            deleters=(h1, h2),
-        )
+        You want to substitute the atoms in the functional group for
+        other atoms. You can do this by using :meth:`.with_atoms` to
+        create a clone of the functional group, which holds the
+        replacement atoms
 
-        n20 = stk.N(20)
-        h100 = stk.H(100)
+        .. testcode:: changing-the-atoms-of-a-functional-group
 
-        # amine_clone is a clone of amine, except that instead of
-        # holding n, amine_clone holds n20, and instead of holding h1
-        # amine_clone holds h100. amine_clone continues to hold h2.
-        amine_clone = amine.with_atoms({
-            n.get_id(): n20,
-            h1.get_id(): h100,
-        })
+            import stk
 
-    .. testcode:: changing-the-atoms-of-a-functional-group
-        :hide:
+            c, n, h1, h2 = stk.C(0), stk.N(1), stk.H(2), stk.H(3)
+            amine = stk.PrimaryAmino(
+                nitrogen=n,
+                hydrogen1=h1,
+                hydrogen2=h2,
+                atom=c,
+                bonders=(n, ),
+                deleters=(h1, h2),
+            )
 
-        _atoms = set(amine.get_atom_ids())
-        assert n.get_id() in _atoms
-        assert n20.get_id() not in _atoms
-        assert h1.get_id() in _atoms
-        assert h100.get_id()  not in _atoms
+            n20 = stk.N(20)
+            h100 = stk.H(100)
 
-        _clone_atoms = set(amine_clone.get_atom_ids())
-        assert n.get_id() not in _clone_atoms
-        assert n20.get_id() in _clone_atoms
-        assert h1.get_id() not in _clone_atoms
-        assert h100.get_id() in _clone_atoms
+            # amine_clone is a clone of amine, except that instead of
+            # holding n, amine_clone holds n20, and instead of holding
+            # h1  amine_clone holds h100. amine_clone continues to hold
+            # h2.
+            amine_clone = amine.with_atoms({
+                n.get_id(): n20,
+                h1.get_id(): h100,
+            })
 
-        _bonders = set(amine.get_bonder_ids())
-        assert n.get_id() in _bonders
-        assert n20.get_id() not in _bonders
+        .. testcode:: changing-the-atoms-of-a-functional-group
+            :hide:
 
-        _clone_bonders = set(amine_clone.get_bonder_ids())
-        assert n.get_id() not in _clone_bonders
-        assert n20.get_id() in _clone_bonders
+            _atoms = set(amine.get_atom_ids())
+            assert n.get_id() in _atoms
+            assert n20.get_id() not in _atoms
+            assert h1.get_id() in _atoms
+            assert h100.get_id()  not in _atoms
 
-        _deleters = set(amine.get_deleter_ids())
-        assert h1.get_id() in _deleters
-        assert h2.get_id() in _deleters
-        assert h100.get_id() not in _deleters
+            _clone_atoms = set(amine_clone.get_atom_ids())
+            assert n.get_id() not in _clone_atoms
+            assert n20.get_id() in _clone_atoms
+            assert h1.get_id() not in _clone_atoms
+            assert h100.get_id() in _clone_atoms
 
-        _clone_deleters = set(amine_clone.get_deleter_ids())
-        assert h1.get_id() not in _clone_deleters
-        assert h2.get_id() in _clone_deleters
-        assert h100.get_id() in _clone_deleters
+            _bonders = set(amine.get_bonder_ids())
+            assert n.get_id() in _bonders
+            assert n20.get_id() not in _bonders
+
+            _clone_bonders = set(amine_clone.get_bonder_ids())
+            assert n.get_id() not in _clone_bonders
+            assert n20.get_id() in _clone_bonders
+
+            _deleters = set(amine.get_deleter_ids())
+            assert h1.get_id() in _deleters
+            assert h2.get_id() in _deleters
+            assert h100.get_id() not in _deleters
+
+            _clone_deleters = set(amine_clone.get_deleter_ids())
+            assert h1.get_id() not in _clone_deleters
+            assert h2.get_id() in _clone_deleters
+            assert h100.get_id() in _clone_deleters
 
     """
 
