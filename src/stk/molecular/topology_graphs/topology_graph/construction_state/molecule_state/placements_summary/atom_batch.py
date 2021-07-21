@@ -4,7 +4,12 @@ Atom Batch
 
 """
 
-from ......atoms import AtomInfo
+from __future__ import annotations
+
+from typing import Iterable
+
+from ......atoms import Atom, AtomInfo
+from ......molecules import BuildingBlock
 
 
 class _AtomBatch:
@@ -13,42 +18,46 @@ class _AtomBatch:
 
     """
 
-    __slots__ = ['_atoms', '_atom_infos', '_atom_map']
+    __slots__ = ['_atoms', '_atom_infos', '_id_map']
+
+    _atoms: tuple[Atom, ...]
+    _atom_infos: tuple[AtomInfo, ...]
+    _id_map: dict[int, int]
 
     def __init__(
         self,
-        atoms,
-        num_atoms,
-        building_block,
-        building_block_id,
-    ):
+        atoms: Iterable[Atom],
+        num_atoms: int,
+        building_block: BuildingBlock,
+        building_block_id: int,
+    ) -> None:
         """
         Initialize an :class:`._AtomBatch` instance.
 
-        Parameters
-        ----------
-        atoms : :class:`iterable` of :class:`.Atom`
-            The atoms, which should be added to the batch.
+        Parameters:
 
-        num_atoms : :class:`int`
-            The number of atoms in the molecule being constructed,
-            before atoms in this batch are taken into account.
+            atoms:
+                The atoms, which should be added to the batch.
 
-        building_block : :class:`.BuildingBlock`
-            The building block from which the atoms originate.
+            num_atoms:
+                The number of atoms in the molecule being constructed,
+                before atoms in this batch are taken into account.
 
-        building_block_id : :class:`.int`
-            An id, unique to that building block and placement.
+            building_block:
+                The building block from which the atoms originate.
+
+            building_block_id:
+                An id, unique to that building block and placement.
 
         """
 
-        self._atoms = _atoms = []
-        self._atom_infos = atom_infos = []
-        self._atom_map = atom_map = {}
+        _atoms = []
+        atom_infos = []
+        self._id_map = {}
 
         for id_, atom in enumerate(atoms, num_atoms):
             _atoms.append(atom.with_id(id_))
-            atom_map[atom.get_id()] = _atoms[-1]
+            self._id_map[atom.get_id()] = _atoms[-1].get_id()
             atom_infos.append(
                 AtomInfo(
                     atom=_atoms[-1],
@@ -58,42 +67,42 @@ class _AtomBatch:
                 )
             )
 
-    def get_atoms(self):
+        self._atoms = tuple(_atoms)
+        self._atom_infos = tuple(atom_infos)
+
+    def get_atoms(self) -> Iterable[Atom]:
         """
         Yield the atoms in the batch.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             An atom.
 
         """
 
         yield from self._atoms
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> Iterable[AtomInfo]:
         """
         Yield info about the atoms in the batch.
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+        Yields:
+
             Info about an atom in the batch.
 
         """
 
         yield from self._atom_infos
 
-    def get_atom_map(self):
+    def get_id_map(self) -> dict[int, int]:
         """
         Get a mapping from the old atom id to the new atom.
 
-        Returns
-        -------
-        :class:`dict`
+        Returns:
+
             Maps the id of an atom provided to the initializer, to
-            the new atom held by the batch, which has an updated id.
+            the id of the new, corresponding, atom held by the batch.
 
         """
 
-        return dict(self._atom_map)
+        return dict(self._id_map)
