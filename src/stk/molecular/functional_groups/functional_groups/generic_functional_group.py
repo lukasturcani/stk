@@ -68,15 +68,16 @@ class GenericFunctionalGroup(FunctionalGroup):
         clone._deleters = self._deleters
         return clone
 
-    def _with_atoms(self, atom_map):
-        super()._with_atoms(atom_map)
-        self._bonders = tuple(
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
+        clone.__class__ = GenericFunctionalGroup
+        clone._bonders = tuple(
             atom_map.get(a.get_id(), a) for a in self._bonders
         )
-        self._deleters = tuple(
+        clone._deleters = tuple(
             atom_map.get(a.get_id(), a) for a in self._deleters
         )
-        return self
+        return clone
 
     def _with_ids(self: _T, id_map: dict[int, int]) -> _T:
         super()._with_ids(id_map)

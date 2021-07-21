@@ -315,23 +315,6 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._core_atoms)
 
-    def _with_atoms(self, atom_map):
-        """
-        Modify the functional group.
-
-        """
-
-        self._atoms = tuple(
-            atom_map.get(a.get_id(), a) for a in self._atoms
-        )
-        self._placers = tuple(
-            atom_map.get(a.get_id(), a) for a in self._placers
-        )
-        self._core_atoms = tuple(
-            atom_map.get(a.get_id(), a) for a in self._core_atoms
-        )
-        return self
-
     def with_atoms(self, atom_map):
         """
         Return a clone holding different atoms.
@@ -352,7 +335,18 @@ class FunctionalGroup:
 
         """
 
-        return self.clone()._with_atoms(atom_map)
+        # The clone needs to be downcasted.
+        return FunctionalGroup(
+            atoms=tuple(
+                atom_map.get(a.get_id(), a) for a in self._atoms
+            ),
+            placers=tuple(
+                atom_map.get(a.get_id(), a) for a in self._placers
+            ),
+            core_atoms=tuple(
+                atom_map.get(a.get_id(), a) for a in self._core_atoms
+            ),
+        )
 
     def _with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
         self._atoms = tuple(
