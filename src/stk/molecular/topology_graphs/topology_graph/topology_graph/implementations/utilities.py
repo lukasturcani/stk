@@ -4,6 +4,9 @@ Topology Graph Implementation Utilities
 
 """
 
+from __future__ import annotations
+
+import numpy as np
 from typing import NamedTuple
 
 
@@ -11,20 +14,20 @@ class _PlacementResult(NamedTuple):
     """
     The result of a building block placement.
 
-    Attributes
-    ----------
-    position_matrix : :class:`numpy.ndarray`
-        The position matrix of the building block after it has been
-        placed on the vertex.
+    Attributes:
 
-    functional_group_edges : :class:`dict`
-        Maps the id of a functional group to the id of the edge it is
-        assigned to.
+        position_matrix:
+            The position matrix of the building block after it has been
+            placed on the vertex.
+
+        functional_group_edges:
+            Maps the id of a functional group to the id of the edge it
+            is assigned to.
 
     """
 
-    position_matrix: object
-    functional_group_edges: object
+    position_matrix: np.ndarray
+    functional_group_edges: dict[int, int]
 
 
 class _Placement:
