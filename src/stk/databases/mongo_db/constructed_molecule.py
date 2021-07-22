@@ -5,6 +5,7 @@ Constructed Molecule MongoDB
 """
 
 from functools import lru_cache
+from itertools import chain
 
 from stk.serialization import (
     ConstructedMoleculeJsonizer,
@@ -12,6 +13,7 @@ from stk.serialization import (
 )
 from ..constructed_molecule import ConstructedMoleculeDatabase
 from .utilities import HashableDict
+from stk.utilities import dedupe
 
 
 class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
@@ -690,20 +692,12 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     def get_all(self):
         # Get all potential indices.
-        pos_mat_indices = self._position_matrices.index_information()
-        molecules_indices = self._molecules.index_information()
-        constmolecules_indices = (
-            self._constructed_molecules.index_information()
+        indices = chain(
+            self._position_matrices.index_information().values(),
+            self._molecules.index_information().values(),
+            self._constructed_molecules.index_information().values(),
         )
-
-        keys = tuple(set((
-            val['key'][0][0]
-            for val in (
-                list(pos_mat_indices.values())
-                + list(molecules_indices.values())
-                + list(constmolecules_indices.values())
-            )
-        )))
+        keys = dedupe(index['key'][0][0] for index in indices)
 
         # Iterate over potential keys, and aggregate matching position
         # matrices with molecules and constructedmolecules.

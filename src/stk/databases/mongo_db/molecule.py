@@ -5,6 +5,7 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
+from itertools import chain
 
 from stk.serialization import (
     MoleculeJsonizer,
@@ -12,6 +13,7 @@ from stk.serialization import (
 )
 from ..molecule import MoleculeDatabase
 from .utilities import HashableDict
+from stk.utilities import dedupe
 
 
 class MoleculeMongoDb(MoleculeDatabase):
@@ -477,17 +479,12 @@ class MoleculeMongoDb(MoleculeDatabase):
                 yield key, value
 
     def get_all(self):
-        # Get all potential keys.
-        pos_mat_indices = self._position_matrices.index_information()
-        molecules_indices = self._molecules.index_information()
-
-        keys = tuple(set((
-            val['key'][0][0]
-            for val in (
-                list(pos_mat_indices.values())
-                + list(molecules_indices.values())
-            )
-        )))
+        # Get all potential indices.
+        indices = chain(
+            self._position_matrices.index_information().values(),
+            self._molecules.index_information().values(),
+        )
+        keys = dedupe(index['key'][0][0] for index in indices)
 
         # Iterate over potential keys, and aggregate matching position
         # matrices with molecules.
