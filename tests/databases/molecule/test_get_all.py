@@ -35,11 +35,11 @@ def test_get_all(mongo_client):
     )
 
     all_molecules = (
-        stk.BuildingBlock('CCC').with_canonical_atom_ordering(),
-        stk.BuildingBlock('BrCCCBr').with_canonical_atom_ordering(),
-        stk.BuildingBlock('NCCN').with_canonical_atom_ordering(),
-        stk.BuildingBlock('CCCCCC').with_canonical_atom_ordering(),
-        stk.BuildingBlock('NCCCCN').with_canonical_atom_ordering(),
+        stk.BuildingBlock('CCC'),
+        stk.BuildingBlock('BrCCCBr'),
+        stk.BuildingBlock('NCCN'),
+        stk.BuildingBlock('CCCCC'),
+        stk.BuildingBlock('NCCCCN'),
     )
 
     # Two sets of molecules with two distinct molecules each, and one
@@ -73,14 +73,19 @@ def test_get_all(mongo_client):
         key_makers[1].get_key(molecule): molecule
         for molecule in molecules2
     }
-
+    print(molecules1_by_key, molecules2_by_key)
     for i, retrieved in enumerate(database3.get_all()):
+        print(stk.BuildingBlock.init_from_molecule(retrieved))
+        print(retrieved.to_rdkit_mol())
+        stk.Smiles().get_key(retrieved)
         try:
             key = key_makers[0].get_key(retrieved)
             molecule = molecules1_by_key[key]
         except KeyError:
+            print('been here')
             key = key_makers[1].get_key(retrieved)
             molecule = molecules2_by_key[key]
+
         is_equivalent_molecule(
             molecule1=molecule.with_canonical_atom_ordering(),
             molecule2=retrieved.with_canonical_atom_ordering(),
