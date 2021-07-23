@@ -729,7 +729,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 {
                     '$match': {
                         '$expr': {
-                            '$or': [
+                            '$and': [
                                 {
                                     '$gt': [
                                         {'$size': '$mol'},
