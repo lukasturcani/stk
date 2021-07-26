@@ -504,10 +504,19 @@ class MoleculeMongoDb(MoleculeDatabase):
         ]
         query.extend(
             {
+                '$project': {
+                    key: {'$ifNull': [f"${key}", "[]"]}
+                }
+            }
+            for key in keys
+        )
+        query.extend(
+            {
                 '$lookup': {
                     'from': self._position_matrices.name,
                     'localField': key,
                     'foreignField': key,
+                    # 'let': {key: {'$ifNull': {[key, []]}}},
                     'as': f'posmat_{key}',
                 },
             }
