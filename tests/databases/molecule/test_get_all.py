@@ -71,8 +71,8 @@ def test_get_all(mongo_client):
         inchi_and_smiles_database.put(molecule)
 
     smiles_to_molecule = {
-            smiles.get_key(molecule): molecule
-            for molecule in all_molecules
+        smiles.get_key(molecule): molecule
+        for molecule in all_molecules
     }
 
     # Use an InChIKey database for get_all because none of the
