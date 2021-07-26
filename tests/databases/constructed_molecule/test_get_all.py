@@ -12,26 +12,39 @@ def test_get_all(mongo_client):
     database_name = '_test_get_entries_constructed_molecule'
     mongo_client.drop_database(database_name)
 
-    key_maker = stk.Inchi()
-    jsonizer = stk.ConstructedMoleculeJsonizer((key_maker, ))
-    database1 = stk.ConstructedMoleculeMongoDb(
+    inchi = stk.Inchi()
+    inchi_database = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
-        jsonizer=jsonizer,
+        jsonizer=stk.ConstructedMoleculeJsonizer(
+            key_makers=(inchi, ),
+        ),
         put_lru_cache_size=0,
         get_lru_cache_size=0,
-        indices=(key_maker.get_key_name(), ),
+        indices=(inchi.get_key_name(), ),
     )
 
-    key_maker = stk.Smiles()
-    jsonizer = stk.ConstructedMoleculeJsonizer((key_maker, ))
-    database2 = stk.ConstructedMoleculeMongoDb(
+    smiles = stk.Smiles()
+    smiles_database = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
-        jsonizer=jsonizer,
+        jsonizer=stk.ConstructedMoleculeJsonizer(
+            key_makers=(smiles, ),
+        ),
         put_lru_cache_size=0,
         get_lru_cache_size=0,
-        indices=(key_maker.get_key_name(), ),
+        indices=(smiles.get_key_name(), ),
+    )
+
+    inchi_and_smiles_database = stk.ConstructedMoleculeMongoDb(
+        mongo_client=mongo_client,
+        database=database_name,
+        jsonizer=stk.ConstructedMoleculeJsonizer(
+            key_makers=(smiles, inchi),
+        ),
+        put_lru_cache_size=0,
+        get_lru_cache_size=0,
+        indices=(),
     )
 
     building_blocks = (
@@ -57,7 +70,7 @@ def test_get_all(mongo_client):
                     building_blocks[0], building_blocks[1]
                 ),
                 repeating_unit='AB',
-                num_repeating_units=2,
+                num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
@@ -73,7 +86,7 @@ def test_get_all(mongo_client):
                     building_blocks[2], building_blocks[3]
                 ),
                 repeating_unit='AB',
-                num_repeating_units=2,
+                num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
@@ -83,55 +96,54 @@ def test_get_all(mongo_client):
                 num_repeating_units=3,
             ),
         ),
+        stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    building_blocks[4], building_blocks[5]
+                ),
+                repeating_unit='AB',
+                num_repeating_units=3,
+            ),
+        ),
     ]
 
-    # Two sets of molecules with two distinct molecules each, and one
-    # shared molecule to test for overlap.
-    molecules1 = (all_molecules[0], all_molecules[1], all_molecules[4])
-    molecules2 = (all_molecules[2], all_molecules[3], all_molecules[4])
+    inchi_molecules = all_molecules[:2]
+    smiles_molecules = all_molecules[2:-2]
+    inchi_and_smiles_molecules = all_molecules[-2:]
 
-    for molecule in molecules1:
-        database1.put(molecule)
+    for molecule in inchi_molecules:
+        inchi_database.put(molecule)
 
-    for molecule in molecules2:
-        database2.put(molecule)
+    for molecule in smiles_molecules:
+        smiles_database.put(molecule)
 
-    # A new database with both indices.
-    key_makers = (stk.Inchi(), stk.Smiles())
-    jsonizer = stk.ConstructedMoleculeJsonizer(key_makers)
-    database3 = stk.ConstructedMoleculeMongoDb(
+    for molecule in inchi_and_smiles_molecules:
+        inchi_and_smiles_database.put(molecule)
+
+    smiles_to_molecule = {
+        smiles.get_key(molecule): molecule
+        for molecule in all_molecules
+    }
+
+    # Use an InChIKey database for get_all because none of the
+    # molecules use this key, but this should not matter.
+    inchi_key_database = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
-        jsonizer=jsonizer,
-        put_lru_cache_size=0,
-        get_lru_cache_size=0,
-        indices=(i.get_key_name() for i in key_makers),
+        jsonizer=stk.ConstructedMoleculeJsonizer(
+            key_makers=(stk.InchiKey(), ),
+        ),
+        indices=(),
     )
-
-    molecules1_by_key = {
-        key_makers[0].get_key(molecule): molecule
-        for molecule in molecules1
-    }
-    molecules2_by_key = {
-        key_makers[1].get_key(molecule): molecule
-        for molecule in molecules2
-    }
-
-    for i, retrieved in enumerate(database3.get_all()):
-        try:
-            key = key_makers[0].get_key(retrieved)
-            molecule = molecules1_by_key[key]
-        except KeyError:
-            key = key_makers[1].get_key(retrieved)
-            molecule = molecules2_by_key[key]
+    for i, retrieved in enumerate(inchi_key_database.get_all()):
+        expected = smiles_to_molecule[smiles.get_key(retrieved)]
         is_equivalent_constructed_molecule(
             constructed_molecule1=(
-                molecule.with_canonical_atom_ordering()
+                expected.with_canonical_atom_ordering()
             ),
             constructed_molecule2=(
                 retrieved.with_canonical_atom_ordering()
             ),
         )
 
-    # Check number of molecules.
     assert i+1 == len(all_molecules)
