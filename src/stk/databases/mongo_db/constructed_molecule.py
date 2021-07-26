@@ -695,74 +695,145 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         indices = chain(
             self._position_matrices.index_information().values(),
             self._molecules.index_information().values(),
-            self._constructed_molecules.index_information().values(),
         )
-        keys = dedupe(index['key'][0][0] for index in indices)
+        keys = tuple(dedupe(
+            index['key'][0][0]
+            for index in indices
+            # Ignore "_id" index which is unique in a collection and
+            # cannot be used to match molecular data split across
+            # collections.
+            if index['key'][0][0] != '_id'
+        ))
 
-        # Iterate over potential keys, and aggregate matching position
-        # matrices with molecules and constructedmolecules.
-        for key in keys:
-            cursor = self._constructed_molecules.aggregate([
-                {
-                    '$match': {
-                        key: {
-                            '$exists': True,
-                        },
-                    },
-                },
-                {
-                    '$lookup': {
-                        'from': self._molecules.name,
-                        'localField': key,
-                        'foreignField': key,
-                        'as': 'mol',
-                    },
-                },
-                {
-                    '$lookup': {
-                        'from': self._position_matrices.name,
-                        'localField': key,
-                        'foreignField': key,
-                        'as': 'posmat',
-                    },
-                },
-                {
-                    '$match': {
-                        '$expr': {
-                            '$and': [
-                                {
-                                    '$gt': [
-                                        {'$size': '$mol'},
-                                        0
-                                    ],
-                                },
-                                {
-                                    '$gt': [
-                                        {'$size': '$posmat'},
-                                        0
-                                    ],
-                                },
-                            ],
-                        },
-                    },
-                },
-            ])
-
-            for entry in cursor:
-                molecule = {
-                    'a': entry['mol'][0]['a'],
-                    'b': entry['mol'][0]['b'],
+        query = [
+            {
+                '$match': {
+                    '$or': [
+                        {key: {'$exists': True}}
+                        for key in keys
+                    ],
                 }
-                matrix = {'m': entry['posmat'][0]['m']}
-
-                yield self._dejsonizer.from_json(
-                    json={
-                        'molecule': molecule,
-                        'constructedMolecule': entry,
-                        'matrix': matrix,
-                        'buildingBlocks': tuple(map(
-                            self._get_building_block,
-                            entry['BB'],
-                        ))
+            },
+        ]
+        query.extend(
+            {
+                '$lookup': {
+                    'from': self._position_matrices.name,
+                    'let': {
+                        'const_molecule_key': f'${key}',
                     },
-                )
+                    'as': f'posmat_{key}',
+                    'pipeline': [
+                        {
+                            '$match': {
+                                key: {'$ne': None},
+                            },
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        f'${key}',
+                                        '$$const_molecule_key',
+                                    ]
+                                },
+                            },
+                        },
+                    ],
+                },
+            }
+            for key in keys
+        )
+        query.extend(
+            {
+                '$lookup': {
+                    'from': self._molecules.name,
+                    'let': {
+                        'const_molecule_key': f'${key}',
+                    },
+                    'as': f'mol_{key}',
+                    'pipeline': [
+                        {
+                            '$match': {
+                                key: {'$ne': None},
+                            },
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        f'${key}',
+                                        '$$const_molecule_key',
+                                    ]
+                                },
+                            },
+                        },
+                    ],
+                },
+            }
+            for key in keys
+        )
+        query.append(
+            {
+                '$match': {
+                    '$expr': {
+                        '$or': [
+                            {
+                                '$gt': [
+                                    {'$size': f'$posmat_{key}'},
+                                    0
+                                ],
+                            }
+                            for key in keys
+                        ]
+                    },
+                },
+            },
+        )
+        query.append(
+            {
+                '$match': {
+                    '$expr': {
+                        '$or': [
+                            {
+                                '$gt': [
+                                    {'$size': f'$mol_{key}'},
+                                    0
+                                ],
+                            }
+                            for key in keys
+                        ]
+                    },
+                },
+            },
+        )
+
+        cursor = self._molecules.aggregate(query)
+        for entry in cursor:
+            const_molecule = {
+                'BB': entry['BB'],
+                'aI': entry['aI'],
+                'bI': entry['bI'],
+                'nBB': entry['nBB'],
+            }
+
+            for key in keys:
+                posmat_key = f'posmat_{key}'
+                mol_key = f'mol_{key}'
+                if posmat_key in entry and len(entry[posmat_key]) > 0:
+                    if mol_key in entry and len(entry[mol_key]) > 0:
+                        yield self._dejsonizer.from_json({
+                            'molecule': {
+                                'a': entry[mol_key][0]['a'],
+                                'b': entry[mol_key][0]['b'],
+                            },
+                            'constructedMolecule': const_molecule,
+                            'matrix': {
+                                'm': entry[posmat_key][0]['m'],
+                            },
+                            'buildingBlocks': tuple(map(
+                                self._get_building_block,
+                                entry['BB'],
+                            ))
+                        })
+                        break
