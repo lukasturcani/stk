@@ -560,7 +560,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                     yield self._dejsonizer.from_json({
                         'molecule': molecule,
                         'matrix': {
-                            'm': entry[f'posmat_{key}'][0]['m'],
+                            'm': entry[posmat_key][0]['m'],
                         },
                     })
                     break
