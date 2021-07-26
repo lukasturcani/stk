@@ -484,14 +484,15 @@ class MoleculeMongoDb(MoleculeDatabase):
             self._position_matrices.index_information().values(),
             self._molecules.index_information().values(),
         )
-        # Ignore '_id' index.
         keys = tuple(dedupe(
             index['key'][0][0]
-            for index in indices if index['key'][0][0] != '_id'
+            for index in indices
+            # Ignore "_id" index which is unique in a collection and
+            # cannot be used to match molecular data split across
+            # collections.
+            if index['key'][0][0] != '_id'
         ))
 
-        # You cannot use $exists within a $expr; only aggregation
-        # expressions are allowed, so use $or.
         query = [
             {
                 '$match': {
@@ -506,58 +507,60 @@ class MoleculeMongoDb(MoleculeDatabase):
             {
                 '$lookup': {
                     'from': self._position_matrices.name,
-                    'localField': key,
-                    'foreignField': key,
+                    'let': {
+                        'molecule_key': f'${key}',
+                    },
                     'as': f'posmat_{key}',
+                    'pipeline': [
+                        {
+                            '$match': {
+                                key: {'$ne': None},
+                            },
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        f'${key}',
+                                        '$$molecule_key',
+                                    ]
+                                },
+                            },
+                        },
+                    ],
                 },
             }
             for key in keys
         )
-        print(query)
-
-        # query.append(
-        #     {
-        #         '$match': {
-        #             '$expr': {
-        #                 '$or': [
-        #                     {
-        #                         '$and': [
-        #                             # {
-        #                             #     '$gt': [
-        #                             #         {'$size': f'$mol_{key}'},
-        #                             #         0
-        #                             #     ],
-        #                             # },
-        #                             {
-        #                                 '$gt': [
-        #                                     {'$size': f'$posmat_{key}'},
-        #                                     0
-        #                                 ],
-        #                             },
-        #                         ],
-        #                     }
-        #                     for key in keys
-        #                 ]
-        #             },
-        #         },
-        #     }
-        # )
+        query.append(
+            {
+                '$match': {
+                    '$expr': {
+                        '$or': [
+                            {
+                                '$gt': [
+                                    {'$size': f'$posmat_{key}'},
+                                    0
+                                ],
+                            }
+                            for key in keys
+                        ]
+                    },
+                },
+            },
+        )
 
         cursor = self._molecules.aggregate(query)
         for entry in cursor:
-            print('----')
-            print(entry)
             molecule = {'a': entry['a'], 'b': entry['b']}
+
             for key in keys:
-                try:
+                posmat_key = f'posmat_{key}'
+                if posmat_key in entry and len(entry[posmat_key]) > 0:
                     matrix = {'m': entry[f'posmat_{key}'][0]['m']}
-                    break
-                except KeyError:
-                    pass
-                except IndexError:
-                    pass
-            print(len(molecule['a']), len(matrix['m']))
-            yield self._dejsonizer.from_json({
-                'molecule': molecule,
-                'matrix': matrix,
-            })
+
+                yield self._dejsonizer.from_json({
+                    'molecule': molecule,
+                    'matrix': matrix,
+                })
+                break
