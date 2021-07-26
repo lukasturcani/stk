@@ -557,10 +557,10 @@ class MoleculeMongoDb(MoleculeDatabase):
             for key in keys:
                 posmat_key = f'posmat_{key}'
                 if posmat_key in entry and len(entry[posmat_key]) > 0:
-                    matrix = {'m': entry[f'posmat_{key}'][0]['m']}
-
-                yield self._dejsonizer.from_json({
-                    'molecule': molecule,
-                    'matrix': matrix,
-                })
-                break
+                    yield self._dejsonizer.from_json({
+                        'molecule': molecule,
+                        'matrix': {
+                            'm': entry[f'posmat_{key}'][0]['m'],
+                        },
+                    })
+                    break

@@ -71,8 +71,8 @@ def test_get_all(mongo_client):
         inchi_and_smiles_database.put(molecule)
 
     smiles_to_molecule = {
-        smiles.get_key(molecule): molecule
-        for molecule in all_molecules
+            smiles.get_key(molecule): molecule
+            for molecule in all_molecules
     }
 
     # Use an InChIKey database for get_all because none of the
@@ -86,12 +86,10 @@ def test_get_all(mongo_client):
         indices=(),
     )
     for i, retrieved in enumerate(inchi_key_database.get_all()):
-        molecule = smiles_to_molecule[smiles.get_key(retrieved)]
-
+        expected = smiles_to_molecule[smiles.get_key(retrieved)]
         is_equivalent_molecule(
-            molecule1=molecule.with_canonical_atom_ordering(),
+            molecule1=expected.with_canonical_atom_ordering(),
             molecule2=retrieved.with_canonical_atom_ordering(),
         )
 
-    # Check number of molecules.
     assert i+1 == len(all_molecules)
