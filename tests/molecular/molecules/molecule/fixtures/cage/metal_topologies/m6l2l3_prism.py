@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from .building_blocis import (
+from .building_blocks import (
     get_fe_atom,
     get_tetratopic_linker,
     get_tritopic_linker,

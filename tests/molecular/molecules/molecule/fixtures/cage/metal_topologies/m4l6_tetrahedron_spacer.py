@@ -41,6 +41,7 @@ from ....case_data import CaseData
                 'H])C([H])=C(C([H])=C1[H])N->8=C([H])C1=C([H])C([H])='
                 'C([H])C([H])=N->91'
             ),
+            name=name,
         ),
     ),
 )

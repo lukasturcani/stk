@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Square(
                     building_blocks=(
@@ -28,8 +29,9 @@ from ...case_data import CaseData
                 '[C+]=N4)C3(F)C3=C(N=[C+]3)C3=C(C4=C(Br)[C+]=N4)C(F)(B'
                 'r)[C+]3C3=C2N=[C+]3)[C+]1Br'
             ),
+            name=name,
         ),
     ),
 )
-def cof_square(request):
-    return request.param
+def cof_square(request) -> CaseData:
+    return request.param(request.node.originalname)

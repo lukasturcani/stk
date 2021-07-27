@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.PeriodicKagome(
                     building_blocks=(
@@ -43,8 +44,9 @@ from ...case_data import CaseData
                 '[C+]1)C1=C(N=[C+]1)C%191[C+]=N[C+]%171)C1([C+]=N[C+]%'
                 '211)C1=C3[C+]=N1)C1=C([C+]=N1)C%141[C+]=N[C+]%121'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.PeriodicKagome(
                     building_blocks=(
@@ -82,8 +84,9 @@ from ...case_data import CaseData
                 '[C+]1)C1=C(N=[C+]1)C%191[C+]=N[C+]%171)C1([C+]=N[C+]%'
                 '211)C1=C3[C+]=N1)C1=C([C+]=N1)C%141[C+]=N[C+]%121'
             ),
+            name=name,
         ),
     ),
 )
-def cof_periodic_kagome(request):
-    return request.param
+def cof_periodic_kagome(request) -> CaseData:
+    return request.param(request.node.originalname)

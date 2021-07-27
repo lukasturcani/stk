@@ -8,7 +8,7 @@ from ....case_data import CaseData
 @pytest.fixture(
     scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cage.M8L6Cube(
                     building_blocks={
@@ -59,6 +59,7 @@ from ....case_data import CaseData
                 '=C([H])C([H])=C1C=4[H])<-N1=C([H])C([H])=C([H])C([H])'
                 '=C1C=7[H]'
             ),
+            name=name,
         ),
     ),
 )
