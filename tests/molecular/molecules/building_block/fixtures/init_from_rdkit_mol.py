@@ -10,8 +10,9 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
                 molecule=rdkit_molecule,
             ),
@@ -19,7 +20,7 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
                 molecule=rdkit_molecule,
                 functional_groups=[stk.BromoFactory()],
@@ -41,7 +42,7 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             core_atom_ids=(1, 2),
             placer_ids=(1, 2),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
                 molecule=rdkit_molecule,
                 placer_ids=(1, 2),
@@ -50,7 +51,7 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(1, 2),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
                 molecule=rdkit_molecule,
                 functional_groups=[stk.BromoFactory()],
@@ -73,7 +74,7 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
             core_atom_ids=(1, 2),
             placer_ids=(0, 3),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
                 molecule=rdkit_molecule,
                 functional_groups=[stk.IodoFactory()],
@@ -84,5 +85,5 @@ rdkit.EmbedMolecule(rdkit_molecule, rdkit.ETKDGv2())
         ),
     ),
 )
-def init_from_rdkit_mol(request):
-    return request.param
+def init_from_rdkit_mol(request) -> CaseData:
+    return request.param()
