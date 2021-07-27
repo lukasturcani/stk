@@ -54,7 +54,9 @@ from ...case_data import CaseData
     ),
 )
 def macrocycle_macrocycle(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
 
 
 @pytest.fixture(
