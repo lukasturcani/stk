@@ -47,6 +47,16 @@ def tail(id, position, flip):
     )
 
 
+@pytest.fixture
+def unaligning(id, position, flip):
+    return CaseData(
+        vertex=stk.polymer.linear.UnaligningVertex(id, position, flip),
+        id=id,
+        position=position,
+        cell=np.array([0, 0, 0]),
+    )
+
+
 @pytest.fixture(params=(0, ))
 def id(request):
     return request.param
