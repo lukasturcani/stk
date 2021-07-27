@@ -1,28 +1,8 @@
 import pytest
 import stk
 
+from ...building_blocks import get_pd_atom, get_mo_1
 from ....case_data import CaseData
-
-
-_palladium_atom = stk.BuildingBlock(
-    smiles='[Pd+2]',
-    functional_groups=(
-        stk.SingleAtom(stk.Pd(0, charge=2))
-        for i in range(4)
-    ),
-    position_matrix=([0, 0, 0], ),
-)
-
-_mo_1 = stk.BuildingBlock(
-    smiles='c1cc2c(cn1)CCCCC2',
-    functional_groups=[
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#6]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-    ]
-)
 
 
 @pytest.fixture(
@@ -31,8 +11,8 @@ _mo_1 = stk.BuildingBlock(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.SquarePlanar(
-                    metals={_palladium_atom: 0},
-                    ligands={_mo_1: (0, 1, 2, 3)},
+                    metals={get_pd_atom(): 0},
+                    ligands={get_mo_1(): (0, 1, 2, 3)},
                 )
             ),
             smiles=(
@@ -49,8 +29,8 @@ _mo_1 = stk.BuildingBlock(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.SquarePlanar(
-                    metals=_palladium_atom,
-                    ligands=_mo_1,
+                    metals=get_pd_atom(),
+                    ligands=get_mo_1(),
                 )
             ),
             smiles=(
@@ -67,4 +47,6 @@ _mo_1 = stk.BuildingBlock(
     ),
 )
 def metal_complex_square_planar(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

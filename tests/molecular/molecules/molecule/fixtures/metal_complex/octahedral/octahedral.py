@@ -1,21 +1,8 @@
 import pytest
 import stk
 
-from ...building_blocks import get_fe_atom
+from ...building_blocks import get_fe_atom, get_mo_1
 from ....case_data import CaseData
-
-
-def _get_iron_mo_1() -> stk.BuildingBlock:
-    return stk.BuildingBlock(
-        smiles='c1cc2c(cn1)CCCCC2',
-        functional_groups=[
-            stk.SmartsFunctionalGroupFactory(
-                smarts='[#6]~[#7X2]~[#6]',
-                bonders=(1, ),
-                deleters=(),
-            ),
-        ]
-    )
 
 
 @pytest.fixture(
@@ -25,7 +12,7 @@ def _get_iron_mo_1() -> stk.BuildingBlock:
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.metal_complex.Octahedral(
                     metals={get_fe_atom(): 0},
-                    ligands={_get_iron_mo_1(): (0, 1, 2, 3, 4, 5)},
+                    ligands={get_mo_1(): (0, 1, 2, 3, 4, 5)},
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
@@ -57,7 +44,7 @@ def _get_iron_mo_1() -> stk.BuildingBlock:
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.metal_complex.Octahedral(
                     metals=get_fe_atom(),
-                    ligands=_get_iron_mo_1(),
+                    ligands=get_mo_1(),
                     reaction_factory=stk.DativeReactionFactory(
                         reaction_factory=stk.GenericReactionFactory(
                             bond_orders={

@@ -188,3 +188,16 @@ def get_iron_bi_1() -> stk.BuildingBlock:
             ),
         ]
     )
+
+
+def get_mo_1() -> stk.BuildingBlock:
+    return stk.BuildingBlock(
+        smiles='c1cc2c(cn1)CCCCC2',
+        functional_groups=[
+            stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
+        ],
+    )
