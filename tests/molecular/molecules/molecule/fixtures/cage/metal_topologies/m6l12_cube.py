@@ -13,7 +13,7 @@ from ....case_data import CaseData
                 topology_graph=stk.cage.M6L12Cube(
                     building_blocks={
                         get_pd_atom(): range(6),
-                        get_linker: range(6, 18),
+                        get_linker(): range(6, 18),
                     },
                     reaction_factory=stk.DativeReactionFactory(
                         reaction_factory=stk.GenericReactionFactory(
