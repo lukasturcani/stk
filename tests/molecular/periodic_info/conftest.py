@@ -7,7 +7,7 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             periodic_info=stk.PeriodicInfo(
                 vector_1=np.array([109.29499828, 0., 0.]),
                 vector_2=np.array([18.21583305, 31.54982284, 0.]),
@@ -25,6 +25,6 @@ from .case_data import CaseData
         ),
     ),
 )
-def periodic_case(request):
+def periodic_case(request) -> CaseData:
 
-    return request.param
+    return request.param()
