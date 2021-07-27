@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from .building_blocks import (
+from ...building_blocks import (
     get_other_linker,
     get_palladium_cispbi_sqpl,
 )

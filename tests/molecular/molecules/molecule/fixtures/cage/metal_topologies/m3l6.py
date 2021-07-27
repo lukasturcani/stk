@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from .building_blocks import get_pd_atom, get_linker
+from ...building_blocks import get_pd_atom, get_linker
 from ....case_data import CaseData
 
 

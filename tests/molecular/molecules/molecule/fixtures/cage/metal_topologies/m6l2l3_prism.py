@@ -1,8 +1,7 @@
 import pytest
 import stk
 
-from .building_blocks import (
-    get_fe_atom,
+from ...building_blocks import (
     get_tetratopic_linker,
     get_tritopic_linker,
     get_iron_complex,

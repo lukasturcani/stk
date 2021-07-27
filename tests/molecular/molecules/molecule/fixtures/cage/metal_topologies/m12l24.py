@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from .building_blocks import get_pd_atom, get_linker
+from ...building_blocks import get_pd_atom, get_linker
 from ....case_data import CaseData
 
 
@@ -85,4 +85,6 @@ from ....case_data import CaseData
     ),
 )
 def metal_cage_m12l24(request) -> CaseData:
-    return request.param(request.node.orginalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
