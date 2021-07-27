@@ -821,20 +821,22 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             for key in keys:
                 posmat_key = f'posmat_{key}'
                 mol_key = f'mol_{key}'
-                if posmat_key in entry and len(entry[posmat_key]) > 0:
-                    if mol_key in entry and len(entry[mol_key]) > 0:
-                        yield self._dejsonizer.from_json({
-                            'molecule': {
-                                'a': entry[mol_key][0]['a'],
-                                'b': entry[mol_key][0]['b'],
-                            },
-                            'constructedMolecule': const_molecule,
-                            'matrix': {
-                                'm': entry[posmat_key][0]['m'],
-                            },
-                            'buildingBlocks': tuple(map(
-                                self._get_building_block,
-                                entry['BB'],
-                            ))
-                        })
-                        break
+                if (
+                    posmat_key in entry and len(entry[posmat_key]) > 0
+                    and mol_key in entry and len(entry[mol_key]) > 0
+                ):
+                    yield self._dejsonizer.from_json({
+                        'molecule': {
+                            'a': entry[mol_key][0]['a'],
+                            'b': entry[mol_key][0]['b'],
+                        },
+                        'constructedMolecule': const_molecule,
+                        'matrix': {
+                            'm': entry[posmat_key][0]['m'],
+                        },
+                        'buildingBlocks': tuple(map(
+                            self._get_building_block,
+                            entry['BB'],
+                        ))
+                    })
+                    break
