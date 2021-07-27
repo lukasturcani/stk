@@ -26,6 +26,7 @@ _bi_1 = stk.BuildingBlock(
 
 
 @pytest.fixture(
+    scope='session',
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
