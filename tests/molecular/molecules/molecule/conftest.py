@@ -204,49 +204,56 @@ dative_molecule.AddConformer(
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.BuildingBlock('[H]NCCN'),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.BuildingBlock('C(N)CN'),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=(
                 stk.BuildingBlock('C(N)CN')
                 .with_canonical_atom_ordering()
             ),
             smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=(
                 stk.BuildingBlock.init_from_rdkit_mol(dative_molecule)
             ),
             smiles='N->[Fe+2]',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.BuildingBlock(
                 smiles='[Fe+2]',
                 position_matrix=[[0, 0, 0]],
             ),
             smiles='[Fe+2]',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.BuildingBlock(
                 smiles='[Fe+2]',
                 position_matrix=np.array([[0, 0, 0]]),
             ),
             smiles='[Fe+2]',
+            name=name,
         ),
     ),
 )
-def building_block(request):
-    return request.param
+def building_block(request) -> CaseData:
+    return request.param(request.node.originalname)
 
 
 @pytest.fixture(
