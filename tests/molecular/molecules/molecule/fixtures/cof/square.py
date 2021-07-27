@@ -34,4 +34,6 @@ from ...case_data import CaseData
     ),
 )
 def cof_square(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
