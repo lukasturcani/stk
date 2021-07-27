@@ -1,5 +1,4 @@
 import pytest
-import re
 import os
 from pytest_lazyfixture import lazy_fixture
 import stk
@@ -287,7 +286,7 @@ def case_data(request):
         os.path.dirname(os.path.realpath(__file__)),
         'fixtures',
         'position_matrices',
-        f'{_get_filename(request)}.npy',
+        f'{request.param.name}.npy',
     )
 
     if not os.path.exists(path):
@@ -343,28 +342,3 @@ def name_db(mongo_client):
             stk.Smiles().get_key_name(),
         ),
     )
-
-
-def _get_filename(request):
-    """
-    Get the filename for a position matrix of a molecule.
-
-    Parameters
-    ----------
-    request : :class:`pytest.Request`
-        The :mod:`pytest` request holding the test information.
-
-    Returns
-    -------
-    :class:`str`
-        The filename for the position matrix.
-
-    """
-
-    # "request.node.name" has a value of the form
-    # test_something[param1-param2-param3].
-    # Therefore, return the last "param" value, because that is the
-    # name of the fixture from which the molecule originates + a unique
-    # id.
-    p = re.compile(r'\[(.*)\]')
-    return p.search(request.node.name).group(1).split('-')[-1]

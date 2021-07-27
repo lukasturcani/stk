@@ -1,3 +1,4 @@
+import stk
 import numpy as np
 
 
@@ -5,23 +6,35 @@ class CaseData:
     """
     A test case.
 
-    Attributes
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule to be tested.
+    Attributes:
 
-    smiles : :class:`str`
-        The smiles for the molecule.
+        molecule:
+            The molecule to be tested.
 
-    position_matrix : :class:`numpy.ndarray`
-        The position matrix of the molecule.
+        smiles:
+            The smiles for the molecule.
+
+        name:
+            The name of the test case.
+
+        position_matrix:
+            The position matrix of the molecule.
 
     """
 
-    def __init__(self, molecule, smiles):
+    position_matrix: np.ndarray
+
+    def __init__(
+        self,
+        molecule: stk.Molecule,
+        smiles: str,
+        name: str,
+    ) -> None:
+
         self.molecule = molecule
         self.smiles = smiles
-        self.position_matrix = None
+        self.name = name
+        self.position_matrix = molecule.get_position_matrix()
 
     def with_position_matrix(self, path):
         """
@@ -51,5 +64,5 @@ class CaseData:
     def __repr__(self):
         return (
             f'{self.__class__.__name__}('
-            f'{self.molecule}, {self.smiles!r})'
+            f'{self.molecule}, {self.smiles!r}, {self.name!r})'
         )
