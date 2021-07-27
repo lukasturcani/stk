@@ -77,7 +77,11 @@ from ...case_data import CaseData
                     num_repeating_units=3,
                 ),
             ),
-            smiles='BrC1=C(Br)N=[C+]1',
+            smiles=(
+                '[H]C([H])(Br)C([H])([H])C([H])([H])C([H])([H])C([H])('
+                '[H])C([H])([H])C([H])([H])C([H])([H])C([H])([H])C([H]'
+                ')([H])C([H])([H])C([H])([H])Br'
+            ),
         ),
     ),
 )
