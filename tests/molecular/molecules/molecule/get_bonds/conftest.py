@@ -6,7 +6,7 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             bonds=(
                 stk.Bond(stk.N(0), stk.C(1), 1),
@@ -24,5 +24,5 @@ from .case_data import CaseData
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

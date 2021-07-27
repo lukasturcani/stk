@@ -11,14 +11,15 @@ from .fixtures import *  # noqa
 
 
 @pytest.fixture(
+    scope='session',
     params=[
-        stk.BuildingBlock.init(
+        lambda: stk.BuildingBlock.init(
             atoms=(stk.C(0, 4), ),
             bonds=(),
             position_matrix=np.array([[0.0, 0.0, 0.0]]),
             functional_groups=(),
         ),
-        stk.BuildingBlock.init(
+        lambda: stk.BuildingBlock.init(
             atoms=(stk.C(0, 3), stk.H(1)),
             bonds=(stk.Bond(stk.C(0, 3), stk.H(1), 1), ),
             position_matrix=np.array([
@@ -27,7 +28,7 @@ from .fixtures import *  # noqa
             ]),
             functional_groups=(),
         ),
-        stk.BuildingBlock.init(
+        lambda: stk.BuildingBlock.init(
             atoms=(stk.C(0, 2), stk.H(1), stk.H(2)),
             bonds=(
                 stk.Bond(stk.C(0, 2), stk.H(1), 1),
@@ -40,18 +41,18 @@ from .fixtures import *  # noqa
             ]),
             functional_groups=(),
         ),
-        stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock(
+        lambda: stk.BuildingBlock('NCCN'),
+        lambda: stk.BuildingBlock(
             'C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc'
             '(C#Cc4cccc5cnccc54)cc3c2c1'
         ),
-        stk.BuildingBlock(
+        lambda: stk.BuildingBlock(
             'C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc'
             '(C#Cc4cccc5ccncc45)cc3c2c1'
         ),
-        stk.BuildingBlock('N[C+][C+2]N'),
-        stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
-        stk.ConstructedMolecule(
+        lambda: stk.BuildingBlock('N[C+][C+2]N'),
+        lambda: stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
+        lambda: stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(
                     stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
@@ -65,15 +66,14 @@ from .fixtures import *  # noqa
             ),
         ),
     ],
-    scope='function',
 )
-def molecule(request):
+def molecule(request) -> stk.Molecule:
     """
     A :class:`.Molecule` instance.
 
     """
 
-    return request.param.clone()
+    return request.param()
 
 
 def get_random_position_matrix(molecule):
@@ -196,10 +196,12 @@ def get_atom_ids(request):
     return request.param
 
 
-dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
-dative_molecule.AddConformer(
-    conf=rdkit.Conformer(dative_molecule.GetNumAtoms()),
-)
+def _get_dative_molecule() -> rdkit.Mol:
+    dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
+    dative_molecule.AddConformer(
+        conf=rdkit.Conformer(dative_molecule.GetNumAtoms()),
+    )
+    return dative_molecule
 
 
 @pytest.fixture(
@@ -229,7 +231,9 @@ dative_molecule.AddConformer(
         ),
         lambda name: CaseData(
             molecule=(
-                stk.BuildingBlock.init_from_rdkit_mol(dative_molecule)
+                stk.BuildingBlock.init_from_rdkit_mol(
+                    molecule=_get_dative_molecule(),
+                )
             ),
             smiles='N->[Fe+2]',
             name=name,
