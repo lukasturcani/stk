@@ -11,6 +11,7 @@ from ...case_data import CaseData
         lazy_fixture('center'),
         lazy_fixture('head'),
         lazy_fixture('tail'),
+        lazy_fixture('unaligning'),
     ),
 )
 def case_data(request):
@@ -41,6 +42,16 @@ def head(id, position, flip):
 def tail(id, position, flip):
     return CaseData(
         vertex=stk.polymer.linear.TailVertex(id, position, flip),
+        id=id,
+        position=position,
+        cell=np.array([0, 0, 0]),
+    )
+
+
+@pytest.fixture
+def unaligning(id, position, flip):
+    return CaseData(
+        vertex=stk.polymer.linear.UnaligningVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
