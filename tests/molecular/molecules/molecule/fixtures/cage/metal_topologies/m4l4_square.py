@@ -101,4 +101,6 @@ def _get_palladium_cispbi_sqpl() -> stk.BuildingBlock:
     ),
 )
 def metal_cage_m4l4_square(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
