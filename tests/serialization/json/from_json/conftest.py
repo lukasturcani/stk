@@ -6,6 +6,7 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
         lambda: CaseData(
             dejsonizer=stk.MoleculeDejsonizer(),
