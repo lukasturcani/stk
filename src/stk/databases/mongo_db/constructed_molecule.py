@@ -695,6 +695,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         indices = chain(
             self._position_matrices.index_information().values(),
             self._molecules.index_information().values(),
+            self._constructed_molecules.index_information().values(),
         )
         keys = tuple(dedupe(
             index['key'][0][0]
@@ -808,7 +809,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             },
         )
 
-        cursor = self._molecules.aggregate(query)
+        cursor = self._constructed_molecules.aggregate(query)
         for entry in cursor:
             const_molecule = {
                 'BB': entry['BB'],
