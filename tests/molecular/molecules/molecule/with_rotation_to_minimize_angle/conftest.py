@@ -3,10 +3,11 @@ import stk
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock('Brc1ccc(Br)cc1Br', [stk.BromoFactory()]),
-        stk.ConstructedMolecule(
+        lambda: stk.BuildingBlock('NCCN'),
+        lambda: stk.BuildingBlock('Brc1ccc(Br)cc1Br', [stk.BromoFactory()]),
+        lambda: stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(
                     stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
@@ -21,10 +22,10 @@ import stk
         ),
     ),
 )
-def molecule(request):
+def molecule(request) -> stk.Molecule:
     """
     A :class:`.Molecule` instance with at least 3 atoms.
 
     """
 
-    return request.param.clone()
+    return request.param()
