@@ -48,7 +48,7 @@ def test_get_all(mongo_client):
     )
 
     building_blocks = (
-        stk.BuildingBlock('BrCBr', [stk.BromoFactory()]),
+        stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
         stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
         stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()]),
         stk.BuildingBlock('BrCCCCBr', [stk.BromoFactory()]),
