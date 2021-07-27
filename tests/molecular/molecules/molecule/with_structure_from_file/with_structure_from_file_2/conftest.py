@@ -5,52 +5,53 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN.mae',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN.xyz',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN.pdb',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN_with_cell.pdb',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN.mol',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN.coord',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN_with_cell1.coord',
         ),
 
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             path='NCCN_with_cell2.coord',
         ),
     ),
 )
-def case_data(request):
+def case_data(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
     """
 
-    return request.param
+    return request.param()
