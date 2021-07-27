@@ -253,7 +253,9 @@ dative_molecule.AddConformer(
     ),
 )
 def building_block(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
 
 
 @pytest.fixture(
