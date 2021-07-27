@@ -129,4 +129,6 @@ def _get_guests() -> tuple[stk.host_guest.Guest, ...]:
     ),
 )
 def host_guest_complex(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
