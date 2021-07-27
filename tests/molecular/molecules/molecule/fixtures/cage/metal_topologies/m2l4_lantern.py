@@ -13,19 +13,19 @@ from ....case_data import CaseData
                 stk.cage.M2L4Lantern(
                     building_blocks={
                         get_pd_atom(): range(2),
-                        get_linker(): range(2, 6)
+                        get_linker(): range(2, 6),
                     },
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
                                 frozenset({
                                     stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
-                            }
-                        )
-                    )
-                )
+                                    stk.SingleAtom,
+                                }): 9,
+                            },
+                        ),
+                    ),
+                ),
             ),
             smiles=(
                 '[H]C1=C([H])C2=C([H])C(=C1[H])C1=C([H])C([H])=N(->['
@@ -42,4 +42,6 @@ from ....case_data import CaseData
     ),
 )
 def metal_cage_m2l4_lantern(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

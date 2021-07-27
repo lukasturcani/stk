@@ -10,22 +10,22 @@ from ....case_data import CaseData
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                stk.cage.M24L48(
+                topology_graph=stk.cage.M24L48(
                     building_blocks={
                         get_pd_atom(): range(24),
-                        get_linker(): range(24, 72)
+                        get_linker(): range(24, 72),
                     },
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
                                 frozenset({
                                     stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
-                            }
-                        )
-                    )
-                )
+                                    stk.SingleAtom,
+                                }): 9,
+                            },
+                        ),
+                    ),
+                ),
             ),
             smiles=(
                 '[H]C1=C([H])C2=C([H])C(=C1[H])C1=C([H])C([H])=N(->['
@@ -129,8 +129,11 @@ from ....case_data import CaseData
                 '([H])=C%20[H])C([H])=C%17[H])C([H])=C%14[H])C([H])=C'
                 '%11[H])C([H])=C8[H])C([H])=C5[H])C([H])=C1[H]'
             ),
+            name=name,
         ),
     ),
 )
 def metal_cage_m24l48(request) -> CaseData:
-    return request.param(request.param.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

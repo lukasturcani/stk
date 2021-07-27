@@ -58,4 +58,6 @@ from ....case_data import CaseData
     ),
 )
 def metal_cage_m6l2l3_prism(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

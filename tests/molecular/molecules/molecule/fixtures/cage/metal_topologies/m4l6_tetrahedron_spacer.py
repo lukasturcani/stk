@@ -46,4 +46,6 @@ from ....case_data import CaseData
     ),
 )
 def metal_cage_m4l6_tetrahedron_spacer(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

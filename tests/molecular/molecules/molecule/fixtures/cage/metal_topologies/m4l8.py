@@ -50,4 +50,6 @@ from ....case_data import CaseData
     ),
 )
 def metal_cage_m4l8(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

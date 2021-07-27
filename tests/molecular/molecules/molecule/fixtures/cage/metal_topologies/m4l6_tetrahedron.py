@@ -12,6 +12,7 @@ def _get_fake_complex() -> stk.BuildingBlock:
 
 
 @pytest.fixture(
+    scope='session',
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
@@ -31,4 +32,6 @@ def _get_fake_complex() -> stk.BuildingBlock:
     ),
 )
 def metal_cage_m4l6_tetrahedron(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
