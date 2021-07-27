@@ -7,7 +7,7 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             dejsonizer=stk.MoleculeDejsonizer(),
             json={
                 'molecule': {
@@ -45,7 +45,7 @@ from .case_data import CaseData
                 [3., 0., 0.],
             ])),
         ),
-        CaseData(
+        lambda: CaseData(
             dejsonizer=stk.ConstructedMoleculeDejsonizer(),
             json={
                 'molecule': {
@@ -162,10 +162,10 @@ from .case_data import CaseData
         ),
     ),
 )
-def case_data(request):
+def case_data(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
     """
 
-    return request.param
+    return request.param()
