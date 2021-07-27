@@ -170,3 +170,21 @@ def get_iron_complex() -> stk.BuildingBlock:
         molecule=iron_complex,
         functional_groups=[stk.BromoFactory()]
     )
+
+
+def get_iron_bi_1() -> stk.BuildingBlock:
+    return stk.BuildingBlock(
+        smiles='BrN=Cc1ccccn1',
+        functional_groups=[
+            stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#35]',
+                bonders=(1, ),
+                deleters=(),
+            ),
+            stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
+        ]
+    )

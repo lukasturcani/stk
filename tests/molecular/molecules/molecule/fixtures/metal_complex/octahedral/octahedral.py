@@ -1,28 +1,21 @@
 import pytest
 import stk
 
+from ...building_blocks import get_fe_atom
 from ....case_data import CaseData
 
 
-_iron_atom = stk.BuildingBlock(
-    smiles='[Fe+2]',
-    functional_groups=(
-        stk.SingleAtom(stk.Fe(0, charge=2))
-        for i in range(6)
-    ),
-    position_matrix=([0, 0, 0], ),
-)
-
-_iron_mo_1 = stk.BuildingBlock(
-    smiles='c1cc2c(cn1)CCCCC2',
-    functional_groups=[
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#6]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-    ]
-)
+def _get_iron_mo_1() -> stk.BuildingBlock:
+    return stk.BuildingBlock(
+        smiles='c1cc2c(cn1)CCCCC2',
+        functional_groups=[
+            stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
+        ]
+    )
 
 
 @pytest.fixture(
@@ -31,8 +24,8 @@ _iron_mo_1 = stk.BuildingBlock(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.metal_complex.Octahedral(
-                    metals={_iron_atom: 0},
-                    ligands={_iron_mo_1: (0, 1, 2, 3, 4, 5)},
+                    metals={get_fe_atom(): 0},
+                    ligands={_get_iron_mo_1(): (0, 1, 2, 3, 4, 5)},
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
@@ -63,8 +56,8 @@ _iron_mo_1 = stk.BuildingBlock(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.metal_complex.Octahedral(
-                    metals=_iron_atom,
-                    ligands=_iron_mo_1,
+                    metals=get_fe_atom(),
+                    ligands=_get_iron_mo_1(),
                     reaction_factory=stk.DativeReactionFactory(
                         reaction_factory=stk.GenericReactionFactory(
                             bond_orders={
@@ -94,4 +87,6 @@ _iron_mo_1 = stk.BuildingBlock(
     ),
 )
 def metal_complex_octahedral(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
