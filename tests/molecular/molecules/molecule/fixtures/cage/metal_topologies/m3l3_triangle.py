@@ -1,10 +1,11 @@
 import pytest
 import stk
 
-from .building_blocks import get_metal_atom, get_palladium_cispbi_sqpl
+from .building_blocks import (
+    get_other_linker,
+    get_palladium_cispbi_sqpl,
+)
 from ....case_data import CaseData
-
-
 
 
 @pytest.fixture(
@@ -14,7 +15,7 @@ from ....case_data import CaseData
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cage.M3L3Triangle(
                     corners=get_palladium_cispbi_sqpl(),
-                    linkers=_get_linker(),
+                    linkers=get_other_linker(),
                     reaction_factory=stk.DativeReactionFactory(
                         reaction_factory=stk.GenericReactionFactory(
                             bond_orders={

@@ -1,7 +1,7 @@
 import pytest
 import stk
 
-from .building_blocks import get_metal_atom, get_linker
+from .building_blocks import get_pd_atom, get_linker
 from ....case_data import CaseData
 
 
@@ -12,7 +12,7 @@ from ....case_data import CaseData
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cage.M3L6(
                     building_blocks={
-                        get_metal_atom(): range(3),
+                        get_pd_atom(): range(3),
                         get_linker(): range(3, 9),
                     },
                     reaction_factory=stk.DativeReactionFactory(

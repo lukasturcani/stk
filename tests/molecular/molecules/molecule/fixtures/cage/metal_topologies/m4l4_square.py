@@ -2,7 +2,7 @@ import pytest
 import stk
 
 from .building_blocks import (
-    get_metal_atom,
+    get_pd_atom,
     get_other_linker,
     get_palladium_bi_1,
 )
@@ -12,7 +12,7 @@ from ....case_data import CaseData
 def _get_palladium_cispbi_sqpl() -> stk.BuildingBlock:
     palladium_cispbi_sqpl = stk.ConstructedMolecule(
         topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
-            metals=get_metal_atom(),
+            metals=get_pd_atom(),
             ligands=get_palladium_bi_1(),
         ),
     )
