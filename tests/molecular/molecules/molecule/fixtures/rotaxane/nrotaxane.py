@@ -84,4 +84,6 @@ cycle2 = stk.ConstructedMolecule(
     ),
 )
 def rotaxane_nrotaxane(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
