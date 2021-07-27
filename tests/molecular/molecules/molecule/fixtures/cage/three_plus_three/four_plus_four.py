@@ -35,4 +35,6 @@ from ....case_data import CaseData
     ),
 )
 def cage_four_plus_four(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
