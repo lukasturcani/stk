@@ -1,68 +1,10 @@
 import pytest
 import stk
 
-from .building_blocks import get_metal_atom
+from .building_blocks import get_metal_atom, get_palladium_cispbi_sqpl
 from ....case_data import CaseData
 
 
-def _get_palladium_bi_1() -> stk.BuildingBlock:
-    return stk.BuildingBlock(
-        smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
-        functional_groups=[
-            stk.SmartsFunctionalGroupFactory(
-                smarts='[#7]~[#6]',
-                bonders=(0, ),
-                deleters=(),
-            ),
-        ],
-    )
-
-
-def _get_palladium_cispbi_sqpl() -> stk.BuildingBlock:
-    molecule = stk.ConstructedMolecule(
-        topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
-            metals={get_metal_atom(): 0},
-            ligands={_get_palladium_bi_1(): 0},
-            reaction_factory=stk.DativeReactionFactory(
-                reaction_factory=stk.GenericReactionFactory(
-                    bond_orders={
-                        frozenset({
-                            stk.GenericFunctionalGroup,
-                            stk.SingleAtom
-                        }): 9,
-                    },
-                ),
-            ),
-        ),
-    )
-
-    return stk.BuildingBlock.init_from_molecule(
-        molecule=molecule,
-        functional_groups=[
-            stk.SmartsFunctionalGroupFactory(
-                smarts='[Pd]~[#7]',
-                bonders=(0, ),
-                deleters=(),
-                placers=(0, 1),
-            ),
-        ],
-    )
-
-
-def _get_linker() -> stk.BuildingBlock:
-    return stk.BuildingBlock(
-        smiles=(
-            '[H]C1=NC([H])=C([H])C(C2=C([H])C([H])=NC([H])=C2[H])'
-            '=C1[H]'
-        ),
-        functional_groups=[
-            stk.SmartsFunctionalGroupFactory(
-                smarts='[#6]~[#7X2]~[#6]',
-                bonders=(1, ),
-                deleters=(),
-            ),
-        ],
-    )
 
 
 @pytest.fixture(
@@ -71,7 +13,7 @@ def _get_linker() -> stk.BuildingBlock:
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cage.M3L3Triangle(
-                    corners=_get_palladium_cispbi_sqpl(),
+                    corners=get_palladium_cispbi_sqpl(),
                     linkers=_get_linker(),
                     reaction_factory=stk.DativeReactionFactory(
                         reaction_factory=stk.GenericReactionFactory(
