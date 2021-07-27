@@ -63,15 +63,6 @@ def _get_palladium_cispbi_sqpl() -> stk.BuildingBlock:
             ),
             name=name,
         ),
-    ),
-)
-def metal_cage_m4l4_square(request) -> CaseData:
-    return request.param(request.node.originalname)
-
-
-@pytest.fixture(
-    scope='session',
-    params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cage.M4L4Square(
@@ -109,5 +100,5 @@ def metal_cage_m4l4_square(request) -> CaseData:
         ),
     ),
 )
-def metal_cage_opt_m4l4_square(request) -> CaseData:
+def metal_cage_m4l4_square(request) -> CaseData:
     return request.param(request.node.originalname)

@@ -27,7 +27,7 @@ _bi_1 = stk.BuildingBlock(
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.CisProtectedSquarePlanar(
                     metals={_palladium_atom: 0},
@@ -47,9 +47,10 @@ _bi_1 = stk.BuildingBlock(
             smiles=(
                 '[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]<-N1([H])[H]'
             ),
+            name=name,
         ),
 
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.CisProtectedSquarePlanar(
                     metals=_palladium_atom,
@@ -69,8 +70,9 @@ _bi_1 = stk.BuildingBlock(
             smiles=(
                 '[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]<-N1([H])[H]'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_cis_protected_square_planar(request):
-    return request.param
+def metal_complex_cis_protected_square_planar(request) -> CaseData:
+    return request.param(request.node.originalname)

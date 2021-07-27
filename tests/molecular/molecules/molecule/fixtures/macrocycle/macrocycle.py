@@ -6,8 +6,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.macrocycle.Macrocycle(
                     building_blocks=(
@@ -29,8 +30,9 @@ from ...case_data import CaseData
                 '+]1)C1=C([C+]=[C+]1)C1=C(N=[C+]1)C1=C([C+]=[C+]1)C1=C'
                 '2N=[C+]1'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.macrocycle.Macrocycle(
                     building_blocks=(
@@ -47,11 +49,12 @@ from ...case_data import CaseData
                 'N1=NN2N1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N'
                 '=NN21'
             ),
+            name=name,
         ),
     ),
 )
-def macrocycle_macrocycle(request):
-    return request.param
+def macrocycle_macrocycle(request) -> CaseData:
+    return request.param(request.node.originalname)
 
 
 @pytest.fixture(

@@ -26,8 +26,9 @@ _bi_1 = stk.BuildingBlock(
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.BidentateSquarePlanar(
                     metals={_palladium_atom: 0},
@@ -48,9 +49,10 @@ _bi_1 = stk.BuildingBlock(
                 '[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]2(<-N1([H])'
                 '[H])<-N([H])([H])C([H])([H])C([H])([H])N->2([H])[H]'
             ),
+            name=name,
         ),
 
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.BidentateSquarePlanar(
                     metals=_palladium_atom,
@@ -71,8 +73,9 @@ _bi_1 = stk.BuildingBlock(
                 '[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]2(<-N1([H])'
                 '[H])<-N([H])([H])C([H])([H])C([H])([H])N->2([H])[H]'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_bidentate_square_planar(request):
-    return request.param
+def metal_complex_bidentate_square_planar(request) -> CaseData:
+    return request.param(request.node.originalname)

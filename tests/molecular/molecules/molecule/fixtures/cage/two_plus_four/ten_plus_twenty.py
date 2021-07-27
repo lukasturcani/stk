@@ -5,8 +5,9 @@ from ....case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cage.TenPlusTwenty(
                     building_blocks=(
@@ -40,8 +41,9 @@ from ....case_data import CaseData
                 'C(N=[C+]1)C71[C+]=N[C+]61)C1=C(N=[C+]1)C%131[C+]=N[C+'
                 ']81'
             ),
+            name=name,
         ),
     ),
 )
-def cage_ten_plus_twenty(request):
-    return request.param
+def cage_ten_plus_twenty(request) -> CaseData:
+    return request.param(request.node.originalname)

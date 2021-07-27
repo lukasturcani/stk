@@ -26,8 +26,9 @@ _mo_1 = stk.BuildingBlock(
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.SquarePlanar(
                     metals={_palladium_atom: 0},
@@ -43,8 +44,9 @@ _mo_1 = stk.BuildingBlock(
                 '([H])C3([H])[H])=C([H])C2=C1C([H])([H])C([H])([H])C(['
                 'H])([H])C([H])([H])C2([H])[H]'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.SquarePlanar(
                     metals=_palladium_atom,
@@ -60,8 +62,9 @@ _mo_1 = stk.BuildingBlock(
                 '([H])C3([H])[H])=C([H])C2=C1C([H])([H])C([H])([H])C(['
                 'H])([H])C([H])([H])C2([H])[H]'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_square_planar(request):
-    return request.param
+def metal_complex_square_planar(request) -> CaseData:
+    return request.param(request.node.originalname)

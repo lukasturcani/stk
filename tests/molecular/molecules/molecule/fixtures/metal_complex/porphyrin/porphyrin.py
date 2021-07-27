@@ -29,8 +29,9 @@ _quad_1 = stk.BuildingBlock(
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.Porphyrin(
                     metals={_zinc_atom: 0},
@@ -54,8 +55,9 @@ _quad_1 = stk.BuildingBlock(
                 '([H])=C2[H])=C2C([H])=C([H])C(=C4C3=C([H])C([H])=C(Br'
                 ')C([H])=C3[H])N->52)=C([H])C([H])=C1Br'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.Porphyrin(
                     metals=_zinc_atom,
@@ -79,8 +81,9 @@ _quad_1 = stk.BuildingBlock(
                 '([H])=C2[H])=C2C([H])=C([H])C(=C4C3=C([H])C([H])=C(Br'
                 ')C([H])=C3[H])N->52)=C([H])C([H])=C1Br'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_porphyrin(request):
-    return request.param
+def metal_complex_porphyrin(request) -> CaseData:
+    return request.param(request.node.originalname)

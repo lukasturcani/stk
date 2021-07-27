@@ -32,8 +32,9 @@ _iron_bi_1 = stk.BuildingBlock(
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.OctahedralLambda(
                     metals={_iron_atom: 0},
@@ -55,8 +56,9 @@ _iron_bi_1 = stk.BuildingBlock(
                 '])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)'
                 '<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.OctahedralLambda(
                     metals=_iron_atom,
@@ -78,8 +80,9 @@ _iron_bi_1 = stk.BuildingBlock(
                 '])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)'
                 '<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_octahedral_lambda(request):
-    return request.param
+def metal_complex_octahedral_lambda(request) -> CaseData:
+    return request.param(request.node.originalname)

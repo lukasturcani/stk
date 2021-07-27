@@ -46,8 +46,9 @@ cycle2 = stk.ConstructedMolecule(
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.rotaxane.NRotaxane(
                     axle=stk.BuildingBlock.init_from_molecule(axle),
@@ -78,8 +79,9 @@ cycle2 = stk.ConstructedMolecule(
                 '+]=[C+][C+]1[C+]1[C+]=[C+][C+]1[C+]1[C+]=[C+][C+]1[C+'
                 ']1[C+]=[C+][C+]21'
             ),
+            name=name,
         ),
     ),
 )
-def rotaxane_nrotaxane(request):
-    return request.param
+def rotaxane_nrotaxane(request) -> CaseData:
+    return request.param(request.node.originalname)

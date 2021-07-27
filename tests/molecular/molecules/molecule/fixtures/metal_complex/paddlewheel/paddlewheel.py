@@ -56,7 +56,7 @@ _bi_2 = stk.BuildingBlock(
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.Paddlewheel(
                     metals={
@@ -85,9 +85,10 @@ _bi_2 = stk.BuildingBlock(
                 '=C(N([H])[H])C([H])=C2[H])=O->3)<-OC(C2=C([H])C([H])'
                 '=C(N([H])[H])C([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
             ),
+            name=name,
         ),
 
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.Paddlewheel(
                     metals=_copper_atom,
@@ -110,8 +111,9 @@ _bi_2 = stk.BuildingBlock(
                 '=C(Br)C([H])=C2[H])=O->3)<-OC(C2=C([H])C([H])=C(Br)C'
                 '([H])=C2[H])=O->4)=C([H])C([H])=C1Br'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_paddlewheel(request):
-    return request.param
+def metal_complex_paddlewheel(request) -> CaseData:
+    return request.param(request.node.originalname)
