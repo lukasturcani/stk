@@ -5,6 +5,7 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
@@ -48,4 +49,6 @@ from ...case_data import CaseData
     ),
 )
 def cof_kagome(request) -> CaseData:
-    return request.param(request.node.originalname)
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
