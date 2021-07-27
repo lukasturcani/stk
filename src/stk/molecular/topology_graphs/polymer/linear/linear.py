@@ -440,7 +440,26 @@ class Linear(TopologyGraph):
                 building_block_vertices.get(bb, [])
             )
             building_block_vertices[bb].append(vertex)
+
+        building_block_vertices = self._with_unaligning_vertices(
+            building_block_vertices=building_block_vertices,
+        )
+
         return building_block_vertices
+
+    @staticmethod
+    def _with_unaligning_vertices(building_block_vertices):
+        clone = dict(building_block_vertices)
+        for building_block, vertices in clone.items():
+            # Building blocks with 1 placer, cannot be aligned and
+            # must therefore use an UnaligningVertex.
+            if len(set(building_block.get_placer_ids())) == 1:
+                clone[building_block] = tuple(map(
+                    UnaligningVertex.init_from_vertex,
+                    vertices,
+                ))
+
+        return clone
 
     def _get_scale(self, building_block_vertices):
         return max(
