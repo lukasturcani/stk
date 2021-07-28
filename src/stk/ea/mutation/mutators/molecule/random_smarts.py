@@ -118,7 +118,7 @@ class RandomSmarts(MoleculeMutator):
             self._query_smarts
         )
 
-        self._replacement_smiles = replacement_smiles
+        self._replacement_mol = rdkit.MolFromSmarts(replacement_smiles)
         self._is_replaceable = is_replaceable
         self._name = name
         self._generator = np.random.RandomState(random_seed)
@@ -137,11 +137,10 @@ class RandomSmarts(MoleculeMutator):
             a=replaceable_building_blocks,
         )
         rdmol = replaced_building_block.to_rdkit_mol()
-        replacer_smarts = rdkit.MolFromSmarts(self._replacement_smiles)
         new_rdmol = rdkit.rdmolops.ReplaceSubstructs(
             mol=rdmol,
             query=self._query_mol,
-            replacement=replacer_smarts,
+            replacement=self._replacement_mol,
             replaceAll=True,
         )[0]
         # Create new BuildingBlock
