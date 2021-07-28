@@ -20,24 +20,24 @@ class RandomSmarts(MoleculeMutator):
 
     This mutator takes a :class:`.ConstructedMolecule` and substitutes
     the existing building blocks with ones containing
-    new functionalities, as specified in the SMARTS strings.
+    new functionalities, as specified in the SMILES strings.
     Atoms in functional groups used to
     construct the :class: `.ConstructedMolecule` cannot be changed,
-    and will result in an error being raised, unless
+    and will result in an error being raised, unless the
     new functional groups are specified in `replacement_fgs`.
-    Only external functionalities can be replaced.
 
     Examples
     --------
-    *S Mutation*
+    *Smarts Mutation*
 
     .. testcode:: constructed-molecule-mutation
 
         import stk
 
         # Create a molecule which is to be mutated.
-        bb1 = (
-            stk.BuildingBlock('NCC(CF)CCN', [stk.PrimaryAminoFactory()]
+        bb1 = stk.BuildingBlock(
+            smiles='NCC(CF)CCN',
+            functional_groups=[stk.PrimaryAminoFactory()]
         )
         bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
         polymer = stk.MoleculeRecord(
@@ -52,7 +52,7 @@ class RandomSmarts(MoleculeMutator):
 
         random_smarts = stk.RandomSmarts(
             query_smarts="F",
-            replacement_smarts="Br",
+            replacement_smiles="Br",
             is_replaceable=has_primary_amino_group,
             replacement_fgs=[stk.PrimaryAminoFactory()],
         )
@@ -60,14 +60,25 @@ class RandomSmarts(MoleculeMutator):
         # Mutate a molecule.
         mutation_record1 = random_smarts.mutate(polymer)
 
+        # Create a mutator that will fail.
+
+        random_smarts_failed = stk.RandomSmarts(
+            query_smarts="N",
+            replacement_smiles="Br",
+            is_replaceable=has_primary_amino_group,
+            replacement_fgs=[stk.PrimaryAminoFactory()],
+        )
+        # This will raise an exception`.
+        mutation_record2 = random_smarts.mutate(polymer)
+
     """
 
     def __init__(
         self,
         query_smarts,
-        replacement_smarts,
+        replacement_smiles,
         is_replaceable,
-        replacement_fgs,
+        replacement_functional_groups,
         name='RandomSmarts',
         random_seed=None,
     ):
@@ -76,11 +87,11 @@ class RandomSmarts(MoleculeMutator):
 
         Parameters
         ----------
-        query_smarts : :class`str`
-            SMARTS string to match on the :class: `.BuildingBlock`
+        query_smarts : :class:`str`
+            SMARTS string to match on the :class:`.BuildingBlock`
 
-        replacement_smarts : :class`str`
-            SMARTS string to replace those in `query_smarts` on the
+        replacement_smiles : :class`str`
+            SMILES string to replace those in `query_smarts` on the
             :class: `.BuildingBlock`
 
         is_replaceable : :class:`callable`
@@ -104,23 +115,27 @@ class RandomSmarts(MoleculeMutator):
         """
 
         self._query_smarts = query_smarts
-        self._replacement_smarts = replacement_smarts
+        self._replacement_smiles = replacement_smiles
         self._is_replaceable = is_replaceable
         self._name = name
         self._generator = np.random.RandomState(random_seed)
-        self._replacement_fgs = tuple(replacement_fgs)
+        self._replacement_functional_groups = tuple(
+            replacement_functional_groups,
+        )
 
     def mutate(self, record):
-        replaceable_building_blocks = tuple(filter(
-            self._is_replaceable,
-            record.get_molecule().get_building_blocks(),
-        ))
+        replaceable_building_blocks = tuple(
+            filter(
+                self._is_replaceable,
+                record.get_molecule().get_building_blocks(),
+            ),
+        )
         replaced_building_block = self._generator.choice(
             a=replaceable_building_blocks,
         )
         rdmol = replaced_building_block.to_rdkit_mol()
         query = rdkit.MolFromSmarts(self._query_smarts)
-        replacer_smarts = rdkit.MolFromSmarts(self._replacement_smarts)
+        replacer_smarts = rdkit.MolFromSmarts(self._replacement_smiles)
         new_rdmol = rdkit.rdmolops.ReplaceSubstructs(
             mol=rdmol,
             query=query,
@@ -130,7 +145,7 @@ class RandomSmarts(MoleculeMutator):
         # Create new BuildingBlock
         replacement = BuildingBlock.init_from_rdkit_mol(
             molecule=new_rdmol,
-            functional_groups=self._replacement_fgs
+            functional_groups=self._replacement_functional_groups,
         )
         graph = record.get_topology_graph().with_building_blocks({
             replaced_building_block: replacement,
