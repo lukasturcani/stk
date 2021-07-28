@@ -101,7 +101,7 @@ class RandomSmarts(MoleculeMutator):
             Building blocks which returned ``True`` are liable for
             substitution.
 
-        replacement_functional_groups : :class:`iterable` of \
+        replacement_functional_groups : :class:`iterable` of
         :class:`.FunctionalGroupFactory`
             The functional group factories functional groups to the
             mutated building block.
@@ -140,7 +140,7 @@ class RandomSmarts(MoleculeMutator):
             mol=rdmol,
             query=query,
             replacement=replacer_smarts,
-            replaceAll=True
+            replaceAll=True,
         )[0]
         # Create new BuildingBlock
         replacement = BuildingBlock.init_from_rdkit_mol(
