@@ -114,7 +114,10 @@ class RandomSmarts(MoleculeMutator):
 
         """
 
-        self._query_smarts = query_smarts
+        self._query_mol = rdkit.MolFromSmarts(
+            self._query_smarts
+        )
+
         self._replacement_smiles = replacement_smiles
         self._is_replaceable = is_replaceable
         self._name = name
@@ -134,11 +137,10 @@ class RandomSmarts(MoleculeMutator):
             a=replaceable_building_blocks,
         )
         rdmol = replaced_building_block.to_rdkit_mol()
-        query = rdkit.MolFromSmarts(self._query_smarts)
         replacer_smarts = rdkit.MolFromSmarts(self._replacement_smiles)
         new_rdmol = rdkit.rdmolops.ReplaceSubstructs(
             mol=rdmol,
-            query=query,
+            query=self._query_mol,
             replacement=replacer_smarts,
             replaceAll=True,
         )[0]
