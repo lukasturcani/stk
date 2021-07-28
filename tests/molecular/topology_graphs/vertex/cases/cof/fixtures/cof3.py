@@ -52,7 +52,7 @@ class ShiftParams:
 
 @pytest.fixture(
     params=(
-        ShiftParams(
+        lambda: ShiftParams(
             vertices=(
                 stk.Vertex(1, [-1, 1, 2]),
                 stk.Vertex(2, [1, -1, -2]),
@@ -68,7 +68,7 @@ class ShiftParams:
             ),
             position=np.array([0., 0., 0.]),
         ),
-        ShiftParams(
+        lambda: ShiftParams(
             vertices=(
                 stk.Vertex(1, [-1, 1, 2]),
                 stk.Vertex(2, [1, -1, 0.]),
@@ -86,5 +86,5 @@ class ShiftParams:
         ),
     ),
 )
-def shift_params(request):
-    return request.param
+def shift_params(request) -> ShiftParams:
+    return request.param()

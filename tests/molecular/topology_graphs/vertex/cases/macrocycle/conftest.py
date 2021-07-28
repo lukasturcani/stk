@@ -7,7 +7,7 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             vertex=stk.macrocycle.CycleVertex(
                 id=0,
                 position=(1, 2, 3),
@@ -20,5 +20,5 @@ from ...case_data import CaseData
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

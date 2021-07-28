@@ -69,7 +69,7 @@ def get_edge(vertex):
 
 @pytest.fixture(
     params=(
-        stk.BuildingBlock(
+        lambda: stk.BuildingBlock(
             smiles='c1cc2c(cn1)CCCCC2',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -81,5 +81,5 @@ def get_edge(vertex):
         ),
     ),
 )
-def building_block_1(request):
-    return request.param
+def building_block_1(request) -> stk.BuildingBlock:
+    return request.param()

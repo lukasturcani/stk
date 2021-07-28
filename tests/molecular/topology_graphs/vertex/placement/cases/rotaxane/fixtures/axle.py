@@ -7,7 +7,7 @@ from ....case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             vertex=stk.rotaxane.AxleVertex(0, (1, 2, 3)),
             edges=(),
             building_block=stk.BuildingBlock('BrCCBr'),
@@ -17,5 +17,5 @@ from ....case_data import CaseData
         ),
     ),
 )
-def axle(request):
-    return request.param
+def axle(request) -> CaseData:
+    return request.param()

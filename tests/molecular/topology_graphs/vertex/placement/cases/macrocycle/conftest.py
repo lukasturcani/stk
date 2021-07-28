@@ -19,19 +19,19 @@ def case_data(request):
 
 @pytest.fixture(
     params=(
-        stk.BuildingBlock(
+        lambda: stk.BuildingBlock(
             smiles='BrCCNCBr',
             functional_groups=[stk.BromoFactory()],
         ),
     ),
 )
-def building_block_2(request):
+def building_block_2(request) -> stk.BuildingBlock:
     """
     A :class:`.BuildingBlock` with 2 functional groups.
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture(
