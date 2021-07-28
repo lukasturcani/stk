@@ -20,7 +20,7 @@ graph2 = stk.polymer.Linear((bb2, ), 'A', 2)
         CaseData(
             mutator=stk.RandomSmarts(
                 query_smarts='Cl',
-                replacement_smarts='F',
+                replacement_smiles='F',
                 is_replaceable=has_bromo,
                 replacement_functional_groups=[stk.BromoFactory()],
             ),
