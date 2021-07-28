@@ -11,7 +11,10 @@ def _get_cof_case() -> CaseData:
         building_blocks=(bb1, bb2),
         lattice_size=(1, 1, 1),
     )
-    cof = stk.ConstructedMolecule(topology_graph)
+    construction_result = topology_graph.construct()
+    cof = stk.ConstructedMolecule.init_from_construction_result(
+        construction_result=construction_result,
+    )
     return CaseData(
         molecule=cof,
         writer=stk.PdbWriter(),
@@ -106,7 +109,7 @@ def _get_cof_case() -> CaseData:
             '  30               \nCONECT    3   35               '
             '\nCONECT   14   36               \nEND\n'
         ),
-        periodic_info=topology_graph.get_periodic_info(),
+        periodic_info=construction_result.get_periodic_info(),
     )
 
 

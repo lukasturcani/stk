@@ -11,7 +11,10 @@ def _get_cof_case() -> CaseData:
         building_blocks=(bb1, bb2),
         lattice_size=(1, 1, 1),
     )
-    cof = stk.ConstructedMolecule(topology_graph)
+    construction_result = topology_graph.construct()
+    cof = stk.ConstructedMolecule.init_from_construction_result(
+        construction_result=construction_result,
+    )
     return CaseData(
         molecule=cof,
         writer=stk.TurbomoleWriter(),
@@ -40,7 +43,7 @@ def _get_cof_case() -> CaseData:
             '1.6749 H\n 7.9667 16.1026 53.582 H\n 7.7801 15.8075 5'
             '1.7756 H\n$end\n'
         ),
-        periodic_info=topology_graph.get_periodic_info(),
+        periodic_info=construction_result.get_periodic_info(),
     )
 
 
