@@ -1,5 +1,6 @@
 :author: Lukas Turcani
 :Documentation: https://stk.readthedocs.io
+:Discord: https://discord.gg/YvwdcjKf
 
 .. figure:: docs/source/figures/stk.png
 
@@ -15,7 +16,9 @@ Overview
 ``stk`` is a Python library which allows construction and
 manipulation of complex molecules, as well as automatic
 molecular design, and the creation of molecular, and molecular
-property, databases.
+property, databases. The documentation of ``stk`` is available on
+https://stk.readthedocs.io and Discord server can be joined through
+https://discord.gg/YvwdcjKf.
 
 Installation
 ============
