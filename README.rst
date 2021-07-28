@@ -17,8 +17,8 @@ Overview
 manipulation of complex molecules, as well as automatic
 molecular design, and the creation of molecular, and molecular
 property, databases. The documentation of ``stk`` is available on
-https://stk.readthedocs.io and Discord server can be joined through
-https://discord.gg/YvwdcjKf.
+https://stk.readthedocs.io and the project's Discord server can be
+joined through https://discord.gg/YvwdcjKf.
 
 Installation
 ============
