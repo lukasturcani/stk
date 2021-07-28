@@ -22,12 +22,12 @@ graph2 = stk.polymer.Linear((bb2, ), 'A', 2)
                 query_smarts='Cl',
                 replacement_smarts='F',
                 is_replaceable=has_bromo,
-                replacement_fgs=[stk.BromoFactory()],
+                replacement_functional_groups=[stk.BromoFactory()],
             ),
             record=stk.MoleculeRecord(graph1),
             mutation_record=stk.MutationRecord(
                 molecule_record=stk.MoleculeRecord(graph2),
-                mutator_name='RandomSmarts'
+                mutator_name='RandomSmarts',
             ),
         ),
     ),

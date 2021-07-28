@@ -49,11 +49,14 @@ def _test_mutate(mutator, record, mutation_record):
     assert (
         result.get_mutator_name() == mutation_record.get_mutator_name()
     )
-    original_mol = result.get_molecule_record(
-    ).get_molecule().with_canonical_atom_ordering()
-    mutated_mol = mutation_record.get_molecule_record(
+    mutated_mol = (
+        result.get_molecule_record()
+        .get_molecule()
+        .with_canonical_atom_ordering()
+    )
+    expected_mol = mutation_record.get_molecule_record(
     ).get_molecule().with_canonical_atom_ordering()
     is_equivalent(
-        molecule1=original_mol,
-        molecule2=mutated_mol
+        molecule1=mutated_mol,
+        molecule2=expected_mol,
     )
