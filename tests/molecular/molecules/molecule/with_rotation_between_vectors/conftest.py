@@ -7,7 +7,10 @@ import numpy as np
     scope='session',
     params=(
         lambda: stk.BuildingBlock('NCCN'),
-        lambda: stk.BuildingBlock('Brc1ccc(Br)cc1Br', [stk.BromoFactory()]),
+        lambda: stk.BuildingBlock(
+            smiles='Brc1ccc(Br)cc1Br',
+            functional_groups=[stk.BromoFactory()],
+        ),
         lambda: stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(

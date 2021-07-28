@@ -91,7 +91,10 @@ def init_at_center(request):
 @pytest.fixture(
     params=(
         lambda: (stk.Vertex(0, [1, 2, 3]), ),
-        lambda: (stk.Vertex(0, [1, 2, 3]), stk.Vertex(1, [-1, 2, -32])),
+        lambda: (
+            stk.Vertex(0, [1, 2, 3]),
+            stk.Vertex(1, [-1, 2, -32]),
+        ),
     ),
 )
 def vertices_(request) -> tuple[stk.Vertex, ...]:

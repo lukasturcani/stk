@@ -1,6 +1,5 @@
 import pytest
 import stk
-from rdkit.Chem import AllChem as rdkit
 
 from ...building_blocks import get_iron_bi_1, get_fe_atom
 from ....case_data import CaseData
