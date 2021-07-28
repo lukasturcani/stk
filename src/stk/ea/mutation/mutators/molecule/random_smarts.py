@@ -114,10 +114,7 @@ class RandomSmarts(MoleculeMutator):
 
         """
 
-        self._query_mol = rdkit.MolFromSmarts(
-            self._query_smarts
-        )
-
+        self._query_mol = rdkit.MolFromSmarts(query_smarts)
         self._replacement_mol = rdkit.MolFromSmarts(replacement_smiles)
         self._is_replaceable = is_replaceable
         self._name = name
