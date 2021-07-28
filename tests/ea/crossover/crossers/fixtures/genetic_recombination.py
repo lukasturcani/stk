@@ -14,8 +14,9 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             crosser=stk.GeneticRecombination(
                 get_gene=stk.BuildingBlock.get_num_functional_groups,
             ),
@@ -94,5 +95,5 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
         ),
     ),
 )
-def genetic_recombination(request):
-    return request.param
+def genetic_recombination(request) -> CaseData:
+    return request.param()

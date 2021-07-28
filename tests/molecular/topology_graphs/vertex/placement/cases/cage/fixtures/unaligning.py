@@ -7,7 +7,7 @@ from ....case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             vertex=stk.cage.UnaligningVertex(
                 vertex=stk.cage.vertices._CageVertex(0, (1, 2, 3)),
             ),
@@ -22,5 +22,5 @@ from ....case_data import CaseData
         ),
     ),
 )
-def unaligning(request):
-    return request.param
+def unaligning(request) -> CaseData:
+    return request.param()

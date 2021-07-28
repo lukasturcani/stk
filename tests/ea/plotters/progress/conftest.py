@@ -4,17 +4,20 @@ import pandas as pd
 
 from .case_data import CaseData
 
-topology_graph = stk.polymer.Linear(
-    building_blocks=(
-        stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-    ),
-    repeating_unit='A',
-    num_repeating_units=2,
-)
+
+def _get_topology_graph() -> stk.polymer.Linear:
+    return stk.polymer.Linear(
+        building_blocks=(
+            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+        ),
+        repeating_unit='A',
+        num_repeating_units=2,
+    )
 
 
 def get_generation(*fitness_values):
     v1, v2, v3, *_ = fitness_values
+    topology_graph = _get_topology_graph()
     return (
         stk.MoleculeRecord(
             topology_graph=topology_graph,
@@ -32,8 +35,9 @@ def get_generation(*fitness_values):
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             plotter=stk.ProgressPlotter(
                 generations=(
                     stk.Generation(
@@ -81,5 +85,5 @@ def get_generation(*fitness_values):
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

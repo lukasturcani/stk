@@ -6,8 +6,9 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init(
                 atoms=(stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)),
                 bonds=(
@@ -26,7 +27,7 @@ from ..case_data import CaseData
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init(
                 atoms=(stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)),
                 bonds=(
@@ -59,7 +60,7 @@ from ..case_data import CaseData
             core_atom_ids=(1, 2),
             placer_ids=(1, 2),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init(
                 atoms=(stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)),
                 bonds=(
@@ -79,7 +80,7 @@ from ..case_data import CaseData
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(1, 2),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init(
                 atoms=(stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)),
                 bonds=(
@@ -113,7 +114,7 @@ from ..case_data import CaseData
             core_atom_ids=(1, 2),
             placer_ids=(0, 3),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init(
                 atoms=(stk.Br(0), stk.C(1, 2), stk.C(2, 2), stk.Br(3)),
                 bonds=(
@@ -135,5 +136,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def init(request):
-    return request.param
+def init(request) -> CaseData:
+    return request.param()

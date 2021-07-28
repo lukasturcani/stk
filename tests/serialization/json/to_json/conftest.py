@@ -6,8 +6,9 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             jsonizer=stk.MoleculeJsonizer(
                 key_makers=(
                     stk.Inchi(),
@@ -50,7 +51,7 @@ from .case_data import CaseData
                 }
             },
         ),
-        CaseData(
+        lambda: CaseData(
             jsonizer=stk.ConstructedMoleculeJsonizer(
                 key_makers=(
                     stk.Inchi(),
@@ -172,5 +173,5 @@ from .case_data import CaseData
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

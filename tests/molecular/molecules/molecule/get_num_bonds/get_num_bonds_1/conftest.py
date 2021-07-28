@@ -6,16 +6,16 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('NCCN'),
             num_bonds=11
         ),
     ),
 )
-def case_data(request):
+def case_data(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
     """
 
-    return request.param
+    return request.param()

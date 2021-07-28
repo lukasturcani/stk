@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Hexagonal(
                     building_blocks={
@@ -94,9 +95,10 @@ from ...case_data import CaseData
                 '3[C+]=NN23)[C+]%11N2[C+]=NN2C%102[C+2]S[C+]92)N2N=[C+'
                 ']N52)N=[C+]1'
             ),
+            name=name,
         ),
         # Non-planar linear BB.
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Hexagonal(
                     building_blocks=(
@@ -219,9 +221,10 @@ from ...case_data import CaseData
                 ')C(C([H])([H])C([H])([H])C([H])([H])C([H])([H])[H])=C'
                 '2C([H])=C1Br'
             ),
+            name=name,
         ),
         # One placer atom linear BB.
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Hexagonal(
                     building_blocks=(
@@ -265,9 +268,10 @@ from ...case_data import CaseData
                 ')C([H])([H])C6([H])C7([H])C([H])([H])C82[H])C4([H])C('
                 '[H])([H])C31[H]'
             ),
+            name=name,
         ),
         # Two placer atom linear BB.
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Hexagonal(
                     building_blocks=(
@@ -321,8 +325,11 @@ from ...case_data import CaseData
                 '])C([H])([H])C([H])([H])C6([H])C7([H])C([H])([H])C([H'
                 '])([H])C82[H]'
             ),
+            name=name,
         ),
     ),
 )
-def cof_hexagonal(request):
-    return request.param
+def cof_hexagonal(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

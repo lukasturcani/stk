@@ -12,7 +12,7 @@ single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             vertex=stk.metal_complex.MetalVertex(
                 id=0,
                 position=(1, 2, 3),
@@ -27,5 +27,5 @@ single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
         ),
     ),
 )
-def metal(request):
-    return request.param
+def metal(request) -> CaseData:
+    return request.param()
