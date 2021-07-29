@@ -779,6 +779,18 @@ class BuildingBlock(Molecule):
         clone._placer_ids = self._placer_ids
         return clone
 
+    def get_num_placers(self) -> int:
+        """
+        Return the number of *placer* atoms in the building block.
+
+        Returns:
+
+            The number of placer atoms in the building block.
+
+        """
+
+        return len(self._placer_ids)
+
     def get_placer_ids(self):
         """
         Yield the ids of *placer* atoms.
