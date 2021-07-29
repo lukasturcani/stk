@@ -611,22 +611,23 @@ class BuildingBlock(Molecule):
             functional_groups=self._functional_groups,
         )
 
-    def _normalize_placer_ids(self, placer_ids, functional_groups):
+    def _normalize_placer_ids(
+        self,
+        placer_ids: tuple[int],
+        functional_groups: Iterable[FunctionalGroup],
+    ) -> set[int]:
         """
         Get the final *placer* ids.
 
-        Parameters
-        ----------
-        placer_ids : :class:`tuple` of :class:`int`
-            The ids of *placer* atoms or ``None``.
+        Parameters:
 
-        functional_groups : :class:`iterable`
-            The :class:`.FunctionalGroup` instances of the building
-            block.
+            placer_ids: The ids of *placer* atoms or ``None``.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`int`
+            functional_groups:  The :class:`.FunctionalGroup` instances
+            of the building block.
+
+        Returns:
+
             Depending on the input  values, this function will return
             different things.
 
@@ -644,15 +645,15 @@ class BuildingBlock(Molecule):
         """
 
         if placer_ids is not None:
-            return placer_ids
+            return frozenset(placer_ids)
 
         if functional_groups:
-            return tuple(flatten(
+            return frozenset(flatten(
                 functional_group.get_placer_ids()
                 for functional_group in functional_groups
             ))
 
-        return tuple(atom.get_id() for atom in self._atoms)
+        return frozenset(atom.get_id() for atom in self._atoms)
 
     def _extract_functional_groups(self, functional_groups):
         """
@@ -725,7 +726,7 @@ class BuildingBlock(Molecule):
             functional_group.with_ids(id_map)
             for functional_group in self._functional_groups
         )
-        self._placer_ids = tuple(
+        self._placer_ids = frozenset(
             id_map[placer_id]
             for placer_id in self._placer_ids
         )
