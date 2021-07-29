@@ -785,7 +785,7 @@ class BuildingBlock(Molecule):
 
         Returns:
 
-            The number of placer atoms in the building block.
+            The number of *placer* atoms in the building block.
 
         """
 
