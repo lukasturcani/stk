@@ -871,7 +871,7 @@ class BuildingBlock(Molecule):
         Yields
         ------
         :class:`int`
-            The id of a core atom.
+            The id of a *core* atom.
 
         See Also
         --------
