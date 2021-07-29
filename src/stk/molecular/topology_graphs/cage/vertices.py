@@ -154,6 +154,62 @@ class _CageVertex(Vertex):
         )
 
 
+class OrthogonalVertex(_CageVertex):
+    def place_building_block(self, building_block, edges):
+        assert (
+            building_block.get_num_functional_groups() == 2
+        ), (
+            f'{building_block} needs to have exactly 2 functional '
+            'groups but has '
+            f'{building_block.get_num_functional_groups()}.'
+        )
+        building_block = building_block.with_centroid(
+            position=self._position,
+            atom_ids=building_block.get_placer_ids(),
+        )
+        # return building_block.get_position_matrix()
+        print(tuple(building_block.get_centroid()))
+        fg_centroid = building_block.get_centroid(
+            atom_ids=next(
+                building_block.get_functional_groups()
+            ).get_placer_ids(),
+        )
+        print(fg_centroid)
+        edge_position = edges[self._aligner_edge].get_position()
+        edge_centroid = (
+            sum(edge.get_position() for edge in edges) / len(edges)
+        )
+        # building_block = building_block.with_rotation_between_vectors(
+        #     start=fg_centroid - self._position,
+        #     target=edge_position - edge_centroid,
+        #     origin=self._position,
+        # )
+        return building_block.get_position_matrix()
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
+        return building_block.with_rotation_to_minimize_angle(
+            start=core_centroid - self._position,
+            target=self._position,
+            axis=normalize_vector(
+                edges[0].get_position() - edges[1].get_position()
+            ),
+            origin=self._position,
+        ).get_position_matrix()
+
+    def map_functional_groups_to_edges(self, building_block, edges):
+        fg, = building_block.get_functional_groups(0)
+        fg_position = building_block.get_centroid(fg.get_placer_ids())
+
+        def fg_distance(edge):
+            return euclidean(edge.get_position(), fg_position)
+
+        edges = sorted(edges, key=fg_distance)
+        return {
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+        }
+
+
 class LinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
