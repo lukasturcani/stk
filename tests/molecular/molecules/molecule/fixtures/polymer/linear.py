@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
@@ -24,8 +25,9 @@ from ...case_data import CaseData
                 ),
             ),
             smiles='BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
@@ -44,8 +46,9 @@ from ...case_data import CaseData
                 ),
             ),
             smiles='BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1',
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
@@ -59,6 +62,7 @@ from ...case_data import CaseData
                 ),
             ),
             smiles='BrC1=C(Br)N=[C+]1',
+            name=name,
         ),
         CaseData(
             molecule=stk.ConstructedMolecule(
@@ -85,5 +89,7 @@ from ...case_data import CaseData
         ),
     ),
 )
-def polymer_linear(request):
-    return request.param
+def polymer_linear(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

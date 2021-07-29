@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Honeycomb(
                     building_blocks=(
@@ -36,8 +37,9 @@ from ...case_data import CaseData
                 'Br)[C+]=N2)[C+]5F)[C+]6F)C2([H])[C+]=NC2(Br)[C+]4F)N='
                 '[C+]1'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Honeycomb(
                     building_blocks=(
@@ -69,8 +71,9 @@ from ...case_data import CaseData
                 '2(C2=C(Br)[C+]=N2)[C+]5F)C2([H])[C+]=NC2(Br)[C+]4F)N='
                 '[C+]1'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Honeycomb(
                     building_blocks=(
@@ -102,8 +105,11 @@ from ...case_data import CaseData
                 'N3)[C+]6F)N=[C+]2)[C+]5F)C2([H])[C+]=NC2(Br)[C+]4F)N='
                 '[C+]1'
             ),
+            name=name,
         ),
     ),
 )
-def cof_honeycomb(request):
-    return request.param
+def cof_honeycomb(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

@@ -36,7 +36,7 @@ class CaseDataData:
 
 @pytest.fixture(
     params=(
-        CaseDataData(
+        lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
@@ -64,7 +64,7 @@ class CaseDataData:
                     )),
             },
         ),
-        CaseDataData(
+        lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
@@ -92,7 +92,7 @@ class CaseDataData:
                     )),
             },
         ),
-        CaseDataData(
+        lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
@@ -127,7 +127,7 @@ class CaseDataData:
             ),
             key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
         ),
-        CaseDataData(
+        lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
@@ -164,9 +164,14 @@ class CaseDataData:
         ),
     ),
 )
-def constructed_molecule_mongo_db(request, mongo_client):
+def constructed_molecule_mongo_db(
+    request,
+    mongo_client: pymongo.MongoClient,
+) -> CaseData:
+
+    data = request.param()
     return CaseData(
-        database=request.param.get_database(mongo_client),
-        molecule=request.param.molecule,
-        key=request.param.key,
+        database=data.get_database(mongo_client),
+        molecule=data.molecule,
+        key=data.key,
     )

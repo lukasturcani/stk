@@ -10,7 +10,7 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             topology_graph=stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 1, 2),
@@ -21,7 +21,7 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
                 np.array([0., 0., 210.33234855])
             ),
         ),
-        CaseData(
+        lambda: CaseData(
             topology_graph=stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 1, 2),
@@ -35,7 +35,7 @@ bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
         ),
     ),
 )
-def unscaled_periodic_case(request):
+def unscaled_periodic_case(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
@@ -47,12 +47,12 @@ def unscaled_periodic_case(request):
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             topology_graph=stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 1, 2),
@@ -63,7 +63,7 @@ def unscaled_periodic_case(request):
                 np.array([0., 0., 210.33234855])
             ),
         ),
-        CaseData(
+        lambda: CaseData(
             topology_graph=stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 1, 2),
@@ -77,7 +77,7 @@ def unscaled_periodic_case(request):
         ),
     ),
 )
-def scaled_periodic_case(request):
+def scaled_periodic_case(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
@@ -89,4 +89,4 @@ def scaled_periodic_case(request):
 
     """
 
-    return request.param
+    return request.param()

@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.PeriodicSquare(
                     building_blocks=(
@@ -28,8 +29,9 @@ from ...case_data import CaseData
                 '=C(C4=C([C+]=N4)[C+]32)C1(F)C1=C6N=[C+]1)C1=C([C+]=N1'
                 ')C75F'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.PeriodicSquare(
                     building_blocks=(
@@ -52,8 +54,11 @@ from ...case_data import CaseData
                 '=C(C4=C([C+]=N4)[C+]32)C1(F)C1=C6N=[C+]1)C1=C([C+]=N1'
                 ')C75F'
             ),
+            name=name,
         ),
     ),
 )
-def cof_periodic_square(request):
-    return request.param
+def cof_periodic_square(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

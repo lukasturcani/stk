@@ -1,52 +1,31 @@
 import pytest
 import stk
 
+from ...building_blocks import get_pd_atom, get_linker
 from ....case_data import CaseData
 
 
-metal_atom = stk.BuildingBlock(
-    smiles='[Pd+2]',
-    functional_groups=(
-        stk.SingleAtom(stk.Pd(0, charge=2))
-        for i in range(4)
-    ),
-    position_matrix=([0, 0, 0], ),
-)
-linker = stk.BuildingBlock(
-    smiles=(
-        '[H]C1=NC([H])=C([H])C(C2=C([H])C([H])=C([H])C(C3=C([H])C([H]'
-        ')=NC([H])=C3[H])=C2[H])=C1[H]'
-    ),
-    functional_groups=[
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#6]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-    ]
-)
-
-
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                stk.cage.M4L8(
+                topology_graph=stk.cage.M4L8(
                     building_blocks={
-                        metal_atom: range(4),
-                        linker: range(4, 12)
+                        get_pd_atom(): range(4),
+                        get_linker(): range(4, 12),
                     },
                     reaction_factory=stk.DativeReactionFactory(
-                        stk.GenericReactionFactory(
+                        reaction_factory=stk.GenericReactionFactory(
                             bond_orders={
                                 frozenset({
                                     stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
-                            }
-                        )
-                    )
-                )
+                                    stk.SingleAtom,
+                                }): 9,
+                            },
+                        ),
+                    ),
+                ),
             ),
             smiles=(
                 '[H]C1=C([H])C2=C([H])C(=C1[H])C1=C([H])C([H])=N(->['
@@ -66,8 +45,11 @@ linker = stk.BuildingBlock(
                 'C3=C([H])C([H])=N->6C([H])=C3[H])C([H])=C7[H])<-N3='
                 'C([H])C([H])=C2C([H])=C3[H])C([H])=C5[H])C([H])=C1[H]'
             ),
+            name=name,
         ),
     ),
 )
-def metal_cage_m4l8(request):
-    return request.param
+def metal_cage_m4l8(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
