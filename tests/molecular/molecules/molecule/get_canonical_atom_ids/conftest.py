@@ -6,11 +6,11 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock('[C+2][N+]Br'),
             canonical_atom_ids={0: 0, 1: 2, 2: 1},
         ),
-        CaseData(
+        lambda: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
@@ -34,5 +34,5 @@ from .case_data import CaseData
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

@@ -4,9 +4,19 @@ Placements Summary
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 from collections import defaultdict
+from typing import Iterable
 
+from .....topology_graph.topology_graph.implementations import (
+    _PlacementResult,
+)
+from ......functional_groups import FunctionalGroup
+from ......atoms import Atom, AtomInfo
+from ......bonds import Bond, BondInfo
+from ......molecules import BuildingBlock
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
 
@@ -27,32 +37,39 @@ class _PlacementsSummary:
         '_num_atoms',
     ]
 
+    _atoms: list[Atom]
+    _atom_infos: list[AtomInfo]
+    _bonds: list[Bond]
+    _bond_infos: list[BondInfo]
+    _edge_functional_groups: defaultdict[int, list[FunctionalGroup]]
+    _position_matrices: list[np.ndarray]
+
     def __init__(
         self,
-        building_blocks,
-        placement_results,
-        num_atoms,
-        num_previous_placements,
-    ):
+        building_blocks: Iterable[BuildingBlock],
+        placement_results: Iterable[_PlacementResult],
+        num_atoms: int,
+        num_previous_placements: int,
+    ) -> None:
         """
         Initialize a :class:`._PlacementsSummary` instance.
 
-        Parameters
-        ----------
-        building_blocks : :class:`iterable` of :class:`.BuildingBlock`
-            The building blocks which were placed.
+        Parameters:
 
-        placement_results : :class:`iterable`
-            Holds a :class:`_PlacementResults` instance for each
-            building block in `building_blocks`.
+            building_blocks:
+                The building blocks which were placed.
 
-        num_atoms : :class:`int`
-            The number of atoms in molecule being constructed,
-            before this summary is taken into account.
+            placement_results:
+                Holds a :class:`_PlacementResults` instance for each
+                building block in `building_blocks`.
 
-        num_previous_placements : :class:`int`
-            The total number of building block placements done
-            previously.
+            num_atoms:
+                The number of atoms in molecule being constructed,
+                before this summary is taken into account.
+
+            num_previous_placements:
+                The total number of building block placements done
+                previously.
 
         """
 
@@ -75,27 +92,23 @@ class _PlacementsSummary:
 
     def _with_placement_result(
         self,
-        building_block,
-        building_block_id,
-        result,
-    ):
+        building_block: BuildingBlock,
+        building_block_id: int,
+        result: _PlacementResult,
+    ) -> None:
         """
         Add the placement result to the summary.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block which was placed.
+        Parameters:
 
-        building_block_id : :class:`int`
-            A unique for the building block placement.
+            building_block:
+                The building block which was placed.
 
-        result : :class:`._PlacementResult`
-            The result of the placement.
+            building_block_id:
+                A unique for the building block placement.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            result:
+                The result of the placement.
 
         """
 
@@ -108,11 +121,11 @@ class _PlacementsSummary:
             building_block_id=building_block_id,
         )
         self._with_atom_batch(atom_batch)
-        atom_map = atom_batch.get_atom_map()
+        id_map = atom_batch.get_id_map()
 
         bond_batch = _BondBatch(
             bonds=building_block.get_bonds(),
-            atom_map=atom_map,
+            id_map=id_map,
             building_block=building_block,
             building_block_id=building_block_id,
         )
@@ -121,7 +134,7 @@ class _PlacementsSummary:
         self._with_functional_group_edges(
             building_block=building_block,
             functional_group_edges=result.functional_group_edges,
-            atom_map=atom_map,
+            id_map=id_map,
         )
 
     def _with_atom_batch(self, batch):
@@ -162,29 +175,25 @@ class _PlacementsSummary:
 
     def _with_functional_group_edges(
         self,
-        building_block,
-        functional_group_edges,
-        atom_map,
+        building_block: BuildingBlock,
+        functional_group_edges: dict[int, int],
+        id_map: dict[int, int],
     ):
         """
         Add the mapping from functional groups to edges.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block which owns the functional groups.
+        Parameters:
 
-        functional_group_edges : :class:`dict`
-            Maps the id of each functional group of `building_block`
-            the the id of an edge.
+            building_block:
+                The building block which owns the functional groups.
 
-        atom_map : :class:`dict`
-            Maps the ids of atoms in `building_block` to the new atoms
-            of the molecule being constructed.
+            functional_group_edges:
+                Maps the id of each functional group of
+                `building_block` the the id of an edge.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            id_map:
+                Maps the ids of atoms in `building_block` to the new
+                atoms of the molecule being constructed.
 
         """
 
@@ -192,10 +201,10 @@ class _PlacementsSummary:
             fg_ids=functional_group_edges,
         )
         edge_ids = functional_group_edges.values()
-        functional_group_edges = zip(functional_groups, edge_ids)
-        for functional_group, edge_id in functional_group_edges:
+        functional_group_edges_ = zip(functional_groups, edge_ids)
+        for functional_group, edge_id in functional_group_edges_:
             self._edge_functional_groups[edge_id].append(
-                functional_group.with_atoms(atom_map)
+                functional_group.with_ids(id_map)
             )
 
     def get_atoms(self):

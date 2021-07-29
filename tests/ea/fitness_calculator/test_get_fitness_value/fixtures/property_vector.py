@@ -6,8 +6,9 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             fitness_calculator=stk.PropertyVector(
                 property_functions=(
                     stk.Molecule.get_num_atoms,
@@ -31,5 +32,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def property_vector(request):
-    return request.param
+def property_vector(request) -> CaseData:
+    return request.param()

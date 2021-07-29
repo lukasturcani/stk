@@ -1,44 +1,25 @@
 import pytest
 import stk
 
+from ...building_blocks import get_fe_atom, get_mo_1
 from ....case_data import CaseData
 
 
-_iron_atom = stk.BuildingBlock(
-    smiles='[Fe+2]',
-    functional_groups=(
-        stk.SingleAtom(stk.Fe(0, charge=2))
-        for i in range(6)
-    ),
-    position_matrix=([0, 0, 0], ),
-)
-
-_iron_mo_1 = stk.BuildingBlock(
-    smiles='c1cc2c(cn1)CCCCC2',
-    functional_groups=[
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#6]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-    ]
-)
-
-
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                stk.metal_complex.Octahedral(
-                    metals={_iron_atom: 0},
-                    ligands={_iron_mo_1: (0, 1, 2, 3, 4, 5)},
+                topology_graph=stk.metal_complex.Octahedral(
+                    metals={get_fe_atom(): 0},
+                    ligands={get_mo_1(): (0, 1, 2, 3, 4, 5)},
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
                                 frozenset({
                                     stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
+                                    stk.SingleAtom,
+                                }): 9,
                             }
                         )
                     )
@@ -56,20 +37,21 @@ _iron_mo_1 = stk.BuildingBlock(
                 '([H])C([H])([H])C3([H])[H])=C([H])C2=C1C([H])([H])C('
                 '[H])([H])C([H])([H])C([H])([H])C2([H])[H]'
             ),
+            name=name,
         ),
 
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                stk.metal_complex.Octahedral(
-                    metals=_iron_atom,
-                    ligands=_iron_mo_1,
+                topology_graph=stk.metal_complex.Octahedral(
+                    metals=get_fe_atom(),
+                    ligands=get_mo_1(),
                     reaction_factory=stk.DativeReactionFactory(
-                        stk.GenericReactionFactory(
+                        reaction_factory=stk.GenericReactionFactory(
                             bond_orders={
                                 frozenset({
                                     stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
+                                    stk.SingleAtom,
+                                }): 9,
                             }
                         )
                     )
@@ -87,8 +69,11 @@ _iron_mo_1 = stk.BuildingBlock(
                 '([H])C([H])([H])C3([H])[H])=C([H])C2=C1C([H])([H])C('
                 '[H])([H])C([H])([H])C([H])([H])C2([H])[H]'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_octahedral(request):
-    return request.param
+def metal_complex_octahedral(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

@@ -3,13 +3,11 @@ import stk
 
 from .case_data import CaseData
 
-bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-
 
 @pytest.fixture(
     params=(
-        CaseData(
-            molecule=bb1,
+        lambda: CaseData(
+            molecule=stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
             writer=stk.XyzWriter(),
             string=(
                 '8\n\nBr -1.423838 1.561473 0.322335\nC -0.740543 -0.2'
@@ -21,6 +19,6 @@ bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
         ),
     ),
 )
-def case_data(request):
+def case_data(request) -> CaseData:
 
-    return request.param
+    return request.param()

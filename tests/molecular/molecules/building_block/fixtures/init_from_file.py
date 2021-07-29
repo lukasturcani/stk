@@ -95,8 +95,9 @@ class InitFromFileData:
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        InitFromFileData(
+        lambda: InitFromFileData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
             init_functional_groups=(),
             init_placer_ids=None,
@@ -104,7 +105,7 @@ class InitFromFileData:
             case_data_core_atom_ids=(0, 1, 2, 3),
             case_data_placer_ids=(0, 1, 2, 3),
         ),
-        InitFromFileData(
+        lambda: InitFromFileData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
             init_functional_groups=[stk.BromoFactory()],
             init_placer_ids=None,
@@ -125,7 +126,7 @@ class InitFromFileData:
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(1, 2),
         ),
-        InitFromFileData(
+        lambda: InitFromFileData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
             init_functional_groups=(),
             init_placer_ids=(1, 2),
@@ -133,7 +134,7 @@ class InitFromFileData:
             case_data_core_atom_ids=(0, 1, 2, 3),
             case_data_placer_ids=(1, 2),
         ),
-        InitFromFileData(
+        lambda: InitFromFileData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
             init_functional_groups=[stk.BromoFactory()],
             init_placer_ids=(0, 3),
@@ -154,7 +155,7 @@ class InitFromFileData:
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(0, 3),
         ),
-        InitFromFileData(
+        lambda: InitFromFileData(
             building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
             init_functional_groups=[stk.IodoFactory()],
             init_placer_ids=None,
@@ -164,13 +165,13 @@ class InitFromFileData:
         ),
     ),
 )
-def init_from_file_data(request):
+def init_from_file_data(request) -> InitFromFileData:
     """
     A :class:`.InitFromFileData` instance.
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture

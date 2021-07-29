@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import stk
 
@@ -14,57 +16,65 @@ def get_topology_graph(num_repeating_units):
     )
 
 
-population1 = (
-    stk.MoleculeRecord(
-        topology_graph=get_topology_graph(2),
-    ).with_fitness_value(10),
-    stk.MoleculeRecord(
-        topology_graph=get_topology_graph(3),
-    ).with_fitness_value(9),
-    stk.MoleculeRecord(
-        topology_graph=get_topology_graph(4),
-    ).with_fitness_value(2),
-    stk.MoleculeRecord(
-        topology_graph=get_topology_graph(5),
-    ).with_fitness_value(1),
-    stk.MoleculeRecord(
-        topology_graph=get_topology_graph(6),
-    ).with_fitness_value(1),
+@pytest.fixture(
+    scope='session',
 )
+def filter_batches_population_1() -> tuple[stk.MoleculeRecord, ...]:
+    return (
+        stk.MoleculeRecord(
+            topology_graph=get_topology_graph(2),
+        ).with_fitness_value(10),
+        stk.MoleculeRecord(
+            topology_graph=get_topology_graph(3),
+        ).with_fitness_value(9),
+        stk.MoleculeRecord(
+            topology_graph=get_topology_graph(4),
+        ).with_fitness_value(2),
+        stk.MoleculeRecord(
+            topology_graph=get_topology_graph(5),
+        ).with_fitness_value(1),
+        stk.MoleculeRecord(
+            topology_graph=get_topology_graph(6),
+        ).with_fitness_value(1),
+    )
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda population: CaseData(
             selector=stk.FilterBatches(
                 filter=stk.Best(4),
                 selector=stk.Best(),
             ),
-            population=population1,
+            population=population,
             selected=(
                 stk.Batch(
-                    records=(population1[0], ),
-                    fitness_values={population1[0]: 10},
+                    records=(population[0], ),
+                    fitness_values={population[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[1], ),
-                    fitness_values={population1[1]: 9},
+                    records=(population[1], ),
+                    fitness_values={population[1]: 9},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[2], ),
-                    fitness_values={population1[2]: 2},
+                    records=(population[2], ),
+                    fitness_values={population[2]: 2},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population1[3], ),
-                    fitness_values={population1[3]: 1},
+                    records=(population[3], ),
+                    fitness_values={population[3]: 1},
                     key_maker=stk.Inchi(),
                 ),
             ),
         ),
     ),
 )
-def filter_batches(request):
-    return request.param
+def filter_batches(
+    request,
+    filter_batches_population_1: tuple[stk.MoleculeRecord, ...],
+) -> CaseData:
+    return request.param(filter_batches_population_1)

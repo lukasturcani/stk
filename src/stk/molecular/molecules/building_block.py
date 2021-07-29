@@ -4,12 +4,15 @@ Building Block
 
 """
 
+from __future__ import annotations
+
 
 import logging
 import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
+from typing import Optional, Union, Iterable
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -689,10 +692,7 @@ class BuildingBlock(Molecule):
 
         """
 
-        atom_map = {a.get_id(): a for a in self._atoms}
-        self._functional_groups = tuple(
-            fg.with_atoms(atom_map) for fg in functional_groups
-        )
+        self._functional_groups = tuple(functional_groups)
         return self
 
     def with_functional_groups(self, functional_groups):
@@ -717,16 +717,16 @@ class BuildingBlock(Molecule):
     def _with_canonical_atom_ordering(self):
         ordering = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
         super()._with_canonical_atom_ordering()
-        atom_map = {
-            old_id: self._atoms[new_id]
+        id_map = {
+            old_id: new_id
             for old_id, new_id in enumerate(ordering)
         }
         self._functional_groups = tuple(
-            functional_group.with_atoms(atom_map)
+            functional_group.with_ids(id_map)
             for functional_group in self._functional_groups
         )
         self._placer_ids = tuple(
-            atom_map[placer_id].get_id()
+            id_map[placer_id]
             for placer_id in self._placer_ids
         )
         return self
@@ -744,21 +744,23 @@ class BuildingBlock(Molecule):
 
         return len(self._functional_groups)
 
-    def get_functional_groups(self, fg_ids=None):
+    def get_functional_groups(
+        self,
+        fg_ids: Optional[Union[int, Iterable[int]]] = None,
+    ) -> Iterable[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
 
-        Parameters
-        ----------
-        fg_ids : :class:`iterable` of :class:`int`, optional
-            The ids of functional groups yielded. If ``None``, then
-            all functional groups are yielded. Can be a single
-            :class:`int`, if a single functional group is
-            desired.
+        Parameters:
 
-        Yields
-        ------
-        :class:`.FunctionalGroup`
+            fg_ids:
+                The ids of functional groups yielded. If ``None``, then
+                all functional groups are yielded. Can be a single
+                :class:`int`, if a single functional group is
+                desired.
+
+        Yields:
+
             A functional group of the building block.
 
         """

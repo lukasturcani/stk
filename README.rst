@@ -1,5 +1,6 @@
 :author: Lukas Turcani
 :Documentation: https://stk.readthedocs.io
+:Discord: https://discord.gg/YvwdcjKf
 
 .. figure:: docs/source/figures/stk.png
 
@@ -15,7 +16,9 @@ Overview
 ``stk`` is a Python library which allows construction and
 manipulation of complex molecules, as well as automatic
 molecular design, and the creation of molecular, and molecular
-property, databases.
+property, databases. The documentation of ``stk`` is available on
+https://stk.readthedocs.io and the project's Discord server can be
+joined through https://discord.gg/YvwdcjKf.
 
 Installation
 ============
@@ -77,7 +80,7 @@ using stk
 * `High-throughput Computational Evaluation of Low Symmetry Pd2L4
   Cages to Aid in System Design`__
 
-__ https://chemrxiv.org/articles/preprint/High-throughput_Computational_Evaluation_of_Low_Symmetry_Pd2L4_Cages_to_Aid_in_System_Design/14604294
+__ https://onlinelibrary.wiley.com/doi/10.1002/anie.202106721
 
 * `Forecasting System of Computational Time of DFT/TDDFT Calculations
   under the Multiverse Ansatz via Machine Learning and

@@ -5,8 +5,9 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
             ),
@@ -14,7 +15,7 @@ from ..case_data import CaseData
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
                 functional_groups=[stk.BromoFactory()],
@@ -36,7 +37,7 @@ from ..case_data import CaseData
             core_atom_ids=(1, 2),
             placer_ids=(1, 2),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
                 placer_ids=(1, 2),
@@ -45,7 +46,7 @@ from ..case_data import CaseData
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(1, 2),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
                 functional_groups=[stk.BromoFactory()],
@@ -68,7 +69,7 @@ from ..case_data import CaseData
             core_atom_ids=(1, 2),
             placer_ids=(0, 3),
         ),
-        CaseData(
+        lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_molecule(
                 molecule=stk.BuildingBlock('Br[C+2][C+2]Br'),
                 functional_groups=[stk.IodoFactory()],
@@ -79,5 +80,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def init_from_molecule(request):
-    return request.param
+def init_from_molecule(request) -> CaseData:
+    return request.param()
