@@ -4,6 +4,8 @@ Linear Polymer Vertices
 
 """
 
+from __future__ import annotations
+
 import logging
 
 from ...topology_graph import Vertex
@@ -197,13 +199,17 @@ class UnaligningVertex(LinearVertex):
     """
 
     @classmethod
-    def init_from_vertex(cls, vertex):
+    def init_from_vertex(
+        cls: type[Vertex],
+        vertex: type[Vertex],
+    ) -> UnaligningVertex:
         """
-        Initialize from a :class:`LinearVertex`.
-        Parameters
-        ----------
-        vertex : :class:`LinearVertex`
-            The vertex to initalize from.
+        Initialize from a :class:`.LinearVertex`.
+
+        Parameters:
+
+            vertex: The vertex to initalize from.
+
         """
         return cls(
             id=vertex.get_id(),
