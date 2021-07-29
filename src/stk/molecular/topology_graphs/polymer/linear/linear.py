@@ -438,7 +438,7 @@ class Linear(TopologyGraph):
         self,
         building_blocks: dict[int, BuildingBlock],
         vertices: Iterable[Vertex],
-    ) -> dict[type[BuildingBlock], type[Vertex]]:
+    ) -> dict[BuildingBlock, type[Vertex]]:
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
@@ -456,27 +456,26 @@ class Linear(TopologyGraph):
 
     @staticmethod
     def _with_unaligning_vertices(
-        building_block_vertices: dict[
-            type[BuildingBlock], type[Vertex]
-        ]
-    ) -> dict[type[BuildingBlock], type[Vertex]]:
+        building_block_vertices: dict[BuildingBlock, type[Vertex]],
+    ) -> dict[BuildingBlock, type[Vertex]]:
         clone = dict(building_block_vertices)
         for building_block, vertices in clone.items():
             # Building blocks with 1 placer, cannot be aligned and
             # must therefore use an UnaligningVertex.
             if building_block.get_num_placers() == 1:
-                clone[building_block] = tuple(map(
-                    UnaligningVertex.init_from_vertex,
-                    vertices,
-                ))
+                clone[building_block] = tuple(
+                    UnaligningVertex(
+                        id=vertex.get_id(),
+                        position=vertex.get_position(),
+                        flip=vertex.get_flip(),
+                    ) for vertex in vertices
+                )
 
         return clone
 
     def _get_scale(
         self,
-        building_block_vertices: dict[
-            type[BuildingBlock], type[Vertex]
-        ]
+        building_block_vertices: dict[BuildingBlock, type[Vertex]],
     ) -> float:
         return max(
             bb.get_maximum_diameter()

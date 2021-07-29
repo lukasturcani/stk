@@ -198,25 +198,6 @@ class UnaligningVertex(LinearVertex):
 
     """
 
-    @classmethod
-    def init_from_vertex(
-        cls: type[Vertex],
-        vertex: type[Vertex],
-    ) -> UnaligningVertex:
-        """
-        Initialize from a :class:`.LinearVertex`.
-
-        Parameters:
-
-            vertex: The vertex to initalize from.
-
-        """
-        return cls(
-            id=vertex.get_id(),
-            position=vertex.get_position(),
-            flip=vertex.get_flip(),
-        )
-
     def place_building_block(self, building_block, edges):
         return building_block.with_centroid(
             position=self._position,
