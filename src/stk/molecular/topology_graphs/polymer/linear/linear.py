@@ -4,10 +4,13 @@ Linear
 
 """
 
-from dataclasses import dataclass
-import numpy as np
-from typing import Tuple
+from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Iterable, Tuple
+import numpy as np
+
+from ....molecules import BuildingBlock
 from .vertices import (
     HeadVertex,
     TailVertex,
@@ -431,7 +434,11 @@ class Linear(TopologyGraph):
         base = ord('A')
         return tuple(ord(letter)-base for letter in repeating_unit)
 
-    def _get_building_block_vertices(self, building_blocks, vertices):
+    def _get_building_block_vertices(
+        self,
+        building_blocks: dict[int, BuildingBlock],
+        vertices: Iterable[Vertex],
+    ) -> dict[type[BuildingBlock], type[Vertex]]:
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
@@ -448,12 +455,16 @@ class Linear(TopologyGraph):
         return building_block_vertices
 
     @staticmethod
-    def _with_unaligning_vertices(building_block_vertices):
+    def _with_unaligning_vertices(
+        building_block_vertices: dict[
+            type[BuildingBlock], type[Vertex]
+        ]
+    ) -> dict[type[BuildingBlock], type[Vertex]]:
         clone = dict(building_block_vertices)
         for building_block, vertices in clone.items():
             # Building blocks with 1 placer, cannot be aligned and
             # must therefore use an UnaligningVertex.
-            if len(set(building_block.get_placer_ids())) == 1:
+            if building_block.get_num_placers() == 1:
                 clone[building_block] = tuple(map(
                     UnaligningVertex.init_from_vertex,
                     vertices,
@@ -461,7 +472,12 @@ class Linear(TopologyGraph):
 
         return clone
 
-    def _get_scale(self, building_block_vertices):
+    def _get_scale(
+        self,
+        building_block_vertices: dict[
+            type[BuildingBlock], type[Vertex]
+        ]
+    ) -> float:
         return max(
             bb.get_maximum_diameter()
             for bb in building_block_vertices
