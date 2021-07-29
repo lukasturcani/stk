@@ -34,7 +34,7 @@ def _test_get_num_placers(
             The building block to test.
 
         expected_num_placers:
-            The correct number of placer atoms
+            The correct number of *placer* atoms
 
     """
 
