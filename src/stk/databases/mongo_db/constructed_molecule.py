@@ -713,7 +713,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                         {key: {'$exists': True}}
                         for key in keys
                     ],
-                }
+                },
             },
         ]
         query.extend(
@@ -736,7 +736,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                                     '$eq': [
                                         f'${key}',
                                         '$$const_molecule_key',
-                                    ]
+                                    ],
                                 },
                             },
                         },
@@ -765,7 +765,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                                     '$eq': [
                                         f'${key}',
                                         '$$const_molecule_key',
-                                    ]
+                                    ],
                                 },
                             },
                         },
@@ -786,7 +786,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                                 ],
                             }
                             for key in keys
-                        ]
+                        ],
                     },
                 },
             },
@@ -803,7 +803,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                                 ],
                             }
                             for key in keys
-                        ]
+                        ],
                     },
                 },
             },
@@ -811,12 +811,6 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         cursor = self._constructed_molecules.aggregate(query)
         for entry in cursor:
-            const_molecule = {
-                'BB': entry['BB'],
-                'aI': entry['aI'],
-                'bI': entry['bI'],
-                'nBB': entry['nBB'],
-            }
 
             for key in keys:
                 posmat_key = f'posmat_{key}'
@@ -830,13 +824,13 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                             'a': entry[mol_key][0]['a'],
                             'b': entry[mol_key][0]['b'],
                         },
-                        'constructedMolecule': const_molecule,
+                        'constructedMolecule': entry,
                         'matrix': {
                             'm': entry[posmat_key][0]['m'],
                         },
                         'buildingBlocks': tuple(map(
                             self._get_building_block,
                             entry['BB'],
-                        ))
+                        )),
                     })
                     break

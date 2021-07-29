@@ -1,53 +1,47 @@
+from typing import Iterable
+import stk
+
+
 class CaseData:
     """
     A test case.
 
-    Attributes
-    ----------
-    inchi_database : :class:`.MoleculeDatabase`
-        A database to test.
+    Attributes:
 
-    smiles_database : :class:`.MoleculeDatabase`
-        A database to test.
+        inchi_database: A database to test.
 
-    inchi_key_database : :class:`.MoleculeDatabase`
-        A database to test.
+        smiles_database: A database to test.
 
-    inchi_and_smiles_database : :class:`.MoleculeDatabase`
-        The database to test collection from.
+        inchi_key_database: A database to test.
 
-    molecules : :class:`iterable` of :class:`.Molecule`
-        The molecules to put and get from the databases.
+        inchi_and_smiles_database: The database to test.
+
+        molecules: The molecules to put and get from the databases.
 
     """
 
     def __init__(
         self,
-        inchi_database,
-        smiles_database,
-        inchi_key_database,
-        inchi_and_smiles_database,
-        molecules,
+        inchi_database: stk.MoleculeDatabase,
+        smiles_database: stk.MoleculeDatabase,
+        inchi_key_database: stk.MoleculeDatabase,
+        inchi_and_smiles_database: stk.MoleculeDatabase,
+        molecules: Iterable[stk.BuildingBlock],
     ):
         """
         Initialize a :class:`.CaseData` instance.
 
-        Parameters
-        ----------
-        inchi_database : :class:`.MoleculeDatabase`
-            A database to test.
+        Parameters:
 
-        smiles_database : :class:`.MoleculeDatabase`
-            A database to test.
+            inchi_database: A database to test.
 
-        inchi_key_database : :class:`.MoleculeDatabase`
-            A database to test.
+            smiles_database: A database to test.
 
-        inchi_and_smiles_database : :class:`.MoleculeDatabase`
-            The database to test collection from.
+            inchi_key_database: A database to test.
 
-        molecules : :class:`iterable` of :class:`.Molecule`
-            The molecules to put and get from the databases.
+            inchi_and_smiles_database The database to test.
+
+            molecules: The molecules to put and get from the databases.
 
         """
 

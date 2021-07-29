@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import pytest
 import stk
 
 from ..case_data import CaseData
+import pymongo
 
 
 @pytest.fixture
-def molecules():
+def molecules() -> tuple[stk.ConstructedMolecule]:
     building_blocks = (
         stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
         stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
@@ -67,7 +70,12 @@ def molecules():
     ]
 
 
-def get_database(database_name, mongo_client, keys, indices):
+def get_database(
+    database_name: str,
+    mongo_client: pymongo.MongoClient,
+    keys: tuple[stk.MoleculeKeyMaker],
+    indices: tuple[str],
+) -> stk.ConstructedMoleculeMongoDb:
 
     return stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
@@ -80,7 +88,10 @@ def get_database(database_name, mongo_client, keys, indices):
 
 
 @pytest.fixture
-def constructed_molecule_mongo_dbs(mongo_client, molecules):
+def constructed_molecule_mongo_dbs(
+    mongo_client: pymongo.MongoClient,
+    molecules: tuple[stk.ConstructedMolecule],
+) -> CaseData:
 
     inchi = stk.Inchi()
     smiles = stk.Smiles()

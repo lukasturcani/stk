@@ -500,7 +500,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                         {key: {'$exists': True}}
                         for key in keys
                     ],
-                }
+                },
             },
         ]
         query.extend(
@@ -523,7 +523,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                                     '$eq': [
                                         f'${key}',
                                         '$$molecule_key',
-                                    ]
+                                    ],
                                 },
                             },
                         },
@@ -544,7 +544,7 @@ class MoleculeMongoDb(MoleculeDatabase):
                                 ],
                             }
                             for key in keys
-                        ]
+                        ],
                     },
                 },
             },
@@ -552,13 +552,12 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         cursor = self._molecules.aggregate(query)
         for entry in cursor:
-            molecule = {'a': entry['a'], 'b': entry['b']}
 
             for key in keys:
                 posmat_key = f'posmat_{key}'
                 if posmat_key in entry and len(entry[posmat_key]) > 0:
                     yield self._dejsonizer.from_json({
-                        'molecule': molecule,
+                        'molecule': entry,
                         'matrix': {
                             'm': entry[posmat_key][0]['m'],
                         },

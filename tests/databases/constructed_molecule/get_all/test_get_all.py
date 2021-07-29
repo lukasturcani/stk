@@ -1,21 +1,22 @@
+from typing import Iterable
 import stk
 
 from tests.utilities import is_equivalent_constructed_molecule
+from .case_data import CaseData
 
 
-def test_get_all(case_data):
+def test_get_all(case_data: CaseData) -> None:
     """
     Test iteration over all entries.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the databases to test and the molecules to
-        place into the databases.
+    Parameters:
 
-    Returns
-    -------
-    None : :class:`NoneType`
+        case_data: A test case. Holds the databases to test and the
+            molecules to place into the databases.
+
+    Returns:
+
+        None.
 
     """
 
@@ -29,35 +30,30 @@ def test_get_all(case_data):
 
 
 def _test_get_all(
-    inchi_database,
-    smiles_database,
-    inchi_key_database,
-    inchi_and_smiles_database,
-    molecules,
-):
+    inchi_database: stk.ConstructedMoleculeDatabase,
+    smiles_database: stk.ConstructedMoleculeDatabase,
+    inchi_key_database: stk.ConstructedMoleculeDatabase,
+    inchi_and_smiles_database: stk.ConstructedMoleculeDatabase,
+    molecules: Iterable[stk.ConstructedMolecule],
+) -> None:
     """
     Test iteration over all entries.
 
-    Parameters
-    ----------
-    inchi_database : :class:`.MoleculeDatabase`
-        A database to test.
+    Parameters:
 
-    smiles_database : :class:`.MoleculeDatabase`
-        A database to test.
+        inchi_database: A database to test.
 
-    inchi_key_database : :class:`.MoleculeDatabase`
-        A database to test.
+        smiles_database: A database to test.
 
-    inchi_and_smiles_database : :class:`.MoleculeDatabase`
-        The database to test collection from.
+        inchi_key_database: A database to test.
 
-    molecules : :class:`iterable` of :class:`.Molecule`
-        The molecules to put and get from the databases.
+        inchi_and_smiles_database The database to test.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+        molecules: The molecules to put and get from the databases.
+
+    Returns:
+
+        None.
 
     """
 
