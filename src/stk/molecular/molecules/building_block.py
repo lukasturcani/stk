@@ -394,6 +394,11 @@ class BuildingBlock(Molecule):
                 functional_groups=building_block._functional_groups,
             )
         )
+        building_block._core_ids = (
+            building_block._get_core_ids(
+                functional_groups=building_block._functional_groups,
+            )
+        )
         return building_block
 
     @classmethod
@@ -610,12 +615,15 @@ class BuildingBlock(Molecule):
             placer_ids=placer_ids,
             functional_groups=self._functional_groups,
         )
+        self._core_ids = self._get_core_ids(
+            functional_groups=self._functional_groups,
+        )
 
     def _normalize_placer_ids(
         self,
         placer_ids: tuple[int],
         functional_groups: Iterable[FunctionalGroup],
-    ) -> set[int]:
+    ) -> frozenset[int]:
         """
         Get the final *placer* ids.
 
@@ -628,7 +636,7 @@ class BuildingBlock(Molecule):
 
         Returns:
 
-            Depending on the input  values, this function will return
+            Depending on the input values, this function will return
             different things.
 
             #. `placer_ids` is a :class:`tuple` of :class`int`: the
@@ -654,6 +662,41 @@ class BuildingBlock(Molecule):
             ))
 
         return frozenset(atom.get_id() for atom in self._atoms)
+
+    def _get_core_ids(
+        self,
+        functional_groups: Iterable[FunctionalGroup],
+    ) -> frozenset[int]:
+        """
+        Get the final *core* ids.
+
+        Parameters:
+
+            functional_groups:  The :class:`.FunctionalGroup` instances
+            of the building block.
+
+        Returns:
+
+            core_ids: Ids of atoms defining the core.
+
+        """
+
+        core_ids = []
+        functional_group_atom_ids = {
+            atom_id
+            for functional_group in functional_groups
+            for atom_id in functional_group.get_atom_ids()
+        }
+        for atom in self._atoms:
+            atom_id = atom.get_id()
+            if atom_id not in functional_group_atom_ids:
+                core_ids.append(atom_id)
+
+        for functional_group in functional_groups:
+            for atom_id in functional_group.get_core_atom_ids():
+                core_ids.append(atom_id)
+
+        return frozenset(core_ids)
 
     def _extract_functional_groups(self, functional_groups):
         """
@@ -730,6 +773,10 @@ class BuildingBlock(Molecule):
             id_map[placer_id]
             for placer_id in self._placer_ids
         )
+        self._core_ids = frozenset(
+            id_map[core_id]
+            for core_id in self._core_ids
+        )
         return self
 
     def get_num_functional_groups(self):
@@ -778,6 +825,7 @@ class BuildingBlock(Molecule):
         clone = super().clone()
         clone._functional_groups = self._functional_groups
         clone._placer_ids = self._placer_ids
+        clone._core_ids = self._core_ids
         return clone
 
     def get_num_placers(self) -> int:
@@ -831,19 +879,7 @@ class BuildingBlock(Molecule):
 
         """
 
-        functional_group_atom_ids = {
-            atom_id
-            for functional_group in self._functional_groups
-            for atom_id in functional_group.get_atom_ids()
-        }
-        for atom in self._atoms:
-            atom_id = atom.get_id()
-            if atom_id not in functional_group_atom_ids:
-                yield atom_id
-
-        for functional_group in self._functional_groups:
-            for atom_id in functional_group.get_core_atom_ids():
-                yield atom_id
+        yield from self._core_ids
 
     def __str__(self):
         if self._functional_groups:
