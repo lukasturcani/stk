@@ -52,9 +52,44 @@ class Linear(TopologyGraph):
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2),
                 repeating_unit='AB',
-                num_repeating_units=12,
+                num_repeating_units=4,
             ),
         )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=4,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    polymer.get_atoms(),
+                    polymer.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in polymer.get_bonds()
+            ),
+        )
+
 
     *Suggested Optimization*
 
@@ -72,10 +107,48 @@ class Linear(TopologyGraph):
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2),
                 repeating_unit='AB',
-                num_repeating_units=12,
+                num_repeating_units=4,
                 # Setting scale_steps to False tends to lead to a
                 # better structure.
                 optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=4,
+                # Setting scale_steps to False tends to lead to a
+                # better structure.
+                optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    polymer.get_atoms(),
+                    polymer.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in polymer.get_bonds()
             ),
         )
 
@@ -88,15 +161,51 @@ class Linear(TopologyGraph):
 
         import stk
 
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb1 = stk.BuildingBlock('NCC(F)N', [stk.PrimaryAminoFactory()])
         bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-        bb3 = stk.BuildingBlock('CCN', [stk.PrimaryAminoFactory()])
+        bb3 = stk.BuildingBlock('BrCCN', [stk.PrimaryAminoFactory()])
 
         polymer = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2, bb3),
                 repeating_unit='ABABC',
                 num_repeating_units=1,
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('NCC(F)N', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+        bb3 = stk.BuildingBlock('BrCCN', [stk.PrimaryAminoFactory()])
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2, bb3),
+                repeating_unit='ABABC',
+                num_repeating_units=1,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    polymer.get_atoms(),
+                    polymer.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in polymer.get_bonds()
             ),
         )
 
@@ -110,7 +219,10 @@ class Linear(TopologyGraph):
         import stk
 
         bb1 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-        bb2 = stk.BuildingBlock('NCNCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='NC(Br)CN',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
 
         p1 = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
@@ -118,6 +230,45 @@ class Linear(TopologyGraph):
                 repeating_unit='AB',
                 num_repeating_units=5,
                 orientations=(1, 0.5),
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('O=CC(F)CC=O', [stk.AldehydeFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='NC(Br)CN',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
+
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                orientations=(1, 0.5),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    polymer.get_atoms(),
+                    polymer.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in polymer.get_bonds()
             ),
         )
 
