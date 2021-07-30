@@ -3,6 +3,11 @@ Basic Examples
 ==============
 
 
+.. note::
+
+    The molecules displayed are interactive renderings.
+
+
 Creating Building Blocks
 ========================
 
@@ -31,6 +36,32 @@ strings and loading them from molecule structure files.
 
     bb1 = stk.BuildingBlock('NCCCN')
     bb2 = stk.BuildingBlock.init_from_file('path/to/file.mol')
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb1 = stk.BuildingBlock('NCCCN')
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                bb1.get_atoms(),
+                bb1.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in bb1.get_bonds()
+        ),
+    )
 
 .. testcode:: creating-building-blocks
     :hide:
@@ -75,6 +106,32 @@ during construction, you would use a :class:`.BromoFactory`
     )
     assert bb.get_num_functional_groups() == 2
 
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                bb.get_atoms(),
+                bb.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in bb.get_bonds()
+        ),
+    )
+
 The ``bb``, in the example above, would have two :class:`.Bromo`
 functional groups. Similarly, if you have a building block with
 aldehyde groups
@@ -91,6 +148,32 @@ aldehyde groups
         for fg in bb2.get_functional_groups()
     )
     assert bb2.get_num_functional_groups() == 2
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                bb.get_atoms(),
+                bb.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in bb.get_bonds()
+        ),
+    )
 
 In this example, ``bb2`` will have two :class:`.Aldehyde` functional
 groups. Finally, if you have both aldehyde and bromo groups on a
@@ -110,6 +193,35 @@ you would use both of the factories
     assert (
         set(map(type, bb3.get_functional_groups()))
         == {stk.Aldehyde, stk.Bromo}
+    )
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb = stk.BuildingBlock(
+        smiles='O=CCCBr',
+        functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                bb.get_atoms(),
+                bb.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in bb.get_bonds()
+        ),
     )
 
 In the example above, ``bb3`` has one :class:`.Bromo` and one
@@ -136,16 +248,90 @@ a :class:`.TopologyGraph`, which, in turn,  requires
         topology_graph=stk.polymer.Linear(
             building_blocks=(bb1, bb2),
             repeating_unit='AB',
-            num_repeating_units=12,
+            num_repeating_units=4,
+            optimizer=stk.Collapser(scale_steps=False),
         ),
     )
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=4,
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                polymer.get_atoms(),
+                polymer.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in polymer.get_bonds()
+        ),
+    )
+
+.. testcode:: constructing-molecules
 
     # Build a longer polymer.
     longer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear(
             building_blocks=(bb1, bb2),
             repeating_unit='AB',
-            num_repeating_units=23,
+            num_repeating_units=8,
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=8,
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                polymer.get_atoms(),
+                polymer.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in polymer.get_bonds()
         ),
     )
 
@@ -153,10 +339,11 @@ a :class:`.TopologyGraph`, which, in turn,  requires
 .. testcode:: constructing-molecules
     :hide:
 
-    assert polymer.get_num_building_block(bb1) == 12
-    assert polymer.get_num_building_block(bb2) == 12
-    assert longer.get_num_building_block(bb1) == 23
-    assert longer.get_num_building_block(bb2) == 23
+    assert polymer.get_num_building_block(bb1) == 4
+    assert polymer.get_num_building_block(bb2) == 4
+    assert longer.get_num_building_block(bb1) == 8
+    assert longer.get_num_building_block(bb2) == 8
+
 
 Each topology graph requires different input parameters.
 For example, organic cage topology graphs only require the
@@ -179,6 +366,42 @@ For example, organic cage topology graphs only require the
 
     assert cage.get_num_building_block(bb1) == 6
     assert cage.get_num_building_block(cage_bb2) == 4
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock(
+        smiles='O=CC(C=O)CC=O',
+        functional_groups=[stk.AldehydeFactory()],
+    )
+    cage = stk.ConstructedMolecule(
+        topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                cage.get_atoms(),
+                cage.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in cage.get_bonds()
+        ),
+    )
+
+Note that this structure is far from ideal, the next example shows
+how to make one with shorter bond lengths!
 
 
 Read the documentation for each kind of :class:`.TopologyGraph`, for
@@ -208,7 +431,7 @@ clashes occur.
             building_blocks=(bb1, bb2),
             repeating_unit='AB',
             num_repeating_units=3,
-            optimizer=stk.Collapser(),
+            optimizer=stk.Collapser(scale_steps=False),
         ),
     )
 
@@ -217,6 +440,42 @@ clashes occur.
 
     assert polymer.get_num_building_block(bb1) == 3
     assert polymer.get_num_building_block(bb2) == 3
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock('O=CCCC=O', [stk.AldehydeFactory()])
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(bb1, bb2),
+            repeating_unit='AB',
+            num_repeating_units=3,
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                polymer.get_atoms(),
+                polymer.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in polymer.get_bonds()
+        ),
+    )
+
 
 Similarly, :class:`.MCHammer` performs rigid translations of the
 building blocks either toward the centroid of the
@@ -227,29 +486,69 @@ interactions.
 
 .. testcode:: using-built-in-optimizers-during-construction
 
-    polymer2 = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear(
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock(
+        smiles='O=CC(C=O)CC=O',
+        functional_groups=[stk.AldehydeFactory()],
+    )
+    cage = stk.ConstructedMolecule(
+        topology_graph=stk.cage.FourPlusSix(
             building_blocks=(bb1, bb2),
-            repeating_unit='AB',
-            num_repeating_units=3,
-            optimizer=stk.MCHammer(num_steps=1500, step_size=0.15),
+            optimizer=stk.MCHammer(),
         ),
     )
 
 .. testcode:: using-built-in-optimizers-during-construction
     :hide:
 
-    assert polymer.get_num_building_block(bb1) == 3
-    assert polymer.get_num_building_block(bb2) == 3
+    assert cage.get_num_building_block(bb1) == 6
+    assert cage.get_num_building_block(bb2) == 4
 
-See also
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+    bb2 = stk.BuildingBlock(
+        smiles='O=CC(C=O)CC=O',
+        functional_groups=[stk.AldehydeFactory()],
+    )
+    cage = stk.ConstructedMolecule(
+        topology_graph=stk.cage.FourPlusSix(
+            building_blocks=(bb1, bb2),
+            optimizer=stk.MCHammer(),
+        ),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                cage.get_atoms(),
+                cage.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in cage.get_bonds()
+        ),
+    )
+
+.. seealso::
+
     The :class:`.Collapser` and :class:`.MCHammer` optimizers use the
     algorithms from https://github.com/andrewtarzia/MCHammer.
-    :mod:`stk` returns the final molecule only but further visualisation of
-    the full trajectory and properties can be performed
-    using the :mod:`MCHammer` code explicitly. This is useful for
-    determining optimal optimization parameters, for which safe options
-    are provided by default in :mod:`stk`.
+    :mod:`stk` returns the final molecule only but further
+    visualisation of the full trajectory and properties can be
+    performed using the :mod:`MCHammer` code explicitly. This is useful
+    for determining optimal optimization parameters, for which safe
+    options are provided by default in :mod:`stk`.
 
 Using RDKit to Optimize Molecular Structures
 ============================================
@@ -288,12 +587,52 @@ after construction. One easy way to do is, is with the
         rdkit_bb.GetConformer().GetPositions(),
     ))
 
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+    import rdkit.Chem.AllChem as rdkit
+
+    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+
+    # Optimize with the MMFF force field.
+
+    rdkit_bb = bb.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_bb)
+    rdkit.MMFFOptimizeMolecule(rdkit_bb)
+
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    bb = bb.with_position_matrix(
+        position_matrix=rdkit_bb.GetConformer().GetPositions(),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                bb.get_atoms(),
+                bb.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in bb.get_bonds()
+        ),
+    )
+
 or a :class:`.ConstructedMolecule`
 
 .. testcode:: using-rdkit-to-optimize-molecular-structures
 
     polymer = stk.ConstructedMolecule(
-        topology_graph=stk.polymer.Linear((bb, ), 'A', 15),
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 8),
     )
 
     # Optimize with the MMFF force field.
@@ -315,6 +654,50 @@ or a :class:`.ConstructedMolecule`
         polymer.get_position_matrix(),
         rdkit_polymer.GetConformer().GetPositions(),
     ))
+
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+    import rdkit.Chem.AllChem as rdkit
+
+    bb = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear((bb, ), 'A', 8),
+    )
+
+    # Optimize with the MMFF force field.
+
+    rdkit_polymer = polymer.to_rdkit_mol()
+    rdkit.SanitizeMol(rdkit_polymer)
+    rdkit.MMFFOptimizeMolecule(rdkit_polymer)
+
+    # stk molecules are immutable. with_position_matrix returns a
+    # a clone, holding the new position matrix.
+    polymer = polymer.with_position_matrix(
+        position_matrix=rdkit_polymer.GetConformer().GetPositions(),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                polymer.get_atoms(),
+                polymer.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in polymer.get_bonds()
+        ),
+    )
 
 Writing Molecular Files
 =======================
