@@ -13,6 +13,42 @@ class SixPlusTwelve(Cage):
     """
     Represents a cage topology graph.
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+        bb2 = stk.BuildingBlock(
+            smiles='Brc1c(Br)cc(Br)c(Br)c1',
+            functional_groups=[stk.BromoFactory()],
+        )
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.SixPlusTwelve((bb1, bb2)),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
     Nonlinear building blocks with four functional groups are
     required for this topology.
 

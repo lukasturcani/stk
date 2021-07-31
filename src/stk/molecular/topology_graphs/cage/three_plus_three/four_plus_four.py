@@ -13,6 +13,38 @@ class FourPlusFour(Cage):
     """
     Represents a cube cage topology graph.
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb = stk.BuildingBlock(
+            smiles='Brc1cc(Br)cc(Br)c1',
+            functional_groups=[stk.BromoFactory()],
+        )
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusFour((bb, )),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
     Building blocks with three functional groups are required for
     this topology.
 
