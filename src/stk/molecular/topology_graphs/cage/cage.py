@@ -786,7 +786,6 @@ class Cage(TopologyGraph):
             ),
         )
 
-
         moldoc_display_molecule = molecule.Molecule(
             atoms=(
                 molecule.Atom(
