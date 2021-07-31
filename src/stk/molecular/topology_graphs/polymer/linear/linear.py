@@ -250,6 +250,7 @@ class Linear(TopologyGraph):
                 repeating_unit='AB',
                 num_repeating_units=5,
                 orientations=(1, 0.5),
+                random_seed=4,
             ),
         )
 
