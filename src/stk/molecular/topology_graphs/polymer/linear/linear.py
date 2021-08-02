@@ -23,11 +23,6 @@ from ...topology_graph import (
 from ....reactions import GenericReactionFactory
 
 
-__all__ = [
-    'Linear',
-]
-
-
 class Linear(TopologyGraph):
     """
     Represents a linear polymer topology graph.
@@ -563,7 +558,7 @@ class Linear(TopologyGraph):
 
         edges.append(Edge(len(edges), vertices[-2], vertices[-1]))
 
-        return VerticesAndEdges(
+        return _VerticesAndEdges(
             vertices=tuple(vertices),
             edges=tuple(edges),
         )
@@ -609,6 +604,6 @@ class Linear(TopologyGraph):
 
 
 @dataclass(frozen=True)
-class VerticesAndEdges:
+class _VerticesAndEdges:
     vertices: Tuple[Vertex]
     edges: Tuple[Edge]
