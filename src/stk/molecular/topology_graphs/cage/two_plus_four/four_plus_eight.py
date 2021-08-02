@@ -13,6 +13,8 @@ class FourPlusEight(Cage):
     """
     Represents a cage topology graph.
 
+    Unoptimized construction
+
     .. moldoc::
 
         import moldoc.molecule as molecule
@@ -28,6 +30,47 @@ class FourPlusEight(Cage):
         )
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusEight((bb1, bb2)),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
+    :class:`.Collapser` optimized construction
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='BrCCBr',
+            functional_groups=[stk.BromoFactory()],
+        )
+        bb2 = stk.BuildingBlock(
+            smiles='Brc1c(Br)cc(Br)c(Br)c1',
+            functional_groups=[stk.BromoFactory()],
+        )
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusEight(
+                building_blocks=(bb1, bb2),
+                optimizer=stk.Collapser(),
+            ),
         )
 
         moldoc_display_molecule = molecule.Molecule(
