@@ -625,7 +625,7 @@ class Cage(TopologyGraph):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ].
+            ],
         )
 
         # Build iron complex with delta stereochemistry.
