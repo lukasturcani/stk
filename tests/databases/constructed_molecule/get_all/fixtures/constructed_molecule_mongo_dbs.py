@@ -98,30 +98,54 @@ def constructed_molecule_mongo_dbs(
     database_name = '_test_get_entries_constructed_molecule'
     mongo_client.drop_database(database_name)
 
+    smiles = stk.Smiles()
+
+    inchi_molecules = molecules[:2]
+    smiles_molecules = molecules[2:4]
+    inchi_and_smiles_molecules = molecules[4:]
+
+    inchi_database = get_database(
+        database_name=database_name,
+        mongo_client=mongo_client,
+        keys=(inchi, ),
+        indices=(inchi.get_key_name(), ),
+    )
+    smiles_database = get_database(
+        database_name=database_name,
+        mongo_client=mongo_client,
+        keys=(smiles, ),
+        indices=(smiles.get_key_name(), ),
+    )
+
+    inchi_and_smiles_database = get_database(
+        database_name=database_name,
+        mongo_client=mongo_client,
+        keys=(inchi, smiles),
+        indices=(),
+    )
+
+    for molecule in inchi_molecules:
+        inchi_database.put(molecule)
+
+    for molecule in smiles_molecules:
+        smiles_database.put(molecule)
+
+    for molecule in inchi_and_smiles_molecules:
+        inchi_and_smiles_database.put(molecule)
+
+    inchi_key_database = get_database(
+        database_name=database_name,
+        mongo_client=mongo_client,
+        keys=(stk.InchiKey(), ),
+        indices=(),
+    )
+
+    expected_molecules = {
+        smiles.get_key(molecule): molecule
+        for molecule in molecules
+    }
+
     return CaseData(
-        inchi_database=get_database(
-            database_name=database_name,
-            mongo_client=mongo_client,
-            keys=(inchi, ),
-            indices=(inchi.get_key_name(), ),
-        ),
-        smiles_database=get_database(
-            database_name=database_name,
-            mongo_client=mongo_client,
-            keys=(smiles, ),
-            indices=(smiles.get_key_name(), ),
-        ),
-        inchi_key_database=get_database(
-            database_name=database_name,
-            mongo_client=mongo_client,
-            keys=(stk.InchiKey(), ),
-            indices=(),
-        ),
-        inchi_and_smiles_database=get_database(
-            database_name=database_name,
-            mongo_client=mongo_client,
-            keys=(inchi, smiles),
-            indices=(),
-        ),
-        molecules=molecules,
+        database=inchi_key_database,
+        expected_molecules=expected_molecules,
     )

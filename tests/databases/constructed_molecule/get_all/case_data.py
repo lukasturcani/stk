@@ -1,4 +1,5 @@
-from typing import Iterable
+from __future__ import annotations
+
 import stk
 
 
@@ -8,45 +9,29 @@ class CaseData:
 
     Attributes:
 
-        inchi_database: A database to test.
+        database: The database to test.
 
-        smiles_database: A database to test.
-
-        inchi_key_database: A database to test.
-
-        inchi_and_smiles_database: The database to test.
-
-        molecules: The molecules to put and get from the databases.
+        expected_molecules: The expected molecules to get from the
+            databases using their smiles as the key.
 
     """
 
     def __init__(
         self,
-        inchi_database: stk.ConstructedMoleculeDatabase,
-        smiles_database: stk.ConstructedMoleculeDatabase,
-        inchi_key_database: stk.ConstructedMoleculeDatabase,
-        inchi_and_smiles_database: stk.ConstructedMoleculeDatabase,
-        molecules: Iterable[stk.ConstructedMolecule],
+        database: stk.ConstructedMoleculeDatabase,
+        expected_molecules: dict[str, stk.ConstructedMolecule],
     ):
         """
         Initialize a :class:`.CaseData` instance.
 
         Parameters:
 
-            inchi_database: A database to test.
+            database: The database to test.
 
-            smiles_database: A database to test.
-
-            inchi_key_database: A database to test.
-
-            inchi_and_smiles_database The database to test.
-
-            molecules: The molecules to put and get from the databases.
+            expected_molecules: The expected molecules to get from the
+                databases using their smiles as the key.
 
         """
 
-        self.inchi_database = inchi_database
-        self.smiles_database = smiles_database
-        self.inchi_key_database = inchi_key_database
-        self.inchi_and_smiles_database = inchi_and_smiles_database
-        self.molecules = molecules
+        self.database = database
+        self.expected_molecules = expected_molecules
