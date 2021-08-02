@@ -15,6 +15,155 @@ class M6L2L3Prism(Cage):
     """
     Represents a cage topology graph.
 
+    Unoptimized construction
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(3)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bb2 = stk.BuildingBlock(
+            smiles='c2cnccc2c1cc(c4ccncc4)cc(c3ccncc3)c1',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        bb3 = stk.BuildingBlock(
+            smiles=(
+                'c2cnccc2C#Cc1c(C#Cc4ccncc4)cc'
+                '(C#Cc3ccncc3)c(C#Cc5ccncc5)c1'
+            ),
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.M6L2L3Prism(
+                building_blocks={
+                    bb1: range(6),
+                    bb2: (6, 7),
+                    bb3: range(8, 11),
+                },
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
+    :class:`.Collapser` optimized construction
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(3)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bb2 = stk.BuildingBlock(
+            smiles='c2cnccc2c1cc(c4ccncc4)cc(c3ccncc3)c1',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        bb3 = stk.BuildingBlock(
+            smiles=(
+                'c2cnccc2C#Cc1c(C#Cc4ccncc4)cc'
+                '(C#Cc3ccncc3)c(C#Cc5ccncc5)c1'
+            ),
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.M6L2L3Prism(
+                building_blocks={
+                    bb1: range(6),
+                    bb2: (6, 7),
+                    bb3: range(8, 11),
+                },
+                optimizer=stk.Collapser(),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
     Metal building blocks with three functional groups are
     required for this topology.
 
