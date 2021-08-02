@@ -63,6 +63,63 @@ class NRotaxane(TopologyGraph):
             ),
         )
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        cycle = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles='[Br]CC[Br]',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+                repeating_unit='A',
+                num_repeating_units=5,
+            ),
+        )
+        axle = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=7,
+            )
+        )
+        rotaxane = stk.ConstructedMolecule(
+            topology_graph=stk.rotaxane.NRotaxane(
+                axle=stk.BuildingBlock.init_from_molecule(axle),
+                cycles=(
+                    stk.BuildingBlock.init_from_molecule(cycle),
+                ),
+                repeating_unit='A',
+                num_repeating_units=3,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    rotaxane.get_atoms(),
+                    rotaxane.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in rotaxane.get_bonds()
+            ),
+        )
+
     *Suggested Optimization*
 
     For :class:`.NRotaxane` topologies, there is no need to use an
