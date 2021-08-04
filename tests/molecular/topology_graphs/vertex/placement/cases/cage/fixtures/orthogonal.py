@@ -27,7 +27,7 @@ def orthogonal(position, orthogonal_aligner_edge, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = stk.cage.OrthogonalVertex(
+    vertex = stk.cage.AngledVertex(
         id=0,
         position=position,
         aligner_edge=orthogonal_aligner_edge,

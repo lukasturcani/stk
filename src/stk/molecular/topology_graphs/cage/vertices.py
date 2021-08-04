@@ -154,7 +154,7 @@ class _CageVertex(Vertex):
         )
 
 
-class OrthogonalVertex(_CageVertex):
+class AngledVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
