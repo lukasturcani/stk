@@ -168,27 +168,23 @@ class AngledVertex(_CageVertex):
             atom_ids=building_block.get_placer_ids(),
         )
 
-        fg_centroid = (
-            sum(
-                building_block.get_centroid(fg.get_placer_ids())
-                for fg in building_block.get_functional_groups()
-            ) / 2
+        placer_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_placer_ids(),
         )
+        core_centroid = building_block.get_centroid(
+            atom_ids=building_block.get_core_atom_ids(),
+        )
+        core_to_placer = placer_centroid - core_centroid
         edge_centroid = (
             sum(edge.get_position() for edge in edges) / len(edges)
         )
 
         building_block = building_block.with_rotation_between_vectors(
-            start=fg_centroid - self._position,
+            start=core_to_placer,
             target=edge_centroid - self._position,
             origin=self._position,
         )
-        fg_centroid = (
-            sum(
-                building_block.get_centroid(fg.get_placer_ids())
-                for fg in building_block.get_functional_groups()
-            ) / 2
-        )
+
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
