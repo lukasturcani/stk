@@ -101,8 +101,49 @@ class MetalComplex(TopologyGraph):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bidentate = stk.BuildingBlock(
+            smiles='C=NC/C=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    bidentate.get_atoms(),
+                    bidentate.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in bidentate.get_bonds()
+            ),
+        )
+
 
     Finally, we can create the :class:`.MetalComplex`.
 
@@ -113,6 +154,66 @@ class MetalComplex(TopologyGraph):
                 metals=metal,
                 ligands=bidentate,
             )
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        metal = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bidentate = stk.BuildingBlock(
+            smiles='C=NC/C=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralLambda(
+                metals=metal,
+                ligands=bidentate,
+            )
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    complex.get_atoms(),
+                    complex.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        bond.get_order()
+                        if bond.get_order() != 9
+                        else 1
+                    ),
+                ) for bond in complex.get_bonds()
+            ),
         )
 
     *Suggested Optimization*
@@ -154,7 +255,68 @@ class MetalComplex(TopologyGraph):
                 metals=metal,
                 ligands=bidentate,
                 optimizer=stk.MCHammer(),
-            )
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        metal = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bidentate = stk.BuildingBlock(
+            smiles='C=NC/C=N/Br',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ]
+        )
+
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralLambda(
+                metals=metal,
+                ligands=bidentate,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    complex.get_atoms(),
+                    complex.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        bond.get_order()
+                        if bond.get_order() != 9
+                        else 1
+                    ),
+                ) for bond in complex.get_bonds()
+            ),
         )
 
     *Construction with Multiple Metals & Ligands*
@@ -190,7 +352,7 @@ class MetalComplex(TopologyGraph):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
 
         # Define a second organic linker with two functional groups.
@@ -207,18 +369,18 @@ class MetalComplex(TopologyGraph):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
 
         # Build heteroleptic complex.
         complex = stk.ConstructedMolecule(
-            stk.metal_complex.OctahedralLambda(
+            topology_graph=stk.metal_complex.OctahedralLambda(
                 metals=metal,
                 ligands={
                     bidentate1: (0, 1),
                     bidentate2: (2, ),
                 },
-            )
+            ),
         )
 
     However, if each ligand is has a different number of
@@ -229,12 +391,13 @@ class MetalComplex(TopologyGraph):
     metal complex you are using. These are detailed in the docstring
     for that specific metal vertex topology graph.
 
-    *Leaving Unsubstituted Sites*
+    *Unsubstituted Metal Complexes*
 
     Some metal complex topologies represent metal complexes with
     unsubstituted metal sites. For example,
-    here we show how to build a square planar
-    palladium(II) complex with two open metal sites.
+    :class:`.BidentateSquarePlanar` has all sites substituted and
+    :class:`.CisProtectedSquarePlanar` is the equivalent metal complex
+    with some unsubstituted sites
 
     .. testcode:: leaving-unsubstituted-sites
 
@@ -258,15 +421,72 @@ class MetalComplex(TopologyGraph):
                     bonders=(0, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
 
         # Construct a cis-protected square planar metal complex.
         complex = stk.ConstructedMolecule(
-            stk.metal_complex.CisProtectedSquarePlanar(
+            topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
                 metals=pd,
                 ligands=bidentate_ligand,
-            )
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        pd = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(4)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        # Define a bidentate ligand with two functional groups.
+        bidentate_ligand = stk.BuildingBlock(
+            smiles='NCCN',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#7]~[#6]',
+                    bonders=(0, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        # Construct a cis-protected square planar metal complex.
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
+                metals=pd,
+                ligands=bidentate_ligand,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    complex.get_atoms(),
+                    complex.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        bond.get_order()
+                        if bond.get_order() != 9
+                        else 1
+                    ),
+                ) for bond in complex.get_bonds()
+            ),
         )
 
     """

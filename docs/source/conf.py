@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'numpydoc',
+    'moldoc',
 ]
 
 autodoc_default_options = {
