@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import numpy as np
 from pytest_lazyfixture import lazy_fixture
@@ -71,6 +73,8 @@ def position(request):
     params=(
         stk.cage.LinearVertex,
         stk.cage.NonLinearVertex,
+        stk.cage.UnaligningVertex,
+        stk.cage.AngledVertex,
     ),
 )
 def cls(request):
@@ -82,6 +86,7 @@ def cls(request):
         stk.cage.LinearVertex.init_at_center,
         stk.cage.NonLinearVertex.init_at_center,
         stk.cage.UnaligningVertex.init_at_center,
+        stk.cage.AngledVertex.init_at_center,
     ),
 )
 def init_at_center(request):
