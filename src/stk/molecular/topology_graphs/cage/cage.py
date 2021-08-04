@@ -176,6 +176,39 @@ class Cage(TopologyGraph):
             topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
         )
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
     *Suggested Optimization*
 
     For :class:`.Cage` topologies, it is recommend to use the
@@ -199,6 +232,43 @@ class Cage(TopologyGraph):
             topology_graph=stk.cage.FourPlusSix(
                 building_blocks=(bb1, bb2),
                 optimizer=stk.MCHammer(),
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(bb1, bb2),
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
             ),
         )
 
@@ -260,9 +330,6 @@ class Cage(TopologyGraph):
 
         cage1 = stk.ConstructedMolecule(
             topology_graph=stk.cage.FourPlusSix(
-                # building_blocks is now a dict, which maps building
-                # blocks to the id of the vertices it should be placed
-                # on. You can use ranges to specify the ids.
                 building_blocks={
                     bb1: range(2),
                     bb2: (2, 3),
@@ -272,6 +339,58 @@ class Cage(TopologyGraph):
                 },
             ),
         )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(Cl)(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb3 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb4 = stk.BuildingBlock(
+            smiles='NCC(Cl)N',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
+        bb5 = stk.BuildingBlock('NCCCCN', [stk.PrimaryAminoFactory()])
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks={
+                    bb1: range(2),
+                    bb2: (2, 3),
+                    bb3: 4,
+                    bb4: 5,
+                    bb5: range(6, 10),
+                },
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
 
     You can combine this with the `vertex_alignments` parameter
 
@@ -286,7 +405,59 @@ class Cage(TopologyGraph):
                     bb4: 5,
                     bb5: range(6, 10),
                 },
-                vertex_alignments={0: 1, 1: 1, 2: 2},
+                vertex_alignments={5: 1},
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='O=CC(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb2 = stk.BuildingBlock(
+            smiles='O=CC(Cl)(C=O)C=O',
+            functional_groups=[stk.AldehydeFactory()],
+        )
+        bb3 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+        bb4 = stk.BuildingBlock(
+            smiles='NCC(Cl)N',
+            functional_groups=[stk.PrimaryAminoFactory()],
+        )
+        bb5 = stk.BuildingBlock('NCCCCN', [stk.PrimaryAminoFactory()])
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks={
+                    bb1: range(2),
+                    bb2: (2, 3),
+                    bb3: 4,
+                    bb4: 5,
+                    bb5: range(6, 10),
+                },
+                vertex_alignments={5: 1},
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
             ),
         )
 
@@ -340,12 +511,78 @@ class Cage(TopologyGraph):
                         bond_orders={
                             frozenset({
                                 stk.GenericFunctionalGroup,
-                                stk.SingleAtom
-                            }): 9
-                        }
-                    )
+                                stk.SingleAtom,
+                            }): 9,
+                        },
+                    ),
+                ),
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        palladium_atom = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(4)
+            ),
+            position_matrix=[[0., 0., 0.]],
+        )
+
+        bb1 = stk.BuildingBlock(
+            smiles=(
+                'C1=NC=CC(C2=CC=CC(C3=C'
+                'C=NC=C3)=C2)=C1'
+            ),
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        cage = stk.ConstructedMolecule(
+            stk.cage.M2L4Lantern(
+                building_blocks=(palladium_atom, bb1),
+                reaction_factory=stk.DativeReactionFactory(
+                    stk.GenericReactionFactory(
+                        bond_orders={
+                            # Use bond order of 1 here so that the
+                            # rendering does not show a bond order
+                            # of 9.
+                            frozenset({
+                                stk.GenericFunctionalGroup,
+                                stk.SingleAtom,
+                            }): 1,
+                        },
+                    ),
+                ),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
                 )
-            )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in cage.get_bonds()
+            ),
         )
 
     *Controlling Metal-Complex Stereochemistry*
@@ -388,15 +625,75 @@ class Cage(TopologyGraph):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
 
         # Build iron complex with delta stereochemistry.
         iron_oct_delta = stk.ConstructedMolecule(
-            stk.metal_complex.OctahedralDelta(
+            topology_graph=stk.metal_complex.OctahedralDelta(
                 metals=iron_atom,
                 ligands=bb2,
-            )
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bb2 = stk.BuildingBlock(
+            smiles='C1=NC(C=NBr)=CC=C1',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    complex.get_atoms(),
+                    complex.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in complex.get_bonds()
+            ),
         )
 
     Then the metal complexes can be placed on the appropriate
@@ -422,12 +719,94 @@ class Cage(TopologyGraph):
 
         # Build an M4L6 Tetrahedron with a spacer.
         cage2 = stk.ConstructedMolecule(
-            stk.cage.M4L6TetrahedronSpacer(
+            topology_graph=stk.cage.M4L6TetrahedronSpacer(
                 building_blocks=(
                     iron_oct_delta,
                     bb3,
                 ),
-            )
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bb2 = stk.BuildingBlock(
+            smiles='C1=NC(C=NBr)=CC=C1',
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        iron_oct_delta = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+            ),
+        )
+
+        iron_oct_delta = stk.BuildingBlock.init_from_molecule(
+            molecule=iron_oct_delta,
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        bb3 = stk.BuildingBlock(
+            smiles=(
+                'C1=CC(C2=CC=C(Br)C=C2)=C'
+                'C=C1Br'
+            ),
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.M4L6TetrahedronSpacer(
+                building_blocks=(
+                    iron_oct_delta,
+                    bb3,
+                ),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in cage.get_bonds()
+            ),
         )
 
     *Aligning Metal Complex Building Blocks*
@@ -477,14 +856,14 @@ class Cage(TopologyGraph):
                     bonders=(0, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
 
         metal_complex = stk.ConstructedMolecule(
-            stk.metal_complex.CisProtectedSquarePlanar(
+            topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
                 metals=metal_atom,
                 ligands=ligand,
-            )
+            ),
         )
 
     Next, we convert the metal complex into a :class:`.BuildingBlock`,
@@ -504,7 +883,7 @@ class Cage(TopologyGraph):
                     # for each functional group.
                     placers=(0, 1),
                 ),
-            ]
+            ],
         )
 
     We load in the organic linker of the cage as normal
@@ -519,7 +898,7 @@ class Cage(TopologyGraph):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
 
     And finally, we build the cage with a
@@ -528,7 +907,7 @@ class Cage(TopologyGraph):
     .. testcode:: aligning-metal-complex-building-blocks
 
         cage = stk.ConstructedMolecule(
-            stk.cage.M4L4Square(
+            topology_graph=stk.cage.M4L4Square(
                 corners=metal_complex,
                 linkers=linker,
                 reaction_factory=stk.DativeReactionFactory(
@@ -537,11 +916,11 @@ class Cage(TopologyGraph):
                             frozenset({
                                 stk.GenericFunctionalGroup,
                                 stk.GenericFunctionalGroup,
-                            }): 9
-                        }
-                    )
+                            }): 9,
+                        },
+                    ),
                 ),
-            )
+            ),
         )
 
     """

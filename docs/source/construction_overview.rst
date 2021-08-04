@@ -57,7 +57,47 @@ else, take for example the construction of a linear polymer
 
 which will produce:
 
-.. image:: https://i.imgur.com/e782BBV.png
+.. moldoc::
+
+    import stk
+    import moldoc.molecule as molecule
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(
+                stk.BuildingBlock(
+                    smiles='Brc1ccc(Br)cc1',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='BrC#CBr',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+            ),
+            repeating_unit='ABBA',
+            num_repeating_units=1,
+        ),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                polymer.get_atoms(),
+                polymer.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in polymer.get_bonds()
+        ),
+    )
+
 
 Because the topology graph is an idealized representation of the
 constructed molecule, the bonds formed during construction often have
@@ -66,17 +106,89 @@ undergo structure optimization. There is no single correct way to go
 about this, because the appropriate methodology for structure
 optimization will depend on various factors, such as the nature of the
 constructed molecule, the desired accuracy, and time constraints.
-In addition, there are countless options already available,
+
+However, :mod:`stk` does provide a handful of
+simple and lightweight methods for making structures more
+realistic, via optimizers
+
+.. testcode:: introduction
+
+    import stk
+
+    optimized_polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(
+                stk.BuildingBlock(
+                    smiles='Brc1ccc(Br)cc1',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='BrC#CBr',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+            ),
+            repeating_unit='ABBA',
+            num_repeating_units=1,
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+
+.. moldoc::
+
+    import stk
+    import moldoc.molecule as molecule
+
+    polymer = stk.ConstructedMolecule(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(
+                stk.BuildingBlock(
+                    smiles='Brc1ccc(Br)cc1',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='BrC#CBr',
+                    functional_groups=[stk.BromoFactory()],
+                ),
+            ),
+            repeating_unit='ABBA',
+            num_repeating_units=1,
+            optimizer=stk.Collapser(scale_steps=False),
+        ),
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                polymer.get_atoms(),
+                polymer.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in polymer.get_bonds()
+        ),
+    )
+
+
+:mod:`stk` only provides limited capacity in this regard because
+there are countless options already available,
 be it Python libraries such as :mod:`rdkit` or :mod:`ase`, or
-some sort of computational chemistry software. Since
-:mod:`stk` cannot hope to provide a good solution to this problem,
-it does try to make it easy for you to convert an
+some sort of computational chemistry software. In order to
+easily interact with these other tools, :mod:`stk` does try to make it
+easy for you to convert an
 :mod:`stk` :class:`.Molecule` into whatever format you need to make
 use of other software. This means you can access atoms and
 bonds with :meth:`.Molecule.get_atoms` and :meth:`.Molecule.get_bonds`,
 you can convert any :mod:`stk` :class:`.Molecule` into an
 :mod:`rdkit` molecule with :meth:`.Molecule.to_rdkit_mol` or you
-can write it to a file with :meth:`.Molecule.write`.
+can write it to a file using the various writer classes, such as
+:class:`.MolWriter`.
 
 .. figure:: https://i.imgur.com/UlCnTj9.png
     :align: center
@@ -166,6 +278,32 @@ during construction, you can use a :class:`.BromoFactory`.
     for fg in building_block.get_functional_groups():
         assert isinstance(fg, stk.Bromo)
 
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    building_block = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                building_block.get_atoms(),
+                building_block.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in building_block.get_bonds()
+        ),
+    )
+
 In the example above, ``building_block`` will have two
 :class:`.Bromo` functional groups. When ``building_block`` is used
 for construction, it is the atoms held by the :class:`.Bromo`
@@ -187,6 +325,35 @@ aldehyde functional groups, we could have used an
     for fg in building_block2.get_functional_groups():
         assert isinstance(fg, stk.Aldehyde)
 
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    building_block = stk.BuildingBlock(
+        smiles='O=CCC=O',
+        functional_groups=[stk.AldehydeFactory()],
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                building_block.get_atoms(),
+                building_block.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in building_block.get_bonds()
+        ),
+    )
+
 Finally, if we had a mix of functional groups, we could have used
 a mix of factories
 
@@ -205,6 +372,35 @@ a mix of factories
         set(map(type, building_block3.get_functional_groups()))
         == {stk.Bromo, stk.Aldehyde}
      )
+
+.. moldoc::
+
+    import moldoc.molecule as molecule
+    import stk
+
+    building_block = stk.BuildingBlock(
+        smiles='O=CCCBr',
+        functional_groups=[stk.AldehydeFactory(), stk.BromoFactory()],
+    )
+
+    moldoc_display_molecule = molecule.Molecule(
+        atoms=(
+            molecule.Atom(
+                atomic_number=atom.get_atomic_number(),
+                position=position,
+            ) for atom, position in zip(
+                building_block.get_atoms(),
+                building_block.get_position_matrix(),
+            )
+        ),
+        bonds=(
+            molecule.Bond(
+                atom1_id=bond.get_atom1().get_id(),
+                atom2_id=bond.get_atom2().get_id(),
+                order=bond.get_order(),
+            ) for bond in building_block.get_bonds()
+        ),
+    )
 
 Based on the specific functional groups found on an
 edge of the :class:`.TopologyGraph`, :mod:`stk` will select an

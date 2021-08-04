@@ -107,6 +107,7 @@ dependencies:
     - jinja2==3.0.1
     - markupsafe==2.0.1
     - mchammer==1.0.2
+    - moldoc==0.0.2
     - multiprocess==0.70.11.1
     - mypy==0.910
     - mypy-extensions==0.4.3

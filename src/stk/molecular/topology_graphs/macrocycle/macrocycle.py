@@ -42,6 +42,41 @@ class Macrocycle(TopologyGraph):
             ),
         )
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        macrocycle = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    macrocycle.get_atoms(),
+                    macrocycle.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in macrocycle.get_bonds()
+            ),
+        )
+
     *Suggested Optimization*
 
     For :class:`.Macrocycle` topologies, it is recommended to use the
@@ -63,6 +98,42 @@ class Macrocycle(TopologyGraph):
             ),
         )
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        macrocycle = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(
+                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+                ),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    macrocycle.get_atoms(),
+                    macrocycle.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in macrocycle.get_bonds()
+            ),
+        )
+
     *Defining the Orientation of Each Building Block*
 
     The `orientations` parameter allows the direction of each building
@@ -81,6 +152,43 @@ class Macrocycle(TopologyGraph):
                 repeating_unit='AB',
                 num_repeating_units=5,
                 orientations=(1, 0.5),
+            ),
+        )
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCOCCBr', [stk.BromoFactory()])
+
+        macrocycle = stk.ConstructedMolecule(
+            topology_graph=stk.macrocycle.Macrocycle(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=5,
+                orientations=(1, 0.5),
+                random_seed=1,
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    macrocycle.get_atoms(),
+                    macrocycle.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in macrocycle.get_bonds()
             ),
         )
 
