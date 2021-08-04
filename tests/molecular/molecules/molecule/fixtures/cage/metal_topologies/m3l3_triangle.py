@@ -39,6 +39,56 @@ from ....case_data import CaseData
             ),
             name=name,
         ),
+        # Non-metal-containing tests with increasing angles between
+        # functional groups.
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles='C1CC(C1Br)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles='C(#CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+            smiles=(''),
+            name=name,
+        ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles='C1CC(CC(C1)Br)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles='C(#CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+            smiles=(''),
+            name=name,
+        ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles='C(CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles='C(#CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+            smiles=(''),
+            name=name,
+        ),
     ),
 )
 def metal_cage_m3l3_triangle(request) -> CaseData:
