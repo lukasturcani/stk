@@ -11,7 +11,7 @@ from ....case_data import CaseData
 def orthogonal(position, orthogonal_aligner_edge, building_block_2):
 
     point1, point2 = points = (
-        position + [-10, 0, 0],
+        position + [0, 10, 0],
         position + [10, 0, 0],
     )
 
@@ -65,7 +65,7 @@ def get_fg_position(id, building_block):
 
 
 def get_orthogonal_edges(vertex):
-    vertex2 = stk.Vertex(1, vertex.get_position() + [-10, 0, 0])
+    vertex2 = stk.Vertex(1, vertex.get_position() + [0, 10, 0])
     vertex3 = stk.Vertex(2, vertex.get_position() + [10, 0, 0])
     yield stk.Edge(0, vertex, vertex2)
     yield stk.Edge(1, vertex, vertex3)
