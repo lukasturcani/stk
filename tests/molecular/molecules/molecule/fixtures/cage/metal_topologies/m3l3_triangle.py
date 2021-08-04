@@ -54,7 +54,11 @@ from ....case_data import CaseData
                     ),
                 ),
             ),
-            smiles=(''),
+            smiles=(
+                '[H]C1([H])C([H])([H])C2([H])C#CC3([H])C([H])([H])C([H'
+                '])([H])C3([H])C#CC3([H])C([H])([H])C([H])([H])C3([H])'
+                'C#CC12[H]'
+            ),
             name=name,
         ),
         lambda name: CaseData(
@@ -70,7 +74,12 @@ from ....case_data import CaseData
                     ),
                 ),
             ),
-            smiles=(''),
+            smiles=(
+                '[H]C1([H])C([H])([H])C2([H])C#CC3([H])C([H])([H])C([H'
+                '])([H])C([H])([H])C([H])(C#CC4([H])C([H])([H])C([H])('
+                '[H])C([H])([H])C([H])(C#CC([H])(C1([H])[H])C2([H])[H]'
+                ')C4([H])[H])C3([H])[H]'
+            ),
             name=name,
         ),
         lambda name: CaseData(
@@ -86,7 +95,10 @@ from ....case_data import CaseData
                     ),
                 ),
             ),
-            smiles=(''),
+            smiles=(
+                '[H]C1([H])C#CC([H])([H])C([H])([H])C#CC([H])([H])C([H'
+                '])([H])C#CC1([H])[H]'
+            ),
             name=name,
         ),
     ),
