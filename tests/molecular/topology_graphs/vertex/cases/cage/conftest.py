@@ -73,11 +73,10 @@ def position(request):
     params=(
         stk.cage.LinearVertex,
         stk.cage.NonLinearVertex,
-        stk.cage.UnaligningVertex,
         stk.cage.AngledVertex,
     ),
 )
-def cls(request):
+def cls(request) -> stk.Vertex:
     return request.param
 
 
@@ -89,7 +88,7 @@ def cls(request):
         stk.cage.AngledVertex.init_at_center,
     ),
 )
-def init_at_center(request):
+def init_at_center(request) -> stk.Vertex:
     return request.param
 
 
