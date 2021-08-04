@@ -8,7 +8,7 @@ from ....case_data import CaseData
 
 
 @pytest.fixture
-def orthogonal(position, orthogonal_aligner_edge, building_block_2):
+def angled(position, angled_aligner_edge, building_block_2):
 
     point1, point2 = points = (
         position + [0, 10, 0],
@@ -30,25 +30,25 @@ def orthogonal(position, orthogonal_aligner_edge, building_block_2):
     vertex = stk.cage.AngledVertex(
         id=0,
         position=position,
-        aligner_edge=orthogonal_aligner_edge,
+        aligner_edge=angled_aligner_edge,
     )
 
     return CaseData(
         vertex=vertex,
-        edges=tuple(get_orthogonal_edges(vertex)),
+        edges=tuple(get_angled_edges(vertex)),
         building_block=building_block_2,
         position=position,
         alignment_tests={
             get_fg0_point: (
-                point1 if orthogonal_aligner_edge == 0 else point2
+                point1 if angled_aligner_edge == 0 else point2
             ),
             get_fg1_point: (
-                point2 if orthogonal_aligner_edge == 0 else point1
+                point2 if angled_aligner_edge == 0 else point1
             ),
         },
         functional_group_edges=(
             {0: 0, 1: 1}
-            if orthogonal_aligner_edge == 0 else {0: 1, 1: 0}
+            if angled_aligner_edge == 0 else {0: 1, 1: 0}
         ),
     )
 
@@ -64,7 +64,7 @@ def get_fg_position(id, building_block):
     )
 
 
-def get_orthogonal_edges(vertex):
+def get_angled_edges(vertex):
     vertex2 = stk.Vertex(1, vertex.get_position() + [0, 10, 0])
     vertex3 = stk.Vertex(2, vertex.get_position() + [10, 0, 0])
     yield stk.Edge(0, vertex, vertex2)
@@ -72,7 +72,7 @@ def get_orthogonal_edges(vertex):
 
 
 @pytest.fixture(params=(0, 1))
-def orthogonal_aligner_edge(request):
+def angled_aligner_edge(request):
     return request.param
 
 
