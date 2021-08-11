@@ -39,7 +39,7 @@ class Paddlewheel(MetalComplex):
                     bonders=(1, ),
                     deleters=(),
                 ),
-            ]
+            ],
         )
         complex = stk.ConstructedMolecule(
             topology_graph=stk.metal_complex.Paddlewheel(
@@ -55,7 +55,7 @@ class Paddlewheel(MetalComplex):
                         },
                     ),
                 ),
-            )
+            ),
         )
 
         moldoc_display_molecule = molecule.Molecule(
