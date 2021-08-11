@@ -27,14 +27,11 @@ class BidentateSquarePlanar(MetalComplex):
             position_matrix=[[0, 0, 0]],
         )
         bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=CC=NC(C2=CC=CC(C3=C'
-                'C=CC=N3)=C2)=C1'
-            ),
+            smiles='NCCN',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
+                    smarts='[#7]~[#6]',
+                    bonders=(0, ),
                     deleters=(),
                 ),
             ],
