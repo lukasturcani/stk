@@ -19,21 +19,23 @@ class Paddlewheel(MetalComplex):
         import stk
 
         bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
+            smiles='[Cu+2]',
             functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
+                stk.SingleAtom(stk.Cu(0, charge=2))
                 for i in range(4)
             ),
-            position_matrix=[[0, 0, 0]],
+            position_matrix=([0, 0, 0], ),
         )
         bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=CC=NC(C2=CC=CC(C3=C'
-                'C=CC=N3)=C2)=C1'
-            ),
+            smiles='O=C(O)c1ccc(Br)cc1',
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
+                    smarts='[#6]~[#8]~[#1]',
+                    bonders=(1, ),
+                    deleters=(2, ),
+                ),
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#8X1]',
                     bonders=(1, ),
                     deleters=(),
                 ),
@@ -43,6 +45,16 @@ class Paddlewheel(MetalComplex):
             topology_graph=stk.metal_complex.Paddlewheel(
                 metals=bb1,
                 ligands=bb2,
+                reaction_factory=stk.DativeReactionFactory(
+                    stk.GenericReactionFactory(
+                        bond_orders={
+                            frozenset({
+                                stk.GenericFunctionalGroup,
+                                stk.SingleAtom,
+                            }): 9,
+                        },
+                    ),
+                ),
             ),
         )
 
