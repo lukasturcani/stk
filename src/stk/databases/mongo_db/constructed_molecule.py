@@ -811,7 +811,6 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         cursor = self._constructed_molecules.aggregate(query)
         for entry in cursor:
-
             for key in keys:
                 posmat_key = f'posmat_{key}'
                 mol_key = f'mol_{key}'
