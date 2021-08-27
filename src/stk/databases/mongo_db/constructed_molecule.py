@@ -721,7 +721,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 '$lookup': {
                     'from': self._position_matrices.name,
                     'let': {
-                        'const_molecule_key': f'${key}',
+                        'molecule_key': f'${key}',
                     },
                     'as': f'posmat_{key}',
                     'pipeline': [
@@ -735,7 +735,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                                 '$expr': {
                                     '$eq': [
                                         f'${key}',
-                                        '$$const_molecule_key',
+                                        '$$molecule_key',
                                     ],
                                 },
                             },
@@ -750,7 +750,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 '$lookup': {
                     'from': self._molecules.name,
                     'let': {
-                        'const_molecule_key': f'${key}',
+                        'molecule_key': f'${key}',
                     },
                     'as': f'mol_{key}',
                     'pipeline': [
@@ -764,7 +764,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                                 '$expr': {
                                     '$eq': [
                                         f'${key}',
-                                        '$$const_molecule_key',
+                                        '$$molecule_key',
                                     ],
                                 },
                             },
