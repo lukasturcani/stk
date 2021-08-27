@@ -812,11 +812,11 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         cursor = self._constructed_molecules.aggregate(query)
         for entry in cursor:
             molecule_document = get_any_value(
-                entry=entry,
+                mapping=entry,
                 keys=(f'mol_{key}' for key in keys),
             )
             position_matrix_document = get_any_value(
-                entry=entry,
+                mapping=entry,
                 keys=(f'posmat_{key}' for key in keys),
             )
             if (
