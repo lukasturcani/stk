@@ -12,7 +12,7 @@ from stk.serialization import (
     ConstructedMoleculeDejsonizer,
 )
 from ..constructed_molecule import ConstructedMoleculeDatabase
-from .utilities import HashableDict
+from .utilities import get_any_value, HashableDict
 from stk.utilities import dedupe
 
 
@@ -811,25 +811,24 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         cursor = self._constructed_molecules.aggregate(query)
         for entry in cursor:
-            for key in keys:
-                posmat_key = f'posmat_{key}'
-                mol_key = f'mol_{key}'
-                if (
-                    posmat_key in entry and len(entry[posmat_key]) > 0
-                    and mol_key in entry and len(entry[mol_key]) > 0
-                ):
-                    yield self._dejsonizer.from_json({
-                        'molecule': {
-                            'a': entry[mol_key][0]['a'],
-                            'b': entry[mol_key][0]['b'],
-                        },
-                        'constructedMolecule': entry,
-                        'matrix': {
-                            'm': entry[posmat_key][0]['m'],
-                        },
-                        'buildingBlocks': tuple(map(
-                            self._get_building_block,
-                            entry['BB'],
-                        )),
-                    })
-                    break
+            molecule_document = get_any_value(
+                entry=entry,
+                keys=(f'mol_{key}' for key in keys),
+            )
+            position_matrix_document = get_any_value(
+                entry=entry,
+                keys=(f'posmat_{key}' for key in keys),
+            )
+            if (
+                molecule_document is not None
+                and position_matrix_document is not None
+            ):
+                yield self._dejsonizer.from_json({
+                    'molecule': molecule_document,
+                    'constructedMolecule': entry,
+                    'matrix': position_matrix_document,
+                    'buildingBlocks': tuple(map(
+                        self._get_building_block,
+                        entry['BB'],
+                    )),
+                })
