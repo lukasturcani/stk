@@ -5,7 +5,7 @@ Constructed Molecule MongoDB
 """
 
 from functools import lru_cache
-from itertools import chain
+import itertools
 
 from stk.serialization import (
     ConstructedMoleculeJsonizer,
@@ -692,7 +692,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
     def get_all(self):
         # Get all potential indices.
-        indices = chain(
+        indices = itertools.chain(
             self._position_matrices.index_information().values(),
             self._molecules.index_information().values(),
             self._constructed_molecules.index_information().values(),
