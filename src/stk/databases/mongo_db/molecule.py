@@ -5,7 +5,7 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
-from itertools import chain
+import itertools
 
 from stk.serialization import (
     MoleculeJsonizer,
@@ -480,7 +480,7 @@ class MoleculeMongoDb(MoleculeDatabase):
 
     def get_all(self):
         # Get all potential indices.
-        indices = chain(
+        indices = itertools.chain(
             self._position_matrices.index_information().values(),
             self._molecules.index_information().values(),
         )
@@ -552,7 +552,6 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         cursor = self._molecules.aggregate(query)
         for entry in cursor:
-
             for key in keys:
                 posmat_key = f'posmat_{key}'
                 if posmat_key in entry and len(entry[posmat_key]) > 0:
