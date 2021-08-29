@@ -682,14 +682,6 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 self._building_block_position_matrices.find_one(key),
         }
 
-    def _get_molecule_keys(self, entry):
-        # Ignore keys reserved by constructed molecule collections.
-        reserved_keys = ('_id', 'BB', 'nBB', 'aI', 'bI')
-
-        for key, value in entry.items():
-            if key not in reserved_keys:
-                yield key, value
-
     def get_all(self):
         # Get all potential indices.
         indices = itertools.chain(

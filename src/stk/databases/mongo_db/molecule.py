@@ -469,15 +469,6 @@ class MoleculeMongoDb(MoleculeDatabase):
             'matrix': position_matrix,
         })
 
-    def _get_molecule_keys(self, entry):
-
-        # Ignore keys reserved by position matrix collections.
-        reserved_keys = ('m', '_id')
-
-        for key, value in entry.items():
-            if key not in reserved_keys:
-                yield key, value
-
     def get_all(self):
         # Get all potential indices.
         indices = itertools.chain(
