@@ -65,14 +65,14 @@ def molecules() -> tuple[stk.ConstructedMolecule, ...]:
 def get_database(
     database_name: str,
     mongo_client: pymongo.MongoClient,
-    keys: tuple[stk.MoleculeKeyMaker, ...],
+    key_makers: tuple[stk.MoleculeKeyMaker, ...],
     indices: tuple[str, ...],
 ) -> stk.ConstructedMoleculeMongoDb:
 
     return stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
-        jsonizer=stk.ConstructedMoleculeJsonizer(keys),
+        jsonizer=stk.ConstructedMoleculeJsonizer(key_makers),
         put_lru_cache_size=0,
         get_lru_cache_size=0,
         indices=indices,
@@ -87,10 +87,8 @@ def constructed_molecule_mongo_db(
 
     inchi = stk.Inchi()
     smiles = stk.Smiles()
-    database_name = '_test_get_entries_constructed_molecule'
+    database_name = '_test_get_all_constructed_molecules'
     mongo_client.drop_database(database_name)
-
-    smiles = stk.Smiles()
 
     inchi_molecules = molecules[:2]
     smiles_molecules = molecules[2:4]
@@ -99,20 +97,20 @@ def constructed_molecule_mongo_db(
     inchi_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        keys=(inchi, ),
+        key_makers=(inchi, ),
         indices=(inchi.get_key_name(), ),
     )
     smiles_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        keys=(smiles, ),
+        key_makers=(smiles, ),
         indices=(smiles.get_key_name(), ),
     )
 
     inchi_and_smiles_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        keys=(inchi, smiles),
+        key_makers=(inchi, smiles),
         indices=(),
     )
 
@@ -128,7 +126,7 @@ def constructed_molecule_mongo_db(
     inchi_key_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        keys=(stk.InchiKey(), ),
+        key_makers=(stk.InchiKey(), ),
         indices=(),
     )
 
