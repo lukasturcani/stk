@@ -15,10 +15,6 @@ def test_get_all(case_data: CaseData) -> None:
         case_data: A test case. Holds the databases to test and the
             molecules to place into the databases.
 
-    Returns:
-
-        None.
-
     """
 
     _test_get_all(
@@ -40,10 +36,6 @@ def _test_get_all(
 
         expected_molecules: The expected molecules to get from the
             databases using their smiles as the key.
-
-    Returns:
-
-        None.
 
     """
 
