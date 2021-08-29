@@ -5,8 +5,9 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             fitness_calculator=stk.FitnessFunction(
                 fitness_function=stk.Molecule.get_num_atoms,
             ),
@@ -15,5 +16,5 @@ from ..case_data import CaseData
         ),
     ),
 )
-def fitness_function(request):
-    return request.param
+def fitness_function(request) -> CaseData:
+    return request.param()

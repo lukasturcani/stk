@@ -9,8 +9,9 @@ def get_eight_plus_twelve(graph):
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             mutator=stk.RandomTopologyGraph(
                 replacement_funcs=(get_eight_plus_twelve, ),
             ),
@@ -48,5 +49,5 @@ def get_eight_plus_twelve(graph):
         ),
     ),
 )
-def random_topology_graph(request):
-    return request.param
+def random_topology_graph(request) -> CaseData:
+    return request.param()

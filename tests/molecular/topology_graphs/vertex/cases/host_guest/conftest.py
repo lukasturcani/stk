@@ -7,13 +7,13 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             vertex=stk.host_guest.HostVertex(0, (1, 2, 3)),
             id=0,
             position=np.array([1, 2, 3], dtype=np.float64),
             cell=np.array([0, 0, 0]),
         ),
-        CaseData(
+        lambda: CaseData(
             vertex=stk.host_guest.GuestVertex(
                 id=0,
                 position=(1, 2, 3),
@@ -26,5 +26,5 @@ from ...case_data import CaseData
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

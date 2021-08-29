@@ -35,19 +35,19 @@ def aligner_3(request):
 
 @pytest.fixture(
     params=(
-        stk.BuildingBlock(
+        lambda: stk.BuildingBlock(
             smiles='BrCC(Br)C(CCCC)NCBr',
             functional_groups=[stk.BromoFactory()],
         ),
     ),
 )
-def building_block_3(request):
+def building_block_3(request) -> stk.BuildingBlock:
     """
     A :class:`.BuildingBlock` with 3 functional groups.
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture
@@ -67,19 +67,19 @@ def aligner_4(request):
 
 @pytest.fixture(
     params=(
-        stk.BuildingBlock(
+        lambda: stk.BuildingBlock(
             smiles='BrC(CCCCCC)C(Br)CC(Br)CNCBr',
             functional_groups=[stk.BromoFactory()],
         ),
     ),
 )
-def building_block_4(request):
+def building_block_4(request) -> stk.BuildingBlock:
     """
     A :class:`.BuildingBlock` with 4 functional groups.
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture(

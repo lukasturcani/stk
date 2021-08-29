@@ -13,7 +13,7 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             molecule=stk.BuildingBlock(
                 smiles='Br[C+2][N+]Cl',
                 functional_groups=[stk.BromoFactory()],
@@ -44,7 +44,7 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
                 placer_ids=(1, ),
             )
         ),
-        CaseData(
+        lambda: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(bb1, bb2),
@@ -117,4 +117,4 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
     ),
 )
 def case_data(request):
-    return request.param
+    return request.param()

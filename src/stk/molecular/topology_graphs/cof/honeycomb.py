@@ -16,6 +16,85 @@ class Honeycomb(Cof):
     """
     Represents a honeycomb COF topology graph.
 
+    Unoptimized construction
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+            ),
+        )
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cof.get_atoms(),
+                    cof.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in cof.get_bonds()
+            ),
+        )
+
+    ``Collapser(scale_steps=False)`` optimized construction
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+        cof = stk.ConstructedMolecule(
+            topology_graph=stk.cof.Honeycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+                optimizer=stk.Collapser(scale_steps=False),
+            ),
+        )
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cof.get_atoms(),
+                    cof.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in cof.get_bonds()
+            ),
+        )
+
     Building blocks with three and two functional groups are required
     for this topology graph.
 

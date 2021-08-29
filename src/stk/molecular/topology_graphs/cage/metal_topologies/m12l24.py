@@ -13,6 +13,63 @@ class M12L24(Cage):
     """
     Represents a cage topology graph.
 
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='[Pd+2]',
+            functional_groups=(
+                stk.SingleAtom(stk.Pd(0, charge=2))
+                for i in range(4)
+            ),
+            position_matrix=[[0, 0, 0]],
+        )
+
+        bb2 = stk.BuildingBlock(
+            smiles=(
+                'C1=NC=CC(C2=CC=CC(C3=C'
+                'C=NC=C3)=C2)=C1'
+            ),
+            functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#6]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
+            ],
+        )
+
+        cage = stk.ConstructedMolecule(
+            topology_graph=stk.cage.M12L24(
+                building_blocks=(bb1, bb2),
+            ),
+        )
+
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    cage.get_atoms(),
+                    cage.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=(
+                        1
+                        if bond.get_order() == 9
+                        else bond.get_order()
+                    ),
+                ) for bond in cage.get_bonds()
+            ),
+        )
+
     Metal building blocks with four functional groups are
     required for this topology.
 

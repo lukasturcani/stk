@@ -24,6 +24,7 @@
    Key Makers <stk.molecular.key_makers.molecule>
    Reactions <stk.molecular.reactions.reactions.reaction.reaction>
    Reaction Factories <stk.molecular.reactions.factories.reaction_factory>
+   Writers <writers>
 
 .. toctree::
    :hidden:

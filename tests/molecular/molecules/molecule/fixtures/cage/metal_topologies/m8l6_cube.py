@@ -1,73 +1,21 @@
 import pytest
 import stk
 
+from ...building_blocks import get_iron_complex, get_tetratopic_linker
 from ....case_data import CaseData
 
 
-metal_atom = stk.BuildingBlock(
-    smiles='[Fe+2]',
-    functional_groups=(
-        stk.SingleAtom(stk.Fe(0, charge=2))
-        for i in range(6)
-    ),
-    position_matrix=([0, 0, 0], ),
-)
-
-tetratopic_linker = stk.BuildingBlock(
-    smiles=(
-        '[H]C1=C([H])C(C(C2=C([H])C([H])=C(Br)C([H])=C2[H])C(C2=C([H])'
-        'C([H])=C(Br)C([H])=C2[H])C2=C([H])C([H])=C(Br)C([H])=C2[H])=C'
-        '([H])C([H])=C1Br'
-    ),
-    functional_groups=[stk.BromoFactory()]
-)
-complex_ligand = stk.BuildingBlock(
-    smiles='[H]C1=NC(C([H])=NBr)=C([H])C([H])=C1[H]',
-    functional_groups=[
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#35]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#6]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-    ]
-)
-iron_complex = stk.ConstructedMolecule(
-    stk.metal_complex.OctahedralDelta(
-        metals={metal_atom: 0},
-        ligands={complex_ligand: (0, 1, 2)},
-        reaction_factory=stk.DativeReactionFactory(
-            stk.GenericReactionFactory(
-                bond_orders={
-                    frozenset({
-                        stk.GenericFunctionalGroup,
-                        stk.SingleAtom
-                    }): 9
-                }
-            )
-        )
-    )
-)
-iron_complex = stk.BuildingBlock.init_from_molecule(
-    molecule=iron_complex,
-    functional_groups=[stk.BromoFactory()]
-)
-
-
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                stk.cage.M8L6Cube(
+                topology_graph=stk.cage.M8L6Cube(
                     building_blocks={
-                        iron_complex: range(8),
-                        tetratopic_linker: range(8, 14),
+                        get_iron_complex(): range(8),
+                        get_tetratopic_linker(): range(8, 14),
                     },
-                )
+                ),
             ),
             smiles=(
                 '[H]C1=C([H])C([H])=N2->[Fe+2]3456<-N7=C([H])C([H])=C('
@@ -111,8 +59,11 @@ iron_complex = stk.BuildingBlock.init_from_molecule(
                 '=C([H])C([H])=C1C=4[H])<-N1=C([H])C([H])=C([H])C([H])'
                 '=C1C=7[H]'
             ),
+            name=name,
         ),
     ),
 )
-def metal_cage_m8l6_cube(request):
-    return request.param
+def metal_cage_m8l6_cube(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

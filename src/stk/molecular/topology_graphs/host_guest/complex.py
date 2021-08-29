@@ -117,6 +117,7 @@ class Complex(TopologyGraph):
     Host and guest building blocks do not require functional groups.
 
     Examples:
+
         *Construction*
 
         You can use :class:`.ConstructedMolecule` instances as the
@@ -131,14 +132,17 @@ class Complex(TopologyGraph):
                 topology_graph=stk.cage.FourPlusSix(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
+                            smiles='NC1CCCCC1N',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
                         ),
                         stk.BuildingBlock(
-                            smiles='BrCC(Br)CBr',
-                            functional_groups=[stk.BromoFactory()],
+                            smiles='O=Cc1cc(C=O)cc(C=O)c1',
+                            functional_groups=[stk.AldehydeFactory()],
                         ),
                     ),
+                    optimizer=stk.MCHammer(),
                 ),
             )
             complex = stk.ConstructedMolecule(
@@ -147,6 +151,56 @@ class Complex(TopologyGraph):
                     guests=stk.host_guest.Guest(
                         building_block=stk.BuildingBlock('[Br][Br]'),
                     ),
+                ),
+            )
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            host = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='NC1CCCCC1N',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='O=Cc1cc(C=O)cc(C=O)c1',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                    ),
+                    optimizer=stk.MCHammer(),
+                ),
+            )
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(host),
+                    guests=stk.host_guest.Guest(
+                        building_block=stk.BuildingBlock('[Br][Br]'),
+                    ),
+                ),
+            )
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        complex.get_atoms(),
+                        complex.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in complex.get_bonds()
                 ),
             )
 
@@ -160,18 +214,22 @@ class Complex(TopologyGraph):
                 topology_graph=stk.cage.FourPlusSix(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
+                            smiles='NC1CCCCC1N',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
                         ),
                         stk.BuildingBlock(
-                            smiles='BrCC(Br)CBr',
-                            functional_groups=[stk.BromoFactory()],
+                            smiles='O=Cc1cc(C=O)cc(C=O)c1',
+                            functional_groups=[stk.AldehydeFactory()],
                         ),
                     ),
+                    optimizer=stk.MCHammer(),
                 ),
             )
             guest1 = stk.host_guest.Guest(
-                building_block=stk.BuildingBlock('c1ccccc1'),
+                building_block=stk.BuildingBlock('BrBr'),
+                displacement=(0., 3., 0.),
             )
             guest2 = stk.host_guest.Guest(
                 building_block=stk.BuildingBlock('C1CCCC1'),
@@ -181,6 +239,62 @@ class Complex(TopologyGraph):
                 topology_graph=stk.host_guest.Complex(
                     host=stk.BuildingBlock.init_from_molecule(host),
                     guests=(guest1, guest2),
+                ),
+            )
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            host = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='NC1CCCCC1N',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='O=Cc1cc(C=O)cc(C=O)c1',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                    ),
+                    optimizer=stk.MCHammer(),
+                ),
+            )
+            guest1 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('BrBr'),
+                displacement=(0., 3., 0.),
+            )
+            guest2 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('C1CCCC1'),
+            )
+
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(host),
+                    guests=(guest1, guest2),
+                ),
+            )
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        complex.get_atoms(),
+                        complex.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in complex.get_bonds()
                 ),
             )
 
@@ -195,27 +309,93 @@ class Complex(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock(
-                smiles='O=CC(C=O)C=O',
-                functional_groups=[stk.AldehydeFactory()],
-            )
-            guest = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
-            cage = stk.ConstructedMolecule(
+            host = stk.ConstructedMolecule(
                 topology_graph=stk.cage.FourPlusSix(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='NC1CCCCC1N',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='O=Cc1cc(C=O)cc(C=O)c1',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                    ),
                     optimizer=stk.MCHammer(),
                 ),
+            )
+            guest1 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('BrBr'),
+                displacement=(0., 3., 0.),
+            )
+            guest2 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('C1CCCC1'),
             )
 
             complex = stk.ConstructedMolecule(
                 topology_graph=stk.host_guest.Complex(
-                    host=stk.BuildingBlock.init_from_molecule(cage),
-                    guests=guest,
+                    host=stk.BuildingBlock.init_from_molecule(host),
+                    guests=(guest1, guest2),
                     optimizer=stk.Spinner(),
+                ),
+            )
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            host = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='NC1CCCCC1N',
+                            functional_groups=[
+                                stk.PrimaryAminoFactory(),
+                            ],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='O=Cc1cc(C=O)cc(C=O)c1',
+                            functional_groups=[stk.AldehydeFactory()],
+                        ),
+                    ),
+                    optimizer=stk.MCHammer(),
+                ),
+            )
+            guest1 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('BrBr'),
+                displacement=(0., 3., 0.),
+            )
+            guest2 = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('C1CCCC1'),
+            )
+
+            complex = stk.ConstructedMolecule(
+                topology_graph=stk.host_guest.Complex(
+                    host=stk.BuildingBlock.init_from_molecule(host),
+                    guests=(guest1, guest2),
+                    optimizer=stk.Spinner(),
+                ),
+            )
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        complex.get_atoms(),
+                        complex.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in complex.get_bonds()
                 ),
             )
 

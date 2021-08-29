@@ -1,42 +1,18 @@
 import pytest
 import stk
 
+from ...building_blocks import get_fe_atom, get_iron_bi_1
 from ....case_data import CaseData
 
 
-_iron_atom = stk.BuildingBlock(
-    smiles='[Fe+2]',
-    functional_groups=(
-        stk.SingleAtom(stk.Fe(0, charge=2))
-        for i in range(6)
-    ),
-    position_matrix=([0, 0, 0], ),
-)
-
-_iron_bi_1 = stk.BuildingBlock(
-    smiles='BrN=Cc1ccccn1',
-    functional_groups=[
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#35]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-        stk.SmartsFunctionalGroupFactory(
-            smarts='[#6]~[#7X2]~[#6]',
-            bonders=(1, ),
-            deleters=(),
-        ),
-    ]
-)
-
-
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.OctahedralDelta(
-                    metals={_iron_atom: 0},
-                    ligands={_iron_bi_1: (0, 1, 2)},
+                    metals={get_fe_atom(): 0},
+                    ligands={get_iron_bi_1(): (0, 1, 2)},
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
@@ -54,13 +30,14 @@ _iron_bi_1 = stk.BuildingBlock(
                 '])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)'
                 '<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41'
             ),
+            name=name,
         ),
 
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.OctahedralDelta(
-                    metals=_iron_atom,
-                    ligands=_iron_bi_1,
+                    metals=get_fe_atom(),
+                    ligands=get_iron_bi_1(),
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
@@ -78,8 +55,11 @@ _iron_bi_1 = stk.BuildingBlock(
                 '])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)'
                 '<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41'
             ),
+            name=name,
         ),
     ),
 )
-def metal_complex_octahedral_delta(request):
-    return request.param
+def metal_complex_octahedral_delta(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )
