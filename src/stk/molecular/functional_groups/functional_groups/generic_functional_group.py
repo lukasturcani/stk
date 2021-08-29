@@ -7,8 +7,9 @@ Generic Functional Group
 
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import TypeVar, Optional, Iterable
 
+from ...atoms import Atom
 from .functional_group import FunctionalGroup
 
 
@@ -29,24 +30,30 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     """
 
-    def __init__(self, atoms, bonders, deleters, placers=None):
+    def __init__(
+        self,
+        atoms: tuple[Atom, ...],
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.GenericFunctionalGroup`.
 
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms in the functional group.
+        Parameters:
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms in the functional group.
+            atoms:
+                The atoms in the functional group.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms in the functional group.
+            bonders:
+                The bonder atoms in the functional group.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms of the functional group. If ``None``,
-            the `bonders` will be used.
+            deleters:
+                The deleter atoms in the functional group.
+
+            placers:
+                The placer atoms of the functional group. If ``None``,
+                the `bonders` will be used.
 
         """
 
@@ -62,13 +69,17 @@ class GenericFunctionalGroup(FunctionalGroup):
         self._bonders = bonders
         self._deleters = deleters
 
-    def clone(self):
+    def clone(self) -> GenericFunctionalGroup:
         clone = super().clone()
         clone._bonders = self._bonders
         clone._deleters = self._deleters
         return clone
 
-    def with_atoms(self, atom_map):
+    def with_atoms(
+        self,
+        atom_map: dict[int, Atom],
+    ) -> GenericFunctionalGroup:
+
         clone = super().with_atoms(atom_map)
         clone.__class__ = GenericFunctionalGroup
         clone._bonders = tuple(
@@ -99,78 +110,80 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return self
 
-    def get_bonders(self):
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> GenericFunctionalGroup:
+
+        return super().with_ids(id_map)
+
+    def get_bonders(self) -> Iterable[Atom]:
         """
         Yield bonder atoms in the functional group.
 
         These are atoms which have bonds added during
         :class:`.ConstructedMolecule` construction.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             A bonder atom.
 
         """
 
         yield from self._bonders
 
-    def get_num_bonders(self):
+    def get_num_bonders(self) -> int:
         """
         Get the number of bonder atoms.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of bonder atoms.
 
         """
 
         return len(self._bonders)
 
-    def get_bonder_ids(self):
+    def get_bonder_ids(self) -> Iterable[int]:
         """
         Yield the ids of bonder atoms.
 
-        Yields
-        ------
-        :class:`int`
+        Yields:
+
             The id of a bonder :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._bonders)
 
-    def get_deleters(self):
+    def get_deleters(self) -> Iterable[Atom]:
         """
         Yield the deleter atoms in the functional group.
 
         These are atoms which are removed during
         :class:`.ConstructedMolecule` construction.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             A deleter atom.
 
         """
 
         yield from self._deleters
 
-    def get_deleter_ids(self):
+    def get_deleter_ids(self) -> Iterable[int]:
         """
         Yield the ids of deleter atoms.
 
-        Yields
-        -------
-        :class:`int`
+        Yields:
+
             The id of a deleter :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._deleters)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'atoms={self._atoms}, '
