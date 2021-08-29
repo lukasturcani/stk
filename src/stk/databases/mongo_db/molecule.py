@@ -5,13 +5,15 @@ Molecule MongoDB
 """
 
 from functools import lru_cache
+import itertools
 
 from stk.serialization import (
     MoleculeJsonizer,
     MoleculeDejsonizer,
 )
 from ..molecule import MoleculeDatabase
-from .utilities import HashableDict
+from .utilities import get_any_value, HashableDict
+from stk.utilities import dedupe
 
 
 class MoleculeMongoDb(MoleculeDatabase):
@@ -467,32 +469,86 @@ class MoleculeMongoDb(MoleculeDatabase):
             'matrix': position_matrix,
         })
 
-    def _get_molecule_keys(self, entry):
-
-        # Ignore keys reserved by position matrix collections.
-        reserved_keys = ('m', '_id')
-
-        for key, value in entry.items():
-            if key not in reserved_keys:
-                yield key, value
-
     def get_all(self):
-        for entry in self._position_matrices.find():
-            # Do 'or' query over all key value pairs.
-            query = {'$or': [
-                {key: value}
-                for key, value in self._get_molecule_keys(entry)
-            ]}
+        # Get all potential indices.
+        indices = itertools.chain(
+            self._position_matrices.index_information().values(),
+            self._molecules.index_information().values(),
+        )
+        keys = tuple(dedupe(
+            index['key'][0][0]
+            for index in indices
+            # Ignore "_id" index which is unique in a collection and
+            # cannot be used to match molecular data split across
+            # collections.
+            if index['key'][0][0] != '_id'
+        ))
 
-            json = self._molecules.find_one(query)
-            if json is None:
-                raise KeyError(
-                    'No molecule found in the database associated '
-                    f'with a position matrix with query: {query}. '
-                    'This suggests your database is corrupted.'
-                )
+        query = [
+            {
+                '$match': {
+                    '$or': [
+                        {key: {'$exists': True}}
+                        for key in keys
+                    ],
+                },
+            },
+        ]
+        query.extend(
+            {
+                '$lookup': {
+                    'from': self._position_matrices.name,
+                    'let': {
+                        'molecule_key': f'${key}',
+                    },
+                    'as': f'posmat_{key}',
+                    'pipeline': [
+                        {
+                            '$match': {
+                                key: {'$ne': None},
+                            },
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        f'${key}',
+                                        '$$molecule_key',
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                },
+            }
+            for key in keys
+        )
+        query.append(
+            {
+                '$match': {
+                    '$expr': {
+                        '$or': [
+                            {
+                                '$gt': [
+                                    {'$size': f'$posmat_{key}'},
+                                    0
+                                ],
+                            }
+                            for key in keys
+                        ],
+                    },
+                },
+            },
+        )
 
-            yield self._dejsonizer.from_json({
-                'molecule': json,
-                'matrix': entry,
-            })
+        cursor = self._molecules.aggregate(query)
+        for entry in cursor:
+            position_matrix_document = get_any_value(
+                mapping=entry,
+                keys=(f'posmat_{key}' for key in keys),
+            )
+            if position_matrix_document is not None:
+                yield self._dejsonizer.from_json({
+                    'molecule': entry,
+                    'matrix': position_matrix_document,
+                })

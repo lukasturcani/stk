@@ -1,4 +1,5 @@
 dist
+build
 src/stk.egg-info
 
 **/__pycache__/

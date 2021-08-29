@@ -6,31 +6,31 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.Inchi(),
             molecule=stk.BuildingBlock('NCCN'),
             key_name='InChI',
             key='InChI=1S/C2H8N2/c3-1-2-4/h1-4H2',
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.InchiKey(),
             molecule=stk.BuildingBlock('NCCN'),
             key_name='InChIKey',
             key='PIICEJLVQHRZGT-UHFFFAOYSA-N',
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock('NCCN'),
             key_name='SMILES',
             key='NCCN',
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock('C(N)CN'),
             key_name='SMILES',
             key='NCCN',
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock(
                 'C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc'
@@ -42,7 +42,7 @@ from .case_data import CaseData
                 '(C#Cc4cccc5ccncc45)cc3c2c1'
             ),
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock(
                 'C(#Cc1cccc2cnccc21)c1ccc2[nH]c3ccc'
@@ -54,13 +54,13 @@ from .case_data import CaseData
                 '(C#Cc4cccc5ccncc45)cc3c2c1'
             ),
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock('C[C@H](O)c1ccccc1'),
             key_name='SMILES',
             key='C[C@H](O)c1ccccc1',
         ),
-        CaseData(
+        lambda: CaseData(
             key_maker=stk.MoleculeKeyMaker(
                 key_name='NumAtoms',
                 get_key=lambda molecule: molecule.get_num_atoms(),
@@ -71,5 +71,5 @@ from .case_data import CaseData
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

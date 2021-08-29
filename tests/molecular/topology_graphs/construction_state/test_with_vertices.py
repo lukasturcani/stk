@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 import pytest
 import stk
 
@@ -21,13 +24,14 @@ def _test_with_vertices(construction_state, vertices):
 
 
 @pytest.fixture(
+    scope='session',
     params=(
         (
-            stk.Vertex(0, [0, 0, 0]),
-            stk.Vertex(1, [10, 0, 0]),
-            stk.Vertex(2, [20, 0, 0]),
+            lambda: stk.Vertex(0, [0, 0, 0]),
+            lambda: stk.Vertex(1, [10, 0, 0]),
+            lambda: stk.Vertex(2, [20, 0, 0]),
         ),
     ),
 )
-def vertices(request):
-    return request.param
+def vertices(request) -> tuple[stk.Vertex, ...]:
+    return request.param()

@@ -5,8 +5,9 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             factory=stk.PrimaryAminoFactory(),
             molecule=stk.BuildingBlock('NCCN'),
             functional_groups=(
@@ -29,13 +30,13 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.PrimaryAminoFactory(),
             molecule=stk.BuildingBlock('CCCC'),
             functional_groups=(),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.SecondaryAminoFactory(),
             molecule=stk.BuildingBlock('CNCCNCC'),
             functional_groups=(
@@ -58,7 +59,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.AldehydeFactory(),
             molecule=stk.BuildingBlock('O=CCC=O'),
             functional_groups=(
@@ -81,7 +82,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.CarboxylicAcidFactory(),
             molecule=stk.BuildingBlock('O=C(O)CCCC(O)=O'),
             functional_groups=(
@@ -106,7 +107,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.AmideFactory(),
             molecule=stk.BuildingBlock('O=C(N)CCC(=O)N'),
             functional_groups=(
@@ -133,7 +134,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.ThioacidFactory(),
             molecule=stk.BuildingBlock('O=C(S)CC(S)=O'),
             functional_groups=(
@@ -158,7 +159,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.AlcoholFactory(),
             molecule=stk.BuildingBlock('OCCCO'),
             functional_groups=(
@@ -179,7 +180,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.ThiolFactory(),
             molecule=stk.BuildingBlock('SCCCS'),
             functional_groups=(
@@ -200,7 +201,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.FluoroFactory(),
             molecule=stk.BuildingBlock('FCC(F)CCF'),
             functional_groups=(
@@ -225,7 +226,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.BromoFactory(),
             molecule=stk.BuildingBlock('BrCC(Br)CCBr'),
             functional_groups=(
@@ -250,7 +251,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.IodoFactory(),
             molecule=stk.BuildingBlock('ICC(I)CCI'),
             functional_groups=(
@@ -275,7 +276,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.TerminalAlkyneFactory(),
             molecule=stk.BuildingBlock('C#CC#CC'),
             functional_groups=(
@@ -290,7 +291,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.TerminalAlkeneFactory(),
             molecule=stk.BuildingBlock('C=CC=CC'),
             functional_groups=(
@@ -307,7 +308,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.BoronicAcidFactory(),
             molecule=stk.BuildingBlock('B(O)(O)CCB(O)O'),
             functional_groups=(
@@ -339,7 +340,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.DiolFactory(),
             molecule=stk.BuildingBlock('CC(O)C(O)CC'),
             functional_groups=(
@@ -358,7 +359,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.DifluoroFactory(),
             molecule=stk.BuildingBlock('CC(F)C(F)CC'),
             functional_groups=(
@@ -373,7 +374,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.DibromoFactory(),
             molecule=stk.BuildingBlock('CC(Br)C(Br)CC'),
             functional_groups=(
@@ -388,7 +389,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.SmartsFunctionalGroupFactory(
                 smarts='[C][N]',
                 bonders=(0, ),
@@ -404,7 +405,7 @@ from ..case_data import CaseData
             ),
         ),
 
-        CaseData(
+        lambda: CaseData(
             factory=stk.SmartsFunctionalGroupFactory(
                 smarts='CBr',
                 bonders=(0, ),
@@ -430,10 +431,10 @@ from ..case_data import CaseData
 
     )
 )
-def case_data(request):
+def case_data(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
     """
 
-    return request.param
+    return request.param()

@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.PeriodicHexagonal(
                     building_blocks={
@@ -94,8 +95,9 @@ from ...case_data import CaseData
                 '1[C+]=NN71)N1[C+]=NN1[C+]%15C1([C+2]S[C+]%121)N1N=[C+'
                 ']N81'
             ),
+            name=name,
         ),
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.PeriodicHexagonal(
                     building_blocks={
@@ -184,8 +186,11 @@ from ...case_data import CaseData
                 '1[C+]=NN71)N1[C+]=NN1[C+]%15C1([C+2]S[C+]%121)N1N=[C+'
                 ']N81'
             ),
+            name=name,
         ),
     ),
 )
-def cof_periodic_hexagonal(request):
-    return request.param
+def cof_periodic_hexagonal(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

@@ -1,5 +1,5 @@
 """
-Pdb Writer
+PDB Writer
 ==========
 
 """
@@ -27,12 +27,15 @@ class PdbWriter:
             building_blocks=(bb1, bb2),
             lattice_size=(3, 3, 1),
         )
-        cof = stk.ConstructedMolecule(topology_graph)
+        construction_result = topology_graph.construct()
+        cof = stk.ConstructedMolecule.init_from_construction_result(
+            construction_result=construction_result,
+        )
         writer = stk.PdbWriter()
         writer.write(
             molecule=cof,
             path='cof.pdb',
-            periodic_info=topology_graph.get_periodic_info()
+            periodic_info=construction_result.get_periodic_info(),
         )
 
     .. testcode:: writing-to-a-file-with-a-unit-cell

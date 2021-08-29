@@ -89,8 +89,9 @@ class LinearData:
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        LinearData(
+        lambda: LinearData(
             building_blocks=(
                 stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
                 stk.BuildingBlock(
@@ -106,13 +107,13 @@ class LinearData:
         ),
     ),
 )
-def linear_data(request):
+def linear_data(request) -> LinearData:
     """
     A :class:`.LinearData` instance.
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture

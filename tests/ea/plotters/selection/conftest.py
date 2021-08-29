@@ -15,8 +15,9 @@ def get_topology_graph(num_repeating_units):
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             selector=stk.Roulette(num_batches=50),
             population=(
                 stk.MoleculeRecord(
@@ -83,5 +84,5 @@ def get_topology_graph(num_repeating_units):
         ),
     ),
 )
-def case_data(request):
-    return request.param
+def case_data(request) -> CaseData:
+    return request.param()

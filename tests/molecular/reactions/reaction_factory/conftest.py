@@ -7,15 +7,16 @@ from .fixtures import *  # noqa
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        stk.Alcohol(
+        lambda: stk.Alcohol(
             oxygen=stk.O(0),
             hydrogen=stk.H(1),
             atom=stk.C(2),
             bonders=(stk.C(2), ),
             deleters=(stk.O(0), stk.H(1)),
         ),
-        stk.Aldehyde(
+        lambda: stk.Aldehyde(
             carbon=stk.C(0),
             oxygen=stk.O(1),
             hydrogen=stk.H(2),
@@ -23,7 +24,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(0),),
             deleters=(stk.O(1),),
         ),
-        stk.Alkene(
+        lambda: stk.Alkene(
             carbon1=stk.C(0),
             atom1=stk.H(1),
             atom2=stk.H(2),
@@ -33,7 +34,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(4),),
             deleters=(stk.C(0), stk.H(1), stk.H(2)),
         ),
-        stk.Alkyne(
+        lambda: stk.Alkyne(
             carbon1=stk.C(0),
             atom1=stk.H(1),
             carbon2=stk.C(2),
@@ -41,7 +42,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(2),),
             deleters=(stk.C(0), stk.H(1)),
         ),
-        stk.Amide(
+        lambda: stk.Amide(
             carbon=stk.C(0),
             oxygen=stk.O(1),
             nitrogen=stk.N(2),
@@ -51,7 +52,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(0),),
             deleters=(stk.N(2), stk.H(3), stk.H(4)),
         ),
-        stk.BoronicAcid(
+        lambda: stk.BoronicAcid(
             boron=stk.B(0),
             oxygen1=stk.O(1),
             hydrogen1=stk.H(2),
@@ -61,13 +62,13 @@ from .fixtures import *  # noqa
             bonders=(stk.B(0),),
             deleters=(stk.O(1), stk.H(2)),
         ),
-        stk.Bromo(
+        lambda: stk.Bromo(
             bromine=stk.Br(0),
             atom=stk.C(1),
             bonders=(stk.C(1),),
             deleters=(stk.Br(0),),
         ),
-        stk.CarboxylicAcid(
+        lambda: stk.CarboxylicAcid(
             carbon=stk.C(0),
             oxygen1=stk.O(1),
             oxygen2=stk.O(2),
@@ -76,7 +77,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(0), ),
             deleters=(stk.O(2), stk.H(3)),
         ),
-        stk.Dibromo(
+        lambda: stk.Dibromo(
             bromine1=stk.Br(0),
             atom1=stk.C(1),
             bromine2=stk.Br(2),
@@ -84,7 +85,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(1), ),
             deleters=(stk.Br(0), ),
         ),
-        stk.Difluoro(
+        lambda: stk.Difluoro(
             fluorine1=stk.F(0),
             atom1=stk.C(1),
             fluorine2=stk.F(2),
@@ -92,7 +93,7 @@ from .fixtures import *  # noqa
             bonders=(stk.C(1), ),
             deleters=(stk.F(0), ),
         ),
-        stk.Diol(
+        lambda: stk.Diol(
             atom1=stk.C(0),
             oxygen1=stk.O(1),
             hydrogen1=stk.H(2),
@@ -102,26 +103,26 @@ from .fixtures import *  # noqa
             bonders=(stk.C(0), ),
             deleters=(stk.O(1), stk.H(2)),
         ),
-        stk.Fluoro(
+        lambda: stk.Fluoro(
             fluorine=stk.F(1),
             atom=stk.C(0),
             bonders=(stk.C(0), ),
             deleters=(stk.F(1), ),
         ),
-        stk.Iodo(
+        lambda: stk.Iodo(
             iodine=stk.I(0),
             atom=stk.C(1),
             bonders=(stk.C(1), ),
             deleters=(stk.I(0), ),
         ),
-        stk.PrimaryAmino(
+        lambda: stk.PrimaryAmino(
             nitrogen=stk.N(0),
             hydrogen1=stk.H(1),
             hydrogen2=stk.H(2),
             atom=stk.C(3),
             bonders=(stk.C(3), ),
             deleters=(stk.N(0), stk.H(1), stk.H(2)),),
-        stk.SecondaryAmino(
+        lambda: stk.SecondaryAmino(
             nitrogen=stk.N(0),
             hydrogen=stk.H(1),
             atom1=stk.C(2),
@@ -129,7 +130,7 @@ from .fixtures import *  # noqa
             bonders=(stk.N(0), ),
             deleters=(stk.H(1), ),
         ),
-        stk.Thioacid(
+        lambda: stk.Thioacid(
             carbon=stk.C(0),
             oxygen=stk.O(1),
             sulfur=stk.S(2),
@@ -138,23 +139,23 @@ from .fixtures import *  # noqa
             bonders=(stk.C(0), ),
             deleters=(stk.S(2), stk.H(3)),
         ),
-        stk.Thiol(
+        lambda: stk.Thiol(
             sulfur=stk.S(0),
             hydrogen=stk.H(1),
             atom=stk.C(2),
             bonders=(stk.C(2), ),
             deleters=(stk.S(0), stk.H(1)),
         ),
-        stk.SingleAtom(atom=stk.Fe(0)),
+        lambda: stk.SingleAtom(atom=stk.Fe(0)),
     ),
 )
-def functional_group1(request):
+def functional_group1(request) -> stk.GenericFunctionalGroup:
     """
     A :class:`.GenericFunctionalGroup` with 1 bonder atom.
 
     """
 
-    return request.param.clone()
+    return request.param()
 
 
 @pytest.fixture
@@ -169,7 +170,7 @@ def functional_group1_2(functional_group1):
 
 @pytest.fixture(
     params=(
-        stk.Dibromo(
+        lambda: stk.Dibromo(
             bromine1=stk.Br(0),
             atom1=stk.C(1),
             bromine2=stk.Br(2),
@@ -177,7 +178,7 @@ def functional_group1_2(functional_group1):
             bonders=(stk.C(1), stk.C(2)),
             deleters=(stk.Br(0), stk.Br(2)),
         ),
-        stk.Difluoro(
+        lambda: stk.Difluoro(
             fluorine1=stk.F(0),
             atom1=stk.C(1),
             fluorine2=stk.F(2),
@@ -185,7 +186,7 @@ def functional_group1_2(functional_group1):
             bonders=(stk.C(1), stk.C(3)),
             deleters=(stk.F(0), stk.F(2)),
         ),
-        stk.Diol(
+        lambda: stk.Diol(
             atom1=stk.C(0),
             oxygen1=stk.O(1),
             hydrogen1=stk.H(2),
@@ -203,7 +204,7 @@ def functional_group2(request):
 
     """
 
-    return request.param.clone()
+    return request.param()
 
 
 @pytest.fixture(

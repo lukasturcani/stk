@@ -28,12 +28,12 @@ def edge(case_data):
 
 @pytest.fixture(
     params=(
-        stk.Vertex(0, [1, 2, 3]),
-        stk.Vertex(3, [4, 2, 1]),
+        lambda: stk.Vertex(0, [1, 2, 3]),
+        lambda: stk.Vertex(3, [4, 2, 1]),
     ),
 )
-def vertex(request):
-    return request.param
+def vertex(request) -> stk.Vertex:
+    return request.param()
 
 
 @pytest.fixture

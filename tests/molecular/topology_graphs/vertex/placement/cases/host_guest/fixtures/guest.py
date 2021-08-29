@@ -24,7 +24,7 @@ def get_direction(building_block):
 
 @pytest.fixture(
     params=(
-        CaseData(
+        lambda: CaseData(
             vertex=stk.host_guest.GuestVertex(
                 id=0,
                 position=(1, 2, 3),
@@ -44,5 +44,5 @@ def get_direction(building_block):
         ),
     ),
 )
-def guest(request):
-    return request.param
+def guest(request) -> CaseData:
+    return request.param()

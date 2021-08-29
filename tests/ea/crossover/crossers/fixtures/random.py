@@ -14,8 +14,9 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda: CaseData(
             crosser=stk.RandomCrosser(
                 crossers=(
                     stk.GeneticRecombination(
@@ -101,5 +102,5 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
         ),
     ),
 )
-def random_crosser(request):
-    return request.param
+def random_crosser(request) -> CaseData:
+    return request.param()

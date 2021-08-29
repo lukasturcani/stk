@@ -5,8 +5,9 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CaseData(
+        lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.cof.Kagome(
                     building_blocks=(
@@ -43,8 +44,11 @@ from ...case_data import CaseData
                 '=N[C+]4[C+]3Br)[C+](Br)[C+]3N=[C+]C23C2=C(Br)[C+]=N2)'
                 'N=[C+]1'
             ),
+            name=name,
         ),
     ),
 )
-def cof_kagome(request):
-    return request.param
+def cof_kagome(request) -> CaseData:
+    return request.param(
+        f'{request.fixturename}{request.param_index}',
+    )

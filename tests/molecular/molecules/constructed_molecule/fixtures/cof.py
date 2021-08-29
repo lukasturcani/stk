@@ -160,8 +160,9 @@ class CofData:
 
 
 @pytest.fixture(
+    scope='session',
     params=(
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
@@ -181,7 +182,7 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData.init_from_construction_result(
+        lambda: CofData.init_from_construction_result(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
@@ -201,7 +202,7 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
@@ -221,7 +222,7 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
@@ -241,7 +242,7 @@ class CofData:
             num_new_bonds=20,
             num_building_blocks={0: 8, 1: 12},
         ),
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.LinkerlessHoneycomb,
             building_blocks=(
                 stk.BuildingBlock(
@@ -257,7 +258,7 @@ class CofData:
             num_new_bonds=8,
             num_building_blocks={0: 8},
         ),
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.Hexagonal,
             building_blocks=(
                 stk.BuildingBlock(
@@ -281,7 +282,7 @@ class CofData:
             num_new_bonds=81,
             num_building_blocks={0: 16, 1: 48},
         ),
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.Kagome,
             building_blocks=(
                 stk.BuildingBlock(
@@ -302,7 +303,7 @@ class CofData:
             num_new_bonds=41,
             num_building_blocks={0: 12, 1: 24},
         ),
-        CofData(
+        lambda: CofData(
             topology_graph=stk.cof.Square,
             building_blocks=(
                 stk.BuildingBlock(
@@ -322,13 +323,13 @@ class CofData:
         ),
     ),
 )
-def cof_data(request):
+def cof_data(request) -> CofData:
     """
     A :class:`.CofData` instance.
 
     """
 
-    return request.param
+    return request.param()
 
 
 @pytest.fixture
