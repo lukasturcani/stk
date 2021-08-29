@@ -40,7 +40,7 @@ def get_database(
 @pytest.fixture
 def molecule_mongo_db(
     mongo_client: pymongo.MongoClient,
-    molecules: tuple[stk.BuildingBlock],
+    molecules: tuple[stk.BuildingBlock, ...],
 ) -> CaseData:
 
     inchi = stk.Inchi()
