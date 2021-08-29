@@ -39,6 +39,68 @@ from ....case_data import CaseData
             ),
             name=name,
         ),
+        # Non-metal-containing tests with increasing angles between
+        # functional groups.
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles='C1CC(C1Br)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles='C(#CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+            smiles=(
+                '[H]C1([H])C([H])([H])C2([H])C#CC3([H])C([H])([H])C([H'
+                '])([H])C3([H])C#CC3([H])C([H])([H])C([H])([H])C3([H])'
+                'C#CC12[H]'
+            ),
+            name=name,
+        ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles='C1CC(CC(C1)Br)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles='C(#CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+            smiles=(
+                '[H]C1([H])C([H])([H])C2([H])C#CC3([H])C([H])([H])C([H'
+                '])([H])C([H])([H])C([H])(C#CC4([H])C([H])([H])C([H])('
+                '[H])C([H])([H])C([H])(C#CC([H])(C1([H])[H])C2([H])[H]'
+                ')C4([H])[H])C3([H])[H]'
+            ),
+            name=name,
+        ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles='C(CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles='C(#CBr)Br',
+                        functional_groups=[stk.BromoFactory()],
+                    ),
+                ),
+            ),
+            smiles=(
+                '[H]C1([H])C#CC([H])([H])C([H])([H])C#CC([H])([H])C([H'
+                '])([H])C#CC1([H])[H]'
+            ),
+            name=name,
+        ),
     ),
 )
 def metal_cage_m3l3_triangle(request) -> CaseData:
