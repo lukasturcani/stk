@@ -13,7 +13,7 @@ def molecules() -> tuple[stk.ConstructedMolecule, ...]:
     bb2 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
     bb3 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
     bb4 = stk.BuildingBlock('BrCCCCBr', [stk.BromoFactory()])
-    bb5 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()]),
+    bb5 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
     bb6 = stk.BuildingBlock('BrCCNCBr', [stk.BromoFactory()])
 
     return (
