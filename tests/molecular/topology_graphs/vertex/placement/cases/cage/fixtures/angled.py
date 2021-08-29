@@ -68,7 +68,7 @@ def get_closest_point(
 
 def get_fg_position(
     id: id,
-    building_block: stk.BuildingBlock
+    building_block: stk.BuildingBlock,
 ) -> np.ndarray:
     functional_group = next(building_block.get_functional_groups(id))
     return building_block.get_centroid(
