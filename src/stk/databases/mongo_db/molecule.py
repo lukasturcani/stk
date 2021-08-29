@@ -12,7 +12,7 @@ from stk.serialization import (
     MoleculeDejsonizer,
 )
 from ..molecule import MoleculeDatabase
-from .utilities import HashableDict
+from .utilities import get_any_value, HashableDict
 from stk.utilities import dedupe
 
 
@@ -552,13 +552,12 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         cursor = self._molecules.aggregate(query)
         for entry in cursor:
-            for key in keys:
-                posmat_key = f'posmat_{key}'
-                if posmat_key in entry and len(entry[posmat_key]) > 0:
-                    yield self._dejsonizer.from_json({
-                        'molecule': entry,
-                        'matrix': {
-                            'm': entry[posmat_key][0]['m'],
-                        },
-                    })
-                    break
+            position_matrix_document = get_any_value(
+                mapping=entry,
+                keys=(f'posmat_{key}' for key in keys),
+            )
+            if position_matrix_document is not None:
+                yield self._dejsonizer.from_json({
+                    'molecule': entry,
+                    'matrix': position_matrix_document,
+                })
