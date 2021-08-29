@@ -34,4 +34,4 @@ class CaseData:
         """
 
         self.database = database
-        self.expected_molecules = expected_molecules
+        self.expected_molecules = dict(expected_molecules)

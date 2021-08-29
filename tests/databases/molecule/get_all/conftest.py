@@ -8,7 +8,7 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lazy_fixture('molecule_mongo_dbs'),
+        lazy_fixture('molecule_mongo_db'),
     ),
 )
 def case_data(request) -> CaseData:

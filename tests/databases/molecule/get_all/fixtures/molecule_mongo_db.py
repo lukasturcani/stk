@@ -8,7 +8,7 @@ import pymongo
 
 
 @pytest.fixture
-def molecules() -> tuple[stk.BuildingBlock]:
+def molecules() -> tuple[stk.BuildingBlock, ...]:
     return (
         stk.BuildingBlock('CCC'),
         stk.BuildingBlock('BrCCCBr'),
@@ -23,8 +23,8 @@ def molecules() -> tuple[stk.BuildingBlock]:
 def get_database(
     database_name: str,
     mongo_client: pymongo.MongoClient,
-    keys: tuple[stk.MoleculeKeyMaker],
-    indices: tuple[str],
+    keys: tuple[stk.MoleculeKeyMaker, ...],
+    indices: tuple[str, ...],
 ) -> stk.MoleculeMongoDb:
 
     return stk.MoleculeMongoDb(
@@ -38,7 +38,7 @@ def get_database(
 
 
 @pytest.fixture
-def molecule_mongo_dbs(
+def molecule_mongo_db(
     mongo_client: pymongo.MongoClient,
     molecules: tuple[stk.BuildingBlock],
 ) -> CaseData:
