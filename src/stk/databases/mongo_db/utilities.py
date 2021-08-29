@@ -5,7 +5,7 @@ MongoDB Utilities
 """
 
 from collections.abc import Sequence
-from typing import Iterable, Optional, Any
+from typing import Iterable, Optional
 
 
 class HashableDict(dict):
@@ -27,7 +27,7 @@ def _to_hashable(item):
 
 
 def get_any_value(
-    mapping: dict[Any, Sequence[dict]],
+    mapping: dict[str, Sequence[dict]],
     keys: Iterable[str],
 ) -> Optional[dict]:
     """
