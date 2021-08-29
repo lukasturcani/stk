@@ -5,13 +5,15 @@ Constructed Molecule MongoDB
 """
 
 from functools import lru_cache
+import itertools
 
 from stk.serialization import (
     ConstructedMoleculeJsonizer,
     ConstructedMoleculeDejsonizer,
 )
 from ..constructed_molecule import ConstructedMoleculeDatabase
-from .utilities import HashableDict
+from .utilities import get_any_value, HashableDict
+from stk.utilities import dedupe
 
 
 class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
@@ -680,47 +682,145 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 self._building_block_position_matrices.find_one(key),
         }
 
-    def _get_molecule_keys(self, entry):
-        # Ignore keys reserved by constructed molecule collections.
-        reserved_keys = ('_id', 'BB', 'nBB', 'aI', 'bI')
-
-        for key, value in entry.items():
-            if key not in reserved_keys:
-                yield key, value
-
     def get_all(self):
-        for entry in self._constructed_molecules.find():
-            # Do 'or' query over all key value pairs.
-            query = {'$or': [
-                {key: value}
-                for key, value in self._get_molecule_keys(entry)
-            ]}
+        # Get all potential indices.
+        indices = itertools.chain(
+            self._position_matrices.index_information().values(),
+            self._molecules.index_information().values(),
+            self._constructed_molecules.index_information().values(),
+        )
+        keys = tuple(dedupe(
+            index['key'][0][0]
+            for index in indices
+            # Ignore "_id" index which is unique in a collection and
+            # cannot be used to match molecular data split across
+            # collections.
+            if index['key'][0][0] != '_id'
+        ))
 
-            molecule_json = self._molecules.find_one(query)
-            if molecule_json is None:
-                raise KeyError(
-                    'No molecule found in the database associated '
-                    f'with a position matrix with query: {query}. '
-                    'This suggests your database is corrupted.'
-                )
+        query = [
+            {
+                '$match': {
+                    '$or': [
+                        {key: {'$exists': True}}
+                        for key in keys
+                    ],
+                },
+            },
+        ]
+        query.extend(
+            {
+                '$lookup': {
+                    'from': self._position_matrices.name,
+                    'let': {
+                        'molecule_key': f'${key}',
+                    },
+                    'as': f'posmat_{key}',
+                    'pipeline': [
+                        {
+                            '$match': {
+                                key: {'$ne': None},
+                            },
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        f'${key}',
+                                        '$$molecule_key',
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                },
+            }
+            for key in keys
+        )
+        query.extend(
+            {
+                '$lookup': {
+                    'from': self._molecules.name,
+                    'let': {
+                        'molecule_key': f'${key}',
+                    },
+                    'as': f'mol_{key}',
+                    'pipeline': [
+                        {
+                            '$match': {
+                                key: {'$ne': None},
+                            },
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        f'${key}',
+                                        '$$molecule_key',
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                },
+            }
+            for key in keys
+        )
+        query.append(
+            {
+                '$match': {
+                    '$expr': {
+                        '$or': [
+                            {
+                                '$gt': [
+                                    {'$size': f'$posmat_{key}'},
+                                    0
+                                ],
+                            }
+                            for key in keys
+                        ],
+                    },
+                },
+            },
+        )
+        query.append(
+            {
+                '$match': {
+                    '$expr': {
+                        '$or': [
+                            {
+                                '$gt': [
+                                    {'$size': f'$mol_{key}'},
+                                    0
+                                ],
+                            }
+                            for key in keys
+                        ],
+                    },
+                },
+            },
+        )
 
-            position_matrix = self._position_matrices.find_one(query)
-            if position_matrix is None:
-                raise KeyError(
-                    'No position matrix found in the database '
-                    'associated with a position matrix with query: '
-                    f'{query}. This suggests your database is '
-                    'corrupted.'
-                )
-
-            yield self._dejsonizer.from_json(
-                json={
-                    'molecule': molecule_json,
+        cursor = self._constructed_molecules.aggregate(query)
+        for entry in cursor:
+            molecule_document = get_any_value(
+                mapping=entry,
+                keys=(f'mol_{key}' for key in keys),
+            )
+            position_matrix_document = get_any_value(
+                mapping=entry,
+                keys=(f'posmat_{key}' for key in keys),
+            )
+            if (
+                molecule_document is not None
+                and position_matrix_document is not None
+            ):
+                yield self._dejsonizer.from_json({
+                    'molecule': molecule_document,
                     'constructedMolecule': entry,
-                    'matrix': position_matrix,
+                    'matrix': position_matrix_document,
                     'buildingBlocks': tuple(map(
                         self._get_building_block,
                         entry['BB'],
-                    ))
-                },
-            )
+                    )),
+                })
