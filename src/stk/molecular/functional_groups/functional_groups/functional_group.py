@@ -63,6 +63,7 @@ from __future__ import annotations
 
 from typing import Iterable, TypeVar
 
+from .utilities import get_atom_map
 from ...atoms import Atom
 
 
@@ -363,37 +364,6 @@ class FunctionalGroup:
             ),
         )
 
-    def _with_ids(
-        self: _T,
-        id_map: dict[int, int],
-    ) -> _T:
-
-        self._atoms = tuple(
-            atom.with_id(
-                id=id_map.get(
-                    atom.get_id(),
-                    atom.get_id(),
-                ),
-            ) for atom in self._atoms
-        )
-        self._placers = tuple(
-            atom.with_id(
-                id=id_map.get(
-                    atom.get_id(),
-                    atom.get_id(),
-                ),
-            ) for atom in self._placers
-        )
-        self._core_atoms = tuple(
-            atom.with_id(
-                id=id_map.get(
-                    atom.get_id(),
-                    atom.get_id(),
-                ),
-            ) for atom in self._core_atoms
-        )
-        return self
-
     def with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
         """
         Return a clone holding different atom ids.
@@ -412,7 +382,33 @@ class FunctionalGroup:
 
         """
 
-        return self.clone()._with_ids(id_map)
+        atom_map = get_atom_map(
+            id_map=id_map,
+            atoms=(
+                *self._atoms,
+                *self._placers,
+                *self._core_atoms,
+            ),
+        )
+
+        clone = self.__class__.__new__(self.__class__)
+        FunctionalGroup.__init__(
+            self=clone,
+            atoms=tuple(
+                atom_map.get(atom.get_id(), atom)
+                for atom in self._atoms
+            ),
+            placers=tuple(
+                atom_map.get(atom.get_id(), atom)
+                for atom in self._placers
+            ),
+            core_atoms=tuple(
+                atom_map.get(atom.get_id(), atom)
+                for atom in self._core_atoms
+            ),
+
+        )
+        return clone
 
     def _clone(self: _T) -> _T:
         clone = self.__class__.__new__(self.__class__)
