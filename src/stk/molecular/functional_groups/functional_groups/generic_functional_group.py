@@ -70,7 +70,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         self._deleters = deleters
 
     def clone(self) -> GenericFunctionalGroup:
-        clone = super().clone()
+        clone = super()._clone()
         clone._bonders = self._bonders
         clone._deleters = self._deleters
         return clone
@@ -80,8 +80,16 @@ class GenericFunctionalGroup(FunctionalGroup):
         atom_map: dict[int, Atom],
     ) -> GenericFunctionalGroup:
 
-        clone = super().with_atoms(atom_map)
-        clone.__class__ = GenericFunctionalGroup
+        clone = GenericFunctionalGroup.__new__(GenericFunctionalGroup)
+        clone._atoms = tuple(
+            atom_map.get(a.get_id(), a) for a in self._atoms
+        )
+        clone._placers = tuple(
+            atom_map.get(a.get_id(), a) for a in self._placers
+        )
+        clone._core_atoms = tuple(
+            atom_map.get(a.get_id(), a) for a in self._core_atoms
+        )
         clone._bonders = tuple(
             atom_map.get(a.get_id(), a) for a in self._bonders
         )
@@ -115,7 +123,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         id_map: dict[int, int],
     ) -> GenericFunctionalGroup:
 
-        return super().with_ids(id_map)
+        return self.clone()._with_ids(id_map)
 
     def get_bonders(self) -> Iterable[Atom]:
         """

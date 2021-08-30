@@ -61,9 +61,12 @@ information.
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Iterable, TypeVar
 
 from ...atoms import Atom
+
+
+_T = TypeVar('_T', bound='FunctionalGroup')
 
 
 class FunctionalGroup:
@@ -360,7 +363,11 @@ class FunctionalGroup:
             ),
         )
 
-    def _with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
+    def _with_ids(
+        self: _T,
+        id_map: dict[int, int],
+    ) -> _T:
+
         self._atoms = tuple(
             atom.with_id(
                 id=id_map.get(
@@ -407,6 +414,16 @@ class FunctionalGroup:
 
         return self.clone()._with_ids(id_map)
 
+    def _clone(self: _T) -> _T:
+        clone = self.__class__.__new__(self.__class__)
+        FunctionalGroup.__init__(
+            self=clone,
+            atoms=self._atoms,
+            placers=self._placers,
+            core_atoms=self._core_atoms,
+        )
+        return clone
+
     def clone(self) -> FunctionalGroup:
         """
         Return a clone.
@@ -417,14 +434,7 @@ class FunctionalGroup:
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
-        FunctionalGroup.__init__(
-            self=clone,
-            atoms=self._atoms,
-            placers=self._placers,
-            core_atoms=self._core_atoms,
-        )
-        return clone
+        return self._clone()
 
     def __str__(self) -> str:
         return repr(self)
