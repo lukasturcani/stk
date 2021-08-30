@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Optional, TypeVar
 
+from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
 from ...atoms import Atom, O, H
 
@@ -120,18 +121,54 @@ class Alcohol(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Alcohol:
 
-        clone = super()._with_ids(id_map)
-        clone._oxygen = id_map.get(
-            self._oxygen.get_id(),
-            self._oxygen,
+        atom_map = get_atom_map(
+            id_map=id_map,
+            atoms=(
+                *self._atoms,
+                *self._placers,
+                *self._core_atoms,
+                *self._bonders,
+                *self._deleters,
+                self._oxygen,
+                self._hydrogen,
+                self._atom,
+            ),
         )
-        clone._hydrogen = id_map.get(
-            self._hydrogen.get_id(),
-            self._hydrogen,
+        clone = self.clone()
+        clone._atoms = tuple(
+            atom_map.get(atom.get_id(), atom) for atom in clone._atoms
         )
-        clone._atom = id_map.get(
-            self._atom.get_id(),
-            self._atom,
+        clone._placers = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in clone._placers
+        )
+        clone._core_atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in clone._core_atoms
+        )
+        clone._bonders = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in clone._bonders
+        )
+        clone._deleters = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in clone._deleters
+        )
+        # This is type-safe, assuming get_atom_map() is implemented
+        # correctly and does not change the element of atoms.
+        clone._oxygen = atom_map.get(  # type: ignore
+            clone._oxygen.get_id(),
+            clone._oxygen,
+        )
+        # This is type-safe, assuming get_atom_map() is implemented
+        # correctly and does not change the element of atoms.
+        clone._hydrogen = atom_map.get(  # type: ignore
+            clone._hydrogen.get_id(),
+            clone._hydrogen,
+        )
+        clone._atom = atom_map.get(
+            clone._atom.get_id(),
+            clone._atom,
         )
         return clone
 
