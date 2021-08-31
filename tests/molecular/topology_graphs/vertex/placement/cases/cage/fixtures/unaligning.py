@@ -9,7 +9,8 @@ from ....case_data import CaseData
     params=(
         lambda: CaseData(
             vertex=stk.cage.UnaligningVertex(
-                vertex=stk.cage.vertices._CageVertex(0, (1, 2, 3)),
+                id=0,
+                position=(1, 2, 3),
             ),
             edges=(),
             building_block=stk.BuildingBlock(

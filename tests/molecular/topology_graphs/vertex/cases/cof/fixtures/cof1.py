@@ -23,12 +23,10 @@ def cof1(cls, id, position, aligner_edge, cell):
 def unaligned_cof1(cls, id, position, aligner_edge, cell):
     return CaseData(
         vertex=stk.cof.UnaligningVertex(
-            vertex=cls(
-                id=id,
-                position=position,
-                aligner_edge=aligner_edge,
-                cell=cell,
-            )
+            id=id,
+            position=position,
+            aligner_edge=aligner_edge,
+            cell=cell,
         ),
         id=id,
         cell=cell,
@@ -40,6 +38,7 @@ def unaligned_cof1(cls, id, position, aligner_edge, cell):
     params=(
         stk.cof.LinearVertex,
         stk.cof.NonLinearVertex,
+        stk.cof.UnaligningVertex,
     ),
 )
 def cls(request):

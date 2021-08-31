@@ -51,7 +51,8 @@ def cage2(init_at_center, vertices_):
 def cage3(position):
     return CaseData(
         vertex=stk.cage.UnaligningVertex(
-            vertex=stk.cage.vertices._CageVertex(0, position),
+            id=0,
+            position=position,
         ),
         id=0,
         position=position,
@@ -73,6 +74,7 @@ def position(request):
     params=(
         stk.cage.LinearVertex,
         stk.cage.NonLinearVertex,
+        stk.cage.UnaligningVertex,
         stk.cage.AngledVertex,
     ),
 )
