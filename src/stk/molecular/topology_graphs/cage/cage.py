@@ -1070,11 +1070,18 @@ class Cage(TopologyGraph):
         for building_block, vertices in clone.items():
             # Building blocks with 1 placer, cannot be aligned and
             # must therefore use an UnaligningVertex.
-            if len(set(building_block.get_placer_ids())) == 1:
-                clone[building_block] = tuple(map(
-                    UnaligningVertex,
-                    vertices,
-                ))
+            if building_block.get_num_placers() == 1:
+                clone[building_block] = tuple(
+                    UnaligningVertex(
+                        id=v.get_id(),
+                        position=v.get_position(),
+                        use_neighbor_placement=(
+                            v.use_neighbor_placement()
+                        ),
+                        aligner_edge=v.get_aligner_edge(),
+                    )
+                    for v in vertices
+                )
 
         return clone
 
