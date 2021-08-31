@@ -6,14 +6,11 @@ Alcohol
 
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+from typing import Optional
 
 from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
 from ...atoms import Atom, O, H
-
-
-_T = TypeVar('_T', bound='GenericFunctionalGroup')
 
 
 class Alcohol(GenericFunctionalGroup):
@@ -62,7 +59,8 @@ class Alcohol(GenericFunctionalGroup):
         """
 
         atoms = (oxygen, hydrogen, atom)
-        super().__init__(
+        GenericFunctionalGroup.__init__(
+            self=self,
             atoms=atoms,
             bonders=bonders,
             deleters=deleters,
@@ -110,7 +108,7 @@ class Alcohol(GenericFunctionalGroup):
         return self._atom
 
     def clone(self) -> Alcohol:
-        clone = super()._clone()
+        clone = self._clone()
         clone._oxygen = self._oxygen
         clone._hydrogen = self._hydrogen
         clone._atom = self._atom
@@ -134,35 +132,32 @@ class Alcohol(GenericFunctionalGroup):
                 self._atom,
             ),
         )
-        clone = self.clone()
+        clone = self.__class__.__new__(self.__class__)
         clone._atoms = tuple(
-            atom_map.get(atom.get_id(), atom) for atom in clone._atoms
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._atoms
         )
         clone._placers = tuple(
             atom_map.get(atom.get_id(), atom)
-            for atom in clone._placers
+            for atom in self._placers
         )
         clone._core_atoms = tuple(
             atom_map.get(atom.get_id(), atom)
-            for atom in clone._core_atoms
+            for atom in self._core_atoms
         )
         clone._bonders = tuple(
             atom_map.get(atom.get_id(), atom)
-            for atom in clone._bonders
+            for atom in self._bonders
         )
         clone._deleters = tuple(
             atom_map.get(atom.get_id(), atom)
-            for atom in clone._deleters
+            for atom in self._deleters
         )
-        # This is type-safe, assuming get_atom_map() is implemented
-        # correctly and does not change the element of atoms.
-        clone._oxygen = atom_map.get(  # type: ignore
+        clone._oxygen = atom_map.get(
             clone._oxygen.get_id(),
             clone._oxygen,
         )
-        # This is type-safe, assuming get_atom_map() is implemented
-        # correctly and does not change the element of atoms.
-        clone._hydrogen = atom_map.get(  # type: ignore
+        clone._hydrogen = atom_map.get(
             clone._hydrogen.get_id(),
             clone._hydrogen,
         )
@@ -172,7 +167,7 @@ class Alcohol(GenericFunctionalGroup):
         )
         return clone
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._oxygen}, {self._hydrogen}, {self._atom}, '

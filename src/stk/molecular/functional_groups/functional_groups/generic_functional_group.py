@@ -11,6 +11,7 @@ from typing import TypeVar, Optional, Iterable
 
 from ...atoms import Atom
 from .functional_group import FunctionalGroup
+from .utilities import get_atom_map
 
 
 _T = TypeVar('_T', bound='GenericFunctionalGroup')
@@ -58,7 +59,8 @@ class GenericFunctionalGroup(FunctionalGroup):
         """
 
         deleter_set = set(atom.get_id() for atom in deleters)
-        super().__init__(
+        FunctionalGroup.__init__(
+            self=self,
             atoms=atoms,
             placers=bonders if placers is None else placers,
             core_atoms=tuple(
@@ -69,11 +71,14 @@ class GenericFunctionalGroup(FunctionalGroup):
         self._bonders = bonders
         self._deleters = deleters
 
-    def clone(self) -> GenericFunctionalGroup:
+    def _clone(self: _T) -> _T:
         clone = super()._clone()
         clone._bonders = self._bonders
         clone._deleters = self._deleters
         return clone
+
+    def clone(self) -> GenericFunctionalGroup:
+        return self._clone()
 
     def with_atoms(
         self,
@@ -98,32 +103,47 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return clone
 
-    def _with_ids(self: _T, id_map: dict[int, int]) -> _T:
-        super()._with_ids(id_map)
-        self._bonders = tuple(
-            bonder.with_id(
-                id=id_map.get(
-                    bonder.get_id(),
-                    bonder.get_id(),
-                )
-            ) for bonder in self._bonders
-        )
-        self._deleters = tuple(
-            deleter.with_id(
-                id=id_map.get(
-                    deleter.get_id(),
-                    deleter.get_id(),
-                ),
-            ) for deleter in self._deleters
-        )
-        return self
-
     def with_ids(
         self,
         id_map: dict[int, int],
     ) -> GenericFunctionalGroup:
 
-        return self.clone()._with_ids(id_map)
+        atom_map = get_atom_map(
+            id_map=id_map,
+            atoms=(
+                *self._atoms,
+                *self._placers,
+                *self._core_atoms,
+                *self._bonders,
+                *self._deleters,
+            ),
+        )
+        clone = self.__class__.__new__(self.__class__)
+        FunctionalGroup.__init__(
+            self=clone,
+            atoms=tuple(
+                atom_map.get(atom.get_id(), atom)
+                for atom in self._atoms
+            ),
+            placers=tuple(
+                atom_map.get(atom.get_id(), atom)
+                for atom in self._placers
+            ),
+            core_atoms=tuple(
+                atom_map.get(atom.get_id(), atom)
+                for atom in self._core_atoms
+            ),
+
+        )
+        clone._bonders = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._bonders
+        )
+        clone._deleters = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._deleters
+        )
+        return clone
 
     def get_bonders(self) -> Iterable[Atom]:
         """

@@ -4,7 +4,13 @@ Amide
 
 """
 
+from __future__ import annotations
+
+from typing import Optional
+
+from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import Atom, C, O, N, H
 
 
 class Amide(GenericFunctionalGroup):
@@ -18,144 +24,142 @@ class Amide(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon,
-        oxygen,
-        nitrogen,
-        hydrogen1,
-        hydrogen2,
-        atom,
-        bonders,
-        deleters,
-        placers=None,
-    ):
+        carbon: C,
+        # O is not an ambiguous name.
+        oxygen: O,  # noqa
+        nitrogen: N,
+        hydrogen1: H,
+        hydrogen2: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.Amide` instance.
 
-        Parameters
-        ----------
-        carbon : :class:`.C`
-            The ``[carbon]`` atom.
+        Parameters:
 
-        oxygen : :class:`.O`
-            The ``[oxygen]`` atom.
+            carbon:
+                The ``[carbon]`` atom.
 
-        nitrogen : :class:`.N`
-            The ``[nitrogen]`` atom.
+            oxygen:
+                The ``[oxygen]`` atom.
 
-        hydrogen1 : :class:`.H`
-            The ``[hydrogen1]`` atom.
+            nitrogen:
+                The ``[nitrogen]`` atom.
 
-        hydrogen2 : :class:`.H`
-            The ``[hydrogen2]`` atom.
+            hydrogen1:
+                The ``[hydrogen1]`` atom.
 
-        atom : :class:`.Atom`
-            The ``[atom]`` atom.
+            hydrogen2:
+                The ``[hydrogen2]`` atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
+            atom:
+                The ``[atom]`` atom.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
+        atoms = (carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom)
+        GenericFunctionalGroup.__init__(
+            self=self,
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
         self._carbon = carbon
         self._oxygen = oxygen
         self._nitrogen = nitrogen
         self._hydrogen1 = hydrogen1
         self._hydrogen2 = hydrogen2
         self._atom = atom
-        atoms = (carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom)
-        super().__init__(
-            atoms=atoms,
-            bonders=bonders,
-            deleters=deleters,
-            placers=bonders if placers is None else placers,
-        )
 
-    def get_carbon(self):
+    def get_carbon(self) -> C:
         """
         Get the ``[carbon]`` atom.
 
-        Returns
-        -------
-        :class:`.C`
+        Returns:
+
             The ``[carbon]`` atom.
 
         """
 
         return self._carbon
 
-    def get_oxygen(self):
+    # O is not an ambiguous name.
+    def get_oxygen(self) -> O:  # noqa
         """
         Get the ``[oxygen]`` atom.
 
-        Returns
-        -------
-        :class:`.O`
+        Returns:
+
             The ``[oxygen]`` atom.
 
         """
 
         return self._oxygen
 
-    def get_nitrogen(self):
+    def get_nitrogen(self) -> N:
         """
         Get the ``[nitrogen]`` atom.
 
-        Returns
-        -------
-        :class:`.N`
+        Returns:
+
             The ``[nitrogen]`` atom.
 
         """
 
         return self._nitrogen
 
-    def get_hydrogen1(self):
+    def get_hydrogen1(self) -> H:
         """
         Get the ``[hydrogen1]`` atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
+
             The ``[hydrogen1]`` atom.
 
         """
 
         return self._hydrogen1
 
-    def get_hydrogen2(self):
+    def get_hydrogen2(self) -> H:
         """
         Get the ``[hydrogen2]`` atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
+
             The ``[hydrogen2]`` atom.
 
         """
 
         return self._hydrogen2
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The ``[atom]`` atom.
 
         """
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> Amide:
+        clone = self._clone()
         clone._carbon = self._carbon
         clone._oxygen = self._oxygen
         clone._nitrogen = self._nitrogen
@@ -164,8 +168,48 @@ class Amide(GenericFunctionalGroup):
         clone._atom = self._atom
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Amide:
+
+        atom_map = get_atom_map(
+            id_map=id_map,
+            atoms=(
+                *self._atoms,
+                *self._placers,
+                *self._core_atoms,
+                *self._bonders,
+                *self._deleters,
+                self._carbon,
+                self._oxygen,
+                self._nitrogen,
+                self._hydrogen1,
+                self._hydrogen2,
+                self._atom,
+            ),
+        )
+        clone = self.__class__.__new__(self.__class__)
+        clone._atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._atoms
+        )
+        clone._placers = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._placers
+        )
+        clone._core_atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._core_atoms
+        )
+        clone._bonders = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._bonders
+        )
+        clone._deleters = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._deleters
+        )
         clone._carbon = atom_map.get(
             self._carbon.get_id(),
             self._carbon,
@@ -192,7 +236,7 @@ class Amide(GenericFunctionalGroup):
         )
         return clone
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._carbon}, {self._oxygen}, {self._nitrogen}, '
