@@ -621,7 +621,7 @@ class BuildingBlock(Molecule):
 
     def _normalize_placer_ids(
         self,
-        placer_ids: Optional[tuple[int]],
+        placer_ids: Optional[tuple[int, ...]],
         functional_groups: Iterable[FunctionalGroup],
     ) -> frozenset[int]:
         """
@@ -631,8 +631,9 @@ class BuildingBlock(Molecule):
 
             placer_ids: The ids of *placer* atoms or ``None``.
 
-            functional_groups:  The :class:`.FunctionalGroup` instances
-            of the building block.
+            functional_groups:
+                The :class:`.FunctionalGroup` instances of the building
+                block.
 
         Returns:
 
@@ -670,7 +671,7 @@ class BuildingBlock(Molecule):
         """
         Get the final *core* ids.
 
-        This method may return duplicates.
+        This method may return duplicate ids.
 
         Parameters:
 
@@ -680,7 +681,7 @@ class BuildingBlock(Molecule):
 
         Yields:
 
-            Ids of atoms defining the core.
+            Id of atom defining the core of the molecule.
 
         """
 
