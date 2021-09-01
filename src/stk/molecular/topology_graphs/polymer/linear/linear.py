@@ -7,7 +7,7 @@ Linear
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Tuple
+from typing import Iterable
 import numpy as np
 
 from ....molecules import BuildingBlock
@@ -585,7 +585,7 @@ class Linear(TopologyGraph):
         self,
         building_blocks: dict[int, BuildingBlock],
         vertices: Iterable[Vertex],
-    ) -> dict[BuildingBlock, type[Vertex]]:
+    ) -> dict[BuildingBlock, Vertex]:
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
@@ -604,8 +604,10 @@ class Linear(TopologyGraph):
     def _with_unaligning_vertices(
         building_block_vertices: dict[BuildingBlock, type[Vertex]],
     ) -> dict[BuildingBlock, type[Vertex]]:
-        clone = dict(building_block_vertices)
-        for building_block, vertices in clone.items():
+        clone = {}
+        for building_block, vertices in (
+            building_block_vertices.items()
+        ):
             # Building blocks with 1 placer, cannot be aligned and
             # must therefore use an UnaligningVertex.
             if building_block.get_num_placers() == 1:
@@ -616,12 +618,14 @@ class Linear(TopologyGraph):
                         flip=vertex.get_flip(),
                     ) for vertex in vertices
                 )
+            else:
+                clone[building_block] = vertices
 
         return clone
 
     def _get_scale(
         self,
-        building_block_vertices: dict[BuildingBlock, type[Vertex]],
+        building_block_vertices: dict[BuildingBlock, Vertex],
     ) -> float:
         return max(
             bb.get_maximum_diameter()
@@ -638,5 +642,5 @@ class Linear(TopologyGraph):
 
 @dataclass(frozen=True)
 class _VerticesAndEdges:
-    vertices: Tuple[Vertex]
-    edges: Tuple[Edge]
+    vertices: tuple[Vertex]
+    edges: tuple[Edge]
