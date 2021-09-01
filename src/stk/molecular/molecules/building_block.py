@@ -12,7 +12,7 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
-from typing import Optional, Union, Iterable, Iterator
+from typing import Optional, Union, Iterable, Iterator, Collection
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -622,7 +622,7 @@ class BuildingBlock(Molecule):
     def _normalize_placer_ids(
         self,
         placer_ids: Optional[tuple[int, ...]],
-        functional_groups: Iterable[FunctionalGroup],
+        functional_groups: Collection[FunctionalGroup],
     ) -> frozenset[int]:
         """
         Get the final *placer* ids.
