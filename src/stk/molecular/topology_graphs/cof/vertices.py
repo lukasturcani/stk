@@ -310,14 +310,6 @@ class UnaligningVertex(_CofVertex):
 
     """
 
-    def __init__(self, vertex):
-        super().__init__(
-            id=vertex.get_id(),
-            position=vertex.get_position(),
-            aligner_edge=vertex.get_aligner_edge(),
-            cell=vertex.get_cell(),
-        )
-
     def place_building_block(self, building_block, edges):
         return building_block.with_centroid(
             position=self._position,
