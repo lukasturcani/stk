@@ -686,7 +686,6 @@ class BuildingBlock(Molecule):
 
         """
 
-        core_ids = set()
         functional_group_atom_ids = {
             atom_id
             for functional_group in functional_groups
@@ -695,13 +694,11 @@ class BuildingBlock(Molecule):
         for atom in self._atoms:
             atom_id = atom.get_id()
             if atom_id not in functional_group_atom_ids:
-                core_ids.add(atom_id)
+                yield atom_id
 
         for functional_group in functional_groups:
             for atom_id in functional_group.get_core_atom_ids():
-                core_ids.add(atom_id)
-
-        yield from core_ids
+                yield atom_id
 
     def _extract_functional_groups(self, functional_groups):
         """
