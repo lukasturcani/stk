@@ -682,7 +682,7 @@ class BuildingBlock(Molecule):
 
         Yields:
 
-            Id of an atom defining the core of the molecule.
+            The id of an atom defining the core of the molecule.
 
         """
 
