@@ -12,7 +12,7 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
-from typing import Optional, Union, Iterable
+from typing import FrozenSet, Optional, Union, Iterable, Iterator
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -390,11 +390,11 @@ class BuildingBlock(Molecule):
         building_block._with_functional_groups(functional_groups)
         building_block._placer_ids = (
             building_block._normalize_placer_ids(
-                placer_ids=placer_ids,
+                placer_ids=frozenset(placer_ids),
                 functional_groups=building_block._functional_groups,
             )
         )
-        building_block._core_ids = (
+        building_block._core_ids = frozenset(
             building_block._get_core_ids(
                 functional_groups=building_block._functional_groups,
             )
@@ -612,16 +612,16 @@ class BuildingBlock(Molecule):
             functional_groups=functional_groups,
         ))
         self._placer_ids = self._normalize_placer_ids(
-            placer_ids=placer_ids,
+            placer_ids=frozenset(placer_ids),
             functional_groups=self._functional_groups,
         )
-        self._core_ids = self._get_core_ids(
+        self._core_ids = frozenset(self._get_core_ids(
             functional_groups=self._functional_groups,
-        )
+        ))
 
     def _normalize_placer_ids(
         self,
-        placer_ids: tuple[int, ...],
+        placer_ids: Optional[FrozenSet[int]],
         functional_groups: Iterable[FunctionalGroup],
     ) -> frozenset[int]:
         """
@@ -653,7 +653,7 @@ class BuildingBlock(Molecule):
         """
 
         if placer_ids is not None:
-            return frozenset(placer_ids)
+            return placer_ids
 
         if functional_groups:
             return frozenset(flatten(
@@ -666,22 +666,25 @@ class BuildingBlock(Molecule):
     def _get_core_ids(
         self,
         functional_groups: Iterable[FunctionalGroup],
-    ) -> frozenset[int]:
+    ) -> Iterator[int]:
         """
         Get the final *core* ids.
 
+        This method may return duplicates.
+
         Parameters:
 
-            functional_groups:  The :class:`.FunctionalGroup` instances
-            of the building block.
+            functional_groups:
+                The :class:`.FunctionalGroup` instances of the building
+                block.
 
-        Returns:
+        Yields:
 
-            core_ids: Ids of atoms defining the core.
+            Ids of atoms defining the core.
 
         """
 
-        core_ids = []
+        core_ids = {}
         functional_group_atom_ids = {
             atom_id
             for functional_group in functional_groups
@@ -690,13 +693,13 @@ class BuildingBlock(Molecule):
         for atom in self._atoms:
             atom_id = atom.get_id()
             if atom_id not in functional_group_atom_ids:
-                core_ids.append(atom_id)
+                core_ids.add(atom_id)
 
         for functional_group in functional_groups:
             for atom_id in functional_group.get_core_atom_ids():
-                core_ids.append(atom_id)
+                core_ids.add(atom_id)
 
-        return frozenset(core_ids)
+        yield from core_ids
 
     def _extract_functional_groups(self, functional_groups):
         """
