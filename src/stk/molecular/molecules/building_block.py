@@ -12,7 +12,8 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
-from typing import Optional, Union, Iterable, Iterator, Collection
+from typing import Optional, Union, Iterable, Iterator
+from collections.abc import Collection
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
