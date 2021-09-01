@@ -11,6 +11,7 @@ from ...case_data import CaseData
         lazy_fixture('center'),
         lazy_fixture('head'),
         lazy_fixture('tail'),
+        lazy_fixture('unaligning'),
     ),
 )
 def case_data(request):
