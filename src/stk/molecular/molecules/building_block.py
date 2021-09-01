@@ -12,7 +12,7 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
-from typing import FrozenSet, Optional, Union, Iterable, Iterator
+from typing import Optional, Union, Iterable, Iterator
 
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
@@ -390,7 +390,7 @@ class BuildingBlock(Molecule):
         building_block._with_functional_groups(functional_groups)
         building_block._placer_ids = (
             building_block._normalize_placer_ids(
-                placer_ids=frozenset(placer_ids),
+                placer_ids=placer_ids,
                 functional_groups=building_block._functional_groups,
             )
         )
@@ -612,7 +612,7 @@ class BuildingBlock(Molecule):
             functional_groups=functional_groups,
         ))
         self._placer_ids = self._normalize_placer_ids(
-            placer_ids=frozenset(placer_ids),
+            placer_ids=placer_ids,
             functional_groups=self._functional_groups,
         )
         self._core_ids = frozenset(self._get_core_ids(
@@ -621,7 +621,7 @@ class BuildingBlock(Molecule):
 
     def _normalize_placer_ids(
         self,
-        placer_ids: Optional[FrozenSet[int]],
+        placer_ids: Optional[tuple[int]],
         functional_groups: Iterable[FunctionalGroup],
     ) -> frozenset[int]:
         """
@@ -653,7 +653,7 @@ class BuildingBlock(Molecule):
         """
 
         if placer_ids is not None:
-            return placer_ids
+            return frozenset(placer_ids)
 
         if functional_groups:
             return frozenset(flatten(
@@ -684,7 +684,7 @@ class BuildingBlock(Molecule):
 
         """
 
-        core_ids = {}
+        core_ids = set()
         functional_group_atom_ids = {
             atom_id
             for functional_group in functional_groups
