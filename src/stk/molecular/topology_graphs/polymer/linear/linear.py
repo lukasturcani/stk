@@ -602,8 +602,8 @@ class Linear(TopologyGraph):
 
     @staticmethod
     def _with_unaligning_vertices(
-        building_block_vertices: dict[BuildingBlock, type[Vertex]],
-    ) -> dict[BuildingBlock, type[Vertex]]:
+        building_block_vertices: dict[BuildingBlock, Vertex],
+    ) -> dict[BuildingBlock, Vertex]:
         clone = {}
         for building_block, vertices in (
             building_block_vertices.items()
