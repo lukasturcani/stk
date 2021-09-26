@@ -4,9 +4,14 @@ Thioacid Factory
 
 """
 
+from typing import Optional, Iterable, Literal
+
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import _get_atom_ids
 from ..functional_groups import Thioacid
+from ...molecule import Molecule
+
+ValidIndices = tuple[Literal[0, 1, 2, 3, 4], ...]
 
 
 class ThioacidFactory(FunctionalGroupFactory):
@@ -16,101 +21,107 @@ class ThioacidFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][C](=[O])[S][H]`` functional group string.
 
-    Examples
-    --------
-    *Creating Functional Groups with the Factory*
+    Examples:
 
-    You want to create a building block which has :class:`.Thioacid`
-    functional groups. You want the carbon atom in those functional
-    groups to be the *bonder* atom, and SH group to be the *deleter*
-    atoms.
+        *Creating Functional Groups with the Factory*
 
-    .. testcode:: creating-functional-groups-with-the-factory
+        You want to create a building block which has
+        :class:`.Thioacid` functional groups. You want the carbon atom
+        in those functional groups to be the *bonder* atom, and SH
+        group to be the *deleter* atoms.
 
-        import stk
+        .. testcode:: creating-functional-groups-with-the-factory
 
-        building_block = stk.BuildingBlock(
-            smiles='SC(=O)CC(=O)S',
-            functional_groups=(stk.ThioacidFactory(), ),
-        )
+            import stk
 
-    .. testcode:: creating-functional-groups-with-the-factory
-        :hide:
+            building_block = stk.BuildingBlock(
+                smiles='SC(=O)CC(=O)S',
+                functional_groups=(stk.ThioacidFactory(), ),
+            )
 
-        assert all(
-            isinstance(functional_group, stk.Thioacid)
-            for functional_group
-            in building_block.get_functional_groups()
-        )
-        assert building_block.get_num_functional_groups() == 2
+        .. testcode:: creating-functional-groups-with-the-factory
+            :hide:
 
-    *Changing the Bonder and Deleter Atoms*
+            assert all(
+                isinstance(functional_group, stk.Thioacid)
+                for functional_group
+                in building_block.get_functional_groups()
+            )
+            assert building_block.get_num_functional_groups() == 2
 
-    You want to create a building block which has :class:`.Thioacid`
-    functional groups. You want the carbon atom to be the *bonder*
-    atom and the oxygen atom to be the *deleter* atom.
+        *Changing the Bonder and Deleter Atoms*
 
-    .. testcode:: changing-the-bonder-and-deleter-atoms
+        You want to create a building block which has
+        :class:`.Thioacid` functional groups. You want the carbon atom
+        to be the *bonder* atom and the oxygen atom to be the *deleter*
+        atom.
 
-        import stk
+        .. testcode:: changing-the-bonder-and-deleter-atoms
 
-        thioacid_factory = stk.ThioacidFactory(
-            # The index of the carbon atom in the functional
-            # group string (see docstring) is 1.
-            bonders=(1, ),
-            # The index of the oxygen atom in the functional
-            # group string (see docstring) is 2.
-            deleters=(2, ),
-        )
-        building_block = stk.BuildingBlock(
-            smiles='SC(=O)CC(=O)S',
-            functional_groups=(thioacid_factory, ),
-        )
+            import stk
 
-    .. testcode:: changing-the-bonder-and-deleter-atoms
-        :hide:
+            thioacid_factory = stk.ThioacidFactory(
+                # The index of the carbon atom in the functional
+                # group string (see docstring) is 1.
+                bonders=(1, ),
+                # The index of the oxygen atom in the functional
+                # group string (see docstring) is 2.
+                deleters=(2, ),
+            )
+            building_block = stk.BuildingBlock(
+                smiles='SC(=O)CC(=O)S',
+                functional_groups=(thioacid_factory, ),
+            )
 
-        fg1, fg2 = building_block.get_functional_groups()
-        assert fg1.get_num_bonders() == 1
-        assert sum(1 for _ in fg1.get_deleters()) == 1
-        assert fg2.get_num_bonders() == 1
-        assert sum(1 for _ in fg2.get_deleters()) == 1
+        .. testcode:: changing-the-bonder-and-deleter-atoms
+            :hide:
 
-        assert all(
-            isinstance(atom, stk.C)
-            for functional_group
-            in building_block.get_functional_groups()
-            for atom
-            in functional_group.get_bonders()
-        )
-        assert all(
-            isinstance(atom, stk.O)
-            for functional_group
-            in building_block.get_functional_groups()
-            for atom
-            in functional_group.get_deleters()
-        )
+            fg1, fg2 = building_block.get_functional_groups()
+            assert fg1.get_num_bonders() == 1
+            assert sum(1 for _ in fg1.get_deleters()) == 1
+            assert fg2.get_num_bonders() == 1
+            assert sum(1 for _ in fg2.get_deleters()) == 1
 
-    See Also
-    --------
-    :class:`.GenericFunctionalGroup`
-        Defines *bonders* and  *deleters*.
+            assert all(
+                isinstance(atom, stk.C)
+                for functional_group
+                in building_block.get_functional_groups()
+                for atom
+                in functional_group.get_bonders()
+            )
+            assert all(
+                isinstance(atom, stk.O)
+                for functional_group
+                in building_block.get_functional_groups()
+                for atom
+                in functional_group.get_deleters()
+            )
+
+    See Also:
+
+        :class:`.GenericFunctionalGroup`
+            Defines *bonders* and  *deleters*.
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(3, 4), placers=None):
+    def __init__(
+        self,
+        bonders: ValidIndices = (1, ),
+        deleters: ValidIndices = (3, 4),
+        placers: Optional[ValidIndices] = None,
+    ) -> None:
         """
         Initialize a :class:`.ThioacidFactory` instance.
 
-        Parameters
-        ----------
-        bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *bonder* atoms.
+        Parameters:
 
-        deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *deleter* atoms.
+            bonders:
+                The indices of atoms in the functional group string,
+                which are *bonder* atoms.
+
+            deleters:
+                The indices of atoms in the functional group string,
+                which are *deleter* atoms.
 
         """
 
@@ -118,7 +129,11 @@ class ThioacidFactory(FunctionalGroupFactory):
         self._deleters = deleters
         self._placers = bonders if placers is None else placers
 
-    def get_functional_groups(self, molecule):
+    def get_functional_groups(
+        self,
+        molecule: Molecule,
+    ) -> Iterable[Thioacid]:
+
         for atom_ids in _get_atom_ids('[*][C](=[O])[S][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Thioacid(
