@@ -31,9 +31,14 @@ class SingleAtom(GenericFunctionalGroup):
 
         """
 
+        GenericFunctionalGroup.__init__(
+            self=self,
+            atoms=(atom, ),
+            bonders=(atom, ),
+            deleters=(),
+            placers=(atom, )
+        )
         self._atom = atom
-        atoms = (atom, )
-        super().__init__(atoms, atoms, ())
 
     def get_atom(self) -> Atom:
         """
