@@ -28,10 +28,10 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         *Creating Functional Groups with the Factory*
 
         You want to create a building block which has
-        :class:`.Alkene` functional groups, but only if they are terminal.
-        You want the non-terminal carbon atom in those functional
-        groups to be the *bonder* atom, and the terminal CH\ :sub:`2`
-        group to be the *deleter* atoms.
+        :class:`.Alkene` functional groups, but only if they are
+        terminal. You want the non-terminal carbon atom in those
+        functional groups to be the *bonder* atom, and the terminal
+        CH\ :sub:`2` group to be the *deleter* atoms.
 
         .. testcode:: creating-functional-groups-with-the-factory
 
@@ -55,9 +55,9 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         *Changing the Bonder and Deleter Atoms*
 
         You want to create a building block which has
-        :class:`.Alkene` functional groups, but only if they are terminal.
-        You want the carbon atoms to be the *bonder* atoms and you don't
-        want any *deleter* atoms.
+        :class:`.Alkene` functional groups, but only if they are
+        terminal. You want the carbon atoms to be the *bonder* atoms
+        and you don't want any *deleter* atoms.
 
         .. testcode:: changing-the-bonder-and-deleter-atoms
 

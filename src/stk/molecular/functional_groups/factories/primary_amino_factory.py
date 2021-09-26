@@ -52,20 +52,21 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
         *Changing the Bonder and Deleter Atoms*
 
         You want to create a building block which has
-        :class:`.PrimaryAmino` functional groups. You want the non-hydrogen
-        atom bonded to nitrogen to be the *bonder* atom and the
-        nitrogen and hydrogen atoms to be *deleter* atoms.
+        :class:`.PrimaryAmino` functional groups. You want the
+        non-hydrogen atom bonded to nitrogen to be the *bonder* atom
+        and the nitrogen and hydrogen atoms to be *deleter* atoms.
 
         .. testcode:: changing-the-bonder-and-deleter-atoms
 
             import stk
 
             primary_amino_factory = stk.PrimaryAminoFactory(
-                # The index of the atom attached to the nitrogen is 0 in
-                # the functional group string (see docstring).
+                # The index of the atom attached to the nitrogen is 0
+                # in the functional group string (see docstring).
                 bonders=(0, ),
                 # The indices of the nitrogen and hydrogen atoms in the
-                # functional group string (see docstring) are 1, 2 and 3.
+                # functional group string (see docstring) are 1, 2 and
+                # 3.
                 deleters=(1, 2, 3),
             )
             building_block = stk.BuildingBlock(

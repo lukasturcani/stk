@@ -26,9 +26,9 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
         *Creating Functional Groups with the Factory*
 
         You want to create a building block which has
-        :class:`.SecondaryAmino` functional groups. You want the nitrogen
-        atom in those functional groups to be the *bonder* atom, and the
-        hydrogen atom to be the *deleter* atom.
+        :class:`.SecondaryAmino` functional groups. You want the
+        nitrogen atom in those functional groups to be the *bonder*
+        atom, and the hydrogen atom to be the *deleter* atom.
 
         .. testcode:: creating-functional-groups-with-the-factory
 
@@ -52,9 +52,9 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
         *Changing the Bonder and Deleter Atoms*
 
         You want to create a building block which has
-        :class:`.SecondaryAmino` functional groups. You want the nitrogen
-        atom to be the *bonder* atom and one of the carbon atoms to be the
-        *deleter* atom.
+        :class:`.SecondaryAmino` functional groups. You want the
+        nitrogen atom to be the *bonder* atom and one of the carbon
+        atoms to be the *deleter* atom.
 
         .. testcode:: changing-the-bonder-and-deleter-atoms
 
@@ -64,8 +64,8 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
                 # The index of the nitrogen atom in the functional
                 # group string (see docstring) is 1.
                 bonders=(1, ),
-                # The index of one of the carbon atoms in the functional
-                # group string (see docstring) is 2.
+                # The index of one of the carbon atoms in the
+                # functional group string (see docstring) is 2.
                 deleters=(2, ),
             )
             building_block = stk.BuildingBlock(
