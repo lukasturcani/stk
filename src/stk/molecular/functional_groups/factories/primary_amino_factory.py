@@ -4,9 +4,14 @@ Primary Amino Factory
 
 """
 
+from typing import Optional, Iterable, Literal
+
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import _get_atom_ids
 from ..functional_groups import PrimaryAmino
+from ...molecule import Molecule
+
+ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
 
 
 class PrimaryAminoFactory(FunctionalGroupFactory):
@@ -16,111 +21,112 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][N]([H])[H]`` functional group string.
 
-    Examples
-    --------
-    *Creating Functional Groups with the Factory*
+    Examples:
 
-    You want to create a building block which has
-    :class:`.PrimaryAmino` functional groups. You want the nitrogen
-    atom to be the *bonder* atom, and the hydrogen atoms to be the
-    *deleter* atoms.
+        *Creating Functional Groups with the Factory*
 
-    .. testcode:: creating-functional-groups-with-the-factory
+        You want to create a building block which has
+        :class:`.PrimaryAmino` functional groups. You want the nitrogen
+        atom to be the *bonder* atom, and the hydrogen atoms to be the
+        *deleter* atoms.
 
-        import stk
+        .. testcode:: creating-functional-groups-with-the-factory
 
-        building_block = stk.BuildingBlock(
-            smiles='NCCCCN',
-            functional_groups=(stk.PrimaryAminoFactory(), ),
-        )
+            import stk
 
-    .. testcode:: creating-functional-groups-with-the-factory
-        :hide:
+            building_block = stk.BuildingBlock(
+                smiles='NCCCCN',
+                functional_groups=(stk.PrimaryAminoFactory(), ),
+            )
 
-        assert all(
-            isinstance(functional_group, stk.PrimaryAmino)
-            for functional_group
-            in building_block.get_functional_groups()
-        )
-        assert building_block.get_num_functional_groups() == 2
+        .. testcode:: creating-functional-groups-with-the-factory
+            :hide:
 
-    *Changing the Bonder and Deleter Atoms*
+            assert all(
+                isinstance(functional_group, stk.PrimaryAmino)
+                for functional_group
+                in building_block.get_functional_groups()
+            )
+            assert building_block.get_num_functional_groups() == 2
 
-    You want to create a building block which has
-    :class:`.PrimaryAmino` functional groups. You want the non-hydrogen
-    atom bonded to nitrogen to be the *bonder* atom and the
-    nitrogen and hydrogen atoms to be *deleter* atoms.
+        *Changing the Bonder and Deleter Atoms*
 
-    .. testcode:: changing-the-bonder-and-deleter-atoms
+        You want to create a building block which has
+        :class:`.PrimaryAmino` functional groups. You want the non-hydrogen
+        atom bonded to nitrogen to be the *bonder* atom and the
+        nitrogen and hydrogen atoms to be *deleter* atoms.
 
-        import stk
+        .. testcode:: changing-the-bonder-and-deleter-atoms
 
-        primary_amino_factory = stk.PrimaryAminoFactory(
-            # The index of the atom attached to the nitrogen is 0 in
-            # the functional group string (see docstring).
-            bonders=(0, ),
-            # The indices of the nitrogen and hydrogen atoms in the
-            # functional group string (see docstring) are 1, 2 and 3.
-            deleters=(1, 2, 3),
-        )
-        building_block = stk.BuildingBlock(
-            smiles='NCCCCN',
-            functional_groups=(primary_amino_factory, ),
-        )
+            import stk
 
-    .. testcode:: changing-the-bonder-and-deleter-atoms
-        :hide:
+            primary_amino_factory = stk.PrimaryAminoFactory(
+                # The index of the atom attached to the nitrogen is 0 in
+                # the functional group string (see docstring).
+                bonders=(0, ),
+                # The indices of the nitrogen and hydrogen atoms in the
+                # functional group string (see docstring) are 1, 2 and 3.
+                deleters=(1, 2, 3),
+            )
+            building_block = stk.BuildingBlock(
+                smiles='NCCCCN',
+                functional_groups=(primary_amino_factory, ),
+            )
 
-        fg1, fg2 = building_block.get_functional_groups()
-        assert fg1.get_num_bonders() == 1
-        assert sum(1 for _ in fg1.get_deleters()) == 3
-        assert fg2.get_num_bonders() == 1
-        assert sum(1 for _ in fg2.get_deleters()) == 3
+        .. testcode:: changing-the-bonder-and-deleter-atoms
+            :hide:
 
-        assert all(
-            isinstance(atom, stk.C)
-            for functional_group
-            in building_block.get_functional_groups()
-            for atom
-            in functional_group.get_bonders()
-        )
-        assert all(
-            isinstance(atom, (stk.H, stk.N))
-            for functional_group
-            in building_block.get_functional_groups()
-            for atom
-            in functional_group.get_deleters()
-        )
+            fg1, fg2 = building_block.get_functional_groups()
+            assert fg1.get_num_bonders() == 1
+            assert sum(1 for _ in fg1.get_deleters()) == 3
+            assert fg2.get_num_bonders() == 1
+            assert sum(1 for _ in fg2.get_deleters()) == 3
 
-    See Also
-    --------
-    :class:`.GenericFunctionalGroup`
-        Defines *bonders* and  *deleters*.
+            assert all(
+                isinstance(atom, stk.C)
+                for functional_group
+                in building_block.get_functional_groups()
+                for atom
+                in functional_group.get_bonders()
+            )
+            assert all(
+                isinstance(atom, (stk.H, stk.N))
+                for functional_group
+                in building_block.get_functional_groups()
+                for atom
+                in functional_group.get_deleters()
+            )
+
+    See Also:
+
+        :class:`.GenericFunctionalGroup`
+            Defines *bonders* and  *deleters*.
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(2, 3), placers=None):
+    def __init__(
+        self,
+        bonders: ValidIndices = (1, ),
+        deleters: ValidIndices = (2, 3),
+        placers: Optional[ValidIndices] = None,
+    ) -> None:
         """
         Initialize a :class:`.PrimaryAminoFactory` instance.
 
-        Parameters
-        ----------
-        bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *bonder* atoms.
+        Parameters:
 
-        deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *deleter* atoms.
+            bonders:
+                The indices of atoms in the functional group string,
+                which are *bonder* atoms.
 
-        placers : :class:`tuple` of :class:`int`, optional
-            The indices of atoms in the functional group string, which
-            are *placer* atoms. If ``None``, `bonders` will be used.
+            deleters:
+                The indices of atoms in the functional group string,
+                which are *deleter* atoms.
 
-        """
-
-        """
-        Initialize an :class:`.AmineFactory`.
+            placers:
+                The indices of atoms in the functional group string,
+                which are *placer* atoms. If ``None``, `bonders` will
+                be used.
 
         """
 
@@ -128,7 +134,11 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
         self._deleters = deleters
         self._placers = bonders if placers is None else placers
 
-    def get_functional_groups(self, molecule):
+    def get_functional_groups(
+        self,
+        molecule: Molecule,
+    ) -> Iterable[PrimaryAmino]:
+
         for atom_ids in _get_atom_ids('[*][N]([H])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield PrimaryAmino(
