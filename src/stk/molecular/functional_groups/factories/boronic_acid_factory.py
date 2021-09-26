@@ -111,7 +111,7 @@ class BoronicAcidFactory(FunctionalGroupFactory):
         bonders: tuple[ValidIndices, ...] = (1, ),
         deleters: tuple[ValidIndices, ...] = (2, 3, 4, 5),
         placers: Optional[tuple[ValidIndices, ...]] = None,
-    ):
+    ) -> None:
         """
         Initialize a :class:`.BoronicAcidFactory` instance.
 
