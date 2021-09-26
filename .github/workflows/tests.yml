@@ -13,12 +13,7 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Lint with flake8
-              run: conda run -n stk
-                flake8 .
-                    --count
-                    --show-source
-                    --max-line-length=71
-                    --statistics
+              run: conda run -n stk flake8 .
 
     pytest-stable-linux:
         runs-on: ubuntu-20.04
