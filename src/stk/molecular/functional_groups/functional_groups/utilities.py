@@ -25,6 +25,11 @@ def get_atom_map(
             The atoms which should have their ids updated as
             specified by the `id_map`.
 
+    Returns:
+
+        A mapping from the id of an atom to to the atom it should be
+        replaced by.
+
     """
 
     atom_map = {}
