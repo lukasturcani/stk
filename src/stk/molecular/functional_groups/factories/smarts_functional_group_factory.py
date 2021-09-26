@@ -7,7 +7,7 @@ SMARTS Functional Group Factory
 from typing import Optional, Iterable
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import GenericFunctionalGroup
 from ...molecule import Molecule
 
@@ -111,7 +111,7 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[GenericFunctionalGroup]:
 
-        for atom_ids in _get_atom_ids(self._smarts, molecule):
+        for atom_ids in get_atom_ids(self._smarts, molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield GenericFunctionalGroup(
                 atoms=atoms,

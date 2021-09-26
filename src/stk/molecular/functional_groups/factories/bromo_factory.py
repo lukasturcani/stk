@@ -7,7 +7,7 @@ Bromo Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Bromo
 from ...molecule import Molecule
 
@@ -88,7 +88,7 @@ class BromoFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[Bromo]:
 
-        for atom_ids in _get_atom_ids('[*][Br]', molecule):
+        for atom_ids in get_atom_ids('[*][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Bromo(
                 bromine=atoms[1],

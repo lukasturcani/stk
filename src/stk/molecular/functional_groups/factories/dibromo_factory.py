@@ -7,7 +7,7 @@ Dibromo Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Dibromo
 from ...molecule import Molecule
 
@@ -136,7 +136,7 @@ class DibromoFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[Dibromo]:
 
-        for atom_ids in _get_atom_ids('[Br][#6]~[#6][Br]', molecule):
+        for atom_ids in get_atom_ids('[Br][#6]~[#6][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Dibromo(
                 atom1=atoms[1],

@@ -7,7 +7,7 @@ Difluoro Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Difluoro
 from ...molecule import Molecule
 
@@ -136,7 +136,7 @@ class DifluoroFactory(FunctionalGroupFactory):
         self,
         molecule: Molecule,
     ) -> Iterable[Difluoro]:
-        for atom_ids in _get_atom_ids('[F][#6]~[#6][F]', molecule):
+        for atom_ids in get_atom_ids('[F][#6]~[#6][F]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Difluoro(
                 atom1=atoms[1],

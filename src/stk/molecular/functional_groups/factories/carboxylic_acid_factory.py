@@ -7,7 +7,7 @@ Carboxylic Acid Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import CarboxylicAcid
 from ...molecule import Molecule
 
@@ -140,7 +140,7 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[CarboxylicAcid]:
 
-        for atom_ids in _get_atom_ids('[*][C](=[O])[O][H]', molecule):
+        for atom_ids in get_atom_ids('[*][C](=[O])[O][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield CarboxylicAcid(
                 carbon=atoms[1],

@@ -7,7 +7,7 @@ Primary Amino Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import PrimaryAmino
 from ...molecule import Molecule
 
@@ -140,7 +140,7 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[PrimaryAmino]:
 
-        for atom_ids in _get_atom_ids('[*][N]([H])[H]', molecule):
+        for atom_ids in get_atom_ids('[*][N]([H])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield PrimaryAmino(
                 nitrogen=atoms[1],

@@ -7,7 +7,7 @@ Ring Amine Factory
 from typing import Iterable
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import RingAmine
 from ...molecule import Molecule
 
@@ -36,7 +36,7 @@ class RingAmineFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[RingAmine]:
 
-        ids = _get_atom_ids(
+        ids = get_atom_ids(
             query='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
             molecule=molecule,
         )

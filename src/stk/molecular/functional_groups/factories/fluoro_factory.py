@@ -7,7 +7,7 @@ Fluoro Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Fluoro
 from ...molecule import Molecule
 
@@ -91,7 +91,7 @@ class FluoroFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[Fluoro]:
 
-        for atom_ids in _get_atom_ids('[*][F]', molecule):
+        for atom_ids in get_atom_ids('[*][F]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Fluoro(
                 fluorine=atoms[1],

@@ -6,7 +6,7 @@ Terminal Alkene Factory
 
 from typing import Optional, Iterable, Literal
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Alkene
 from ...molecule import Molecule
 
@@ -133,7 +133,7 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[Alkene]:
 
-        ids = _get_atom_ids('[*][C]([*])=[C]([H])[H]', molecule)
+        ids = get_atom_ids('[*][C]([*])=[C]([H])[H]', molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Alkene(

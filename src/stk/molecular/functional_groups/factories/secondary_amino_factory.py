@@ -7,7 +7,7 @@ Secondary Amino Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import SecondaryAmino
 from ...molecule import Molecule
 
@@ -136,7 +136,7 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
         self,
         molecule: Molecule,
     ) -> Iterable[SecondaryAmino]:
-        for atom_ids in _get_atom_ids('[H][N]([#6])[#6]', molecule):
+        for atom_ids in get_atom_ids('[H][N]([#6])[#6]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield SecondaryAmino(
                 nitrogen=atoms[1],
