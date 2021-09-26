@@ -24,8 +24,9 @@ class BromoFactory(FunctionalGroupFactory):
         *Creating Functional Groups with the Factory*
 
         You want to create a building block which has :class:`.Bromo`
-        functional groups. You want the atom bonded to the bromine to be
-        the *bonder* atom, and the bromine atom to be the *deleter* atom.
+        functional groups. You want the atom bonded to the bromine to
+        be the *bonder* atom, and the bromine atom to be the *deleter*
+        atom.
 
         .. testcode:: creating-functional-groups-with-the-factory
 
