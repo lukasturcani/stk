@@ -70,10 +70,16 @@ class Amide(GenericFunctionalGroup):
 
         """
 
-        atoms = (carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom)
         GenericFunctionalGroup.__init__(
             self=self,
-            atoms=atoms,
+            atoms=(
+                carbon,
+                oxygen,
+                nitrogen,
+                hydrogen1,
+                hydrogen2,
+                atom,
+            ),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,

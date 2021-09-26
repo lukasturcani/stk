@@ -69,10 +69,9 @@ class Alkene(GenericFunctionalGroup):
 
         """
 
-        atoms = (carbon1, atom1, atom2, carbon2, atom3, atom4)
         GenericFunctionalGroup.__init__(
             self=self,
-            atoms=atoms,
+            atoms=(carbon1, atom1, atom2, carbon2, atom3, atom4),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,

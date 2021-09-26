@@ -62,10 +62,9 @@ class Aldehyde(GenericFunctionalGroup):
 
         """
 
-        atoms = (carbon, oxygen, hydrogen, atom)
         GenericFunctionalGroup.__init__(
             self=self,
-            atoms=atoms,
+            atoms=(carbon, oxygen, hydrogen, atom),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,

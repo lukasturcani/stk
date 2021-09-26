@@ -67,10 +67,9 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
         """
 
-        atoms = (carbon, oxygen1, oxygen2, hydrogen, atom)
         GenericFunctionalGroup.__init__(
             self=self,
-            atoms=atoms,
+            atoms=(carbon, oxygen1, oxygen2, hydrogen, atom),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,
@@ -143,8 +142,8 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> CarboxylicAcid:
+        clone = self._clone()
         clone._carbon = self._carbon
         clone._oxygen1 = self._oxygen1
         clone._oxygen2 = self._oxygen2

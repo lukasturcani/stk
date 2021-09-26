@@ -58,10 +58,9 @@ class Alcohol(GenericFunctionalGroup):
 
         """
 
-        atoms = (oxygen, hydrogen, atom)
         GenericFunctionalGroup.__init__(
             self=self,
-            atoms=atoms,
+            atoms=(oxygen, hydrogen, atom),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,

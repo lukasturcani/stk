@@ -61,10 +61,9 @@ class Alkyne(GenericFunctionalGroup):
 
         """
 
-        atoms = (carbon1, atom1, carbon2, atom2)
         GenericFunctionalGroup.__init__(
             self=self,
-            atoms=atoms,
+            atoms=(carbon1, atom1, carbon2, atom2),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,
