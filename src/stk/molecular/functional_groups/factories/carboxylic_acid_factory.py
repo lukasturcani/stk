@@ -28,8 +28,8 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
         You want to create a building block which has
         :class:`.CarboxylicAcid` functional groups. You want the carbon
         atom in those functional
-        groups to be the *bonder* atom, and the OH group to be a leaving
-        group.
+        groups to be the *bonder* atom, and the OH group to be a
+        leaving group.
 
         .. testcode:: creating-functional-groups-with-the-factory
 
