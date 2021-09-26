@@ -4,9 +4,12 @@ Bromo Factory
 
 """
 
+from typing import Optional, Iterable, Literal
+
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Bromo
+from ...molecule import Molecule
 
 
 class BromoFactory(FunctionalGroupFactory):
@@ -16,57 +19,64 @@ class BromoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][Br]`` functional group string.
 
-    Examples
-    --------
-    *Creating Functional Groups with the Factory*
+    Examples:
 
-    You want to create a building block which has :class:`.Bromo`
-    functional groups. You want the atom bonded to the bromine to be
-    the *bonder* atom, and the bromine atom to be the *deleter* atom.
+        *Creating Functional Groups with the Factory*
 
-    .. testcode:: creating-functional-groups-with-the-factory
+        You want to create a building block which has :class:`.Bromo`
+        functional groups. You want the atom bonded to the bromine to
+        be the *bonder* atom, and the bromine atom to be the *deleter*
+        atom.
 
-        import stk
+        .. testcode:: creating-functional-groups-with-the-factory
 
-        building_block = stk.BuildingBlock(
-            smiles='BrCCCBr',
-            functional_groups=(stk.BromoFactory(), ),
-        )
+            import stk
 
-    .. testcode:: creating-functional-groups-with-the-factory
-        :hide:
+            building_block = stk.BuildingBlock(
+                smiles='BrCCCBr',
+                functional_groups=(stk.BromoFactory(), ),
+            )
 
-        assert all(
-            isinstance(functional_group, stk.Bromo)
-            for functional_group
-            in building_block.get_functional_groups()
-        )
-        assert building_block.get_num_functional_groups() == 2
+        .. testcode:: creating-functional-groups-with-the-factory
+            :hide:
 
-    See Also
-    --------
-    :class:`.GenericFunctionalGroup`
-        Defines *bonders* and  *deleters*.
+            assert all(
+                isinstance(functional_group, stk.Bromo)
+                for functional_group
+                in building_block.get_functional_groups()
+            )
+            assert building_block.get_num_functional_groups() == 2
+
+    See Also:
+
+        :class:`.GenericFunctionalGroup`
+            Defines *bonders* and  *deleters*.
 
     """
 
-    def __init__(self, bonders=(0, ), deleters=(1, ), placers=None):
+    def __init__(
+        self,
+        bonders: tuple[Literal[0, 1], ...] = (0, ),
+        deleters: tuple[Literal[0, 1], ...] = (1, ),
+        placers: Optional[tuple[Literal[0, 1], ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.BromoFactory` instance.
 
-        Parameters
-        ----------
-        bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *bonder* atoms.
+        Parameters:
 
-        deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *deleter* atoms.
+            bonders:
+                The indices of atoms in the functional group string,
+                which are *bonder* atoms.
 
-        placers : :class:`tuple` of :class:`int`, optional
-            The indices of atoms in the functional group string, which
-            are *placer* atoms. If ``None``, `bonders` will be used.
+            deleters:
+                The indices of atoms in the functional group string,
+                which are *deleter* atoms.
+
+            placers:
+                The indices of atoms in the functional group string,
+                which are *placer* atoms. If ``None``, `bonders` will
+                be used.
 
         """
 
@@ -74,8 +84,12 @@ class BromoFactory(FunctionalGroupFactory):
         self._deleters = deleters
         self._placers = bonders if placers is None else placers
 
-    def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[*][Br]', molecule):
+    def get_functional_groups(
+        self,
+        molecule: Molecule,
+    ) -> Iterable[Bromo]:
+
+        for atom_ids in get_atom_ids('[*][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Bromo(
                 bromine=atoms[1],

@@ -1,5 +1,6 @@
 from .topology_graphs import *  # noqa
 from .functional_groups import *  # noqa
+from .molecule import *  # noqa
 from .molecules import *  # noqa
 from .atoms import *  # noqa
 from .bonds import *  # noqa

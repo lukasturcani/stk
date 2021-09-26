@@ -3,28 +3,33 @@ Functional Group Factory Utilities
 ==================================
 
 """
+from typing import Iterable
 
 import rdkit.Chem.AllChem as rdkit
 
+from ...molecule import Molecule
 
-def _get_atom_ids(query, molecule):
+
+def get_atom_ids(
+    query: str,
+    molecule: Molecule,
+) -> Iterable[int]:
     """
     Yield the ids of atoms in `molecule` which match `query`.
 
     Multiple substructures in `molecule` can match `query` and
     therefore each set is yielded as a group.
 
-    Parameters
-    ----------
-    query : :class:`str`
-        A SMARTS string used to query atoms.
+    Parameters:
 
-    molecule : :class:`.Molecule`
-        A molecule whose atoms should be queried.
+        query:
+            A SMARTS string used to query atoms.
 
-    Yields
-    ------
-    :class:`tuple` of :class:`int`
+        molecule:
+            A molecule whose atoms should be queried.
+
+    Yields:
+
         The ids of atoms in `molecule` which match `query`.
 
     """

@@ -4,7 +4,13 @@ Alcohol
 
 """
 
+from __future__ import annotations
+
+from typing import Optional
+
+from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import Atom, O, H
 
 
 class Alcohol(GenericFunctionalGroup):
@@ -18,97 +24,134 @@ class Alcohol(GenericFunctionalGroup):
 
     def __init__(
         self,
-        oxygen,
-        hydrogen,
-        atom,
-        bonders,
-        deleters,
-        placers=None,
-    ):
+        # O is not an ambiguous name.
+        oxygen: O,  # noqa
+        hydrogen: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.Alcohol` instance.
 
-        Parameters
-        ----------
-        oxygen : :class:`.O`
-            The oxygen atom.
+        Parameters:
 
-        hydrogen : :class:`.H`
-            The hydrogen atom.
+            oxygen:
+                The oxygen atom.
 
-        atom : :class:`.Atom`
-            The atom to which the alcohol is attached.
+            hydrogen:
+                The hydrogen atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
+            atom:
+                The atom to which the alcohol is attached.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
-        self._oxygen = oxygen
-        self._hydrogen = hydrogen
-        self._atom = atom
-        atoms = (oxygen, hydrogen, atom)
-        super().__init__(
-            atoms=atoms,
+        GenericFunctionalGroup.__init__(
+            self=self,
+            atoms=(oxygen, hydrogen, atom),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,
         )
+        self._oxygen = oxygen
+        self._hydrogen = hydrogen
+        self._atom = atom
 
-    def get_oxygen(self):
+    # O is not an ambiguous name.
+    def get_oxygen(self) -> O:  # noqa
         """
         Get the oxygen atom.
 
-        Returns
-        -------
-        :class:`.O`
+        Returns:
+
             The oxygen atom.
 
         """
 
         return self._oxygen
 
-    def get_hydrogen(self):
+    def get_hydrogen(self) -> H:
         """
         Get the hydrogen atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
+
             The hydrogen atom.
 
         """
 
         return self._hydrogen
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the atom to which the functional group is attached.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The atom to which the functional group is attached.
 
         """
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> Alcohol:
+        clone = self._clone()
         clone._oxygen = self._oxygen
         clone._hydrogen = self._hydrogen
         clone._atom = self._atom
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Alcohol:
+
+        atom_map = get_atom_map(
+            id_map=id_map,
+            atoms=(
+                *self._atoms,
+                *self._placers,
+                *self._core_atoms,
+                *self._bonders,
+                *self._deleters,
+                self._oxygen,
+                self._hydrogen,
+                self._atom,
+            ),
+        )
+        clone = self.__class__.__new__(self.__class__)
+        clone._atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._atoms
+        )
+        clone._placers = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._placers
+        )
+        clone._core_atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._core_atoms
+        )
+        clone._bonders = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._bonders
+        )
+        clone._deleters = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._deleters
+        )
         clone._oxygen = atom_map.get(
             self._oxygen.get_id(),
             self._oxygen,
@@ -123,7 +166,7 @@ class Alcohol(GenericFunctionalGroup):
         )
         return clone
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._oxygen}, {self._hydrogen}, {self._atom}, '

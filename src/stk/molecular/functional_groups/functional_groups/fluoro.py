@@ -4,7 +4,13 @@ Fluoro
 
 """
 
+from __future__ import annotations
+
+from typing import Optional
+
+from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import F, Atom
 
 
 class Fluoro(GenericFunctionalGroup):
@@ -18,77 +24,112 @@ class Fluoro(GenericFunctionalGroup):
 
     def __init__(
         self,
-        fluorine,
-        atom,
-        bonders,
-        deleters,
-        placers=None,
-    ):
+        fluorine: F,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.Fluoro` instance.
 
-        Parameters
-        ----------
-        fluorine : :class:`.F`
-            The ``[fluorine]`` atom.
+        Parameters:
 
-        atom : :class:`.Atom`
-            The ``[atom]`` atom.
+            fluorine:
+                The ``[fluorine]`` atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
+            atom:
+                The ``[atom]`` atom.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
-        self._fluorine = fluorine
-        self._atom = atom
-        super().__init__(
+        GenericFunctionalGroup.__init__(
+            self=self,
             atoms=(fluorine, atom),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,
         )
+        self._fluorine = fluorine
+        self._atom = atom
 
-    def get_fluorine(self):
+    def get_fluorine(self) -> F:
         """
         Get the ``[fluorine]`` atom.
 
-        Returns
-        -------
-        :class:`.F`
+        Returns:
+
             The ``[fluorine]`` atom.
 
         """
 
         return self._fluorine
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The ``[atom]`` atom.
 
         """
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> Fluoro:
+        clone = self._clone()
         clone._fluorine = self._fluorine
         clone._atom = self._atom
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Fluoro:
+        atom_map = get_atom_map(
+            id_map=id_map,
+            atoms=(
+                *self._atoms,
+                *self._placers,
+                *self._core_atoms,
+                *self._bonders,
+                *self._deleters,
+                self._atom,
+                self._fluorine,
+            ),
+        )
+        clone = self.__class__.__new__(self.__class__)
+        clone._atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._atoms
+        )
+        clone._placers = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._placers
+        )
+        clone._core_atoms = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._core_atoms
+        )
+        clone._bonders = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._bonders
+        )
+        clone._deleters = tuple(
+            atom_map.get(atom.get_id(), atom)
+            for atom in self._deleters
+        )
         clone._fluorine = atom_map.get(
             self._fluorine.get_id(),
             self._fluorine,
@@ -99,7 +140,7 @@ class Fluoro(GenericFunctionalGroup):
         )
         return clone
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._fluorine}, {self._atom}, '
