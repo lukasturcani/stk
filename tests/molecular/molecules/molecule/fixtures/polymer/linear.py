@@ -64,6 +64,30 @@ from ...case_data import CaseData
             smiles='BrC1=C(Br)N=[C+]1',
             name=name,
         ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='AB',
+                    num_repeating_units=3,
+                ),
+            ),
+            smiles=(
+                '[H]C([H])(Br)C([H])([H])C([H])([H])C([H])([H])C([H])('
+                '[H])C([H])([H])C([H])([H])C([H])([H])C([H])([H])C([H]'
+                ')([H])C([H])([H])C([H])([H])Br'
+            ),
+            name=name,
+        ),
     ),
 )
 def polymer_linear(request) -> CaseData:

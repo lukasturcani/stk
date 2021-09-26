@@ -290,14 +290,6 @@ class UnaligningVertex(_CageVertex):
 
     """
 
-    def __init__(self, vertex):
-        super().__init__(
-            id=vertex.get_id(),
-            position=vertex.get_position(),
-            use_neighbor_placement=vertex.use_neighbor_placement(),
-            aligner_edge=vertex.get_aligner_edge()
-        )
-
     def place_building_block(self, building_block, edges):
         return building_block.with_centroid(
             position=self._position,
