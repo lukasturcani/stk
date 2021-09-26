@@ -138,7 +138,7 @@ class AlcoholFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[Molecule]:
+    ) -> Iterable[Alcohol]:
 
         for atom_ids in _get_atom_ids('[*][O][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))

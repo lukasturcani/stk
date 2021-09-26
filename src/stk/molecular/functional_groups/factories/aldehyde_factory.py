@@ -136,7 +136,7 @@ class AldehydeFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[Molecule]:
+    ) -> Iterable[Aldehyde]:
 
         for atom_ids in _get_atom_ids('[*][C](=[O])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
