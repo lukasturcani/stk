@@ -7,7 +7,7 @@ Amide Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Amide
 from ...molecule import Molecule
 
@@ -138,7 +138,7 @@ class AmideFactory(FunctionalGroupFactory):
         self,
         molecule: Molecule,
     ) -> Iterable[Amide]:
-        ids = _get_atom_ids('[*][C](=[O])[N]([H])[H]', molecule)
+        ids = get_atom_ids('[*][C](=[O])[N]([H])[H]', molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Amide(

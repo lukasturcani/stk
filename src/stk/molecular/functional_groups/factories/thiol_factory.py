@@ -7,7 +7,7 @@ Thiol Factory
 from typing import Optional, Iterable, Literal
 
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from .utilities import get_atom_ids
 from ..functional_groups import Thiol
 from ...molecule import Molecule
 
@@ -140,7 +140,7 @@ class ThiolFactory(FunctionalGroupFactory):
         molecule: Molecule,
     ) -> Iterable[Thiol]:
 
-        for atom_ids in _get_atom_ids('[*][S][H]', molecule):
+        for atom_ids in get_atom_ids('[*][S][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Thiol(
                 sulfur=atoms[1],
