@@ -4,9 +4,15 @@ Difluoro Factory
 
 """
 
+from typing import Optional, Iterable, Literal
+
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import _get_atom_ids
 from ..functional_groups import Difluoro
+from ...molecule import Molecule
+
+
+ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
 
 
 class DifluoroFactory(FunctionalGroupFactory):
@@ -16,103 +22,109 @@ class DifluoroFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[F][#6]~[#6][F]`` functional group string.
 
-    Examples
-    --------
-    *Creating Functional Groups with the Factory*
+    Examples:
 
-    You want to create a building block which has :class:`.Difluoro`
-    functional groups. You want the non-fluorine atoms in those
-    functional groups to be the *bonder* atoms, and the fluorine atoms
-    to be the *deleter* atoms.
+        *Creating Functional Groups with the Factory*
 
-    .. testcode:: creating-functional-groups-with-the-factory
+        You want to create a building block which has
+        :class:`.Difluoro` functional groups. You want the non-fluorine
+        atoms in those functional groups to be the *bonder* atoms, and
+        the fluorine atoms to be the *deleter* atoms.
 
-        import stk
+        .. testcode:: creating-functional-groups-with-the-factory
 
-        building_block = stk.BuildingBlock(
-            smiles='FCC(F)CCC',
-            functional_groups=(stk.DifluoroFactory(), ),
-        )
+            import stk
 
-    .. testcode:: creating-functional-groups-with-the-factory
-        :hide:
+            building_block = stk.BuildingBlock(
+                smiles='FCC(F)CCC',
+                functional_groups=(stk.DifluoroFactory(), ),
+            )
 
-        assert all(
-            isinstance(functional_group, stk.Difluoro)
-            for functional_group
-            in building_block.get_functional_groups()
-        )
-        assert building_block.get_num_functional_groups() == 1
+        .. testcode:: creating-functional-groups-with-the-factory
+            :hide:
 
-    *Changing the Bonder and Deleter Atoms*
+            assert all(
+                isinstance(functional_group, stk.Difluoro)
+                for functional_group
+                in building_block.get_functional_groups()
+            )
+            assert building_block.get_num_functional_groups() == 1
 
-    You want to create a building block which has :class:`.Difluoro`
-    functional groups, You want only one of non-fluorine atoms to be
-    a *bonder* atom and its neighboring fluorine atom to be a
-    *deleter* atom.
+        *Changing the Bonder and Deleter Atoms*
 
-    .. testcode:: changing-the-bonder-and-deleter-atoms
+        You want to create a building block which has
+        :class:`.Difluoro` functional groups, You want only one of
+        non-fluorine atoms to be a *bonder* atom and its neighboring
+        fluorine atom to be a *deleter* atom.
 
-        import stk
+        .. testcode:: changing-the-bonder-and-deleter-atoms
 
-        difluoro_factory = stk.DifluoroFactory(
-            # The index of one of the non-fluorine atoms in the
-            # functional group string (see docstring) is 1.
-            bonders=(1, ),
-            # The neighboring fluorine atom has an index of 0.
-            deleters=(0, ),
-        )
-        building_block = stk.BuildingBlock(
-            smiles='FCC(F)CCC',
-            functional_groups=(difluoro_factory, ),
-        )
+            import stk
 
-    .. testcode:: changing-the-bonder-and-deleter-atoms
-        :hide:
+            difluoro_factory = stk.DifluoroFactory(
+                # The index of one of the non-fluorine atoms in the
+                # functional group string (see docstring) is 1.
+                bonders=(1, ),
+                # The neighboring fluorine atom has an index of 0.
+                deleters=(0, ),
+            )
+            building_block = stk.BuildingBlock(
+                smiles='FCC(F)CCC',
+                functional_groups=(difluoro_factory, ),
+            )
 
-        fg, = building_block.get_functional_groups()
-        assert fg.get_num_bonders() == 1
-        assert sum(1 for _ in fg.get_deleters()) == 1
+        .. testcode:: changing-the-bonder-and-deleter-atoms
+            :hide:
 
-        assert all(
-            isinstance(atom, stk.C)
-            for functional_group
-            in building_block.get_functional_groups()
-            for atom
-            in functional_group.get_bonders()
-        )
-        assert all(
-            isinstance(atom, stk.F)
-            for functional_group
-            in building_block.get_functional_groups()
-            for atom
-            in functional_group.get_deleters()
-        )
+            fg, = building_block.get_functional_groups()
+            assert fg.get_num_bonders() == 1
+            assert sum(1 for _ in fg.get_deleters()) == 1
 
-    See Also
-    --------
-    :class:`.GenericFunctionalGroup`
-        Defines *bonders* and  *deleters*.
+            assert all(
+                isinstance(atom, stk.C)
+                for functional_group
+                in building_block.get_functional_groups()
+                for atom
+                in functional_group.get_bonders()
+            )
+            assert all(
+                isinstance(atom, stk.F)
+                for functional_group
+                in building_block.get_functional_groups()
+                for atom
+                in functional_group.get_deleters()
+            )
+
+    See Also:
+
+        :class:`.GenericFunctionalGroup`
+            Defines *bonders* and  *deleters*.
 
     """
 
-    def __init__(self, bonders=(1, 2), deleters=(0, 3), placers=None):
+    def __init__(
+        self,
+        bonders: ValidIndices = (1, 2),
+        deleters: ValidIndices = (0, 3),
+        placers: Optional[ValidIndices] = None,
+    ) -> None:
         """
         Initialize a :class:`.DifluoroFactory` instance.
 
-        Parameters
-        ----------
-        bonders : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *bonder* atoms.
+        Parameters:
 
-        deleters : :class:`tuple` of :class:`int`
-            The indices of atoms in the functional group string, which
-            are *deleter* atoms.
+            bonders:
+                The indices of atoms in the functional group string,
+                which are *bonder* atoms.
 
-        placers : :class:`tuple` of :class:`int`, optional
-            The indices of atoms in the functional group string, which
-            are *placer* atoms. If ``None``, `bonders` will be used.
+            deleters:
+                The indices of atoms in the functional group string,
+                which are *deleter* atoms.
+
+            placers:
+                The indices of atoms in the functional group string,
+                which are *placer* atoms. If ``None``, `bonders` will
+                be used.
 
         """
 
@@ -120,7 +132,10 @@ class DifluoroFactory(FunctionalGroupFactory):
         self._deleters = deleters
         self._placers = bonders if placers is None else placers
 
-    def get_functional_groups(self, molecule):
+    def get_functional_groups(
+        self,
+        molecule: Molecule,
+    ) -> Iterable[Difluoro]:
         for atom_ids in _get_atom_ids('[F][#6]~[#6][F]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Difluoro(
