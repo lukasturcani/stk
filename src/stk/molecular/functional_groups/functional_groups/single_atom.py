@@ -65,7 +65,6 @@ class SingleAtom(GenericFunctionalGroup):
                 *self._core_atoms,
                 *self._bonders,
                 *self._deleters,
-                self._bromine,
                 self._atom,
             ),
         )

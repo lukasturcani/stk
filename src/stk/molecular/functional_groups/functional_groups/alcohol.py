@@ -153,16 +153,16 @@ class Alcohol(GenericFunctionalGroup):
             for atom in self._deleters
         )
         clone._oxygen = atom_map.get(
-            clone._oxygen.get_id(),
-            clone._oxygen,
+            self._oxygen.get_id(),
+            self._oxygen,
         )
         clone._hydrogen = atom_map.get(
-            clone._hydrogen.get_id(),
-            clone._hydrogen,
+            self._hydrogen.get_id(),
+            self._hydrogen,
         )
         clone._atom = atom_map.get(
-            clone._atom.get_id(),
-            clone._atom,
+            self._atom.get_id(),
+            self._atom,
         )
         return clone
 

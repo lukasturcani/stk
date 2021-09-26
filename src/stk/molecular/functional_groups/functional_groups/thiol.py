@@ -125,10 +125,9 @@ class Thiol(GenericFunctionalGroup):
                 *self._core_atoms,
                 *self._bonders,
                 *self._deleters,
-                self._nitrogen,
+                self._sulfur,
                 self._hydrogen,
-                self._atom1,
-                self._atom2,
+                self._atom,
             ),
         )
         clone = self.__class__.__new__(self.__class__)
