@@ -62,7 +62,7 @@ information.
 from __future__ import annotations
 
 from typing import TypeVar
-import collections.abc as abc
+from collections import abc
 
 from .utilities import get_atom_map
 from ...atoms import Atom

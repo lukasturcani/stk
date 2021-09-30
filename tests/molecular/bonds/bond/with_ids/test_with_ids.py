@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import stk
+from collections import abc
 
-from typing import Callable
 
 
 def test_with_ids(
     bond: stk.Bond,
-    get_id_map: Callable[[stk.Bond], dict[int, int]],
+    get_id_map: abc.Callable[[stk.Bond], dict[int, int]],
 ) -> None:
     """
     Test :meth:`.Bond.with_ids`.

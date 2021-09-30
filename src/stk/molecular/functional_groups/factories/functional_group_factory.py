@@ -68,7 +68,7 @@ stk.molecular.functional_groups.factories.thiol_factory\
 
 from __future__ import annotations
 
-import collections.abc as abc
+from collections import abc
 
 from ..functional_groups import FunctionalGroup
 from ...molecule import Molecule

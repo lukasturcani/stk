@@ -7,7 +7,7 @@ Fluoro Factory
 from __future__ import annotations
 
 from typing import Optional, Literal
-import collections.abc as abc
+from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids

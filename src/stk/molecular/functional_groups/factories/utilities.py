@@ -4,7 +4,7 @@ Functional Group Factory Utilities
 
 """
 
-import collections.abc as abc
+from collections import abc
 import rdkit.Chem.AllChem as rdkit
 
 from ...molecule import Molecule

@@ -18,7 +18,7 @@ from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
 import typing
 import pathlib
-import collections.abc as abc
+from collections import abc
 
 from stk.utilities import (
     vector_angle,
