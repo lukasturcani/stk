@@ -4,8 +4,10 @@ Terminal Alkyne Factory
 
 """
 
+from __future__ import annotations
 
-from typing import Optional, Iterable, Literal
+from typing import Optional, Literal
+import collections.abc as abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
@@ -130,7 +132,7 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[Alkyne]:
+    ) -> abc.Iterable[Alkyne]:
 
         for atom_ids in get_atom_ids('[*][C]#[C][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))

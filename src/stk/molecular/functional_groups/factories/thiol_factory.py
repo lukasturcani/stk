@@ -4,7 +4,10 @@ Thiol Factory
 
 """
 
-from typing import Optional, Iterable, Literal
+from __future__ import annotations
+
+from typing import Optional, Literal
+import collections.abc as abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
@@ -138,7 +141,7 @@ class ThiolFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[Thiol]:
+    ) -> abc.Iterable[Thiol]:
 
         for atom_ids in get_atom_ids('[*][S][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))

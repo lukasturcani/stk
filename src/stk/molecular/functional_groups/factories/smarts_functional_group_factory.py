@@ -4,7 +4,10 @@ SMARTS Functional Group Factory
 
 """
 
-from typing import Optional, Iterable
+from __future__ import annotations
+
+from typing import Optional
+import collections.abc as abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
@@ -109,7 +112,7 @@ class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[GenericFunctionalGroup]:
+    ) -> abc.Iterable[GenericFunctionalGroup]:
 
         for atom_ids in get_atom_ids(self._smarts, molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))

@@ -18,6 +18,7 @@ from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
 import typing
 import pathlib
+import collections.abc as abc
 
 from stk.utilities import (
     vector_angle,
@@ -35,7 +36,7 @@ from ..molecular_utilities import (
 _T = typing.TypeVar('_T', bound='Molecule')
 
 T = typing.TypeVar('T')
-OneOrMany = typing.Union[T, typing.Iterable[T]]
+OneOrMany = typing.Union[T, abc.Iterable[T]]
 
 
 class Molecule:
@@ -428,7 +429,7 @@ class Molecule:
     def get_atomic_positions(
         self,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> typing.Iterable[np.ndarray]:
+    ) -> abc.Iterable[np.ndarray]:
         """
         Yield the positions of atoms.
 
@@ -460,7 +461,7 @@ class Molecule:
     def get_atoms(
         self,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> typing.Iterable[Atom]:
+    ) -> abc.Iterable[Atom]:
         """
         Yield the atoms in the molecule, ordered by id.
 
@@ -497,7 +498,7 @@ class Molecule:
 
         return len(self._atoms)
 
-    def get_bonds(self) -> typing.Iterable[Bond]:
+    def get_bonds(self) -> abc.Iterable[Bond]:
         """
         Yield the bond in the molecule.
 

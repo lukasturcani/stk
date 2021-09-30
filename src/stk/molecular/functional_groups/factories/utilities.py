@@ -3,8 +3,8 @@ Functional Group Factory Utilities
 ==================================
 
 """
-from typing import Iterable
 
+import collections.abc as abc
 import rdkit.Chem.AllChem as rdkit
 
 from ...molecule import Molecule
@@ -13,7 +13,7 @@ from ...molecule import Molecule
 def get_atom_ids(
     query: str,
     molecule: Molecule,
-) -> Iterable[int]:
+) -> abc.Iterable[int]:
     """
     Yield the ids of atoms in `molecule` which match `query`.
 

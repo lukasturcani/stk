@@ -4,7 +4,10 @@ Boronic Acid Factory
 
 """
 
-from typing import Optional, Iterable, Literal
+from __future__ import annotations
+
+from typing import Optional, Literal
+import collections.abc as abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
@@ -139,7 +142,7 @@ class BoronicAcidFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[BoronicAcid]:
+    ) -> abc.Iterable[BoronicAcid]:
         ids = get_atom_ids('[*][B]([O][H])[O][H]', molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))

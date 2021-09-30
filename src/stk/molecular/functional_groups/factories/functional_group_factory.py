@@ -68,7 +68,7 @@ stk.molecular.functional_groups.factories.thiol_factory\
 
 from __future__ import annotations
 
-from typing import Iterable
+import collections.abc as abc
 
 from ..functional_groups import FunctionalGroup
 from ...molecule import Molecule
@@ -162,7 +162,7 @@ class FunctionalGroupFactory:
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[FunctionalGroup]:
+    ) -> abc.Iterable[FunctionalGroup]:
         """
         Yield functional groups in `molecule`.
 

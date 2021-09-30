@@ -4,8 +4,10 @@ Aldehyde Factory
 
 """
 
+from __future__ import annotations
 
-from typing import Iterable, Literal, Optional
+from typing import Literal, Optional
+import collections.abc as abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
@@ -136,7 +138,7 @@ class AldehydeFactory(FunctionalGroupFactory):
     def get_functional_groups(
         self,
         molecule: Molecule,
-    ) -> Iterable[Aldehyde]:
+    ) -> abc.Iterable[Aldehyde]:
 
         for atom_ids in get_atom_ids('[*][C](=[O])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
