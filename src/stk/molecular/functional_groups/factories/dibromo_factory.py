@@ -6,15 +6,16 @@ Dibromo Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Dibromo
 from ...molecule import Molecule
+from ...atoms import elements
 
-ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
+ValidIndex = typing.Literal[0, 1, 2, 3]
 
 
 class DibromoFactory(FunctionalGroupFactory):
@@ -106,9 +107,9 @@ class DibromoFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, 2),
-        deleters: ValidIndices = (0, 3),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (1, 2),
+        deleters: tuple[ValidIndex, ...] = (0, 3),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.DibromoFactory` instance.
@@ -143,9 +144,9 @@ class DibromoFactory(FunctionalGroupFactory):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Dibromo(
                 atom1=atoms[1],
-                bromine1=atoms[0],
+                bromine1=typing.cast(elements.Br, atoms[0]),
                 atom2=atoms[2],
-                bromine2=atoms[3],
+                bromine2=typing.cast(elements.Br, atoms[3]),
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
                 placers=tuple(atoms[i] for i in self._placers),

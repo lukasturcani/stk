@@ -6,17 +6,17 @@ Diol Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Diol
-
 from ...molecule import Molecule
+from ...atoms import elements
 
 
-ValidIndices = tuple[Literal[0, 1, 2, 3, 4, 5], ...]
+ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
 
 
 class DiolFactory(FunctionalGroupFactory):
@@ -108,9 +108,9 @@ class DiolFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (2, 3),
-        deleters: ValidIndices = (0, 1, 4, 5),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (2, 3),
+        deleters: tuple[ValidIndex, ...] = (0, 1, 4, 5),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.DiolFactory` instance.
@@ -145,12 +145,12 @@ class DiolFactory(FunctionalGroupFactory):
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Diol(
-                hydrogen1=atoms[0],
-                oxygen1=atoms[1],
+                hydrogen1=typing.cast(elements.H, atoms[0]),
+                oxygen1=typing.cast(elements.O, atoms[1]),
                 atom1=atoms[2],
                 atom2=atoms[3],
-                oxygen2=atoms[4],
-                hydrogen2=atoms[5],
+                oxygen2=typing.cast(elements.O, atoms[4]),
+                hydrogen2=typing.cast(elements.H, atoms[5]),
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
                 placers=tuple(atoms[i] for i in self._placers),

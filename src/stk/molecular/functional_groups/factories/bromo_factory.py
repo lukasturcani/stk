@@ -6,13 +6,17 @@ Bromo Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Bromo
 from ...molecule import Molecule
+from ...atoms import elements
+
+
+ValidIndex = typing.Literal[0, 1]
 
 
 class BromoFactory(FunctionalGroupFactory):
@@ -59,9 +63,9 @@ class BromoFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: tuple[Literal[0, 1], ...] = (0, ),
-        deleters: tuple[Literal[0, 1], ...] = (1, ),
-        placers: Optional[tuple[Literal[0, 1], ...]] = None,
+        bonders: tuple[ValidIndex, ...] = (0, ),
+        deleters: tuple[ValidIndex, ...] = (1, ),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.BromoFactory` instance.
@@ -95,7 +99,7 @@ class BromoFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[*][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Bromo(
-                bromine=atoms[1],
+                bromine=typing.cast(elements.Br, atoms[1]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

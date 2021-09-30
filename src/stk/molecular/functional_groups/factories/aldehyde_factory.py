@@ -6,13 +6,17 @@ Aldehyde Factory
 
 from __future__ import annotations
 
-from typing import Literal, Optional
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Aldehyde
 from ...molecule import Molecule
+from ...atoms import elements
+
+
+ValidIndex = typing.Literal[0, 1, 2, 3]
 
 
 class AldehydeFactory(FunctionalGroupFactory):
@@ -107,9 +111,9 @@ class AldehydeFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: tuple[Literal[0, 1, 2, 3], ...] = (1, ),
-        deleters: tuple[Literal[0, 1, 2, 3], ...] = (2, ),
-        placers: Optional[tuple[Literal[0, 1, 2, 3], ...]] = None,
+        bonders: tuple[ValidIndex, ...] = (1, ),
+        deleters: tuple[ValidIndex, ...] = (2, ),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.AldehydeFactory` instance.
@@ -143,9 +147,9 @@ class AldehydeFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[*][C](=[O])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Aldehyde(
-                carbon=atoms[1],
-                oxygen=atoms[2],
-                hydrogen=atoms[3],
+                carbon=typing.cast(elements.C, atoms[1]),
+                oxygen=typing.cast(elements.O, atoms[2]),
+                hydrogen=typing.cast(elements.H, atoms[3]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
