@@ -7,7 +7,8 @@ Generic Functional Group
 
 from __future__ import annotations
 
-from typing import TypeVar, Optional, Iterable
+from typing import TypeVar, Optional
+from collections import abc
 
 from ...atoms import Atom
 from .functional_group import FunctionalGroup
@@ -145,7 +146,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return clone
 
-    def get_bonders(self) -> Iterable[Atom]:
+    def get_bonders(self) -> abc.Iterable[Atom]:
         """
         Yield bonder atoms in the functional group.
 
@@ -172,7 +173,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         return len(self._bonders)
 
-    def get_bonder_ids(self) -> Iterable[int]:
+    def get_bonder_ids(self) -> abc.Iterable[int]:
         """
         Yield the ids of bonder atoms.
 
@@ -184,7 +185,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         yield from (a.get_id() for a in self._bonders)
 
-    def get_deleters(self) -> Iterable[Atom]:
+    def get_deleters(self) -> abc.Iterable[Atom]:
         """
         Yield the deleter atoms in the functional group.
 
@@ -199,7 +200,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         yield from self._deleters
 
-    def get_deleter_ids(self) -> Iterable[int]:
+    def get_deleter_ids(self) -> abc.Iterable[int]:
         """
         Yield the ids of deleter atoms.
 

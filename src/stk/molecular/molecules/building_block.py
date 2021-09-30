@@ -12,7 +12,8 @@ import os
 import rdkit.Chem.AllChem as rdkit
 from functools import partial
 import numpy as np
-from typing import Optional, Union, Iterable, Iterator
+from typing import Optional, Union, Iterator
+from collections import abc
 from collections.abc import Collection
 
 from ..functional_groups import FunctionalGroup
@@ -667,7 +668,7 @@ class BuildingBlock(Molecule):
 
     def _get_core_ids(
         self,
-        functional_groups: Iterable[FunctionalGroup],
+        functional_groups: abc.Iterable[FunctionalGroup],
     ) -> Iterator[int]:
         """
         Get the final *core* ids.
@@ -796,8 +797,8 @@ class BuildingBlock(Molecule):
 
     def get_functional_groups(
         self,
-        fg_ids: Optional[Union[int, Iterable[int]]] = None,
-    ) -> Iterable[FunctionalGroup]:
+        fg_ids: Optional[Union[int, abc.Iterable[int]]] = None,
+    ) -> abc.Iterable[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
 

@@ -6,14 +6,14 @@ Function Group Utilities
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections import abc
 
 from ...atoms import Atom
 
 
 def get_atom_map(
     id_map: dict[int, int],
-    atoms: Iterable[Atom],
+    atoms: abc.Iterable[Atom],
 ) -> dict[int, Atom]:
     """
     Get an atom map from an `id_map`.

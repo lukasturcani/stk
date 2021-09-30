@@ -61,7 +61,8 @@ information.
 
 from __future__ import annotations
 
-from typing import Iterable, TypeVar
+from typing import TypeVar
+import collections.abc as abc
 
 from .utilities import get_atom_map
 from ...atoms import Atom
@@ -269,7 +270,7 @@ class FunctionalGroup:
         self._placers = placers
         self._core_atoms = core_atoms
 
-    def get_atoms(self) -> Iterable[Atom]:
+    def get_atoms(self) -> abc.Iterable[Atom]:
         """
         Yield all the atoms in the functional group.
 
@@ -281,7 +282,7 @@ class FunctionalGroup:
 
         yield from self._atoms
 
-    def get_atom_ids(self) -> Iterable[int]:
+    def get_atom_ids(self) -> abc.Iterable[int]:
         """
         Yield the ids of all atoms in the functional group.
 
@@ -293,7 +294,7 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._atoms)
 
-    def get_placer_ids(self) -> Iterable[int]:
+    def get_placer_ids(self) -> abc.Iterable[int]:
         """
         Yield the ids of *placer* atoms.
 
@@ -308,7 +309,7 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._placers)
 
-    def get_core_atom_ids(self) -> Iterable[int]:
+    def get_core_atom_ids(self) -> abc.Iterable[int]:
         """
         Yield the ids of core atoms held by the functional group.
 

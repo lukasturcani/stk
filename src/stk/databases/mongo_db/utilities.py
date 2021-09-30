@@ -4,8 +4,10 @@ MongoDB Utilities
 
 """
 
-from collections.abc import Sequence
-from typing import Iterable, Optional
+from __future__ import annotations
+
+from collections.abc import Sequence, Iterable
+from typing import Optional
 
 
 class HashableDict(dict):
@@ -56,3 +58,4 @@ def get_any_value(
     for key in keys:
         if key in mapping and len(mapping[key]) > 0:
             return mapping[key][0]
+    return None
