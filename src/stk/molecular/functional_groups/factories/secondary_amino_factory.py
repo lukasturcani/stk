@@ -6,15 +6,16 @@ Secondary Amino Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import SecondaryAmino
 from ...molecule import Molecule
+from ...atoms import elements
 
-ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
+ValidIndex = typing.Literal[0, 1, 2, 3]
 
 
 class SecondaryAminoFactory(FunctionalGroupFactory):
@@ -107,9 +108,9 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (0, ),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (1, ),
+        deleters: tuple[ValidIndex, ...] = (0, ),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.SecondaryAminoFactory` instance.
@@ -142,8 +143,8 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[H][N]([#6])[#6]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield SecondaryAmino(
-                nitrogen=atoms[1],
-                hydrogen=atoms[0],
+                nitrogen=typing.cast(elements.N, atoms[1]),
+                hydrogen=typing.cast(elements.H, atoms[0]),
                 atom1=atoms[2],
                 atom2=atoms[3],
                 bonders=tuple(atoms[i] for i in self._bonders),

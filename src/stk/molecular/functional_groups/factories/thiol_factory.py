@@ -6,15 +6,16 @@ Thiol Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Thiol
+from ...atoms import elements
 from ...molecule import Molecule
 
-ValidIndices = tuple[Literal[0, 1, 2], ...]
+ValidIndex = typing.Literal[0, 1, 2]
 
 
 class ThiolFactory(FunctionalGroupFactory):
@@ -110,9 +111,9 @@ class ThiolFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (2, ),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (1, ),
+        deleters: tuple[ValidIndex, ...] = (2, ),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.ThiolFactory` instance.
@@ -146,8 +147,8 @@ class ThiolFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[*][S][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Thiol(
-                sulfur=atoms[1],
-                hydrogen=atoms[2],
+                sulfur=typing.cast(elements.S, atoms[1]),
+                hydrogen=typing.cast(elements.H, atoms[2]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

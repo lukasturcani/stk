@@ -6,12 +6,14 @@ Ring Amine Factory
 
 from __future__ import annotations
 
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import RingAmine
 from ...molecule import Molecule
+from ...atoms import elements
 
 
 class RingAmineFactory(FunctionalGroupFactory):
@@ -45,11 +47,11 @@ class RingAmineFactory(FunctionalGroupFactory):
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield RingAmine(
-                nitrogen=atoms[0],
-                hydrogen1=atoms[1],
-                hydrogen2=atoms[2],
-                carbon1=atoms[3],
-                carbon2=atoms[4],
-                hydrogen3=atoms[5],
-                carbon3=atoms[6],
+                nitrogen=typing.cast(elements.N, atoms[0]),
+                hydrogen1=typing.cast(elements.H, atoms[1]),
+                hydrogen2=typing.cast(elements.H, atoms[2]),
+                carbon1=typing.cast(elements.C, atoms[3]),
+                carbon2=typing.cast(elements.C, atoms[4]),
+                hydrogen3=typing.cast(elements.H, atoms[5]),
+                carbon3=typing.cast(elements.C, atoms[6]),
             )

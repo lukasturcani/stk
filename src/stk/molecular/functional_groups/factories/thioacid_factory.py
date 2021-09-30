@@ -6,15 +6,16 @@ Thioacid Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Thioacid
 from ...molecule import Molecule
+from ...atoms import elements
 
-ValidIndices = tuple[Literal[0, 1, 2, 3, 4], ...]
+ValidIndex = typing.Literal[0, 1, 2, 3, 4]
 
 
 class ThioacidFactory(FunctionalGroupFactory):
@@ -109,9 +110,9 @@ class ThioacidFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (3, 4),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (1, ),
+        deleters: tuple[ValidIndex, ...] = (3, 4),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.ThioacidFactory` instance.
@@ -140,10 +141,10 @@ class ThioacidFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[*][C](=[O])[S][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Thioacid(
-                carbon=atoms[1],
-                oxygen=atoms[2],
-                sulfur=atoms[3],
-                hydrogen=atoms[4],
+                carbon=typing.cast(elements.C, atoms[1]),
+                oxygen=typing.cast(elements.O, atoms[2]),
+                sulfur=typing.cast(elements.S, atoms[3]),
+                hydrogen=typing.cast(elements.H, atoms[4]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

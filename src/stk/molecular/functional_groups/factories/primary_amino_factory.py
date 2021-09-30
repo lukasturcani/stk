@@ -6,15 +6,16 @@ Primary Amino Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import PrimaryAmino
 from ...molecule import Molecule
+from ...atoms import elements
 
-ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
+ValidIndex = typing.Literal[0, 1, 2, 3]
 
 
 class PrimaryAminoFactory(FunctionalGroupFactory):
@@ -110,9 +111,9 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (2, 3),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (1, ),
+        deleters: tuple[ValidIndex, ...] = (2, 3),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.PrimaryAminoFactory` instance.
@@ -146,9 +147,9 @@ class PrimaryAminoFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[*][N]([H])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield PrimaryAmino(
-                nitrogen=atoms[1],
-                hydrogen1=atoms[2],
-                hydrogen2=atoms[3],
+                nitrogen=typing.cast(elements.N, atoms[1]),
+                hydrogen1=typing.cast(elements.H, atoms[2]),
+                hydrogen2=typing.cast(elements.H, atoms[3]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

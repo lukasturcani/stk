@@ -6,16 +6,17 @@ Terminal Alkene Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Alkene
 from ...molecule import Molecule
+from ...atoms import elements
 
 
-ValidIndices = tuple[Literal[0, 1, 2, 3, 4, 5], ...]
+ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
 
 
 class TerminalAlkeneFactory(FunctionalGroupFactory):
@@ -104,9 +105,9 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (3, 4, 5),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (1, ),
+        deleters: tuple[ValidIndex, ...] = (3, 4, 5),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.TerminalAlkeneFactory` instance.
@@ -141,10 +142,10 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Alkene(
-                carbon1=atoms[1],
+                carbon1=typing.cast(elements.C, atoms[1]),
                 atom1=atoms[0],
                 atom2=atoms[2],
-                carbon2=atoms[3],
+                carbon2=typing.cast(elements.C, atoms[3]),
                 atom3=atoms[4],
                 atom4=atoms[5],
                 bonders=tuple(atoms[i] for i in self._bonders),

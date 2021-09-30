@@ -6,15 +6,16 @@ Iodo Factory
 
 from __future__ import annotations
 
-from typing import Optional, Literal
+import typing
 from collections import abc
 
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Iodo
 from ...molecule import Molecule
+from ...atoms import elements
 
-ValidIndices = tuple[Literal[0, 1], ...]
+ValidIndex = typing.Literal[0, 1]
 
 
 class IodoFactory(FunctionalGroupFactory):
@@ -61,9 +62,9 @@ class IodoFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (0, ),
-        deleters: ValidIndices = (1, ),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[ValidIndex, ...] = (0, ),
+        deleters: tuple[ValidIndex, ...] = (1, ),
+        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.IodoFactory` instance.
@@ -97,7 +98,7 @@ class IodoFactory(FunctionalGroupFactory):
         for atom_ids in get_atom_ids('[*][I]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Iodo(
-                iodine=atoms[1],
+                iodine=typing.cast(elements.I, atoms[1]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
