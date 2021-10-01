@@ -4,7 +4,6 @@ import stk
 from collections import abc
 
 
-
 def test_with_ids(
     bond: stk.Bond,
     get_id_map: abc.Callable[[stk.Bond], dict[int, int]],
