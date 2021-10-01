@@ -12,6 +12,7 @@ Molecule
 
 from __future__ import annotations
 
+import functools
 import os
 import numpy as np
 from scipy.spatial.distance import euclidean
@@ -832,20 +833,38 @@ class Molecule:
 
             A clone with atomic positions found in `path`.
 
+        Raises:
+
+            :class:`RuntimeError`:
+                If the number of atoms in the file does not match the
+                number of atoms in the molecule.
+
         """
 
         path = str(path)
         if extension is None:
             _, extension = os.path.splitext(path)
 
-        return {
-            '.mol': updaters._with_structure_from_mol,
-            '.sdf': updaters._with_structure_from_mol,
-            '.mae': updaters._with_structure_from_mae,
-            '.xyz': updaters._with_structure_from_xyz,
-            '.coord': updaters._with_structure_from_turbomole,
-            '.pdb': updaters._with_structure_from_pdb,
-        }[extension](self.clone(), path)
+        position_matrix = {
+            '.mol': updaters.get_position_matrix_from_mol,
+            '.sdf': updaters.get_position_matrix_from_mol,
+            '.mae': updaters.get_position_matrix_from_mae,
+            '.xyz': updaters.get_position_matrix_from_xyz,
+            '.coord': functools.partial(
+                updaters.get_position_matrix_from_turbomole,
+                len(self._atoms),
+            ),
+            '.pdb': updaters.get_position_matrix_from_pdb,
+        }[extension](path)
+
+        if len(position_matrix) != len(self._atoms):
+            raise RuntimeError(
+                f'The number of atoms in {path}, '
+                f'{len(position_matrix)}, does not match the number '
+                f'of atoms in the molecule, {len(self._atoms)}.'
+            )
+
+        return self.clone()._with_position_matrix(position_matrix)
 
     def with_canonical_atom_ordering(self) -> Molecule:
         """

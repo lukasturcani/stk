@@ -10,6 +10,8 @@ part of ``stk``. They must be completely self-sufficient.
 
 """
 
+import typing
+import pathlib
 from scipy.spatial.transform import Rotation
 import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
@@ -348,27 +350,28 @@ def matrix_centroid(matrix):
     return np.sum(matrix, axis=0) / len(matrix)
 
 
-def mol_from_mae_file(mae_path):
+def mol_from_mae_file(
+    path: typing.Union[pathlib.Path, str],
+) -> rdkit.Mol:
     """
-    Creates a ``rdkit`` molecule from a ``.mae`` file.
+    Create a :mod:`rdkit` molecule from a ``.mae`` file.
 
-    Parameters
-    ----------
-    mol2_file : :class:`str`
-        The full path of the ``.mae`` file from which an rdkit molecule
-        should be instantiated.
+    Parameters:
 
-    Returns
-    -------
-    :class:`rdkit.Mol`
-        An ``rdkit`` instance of the molecule held in `mae_file`.
+        path:
+            The full path of the ``.mae`` file from which an
+            :mod:`rdkit` molecule should be instantiated.
+
+    Returns:
+
+        An :mod:`rdkit` instance of the molecule held in `path`.
 
     """
 
     mol = rdkit.EditableMol(rdkit.Mol())
     conf = rdkit.Conformer()
 
-    with open(mae_path, 'r') as mae:
+    with open(path, 'r') as mae:
         content = re.split(r'[{}]', mae.read())
 
     prev_block = deque([''], maxlen=1)
