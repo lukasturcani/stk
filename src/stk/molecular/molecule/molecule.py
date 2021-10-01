@@ -36,8 +36,8 @@ from ..molecular_utilities import (
 
 _T = typing.TypeVar('_T', bound='Molecule')
 
-T = typing.TypeVar('T')
-OneOrMany = typing.Union[T, abc.Iterable[T]]
+_T2 = typing.TypeVar('_T2')
+OneOrMany = typing.Union[_T2, abc.Iterable[_T2]]
 
 
 class Molecule:
@@ -845,7 +845,7 @@ class Molecule:
         if extension is None:
             _, extension = os.path.splitext(path)
 
-        position_matrix = {
+        getters: dict[str, abc.Callable[[str], np.ndarray]] = {
             '.mol': updaters.get_position_matrix_from_mol,
             '.sdf': updaters.get_position_matrix_from_mol,
             '.mae': updaters.get_position_matrix_from_mae,
@@ -855,7 +855,9 @@ class Molecule:
                 len(self._atoms),
             ),
             '.pdb': updaters.get_position_matrix_from_pdb,
-        }[extension](path)
+        }
+        get_position_matrix = getters[extension]
+        position_matrix = get_position_matrix(path)
 
         if len(position_matrix) != len(self._atoms):
             raise RuntimeError(
@@ -964,11 +966,17 @@ class Molecule:
         path = str(path)
         _, extension = os.path.splitext(path)
         {
-            '.mol': writers._write_mdl_mol_file,
-            '.sdf': writers._write_mdl_mol_file,
-            '.xyz': writers._write_xyz_file,
-            '.pdb': writers._write_pdb_file,
-        }[extension](self, path, atom_ids)
+            '.mol': writers.write_mdl_mol_file,
+            '.sdf': writers.write_mdl_mol_file,
+            '.xyz': writers.write_xyz_file,
+            '.pdb': writers.write_pdb_file,
+        }[extension](
+            atoms=self._atoms,
+            bonds=self._bonds,
+            position_matrix=self._position_matrix,
+            path=path,
+            atom_ids=atom_ids,
+        )
         return self
 
     def __str__(self) -> str:
