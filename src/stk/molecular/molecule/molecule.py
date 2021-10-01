@@ -408,6 +408,16 @@ class Molecule:
             origin=origin,
         )
 
+    def _clone(self: _T) -> _T:
+        clone = self.__class__.__new__(self.__class__)
+        Molecule.__init__(
+            self=clone,
+            atoms=self._atoms,
+            bonds=self._bonds,
+            position_matrix=self._position_matrix.T,
+        )
+        return clone
+
     def clone(self) -> Molecule:
         """
         Return a clone.
@@ -418,14 +428,7 @@ class Molecule:
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
-        Molecule.__init__(
-            self=clone,
-            atoms=self._atoms,
-            bonds=self._bonds,
-            position_matrix=self._position_matrix.T,
-        )
-        return clone
+        return self._clone()
 
     def get_atomic_positions(
         self,
@@ -501,7 +504,7 @@ class Molecule:
 
     def get_bonds(self) -> abc.Iterable[Bond]:
         """
-        Yield the bond in the molecule.
+        Yield the bonds in the molecule.
 
         Yields:
 
@@ -625,7 +628,7 @@ class Molecule:
 
         Returns:
 
-            The maximum diameter in the molecule.
+            The maximum diameter of the molecule.
 
         Raises:
 
@@ -713,7 +716,7 @@ class Molecule:
         self,
         position: np.ndarray,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ):
+    ) -> Molecule:
         """
         Return a clone with its centroid at `position`.
 
@@ -803,6 +806,38 @@ class Molecule:
         mol.AddConformer(rdkit_conf)
         return mol
 
+    def _with_structure_from_file(
+        self: _T,
+        path: typing.Union[pathlib.Path, str],
+        extension: typing.Optional[str] = None,
+    ) -> _T:
+
+        path = str(path)
+        if extension is None:
+            _, extension = os.path.splitext(path)
+
+        getters: dict[str, abc.Callable[[str], np.ndarray]] = {
+            '.mol': updaters.get_position_matrix_from_mol,
+            '.sdf': updaters.get_position_matrix_from_mol,
+            '.mae': updaters.get_position_matrix_from_mae,
+            '.xyz': updaters.get_position_matrix_from_xyz,
+            '.coord': functools.partial(
+                updaters.get_position_matrix_from_turbomole,
+                len(self._atoms),
+            ),
+            '.pdb': updaters.get_position_matrix_from_pdb,
+        }
+        get_position_matrix = getters[extension]
+        position_matrix = get_position_matrix(path)
+
+        if len(position_matrix) != len(self._atoms):
+            raise RuntimeError(
+                f'The number of atoms in {path}, '
+                f'{len(position_matrix)}, does not match the number '
+                f'of atoms in the molecule, {len(self._atoms)}.'
+            )
+        return self._with_position_matrix(position_matrix)
+
     def with_structure_from_file(
         self,
         path: typing.Union[pathlib.Path, str],
@@ -841,38 +876,14 @@ class Molecule:
 
         """
 
-        path = str(path)
-        if extension is None:
-            _, extension = os.path.splitext(path)
-
-        getters: dict[str, abc.Callable[[str], np.ndarray]] = {
-            '.mol': updaters.get_position_matrix_from_mol,
-            '.sdf': updaters.get_position_matrix_from_mol,
-            '.mae': updaters.get_position_matrix_from_mae,
-            '.xyz': updaters.get_position_matrix_from_xyz,
-            '.coord': functools.partial(
-                updaters.get_position_matrix_from_turbomole,
-                len(self._atoms),
-            ),
-            '.pdb': updaters.get_position_matrix_from_pdb,
-        }
-        get_position_matrix = getters[extension]
-        position_matrix = get_position_matrix(path)
-
-        if len(position_matrix) != len(self._atoms):
-            raise RuntimeError(
-                f'The number of atoms in {path}, '
-                f'{len(position_matrix)}, does not match the number '
-                f'of atoms in the molecule, {len(self._atoms)}.'
-            )
-
-        return self.clone()._with_position_matrix(position_matrix)
+        return self.clone()._with_structure_from_file(path, extension)
 
     def with_canonical_atom_ordering(self) -> Molecule:
         """
         Return a clone, with canonically ordered atoms.
 
         Returns:
+
             The clone.
 
         """
@@ -918,8 +929,8 @@ class Molecule:
 
         Returns:
 
-            Maps the id of each atom in the molecule to the id it would
-            have under canonical ordering.
+            A map of the id of each atom in the molecule to the id it
+            would have under canonical ordering.
 
         """
 
@@ -929,6 +940,28 @@ class Molecule:
                 rdkit.CanonicalRankAtoms(self.to_rdkit_mol()),
             )
         }
+
+    def _write(
+        self: _T,
+        path: typing.Union[pathlib.Path, str],
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> _T:
+
+        path = str(path)
+        _, extension = os.path.splitext(path)
+        {
+            '.mol': writers.write_mdl_mol_file,
+            '.sdf': writers.write_mdl_mol_file,
+            '.xyz': writers.write_xyz_file,
+            '.pdb': writers.write_pdb_file,
+        }[extension](
+            atoms=self._atoms,
+            bonds=self._bonds,
+            position_matrix=self._position_matrix,
+            path=path,
+            atom_ids=atom_ids,
+        )
+        return self
 
     def write(
         self,
@@ -963,21 +996,7 @@ class Molecule:
 
         """
 
-        path = str(path)
-        _, extension = os.path.splitext(path)
-        {
-            '.mol': writers.write_mdl_mol_file,
-            '.sdf': writers.write_mdl_mol_file,
-            '.xyz': writers.write_xyz_file,
-            '.pdb': writers.write_pdb_file,
-        }[extension](
-            atoms=self._atoms,
-            bonds=self._bonds,
-            position_matrix=self._position_matrix,
-            path=path,
-            atom_ids=atom_ids,
-        )
-        return self
+        return self._write(path, atom_ids)
 
     def __str__(self) -> str:
         return repr(self)
