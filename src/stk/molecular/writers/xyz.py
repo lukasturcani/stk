@@ -10,8 +10,8 @@ from collections import abc
 import pathlib
 import typing
 
-from .. import molecule as _molecule
-from stk.utilities import typing as _typing
+from stk.utilities.typing import OneOrMany
+from ..molecule import Molecule
 
 
 __all__ = (
@@ -51,8 +51,8 @@ class XyzWriter:
 
     def _write_content(
         self,
-        molecule: _molecule.Molecule,
-        atom_ids: typing.Optional[_typing.OneOrMany[int]],
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]],
     ) -> abc.Iterable[str]:
 
         if atom_ids is None:
@@ -74,8 +74,8 @@ class XyzWriter:
 
     def to_string(
         self,
-        molecule: _molecule.Molecule,
-        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> str:
         """
         Get the ``.xyz`` string of  `molecule`.
@@ -102,9 +102,9 @@ class XyzWriter:
 
     def write(
         self,
-        molecule: _molecule.Molecule,
+        molecule: Molecule,
         path: typing.Union[pathlib.Path, str],
-        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> None:
         """
         Write `molecule` to ``.xyz`` file format.

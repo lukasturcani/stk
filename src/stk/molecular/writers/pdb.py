@@ -12,9 +12,9 @@ import pathlib
 
 from collections import abc
 
-from stk.utilities import typing as _typing
-from .. import molecule as _molecule
-from .. import periodic_info as _periodic_info
+from stk.utilities.typing import OneOrMany
+from ..molecule import Molecule
+from ..periodic_info import PeriodicInfo
 
 __all__ = (
     'PdbWriter',
@@ -74,9 +74,9 @@ class PdbWriter:
 
     def _write_content(
         self,
-        molecule: _molecule.Molecule,
-        atom_ids: typing.Optional[_typing.OneOrMany[int]],
-        periodic_info: typing.Optional[_periodic_info.PeriodicInfo],
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]],
+        periodic_info: typing.Optional[PeriodicInfo],
     ) -> abc.Iterable[str]:
 
         if atom_ids is None:
@@ -145,10 +145,9 @@ class PdbWriter:
 
     def to_string(
         self,
-        molecule: _molecule.Molecule,
-        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
-        periodic_info:
-            typing.Optional[_periodic_info.PeriodicInfo] = None,
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> str:
         """
         Get a ``.pdb`` file format string of `molecule`.
@@ -180,11 +179,10 @@ class PdbWriter:
 
     def write(
         self,
-        molecule: _molecule.Molecule,
+        molecule: Molecule,
         path: typing.Union[pathlib.Path, str],
-        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
-        periodic_info:
-            typing.Optional[_periodic_info.PeriodicInfo] = None
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        periodic_info: typing.Optional[PeriodicInfo] = None
     ) -> None:
         """
         Write `molecule` to ``.pdb`` file format.
