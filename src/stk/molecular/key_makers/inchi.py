@@ -4,55 +4,70 @@ InChI
 
 """
 
-from .molecule import MoleculeKeyMaker
-from .utilities import get_inchi
+from . import molecule as _molecule
+from . import utilities as _utilities
 
 
-class Inchi(MoleculeKeyMaker):
+__all__ = (
+    'Inchi',
+)
+
+
+class Inchi(_molecule.MoleculeKeyMaker):
     """
     Used to get the InChI of molecules.
 
-    Examples
-    --------
-    *Adding InChI to a Molecule's JSON*
+    Examples:
 
-    You want to use the InChI as part of a JSON representation of a
-    molecule
+        *Adding InChI to a Molecule's JSON*
 
-    .. testcode:: adding-inchi-to-a-molecules-json
+        You want to use the InChI as part of a JSON representation of a
+        molecule
 
-        import stk
+        .. testcode:: adding-inchi-to-a-molecules-json
 
-        jsonizer = stk.MoleculeJsonizer(
-            key_makers=(stk.Inchi(), ),
-        )
-        building_block = stk.BuildingBlock('NCCN')
-        # Get the JSON representation, including an InChI.
-        json = jsonizer.to_json(building_block)
+            import stk
 
-    .. testcode:: adding-inchi-to-a-molecules-json
-        :hide:
+            jsonizer = stk.MoleculeJsonizer(
+                key_makers=(stk.Inchi(), ),
+            )
+            building_block = stk.BuildingBlock('NCCN')
+            # Get the JSON representation, including an InChI.
+            json = jsonizer.to_json(building_block)
 
-        _inchi = stk.Inchi()
-        _expected_inchi = 'InChI=1S/C2H8N2/c3-1-2-4/h1-4H2'
-        _molecule_json = json['molecule']
-        assert _molecule_json[_inchi.get_key_name()] == _expected_inchi
+        .. testcode:: adding-inchi-to-a-molecules-json
+            :hide:
 
-        _matrix_json = json['matrix']
-        assert _matrix_json[_inchi.get_key_name()] == _expected_inchi
+            _inchi = stk.Inchi()
+            _expected_inchi = 'InChI=1S/C2H8N2/c3-1-2-4/h1-4H2'
+            _molecule_json = json['molecule']
+            assert (
+                _molecule_json[_inchi.get_key_name()]
+                == _expected_inchi
+            )
+
+            _matrix_json = json['matrix']
+            assert (
+                _matrix_json[_inchi.get_key_name()]
+                == _expected_inchi
+            )
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize a :class:`Inchi` instance.
 
         """
 
-        super().__init__('InChI', get_inchi)
+        _molecule.MoleculeKeyMaker.__init__(
+            self=self,
+            key_name='InChI',
+            get_key=_utilities.get_inchi,
+        )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Inchi()'
