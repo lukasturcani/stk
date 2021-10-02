@@ -217,7 +217,8 @@ class ConstructedMolecule(_molecule.Molecule):
 
         """
 
-        super(ConstructedMolecule, obj).__init__(
+        _molecule.Molecule.__init__(
+            self=obj,
             atoms=construction_result.get_atoms(),
             bonds=construction_result.get_bonds(),
             position_matrix=construction_result.get_position_matrix(),

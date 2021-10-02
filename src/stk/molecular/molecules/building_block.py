@@ -719,7 +719,12 @@ class BuildingBlock(_molecule.Molecule):
         )
         position_matrix = molecule.GetConformer().GetPositions()
 
-        super().__init__(atoms, bonds, position_matrix)
+        _molecule.Molecule.__init__(
+            self=self,
+            atoms=atoms,
+            bonds=bonds,
+            position_matrix=position_matrix,
+        )
         self._with_functional_groups(self._extract_functional_groups(
             functional_groups=functional_groups,
         ))
