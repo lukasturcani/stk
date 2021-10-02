@@ -4,38 +4,51 @@ XYZ Writer
 
 """
 
+from __future__ import annotations
+
+from collections import abc
+import pathlib
+import typing
+
+from .. import molecule as _molecule
+from stk.utilities import typing as _typing
+
 
 class XyzWriter:
     """
     A writer class for ``.xyz`` files.
 
-    Examples
-    --------
-    *Writing to a File*
+    Examples:
 
-    .. testcode:: writing-to-a-file
+        *Writing to a File*
 
-        import stk
+        .. testcode:: writing-to-a-file
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            import stk
 
-        writer = stk.XyzWriter()
-        writer.write(molecule=bb1, path='bb1.xyz')
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 
-    .. testcode:: writing-to-a-file
-        :hide:
+            writer = stk.XyzWriter()
+            writer.write(molecule=bb1, path='bb1.xyz')
 
-        import os
+        .. testcode:: writing-to-a-file
+            :hide:
 
-        assert os.path.exists('bb1.xyz')
+            import os
 
-    .. testcleanup:: writing-to-a-file
+            assert os.path.exists('bb1.xyz')
 
-        os.remove('bb1.xyz')
+        .. testcleanup:: writing-to-a-file
+
+            os.remove('bb1.xyz')
 
     """
 
-    def _write_content(self, molecule, atom_ids):
+    def _write_content(
+        self,
+        molecule: _molecule.Molecule,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]],
+    ) -> abc.Iterable[str]:
 
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
@@ -43,7 +56,7 @@ class XyzWriter:
             atom_ids = (atom_ids, )
 
         coords = molecule.get_position_matrix()
-        content = [0]
+        content = ['']
         for i, atom_id in enumerate(atom_ids, 1):
             x, y, z = (i for i in coords[atom_id])
             atom, = molecule.get_atoms(atom_ids=atom_id)
@@ -54,23 +67,26 @@ class XyzWriter:
 
         return content
 
-    def to_string(self, molecule, atom_ids=None):
+    def to_string(
+        self,
+        molecule: _molecule.Molecule,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+    ) -> str:
         """
         Get the ``.xyz`` string of  `molecule`.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to `.xyz` format.
+        Parameters:
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            molecule:
+                Molecule to write to `.xyz` format.
 
-        Returns
-        -------
-        :class:`str`
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
+
+        Returns:
+
             String in ``.xyz`` file format.
 
         """
@@ -79,26 +95,30 @@ class XyzWriter:
 
         return ''.join(content)
 
-    def write(self, molecule, path, atom_ids=None):
+    def write(
+        self,
+        molecule: _molecule.Molecule,
+        path: typing.Union[pathlib.Path, str],
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+    ) -> None:
         """
         Write `molecule` to ``.xyz`` file format.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to ``.xyz`` format.
+        Parameters:
 
-        path : :class:`str`
-            The full path to the file being written.
+            molecule:
+                Molecule to write to ``.xyz`` format.
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            path:
+                The full path to the file being written.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
+
+        Returns:
+
             A file is written.
 
         """
