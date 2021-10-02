@@ -13,6 +13,11 @@ from .. import molecule as _molecule
 from stk.utilities import typing as _typing
 
 
+__all__ = (
+    'MolWriter',
+)
+
+
 class MolWriter:
     """
     A writer class for V3000 ``.mol`` files.

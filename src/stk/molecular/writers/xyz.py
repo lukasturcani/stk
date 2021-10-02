@@ -14,6 +14,11 @@ from .. import molecule as _molecule
 from stk.utilities import typing as _typing
 
 
+__all__ = (
+    'XyzWriter',
+)
+
+
 class XyzWriter:
     """
     A writer class for ``.xyz`` files.

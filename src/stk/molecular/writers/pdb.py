@@ -16,6 +16,10 @@ from stk.utilities import typing as _typing
 from .. import molecule as _molecule
 from .. import periodic_info as _periodic_info
 
+__all__ = (
+    'PdbWriter',
+)
+
 
 class PdbWriter:
     """
