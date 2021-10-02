@@ -12,4 +12,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   stk.utilities.typing
    stk.utilities.utilities
