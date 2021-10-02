@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from collections import abc
 import numpy as np
 
-from ....molecules import BuildingBlock
+from ....building_block import BuildingBlock
 from .vertices import (
     HeadVertex,
     TailVertex,

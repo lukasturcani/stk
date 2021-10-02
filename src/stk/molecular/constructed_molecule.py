@@ -13,11 +13,11 @@ import rdkit.Chem.AllChem as rdkit
 from collections import abc
 
 from stk.utilities.typing import OneOrMany
-from ..molecule import Molecule
-from ..atoms import Atom, AtomInfo
-from ..bonds import Bond, BondInfo
-from .. import molecular_utilities as _utilities
-from ..topology_graphs import TopologyGraph, ConstructionResult
+from .molecule import Molecule
+from .atoms import Atom, AtomInfo
+from .bonds import Bond, BondInfo
+from . import molecular_utilities as _utilities
+from .topology_graphs import TopologyGraph, ConstructionResult
 
 
 _T = typing.TypeVar('_T', bound='ConstructedMolecule')
