@@ -25,8 +25,8 @@ from stk import utilities as _utilities
 from stk.utilities import typing as _typing
 from .utilities import writers as _writers
 from .utilities import updaters as _updaters
-from .. import atoms as _atoms
-from .. import bonds as _bonds
+from ..atoms import Atom
+from ..bonds import Bond
 from .. import molecular_utilities as _molecular_utilities
 
 
@@ -111,8 +111,8 @@ class Molecule:
 
     def __init__(
         self,
-        atoms: tuple[_atoms.Atom, ...],
-        bonds: tuple[_bonds.Bond, ...],
+        atoms: tuple[Atom, ...],
+        bonds: tuple[Bond, ...],
         position_matrix: np.ndarray,
     ) -> None:
         """
@@ -469,7 +469,7 @@ class Molecule:
     def get_atoms(
         self,
         atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
-    ) -> abc.Iterable[_atoms.Atom]:
+    ) -> abc.Iterable[Atom]:
         """
         Yield the atoms in the molecule, ordered by id.
 
@@ -506,7 +506,7 @@ class Molecule:
 
         return len(self._atoms)
 
-    def get_bonds(self) -> abc.Iterable[_bonds.Bond]:
+    def get_bonds(self) -> abc.Iterable[Bond]:
         """
         Yield the bonds in the molecule.
 
