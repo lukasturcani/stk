@@ -6,14 +6,21 @@ Carboxylic Acid
 
 from __future__ import annotations
 
-from typing import Optional
+import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import C, O, H, Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
-class CarboxylicAcid(GenericFunctionalGroup):
+__all__ = (
+    'CarboxylicAcid',
+)
+
+
+class CarboxylicAcid(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents a carboxylic acid functional group.
 
@@ -24,16 +31,16 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon: C,
+        carbon: _atoms.C,
         # O is not an ambiguous name.
-        oxygen1: O,  # noqa
+        oxygen1: _atoms.O,  # noqa
         # O is not an ambiguous name.
-        oxygen2: O,  # noqa
-        hydrogen: H,
-        atom: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
+        oxygen2: _atoms.O,  # noqa
+        hydrogen: _atoms.H,
+        atom: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ):
         """
         Initialize a :class:`.CarboxylicAcid` instance.
@@ -67,7 +74,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(carbon, oxygen1, oxygen2, hydrogen, atom),
             bonders=bonders,
@@ -80,7 +87,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
         self._hydrogen = hydrogen
         self._atom = atom
 
-    def get_carbon(self) -> C:
+    def get_carbon(self) -> _atoms.C:
         """
         Get the ``[carbon]`` atom.
 
@@ -93,7 +100,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
         return self._carbon
 
     # O is not an ambiguous name.
-    def get_oxygen1(self) -> O:  # noqa
+    def get_oxygen1(self) -> _atoms.O:  # noqa
         """
         Get the ``[oxygen1]`` atom.
 
@@ -118,7 +125,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
         return self._oxygen2
 
-    def get_hydrogen(self) -> H:
+    def get_hydrogen(self) -> _atoms.H:
         """
         Get the ``[hydrogen]`` atom.
 
@@ -130,7 +137,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
 
         return self._hydrogen
 
-    def get_atom(self) -> Atom:
+    def get_atom(self) -> _atoms.Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -156,7 +163,7 @@ class CarboxylicAcid(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> CarboxylicAcid:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

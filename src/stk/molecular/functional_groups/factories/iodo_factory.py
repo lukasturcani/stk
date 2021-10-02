@@ -4,17 +4,27 @@ Iodo Factory
 
 """
 
-from typing import Optional, Iterable, Literal
+from __future__ import annotations
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Iodo
-from ...molecule import Molecule
+import typing
+from collections import abc
 
-ValidIndices = tuple[Literal[0, 1], ...]
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
+
+__all__ = (
+    'IodoFactory',
+)
+
+_ValidIndex = typing.Literal[0, 1]
 
 
-class IodoFactory(FunctionalGroupFactory):
+class IodoFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.Iodo` instances.
 
@@ -58,9 +68,9 @@ class IodoFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (0, ),
-        deleters: ValidIndices = (1, ),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[_ValidIndex, ...] = (0, ),
+        deleters: tuple[_ValidIndex, ...] = (1, ),
+        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.IodoFactory` instance.
@@ -88,13 +98,13 @@ class IodoFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> Iterable[Iodo]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Iodo]:
 
-        for atom_ids in get_atom_ids('[*][I]', molecule):
+        for atom_ids in _utilities.get_atom_ids('[*][I]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Iodo(
-                iodine=atoms[1],
+            yield _functional_groups.Iodo(
+                iodine=typing.cast(_elements.I, atoms[1]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

@@ -7,21 +7,21 @@ Defines an :class:`.Atom` class for each element.
 """
 
 from __future__ import annotations
-from typing import ClassVar, TypeVar
 
-from .atom import Atom
-
-
-_T = TypeVar('_T', bound='AtomImpl')
+import typing
+from . import atom as _atom
 
 
-class AtomImpl(Atom):
+_T = typing.TypeVar('_T', bound='AtomImpl')
+
+
+class AtomImpl(_atom.Atom):
     """
     An implementation of the :class:`.Atom` interface.
 
     """
 
-    _atomic_number: ClassVar[int]
+    _atomic_number: typing.ClassVar[int]
 
     def __init_subclass__(cls: type[AtomImpl], **kwargs) -> None:
         cls._elements[cls._atomic_number] = cls

@@ -4,18 +4,28 @@ Terminal Alkyne Factory
 
 """
 
+from __future__ import annotations
 
-from typing import Optional, Iterable, Literal
+import typing
+from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Alkyne
-from ...molecule import Molecule
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
-ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
+
+__all__ = (
+    'TerminalAlkyneFactory',
+)
+
+_ValidIndex = typing.Literal[0, 1, 2, 3]
 
 
-class TerminalAlkyneFactory(FunctionalGroupFactory):
+class TerminalAlkyneFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.Alkyne` instances.
 
@@ -99,9 +109,9 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (2, 3),
-        placers: Optional[ValidIndices] = None,
+        bonders: tuple[_ValidIndex, ...] = (1, ),
+        deleters: tuple[_ValidIndex, ...] = (2, 3),
+        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.TerminalAlkyneFactory` instance.
@@ -129,15 +139,18 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> Iterable[Alkyne]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Alkyne]:
 
-        for atom_ids in get_atom_ids('[*][C]#[C][H]', molecule):
+        for atom_ids in _utilities.get_atom_ids(
+            query='[*][C]#[C][H]',
+            molecule=molecule,
+        ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Alkyne(
+            yield _functional_groups.Alkyne(
                 atom1=atoms[0],
-                carbon1=atoms[1],
-                carbon2=atoms[2],
+                carbon1=typing.cast(_elements.C, atoms[1]),
+                carbon2=typing.cast(_elements.C, atoms[2]),
                 atom2=atoms[3],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

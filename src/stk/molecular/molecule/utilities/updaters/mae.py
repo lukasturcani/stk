@@ -5,27 +5,29 @@ MAE Updating Utilities
 """
 
 
+import typing
+import pathlib
+import numpy as np
 from stk.utilities import mol_from_mae_file
 
 
-def _with_structure_from_mae(self, path):
+def get_position_matrix_from_mae(
+    path: typing.Union[pathlib.Path, str],
+) -> np.ndarray:
     """
-    Change structure to match an ``.mae`` file.
+    Get the position matrix from an ``.mae`` file.
 
-    Parameters
-    ----------
-    path : :class:`str`
-        The full path of the ``.mae`` file from which the structure
-        should be updated.
+    Parameters:
 
-    Returns
-    -------
-    :class:`.Molecule`
-        The molecule.
+        path:
+            The full path to the ``.mae`` file which holds the
+            position matrix.
+
+    Returns:
+
+        The position matrix.
 
     """
 
     molecule = mol_from_mae_file(path)
-    return self._with_position_matrix(
-        position_matrix=molecule.GetConformer().GetPositions()
-    )
+    return molecule.GetConformer().GetPositions()

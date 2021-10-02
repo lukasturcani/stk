@@ -4,54 +4,97 @@ MDL Writing Utilities
 
 """
 
+from __future__ import annotations
 
-def _write_mdl_mol_file(self, path, atom_ids):
+import pathlib
+import typing
+import numpy as np
+from collections import abc
+
+from ....atoms import atom
+from ....bonds import bond
+
+
+_T = typing.TypeVar('_T')
+OneOrMany = typing.Union[_T, abc.Iterable[_T]]
+
+
+def write_mdl_mol_file(
+    atoms: tuple[atom.Atom, ...],
+    bonds: tuple[bond.Bond, ...],
+    position_matrix: np.ndarray,
+    path: typing.Union[pathlib.Path, str],
+    atom_ids: typing.Optional[OneOrMany[int]],
+) -> None:
     """
     Write to a V3000 ``.mol`` file.
 
     This function should not be used directly, only via
     :meth:`write`.
 
-    Parameters
-    ----------
-    path : :class:`str`
-        The full path to the file being written.
+    Parameters:
 
-    atom_ids : :class:`iterable` of :class:`int`
-        The atom ids of atoms to write. Can be a single
-        :class:`int`, if a single atom is to be used, or ``None``,
-        if all atoms are to be used.
+        atoms:
+            The atoms of the molecule to write.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+        bonds:
+            The bonds of the molecule to write.
+
+        position_matrix:
+            The ``3 x N`` position of the molecule to write.
+
+        path:
+            The full path to the file being written.
+
+        atom_ids:
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
     """
 
     with open(path, 'w') as f:
-        f.write(_to_mdl_mol_block(self, atom_ids))
+        f.write(_to_mdl_mol_block(
+            atoms=atoms,
+            bonds=bonds,
+            position_matrix=position_matrix,
+            atom_ids=atom_ids,
+        ))
 
 
-def _to_mdl_mol_block(self, atom_ids=None):
+def _to_mdl_mol_block(
+    atoms: tuple[atom.Atom, ...],
+    bonds: tuple[bond.Bond, ...],
+    position_matrix: np.ndarray,
+    atom_ids: typing.Optional[OneOrMany[int]],
+) -> str:
     """
     Return a V3000 mol block of the molecule.
 
-    Parameters
-    ----------
-    atom_ids : :class:`iterable` of :class:`int`, optional
-        The atom ids of atoms to write. Can be a single
-        :class:`int`, if a single atom is to be used, or
-        ``None``, if all atoms are to be used.
+    Parameters:
 
-    Returns
-    -------
-    :class:`str`
+        atoms:
+            The atoms of the molecule to write.
+
+        bonds:
+            The bonds of the molecule to write.
+
+        position_matrix:
+            The ``3 x N`` position of the molecule to write.
+
+        atom_ids:
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or
+            ``None``, if all atoms are to be used.
+
+    Returns:
+
         The V3000 mol block representing the molecule.
 
     """
 
     if atom_ids is None:
-        atom_ids = range(len(self._atoms))
+        atom_ids = range(len(atoms))
     elif isinstance(atom_ids, int):
         atom_ids = (atom_ids, )
 
@@ -61,25 +104,25 @@ def _to_mdl_mol_block(self, atom_ids=None):
     for new_atom_id, old_atom_id in enumerate(atom_ids, 1):
         id_map[old_atom_id] = new_atom_id
 
-        x, y, z = self._position_matrix[:, old_atom_id]
-        atom = self._atoms[old_atom_id]
+        x, y, z = position_matrix[:, old_atom_id]
+        atom = atoms[old_atom_id]
         symbol = atom.__class__.__name__
-        charge = atom.get_charge()
-        charge = f' CHG={charge}' if charge else ''
+        charge_value = atom.get_charge()
+        charge = f' CHG={charge_value}' if charge_value else ''
         atom_lines.append(
             f'M  V30 {new_atom_id} {symbol} {x:.4f} '
             f'{y:.4f} {z:.4f} 0{charge}\n'
         )
     atom_block = ''.join(atom_lines)
 
-    bond_lines = []
-    for bond in self._bonds:
-        a1 = bond.get_atom1().get_id()
-        a2 = bond.get_atom2().get_id()
+    bond_lines: list[str] = []
+    for bond_ in bonds:
+        a1 = bond_.get_atom1().get_id()
+        a2 = bond_.get_atom2().get_id()
         if a1 in id_map and a2 in id_map:
             bond_lines.append(
                 f'M  V30 {len(bond_lines)+1} '
-                f'{int(bond.get_order())} '
+                f'{int(bond_.get_order())} '
                 f'{id_map[a1]} {id_map[a2]}\n'
             )
 

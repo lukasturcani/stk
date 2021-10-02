@@ -6,14 +6,21 @@ Alkene
 
 from __future__ import annotations
 
-from typing import Optional
+import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Atom, C
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
-class Alkene(GenericFunctionalGroup):
+__all__ = (
+    'Alkene',
+)
+
+
+class Alkene(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents an alkene functional group.
 
@@ -24,15 +31,15 @@ class Alkene(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon1: C,
-        atom1: Atom,
-        atom2: Atom,
-        carbon2: C,
-        atom3: Atom,
-        atom4: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
+        carbon1: _atoms.C,
+        atom1: _atoms.Atom,
+        atom2: _atoms.Atom,
+        carbon2: _atoms.C,
+        atom3: _atoms.Atom,
+        atom4: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Alkene` instance.
@@ -69,7 +76,7 @@ class Alkene(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(carbon1, atom1, atom2, carbon2, atom3, atom4),
             bonders=bonders,
@@ -83,7 +90,7 @@ class Alkene(GenericFunctionalGroup):
         self._atom3 = atom3
         self._atom4 = atom4
 
-    def get_carbon1(self) -> C:
+    def get_carbon1(self) -> _atoms.C:
         """
         Get the ``[carbon1]`` atom.
 
@@ -95,7 +102,7 @@ class Alkene(GenericFunctionalGroup):
 
         return self._carbon1
 
-    def get_atom1(self) -> Atom:
+    def get_atom1(self) -> _atoms.Atom:
         """
         Get the ``[atom1]`` atom.
 
@@ -107,7 +114,7 @@ class Alkene(GenericFunctionalGroup):
 
         return self._atom1
 
-    def get_atom2(self) -> Atom:
+    def get_atom2(self) -> _atoms.Atom:
         """
         Get the ``[atom2]`` atom.
 
@@ -119,7 +126,7 @@ class Alkene(GenericFunctionalGroup):
 
         return self._atom2
 
-    def get_carbon2(self) -> C:
+    def get_carbon2(self) -> _atoms.C:
         """
         Get the ``[carbon2]`` atom.
 
@@ -131,7 +138,7 @@ class Alkene(GenericFunctionalGroup):
 
         return self._carbon2
 
-    def get_atom3(self) -> Atom:
+    def get_atom3(self) -> _atoms.Atom:
         """
         Get the ``[atom3]`` atom.
 
@@ -143,7 +150,7 @@ class Alkene(GenericFunctionalGroup):
 
         return self._atom3
 
-    def get_atom4(self) -> Atom:
+    def get_atom4(self) -> _atoms.Atom:
         """
         Get the ``[atom4]`` atom.
 
@@ -170,7 +177,7 @@ class Alkene(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Alkene:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

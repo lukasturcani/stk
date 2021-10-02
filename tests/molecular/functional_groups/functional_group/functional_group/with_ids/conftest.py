@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import stk
 import pytest
 
-from typing import Callable
+from collections import abc
 
 
 def get_id_map_0(
@@ -39,7 +41,7 @@ def get_id_map_1(
 )
 def get_id_map(
     request,
-) -> Callable[[stk.FunctionalGroup], dict[int, int]]:
+) -> abc.Callable[[stk.FunctionalGroup], dict[int, int]]:
     """
     Return a valid `id_map` parameter for a functional group.
 
