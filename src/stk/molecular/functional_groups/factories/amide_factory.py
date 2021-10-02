@@ -16,6 +16,11 @@ from ... import molecule as _molecule
 from ...atoms import elements as _elements
 
 
+__all__ = (
+    'AmideFactory',
+)
+
+
 _ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
 
 
