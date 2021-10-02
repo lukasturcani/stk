@@ -9,17 +9,22 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Alkene
-from ...molecule import Molecule
-from ...atoms import elements
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
+
+__all__ = (
+    'TerminalAlkeneFactory',
+)
+
+_ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
 
 
-ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
-
-
-class TerminalAlkeneFactory(FunctionalGroupFactory):
+class TerminalAlkeneFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     # This docstring is a literal string, to silence a flake8 warning
     # about CH\ :sub:`2`. It's taking the backslash out of context.
     r"""
@@ -105,9 +110,9 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: tuple[ValidIndex, ...] = (1, ),
-        deleters: tuple[ValidIndex, ...] = (3, 4, 5),
-        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
+        bonders: tuple[_ValidIndex, ...] = (1, ),
+        deleters: tuple[_ValidIndex, ...] = (3, 4, 5),
+        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.TerminalAlkeneFactory` instance.
@@ -135,17 +140,19 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> abc.Iterable[Alkene]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Alkene]:
 
-        ids = get_atom_ids('[*][C]([*])=[C]([H])[H]', molecule)
-        for atom_ids in ids:
+        for atom_ids in _utilities.get_atom_ids(
+            query='[*][C]([*])=[C]([H])[H]',
+            molecule=molecule,
+        ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Alkene(
-                carbon1=typing.cast(elements.C, atoms[1]),
+            yield _functional_groups.Alkene(
+                carbon1=typing.cast(_elements.C, atoms[1]),
                 atom1=atoms[0],
                 atom2=atoms[2],
-                carbon2=typing.cast(elements.C, atoms[3]),
+                carbon2=typing.cast(_elements.C, atoms[3]),
                 atom3=atoms[4],
                 atom4=atoms[5],
                 bonders=tuple(atoms[i] for i in self._bonders),
