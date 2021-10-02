@@ -9,11 +9,11 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import PrimaryAmino
+from ...molecule import Molecule
+from ...atoms import N, H
 
 __all__ = (
     'PrimaryAminoFactory',
@@ -22,9 +22,7 @@ __all__ = (
 _ValidIndex = typing.Literal[0, 1, 2, 3]
 
 
-class PrimaryAminoFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class PrimaryAminoFactory(FunctionalGroupFactory):
     """
     Creates :class:`.PrimaryAmino` instances.
 
@@ -147,18 +145,18 @@ class PrimaryAminoFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.PrimaryAmino]:
+        molecule: Molecule,
+    ) -> abc.Iterable[PrimaryAmino]:
 
-        for atom_ids in _utilities.get_atom_ids(
+        for atom_ids in get_atom_ids(
             query='[*][N]([H])[H]',
             molecule=molecule,
         ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.PrimaryAmino(
-                nitrogen=typing.cast(_elements.N, atoms[1]),
-                hydrogen1=typing.cast(_elements.H, atoms[2]),
-                hydrogen2=typing.cast(_elements.H, atoms[3]),
+            yield PrimaryAmino(
+                nitrogen=typing.cast(N, atoms[1]),
+                hydrogen1=typing.cast(H, atoms[2]),
+                hydrogen2=typing.cast(H, atoms[3]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

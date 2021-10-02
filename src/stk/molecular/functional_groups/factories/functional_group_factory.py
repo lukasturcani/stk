@@ -70,8 +70,8 @@ from __future__ import annotations
 
 from collections import abc
 
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
+from ..functional_groups import FunctionalGroup
+from ...molecule import Molecule
 
 
 class FunctionalGroupFactory:
@@ -161,8 +161,8 @@ class FunctionalGroupFactory:
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.FunctionalGroup]:
+        molecule: Molecule,
+    ) -> abc.Iterable[FunctionalGroup]:
         """
         Yield functional groups in `molecule`.
 

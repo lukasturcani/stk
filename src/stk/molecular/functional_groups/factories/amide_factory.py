@@ -9,11 +9,11 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import Amide
+from ...molecule import Molecule
+from ...atoms import C, O, H, N
 
 
 __all__ = (
@@ -24,9 +24,7 @@ __all__ = (
 _ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
 
 
-class AmideFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class AmideFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Amide` instances.
 
@@ -147,20 +145,20 @@ class AmideFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.Amide]:
+        molecule: Molecule,
+    ) -> abc.Iterable[Amide]:
 
-        for atom_ids in _utilities.get_atom_ids(
+        for atom_ids in get_atom_ids(
             query='[*][C](=[O])[N]([H])[H]',
             molecule=molecule,
         ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.Amide(
-                carbon=typing.cast(_elements.C, atoms[1]),
-                oxygen=typing.cast(_elements.O, atoms[2]),
-                nitrogen=typing.cast(_elements.N, atoms[3]),
-                hydrogen1=typing.cast(_elements.H, atoms[4]),
-                hydrogen2=typing.cast(_elements.H, atoms[5]),
+            yield Amide(
+                carbon=typing.cast(C, atoms[1]),
+                oxygen=typing.cast(O, atoms[2]),
+                nitrogen=typing.cast(N, atoms[3]),
+                hydrogen1=typing.cast(H, atoms[4]),
+                hydrogen2=typing.cast(H, atoms[5]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
