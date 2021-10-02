@@ -11,6 +11,11 @@ from collections import abc
 from ... import atoms as _atoms
 
 
+__all__ = (
+    'get_atom_map',
+)
+
+
 def get_atom_map(
     id_map: dict[int, int],
     atoms: abc.Iterable[_atoms.Atom],
