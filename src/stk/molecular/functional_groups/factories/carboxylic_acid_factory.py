@@ -4,17 +4,28 @@ Carboxylic Acid Factory
 
 """
 
-from typing import Optional, Iterable, Literal
+from __future__ import annotations
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import CarboxylicAcid
-from ...molecule import Molecule
+import typing
+from collections import abc
 
-ValidIndices = Literal[0, 1, 2, 3, 4]
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 
-class CarboxylicAcidFactory(FunctionalGroupFactory):
+__all__ = (
+    'CarboxylicAcidFactory',
+)
+
+_ValidIndex = typing.Literal[0, 1, 2, 3, 4]
+
+
+class CarboxylicAcidFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.CarboxylicAcid` instances.
 
@@ -107,9 +118,9 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: tuple[ValidIndices, ...] = (1, ),
-        deleters: tuple[ValidIndices, ...] = (3, 4),
-        placers: Optional[tuple[ValidIndices, ...]] = None,
+        bonders: tuple[_ValidIndex, ...] = (1, ),
+        deleters: tuple[_ValidIndex, ...] = (3, 4),
+        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.CarboxylicAcidFactory` instance.
@@ -137,16 +148,19 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> Iterable[CarboxylicAcid]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.CarboxylicAcid]:
 
-        for atom_ids in get_atom_ids('[*][C](=[O])[O][H]', molecule):
+        for atom_ids in _utilities.get_atom_ids(
+            query='[*][C](=[O])[O][H]',
+            molecule=molecule,
+        ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield CarboxylicAcid(
-                carbon=atoms[1],
-                oxygen1=atoms[2],
-                oxygen2=atoms[3],
-                hydrogen=atoms[4],
+            yield _functional_groups.CarboxylicAcid(
+                carbon=typing.cast(_elements.C, atoms[1]),
+                oxygen1=typing.cast(_elements.O, atoms[2]),
+                oxygen2=typing.cast(_elements.O, atoms[3]),
+                hydrogen=typing.cast(_elements.H, atoms[4]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

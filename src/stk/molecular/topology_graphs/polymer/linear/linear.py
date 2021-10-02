@@ -7,7 +7,7 @@ Linear
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
+from collections import abc
 import numpy as np
 
 from ....molecules import BuildingBlock
@@ -584,7 +584,7 @@ class Linear(TopologyGraph):
     def _get_building_block_vertices(
         self,
         building_blocks: dict[int, BuildingBlock],
-        vertices: Iterable[Vertex],
+        vertices: abc.Iterable[Vertex],
     ) -> dict[BuildingBlock, Vertex]:
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}

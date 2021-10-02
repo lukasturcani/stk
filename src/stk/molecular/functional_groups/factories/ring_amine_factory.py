@@ -4,15 +4,25 @@ Ring Amine Factory
 
 """
 
-from typing import Iterable
+from __future__ import annotations
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import RingAmine
-from ...molecule import Molecule
+import typing
+from collections import abc
+
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
+
+__all__ = (
+    'RingAmineFactory',
+)
 
 
-class RingAmineFactory(FunctionalGroupFactory):
+class RingAmineFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.RingAmine` functional groups.
 
@@ -33,21 +43,20 @@ class RingAmineFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> Iterable[RingAmine]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.RingAmine]:
 
-        ids = get_atom_ids(
+        for atom_ids in _utilities.get_atom_ids(
             query='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
             molecule=molecule,
-        )
-        for atom_ids in ids:
+        ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield RingAmine(
-                nitrogen=atoms[0],
-                hydrogen1=atoms[1],
-                hydrogen2=atoms[2],
-                carbon1=atoms[3],
-                carbon2=atoms[4],
-                hydrogen3=atoms[5],
-                carbon3=atoms[6],
+            yield _functional_groups.RingAmine(
+                nitrogen=typing.cast(_elements.N, atoms[0]),
+                hydrogen1=typing.cast(_elements.H, atoms[1]),
+                hydrogen2=typing.cast(_elements.H, atoms[2]),
+                carbon1=typing.cast(_elements.C, atoms[3]),
+                carbon2=typing.cast(_elements.C, atoms[4]),
+                hydrogen3=typing.cast(_elements.H, atoms[5]),
+                carbon3=typing.cast(_elements.C, atoms[6]),
             )

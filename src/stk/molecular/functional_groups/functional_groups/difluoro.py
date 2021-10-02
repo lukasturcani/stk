@@ -6,14 +6,21 @@ Difluoro
 
 from __future__ import annotations
 
-from typing import Optional
+import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import F, Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
-class Difluoro(GenericFunctionalGroup):
+__all__ = (
+    'Difluoro',
+)
+
+
+class Difluoro(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents a difluoro functional group.
 
@@ -24,13 +31,13 @@ class Difluoro(GenericFunctionalGroup):
 
     def __init__(
         self,
-        fluorine1: F,
-        atom1: Atom,
-        fluorine2: F,
-        atom2: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
+        fluorine1: _atoms.F,
+        atom1: _atoms.Atom,
+        fluorine2: _atoms.F,
+        atom2: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Difluoro` instance.
@@ -55,7 +62,7 @@ class Difluoro(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(fluorine1, atom1, fluorine2, atom2),
             bonders=bonders,
@@ -67,7 +74,7 @@ class Difluoro(GenericFunctionalGroup):
         self._fluorine2 = fluorine2
         self._atom2 = atom2
 
-    def get_atom1(self) -> Atom:
+    def get_atom1(self) -> _atoms.Atom:
         """
         Get the ``[atom1]`` atom.
 
@@ -79,7 +86,7 @@ class Difluoro(GenericFunctionalGroup):
 
         return self._atom1
 
-    def get_fluorine1(self) -> F:
+    def get_fluorine1(self) -> _atoms.F:
         """
         Get the ``[fluorine1]`` atom.
 
@@ -91,7 +98,7 @@ class Difluoro(GenericFunctionalGroup):
 
         return self._fluorine1
 
-    def get_atom2(self) -> Atom:
+    def get_atom2(self) -> _atoms.Atom:
         """
         Get the ``[atom2]`` atom.
 
@@ -103,7 +110,7 @@ class Difluoro(GenericFunctionalGroup):
 
         return self._atom2
 
-    def get_fluorine2(self) -> F:
+    def get_fluorine2(self) -> _atoms.F:
         """
         Get the ``[fluorine2]`` atom.
 
@@ -120,7 +127,7 @@ class Difluoro(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Difluoro:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

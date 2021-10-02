@@ -10,6 +10,8 @@ part of ``stk``. They must be completely self-sufficient.
 
 """
 
+import typing
+import pathlib
 from scipy.spatial.transform import Rotation
 import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
@@ -20,6 +22,39 @@ import os
 import re
 from collections import deque
 import tarfile
+
+
+__all__ = (
+    'atom_vdw_radii',
+    'bond_dict',
+    'periodic_table',
+    'Cell',
+    'ChargedMolError',
+    'MolFileError',
+    'PopulationSizeError',
+    'LazyAttr',
+    'archive_output',
+    'dedupe',
+    'flatten',
+    'kabsch',
+    'matrix_centroid',
+    'mol_from_mae_file',
+    'normalize_vector',
+    'remake',
+    'get_projection',
+    'orthogonal_vector',
+    'rotation_matrix',
+    'rotation_matrix_arbitrary_axis',
+    'dice_similarity',
+    'quaternion',
+    'translation_component',
+    'tar_output',
+    'time_it',
+    'vector_angle',
+    'get_acute_vector',
+    'get_plane_normal',
+    'cap_absolute_value',
+)
 
 
 # Holds the elements Van der Waals radii in Angstroms.
@@ -348,27 +383,28 @@ def matrix_centroid(matrix):
     return np.sum(matrix, axis=0) / len(matrix)
 
 
-def mol_from_mae_file(mae_path):
+def mol_from_mae_file(
+    path: typing.Union[pathlib.Path, str],
+) -> rdkit.Mol:
     """
-    Creates a ``rdkit`` molecule from a ``.mae`` file.
+    Create a :mod:`rdkit` molecule from a ``.mae`` file.
 
-    Parameters
-    ----------
-    mol2_file : :class:`str`
-        The full path of the ``.mae`` file from which an rdkit molecule
-        should be instantiated.
+    Parameters:
 
-    Returns
-    -------
-    :class:`rdkit.Mol`
-        An ``rdkit`` instance of the molecule held in `mae_file`.
+        path:
+            The full path of the ``.mae`` file from which an
+            :mod:`rdkit` molecule should be instantiated.
+
+    Returns:
+
+        An :mod:`rdkit` instance of the molecule held in `path`.
 
     """
 
     mol = rdkit.EditableMol(rdkit.Mol())
     conf = rdkit.Conformer()
 
-    with open(mae_path, 'r') as mae:
+    with open(path, 'r') as mae:
         content = re.split(r'[{}]', mae.read())
 
     prev_block = deque([''], maxlen=1)

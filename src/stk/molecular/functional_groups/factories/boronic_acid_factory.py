@@ -4,18 +4,29 @@ Boronic Acid Factory
 
 """
 
-from typing import Optional, Iterable, Literal
+from __future__ import annotations
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import BoronicAcid
-from ...molecule import Molecule
+import typing
+from collections import abc
+
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 
-ValidIndices = Literal[0, 1, 2, 3, 4, 5]
+__all__ = (
+    'BoronicAcidFactory',
+)
 
 
-class BoronicAcidFactory(FunctionalGroupFactory):
+_ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
+
+
+class BoronicAcidFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.BoronicAcid` instances.
 
@@ -108,9 +119,9 @@ class BoronicAcidFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: tuple[ValidIndices, ...] = (1, ),
-        deleters: tuple[ValidIndices, ...] = (2, 3, 4, 5),
-        placers: Optional[tuple[ValidIndices, ...]] = None,
+        bonders: tuple[_ValidIndex, ...] = (1, ),
+        deleters: tuple[_ValidIndex, ...] = (2, 3, 4, 5),
+        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.BoronicAcidFactory` instance.
@@ -138,17 +149,20 @@ class BoronicAcidFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> Iterable[BoronicAcid]:
-        ids = get_atom_ids('[*][B]([O][H])[O][H]', molecule)
-        for atom_ids in ids:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.BoronicAcid]:
+
+        for atom_ids in _utilities.get_atom_ids(
+            query='[*][B]([O][H])[O][H]',
+            molecule=molecule,
+        ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield BoronicAcid(
-                boron=atoms[1],
-                oxygen1=atoms[2],
-                hydrogen1=atoms[3],
-                oxygen2=atoms[4],
-                hydrogen2=atoms[5],
+            yield _functional_groups.BoronicAcid(
+                boron=typing.cast(_elements.B, atoms[1]),
+                oxygen1=typing.cast(_elements.O, atoms[2]),
+                hydrogen1=typing.cast(_elements.H, atoms[3]),
+                oxygen2=typing.cast(_elements.O, atoms[4]),
+                hydrogen2=typing.cast(_elements.H, atoms[5]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

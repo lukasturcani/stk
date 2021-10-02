@@ -6,14 +6,21 @@ Fluoro
 
 from __future__ import annotations
 
-from typing import Optional
+import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import F, Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
-class Fluoro(GenericFunctionalGroup):
+__all__ = (
+    'Fluoro',
+)
+
+
+class Fluoro(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents a fluoro functional group.
 
@@ -24,11 +31,11 @@ class Fluoro(GenericFunctionalGroup):
 
     def __init__(
         self,
-        fluorine: F,
-        atom: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
+        fluorine: _atoms.F,
+        atom: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Fluoro` instance.
@@ -53,7 +60,7 @@ class Fluoro(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(fluorine, atom),
             bonders=bonders,
@@ -63,7 +70,7 @@ class Fluoro(GenericFunctionalGroup):
         self._fluorine = fluorine
         self._atom = atom
 
-    def get_fluorine(self) -> F:
+    def get_fluorine(self) -> _atoms.F:
         """
         Get the ``[fluorine]`` atom.
 
@@ -75,7 +82,7 @@ class Fluoro(GenericFunctionalGroup):
 
         return self._fluorine
 
-    def get_atom(self) -> Atom:
+    def get_atom(self) -> _atoms.Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -97,7 +104,7 @@ class Fluoro(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Fluoro:
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

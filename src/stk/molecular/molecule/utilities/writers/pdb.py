@@ -4,37 +4,60 @@ PDB Writing Utilities
 
 """
 
+from __future__ import annotations
+import pathlib
+import typing
+import numpy as np
+from collections import abc
 
-def _write_pdb_file(self, path, atom_ids):
+from ....atoms import atom
+from ....bonds import bond
+
+_T = typing.TypeVar('_T')
+OneOrMany = typing.Union[_T, abc.Iterable[_T]]
+
+
+def write_pdb_file(
+    atoms: tuple[atom.Atom, ...],
+    bonds: tuple[bond.Bond, ...],
+    position_matrix: np.ndarray,
+    path: typing.Union[pathlib.Path, str],
+    atom_ids: typing.Optional[OneOrMany[int]],
+) -> None:
     """
     Write to a ``.pdb`` file.
 
     This function should not be used directly, only via
     :meth:`write`.
 
-    Parameters
-    ----------
-    path : :class:`str`
-        The full path to the file being written.
+    Parameters:
 
-    atom_ids : :class:`iterable` of :class:`int`
-        The atom ids of atoms to write. Can be a single
-        :class:`int`, if a single atom is to be used, or ``None``,
-        if all atoms are to be used.
+        atoms:
+            The atoms of the molecule to write.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+        bonds:
+            The bonds of the molecule to write.
+
+        position_matrix:
+            The ``3 x N`` position of the molecule to write.
+
+        path:
+            The full path to the file being written.
+
+        atom_ids:
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
     """
 
     if atom_ids is None:
-        atom_ids = range(len(self._atoms))
+        atom_ids = range(len(atoms))
     elif isinstance(atom_ids, int):
         atom_ids = (atom_ids, )
 
     lines = []
-    atom_counts = {}
+    atom_counts: dict[str, int] = {}
     hetatm = 'HETATM'
     alt_loc = ''
     res_name = 'UNL'
@@ -44,33 +67,33 @@ def _write_pdb_file(self, path, atom_ids):
     occupancy = '1.00'
     temp_factor = '0.00'
 
-    coords = self._position_matrix
+    coords = position_matrix
     # This set will be used by bonds.
-    atoms = set()
-    for atom in atom_ids:
-        atoms.add(atom)
+    seen_atoms: set[int] = set()
+    for atom_id in atom_ids:
+        seen_atoms.add(atom_id)
 
-        serial = atom+1
-        element = self._atoms[atom].__class__.__name__
+        serial = atom_id+1
+        element = atoms[atom_id].__class__.__name__
         atom_counts[element] = atom_counts.get(element, 0) + 1
         name = f'{element}{atom_counts[element]}'
         # Make sure the coords are no more than 8 columns wide
         # each.
-        x, y, z = (i for i in coords[:, atom])
+        x, y, z = (i for i in coords[:, atom_id])
         lines.append(
             f'{hetatm:<6}{serial:>5} {name:<4}'
             f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
             f'{res_seq:>4}{i_code:<1}   '
             f' {x:>7.3f} {y:>7.3f} {z:>7.3f}'
             f'{occupancy:>6}{temp_factor:>6}          '
-            f'{element:>2}{self._atoms[atom].get_charge():>2}\n'
+            f'{element:>2}{atoms[atom_id].get_charge():>2}\n'
         )
 
     conect = 'CONECT'
-    for bond in self._bonds:
-        a1 = bond.get_atom1().get_id()
-        a2 = bond.get_atom2().get_id()
-        if a1 in atoms and a2 in atoms:
+    for bond_ in bonds:
+        a1 = bond_.get_atom1().get_id()
+        a2 = bond_.get_atom2().get_id()
+        if a1 in seen_atoms and a2 in seen_atoms:
             lines.append(
                 f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
             )

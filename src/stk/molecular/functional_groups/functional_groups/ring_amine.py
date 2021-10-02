@@ -6,12 +6,17 @@ Ring Amine
 
 from __future__ import annotations
 
-from . import FunctionalGroup
-from .utilities import get_atom_map
-from ...atoms import C, N, H
+from . import functional_group as _functional_group
+from . import utilities as _utilities
+from ... import atoms as _atoms
 
 
-class RingAmine(FunctionalGroup):
+__all__ = (
+    'RingAmine',
+)
+
+
+class RingAmine(_functional_group.FunctionalGroup):
     """
     Represents an amine bonded to a ring.
 
@@ -23,13 +28,13 @@ class RingAmine(FunctionalGroup):
 
     def __init__(
         self,
-        nitrogen: N,
-        hydrogen1: H,
-        hydrogen2: H,
-        carbon1: C,
-        carbon2: C,
-        hydrogen3: H,
-        carbon3: C,
+        nitrogen: _atoms.N,
+        hydrogen1: _atoms.H,
+        hydrogen2: _atoms.H,
+        carbon1: _atoms.C,
+        carbon2: _atoms.C,
+        hydrogen3: _atoms.H,
+        carbon3: _atoms.C,
     ) -> None:
         """
         Initializes a :class:`.RingAmine` instance.
@@ -59,7 +64,7 @@ class RingAmine(FunctionalGroup):
 
         """
 
-        FunctionalGroup.__init__(
+        _functional_group.FunctionalGroup.__init__(
             self=self,
             atoms=(
                 nitrogen,
@@ -81,7 +86,7 @@ class RingAmine(FunctionalGroup):
         self._carbon2 = carbon2
         self._carbon3 = carbon3
 
-    def get_nitrogen(self) -> N:
+    def get_nitrogen(self) -> _atoms.N:
         """
         Get the ``[nitrogen]`` atom.
 
@@ -93,7 +98,7 @@ class RingAmine(FunctionalGroup):
 
         return self._nitrogen
 
-    def get_hydrogen1(self) -> H:
+    def get_hydrogen1(self) -> _atoms.H:
         """
         Get the ``[hydrogen1]`` atom.
 
@@ -105,7 +110,7 @@ class RingAmine(FunctionalGroup):
 
         return self._hydrogen1
 
-    def get_hydrogen2(self):
+    def get_hydrogen2(self) -> _atoms.H:
         """
         Get the ``[hydrogen2]`` atom.
 
@@ -117,7 +122,7 @@ class RingAmine(FunctionalGroup):
 
         return self._hydrogen2
 
-    def get_carbon1(self) -> C:
+    def get_carbon1(self) -> _atoms.C:
         """
         Get the ``[carbon1]`` atom.
 
@@ -129,7 +134,7 @@ class RingAmine(FunctionalGroup):
 
         return self._carbon1
 
-    def get_carbon2(self) -> C:
+    def get_carbon2(self) -> _atoms.C:
         """
         Get the ``[carbon2]`` atom.
 
@@ -141,7 +146,7 @@ class RingAmine(FunctionalGroup):
 
         return self._carbon2
 
-    def get_hydrogen3(self) -> H:
+    def get_hydrogen3(self) -> _atoms.H:
         """
         Get the ``[hydrogen3]`` atom.
 
@@ -153,7 +158,7 @@ class RingAmine(FunctionalGroup):
 
         return self._hydrogen3
 
-    def get_carbon3(self) -> C:
+    def get_carbon3(self) -> _atoms.C:
         """
         Get the ``[carbon3]`` atom.
 
@@ -180,7 +185,7 @@ class RingAmine(FunctionalGroup):
         self,
         id_map: dict[int, int],
     ):
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

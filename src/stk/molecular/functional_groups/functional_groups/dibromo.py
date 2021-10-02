@@ -6,14 +6,21 @@ Dibormo
 
 from __future__ import annotations
 
-from typing import Optional
+import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Br, Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
-class Dibromo(GenericFunctionalGroup):
+__all__ = (
+    'Dibromo',
+)
+
+
+class Dibromo(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents a dibromo functional group.
 
@@ -24,13 +31,13 @@ class Dibromo(GenericFunctionalGroup):
 
     def __init__(
         self,
-        bromine1: Br,
-        atom1: Atom,
-        bromine2: Br,
-        atom2: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
+        bromine1: _atoms.Br,
+        atom1: _atoms.Atom,
+        bromine2: _atoms.Br,
+        atom2: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Dibromo` instance.
@@ -61,7 +68,7 @@ class Dibromo(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(bromine1, atom1, bromine2, atom2),
             bonders=bonders,
@@ -73,7 +80,7 @@ class Dibromo(GenericFunctionalGroup):
         self._bromine2 = bromine2
         self._atom2 = atom2
 
-    def get_atom1(self) -> Atom:
+    def get_atom1(self) -> _atoms.Atom:
         """
         Get the ``[atom1]`` atom.
 
@@ -85,7 +92,7 @@ class Dibromo(GenericFunctionalGroup):
 
         return self._atom1
 
-    def get_bromine1(self) -> Br:
+    def get_bromine1(self) -> _atoms.Br:
         """
         Get the ``[bromine1]`` atom.
 
@@ -97,7 +104,7 @@ class Dibromo(GenericFunctionalGroup):
 
         return self._bromine1
 
-    def get_atom2(self) -> Atom:
+    def get_atom2(self) -> _atoms.Atom:
         """
         Get the ``[atom2]`` atom.
 
@@ -109,7 +116,7 @@ class Dibromo(GenericFunctionalGroup):
 
         return self._atom2
 
-    def get_bromine2(self) -> Br:
+    def get_bromine2(self) -> _atoms.Br:
         """
         Get the ``[bromine2]`` atom.
 
@@ -134,7 +141,7 @@ class Dibromo(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Dibromo:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,
