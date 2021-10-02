@@ -53,7 +53,7 @@ class IAtom(typing.Protocol):
     """
     A generic interface for atoms.
 
-    Objects which obey this interface can be for initializing
+    Objects which obey this interface can be used for initializing
     a :class:`.BuildingBlock`.
 
     """
@@ -87,7 +87,7 @@ class IBond(typing.Protocol):
     """
     A generic interface for bonds.
 
-    Objects which obey this interface can be for initializing
+    Objects which obey this interface can be used for initializing
     a :class:`.BuildingBlock`.
 
     """
@@ -125,7 +125,7 @@ class IMolecule(typing.Protocol):
     """
     A generic interface for molecules.
 
-    Any object which obeys this interface can be for initializing
+    Any object which obeys this interface can be used for initializing
     a :class:`.BuildingBlock`.
 
     """
