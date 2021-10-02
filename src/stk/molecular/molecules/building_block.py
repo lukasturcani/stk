@@ -7,7 +7,6 @@ Building Block
 from __future__ import annotations
 
 
-import logging
 import os
 import rdkit.Chem.AllChem as rdkit
 import functools
@@ -16,7 +15,7 @@ import typing
 import pathlib
 from collections import abc
 
-from stk._utilities import typing as _typing
+from stk.utilities import typing as _typing
 from .. import functional_groups as _functional_groups
 from .. import atoms as _atoms
 from .. import bonds as _bonds
@@ -24,7 +23,12 @@ from .. import molecule as _molecule
 from ... import utilities as _utilities
 
 
-logger = logging.getLogger(__name__)
+__all__ = (
+    'IAtom',
+    'IBond',
+    'IMolecule',
+    'BuildingBlock',
+)
 
 
 _T = typing.TypeVar('_T', bound='BuildingBlock')

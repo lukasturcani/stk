@@ -21,23 +21,21 @@ import typing
 import pathlib
 from collections import abc
 
-from stk.utilities import (
-    vector_angle,
-    rotation_matrix,
-    rotation_matrix_arbitrary_axis,
-)
-from ..atoms import Atom
-from ..bonds import Bond
-from .utilities import writers, updaters
-from ..molecular_utilities import (
-    sort_bond_atoms_by_id,
-    get_bond_atom_ids,
-)
+from stk import utilities as _utilities
+from stk.utilities import typing as _typing
+from .utilities import writers as _writers
+from .utilities import updaters as _updaters
+from .. import atoms as _atoms
+from .. import bonds as _bonds
+from .. import molecular_utilities as _molecular_utilities
+
 
 _T = typing.TypeVar('_T', bound='Molecule')
 
-_T2 = typing.TypeVar('_T2')
-OneOrMany = typing.Union[_T2, abc.Iterable[_T2]]
+
+__all__ = (
+    'Molecule',
+)
 
 
 class Molecule:
@@ -113,8 +111,8 @@ class Molecule:
 
     def __init__(
         self,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: tuple[_atoms.Atom, ...],
+        bonds: tuple[_bonds.Bond, ...],
         position_matrix: np.ndarray,
     ) -> None:
         """
@@ -189,7 +187,10 @@ class Molecule:
 
         # Set the origin of the rotation to "origin".
         self._with_displacement(-origin)
-        rot_mat = rotation_matrix_arbitrary_axis(angle, axis)
+        rot_mat = _utilities.rotation_matrix_arbitrary_axis(
+            angle=angle,
+            axis=axis,
+        )
 
         # Apply the rotation matrix on the position matrix, to get the
         # new position matrix.
@@ -248,7 +249,7 @@ class Molecule:
 
         # Set the origin of the rotation to "origin".
         self._with_displacement(-origin)
-        rot_mat = rotation_matrix(start, target)
+        rot_mat = _utilities.rotation_matrix(start, target)
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
@@ -345,13 +346,16 @@ class Molecule:
             self._with_displacement(origin)
             return self
 
-        angle = vector_angle(tstart, tend)
+        angle = _utilities.vector_angle(tstart, tend)
 
         projection = tstart @ np.cross(axis, tend)
         if projection > 0:
             angle = 2*np.pi - angle
 
-        rotation_matrix = rotation_matrix_arbitrary_axis(angle, axis)
+        rotation_matrix = _utilities.rotation_matrix_arbitrary_axis(
+            angle=angle,
+            axis=axis,
+        )
         self._position_matrix = rotation_matrix @ self._position_matrix
         self._with_displacement(origin)
         return self
@@ -432,7 +436,7 @@ class Molecule:
 
     def get_atomic_positions(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> abc.Iterable[np.ndarray]:
         """
         Yield the positions of atoms.
@@ -464,8 +468,8 @@ class Molecule:
 
     def get_atoms(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> abc.Iterable[Atom]:
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+    ) -> abc.Iterable[_atoms.Atom]:
         """
         Yield the atoms in the molecule, ordered by id.
 
@@ -502,7 +506,7 @@ class Molecule:
 
         return len(self._atoms)
 
-    def get_bonds(self) -> abc.Iterable[Bond]:
+    def get_bonds(self) -> abc.Iterable[_bonds.Bond]:
         """
         Yield the bonds in the molecule.
 
@@ -529,7 +533,7 @@ class Molecule:
 
     def get_centroid(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> np.ndarray:
         """
         Return the centroid.
@@ -569,7 +573,7 @@ class Molecule:
 
     def get_direction(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> np.ndarray:
         """
         Return a vector of best fit through the atoms.
@@ -610,7 +614,7 @@ class Molecule:
 
     def get_maximum_diameter(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> float:
         """
         Return the maximum diameter.
@@ -652,7 +656,7 @@ class Molecule:
 
     def get_plane_normal(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> np.ndarray:
         """
         Return the normal to the plane of best fit.
@@ -706,7 +710,7 @@ class Molecule:
     def _with_centroid(
         self: _T,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]],
+        atom_ids: typing.Optional[_typing.OneOrMany[int]],
     ) -> _T:
         centroid = self.get_centroid(atom_ids=atom_ids)
         self._with_displacement(position-centroid)
@@ -715,7 +719,7 @@ class Molecule:
     def with_centroid(
         self,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> Molecule:
         """
         Return a clone with its centroid at `position`.
@@ -817,15 +821,15 @@ class Molecule:
             _, extension = os.path.splitext(path)
 
         getters: dict[str, abc.Callable[[str], np.ndarray]] = {
-            '.mol': updaters.get_position_matrix_from_mol,
-            '.sdf': updaters.get_position_matrix_from_mol,
-            '.mae': updaters.get_position_matrix_from_mae,
-            '.xyz': updaters.get_position_matrix_from_xyz,
+            '.mol': _updaters.get_position_matrix_from_mol,
+            '.sdf': _updaters.get_position_matrix_from_mol,
+            '.mae': _updaters.get_position_matrix_from_mae,
+            '.xyz': _updaters.get_position_matrix_from_xyz,
             '.coord': functools.partial(
-                updaters.get_position_matrix_from_turbomole,
+                _updaters.get_position_matrix_from_turbomole,
                 len(self._atoms),
             ),
-            '.pdb': updaters.get_position_matrix_from_pdb,
+            '.pdb': _updaters.get_position_matrix_from_pdb,
         }
         get_position_matrix = getters[extension]
         position_matrix = get_position_matrix(path)
@@ -909,10 +913,12 @@ class Molecule:
         ))
         self._bonds = tuple(sorted(
             (
-                sort_bond_atoms_by_id(bond.with_atoms(atom_map))
+                _molecular_utilities.sort_bond_atoms_by_id(
+                    bond=bond.with_atoms(atom_map),
+                )
                 for bond in self._bonds
             ),
-            key=get_bond_atom_ids,
+            key=_molecular_utilities.get_bond_atom_ids,
         ))
         old_ids = {
             atom.get_id(): old_id for old_id, atom in atom_map.items()
@@ -944,16 +950,16 @@ class Molecule:
     def _write(
         self: _T,
         path: typing.Union[pathlib.Path, str],
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> _T:
 
         path = str(path)
         _, extension = os.path.splitext(path)
         {
-            '.mol': writers.write_mdl_mol_file,
-            '.sdf': writers.write_mdl_mol_file,
-            '.xyz': writers.write_xyz_file,
-            '.pdb': writers.write_pdb_file,
+            '.mol': _writers.write_mdl_mol_file,
+            '.sdf': _writers.write_mdl_mol_file,
+            '.xyz': _writers.write_xyz_file,
+            '.pdb': _writers.write_pdb_file,
         }[extension](
             atoms=self._atoms,
             bonds=self._bonds,
@@ -966,7 +972,7 @@ class Molecule:
     def write(
         self,
         path: typing.Union[pathlib.Path, str],
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> Molecule:
         """
         Write the structure to a file.

@@ -9,17 +9,24 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Aldehyde
-from ...molecule import Molecule
-from ...atoms import elements
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 
-ValidIndex = typing.Literal[0, 1, 2, 3]
+__all__ = (
+    'AldehydeFactory',
+)
 
 
-class AldehydeFactory(FunctionalGroupFactory):
+_ValidIndex = typing.Literal[0, 1, 2, 3]
+
+
+class AldehydeFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.Aldehyde` instances.
 
@@ -111,9 +118,9 @@ class AldehydeFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders: tuple[ValidIndex, ...] = (1, ),
-        deleters: tuple[ValidIndex, ...] = (2, ),
-        placers: typing.Optional[tuple[ValidIndex, ...]] = None,
+        bonders: tuple[_ValidIndex, ...] = (1, ),
+        deleters: tuple[_ValidIndex, ...] = (2, ),
+        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.AldehydeFactory` instance.
@@ -141,15 +148,18 @@ class AldehydeFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> abc.Iterable[Aldehyde]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Aldehyde]:
 
-        for atom_ids in get_atom_ids('[*][C](=[O])[H]', molecule):
+        for atom_ids in _utilities.get_atom_ids(
+            query='[*][C](=[O])[H]',
+            molecule=molecule,
+        ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Aldehyde(
-                carbon=typing.cast(elements.C, atoms[1]),
-                oxygen=typing.cast(elements.O, atoms[2]),
-                hydrogen=typing.cast(elements.H, atoms[3]),
+            yield _functional_groups.Aldehyde(
+                carbon=typing.cast(_elements.C, atoms[1]),
+                oxygen=typing.cast(_elements.O, atoms[2]),
+                hydrogen=typing.cast(_elements.H, atoms[3]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

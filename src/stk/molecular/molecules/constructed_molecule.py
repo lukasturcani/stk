@@ -9,21 +9,23 @@ from __future__ import annotations
 import pathlib
 import typing
 import numpy as np
-import logging
 import rdkit.Chem.AllChem as rdkit
 from collections import abc
 
-from stk._utilities import typing as _typing
+from stk.utilities import typing as _typing
 from .. import molecule as _molecule
 from .. import atoms as _atoms
 from .. import bonds as _bonds
 from .. import molecular_utilities as _utilities
 from .. import topology_graphs as _topology_graphs
 
-logger = logging.getLogger(__name__)
-
 
 _T = typing.TypeVar('_T', bound='ConstructedMolecule')
+
+
+__all__ = (
+    'ConstructedMolecule',
+)
 
 
 class ConstructedMolecule(_molecule.Molecule):
