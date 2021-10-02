@@ -6,14 +6,20 @@ Boronic Acid
 
 from __future__ import annotations
 
-from typing import Optional
+import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Atom, B, O, H
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
+
+__all__ = (
+    'BoronicAcid',
+)
 
 
-class BoronicAcid(GenericFunctionalGroup):
+class BoronicAcid(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents a boronic acid functional group.
 
@@ -24,17 +30,17 @@ class BoronicAcid(GenericFunctionalGroup):
 
     def __init__(
         self,
-        boron: B,
+        boron: _atoms.B,
         # O is not an ambiguous name.
-        oxygen1: O,  # noqa
-        hydrogen1: H,
+        oxygen1: _atoms.O,  # noqa
+        hydrogen1: _atoms.H,
         # O is not an ambiguous name.
-        oxygen2: O,  # noqa
-        hydrogen2: H,
-        atom: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
+        oxygen2: _atoms.O,  # noqa
+        hydrogen2: _atoms.H,
+        atom: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.BoronicAcid` instance.
@@ -71,7 +77,7 @@ class BoronicAcid(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(
                 boron,
@@ -92,7 +98,7 @@ class BoronicAcid(GenericFunctionalGroup):
         self._hydrogen2 = hydrogen2
         self._atom = atom
 
-    def get_boron(self) -> B:
+    def get_boron(self) -> _atoms.B:
         """
         Get the ``[boron]`` atom.
 
@@ -105,7 +111,7 @@ class BoronicAcid(GenericFunctionalGroup):
         return self._boron
 
     # O is not an ambiguous name.
-    def get_oxygen1(self) -> O:  # noqa
+    def get_oxygen1(self) -> _atoms.O:  # noqa
         """
         Get the ``[oxygen1]`` atom.
 
@@ -117,7 +123,7 @@ class BoronicAcid(GenericFunctionalGroup):
 
         return self._oxygen1
 
-    def get_hydrogen1(self) -> H:
+    def get_hydrogen1(self) -> _atoms.H:
         """
         Get the ``[hydrogen1]`` atom.
 
@@ -130,7 +136,7 @@ class BoronicAcid(GenericFunctionalGroup):
         return self._hydrogen1
 
     # O is not an ambiguous name.
-    def get_oxygen2(self) -> O:  # noqa
+    def get_oxygen2(self) -> _atoms.O:  # noqa
         """
         Get the ``[oxygen2]`` atom.
 
@@ -142,7 +148,7 @@ class BoronicAcid(GenericFunctionalGroup):
 
         return self._oxygen2
 
-    def get_hydrogen2(self) -> H:
+    def get_hydrogen2(self) -> _atoms.H:
         """
         Get the ``[hydrogen2]`` atom.
 
@@ -154,7 +160,7 @@ class BoronicAcid(GenericFunctionalGroup):
 
         return self._hydrogen2
 
-    def get_atom(self) -> Atom:
+    def get_atom(self) -> _atoms.Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -181,7 +187,7 @@ class BoronicAcid(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> BoronicAcid:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,
