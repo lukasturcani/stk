@@ -6,25 +6,32 @@ Key Maker Utilities
 
 import rdkit.Chem.AllChem as rdkit
 
+from .. import molecule as _molecule
 
-def get_inchi(molecule):
+__all__ = (
+    'get_inchi',
+    'get_inchi_key',
+    'get_smiles',
+)
+
+
+def get_inchi(molecule: _molecule.Molecule) -> str:
     """
     Get the InChI of `molecule`.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule whose InChI is required.
+    Parameters:
 
-    Returns
-    -------
-    :class:`str`
+        molecule:
+            The molecule whose InChI is required.
+
+    Returns:
+
         The InChI.
 
-    Raises
-    ------
-    :class:`ValueError`
-        If the InChI of `molecule` cannot be generated.
+    Raises:
+
+        :class:`ValueError`:
+            If the InChI of `molecule` cannot be generated.
 
     """
 
@@ -34,24 +41,25 @@ def get_inchi(molecule):
     raise ValueError('The InChI of {molecule} was empty.')
 
 
-def get_inchi_key(molecule):
+def get_inchi_key(
+    molecule: _molecule.Molecule,
+) -> str:
     """
     Get the InChIKey of `molecule`.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule whose InChIKey is needed.
+    Parameters:
 
-    Returns
-    -------
-    :class:`str`
+        molecule:
+            The molecule whose InChIKey is needed.
+
+    Returns:
+
         The InChIKey.
 
-    Raises
-    ------
-    :class:`ValueError`
-        If the InChIKey of `molecule` cannot be generated.
+    Raises:
+
+        :class:`ValueError`:
+            If the InChIKey of `molecule` cannot be generated.
 
     """
 
@@ -61,18 +69,19 @@ def get_inchi_key(molecule):
     return key
 
 
-def get_smiles(molecule):
+def get_smiles(
+    molecule: _molecule.Molecule,
+) -> str:
     """
     Get the RDKit canonical, isomeric SMILES of `molecule`.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule whose SMILES is required.
+    Parameters:
 
-    Returns
-    -------
-    :class:`str`
+        molecule:
+            The molecule whose SMILES is required.
+
+    Returns:
+
         The SMILES.
 
     """
