@@ -4,38 +4,50 @@ Mol Writer
 
 """
 
+from __future__ import annotations
+
+import pathlib
+import typing
+
+from .. import molecule as _molecule
+from stk.utilities import typing as _typing
+
 
 class MolWriter:
     """
     A writer class for V3000 ``.mol`` files.
 
-    Examples
-    --------
-    *Writing to a File*
+    Examples:
 
-    .. testcode:: writing-to-a-file
+        *Writing to a File*
 
-        import stk
+        .. testcode:: writing-to-a-file
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            import stk
 
-        writer = stk.MolWriter()
-        writer.write(molecule=bb1, path='bb1.mol')
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
 
-    .. testcode:: writing-to-a-file
-        :hide:
+            writer = stk.MolWriter()
+            writer.write(molecule=bb1, path='bb1.mol')
 
-        import os
+        .. testcode:: writing-to-a-file
+            :hide:
 
-        assert os.path.exists('bb1.mol')
+            import os
 
-    .. testcleanup:: writing-to-a-file
+            assert os.path.exists('bb1.mol')
 
-        os.remove('bb1.mol')
+        .. testcleanup:: writing-to-a-file
+
+            os.remove('bb1.mol')
 
     """
 
-    def _write_content(self, molecule, atom_ids):
+    def _write_content(
+        self,
+        molecule: _molecule.Molecule,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]],
+    ) -> str:
 
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
@@ -52,15 +64,15 @@ class MolWriter:
             x, y, z = (i for i in coords[old_atom_id])
             atom, = molecule.get_atoms(atom_ids=old_atom_id)
             symbol = atom.__class__.__name__
-            charge = atom.get_charge()
-            charge = f' CHG={charge}' if charge else ''
+            charge_value = atom.get_charge()
+            charge = f' CHG={charge_value}' if charge_value else ''
             atom_lines.append(
                 f'M  V30 {new_atom_id} {symbol} {x:.4f} '
                 f'{y:.4f} {z:.4f} 0{charge}\n'
             )
         atom_block = ''.join(atom_lines)
 
-        bond_lines = []
+        bond_lines: list[str] = []
         for bond in molecule.get_bonds():
             a1 = bond.get_atom1().get_id()
             a2 = bond.get_atom2().get_id()
@@ -92,49 +104,56 @@ class MolWriter:
             '$$$$\n'
         )
 
-    def to_string(self, molecule, atom_ids=None):
+    def to_string(
+        self,
+        molecule: _molecule.Molecule,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+    ) -> str:
         """
         Get a V3000 ``.mol`` file format string of `molecule`.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to V3000 ``.mol`` format.
+        Parameters:
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            molecule:
+                Molecule to write to V3000 ``.mol`` format.
 
-        Returns
-        -------
-        :class:`str`
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
+
+        Returns:
+
             String in V3000 ``.mol`` file format.
 
         """
 
         return self._write_content(molecule, atom_ids)
 
-    def write(self, molecule, path, atom_ids=None):
+    def write(
+        self,
+        molecule: _molecule.Molecule,
+        path: typing.Union[pathlib.Path, str],
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+    ) -> None:
         """
         Write `molecule` to V3000 ``.mol`` file format.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to V3000 ``.mol`` format.
+        Parameters:
 
-        path : :class:`str`
-            The full path to the file being written.
+            molecule:
+                Molecule to write to V3000 ``.mol`` format.
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            path:
+                The full path to the file being written.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
+
+        Returns:
+
             A file is written.
 
         """
