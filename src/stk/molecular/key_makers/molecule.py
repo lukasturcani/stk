@@ -11,6 +11,8 @@ Molecule Key Maker
 
 """
 
+from __future__ import annotations
+
 from collections import abc
 from .. import molecule as _molecule
 
@@ -116,7 +118,8 @@ class MoleculeKeyMaker:
 
         Parameters:
 
-            The molecule for which a key is needed.
+            molecule:
+                The molecule for which a key is needed.
 
         Returns:
 

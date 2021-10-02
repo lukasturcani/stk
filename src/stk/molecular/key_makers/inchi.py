@@ -56,7 +56,7 @@ class Inchi(_molecule.MoleculeKeyMaker):
 
     def __init__(self) -> None:
         """
-        Initialize a :class:`Inchi` instance.
+        Initialize an :class:`Inchi` instance.
 
         """
 
