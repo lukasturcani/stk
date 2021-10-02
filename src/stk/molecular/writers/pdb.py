@@ -5,60 +5,85 @@ PDB Writer
 """
 
 
+from __future__ import annotations
+
+import typing
+import pathlib
+
+from collections import abc
+
+from stk.utilities.typing import OneOrMany
+from ..molecule import Molecule
+from ..periodic_info import PeriodicInfo
+
+__all__ = (
+    'PdbWriter',
+)
+
+
 class PdbWriter:
     """
     A writer class for ``.pdb`` files.
 
-    Examples
-    --------
-    *Writing to a File with a Unit Cell*
+    Examples:
 
-    This writer can write to a file with the unit
-    cell included for periodic molecules. Note that this always assumes
-    P1 space group.
+        *Writing to a File with a Unit Cell*
 
-    .. testcode:: writing-to-a-file-with-a-unit-cell
+        This writer can write to a file with the unit
+        cell included for periodic molecules. Note that this always
+        assumes P1 space group.
 
-        import stk
+        .. testcode:: writing-to-a-file-with-a-unit-cell
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-        topology_graph = stk.cof.PeriodicHoneycomb(
-            building_blocks=(bb1, bb2),
-            lattice_size=(3, 3, 1),
-        )
-        construction_result = topology_graph.construct()
-        cof = stk.ConstructedMolecule.init_from_construction_result(
-            construction_result=construction_result,
-        )
-        writer = stk.PdbWriter()
-        writer.write(
-            molecule=cof,
-            path='cof.pdb',
-            periodic_info=construction_result.get_periodic_info(),
-        )
+            import stk
 
-    .. testcode:: writing-to-a-file-with-a-unit-cell
-        :hide:
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock(
+                smiles='BrCC(CBr)CBr',
+                functional_groups=[stk.BromoFactory()],
+            )
+            topology_graph = stk.cof.PeriodicHoneycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+            )
+            construction_result = topology_graph.construct()
+            cof = (
+                stk.ConstructedMolecule.init_from_construction_result(
+                    construction_result=construction_result,
+                )
+            )
+            writer = stk.PdbWriter()
+            writer.write(
+                molecule=cof,
+                path='cof.pdb',
+                periodic_info=construction_result.get_periodic_info(),
+            )
 
-        import os
+        .. testcode:: writing-to-a-file-with-a-unit-cell
+            :hide:
 
-        assert os.path.exists('cof.pdb')
+            import os
 
-    .. testcleanup:: writing-to-a-file-with-a-unit-cell
+            assert os.path.exists('cof.pdb')
 
-        os.remove('cof.pdb')
+        .. testcleanup:: writing-to-a-file-with-a-unit-cell
+
+            os.remove('cof.pdb')
 
     """
 
-    def _write_content(self, molecule, atom_ids, periodic_info=None):
+    def _write_content(
+        self,
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]],
+        periodic_info: typing.Optional[PeriodicInfo],
+    ) -> abc.Iterable[str]:
 
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
 
-        content = []
         if periodic_info is not None:
             # Input unit cell information.
             a = periodic_info.get_a()
@@ -67,13 +92,13 @@ class PdbWriter:
             alpha = periodic_info.get_alpha()
             beta = periodic_info.get_beta()
             gamma = periodic_info.get_gamma()
-            content.append(
+            yield (
                 f'CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}'
                 f' {alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f} '
                 f'P 1\n'
             )
 
-        atom_counts = {}
+        atom_counts: dict[str, int] = {}
         hetatm = 'HETATM'
         alt_loc = ''
         res_name = 'UNL'
@@ -98,7 +123,7 @@ class PdbWriter:
             # each.
             x, y, z = (i for i in coords[atom_id])
 
-            content.append(
+            yield (
                 f'{hetatm:<6}{serial:>5} {name:<4}'
                 f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
                 f'{res_seq:>4}{i_code:<1}   '
@@ -112,80 +137,74 @@ class PdbWriter:
             a1 = bond.get_atom1().get_id()
             a2 = bond.get_atom2().get_id()
             if a1 in atoms and a2 in atoms:
-                content.append(
+                yield (
                     f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
                 )
 
-        content.append('END\n')
-
-        return content
+        yield 'END\n'
 
     def to_string(
         self,
-        molecule,
-        atom_ids=None,
-        periodic_info=None
-    ):
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        periodic_info: typing.Optional[PeriodicInfo] = None,
+    ) -> str:
         """
         Get a ``.pdb`` file format string of `molecule`.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to ``.pdb`` format.
+        Parameters:
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            molecule:
+                Molecule to write to ``.pdb`` format.
 
-        periodic_info : :class:`.PeriodicInfo`
-            Information about the periodic cell.
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
 
-        Returns
-        -------
-        :class:`string`
-            A string holding the content of a ``.pdf`` file.
+            periodic_info:
+                Information about the periodic cell.
+
+        Returns:
+
+            A string holding the content of a ``.pdb`` file.
 
         """
 
-        content = self._write_content(
+        return ''.join(self._write_content(
             molecule=molecule,
             atom_ids=atom_ids,
             periodic_info=periodic_info,
-        )
-
-        return ''.join(content)
+        ))
 
     def write(
         self,
-        molecule,
-        path,
-        atom_ids=None,
-        periodic_info=None
-    ):
+        molecule: Molecule,
+        path: typing.Union[pathlib.Path, str],
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        periodic_info: typing.Optional[PeriodicInfo] = None
+    ) -> None:
         """
         Write `molecule` to ``.pdb`` file format.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to ``.pdb`` format.
+        Parameters:
 
-        path : :class:`str`
-            The full path to the file being written.
+            molecule:
+                Molecule to write to ``.pdb`` format.
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            path:
+                The full path to the file being written.
 
-        periodic_info : :class:`.PeriodicInfo`
-            Information about the periodic cell.
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            periodic_info:
+                Information about the periodic cell.
+
+        Returns:
+
             A file is written.
 
         """

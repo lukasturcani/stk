@@ -9,22 +9,18 @@ from __future__ import annotations
 import pathlib
 import typing
 import numpy as np
-from collections import abc
 
-from ....atoms import atom
-from ....bonds import bond
-
-
-_T = typing.TypeVar('_T')
-OneOrMany = typing.Union[_T, abc.Iterable[_T]]
+from .... import atoms as _atoms
+from .... import bonds as _bonds
+from stk.utilities import typing as _typing
 
 
 def write_mdl_mol_file(
-    atoms: tuple[atom.Atom, ...],
-    bonds: tuple[bond.Bond, ...],
+    atoms: tuple[_atoms.Atom, ...],
+    bonds: tuple[_bonds.Bond, ...],
     position_matrix: np.ndarray,
     path: typing.Union[pathlib.Path, str],
-    atom_ids: typing.Optional[OneOrMany[int]],
+    atom_ids: typing.Optional[_typing.OneOrMany[int]],
 ) -> None:
     """
     Write to a V3000 ``.mol`` file.
@@ -63,10 +59,10 @@ def write_mdl_mol_file(
 
 
 def _to_mdl_mol_block(
-    atoms: tuple[atom.Atom, ...],
-    bonds: tuple[bond.Bond, ...],
+    atoms: tuple[_atoms.Atom, ...],
+    bonds: tuple[_bonds.Bond, ...],
     position_matrix: np.ndarray,
-    atom_ids: typing.Optional[OneOrMany[int]],
+    atom_ids: typing.Optional[_typing.OneOrMany[int]],
 ) -> str:
     """
     Return a V3000 mol block of the molecule.
