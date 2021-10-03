@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import I, Atom
 
 
 __all__ = (
@@ -18,9 +18,7 @@ __all__ = (
 )
 
 
-class Iodo(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Iodo(GenericFunctionalGroup):
     """
     Represents an iodo functional group.
 
@@ -32,11 +30,11 @@ class Iodo(
     def __init__(
         self,
         # I is not an ambiguous name.
-        iodine: _atoms.I,  # noqa
-        atom: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        iodine: I,  # noqa
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Iodo` instance.
@@ -61,7 +59,7 @@ class Iodo(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(iodine, atom),
             bonders=bonders,
@@ -72,7 +70,7 @@ class Iodo(
         self._atom = atom
 
     # I is not an ambiguous name.
-    def get_iodine(self) -> _atoms.I:  # noqa
+    def get_iodine(self) -> I:  # noqa
         """
         Get the ``[iodine]`` atom.
 
@@ -84,7 +82,7 @@ class Iodo(
 
         return self._iodine
 
-    def get_atom(self) -> _atoms.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -107,7 +105,7 @@ class Iodo(
         id_map: dict[int, int],
     ) -> Iodo:
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

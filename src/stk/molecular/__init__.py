@@ -1,7 +1,8 @@
 from .topology_graphs import *  # noqa
 from .functional_groups import *  # noqa
 from .molecule import *  # noqa
-from .molecules import *  # noqa
+from .building_block import *  # noqa
+from .constructed_molecule import *  # noqa
 from .atoms import *  # noqa
 from .bonds import *  # noqa
 from .reactions import *  # noqa

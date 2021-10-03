@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections import abc
 
 from ......bonds import Bond, BondInfo
-from ......molecules import BuildingBlock
+from ......building_block import BuildingBlock
 
 
 class _BondBatch:

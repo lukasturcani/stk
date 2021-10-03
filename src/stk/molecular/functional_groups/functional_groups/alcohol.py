@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import O, H, Atom
 
 
 __all__ = (
@@ -18,9 +18,7 @@ __all__ = (
 )
 
 
-class Alcohol(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Alcohol(GenericFunctionalGroup):
     """
     Represents an alcohol functional group.
 
@@ -32,12 +30,12 @@ class Alcohol(
     def __init__(
         self,
         # O is not an ambiguous name.
-        oxygen: _atoms.O,  # noqa
-        hydrogen: _atoms.H,
-        atom: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        oxygen: O,  # noqa
+        hydrogen: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Alcohol` instance.
@@ -65,7 +63,7 @@ class Alcohol(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(oxygen, hydrogen, atom),
             bonders=bonders,
@@ -77,7 +75,7 @@ class Alcohol(
         self._atom = atom
 
     # O is not an ambiguous name.
-    def get_oxygen(self) -> _atoms.O:  # noqa
+    def get_oxygen(self) -> O:  # noqa
         """
         Get the oxygen atom.
 
@@ -89,7 +87,7 @@ class Alcohol(
 
         return self._oxygen
 
-    def get_hydrogen(self) -> _atoms.H:
+    def get_hydrogen(self) -> H:
         """
         Get the hydrogen atom.
 
@@ -101,7 +99,7 @@ class Alcohol(
 
         return self._hydrogen
 
-    def get_atom(self) -> _atoms.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the atom to which the functional group is attached.
 
@@ -125,7 +123,7 @@ class Alcohol(
         id_map: dict[int, int],
     ) -> Alcohol:
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

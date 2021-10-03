@@ -6,7 +6,7 @@ Key Maker Utilities
 
 import rdkit.Chem.AllChem as rdkit
 
-from .. import molecule as _molecule
+from .. molecule import Molecule
 
 __all__ = (
     'get_inchi',
@@ -15,7 +15,7 @@ __all__ = (
 )
 
 
-def get_inchi(molecule: _molecule.Molecule) -> str:
+def get_inchi(molecule: Molecule) -> str:
     """
     Get the InChI of `molecule`.
 
@@ -42,7 +42,7 @@ def get_inchi(molecule: _molecule.Molecule) -> str:
 
 
 def get_inchi_key(
-    molecule: _molecule.Molecule,
+    molecule: Molecule,
 ) -> str:
     """
     Get the InChIKey of `molecule`.
@@ -70,7 +70,7 @@ def get_inchi_key(
 
 
 def get_smiles(
-    molecule: _molecule.Molecule,
+    molecule: Molecule,
 ) -> str:
     """
     Get the RDKit canonical, isomeric SMILES of `molecule`.

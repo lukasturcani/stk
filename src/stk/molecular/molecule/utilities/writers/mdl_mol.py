@@ -10,14 +10,14 @@ import pathlib
 import typing
 import numpy as np
 
-from .... import atoms as _atoms
-from .... import bonds as _bonds
+from ....atoms import Atom
+from ....bonds import Bond
 from stk.utilities import typing as _typing
 
 
 def write_mdl_mol_file(
-    atoms: tuple[_atoms.Atom, ...],
-    bonds: tuple[_bonds.Bond, ...],
+    atoms: tuple[Atom, ...],
+    bonds: tuple[Bond, ...],
     position_matrix: np.ndarray,
     path: typing.Union[pathlib.Path, str],
     atom_ids: typing.Optional[_typing.OneOrMany[int]],
@@ -59,8 +59,8 @@ def write_mdl_mol_file(
 
 
 def _to_mdl_mol_block(
-    atoms: tuple[_atoms.Atom, ...],
-    bonds: tuple[_bonds.Bond, ...],
+    atoms: tuple[Atom, ...],
+    bonds: tuple[Bond, ...],
     position_matrix: np.ndarray,
     atom_ids: typing.Optional[_typing.OneOrMany[int]],
 ) -> str:

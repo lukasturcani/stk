@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import C, O, S, H, Atom
 
 
 __all__ = (
@@ -18,9 +18,7 @@ __all__ = (
 )
 
 
-class Thioacid(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Thioacid(GenericFunctionalGroup):
     """
     Represents a thioacid functional group.
 
@@ -31,15 +29,15 @@ class Thioacid(
 
     def __init__(
         self,
-        carbon: _atoms.C,
+        carbon: C,
         # O is not an ambiguous name.
-        oxygen: _atoms.O,  # noqa
-        sulfur: _atoms.S,
-        hydrogen: _atoms.H,
-        atom: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        oxygen: O,  # noqa
+        sulfur: S,
+        hydrogen: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Thioacid` functional group.
@@ -73,7 +71,7 @@ class Thioacid(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(carbon, oxygen, sulfur, hydrogen, atom),
             bonders=bonders,
@@ -86,7 +84,7 @@ class Thioacid(
         self._hydrogen = hydrogen
         self._atom = atom
 
-    def get_carbon(self) -> _atoms.C:
+    def get_carbon(self) -> C:
         """
         Get the ``[carbon]`` atom.
 
@@ -99,7 +97,7 @@ class Thioacid(
         return self._carbon
 
     # O is not an ambiguous name.
-    def get_oxygen(self) -> _atoms.O:  # noqa
+    def get_oxygen(self) -> O:  # noqa
         """
         Get the ``[oxygen]`` atom.
 
@@ -111,7 +109,7 @@ class Thioacid(
 
         return self._oxygen
 
-    def get_sulfur(self) -> _atoms.S:
+    def get_sulfur(self) -> S:
         """
         Get the ``[sulfur]`` atom.
 
@@ -124,7 +122,7 @@ class Thioacid(
 
         return self._sulfur
 
-    def get_hydrogen(self) -> _atoms.H:
+    def get_hydrogen(self) -> H:
         """
         Get the ``[hydrogen]`` atom.
 
@@ -136,7 +134,7 @@ class Thioacid(
 
         return self._hydrogen
 
-    def get_atom(self) -> _atoms.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -161,7 +159,7 @@ class Thioacid(
         self,
         id_map: dict[int, int],
     ) -> Thioacid:
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

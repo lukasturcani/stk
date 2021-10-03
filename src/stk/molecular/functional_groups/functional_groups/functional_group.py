@@ -64,8 +64,8 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from . import utilities as _utilities
-from ... import atoms as _atoms
+from .utilities import get_atom_map
+from ...atoms import Atom
 
 
 __all__ = (
@@ -248,9 +248,9 @@ class FunctionalGroup:
 
     def __init__(
         self,
-        atoms: tuple[_atoms.Atom, ...],
-        placers: tuple[_atoms.Atom, ...],
-        core_atoms: tuple[_atoms.Atom, ...],
+        atoms: tuple[Atom, ...],
+        placers: tuple[Atom, ...],
+        core_atoms: tuple[Atom, ...],
     ) -> None:
         """
         Initialize a :class:`.FunctionalGroup`.
@@ -275,7 +275,7 @@ class FunctionalGroup:
         self._placers = placers
         self._core_atoms = core_atoms
 
-    def get_atoms(self) -> abc.Iterable[_atoms.Atom]:
+    def get_atoms(self) -> abc.Iterable[Atom]:
         """
         Yield all the atoms in the functional group.
 
@@ -333,7 +333,7 @@ class FunctionalGroup:
 
     def with_atoms(
         self,
-        atom_map: dict[int, _atoms.Atom],
+        atom_map: dict[int, Atom],
     ) -> FunctionalGroup:
         """
         Return a clone holding different atoms.
@@ -388,7 +388,7 @@ class FunctionalGroup:
 
         """
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

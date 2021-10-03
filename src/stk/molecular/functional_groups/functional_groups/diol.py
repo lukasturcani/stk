@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import O, H, Atom
 
 
 __all__ = (
@@ -18,9 +18,7 @@ __all__ = (
 )
 
 
-class Diol(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Diol(GenericFunctionalGroup):
     """
     Represents a diol functional group.
 
@@ -31,17 +29,17 @@ class Diol(
 
     def __init__(
         self,
-        atom1: _atoms.Atom,
+        atom1: Atom,
         # O is not an ambiguous name.
-        oxygen1: _atoms.O,  # noqa
-        hydrogen1: _atoms.H,
-        atom2: _atoms.Atom,
+        oxygen1: O,  # noqa
+        hydrogen1: H,
+        atom2: Atom,
         # O is not an ambiguous name.
-        oxygen2: _atoms.O,  # noqa
-        hydrogen2: _atoms.H,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        oxygen2: O,  # noqa
+        hydrogen2: H,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
     ):
         """
         Initialize a :class:`.Diol` instance.
@@ -78,7 +76,7 @@ class Diol(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(
                 atom1,
@@ -99,7 +97,7 @@ class Diol(
         self._oxygen2 = oxygen2
         self._hydrogen2 = hydrogen2
 
-    def get_atom1(self) -> _atoms.Atom:
+    def get_atom1(self) -> Atom:
         """
         Get the ``[atom1]`` atom.
 
@@ -112,7 +110,7 @@ class Diol(
         return self._atom1
 
     # O is not an ambiguous name.
-    def get_oxygen1(self) -> _atoms.O:  # noqa
+    def get_oxygen1(self) -> O:  # noqa
         """
         Get the ``[oxygen1]`` atom.
 
@@ -124,7 +122,7 @@ class Diol(
 
         return self._oxygen1
 
-    def get_hydrogen1(self) -> _atoms.H:
+    def get_hydrogen1(self) -> H:
         """
         Get the ``[hydrogen1]`` atom.
 
@@ -136,7 +134,7 @@ class Diol(
 
         return self._hydrogen1
 
-    def get_atom2(self) -> _atoms.Atom:
+    def get_atom2(self) -> Atom:
         """
         Get the ``[atom2]`` atom.
 
@@ -149,7 +147,7 @@ class Diol(
         return self._atom2
 
     # O is not an ambiguous name.
-    def get_oxygen2(self) -> _atoms.O:  # noqa
+    def get_oxygen2(self) -> O:  # noqa
         """
         Get the ``[oxygen2]`` atom.
 
@@ -161,7 +159,7 @@ class Diol(
 
         return self._oxygen2
 
-    def get_hydrogen2(self) -> _atoms.H:
+    def get_hydrogen2(self) -> H:
         """
         Get the ``[hydrogen2]`` atom.
 
@@ -188,7 +186,7 @@ class Diol(
         id_map: dict[int, int],
     ) -> Diol:
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,
