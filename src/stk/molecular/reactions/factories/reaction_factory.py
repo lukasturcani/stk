@@ -14,6 +14,9 @@ stk.molecular.reactions.factories.dative_reaction_factory\
 
 """
 
+from ..reactions import Reaction
+from ...topology_graphs import ConstructionState, EdgeGroup
+
 
 class ReactionFactory:
     """
@@ -32,30 +35,33 @@ class ReactionFactory:
     :class:`.ReactionFactory` subclass to the :class:`.TopologyGraph`
     initializer, so that it knows to use it.
 
-    Examples
-    --------
-    *Subclass Implementation*
+    Examples:
 
-    The source code of the subclasses, listed in
-    :mod:`.reaction_factory`, can serve as good examples.
+        *Subclass Implementation*
+
+        The source code of the subclasses, listed in
+        :mod:`.reaction_factory`, can serve as good examples.
 
     """
 
-    def get_reaction(self, construction_state, edge_group):
+    def get_reaction(
+        self,
+        construction_state: ConstructionState,
+        edge_group: EdgeGroup,
+    ) -> Reaction:
         """
         Get a reaction to use on the `edge_group`.
 
-        Parameters
-        ----------
-        construction_state : :class:`.ConstructionState`
-            The state of the current construction.
+        Parameters:
 
-        edge_group : :class:`.EdgeGroup`
-            The edge group for which a reaction should be found.
+            construction_state : :class:`.ConstructionState`
+                The state of the current construction.
 
-        Returns
-        -------
-        :class:`.Reaction`
+            edge_group : :class:`.EdgeGroup`
+                The edge group for which a reaction should be found.
+
+        Returns:
+
             The reaction to use on the `edge_group`.
 
         """
