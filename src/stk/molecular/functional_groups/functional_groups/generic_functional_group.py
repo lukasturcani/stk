@@ -151,7 +151,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return clone
 
-    def get_bonders(self) -> abc.Iterable[Atom]:
+    def get_bonders(self) -> abc.Iterator[Atom]:
         """
         Yield bonder atoms in the functional group.
 
@@ -178,7 +178,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         return len(self._bonders)
 
-    def get_bonder_ids(self) -> abc.Iterable[int]:
+    def get_bonder_ids(self) -> abc.Iterator[int]:
         """
         Yield the ids of bonder atoms.
 
@@ -190,7 +190,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         yield from (a.get_id() for a in self._bonders)
 
-    def get_deleters(self) -> abc.Iterable[Atom]:
+    def get_deleters(self) -> abc.Iterator[Atom]:
         """
         Yield the deleter atoms in the functional group.
 
@@ -205,7 +205,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         yield from self._deleters
 
-    def get_deleter_ids(self) -> abc.Iterable[int]:
+    def get_deleter_ids(self) -> abc.Iterator[int]:
         """
         Yield the ids of deleter atoms.
 
