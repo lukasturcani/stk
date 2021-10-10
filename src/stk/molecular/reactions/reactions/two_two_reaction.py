@@ -4,11 +4,15 @@ Two-Two Reaction
 
 """
 
+from collections import abc
 import itertools as it
 from scipy.spatial.distance import euclidean
 
-from .reaction import Reaction
+from .reaction import Reaction, NewAtom
+from ...functional_groups import GenericFunctionalGroup
+from ...atoms import Atom
 from ...bonds import Bond
+from ...topology_graphs import ConstructionState
 
 
 class TwoTwoReaction(Reaction):
@@ -23,31 +27,32 @@ class TwoTwoReaction(Reaction):
 
     def __init__(
         self,
-        construction_state,
-        functional_group1,
-        functional_group2,
-        bond_order,
-        periodicity,
-    ):
+        construction_state: ConstructionState,
+        functional_group1: GenericFunctionalGroup,
+        functional_group2: GenericFunctionalGroup,
+        bond_order: int,
+        periodicity: tuple[int, int, int],
+    ) -> None:
         """
         Initialize a :class:`.TwoTwoReaction` instance.
 
-        Parameters
-        ----------
-        construction_state : :class:`.ConstructionState`
-            The construction state of the molecule being constructed.
+        Parameters:
 
-        functional_group1 : :class:`.GenericFunctionalGroup`
-            The first functional group in the reaction.
+            construction_state:
+                The construction state of the molecule being
+                constructed.
 
-        functional_group2 : :class:`.GenericFunctionalGroup`
-            The second functional group in the reaction.
+            functional_group1:
+                The first functional group in the reaction.
 
-        bond_order : :class:`int`
-            The bond order of the bonds created by the reaction.
+            functional_group2:
+                The second functional group in the reaction.
 
-        periodicity : :class:`tuple` of :class:`int`
-            The periodicity of the bonds created by the reaction.
+            bond_order:
+                The bond order of the bonds created by the reaction.
+
+            periodicity:
+                The periodicity of the bonds created by the reaction.
 
         """
 
@@ -59,11 +64,11 @@ class TwoTwoReaction(Reaction):
         self._bond_order = bond_order
         self._periodicity = periodicity
 
-    def _get_new_atoms(self):
+    def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
         return
         yield
 
-    def _get_new_bonds(self):
+    def _get_new_bonds(self) -> abc.Iterator[Bond]:
         for bonder1, bonder2 in self._get_bonder_pairs():
             yield Bond(
                 atom1=bonder1,
@@ -72,7 +77,7 @@ class TwoTwoReaction(Reaction):
                 periodicity=self._periodicity,
             )
 
-    def _get_bonder_pairs(self):
+    def _get_bonder_pairs(self) -> abc.Iterator[tuple[Atom, Atom]]:
         pairs = it.product(
             self._functional_group1.get_bonders(),
             self._functional_group2.get_bonders(),
@@ -88,17 +93,17 @@ class TwoTwoReaction(Reaction):
                 bonded.add(bonder2.get_id())
                 yield bonder1, bonder2
 
-    def _pair_distance(self, bonders):
+    def _pair_distance(self, bonders: tuple[Atom, Atom]) -> float:
         bonder1, bonder2 = bonders
         return euclidean(
             self._position_matrix[bonder1.get_id()],
             self._position_matrix[bonder2.get_id()],
         )
 
-    def _get_deleted_atoms(self):
+    def _get_deleted_atoms(self) -> abc.Iterator[Atom]:
         yield from self._functional_group1.get_deleters()
         yield from self._functional_group2.get_deleters()
 
-    def _get_deleted_bonds(self):
+    def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
         return
         yield
