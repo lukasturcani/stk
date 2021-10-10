@@ -33,6 +33,11 @@ from ....atoms import Atom
 from ....bonds import Bond
 
 
+__all__ = (
+    'Reaction',
+)
+
+
 class Reaction:
     """
     An abstract base class for reactions.

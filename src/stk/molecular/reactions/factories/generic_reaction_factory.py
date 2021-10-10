@@ -25,6 +25,10 @@ from ...functional_groups import (
     Amide,
 )
 
+__all__ = (
+    'GenericReactionFactory',
+)
+
 # Impose the same interface on all reaction initializers.
 
 

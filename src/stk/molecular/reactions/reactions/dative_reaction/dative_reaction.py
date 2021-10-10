@@ -12,6 +12,11 @@ from ....bonds import Bond
 from ....atoms import Atom
 
 
+__all__ = (
+    'DativeReaction',
+)
+
+
 class DativeReaction(Reaction):
     """
     A reaction between two functional groups.

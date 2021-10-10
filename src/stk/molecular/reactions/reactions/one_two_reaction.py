@@ -12,6 +12,10 @@ from .reaction import Reaction, NewAtom
 from ...atoms import Atom
 from ...bonds import Bond
 
+__all__ = (
+    'OneTwoReaction',
+)
+
 
 class OneTwoReaction(Reaction):
     """

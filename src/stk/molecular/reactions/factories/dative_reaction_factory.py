@@ -10,6 +10,11 @@ from ...topology_graphs import ConstructionState, EdgeGroup
 from ..reactions import DativeReaction
 
 
+__all__ = (
+    'DativeReactionFactory',
+)
+
+
 class DativeReactionFactory(ReactionFactory):
     """
     Create :class:`.DativeReaction` instances.

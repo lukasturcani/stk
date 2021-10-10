@@ -17,6 +17,10 @@ stk.molecular.reactions.factories.dative_reaction_factory\
 from ..reactions import Reaction
 from ...topology_graphs import ConstructionState, EdgeGroup
 
+__all__ = (
+    'ReactionFactory',
+)
+
 
 class ReactionFactory:
     """

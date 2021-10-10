@@ -14,6 +14,10 @@ from ...atoms import Atom
 from ...bonds import Bond
 from ...topology_graphs import ConstructionState
 
+__all__ = (
+    'TwoTwoReaction',
+)
+
 
 class TwoTwoReaction(Reaction):
     """

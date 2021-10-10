@@ -13,6 +13,11 @@ from ...bonds import Bond
 from ...functional_groups import RingAmine
 
 
+__all__ = (
+    'RingAmineReaction',
+)
+
+
 class RingAmineReaction(Reaction):
     """
     Performs a reaction between two :class:`.RingAmine` groups.

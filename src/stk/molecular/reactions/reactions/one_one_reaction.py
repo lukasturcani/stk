@@ -11,6 +11,10 @@ from ...functional_groups import GenericFunctionalGroup
 from ...atoms import Atom
 from ...bonds import Bond
 
+__all__ = (
+    'OneOneReaction',
+)
+
 
 class OneOneReaction(Reaction):
     """

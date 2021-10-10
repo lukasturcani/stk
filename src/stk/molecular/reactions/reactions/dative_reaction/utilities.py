@@ -8,6 +8,10 @@ from itertools import chain
 
 from ....atoms import Atom
 
+__all__ = (
+    'is_metal',
+)
+
 
 def is_metal(atom: Atom) -> bool:
     """

@@ -9,6 +9,10 @@ from ....atoms import Atom
 from ....bonds import Bond
 from .new_atom import NewAtom
 
+__all__ = (
+    'ReactionResult',
+)
+
 
 class ReactionResult:
     """

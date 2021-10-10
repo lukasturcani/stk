@@ -11,6 +11,11 @@ import numpy as np
 from ....atoms import Atom
 
 
+__all__ = (
+    'NewAtom',
+)
+
+
 class NewAtom:
     """
     Represents a new atom added by a :class:`.Reaction`.
