@@ -20,33 +20,6 @@ class NewAtom:
     """
     Represents a new atom added by a :class:`.Reaction`.
 
-    Examples:
-
-        *Unpacking the Atom and Position*
-
-        The class can be elegantly unpacked into the atom and its
-        position.
-
-        .. testcode:: unpacking-the-atom-and-position
-
-            import stk
-            import numpy as np
-
-            new_atoms = (
-                stk.NewAtom(stk.C(-1), np.array([1., 2., 3.])),
-                stk.NewAtom(stk.H(-2), np.array([2., 5., 7.])),
-                stk.NewAtom(stk.F(-3), np.array([8., 2., 3.])),
-            )
-            for atom, position in new_atoms:
-                # Do stuff.
-                print(atom, position)
-
-        .. testoutput:: unpacking-the-atom-and-position
-
-            C(-1) [1. 2. 3.]
-            H(-2) [2. 5. 7.]
-            F(-3) [8. 2. 3.]
-
     """
 
     __slots__ = ['_atom', '_position']
