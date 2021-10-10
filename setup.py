@@ -30,5 +30,5 @@ setup(
         'MCHammer',
         'SpinDry',
     ),
-    python_requires='>=3.7',
+    python_requires='>=3.9',
 )
