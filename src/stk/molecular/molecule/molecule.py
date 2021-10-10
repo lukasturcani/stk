@@ -5,8 +5,8 @@ Molecule
 .. toctree::
     :maxdepth: 2
 
-    Building Block <stk.molecular.molecules.building_block>
-    Constructed Molecule <stk.molecular.molecules.constructed_molecule>
+    Building Block <stk.molecular.building_block>
+    Constructed Molecule <stk.molecular.constructed_molecule>
 
 """
 
