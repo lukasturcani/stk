@@ -12,6 +12,13 @@ from .bond import Bond
 from .bond_info import BondInfo
 
 
+__all__ = (
+    'sort_bond_atoms_by_id',
+    'get_bond_atom_ids',
+    'get_bond_info_atom_ids',
+)
+
+
 def sort_bond_atoms_by_id(bond: Bond) -> Bond:
     if bond.get_atom1().get_id() < bond.get_atom2().get_id():
         return bond
