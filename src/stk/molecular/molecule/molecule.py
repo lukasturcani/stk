@@ -25,8 +25,8 @@ from stk import utilities as _utilities
 from stk.utilities import typing as _typing
 from .utilities import writers as _writers
 from .utilities import updaters as _updaters
-from ..atoms import Atom
-from ..bonds import Bond
+from ..atom import Atom
+from ..bond import Bond
 from .. import molecular_utilities as _molecular_utilities
 
 

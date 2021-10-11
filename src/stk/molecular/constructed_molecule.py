@@ -14,8 +14,10 @@ from collections import abc
 
 from stk.utilities.typing import OneOrMany
 from .molecule import Molecule
-from .atoms import Atom, AtomInfo
-from .bonds import Bond, BondInfo
+from .atom import Atom
+from .atom_info import AtomInfo
+from .bond import Bond
+from .bond_info import BondInfo
 from . import molecular_utilities as _utilities
 from .topology_graphs import TopologyGraph, ConstructionResult
 

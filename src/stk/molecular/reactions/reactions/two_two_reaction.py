@@ -10,8 +10,8 @@ from scipy.spatial.distance import euclidean
 
 from .reaction import Reaction, NewAtom
 from ...functional_groups import GenericFunctionalGroup
-from ...atoms import Atom
-from ...bonds import Bond
+from ...atom import Atom
+from ...bond import Bond
 from ...topology_graphs import ConstructionState
 
 __all__ = (

@@ -5,7 +5,7 @@ Bond Batch
 
 """
 
-from ......bonds import BondInfo
+from ......bond_info import BondInfo
 
 
 class _BondBatch:

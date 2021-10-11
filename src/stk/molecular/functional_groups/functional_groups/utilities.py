@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import abc
 
-from ...atoms import Atom
+from ...atom import Atom
 
 
 __all__ = (

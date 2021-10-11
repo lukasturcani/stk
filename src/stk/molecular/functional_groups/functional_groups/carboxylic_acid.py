@@ -10,7 +10,8 @@ import typing
 
 from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import C, O, H, Atom
+from ...atom import Atom
+from ...elements import C, O, H
 
 
 __all__ = (

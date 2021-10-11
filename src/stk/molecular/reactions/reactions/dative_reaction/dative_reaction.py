@@ -8,8 +8,8 @@ from collections import abc
 
 from .utilities import is_metal
 from ..reaction import Reaction, NewAtom
-from ....bonds import Bond
-from ....atoms import Atom
+from ....bond import Bond
+from ....atom import Atom
 
 
 __all__ = (

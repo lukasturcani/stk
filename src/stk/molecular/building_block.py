@@ -17,8 +17,8 @@ from collections import abc
 
 from stk.utilities import typing as _typing
 from .functional_groups import FunctionalGroup, FunctionalGroupFactory
-from .atoms import Atom
-from .bonds import Bond
+from .atom import Atom
+from .bond import Bond
 from .molecule import Molecule
 from .. import utilities as _utilities
 

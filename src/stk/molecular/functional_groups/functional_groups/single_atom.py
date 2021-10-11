@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Atom
+from ...atom import Atom
 
 
 __all__ = (

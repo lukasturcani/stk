@@ -12,7 +12,7 @@ from collections import abc
 
 from .functional_group import FunctionalGroup
 from .utilities import get_atom_map
-from ...atoms import Atom
+from ...atom import Atom
 
 
 __all__ = (

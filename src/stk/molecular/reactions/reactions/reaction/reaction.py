@@ -29,8 +29,8 @@ from collections import abc
 
 from .new_atom import NewAtom
 from .reaction_result import ReactionResult
-from ....atoms import Atom
-from ....bonds import Bond
+from ....atom import Atom
+from ....bond import Bond
 
 
 __all__ = (
