@@ -1,3 +1,9 @@
+"""
+Constructed Molecule Utilities
+==============================
+
+"""
+
 from ..molecular_utilities import get_bond_atom_ids
 from ..bond_info import BondInfo
 
