@@ -24,7 +24,7 @@ class AtomInfo:
     def __init__(
         self,
         atom: Atom,
-        building_block_atom: Atom,
+        building_block_atom: typing.Optional[Atom],
         building_block: typing.Optional[Molecule],
         building_block_id: typing.Optional[int],
     ) -> None:

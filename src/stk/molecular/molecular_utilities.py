@@ -6,16 +6,12 @@ This module defines utilities for molecules.
 
 """
 
-import typing
-
 from .bond import Bond
-from .bond_info import BondInfo
 
 
 __all__ = (
     'sort_bond_atoms_by_id',
     'get_bond_atom_ids',
-    'get_bond_info_atom_ids',
 )
 
 
@@ -34,14 +30,8 @@ def sort_bond_atoms_by_id(bond: Bond) -> Bond:
         )
 
 
-def get_bond_atom_ids(bond: Bond) -> typing.Iterable[int]:
+def get_bond_atom_ids(bond: Bond) -> list[int]:
     return sorted((
         bond.get_atom1().get_id(),
         bond.get_atom2().get_id(),
     ))
-
-
-def get_bond_info_atom_ids(
-    bond_info: BondInfo,
-) -> typing.Iterable[int]:
-    return get_bond_atom_ids(bond_info.get_bond())
