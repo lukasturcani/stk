@@ -416,7 +416,10 @@ class Molecule:
         )
 
     def _clone(self: _T) -> _T:
-        clone = self.__class__.__new__(self.__class__)
+        clone = typing.cast(
+            _T,
+            self.__class__.__new__(self.__class__),
+        )
         Molecule.__init__(
             self=clone,
             atoms=self._atoms,
