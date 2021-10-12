@@ -146,7 +146,10 @@ class Bond:
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
+        clone = typing.cast(
+            Bond,
+            self.__class__.__new__(self.__class__),
+        )
         Bond.__init__(
             self=clone,
             atom1=self._atom1,
