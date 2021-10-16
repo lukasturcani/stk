@@ -6,8 +6,16 @@ This module defines utilities for molecules.
 
 """
 
+from .bond import Bond
 
-def sort_bond_atoms_by_id(bond):
+
+__all__ = (
+    'sort_bond_atoms_by_id',
+    'get_bond_atom_ids',
+)
+
+
+def sort_bond_atoms_by_id(bond: Bond) -> Bond:
     if bond.get_atom1().get_id() < bond.get_atom2().get_id():
         return bond
     elif bond.get_order() == 9:
@@ -22,12 +30,8 @@ def sort_bond_atoms_by_id(bond):
         )
 
 
-def get_bond_atom_ids(bond):
+def get_bond_atom_ids(bond: Bond) -> list[int]:
     return sorted((
         bond.get_atom1().get_id(),
         bond.get_atom2().get_id(),
     ))
-
-
-def get_bond_info_atom_ids(bond_info):
-    return get_bond_atom_ids(bond_info.get_bond())

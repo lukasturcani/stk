@@ -8,7 +8,8 @@ from __future__ import annotations
 
 from collections import abc
 
-from ......atoms import Atom, AtomInfo
+from ......atom import Atom
+from ......atom_info import AtomInfo
 from ......building_block import BuildingBlock
 
 

@@ -13,7 +13,7 @@ from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import PrimaryAmino
 from ...molecule import Molecule
-from ...atoms import N, H
+from ...elements import N, H
 
 __all__ = (
     'PrimaryAminoFactory',

@@ -25,9 +25,12 @@ from stk import utilities as _utilities
 from stk.utilities import typing as _typing
 from .utilities import writers as _writers
 from .utilities import updaters as _updaters
-from ..atoms import Atom
-from ..bonds import Bond
-from .. import molecular_utilities as _molecular_utilities
+from ..atom import Atom
+from ..bond import Bond
+from ..molecular_utilities import (
+    sort_bond_atoms_by_id,
+    get_bond_atom_ids,
+)
 
 
 _T = typing.TypeVar('_T', bound='Molecule')
@@ -413,7 +416,10 @@ class Molecule:
         )
 
     def _clone(self: _T) -> _T:
-        clone = self.__class__.__new__(self.__class__)
+        clone = typing.cast(
+            _T,
+            self.__class__.__new__(self.__class__),
+        )
         Molecule.__init__(
             self=clone,
             atoms=self._atoms,
@@ -913,12 +919,12 @@ class Molecule:
         ))
         self._bonds = tuple(sorted(
             (
-                _molecular_utilities.sort_bond_atoms_by_id(
+                sort_bond_atoms_by_id(
                     bond=bond.with_atoms(atom_map),
                 )
                 for bond in self._bonds
             ),
-            key=_molecular_utilities.get_bond_atom_ids,
+            key=get_bond_atom_ids,
         ))
         old_ids = {
             atom.get_id(): old_id for old_id, atom in atom_map.items()

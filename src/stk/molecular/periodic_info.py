@@ -6,8 +6,16 @@ Class holding periodic cell information.
 
 """
 
+from __future__ import annotations
+
 import numpy as np
+import typing
 from ..utilities import cap_absolute_value
+
+
+__all__ = (
+    'PeriodicInfo',
+)
 
 
 class PeriodicInfo:
@@ -16,7 +24,12 @@ class PeriodicInfo:
 
     """
 
-    def __init__(self, vector_1, vector_2, vector_3):
+    def __init__(
+        self,
+        vector_1: np.ndarray,
+        vector_2: np.ndarray,
+        vector_3: np.ndarray,
+    ) -> None:
         """
         Initialize a :class:`.PeriodicInfo` instance.
 
@@ -24,20 +37,20 @@ class PeriodicInfo:
         in Angstrom and angles are in degrees. This code is modified
         from the pymatgen source code [1]_.
 
-        Parameters
-        ----------
-        vector_1 : :class:`numpy.ndarray`
-            First cell lattice vector of shape (3, ) in Angstrom.
+        Parameters:
 
-        vector_2 : :class:`numpy.ndarray`
-            Second cell lattice vector of shape (3, ) in Angstrom.
+            vector_1:
+                First cell lattice vector of shape (3, ) in Angstrom.
 
-        vector_3 : :class:`numpy.ndarray`
-            Third cell lattice vector of shape (3, ) in Angstrom.
+            vector_2:
+                Second cell lattice vector of shape (3, ) in Angstrom.
 
-        References
-        ----------
-        .. [1] https://pymatgen.org/_modules/pymatgen/core/lattice.html
+            vector_3:
+                Third cell lattice vector of shape (3, ) in Angstrom.
+
+        References:
+
+            .. [1] https://tinyurl.com/3f7ahzr3
 
         """
 
@@ -76,14 +89,13 @@ class PeriodicInfo:
         self._beta = beta
         self._gamma = gamma
 
-    def clone(self):
+    def clone(self) -> PeriodicInfo:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.PeriodicInfo`
-            The clone. Has the same cell as the original.
+        Returns:
+
+            The clone.
 
         """
 
@@ -96,13 +108,12 @@ class PeriodicInfo:
         )
         return clone
 
-    def get_vector_1(self):
+    def get_vector_1(self) -> np.ndarray:
         """
         Get *x* vector.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             Cell lattice vector of shape (3, ) in *x* direction in
             Angstrom.
 
@@ -110,13 +121,12 @@ class PeriodicInfo:
 
         return np.array(self._vector_1)
 
-    def get_vector_2(self):
+    def get_vector_2(self) -> np.ndarray:
         """
         Get *y* vector.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             Cell lattice vector of shape (3, ) in *y* direction in
             Angstrom.
 
@@ -124,13 +134,12 @@ class PeriodicInfo:
 
         return np.array(self._vector_2)
 
-    def get_vector_3(self):
+    def get_vector_3(self) -> np.ndarray:
         """
         Get *z* vector.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             Cell lattice vector of shape (3, ) in *z* direction in
             Angstrom.
 
@@ -138,99 +147,96 @@ class PeriodicInfo:
 
         return np.array(self._vector_3)
 
-    def get_cell_matrix(self):
+    def get_cell_matrix(
+        self,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Get cell matrix.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`numpy.ndarray`
+        Returns:
             Tuple of length three containing *x*, *y* and *z* direction
             lattice vector of shape (3, ) in Angstrom.
 
         """
 
-        return tuple(map(np.array, self._cell_matrix))
+        return typing.cast(
+            tuple[np.ndarray, np.ndarray, np.ndarray],
+            tuple(map(np.array, self._cell_matrix)),
+        )
 
-    def get_a(self):
+    def get_a(self) -> float:
         """
         Get *a* length.
 
-        Returns
-        -------
-        :class:`float`
+        Returns:
+
             Length of cell along *a* direction in Angstrom.
 
         """
 
         return self._a
 
-    def get_b(self):
+    def get_b(self) -> float:
         """
         Get *b* length.
 
-        Returns
-        -------
-        :class:`float`
+        Returns:
+
             Length of cell along *b* direction in Angstrom.
 
         """
 
         return self._b
 
-    def get_c(self):
+    def get_c(self) -> float:
         """
         Get *c* length.
 
-        Returns
-        -------
-        :class:`float`
+        Returns:
+
             Length of cell along *c* direction in Angstrom.
 
         """
 
         return self._c
 
-    def get_alpha(self):
+    def get_alpha(self) -> float:
         """
         Get *alpha* angle.
 
-        Returns
-        -------
-        :class:`float`
+        Returns:
+
             *Alpha* angle of cell in degrees.
 
         """
 
         return self._alpha
 
-    def get_beta(self):
+    def get_beta(self) -> float:
         """
         Get *beta* angle.
 
-        Returns
-        -------
-        :class:`float`
+        Returns:
+
             *Beta* angle of cell in degrees.
 
         """
 
         return self._beta
 
-    def get_gamma(self):
+    def get_gamma(self) -> float:
         """
         Get *gamma* angle.
 
-        Returns
-        -------
-        :class:`float`
+        Returns:
+
             *Gamma* angle of cell in degrees.
 
         """
 
         return self._gamma
 
-    def __str__(self):
+    def __str__(self) -> str:
 
         return (
             f'{self.__class__.__name__}(a={self._a}, b={self._b}, '
@@ -238,5 +244,5 @@ class PeriodicInfo:
             f'gamma={self._gamma})'
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)

@@ -13,7 +13,7 @@ from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Thioacid
 from ...molecule import Molecule
-from ...atoms import C, O, H, S
+from ...elements import C, O, H, S
 
 __all__ = (
     'ThioacidFactory',

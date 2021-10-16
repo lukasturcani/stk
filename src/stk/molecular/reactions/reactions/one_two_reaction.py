@@ -9,8 +9,8 @@ from collections import abc
 
 from ...functional_groups import GenericFunctionalGroup
 from .reaction import Reaction, NewAtom
-from ...atoms import Atom
-from ...bonds import Bond
+from ...atom import Atom
+from ...bond import Bond
 
 __all__ = (
     'OneTwoReaction',
