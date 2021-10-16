@@ -4,55 +4,79 @@ Vertex
 
 """
 
+from __future__ import annotations
+
+import typing
 import numpy as np
+
+from .edge import Edge
+from ...building_block import BuildingBlock
+
+
+__all__ = (
+    'Vertex',
+)
+
+
+_T = typing.TypeVar('_T', bound='Vertex')
 
 
 class Vertex:
     """
     An abstract base class for :class:`.TopologyGraph` vertices.
 
-    Notes
-    -----
-    You might notice that some of the public methods of this abstract
-    base class are implemented. This is purely for convenience when
-    implementing subclasses. The implemented public methods are
-    simply default implementations, which can be safely ignored or
-    overridden, when implementing subclasses. Any private methods are
-    implementation details of these default implementations.
+    Notes:
+
+        You might notice that some of the public methods of this
+        abstract base class are implemented. This is purely for
+        convenience when implementing subclasses. The implemented
+        public methods are simply default implementations, which can be
+        safely ignored or overridden, when implementing subclasses. Any
+        private methods are implementation details of these default
+        implementations.
 
     """
 
-    def __init__(self, id, position):
+    def __init__(
+        self,
+        id: int,
+        position: typing.Union[
+            tuple[float, float, float],
+            np.ndarray,
+        ],
+    ) -> None:
         """
         Initialize a :class:`.Vertex`.
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the vertex.
+        Parameters:
 
-        position : :class:`tuple` of :class:`float`
-            The position of the vertex.
+            id:
+                The id of the vertex.
+
+            position:
+                The position of the vertex.
 
         """
 
         self._id = id
         self._position = np.array(position, dtype=np.float64)
 
-    def get_id(self):
+    def get_id(self) -> int:
         """
         Get the id.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The id.
 
         """
 
         return self._id
 
-    def _with_scale(self, scale):
+    def _with_scale(
+        self: _T,
+        scale: typing.Union[float, tuple[float, float, float]],
+    ) -> _T:
         """
         Modify the vertex.
 
@@ -61,56 +85,62 @@ class Vertex:
         self._position *= scale
         return self
 
-    def with_scale(self, scale):
+    def with_scale(
+        self,
+        scale: typing.Union[float, tuple[float, float, float]],
+    ) -> Vertex:
         """
         Get a clone with a scaled position.
 
-        Parameters
-        ----------
-        scale : :class:`float` or :class:`tuple` of :class:`float`
-            The value by which the position of the :class:`Vertex` is
-            scaled. Can be a single number if all axes are scaled by
-            the same amount or a :class:`tuple` of three numbers if
-            each axis is scaled by a different value.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.Vertex`
-            The clone. Has the same type as the original vertex.
+            scale:
+                The value by which the position of the :class:`Vertex`
+                is scaled. Can be a single number if all axes are
+                scaled by the same amount or a :class:`tuple` of three
+                numbers if each axis is scaled by a different value.
+
+        Returns:
+
+            The clone.
 
         """
 
         return self.clone()._with_scale(scale)
 
-    def clone(self):
+    def clone(self) -> Vertex:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.Vertex`
+        Returns:
+
             The clone.
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
+        clone = typing.cast(
+            Vertex,
+            self.__class__.__new__(self.__class__)
+        )
         Vertex.__init__(clone, self._id, self._position)
         return clone
 
-    def get_position(self):
+    def get_position(self) -> np.ndarray:
         """
         Get the position.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The position of the :class:`Vertex`.
 
         """
 
         return np.array(self._position)
 
-    def _with_position(self, position):
+    def _with_position(
+        self: _T,
+        position: np.ndarray,
+    ) -> _T:
         """
         Modify the vertex.
 
@@ -119,53 +149,57 @@ class Vertex:
         self._position = np.array(position, dtype=np.float64)
         return self
 
-    def with_position(self, position):
+    def with_position(
+        self,
+        position: np.ndarray,
+    ) -> Vertex:
         """
         Get a clone at a certain position.
 
-        Parameters
-        ----------
-        position : :class:`numpy.ndarray`
-            The desired position of the clone.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.Vertex`
-            The clone. Has the same type as the original vertex.
+            position:
+                The desired position of the clone.
+
+        Returns:
+
+            The clone.
 
         """
 
         return self.clone()._with_position(position)
 
-    def get_cell(self):
+    def get_cell(self) -> np.ndarray:
         """
         Get the cell of the lattice in which the vertex is found.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The cell of the lattice in which the vertex is found.
 
         """
 
         return np.array([0, 0, 0])
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         """
         Place `building_block` on the :class:`.Vertex`.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block molecule which is to be placed on the
-            vertex.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
-            The edges to which the vertex is attached.
+            building_block:
+                The building block molecule which is to be placed on
+                the vertex.
 
-        Returns
-        -------
-        :class:`numpy.nadarray`
+            edges:
+                The edges to which the vertex is attached.
+
+        Returns:
+
             The position matrix of `building_block` after being
             placed.
 
@@ -173,25 +207,28 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         """
         Map functional groups to edges.
 
         Each functional group in `building_block` needs to be assigned
         to an edge in `edges`.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block which is needs to have functional
-            groups assigned to edges.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
+            building_block:
+                The building block which is needs to have functional
+                groups assigned to edges.
+
+        edges:
             The edges to which the vertex is attached.
 
-        Returns
-        -------
-        :class:`dict`
+        Returns:
+
             A mapping from the id of a functional group in
             `building_block` to the id of the edge in `edges` it
             is assigned to.
@@ -200,9 +237,9 @@ class Vertex:
 
         raise NotImplementedError()
 
-    def __str__(self):
+    def __str__(self) -> str:
         position = self._position.tolist()
         return f'Vertex(id={self._id}, position={position})'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
