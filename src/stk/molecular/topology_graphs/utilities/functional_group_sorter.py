@@ -7,10 +7,16 @@ Functional Group Sorter
 import numpy as np
 
 from stk.utilities import get_acute_vector
-from .sorter import _Sorter
+from ...building_block import BuildingBlock
+from .sorter import Sorter
 
 
-class _FunctionalGroupSorter(_Sorter):
+__all__ = (
+    'FunctionalGroupSorter',
+)
+
+
+class FunctionalGroupSorter(Sorter):
     """
     Sorts functional groups according to their angle.
 
@@ -24,15 +30,18 @@ class _FunctionalGroupSorter(_Sorter):
         '_building_block',
     ]
 
-    def __init__(self, building_block):
+    def __init__(
+        self,
+        building_block: BuildingBlock,
+    ) -> None:
         """
-        Initialize a :class:`._FunctionalGroupSorter` instance.
+        Initialize a :class:`.FunctionalGroupSorter` instance.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block, whose functional groups are to be
-            sorted.
+        Parameters:
+
+            building_block:
+                The building block, whose functional groups are to be
+                sorted.
 
         """
 

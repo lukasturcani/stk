@@ -6,10 +6,16 @@ Sorter
 
 import numpy as np
 
+from collections import abc
 from stk.utilities import vector_angle
 
 
-class _Sorter:
+__all__ = (
+    'Sorter',
+)
+
+
+class Sorter:
     """
     Sorts items according to their angle from a reference vector.
 
@@ -17,22 +23,27 @@ class _Sorter:
 
     __slots__ = ['_items', '_reference', '_axis']
 
-    def __init__(self, items, reference, axis):
+    def __init__(
+        self,
+        items: abc.Iterable[object],
+        reference: np.ndarray,
+        axis: np.ndarray,
+    ) -> None:
         """
-        Initialize a :class:`._Sorter`.
+        Initialize a :class:`.Sorter`.
 
-        Parameters
-        ----------
-        items : :class:`iterable` of :class:`object`
-            The items to be sorted.
+        Parameters:
 
-        reference : :class:`numpy.ndarray`
-            The reference from which the angle is calculated.
+            items:
+                The items to be sorted.
 
-        axis : :class:`numpy.ndarray`
-            A vector orthogonal to `reference`, used to determine
-            which direction is clockwise. Must be an immutable
-            array.
+            reference:
+                The reference from which the angle is calculated.
+
+            axis:
+                A vector orthogonal to `reference`, used to determine
+                which direction is clockwise. Must be an immutable
+                array.
 
         """
 
@@ -40,18 +51,20 @@ class _Sorter:
         self._reference = reference
         self._axis = axis
 
-    def _get_vector(self, item):
+    def _get_vector(
+        self,
+        item: object,
+    ) -> np.ndarray:
         """
         Get the vector according to which `item` should be sorted.
 
-        Parameters
-        ----------
-        item : :class:`object`
-            The item being sorted.
+        Parameters:
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+            item:
+                The item being sorted.
+
+        Returns:
+
             The vector of the `item`, which should be used to measure
             its angle with respect to the *reference*.
 
@@ -59,18 +72,19 @@ class _Sorter:
 
         raise NotImplementedError()
 
-    def _get_angle(self, item):
+    def _get_angle(
+        self,
+        item: object,
+    ) -> float:
         """
         Get the angle of `vector` relative to `reference`.
 
-        Parameters
-        ----------
-        item : :class:`object`
-            The item being sorted.
+        Parameters:
 
-        Returns
-        -------
-        :class:`float`
+            item: The item being sorted.
+
+        Returns:
+
             The angle between `item` and the reference vector.
 
         """
@@ -82,26 +96,24 @@ class _Sorter:
             return 2*np.pi - theta
         return theta
 
-    def get_items(self):
+    def get_items(self) -> abc.Iterator[object]:
         """
         Yield the sorted items.
 
-        Yields
-        ------
-        :class:`object`
+        Yields:
+
             An item.
 
         """
 
         yield from sorted(self._items, key=self._get_angle)
 
-    def get_axis(self):
+    def get_axis(self) -> np.ndarray:
         """
         Get the axis used to determine which direction is clockwise.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The axis. The array is immutable.
 
         """

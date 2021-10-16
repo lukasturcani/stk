@@ -4,10 +4,19 @@ Edge Sorter
 
 """
 
-from .sorter import _Sorter
+import numpy as np
+from collections import abc
+
+from ..topology_graph import Edge
+from .sorter import Sorter
 
 
-class _EdgeSorter(_Sorter):
+__all__ = (
+    'EdgeSorter',
+)
+
+
+class EdgeSorter(Sorter):
     """
     Sorted edges according to their angle.
 
@@ -20,21 +29,26 @@ class _EdgeSorter(_Sorter):
         '_edge_centroid',
     ]
 
-    def __init__(self, edges, aligner_edge, axis):
+    def __init__(
+        self,
+        edges: abc.Iterable[Edge],
+        aligner_edge: Edge,
+        axis: np.ndarray,
+    ) -> None:
         """
-        Initialize an :class:`._EdgeSorter` instance.
+        Initialize an :class:`.EdgeSorter` instance.
 
-        Parameters
-        ----------
-        edges : :class:`iterable` of :class:`.Edge`
-            The edges to sort.
+        Parameters:
+            edges:
+                The edges to sort.
 
-        aligner_edge : :class:`.Edge`
-            The edge in edges, used to calculate the reference vector.
+            aligner_edge:
+                The edge in edges, used to calculate the reference
+                vector.
 
-        axis : :class:`numpy.ndarray`
-            Must be immutable. The axis used to determine the clockwise
-            direction.
+            axis:
+                Must be immutable. The axis used to determine the
+                clockwise direction.
 
         """
 
