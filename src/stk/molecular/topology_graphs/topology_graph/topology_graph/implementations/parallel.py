@@ -8,8 +8,12 @@ import pathos
 
 from .utilities import _Placement
 
+__all__ = (
+    'Parallel',
+)
 
-class _Parallel:
+
+class Parallel:
     """
     Holds parallel implementations of topology graph methods.
 
@@ -35,7 +39,7 @@ class _Parallel:
         self._stages = stages
         self._num_processes = num_processes
 
-    def _place_building_blocks(self, state):
+    def place_building_blocks(self, state):
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
                 vertices = tuple(state.get_vertices(stage))

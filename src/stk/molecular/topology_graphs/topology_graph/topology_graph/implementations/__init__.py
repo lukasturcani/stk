@@ -1,3 +1,3 @@
-from .parallel import _Parallel  # noqa
-from .serial import _Serial  # noqa
-from .utilities import _PlacementResult  # noqa
+from .parallel import Parallel  # noqa
+from .serial import Serial  # noqa
+from .utilities import PlacementResult  # noqa

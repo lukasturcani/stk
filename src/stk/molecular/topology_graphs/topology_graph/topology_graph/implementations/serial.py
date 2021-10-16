@@ -4,10 +4,14 @@ Serial Topology Graph
 
 """
 
-from .utilities import _Placement
+from .utilities import Placement
+
+__all__ = (
+    'Serial',
+)
 
 
-class _Serial:
+class Serial:
     """
     Holds serial implementations of topology graph methods.
 
@@ -29,7 +33,7 @@ class _Serial:
 
         self._stages = stages
 
-    def _place_building_blocks(self, state):
+    def place_building_blocks(self, state):
         for stage in self._stages:
             vertices = tuple(state.get_vertices(stage))
             building_blocks = tuple(

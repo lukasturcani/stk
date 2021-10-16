@@ -154,6 +154,8 @@ class TopologyGraph:
 
     """
 
+    _implementation: typing.Union[Serial, Parallel]
+
     def __init__(
         self,
         building_block_vertices:
@@ -512,7 +514,7 @@ class TopologyGraph:
 
         """
 
-        return self._implementation._place_building_blocks(state)
+        return self._implementation.place_building_blocks(state)
 
     def _run_reactions(
         self,

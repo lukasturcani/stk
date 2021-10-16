@@ -9,8 +9,18 @@ from __future__ import annotations
 import numpy as np
 from typing import NamedTuple
 
+from .....building_block import BuildingBlock
+from ...vertex import Vertex
+from ...edge import Edge
 
-class _PlacementResult(NamedTuple):
+
+__all__ = (
+    'PlacementResult',
+    'Placement',
+)
+
+
+class PlacementResult(NamedTuple):
     """
     The result of a building block placement.
 
@@ -30,7 +40,7 @@ class _PlacementResult(NamedTuple):
     functional_group_edges: dict[int, int]
 
 
-class _Placement:
+class Placement:
     """
     Represents placement of a building block on a vertex.
 
@@ -40,20 +50,25 @@ class _Placement:
 
     """
 
-    def __init__(self, vertex, edges, building_block):
+    def __init__(
+        self,
+        vertex: Vertex,
+        edges: tuple[Edge, ...],
+        building_block: BuildingBlock,
+    ) -> None:
         """
         Initialize a :class:`._Placement`.
 
-        Parameters
-        ----------
-        vertex : :class:`.Vertex`
-            The vertex which does the placement.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
-            The edges connected to `vertex`.
+            vertex:
+                The vertex which does the placement.
 
-        building_block : :class:`.BuildingBlock`
-            The building block to be placed on `vertex`.
+            edges:
+                The edges connected to `vertex`.
+
+            building_block:
+                The building block to be placed on `vertex`.
 
         """
 
@@ -61,13 +76,12 @@ class _Placement:
         self._edges = edges
         self._building_block = building_block
 
-    def get_result(self):
+    def get_result(self) -> PlacementResult:
         """
         Get the result of the placement.
 
-        Returns
-        -------
-        :class:`_PlacementResult`
+        Returns:
+
             The result of the placement.
 
         """
@@ -86,7 +100,7 @@ class _Placement:
                 edges=self._edges,
             )
         )
-        return _PlacementResult(
+        return PlacementResult(
             position_matrix=position_matrix,
             functional_group_edges=functional_group_edges,
         )
