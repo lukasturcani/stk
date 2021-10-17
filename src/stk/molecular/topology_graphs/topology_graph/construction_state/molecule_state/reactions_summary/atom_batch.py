@@ -4,38 +4,60 @@ Atom Batch
 
 """
 
+import numpy as np
+from collections import abc
+
+from ......reactions import NewAtom
+from ......atom import Atom
 from ......atom_info import AtomInfo
 
 
-class _AtomBatch:
+__all__ = (
+    'AtomBatch',
+)
+
+
+class AtomBatch:
     """
     A batch of atoms.
 
     """
 
+    _atoms: list[Atom]
+    _positions: list[np.ndarray]
+    _atom_infos: list[AtomInfo]
+    _atom_map: dict[int, Atom]
+
     __slots__ = ['_atoms', '_atom_infos', '_atom_map', '_positions']
 
-    def __init__(self, atoms, num_atoms):
+    def __init__(
+        self,
+        atoms: abc.Iterable[NewAtom],
+        num_atoms: int,
+    ) -> None:
         """
-        Initialize an :class:`._AtomBatch` instance.
+        Initialize an :class:`.AtomBatch` instance.
 
-        Parameters
-        ----------
-        atoms : :class:`iterable` of :class:`.NewAtom`
-            The atoms, which should be added to the batch.
+        Parameters:
 
-        num_atoms : :class:`int`
-            The number of atoms in the molecule being constructed,
-            before atoms in this batch are taken into account.
+            atoms:
+                The atoms, which should be added to the batch.
+
+            num_atoms:
+                The number of atoms in the molecule being constructed,
+                before atoms in this batch are taken into account.
 
         """
 
-        self._atoms = _atoms = []
-        self._positions = positions = []
-        self._atom_infos = atom_infos = []
-        self._atom_map = atom_map = {}
+        _atoms = self._atoms = []
+        positions = self._positions = []
+        atom_infos = self._atom_infos = []
+        atom_map = self._atom_map = {}
 
-        for id_, (atom, position) in enumerate(atoms, num_atoms):
+        for id_, new_atom in enumerate(atoms, num_atoms):
+            atom = new_atom.get_atom()
+            position = new_atom.get_position()
+
             _atoms.append(atom.with_id(id_))
             atom_map[atom.get_id()] = _atoms[-1]
             atom_infos.append(AtomInfo(
@@ -46,52 +68,48 @@ class _AtomBatch:
             ))
             positions.append(position)
 
-    def get_positions(self):
+    def get_positions(self) -> abc.Iterator[np.ndarray]:
         """
         Yield the positions of atoms in the batch.
 
-        Yields
-        ------
-        :class:`numpy.ndarray`
+        Yields:
+
             The position of an atom in the batch.
 
         """
 
         yield from self._positions
 
-    def get_atoms(self):
+    def get_atoms(self) -> abc.Iterator[Atom]:
         """
         Yield the atoms in the batch.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             An atom.
 
         """
 
         yield from self._atoms
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> abc.Iterator[AtomInfo]:
         """
         Yield info about the atoms in the batch.
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+        Yields:
+
             Info about an atom in the batch.
 
         """
 
         yield from self._atom_infos
 
-    def get_atom_map(self):
+    def get_atom_map(self) -> dict[int, Atom]:
         """
         Get a mapping from the old atom id to the new atom.
 
-        Returns
-        -------
-        :class:`dict`
+        Returns:
+
             Maps the id of an atom provided to the initializer, to
             the new atom held by the batch, which has an updated id.
 
