@@ -819,7 +819,7 @@ class BuildingBlock(Molecule):
     def _extract_functional_groups(
         self,
         functional_groups: _FunctionalGroups,
-    ) -> abc.Iterable[FunctionalGroup]:
+    ) -> abc.Iterator[FunctionalGroup]:
         """
         Yield functional groups.
 
@@ -923,7 +923,7 @@ class BuildingBlock(Molecule):
     def get_functional_groups(
         self,
         fg_ids: typing.Optional[_typing.OneOrMany[int]] = None,
-    ) -> abc.Iterable[FunctionalGroup]:
+    ) -> abc.Iterator[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
 

@@ -22,7 +22,10 @@ class IHasPosition(typing.Protocol):
         pass
 
 
-class Sorter:
+_T = typing.TypeVar('_T', bound=IHasPosition)
+
+
+class Sorter(typing.Generic[_T]):
     """
     Sorts items according to their angle from a reference vector.
 
@@ -32,7 +35,7 @@ class Sorter:
 
     def __init__(
         self,
-        items: abc.Iterable[IHasPosition],
+        items: abc.Iterable[_T],
         reference: np.ndarray,
         axis: np.ndarray,
     ) -> None:
@@ -60,7 +63,7 @@ class Sorter:
 
     def _get_vector(
         self,
-        item: IHasPosition,
+        item: _T,
     ) -> np.ndarray:
         """
         Get the vector according to which `item` should be sorted.
@@ -81,7 +84,7 @@ class Sorter:
 
     def _get_angle(
         self,
-        item: IHasPosition,
+        item: _T,
     ) -> float:
         """
         Get the angle of `vector` relative to `reference`.
@@ -103,7 +106,7 @@ class Sorter:
             return 2*np.pi - theta
         return theta
 
-    def get_items(self) -> abc.Iterator[object]:
+    def get_items(self) -> abc.Iterator[_T]:
         """
         Yield the sorted items.
 

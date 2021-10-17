@@ -15,8 +15,9 @@ from stk.utilities import (
     get_plane_normal,
     normalize_vector,
 )
-from ..utilities import _FunctionalGroupSorter, _EdgeSorter
-from ..topology_graph import Vertex
+from ..utilities import FunctionalGroupSorter, EdgeSorter
+from ..topology_graph import Vertex, Edge
+from ...building_block import BuildingBlock
 
 
 __all__ = (
@@ -150,12 +151,14 @@ class CageVertex(Vertex):
 
         """
 
+        x, y, z = typing.cast(
+            np.ndarray,
+            sum(vertex.get_position() for vertex in vertices)
+            / len(vertices)
+        )
         return cls(
             id=id,
-            position=(
-                sum(vertex.get_position() for vertex in vertices)
-                / len(vertices)
-            ),
+            position=(x, y, z),
         )
 
     def get_aligner_edge(self) -> int:
@@ -179,7 +182,11 @@ class CageVertex(Vertex):
 
 
 class LinearVertex(CageVertex):
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         assert (
             building_block.get_num_functional_groups() == 2
         ), (
@@ -217,21 +224,32 @@ class LinearVertex(CageVertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
+
         fg, = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
 
-        def fg_distance(edge):
+        def fg_distance(edge: Edge) -> float:
             return euclidean(edge.get_position(), fg_position)
 
-        edges = sorted(edges, key=fg_distance)
+        edges_ = sorted(edges, key=fg_distance)
         return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges_)
         }
 
 
 class NonLinearVertex(CageVertex):
-    def place_building_block(self, building_block, edges):
+
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
+
         assert (
             building_block.get_num_functional_groups() > 2
         ), (
@@ -283,7 +301,12 @@ class NonLinearVertex(CageVertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
+
         # The idea is to order the functional groups in building_block
         # by their angle with the vector running from the placer
         # centroid to fg0, going in the clockwise direction.
@@ -293,8 +316,8 @@ class NonLinearVertex(CageVertex):
         #
         # Once the fgs and edges are ordered, zip and assign them.
 
-        fg_sorter = _FunctionalGroupSorter(building_block)
-        edge_sorter = _EdgeSorter(
+        fg_sorter = FunctionalGroupSorter(building_block)
+        edge_sorter = EdgeSorter(
             edges=edges,
             aligner_edge=edges[self._aligner_edge],
             axis=fg_sorter.get_axis(),
@@ -314,20 +337,34 @@ class UnaligningVertex(CageVertex):
 
     """
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
+
         return building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
 
         return {
             fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
         }
 
     @classmethod
-    def init_at_center(cls, id, vertices):
+    def init_at_center(
+        cls,
+        id: int,
+        vertices: tuple[Vertex, ...],
+    ) -> UnaligningVertex:
+
         vertex = cls.__new__(cls)
         vertex._id = id
         vertex._position = (
@@ -341,7 +378,12 @@ class UnaligningVertex(CageVertex):
 
 class AngledVertex(CageVertex):
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
+
         assert (
             building_block.get_num_functional_groups() == 2
         ), (
@@ -386,14 +428,18 @@ class AngledVertex(CageVertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         fg, = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
 
-        def fg_distance(edge):
+        def fg_distance(edge: Edge) -> float:
             return euclidean(edge.get_position(), fg_position)
 
-        edges = sorted(edges, key=fg_distance)
+        edges_ = sorted(edges, key=fg_distance)
         return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
+            fg_id: edge.get_id() for fg_id, edge in enumerate(edges_)
         }
