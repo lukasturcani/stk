@@ -127,10 +127,11 @@ class PeriodicCollapser(Optimizer):
         )
         ratios = (n/o for n, o in zip(new_extents, old_extents))
         old_lattice = state.get_lattice_constants()
-        new_lattice = tuple(
+        assert old_lattice is not None
+        a, b, c = tuple(
             old_lattice[i]*ratio for i, ratio in enumerate(ratios)
         )
-        state = state.with_lattice_constants(new_lattice)
+        state = state.with_lattice_constants((a, b, c))
         return state.with_position_matrix(
             position_matrix=mch_mol.get_position_matrix()
         )
