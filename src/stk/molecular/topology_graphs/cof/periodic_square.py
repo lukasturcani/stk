@@ -6,10 +6,11 @@ Periodic Square
 
 import numpy as np
 import warnings
-from ...reactions import GenericReactionFactory
+from ...reaction_factories import GenericReactionFactory
 from .cof import Cof
 from .vertices import LinearVertex, NonLinearVertex
-from ..topology_graph import Edge, NullOptimizer
+from ..topology_graph import NullOptimizer
+from ...edge import Edge
 from ...periodic_info import PeriodicInfo
 
 

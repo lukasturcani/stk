@@ -19,11 +19,11 @@ from .vertices import (
 )
 from ...topology_graph import (
     TopologyGraph,
-    Edge,
     NullOptimizer,
-    Vertex,
 )
-from ....reactions import GenericReactionFactory
+from ....edge import Edge
+from ....vertex import Vertex
+from ....reaction_factories import GenericReactionFactory
 
 
 class Linear(TopologyGraph):

@@ -4,7 +4,7 @@ COF Edge
 
 """
 
-from ..topology_graph import Edge
+from ...edge import Edge
 
 
 class CofEdge(Edge):

@@ -8,7 +8,7 @@ import numpy as np
 
 from .cof import Cof
 from .vertices import NonLinearVertex
-from ..topology_graph import Edge
+from ...edge import Edge
 
 
 class LinkerlessHoneycomb(Cof):

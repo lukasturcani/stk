@@ -12,12 +12,10 @@ import numpy as np
 
 from .vertices import CageVertex
 from ...building_block import BuildingBlock
-from ..topology_graph import (
-    ConstructionState,
-    Vertex,
-    Edge,
-    PlacementResult,
-)
+from ...vertex import Vertex
+from ...edge import Edge
+from ...placement_result import PlacementResult
+from ...construction_state import ConstructionState
 
 __all__ = (
     'CageConstructionState',

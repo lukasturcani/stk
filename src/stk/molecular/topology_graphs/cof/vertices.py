@@ -8,8 +8,8 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 from stk.utilities import get_acute_vector
 
-from ..utilities import _FunctionalGroupSorter, _EdgeSorter
-from ..topology_graph import Vertex
+from ..utilities import FunctionalGroupSorter, EdgeSorter
+from ...vertex import Vertex
 
 
 class _CofVertex(Vertex):
@@ -289,8 +289,8 @@ class NonLinearVertex(_CofVertex):
         # the aligner_edge is chosen consistently in both cases.
         edges = sorted(edges, key=lambda edge: edge.get_parent_id())
 
-        fg_sorter = _FunctionalGroupSorter(building_block)
-        edge_sorter = _EdgeSorter(
+        fg_sorter = FunctionalGroupSorter(building_block)
+        edge_sorter = EdgeSorter(
             edges=edges,
             aligner_edge=edges[self._aligner_edge],
             axis=fg_sorter.get_axis(),

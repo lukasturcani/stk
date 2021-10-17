@@ -9,7 +9,7 @@ import numpy as np
 
 from .cof import Cof
 from .vertices import LinearVertex, NonLinearVertex
-from ..topology_graph import Edge
+from ...edge import Edge
 
 
 class Honeycomb(Cof):

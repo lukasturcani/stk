@@ -35,12 +35,12 @@ from operator import getitem
 from ..topology_graph import (
     TopologyGraph,
     NullOptimizer,
-    EdgeGroup,
     PeriodicConstructionResult,
 )
 from .vertices import UnaligningVertex
 from .edge import CofEdge
-from ...reactions import GenericReactionFactory
+from ...reaction_factories import GenericReactionFactory
+from ...edge_group import EdgeGroup
 
 
 class UnoccupiedVertexError(Exception):

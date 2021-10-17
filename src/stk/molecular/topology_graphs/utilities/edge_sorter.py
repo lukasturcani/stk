@@ -7,7 +7,7 @@ Edge Sorter
 import numpy as np
 from collections import abc
 
-from ..topology_graph import Edge
+from ...edge import Edge
 from .sorter import Sorter, IHasPosition
 
 

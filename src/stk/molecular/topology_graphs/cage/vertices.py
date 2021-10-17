@@ -17,7 +17,8 @@ from stk.utilities import (
     normalize_vector,
 )
 from ..utilities import FunctionalGroupSorter, EdgeSorter
-from ..topology_graph import Vertex, Edge
+from ...vertex import Vertex
+from ...edge import Edge
 from ...building_block import BuildingBlock
 
 
