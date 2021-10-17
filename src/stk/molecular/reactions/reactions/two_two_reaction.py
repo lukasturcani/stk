@@ -7,12 +7,19 @@ Two-Two Reaction
 from collections import abc
 import itertools as it
 from scipy.spatial.distance import euclidean
+import typing
+import numpy as np
 
 from .reaction import Reaction, NewAtom
 from ...functional_groups import GenericFunctionalGroup
 from ...atom import Atom
 from ...bond import Bond
-from ...topology_graphs import ConstructionState
+
+
+class _IConstructionState(typing.Protocol):
+    def get_position_matrix(self) -> np.ndarray:
+        pass
+
 
 __all__ = (
     'TwoTwoReaction',
@@ -31,7 +38,7 @@ class TwoTwoReaction(Reaction):
 
     def __init__(
         self,
-        construction_state: ConstructionState,
+        construction_state: _IConstructionState,
         functional_group1: GenericFunctionalGroup,
         functional_group2: GenericFunctionalGroup,
         bond_order: int,
@@ -69,8 +76,7 @@ class TwoTwoReaction(Reaction):
         self._periodicity = periodicity
 
     def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
-        return
-        yield
+        yield from ()
 
     def _get_new_bonds(self) -> abc.Iterator[Bond]:
         for bonder1, bonder2 in self._get_bonder_pairs():
@@ -109,5 +115,4 @@ class TwoTwoReaction(Reaction):
         yield from self._functional_group2.get_deleters()
 
     def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
-        return
-        yield
+        yield from ()
