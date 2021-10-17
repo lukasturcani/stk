@@ -4,23 +4,36 @@ Reactions Summary
 
 """
 
+from collections import abc
 from typing import NamedTuple
+import numpy as np
 
-from .atom_batch import _AtomBatch
-from .bond_batch import _BondBatch
+from .atom_batch import AtomBatch
+from .bond_batch import BondBatch
+from ......atom import Atom
+from ......atom_info import AtomInfo
+from ......bond import Bond
+from ......bond_info import BondInfo
+from ......reactions import ReactionResult
 
 
-class _BondId(NamedTuple):
+__all__ = (
+    'ReactionsSummary',
+    'BondId',
+)
+
+
+class BondId(NamedTuple):
     """
     Identifies a bond in a molecule.
 
-    Attributes
-    ----------
-    atom1_id
-        The id of the first :class:`.Atom` in the bond.
+    Attributes:
 
-    atom2_id
-        The id of the sceond :class:`.Atom` in the bond.
+        atom1_id:
+            The id of the first :class:`.Atom` in the bond.
+
+        atom2_id:
+            The id of the second :class:`.Atom` in the bond.
 
     """
 
@@ -28,7 +41,7 @@ class _BondId(NamedTuple):
     atom2_id: int
 
 
-class _ReactionsSummary:
+class ReactionsSummary:
     """
     A summary of reaction results.
 
@@ -45,19 +58,31 @@ class _ReactionsSummary:
         '_deleted_bond_ids',
     ]
 
-    def __init__(self, num_atoms, reaction_results):
+    _atoms: list[Atom]
+    _atom_infos: list[AtomInfo]
+    _positions: list[np.ndarray]
+    _bonds: list[Bond]
+    _bond_infos: list[BondInfo]
+    _deleted_atom_ids: set[int]
+    _deleted_bond_ids: set[BondId]
+
+    def __init__(
+        self,
+        num_atoms: int,
+        reaction_results: abc.Iterable[ReactionResult],
+    ) -> None:
         """
         Initialize a :class:`.ReactionsSummary` instance.
 
-        Parameters
-        ----------
-        num_atoms : :class:`int`
-            The number of atoms in molecule being constructed,
-            before this summary is taken into account.
+        Parameters:
 
-        reaction_results : :class:`iterable`
-            Holds the :class:`.ReactionResult` instances to be
-            summarized.
+            num_atoms:
+                The number of atoms in molecule being constructed,
+                before this summary is taken into account.
+
+            reaction_results:
+                Holds the :class:`.ReactionResult` instances to be
+                summarized.
 
         """
 
@@ -76,28 +101,27 @@ class _ReactionsSummary:
             self._with_reaction_result(result)
             self._num_atoms += len(result.get_new_atoms())
 
-    def _with_reaction_result(self, result):
+    def _with_reaction_result(
+        self,
+        result: ReactionResult,
+    ) -> None:
         """
         Add the `result` to the summary.
 
-        Parameters
-        ----------
-        result : :class:`.ReactionResult`
-            The result to add to the summary.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            result:
+                The result to add to the summary.
 
         """
 
-        atom_batch = _AtomBatch(
+        atom_batch = AtomBatch(
             atoms=result.get_new_atoms(),
             num_atoms=self._num_atoms,
         )
         self._with_atom_batch(atom_batch)
 
-        bond_batch = _BondBatch(
+        bond_batch = BondBatch(
             bonds=result.get_new_bonds(),
             atom_map=atom_batch.get_atom_map(),
         )
@@ -108,25 +132,24 @@ class _ReactionsSummary:
         )
 
         self._deleted_bond_ids.update(
-            _BondId(
+            BondId(
                 atom1_id=bond.get_atom1().get_id(),
                 atom2_id=bond.get_atom2().get_id(),
             )
             for bond in result.get_deleted_bonds()
         )
 
-    def _with_atom_batch(self, batch):
+    def _with_atom_batch(
+        self,
+        batch: AtomBatch,
+    ) -> None:
         """
         Add a batch of atoms to the summary.
 
-        Parameters
-        ----------
-        batch : :class:`._AtomBatch`
-            A batch of atoms.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            batch:
+                A batch of atoms.
 
         """
 
@@ -134,96 +157,89 @@ class _ReactionsSummary:
         self._atom_infos.extend(batch.get_atom_infos())
         self._positions.extend(batch.get_positions())
 
-    def _with_bond_batch(self, batch):
+    def _with_bond_batch(
+        self,
+        batch: BondBatch,
+    ) -> None:
         """
         Add a batch of bonds to the summary.
 
-        Parameters
-        ----------
-        batch : :class:`.BondBatch`
-            A batch of bonds.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            batch:
+                A batch of bonds.
 
         """
 
         self._bonds.extend(batch.get_bonds())
         self._bond_infos.extend(batch.get_bond_infos())
 
-    def get_atoms(self):
+    def get_atoms(self) -> abc.Iterator[Atom]:
         """
         Yield the atoms in the summary.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             An atom.
 
         """
 
         yield from self._atoms
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> abc.Iterator[AtomInfo]:
         """
         Yield infos about atoms in the summary.
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+        Yields:
+
             Info about an atom.
 
         """
 
         yield from self._atom_infos
 
-    def get_bonds(self):
+    def get_bonds(self) -> abc.Iterator[Bond]:
         """
         Yield the bonds in the summary.
 
-        Yields
-        ------
-        :class:`.Bond`
+        Yields:
+
             A bond.
 
         """
 
         yield from self._bonds
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> abc.Iterator[BondInfo]:
         """
         Yield infos about the bonds in the summary.
 
-        Yields
-        ------
-        :class:`.BondInfo`
+        Yields:
+
             Info about a bond.
 
         """
 
         yield from self._bond_infos
 
-    def get_deleted_atom_ids(self):
+    def get_deleted_atom_ids(self) -> abc.Iterator[int]:
         """
         Yield the ids of deletable atoms held by the summary.
 
-        Yields
-        ------
-        :class:`int`
+        Yields:
+
             The id of an atom which should be deleted.
 
         """
 
         yield from self._deleted_atom_ids
 
-    def get_deleted_bond_ids(self):
+    def get_deleted_bond_ids(self) -> abc.Iterator[tuple[int, ...]]:
         """
         Yield the atom ids of bonds to be deleted held by the summary.
 
-        Yields
-        ------
-        :class:`tuple`
+        Yields:
+
             A tuple of the atom ids of the bond which should be
             deleted.
 
@@ -231,13 +247,12 @@ class _ReactionsSummary:
 
         yield from self._deleted_bond_ids
 
-    def get_positions(self):
+    def get_positions(self) -> abc.Iterator[np.ndarray]:
         """
         Yield the positions of atoms held by the summary.
 
-        Yields
-        ------
-        :class:`numpy.ndarray`
+        Yields:
+
             The position of an atom held by the summary.
 
         """
