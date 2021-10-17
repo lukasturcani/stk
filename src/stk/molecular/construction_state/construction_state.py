@@ -15,7 +15,7 @@ from .molecule_state import MoleculeState
 from ..edge import Edge
 from ..edge_group import EdgeGroup
 from ..vertex import Vertex
-from ..topology_graphs import PlacementResult
+from ..placement_result import PlacementResult
 from ..building_block import BuildingBlock
 from ..atom import Atom
 from ..atom_info import AtomInfo

@@ -6,7 +6,8 @@ Dative Reaction Factory
 
 from .reaction_factory import ReactionFactory
 from .generic_reaction_factory import GenericReactionFactory
-from ...topology_graphs import ConstructionState, EdgeGroup
+from ..construction_state import ConstructionState
+from ..edge_group import EdgeGroup
 from ..reactions import DativeReaction
 
 

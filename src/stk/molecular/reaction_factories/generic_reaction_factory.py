@@ -15,8 +15,9 @@ from ..reactions import (
     OneTwoReaction,
     TwoTwoReaction,
 )
-from ...topology_graphs import ConstructionState, EdgeGroup
-from ...functional_groups import (
+from ..edge_group import EdgeGroup
+from ..construction_state import ConstructionState
+from ..functional_groups import (
     GenericFunctionalGroup,
     Alkene,
     Alkyne,
