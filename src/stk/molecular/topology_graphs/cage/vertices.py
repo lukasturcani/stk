@@ -9,6 +9,7 @@ from __future__ import annotations
 import numpy as np
 from scipy.spatial.distance import euclidean
 import typing
+from collections import abc
 
 from stk.utilities import (
     get_acute_vector,
@@ -188,7 +189,7 @@ class LinearVertex(CageVertex):
     def place_building_block(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> np.ndarray:
         assert (
             building_block.get_num_functional_groups() == 2
@@ -230,7 +231,7 @@ class LinearVertex(CageVertex):
     def map_functional_groups_to_edges(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> dict[int, int]:
 
         fg, = building_block.get_functional_groups(0)
@@ -250,7 +251,7 @@ class NonLinearVertex(CageVertex):
     def place_building_block(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> np.ndarray:
 
         assert (
@@ -307,7 +308,7 @@ class NonLinearVertex(CageVertex):
     def map_functional_groups_to_edges(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> dict[int, int]:
 
         # The idea is to order the functional groups in building_block
@@ -343,7 +344,7 @@ class UnaligningVertex(CageVertex):
     def place_building_block(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> np.ndarray:
 
         return building_block.with_centroid(
@@ -354,7 +355,7 @@ class UnaligningVertex(CageVertex):
     def map_functional_groups_to_edges(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> dict[int, int]:
 
         return {
@@ -384,7 +385,7 @@ class AngledVertex(CageVertex):
     def place_building_block(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> np.ndarray:
 
         assert (
@@ -434,7 +435,7 @@ class AngledVertex(CageVertex):
     def map_functional_groups_to_edges(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
     ) -> dict[int, int]:
         fg, = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
