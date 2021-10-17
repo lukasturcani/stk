@@ -5,6 +5,8 @@ Serial Topology Graph
 """
 
 from .utilities import Placement
+from ...construction_state import ConstructionState
+from ...vertex import Vertex
 
 __all__ = (
     'Serial',
@@ -17,23 +19,29 @@ class Serial:
 
     """
 
-    def __init__(self, stages):
+    def __init__(
+        self,
+        stages: tuple[tuple[Vertex, ...], ...],
+    ) -> None:
         """
-        Initialize a :class:`._Serial` instance.
+        Initialize a :class:`.Serial` instance.
 
-        Parameters
-        ----------
-        stages : :class:`tuple`
-            A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
-            where each nested :class:`tuple` holds the
-            :class:`.Vertex` objects used for placement in a particular
-            stage.
+        Parameters:
+
+            stages:
+                A :class:`tuple` of the form
+                ``((v1, v2, v3), (v4, v5))``, where each nested
+                :class:`tuple` holds the :class:`.Vertex` objects used
+                for placement in a particular stage.
 
         """
 
         self._stages = stages
 
-    def place_building_blocks(self, state):
+    def place_building_blocks(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         for stage in self._stages:
             vertices = tuple(state.get_vertices(stage))
             building_blocks = tuple(
@@ -41,7 +49,7 @@ class Serial:
             )
             edges = tuple(map(state.get_edges, stage))
             placements = map(
-                _Placement,
+                Placement,
                 vertices,
                 edges,
                 building_blocks,
@@ -58,13 +66,12 @@ class Serial:
             )
         return state
 
-    def get_num_stages(self):
+    def get_num_stages(self) -> int:
         """
         Get the number of placement stages.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of placement stages.
 
         """

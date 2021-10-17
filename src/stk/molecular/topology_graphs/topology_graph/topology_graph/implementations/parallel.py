@@ -6,7 +6,9 @@ Parallel Topology Graph
 
 import pathos
 
-from .utilities import _Placement
+from .utilities import Placement
+from ...construction_state import ConstructionState
+from ...vertex import Vertex
 
 __all__ = (
     'Parallel',
@@ -19,27 +21,34 @@ class Parallel:
 
     """
 
-    def __init__(self, stages, num_processes):
+    def __init__(
+        self,
+        stages: tuple[tuple[Vertex, ...], ...],
+        num_processes: int,
+    ) -> None:
         """
-        Initialize a :class:`._Parallel` instance.
+        Initialize a :class:`.Parallel` instance.
 
-        Parameters
-        ----------
-        stages : :class:`tuple`
-            A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
-            where each nested :class:`tuple` holds the
-            :class:`.Vertex` objects used for placement in a particular
-            stage.
+        Parameters:
 
-        num_processes : :class:`int`
-            The number of parallel processes to spawn.
+            stages:
+                A :class:`tuple` of the form
+                ``((v1, v2, v3), (v4, v5))``, where each nested
+                :class:`tuple` holds the :class:`.Vertex` objects used
+                for placement in a particular stage.
+
+            num_processes:
+                The number of parallel processes to spawn.
 
         """
 
         self._stages = stages
         self._num_processes = num_processes
 
-    def place_building_blocks(self, state):
+    def place_building_blocks(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
                 vertices = tuple(state.get_vertices(stage))
@@ -48,7 +57,7 @@ class Parallel:
                 )
                 edges = tuple(map(state.get_edges, stage))
                 placements = map(
-                    _Placement,
+                    Placement,
                     vertices,
                     edges,
                     building_blocks,
@@ -65,13 +74,12 @@ class Parallel:
                 )
         return state
 
-    def get_num_stages(self):
+    def get_num_stages(self) -> int:
         """
         Get the number of placement stages.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of placement stages.
 
         """
