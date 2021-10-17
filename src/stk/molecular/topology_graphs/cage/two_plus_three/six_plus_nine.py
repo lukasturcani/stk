@@ -8,7 +8,7 @@ import numpy as np
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class SixPlusNine(Cage):

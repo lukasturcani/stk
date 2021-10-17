@@ -15,9 +15,9 @@ from ..topology_graph import (
     TopologyGraph,
     NullOptimizer,
     Optimizer,
-    ConstructionState,
-    Vertex,
 )
+from ...vertex import Vertex
+from ...construction_state import ConstructionState
 import warnings
 
 

@@ -6,7 +6,7 @@ M2L4 Lantern
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex, LinearVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class M2L4Lantern(Cage):

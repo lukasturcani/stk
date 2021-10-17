@@ -121,14 +121,17 @@ from functools import partial
 from stk.utilities.typing import OneOrMany
 from .vertices import CageVertex, UnaligningVertex
 from .cage_construction_state import CageConstructionState
+from ...edge import Edge
+from ...vertex import Vertex
 from ..topology_graph import (
     TopologyGraph,
     NullOptimizer,
-    Edge,
-    Vertex,
     Optimizer,
 )
-from ...reactions import GenericReactionFactory, ReactionFactory
+from ...reaction_factories import (
+    GenericReactionFactory,
+    ReactionFactory,
+)
 from ...building_block import BuildingBlock
 
 

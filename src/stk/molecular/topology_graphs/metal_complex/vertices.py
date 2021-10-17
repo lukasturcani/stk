@@ -8,7 +8,7 @@ from scipy.spatial.distance import euclidean
 
 from stk.utilities import get_projection
 
-from ..topology_graph import Vertex
+from ...vertex import Vertex
 
 
 class MetalVertex(Vertex):

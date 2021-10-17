@@ -10,9 +10,13 @@ from collections import abc
 
 from ..cage import Cage
 from ..vertices import LinearVertex, AngledVertex
-from ...topology_graph import Edge, NullOptimizer, Optimizer
+from ...topology_graph import NullOptimizer, Optimizer
+from ....edge import Edge
 from ....building_block import BuildingBlock
-from ....reactions import ReactionFactory, GenericReactionFactory
+from ....reaction_factories import (
+    ReactionFactory,
+    GenericReactionFactory,
+)
 
 
 class M3L3Triangle(Cage):

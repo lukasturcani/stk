@@ -6,7 +6,7 @@ M4L8
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex, LinearVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class M4L8(Cage):

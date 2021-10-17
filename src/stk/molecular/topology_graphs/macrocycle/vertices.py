@@ -7,7 +7,7 @@ Macrocycle Vertices
 import numpy as np
 from scipy.spatial.distance import euclidean
 
-from ..topology_graph import Vertex
+from ...vertex import Vertex
 
 
 class CycleVertex(Vertex):

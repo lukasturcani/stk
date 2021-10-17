@@ -13,7 +13,7 @@ from collections import abc
 from stk.utilities import get_acute_vector
 from ..vertices import NonLinearVertex
 from ..cage import Cage
-from ...topology_graph import Edge
+from ....edge import Edge
 from ....building_block import BuildingBlock
 
 

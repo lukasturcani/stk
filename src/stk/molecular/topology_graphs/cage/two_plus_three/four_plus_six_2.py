@@ -6,7 +6,7 @@ Four Plus Six 2
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class FourPlusSix2(Cage):

@@ -6,7 +6,7 @@ M8L6 Cube
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class M8L6Cube(Cage):

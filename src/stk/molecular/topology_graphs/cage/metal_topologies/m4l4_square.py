@@ -9,8 +9,12 @@ from collections import abc
 
 from ..cage import Cage
 from ..vertices import LinearVertex, AngledVertex
-from ...topology_graph import Edge, NullOptimizer, Optimizer
-from ....reactions import ReactionFactory, GenericReactionFactory
+from ...topology_graph import NullOptimizer, Optimizer
+from ....edge import Edge
+from ....reaction_factories import (
+    ReactionFactory,
+    GenericReactionFactory,
+)
 from ....building_block import BuildingBlock
 
 

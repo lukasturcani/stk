@@ -8,7 +8,7 @@ import numpy as np
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class M6L2L3Prism(Cage):

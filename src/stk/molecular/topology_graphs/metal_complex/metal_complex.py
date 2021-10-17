@@ -41,7 +41,10 @@ from collections import Counter, defaultdict
 from itertools import product
 
 from ..topology_graph import TopologyGraph, NullOptimizer
-from ...reactions import DativeReactionFactory, GenericReactionFactory
+from ...reaction_factories import (
+    DativeReactionFactory,
+    GenericReactionFactory,
+)
 
 
 class MetalComplex(TopologyGraph):

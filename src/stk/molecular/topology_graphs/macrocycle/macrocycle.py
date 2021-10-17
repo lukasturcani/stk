@@ -8,8 +8,9 @@ import numpy as np
 import warnings
 
 from .vertices import CycleVertex
-from ..topology_graph import TopologyGraph, NullOptimizer, Edge
-from ...reactions import GenericReactionFactory
+from ..topology_graph import TopologyGraph, NullOptimizer
+from ...edge import Edge
+from ...reaction_factories import GenericReactionFactory
 
 
 class Macrocycle(TopologyGraph):
