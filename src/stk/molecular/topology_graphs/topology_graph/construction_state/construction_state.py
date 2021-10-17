@@ -17,7 +17,12 @@ from ..edge_group import EdgeGroup
 from ..vertex import Vertex
 from ..placement_result import PlacementResult
 from ....building_block import BuildingBlock
+from ....atom import Atom
+from ....atom_info import AtomInfo
+from ....bond import Bond
+from ....bond_info import BondInfo
 from ....functional_groups import FunctionalGroup
+from ....reactions import Reaction, ReactionResult
 
 
 __all__ = (
@@ -282,7 +287,11 @@ class ConstructionState:
             )
         )
 
-    def _with_reaction_results(self, reactions, results):
+    def _with_reaction_results(
+        self: _T,
+        reactions: tuple[Reaction, ...],
+        results: abc.Iterable[ReactionResult],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -296,29 +305,34 @@ class ConstructionState:
         )
         return self
 
-    def with_reaction_results(self, reactions, results):
+    def with_reaction_results(
+        self,
+        reactions: tuple[Reaction, ...],
+        results: abc.Iterable[ReactionResult],
+    ) -> ConstructionState:
         """
         Return a clone holding the reaction results.
 
-        Parameters
-        ----------
-        reactions : :class:`tuple` of :class:`.Reaction`
-            The reactions.
+        Parameters:
 
-        results : :class:`.ReactionResult`
-            For each reaction in `reactions`, its result.
+            reactions:
+                The reactions.
 
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The clone holding the reaction results. Has the same type
-            as the original instance.
+            results:
+                For each reaction in `reactions`, its result.
+
+        Returns:
+
+            The clone holding the reaction results.
 
         """
 
         return self.clone()._with_reaction_results(reactions, results)
 
-    def _with_lattice_constants(self, lattice_constants):
+    def _with_lattice_constants(
+        self: _T,
+        lattice_constants: typing.Optional[_LatticeConstants],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -331,27 +345,32 @@ class ConstructionState:
         )
         return self
 
-    def with_lattice_constants(self, lattice_constants):
+    def with_lattice_constants(
+        self,
+        lattice_constants: typing.Optional[_LatticeConstants],
+    ) -> ConstructionState:
         """
         Return a clone holding the `lattice_constants`.
 
-        Parameters
-        ----------
-        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
-            The lattice constants of the clone. Requires 3 arrays of
-            size``(3, )``.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The clone holding the new lattice constants. Has the same
-            type as the original instance.
+            lattice_constants:
+                The lattice constants of the clone. Requires 3 arrays
+                of size``(3, )``, or ``None`` if the topology graph is
+                not periodic.
+
+        Returns:
+
+            The clone holding the new lattice constants.
 
         """
 
         return self.clone()._with_lattice_constants(lattice_constants)
 
-    def _with_position_matrix(self, position_matrix):
+    def _with_position_matrix(
+        self: _T,
+        position_matrix: np.ndarray,
+    ) -> _T:
         """
         Modify the instance.
 
@@ -364,27 +383,31 @@ class ConstructionState:
         )
         return self
 
-    def with_position_matrix(self, position_matrix):
+    def with_position_matrix(
+        self,
+        position_matrix: np.ndarray,
+    ) -> ConstructionState:
         """
         Return a clone holding the `position_matrix`.
 
-        Parameters
-        ----------
-        position_matrix : :class:`numpy.ndarray`
-            The position matrix of the clone. The shape of the matrix
-            is ``(n, 3)``.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The clone holding the new position matrix. Has the same
-            type as the original instance.
+            position_matrix:
+                The position matrix of the clone. The shape of the
+                matrix is ``(n, 3)``.
+
+        Returns:
+
+            The clone holding the new position matrix.
 
         """
 
         return self.clone()._with_position_matrix(position_matrix)
 
-    def _with_vertices(self, vertices):
+    def _with_vertices(
+        self: _T,
+        vertices: abc.Iterable[Vertex],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -393,102 +416,101 @@ class ConstructionState:
         self._graph_state = self._graph_state.with_vertices(vertices)
         return self
 
-    def with_vertices(self, vertices):
+    def with_vertices(
+        self,
+        vertices: abc.Iterable[Vertex],
+    ) -> ConstructionState:
         """
         Returns a clone holding `vertices`.
 
-        Parameters
-        ----------
-        vertices : :class:`iterable` of :class:`.Vertex`
-            The vertices the clone should hold.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The clone. Has the same type as the original instance.
+            vertices:
+                The vertices the clone should hold.
+
+        Returns:
+
+            The clone.
 
         """
 
         return self.clone()._with_vertices(vertices)
 
-    def get_position_matrix(self):
+    def get_position_matrix(self) -> np.ndarray:
         """
         Get the position matrix of the molecule being constructed.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The position matrix.
 
         """
 
         return self._molecule_state.get_position_matrix()
 
-    def get_atoms(self):
+    def get_atoms(self) -> abc.Iterator[Atom]:
         """
         Yield the atoms of the molecule being constructed.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             An atom of the molecule being constructed.
 
         """
 
         yield from self._molecule_state.get_atoms()
 
-    def get_bonds(self):
+    def get_bonds(self) -> abc.Iterator[Bond]:
         """
         Yield the bonds of the molecule being constructed.
 
-        Yields
-        ------
-        :class:`.Bond`
+        Yields:
+
             A bond of the molecule being constructed.
 
         """
 
         yield from self._molecule_state.get_bonds()
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> abc.Iterator[AtomInfo]:
         """
         Yield the atom infos of the molecule being constructed.
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+        Yields:
+
             An atom info of the molecule being constructed.
 
         """
 
         yield from self._molecule_state.get_atom_infos()
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> abc.Iterator[BondInfo]:
         """
         Yield the bond infos of the molecule being constructed.
 
-        Yields
-        ------
-        :class:`.BondInfo`
+        Yields:
+
             The bond info of the molecule being constructed.
 
         """
 
         yield from self._molecule_state.get_bond_infos()
 
-    def get_num_building_block(self, building_block):
+    def get_num_building_block(
+        self,
+        building_block: BuildingBlock,
+    ) -> int:
         """
         Get the number of times `building_block` is present.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block whose frequency in the topology graph
-            is desired.
+        Parameters:
 
-        Returns
-        -------
-        :class:`int`
+            building_block:
+                The building block whose frequency in the topology
+                graph is desired.
+
+        Returns:
+
             The number of times `building_block` is present in the
             topology graph.
 
@@ -496,7 +518,7 @@ class ConstructionState:
 
         return self._graph_state.get_num_building_block(building_block)
 
-    def get_building_blocks(self):
+    def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:
         """
         Yield the building blocks.
 
@@ -506,9 +528,8 @@ class ConstructionState:
         equivalently positioned building blocks will be yielded at the
         same time.
 
-        Yields
-        ------
-        :class:`.BuildingBlock`
+        Yields:
+
             A building block of the topology graph.
 
         """
