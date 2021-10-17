@@ -11,7 +11,7 @@ from collections import abc
 import numpy as np
 
 from .graph_state import GraphState
-from .molecule_state import _MoleculeState
+from .molecule_state import MoleculeState
 from ..edge import Edge
 from ..edge_group import EdgeGroup
 from ..vertex import Vertex
@@ -72,7 +72,7 @@ class ConstructionState(typing.Generic[_V]):
             edges=edges,
             lattice_constants=lattice_constants,
         )
-        self._molecule_state = _MoleculeState()
+        self._molecule_state = MoleculeState()
 
     def _clone(self: _T) -> _T:
         clone = self.__class__.__new__(self.__class__)
@@ -94,7 +94,7 @@ class ConstructionState(typing.Generic[_V]):
     def _with_placement_results(
         self: _T,
         vertices: tuple[_V, ...],
-        edges: abc.Iterable[abc.Collection[Edge]],
+        edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
         results: abc.Iterable[PlacementResult],
     ) -> _T:
@@ -116,7 +116,7 @@ class ConstructionState(typing.Generic[_V]):
     def with_placement_results(
         self,
         vertices: tuple[Vertex, ...],
-        edges: abc.Iterable[abc.Collection[Edge]],
+        edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
         results: abc.Iterable[PlacementResult],
     ) -> ConstructionState:

@@ -97,9 +97,9 @@ class MoleculeState:
     def _with_placement_results(
         self: _T,
         vertices: tuple[Vertex, ...],
-        edges: abc.Iterable[tuple[Edge, ...]],
+        edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
-        results: tuple[PlacementResult, ...],
+        results: abc.Iterable[PlacementResult],
     ) -> _T:
         """
         Modify the instance.
@@ -135,9 +135,9 @@ class MoleculeState:
     def with_placement_results(
         self,
         vertices: tuple[Vertex, ...],
-        edges: abc.Iterable[tuple[Edge, ...]],
+        edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
-        results: tuple[PlacementResult, ...],
+        results: abc.Iterable[PlacementResult],
     ) -> MoleculeState:
         """
         Return a clone holding the placement results.
