@@ -4,11 +4,29 @@ Graph State
 
 """
 
+from __future__ import annotations
+
 import numpy as np
-from collections import defaultdict
+import typing
+import collections
+from collections import abc
+
+from stk.utilities.typing import OneOrMany
+from ..vertex import Vertex
+from ..edge import Edge
+from ....building_block import BuildingBlock
 
 
-class _GraphState:
+__all__ = (
+    'GraphState',
+)
+
+_LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
+
+_T = typing.TypeVar('_T', bound='GraphState')
+
+
+class GraphState:
     """
     The topology graph of a molecule under construction.
 
@@ -25,27 +43,28 @@ class _GraphState:
 
     def __init__(
         self,
-        building_block_vertices,
-        edges,
-        lattice_constants,
-    ):
+        building_block_vertices:
+            dict[BuildingBlock, tuple[Vertex, ...]],
+        edges: tuple[Edge, ...],
+        lattice_constants: typing.Optional[_LatticeConstants] = None,
+    ) -> None:
         """
         Initialize a :class:`._GraphState` instance.
 
-        Parameters
-        ----------
-        building_block_vertices : :class:`dict`
-            Maps each :class:`.BuildingBlock` to be placed, to a
-            :class:`tuple` of :class:`.Vertex` instances, on which
-            it should be placed.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
-            The edges which make up the topology graph.
+            building_block_vertices:
+                Maps each :class:`.BuildingBlock` to be placed, to a
+                :class:`tuple` of :class:`.Vertex` instances, on which
+                it should be placed.
 
-        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
-            A :class:`numpy.ndarray` for each lattice constant.
-            Can be an empty :class:`tuple` if the topology graph is
-            not periodic.
+            edges:
+                The edges which make up the topology graph.
+
+            lattice_constants:
+                A :class:`numpy.ndarray` for each lattice constant.
+                Can be ``None`` if the topology graph is
+                not periodic.
 
         """
 
@@ -66,25 +85,29 @@ class _GraphState:
             for vertex in vertices
         }
         self._edges = edges
-        self._lattice_constants = tuple(map(
-            np.array,
-            lattice_constants,
-        ))
+
+        if lattice_constants is None:
+            self._lattice_constants = None
+        else:
+            self._lattice_constants = tuple(map(
+                np.array,
+                lattice_constants,
+            ))
+
         self._vertex_edges = self._get_vertex_edges()
 
-    def _get_vertex_edges(self):
+    def _get_vertex_edges(self) -> dict[int, list[Edge]]:
         """
         Get the edges connected to each vertex.
 
-        Returns
-        -------
-        :class:`dict`
+        Returns:
+
             Maps the id of every vertex to a :class:`tuple` of
             :class:`.Edge` instances connected to it.
 
         """
 
-        vertex_edges = defaultdict(list)
+        vertex_edges = collections.defaultdict(list)
         for edge in self._edges:
             if edge.is_periodic():
                 for vertex_id in edge.get_vertex_ids():
@@ -98,7 +121,11 @@ class _GraphState:
                     vertex_edges[vertex_id].append(edge)
         return vertex_edges
 
-    def _get_periodic_edge(self, edge, reference):
+    def _get_periodic_edge(
+        self,
+        edge: Edge,
+        reference: int,
+    ) -> Edge:
         """
         Get an :class:`.Edge`, with its position correctly set.
 
@@ -111,18 +138,17 @@ class _GraphState:
         position. An analogous calculation must be done to get the
         position of the edge from the perspective of *vertex2*.
 
-        Parameters
-        ----------
-        edge : :class:`.Edge`
-            The edge whose periodic position must be set.
+        Parameters:
 
-        reference : :class:`int`
-            The id of the vertex, relative to which the edge position
-            is being calculated.
+            edge : :class:`.Edge`
+                The edge whose periodic position must be set.
 
-        Returns
-        -------
-        :class:`.Edge`
+            reference : :class:`int`
+                The id of the vertex, relative to which the edge
+                position is being calculated.
+
+        Returns:
+
             A clone of `edge`, shifted to have the correct periodic
             position relative to `reference`.
 
@@ -137,26 +163,29 @@ class _GraphState:
         end_cell = vertex1.get_cell() + direction*periodicity
         cell_shift = end_cell - vertex2.get_cell()
 
-        shift = sum(
-            axis_shift*constant
-            for axis_shift, constant in zip(
-                cell_shift,
-                self._lattice_constants,
+        if self._lattice_constants is not None:
+            shift = sum(
+                axis_shift*constant
+                for axis_shift, constant in zip(
+                    cell_shift,
+                    self._lattice_constants,
+                )
             )
-        )
+        else:
+            shift = 0
+
         position = (
             (vertex2.get_position()+shift+vertex1.get_position()) / 2
         )
         return edge.with_position(position)
 
-    def clone(self):
+    def clone(self) -> GraphState:
         """
         Get a clone.
 
-        Returns
-        -------
-        :class:`._GraphState`
-            The clone. Has the same type as the original instance.
+        Returns:
+
+            The clone.
 
         """
 
@@ -167,39 +196,49 @@ class _GraphState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
-        clone._lattice_constants = tuple(map(
-            np.array,
-            self._lattice_constants,
-        ))
+
+        if self._lattice_constants is None:
+            clone._lattice_constants = None
+        else:
+            clone._lattice_constants = tuple(map(
+                np.array,
+                self._lattice_constants,
+            ))
+
         clone._num_building_blocks = dict(self._num_building_blocks)
         return clone
 
-    def get_building_block(self, vertex_id):
+    def get_building_block(
+        self,
+        vertex_id: int,
+    ) -> BuildingBlock:
         """
         Get the building block to be placed on a given vertex.
 
-        Parameters
-        ----------
-        vertex_id : :class:`int`
-            The id of the vertex, on which the building block is to
-            be placed.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.BuildingBlock`
+            vertex_id:
+                The id of the vertex, on which the building block is to
+                be placed.
+
+        Returns:
+
             The building block.
 
         """
 
         return self._vertex_building_blocks[vertex_id]
 
-    def get_vertices(self, vertex_ids=None):
+    def get_vertices(
+        self,
+        vertex_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> abc.Iterator[Vertex]:
         """
         Yield the topology graph vertices.
 
         Parameters
         ----------
-        vertex_ids : :class:`iterable` of :class:`int`, optional
+        vertex_ids:
             The ids of vertices to yield. If ``None``, all vertices
             will be yielded. Can be a single :class:`int` if a
             single vertex is to be yielded.
@@ -219,82 +258,86 @@ class _GraphState:
         for vertex_id in vertex_ids:
             yield self._vertices[vertex_id]
 
-    def get_num_vertices(self):
+    def get_num_vertices(self) -> int:
         """
         Get the number of vertices in the topology graph.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of vertices in the topology graph.
 
         """
 
         return len(self._vertices)
 
-    def get_edge(self, edge_id):
+    def get_edge(self, edge_id: int) -> Edge:
         """
         Get an edge.
 
-        Parameters
-        ----------
-        edge_id : :class:`int`
-            The id of an edge.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.Edge`
+            edge_id:
+                The id of an edge.
+
+        Returns:
+
             An edge.
 
         """
 
         return self._edges[edge_id]
 
-    def get_num_edges(self):
+    def get_num_edges(self) -> int:
         """
         Get the number of edges in the topology graph.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of edges.
 
         """
 
         return len(self._edges)
 
-    def get_lattice_constants(self):
+    def get_lattice_constants(
+        self,
+    ) -> typing.Optional[_LatticeConstants]:
         """
         Get the lattice constants of the state.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`numpy.ndarray`
-            The lattice constants.
+        Returns:
+
+            The lattice constants or ``None`` if the topology graph
+            is not periodic.
 
         """
 
-        return tuple(map(np.array, self._lattice_constants))
+        if self._lattice_constants is None:
+            return None
+        a, b, c = map(np.array, self._lattice_constants)
+        return a, b, c
 
-    def get_edges(self, vertex_id):
+    def get_edges(self, vertex_id: int) -> list[Edge]:
         """
         Get the edges connect to a vertex.
 
-        Parameters
-        ----------
-        vertex_id : class:`int`
-            The id of a vertex.
+        Parameters:
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.Edge`
+            vertex_id:
+                The id of a vertex.
+
+        Returns:
+
             The connected edges.
 
         """
 
         return self._vertex_edges[vertex_id]
 
-    def _with_vertices(self, vertices):
+    def _with_vertices(
+        self: _T,
+        vertices: abc.Iterable[Vertex],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -305,69 +348,81 @@ class _GraphState:
         }
         return self
 
-    def with_vertices(self, vertices):
+    def with_vertices(
+        self,
+        vertices: abc.Iterable[Vertex],
+    ) -> GraphState:
         """
         Returns a clone holding `vertices`.
 
-        Parameters
-        ----------
-        vertices : :class:`iterable` of :class:`.Vertex`
-            The vertices the clone should hold.
+        Parameters:
 
-        Returns
-        -------
-        :class:`._GraphState`
-            The clone. Has the same type as the original instance.
+            vertices:
+                The vertices the clone should hold.
+
+        Returns:
+
+            The clone.
 
         """
 
         return self.clone()._with_vertices(vertices)
 
-    def _with_lattice_constants(self, lattice_constants):
+    def _with_lattice_constants(
+        self: _T,
+        lattice_constants: typing.Optional[_LatticeConstants],
+    ) -> _T:
         """
         Modify the instance.
 
         """
 
-        self._lattice_constants = tuple(map(
-            np.array,
-            lattice_constants,
-        ))
+        if self._lattice_constants is None:
+            self._lattice_constants = None
+        else:
+            a, b, c = map(
+                np.array,
+                self._lattice_constants,
+            )
+            self._lattice_constants = a, b, c
         return self
 
-    def with_lattice_constants(self, lattice_constants):
+    def with_lattice_constants(
+        self,
+        lattice_constants: typing.Optional[_LatticeConstants],
+    ) -> GraphState:
         """
         Return a clone holding the `lattice_constants`.
 
-        Parameters
-        ----------
-        lattice_constants : :class:`tuple` of :class:`numpy.ndarray`
-            The lattice constants of the clone. Requires 3 arrays of
-            size``(3, )``.
+        Parameters:
 
-        Returns
-        -------
-        :class:`._GraphState`
-            The clone holding the new lattice constants. Has the same
-            type as the original instance.
+            lattice_constants:
+                The lattice constants of the clone. Requires 3 arrays
+                of size``(3, )``.
+
+        Returns:
+
+            The clone holding the new lattice constants.
 
         """
 
         return self.clone()._with_lattice_constants(lattice_constants)
 
-    def get_num_building_block(self, building_block):
+    def get_num_building_block(
+        self,
+        building_block: BuildingBlock,
+    ) -> int:
         """
         Get the number of times `building_block` is present.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block whose frequency in the topology graph
-            is desired.
+        Parameters:
 
-        Returns
-        -------
-        :class:`int`
+            building_block:
+                The building block whose frequency in the topology
+                graph is desired.
+
+        Returns:
+
             The number of times `building_block` is present in the
             topology graph.
 
@@ -375,7 +430,7 @@ class _GraphState:
 
         return self._num_building_blocks[building_block]
 
-    def get_building_blocks(self):
+    def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:
         """
         Yield the building blocks.
 
@@ -385,9 +440,8 @@ class _GraphState:
         equivalently positioned building blocks will be yielded at the
         same time.
 
-        Yields
-        ------
-        :class:`.BuildingBlock`
+        Yields:
+
             A building block of the topology graph.
 
         """
