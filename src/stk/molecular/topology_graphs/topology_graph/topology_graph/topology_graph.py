@@ -13,13 +13,13 @@ from collections import abc
 
 from stk.utilities import flatten
 from ..optimizers import Optimizer
+from ....vertex import Vertex
+from ....edge import Edge
+from ....edge_group import EdgeGroup
 from ....building_block import BuildingBlock
 from ....reactions import ReactionFactory
-from ..vertex import Vertex
-from ..edge import Edge
 from ..construction_result import ConstructionResult
 from ....construction_state import ConstructionState
-from ..edge_group import EdgeGroup
 from .implementations import Parallel, Serial
 
 

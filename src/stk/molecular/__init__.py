@@ -12,3 +12,6 @@ from .reactions import *  # noqa
 from .key_makers import *  # noqa
 from .writers import *  # noqa
 from .periodic_info import *  # noqa
+from .vertex import *  # noqa
+from .edge import *  # noqa
+from .edge_group import *  # noqa

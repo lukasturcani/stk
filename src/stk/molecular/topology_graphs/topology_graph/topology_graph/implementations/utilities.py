@@ -10,8 +10,8 @@ from collections import abc
 
 from .....building_block import BuildingBlock
 from ...placement_result import PlacementResult
-from ...vertex import Vertex
-from ...edge import Edge
+from .....vertex import Vertex
+from .....edge import Edge
 
 
 __all__ = (

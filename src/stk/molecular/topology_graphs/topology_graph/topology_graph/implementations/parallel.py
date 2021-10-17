@@ -8,7 +8,7 @@ import pathos
 import typing
 
 from .utilities import Placement
-from ...vertex import Vertex
+from .....vertex import Vertex
 from .....construction_state import ConstructionState
 
 __all__ = (
