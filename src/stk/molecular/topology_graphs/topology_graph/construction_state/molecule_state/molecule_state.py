@@ -78,7 +78,7 @@ class _MoleculeState:
 
         """
 
-        summary = _PlacementsSummary(
+        summary = PlacementsSummary(
             building_blocks=building_blocks,
             placement_results=results,
             num_atoms=len(self._atoms),
@@ -287,12 +287,12 @@ class _MoleculeState:
 
         """
 
-        reactions_summary = _ReactionsSummary(
+        reactions_summary = ReactionsSummary(
             num_atoms=len(self._atoms),
             reaction_results=results,
         )
         self._with_reactions_summary(reactions_summary)
-        self._with_deletions_summary(_DeletionsSummary(
+        self._with_deletions_summary(DeletionsSummary(
             atoms=self._atoms,
             atom_infos=self._atom_infos,
             bonds=self._bonds,
