@@ -234,7 +234,7 @@ class ReactionsSummary:
 
         yield from self._deleted_atom_ids
 
-    def get_deleted_bond_ids(self) -> abc.Iterator[tuple[int, ...]]:
+    def get_deleted_bond_ids(self) -> abc.Iterator[BondId]:
         """
         Yield the atom ids of bonds to be deleted held by the summary.
 

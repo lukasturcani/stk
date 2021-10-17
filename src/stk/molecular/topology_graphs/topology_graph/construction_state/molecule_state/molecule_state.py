@@ -4,18 +4,47 @@ Molecule State
 
 """
 
+from __future__ import annotations
+
+__all__ = (
+    'MoleculeState',
+)
+
 import numpy as np
+import typing
+from collections import abc
 
 from .reactions_summary import ReactionsSummary
 from .deletions_summary import DeletionsSummary
 from .placements_summary import PlacementsSummary
+from ...vertex import Vertex
+from ...edge import Edge
+from ...edge_group import EdgeGroup
+from ...placement_result import PlacementResult
+from .....building_block import BuildingBlock
+from .....functional_groups import FunctionalGroup
+from .....atom import Atom
+from .....atom_info import AtomInfo
+from .....bond import Bond
+from .....bond_info import BondInfo
+from .....reactions import Reaction, ReactionResult
 
 
-class _MoleculeState:
+_T = typing.TypeVar('_T', bound='MoleculeState')
+
+
+class MoleculeState:
     """
     Represents the state of a molecule under construction.
 
     """
+
+    _atoms: list[Atom]
+    _atom_infos: list[AtomInfo]
+    _bonds: list[Bond]
+    _bond_infos: list[BondInfo]
+    _edge_functional_groups: dict[int, list[FunctionalGroup]]
+    _num_placements: int
 
     __slots__ = [
         '_position_matrix',
@@ -41,14 +70,13 @@ class _MoleculeState:
         self._edge_functional_groups = {}
         self._num_placements = 0
 
-    def clone(self):
+    def clone(self) -> MoleculeState:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`._MoleculeState`
-            The clone. Has the same type as the original instance.
+        Returns:
+
+            The clone.
 
         """
 
@@ -67,12 +95,12 @@ class _MoleculeState:
         return clone
 
     def _with_placement_results(
-        self,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
+        self: _T,
+        vertices: tuple[Vertex, ...],
+        edges: tuple[Edge, ...],
+        building_blocks: tuple[BuildingBlock, ...],
+        results: tuple[PlacementResult, ...],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -106,36 +134,34 @@ class _MoleculeState:
 
     def with_placement_results(
         self,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
+        vertices: tuple[Vertex, ...],
+        edges: tuple[Edge, ...],
+        building_blocks: tuple[BuildingBlock, ...],
+        results: tuple[PlacementResult, ...],
+    ) -> MoleculeState:
         """
         Return a clone holding the placement results.
 
-        Parameters
-        ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
-            The vertices used for placement.
+        Parameters:
 
-        edges : :class:`tuple`
-            For each vertex in `vertices`, a :class:`tuple` of
-            :class:`.Edge` instances connected to it.
+            vertices:
+                The vertices used for placement.
 
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            For each vertex in `vertices`, the building block placed
-            on it.
+            edges:
+                For each vertex in `vertices`, a :class:`tuple` of
+                :class:`.Edge` instances connected to it.
 
-        results : :class:`tuple` of :class:`._PlacementResult`
-            For every vertex in `vertices`, the result of the
-            placement.
+            building_blocks:
+                For each vertex in `vertices`, the building block
+                placed on it.
 
-        Returns
-        -------
-        :class:`._MoleculeState`
-            The clone holding the placement results. Has the same
-            type as the original instance.
+            results:
+                For every vertex in `vertices`, the result of the
+                placement.
+
+        Returns:
+
+            The clone holding the placement results.
 
         """
 
@@ -146,33 +172,31 @@ class _MoleculeState:
             results=results,
         )
 
-    def get_position_matrix(self):
+    def get_position_matrix(self) -> np.ndarray:
         """
         Get the position matrix of the molecule.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The position matrix.
 
         """
 
         return np.array(self._position_matrix)
 
-    def get_atoms(self):
+    def get_atoms(self) -> abc.Iterator[Atom]:
         """
         Yield the atoms of the molecule.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             An atom of the molecule.
 
         """
 
         yield from self._atoms
 
-    def get_bonds(self):
+    def get_bonds(self) -> abc.Iterator[Bond]:
         """
         Yield the bonds of the molecule.
 
@@ -185,44 +209,44 @@ class _MoleculeState:
 
         yield from self._bonds
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> abc.Iterator[AtomInfo]:
         """
         Yield the atom infos of the molecule.
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+        Yields:
+
             An atom info of the molecule.
 
         """
 
         yield from self._atom_infos
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> abc.Iterator[BondInfo]:
         """
         Yield the bond infos of the molecule.
 
-        Yields
-        ------
-        :class:`.BondInfo`
+        Yields:
+
             The bond info of the molecule.
 
         """
 
         yield from self._bond_infos
 
-    def get_edge_group_functional_groups(self, edge_group):
+    def get_edge_group_functional_groups(
+        self,
+        edge_group: EdgeGroup,
+    ) -> abc.Iterator[FunctionalGroup]:
         """
         Yield the functional groups associated with `edge_group`.
 
-        Parameters
-        ----------
-        edge_group : :class:`.EdgeGroup`
-            The edge group, whose functional groups are desired.
+        Parameters:
 
-        Yields
-        ------
-        :class:`.FunctionalGroup`
+            edge_group:
+                The edge group, whose functional groups are desired.
+
+        Yields:
+
             A functional group which belongs to `edge_group`.
 
         """
@@ -230,27 +254,31 @@ class _MoleculeState:
         for edge_id in edge_group.get_edge_ids():
             yield from self._edge_functional_groups[edge_id]
 
-    def with_position_matrix(self, position_matrix):
+    def with_position_matrix(
+        self,
+        position_matrix: np.ndarray,
+    ) -> MoleculeState:
         """
         Return a clone holding the `position_matrix`.
 
-        Parameters
-        ----------
-        position_matrix : :class:`numpy.ndarray`
-            The position matrix of the clone. The shape of the matrix
-            is ``(n, 3)``.
+        Parameters:
 
-        Returns
-        -------
-        :class:`._MoleculeState`
-            The clone holding the new position matrix. Has the same
-            type as the original instance.
+            position_matrix:
+                The position matrix of the clone. The shape of the
+                matrix is ``(n, 3)``.
+
+        Returns:
+
+            The clone holding the new position matrix.
 
         """
 
         return self.clone()._with_position_matrix(position_matrix)
 
-    def _with_position_matrix(self, position_matrix):
+    def _with_position_matrix(
+        self: _T,
+        position_matrix: np.ndarray,
+    ) -> _T:
         """
         Modify the instance.
 
@@ -259,29 +287,35 @@ class _MoleculeState:
         self._position_matrix = np.array(position_matrix)
         return self
 
-    def with_reaction_results(self, reactions, results):
+    def with_reaction_results(
+        self,
+        reactions: tuple[Reaction, ...],
+        results: abc.Iterable[ReactionResult],
+    ) -> MoleculeState:
         """
         Return a clone holding the reaction results.
 
-        Parameters
-        ----------
-        reactions : :class:`tuple` of :class:`.Reaction`
-            The reactions.
+        Parameters:
 
-        results : :class:`.ReactionResult`
-            For each reaction in `reactions`, its result.
+            reactions:
+                The reactions.
 
-        Returns
-        -------
-        :class:`._MoleculeState`
-            The clone holding the reaction results. Has the same type
-            as the original instance.
+            results:
+                For each reaction in `reactions`, its result.
+
+        Returns:
+
+            The clone holding the reaction results.
 
         """
 
         return self.clone()._with_reaction_results(reactions, results)
 
-    def _with_reaction_results(self, reactions, results):
+    def _with_reaction_results(
+        self: _T,
+        reactions: tuple[Reaction, ...],
+        results: abc.Iterable[ReactionResult],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -303,18 +337,17 @@ class _MoleculeState:
         ))
         return self
 
-    def _with_reactions_summary(self, summary):
+    def _with_reactions_summary(
+        self,
+        summary: ReactionsSummary,
+    ) -> None:
         """
         Add the results held in `summary`.
 
-        Parameters
-        ----------
-        summary : :class:`._ReactionsSummary`
-            A summary of the reaction results.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            summary:
+                A summary of the reaction results.
 
         """
 
@@ -330,18 +363,17 @@ class _MoleculeState:
                 positions,
             ])
 
-    def _with_deletions_summary(self, summary):
+    def _with_deletions_summary(
+        self: _T,
+        summary: DeletionsSummary,
+    ) -> _T:
         """
         Add the results held in `summary`.
 
-        Parameters
-        ----------
-        summary : :class:`._DeletionsSummary`
-            A summary of the atom deletion results.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            summary:
+                A summary of the atom deletion results.
 
         """
 
