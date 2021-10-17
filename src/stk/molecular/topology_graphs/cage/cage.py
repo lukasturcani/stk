@@ -1335,7 +1335,11 @@ class Cage(TopologyGraph):
                 building_block_vertices.get(building_block, [])
             )
             building_block_vertices[building_block].append(vertex)
-        return building_block_vertices
+        return {
+            building_block: tuple(vertices)
+            for building_block, vertices
+            in building_block_vertices.items()
+        }
 
     def _get_scale(
         self,
