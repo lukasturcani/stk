@@ -6,23 +6,27 @@ This module defines utilities for optimizers.
 
 """
 
-from collections import defaultdict
+import typing
+from collections import defaultdict, abc
 
 import mchammer as mch
 
+from ..construction_state import ConstructionState
 
-def get_mch_bonds(state):
+
+def get_mch_bonds(
+        state: ConstructionState,
+) -> abc.Iterator[mch.Bond]:
     """
     Yield the bonds of the :mod:`MCHammer` molecule.
 
-    Parameters
-    ----------
-    state : :class:`.ConstructionState`
-        The state of the molecule under construction.
+    Parameters:
 
-    Yields
-    -------
-    :class:`MCHammer.Bond`
+        state:
+            The state of the molecule under construction.
+
+    Yields:
+
         A bond in the molecule.
 
     """
@@ -36,18 +40,19 @@ def get_mch_bonds(state):
         yield mch.Bond(id=i, atom_ids=(ba1, ba2))
 
 
-def get_long_bond_ids(state):
+def get_long_bond_ids(
+    state: ConstructionState,
+) -> abc.Iterator[tuple[int, int]]:
     """
     Yield the ids of the long bonds to optimize.
 
-    Parameters
-    ----------
-    state : :class:`.ConstructionState`
-        The state of the molecule under construction.
+    Parameters:
 
-    Yields
-    -------
-    :class:`tuple` of :class:`int`
+        state:
+            The state of the molecule under construction.
+
+    Yields:
+
         A pair of atom ids that identify a bond to be optimized.
 
     """
@@ -57,21 +62,23 @@ def get_long_bond_ids(state):
         ba2 = bond_infos.get_bond().get_atom2().get_id()
         # None if for constructed bonds.
         if bond_infos.get_building_block() is None:
-            yield sorted((ba1, ba2))
+            first, second = sorted((ba1, ba2))
+            yield first, second
 
 
-def get_subunits(state):
+def get_subunits(
+    state: ConstructionState,
+) -> dict[typing.Optional[int], list[int]]:
     """
     Get connected graphs based on building block ids.
 
-    Parameters
-    ----------
-    state : :class:`.ConstructionState`
-        The state of the molecule under construction.
+    Parameters:
 
-    Returns
-    -------
-    :class:`.dict`
+        state:
+            The state of the molecule under construction.
+
+    Returns:
+
         The subunits of the molecule split by building block id. Key is
         subunit identifier, Value is :class:`list` of atom ids in
         subunit.

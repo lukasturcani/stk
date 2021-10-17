@@ -15,6 +15,7 @@ class Spinner(Optimizer):
     Performs Monte Carlo optimisation of host-guest complexes [1]_.
 
     Examples:
+
         *Structure Optimization*
 
         Using :class:`.Spinner` will lead to
@@ -62,6 +63,7 @@ class Spinner(Optimizer):
         general to any chemistry.
 
     References:
+
         .. [1] https://github.com/andrewtarzia/SpinDry
 
     """
