@@ -112,13 +112,13 @@ class TwoPlusFour(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0, -1]),
-        NonLinearVertex(1, [0, 0, 1]),
+        NonLinearVertex(0, (0, 0, -1)),
+        NonLinearVertex(1, (0, 0, 1)),
 
-        LinearVertex(2, [2, 0, 0], False),
-        LinearVertex(3, [-2, 0, 0], False),
-        LinearVertex(4, [0, 2, 0], False),
-        LinearVertex(5, [0, -2, 0], False),
+        LinearVertex(2, (2, 0, 0), False),
+        LinearVertex(3, (-2, 0, 0), False),
+        LinearVertex(4, (0, 2, 0), False),
+        LinearVertex(5, (0, -2, 0), False),
     )
 
     _edge_prototypes = (
