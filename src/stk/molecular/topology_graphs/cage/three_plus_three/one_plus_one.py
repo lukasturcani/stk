@@ -4,23 +4,32 @@ One Plus One
 
 """
 
+from __future__ import annotations
+
+import typing
 import numpy as np
+from collections import abc
 
 from stk.utilities import get_acute_vector
 from ..vertices import NonLinearVertex
 from ..cage import Cage
 from ...topology_graph import Edge
+from ....building_block import BuildingBlock
 
 
 class OnePlusOneVertex(NonLinearVertex):
     def __init__(
         self,
-        id,
-        position,
-        edge_normal,
-        use_neighbor_placement=True,
-        aligner_edge=0,
-    ):
+        id: int,
+        position: typing.Union[
+            np.ndarray,
+            tuple[float, float, float],
+        ],
+        edge_normal: tuple[float, float, float],
+        use_neighbor_placement: bool = True,
+        aligner_edge: int = 0,
+    ) -> None:
+
         super().__init__(
             id=id,
             position=position,
@@ -29,12 +38,17 @@ class OnePlusOneVertex(NonLinearVertex):
         )
         self._edge_normal = np.array(edge_normal, dtype=np.float64)
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> OnePlusOneVertex:
+        clone = super()._clone()
         clone._edge_normal = np.array(self._edge_normal)
         return clone
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: abc.Sequence[Edge],
+    ) -> np.ndarray:
+
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
@@ -176,9 +190,8 @@ class OnePlusOne(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        OnePlusOneVertex(0, [_x, 0., 0.], [1, 0, 0], False),
-        OnePlusOneVertex(1, [-_x, 0., 0.], [-1, 0, 0], False),
-
+        OnePlusOneVertex(0, (_x, 0., 0.), (1, 0, 0), False),
+        OnePlusOneVertex(1, (-_x, 0., 0.), (-1, 0, 0), False),
     )
     _edge_prototypes = (
         Edge(
