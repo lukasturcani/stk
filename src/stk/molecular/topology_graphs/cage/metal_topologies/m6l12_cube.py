@@ -155,25 +155,25 @@ class M6L12Cube(Cage):
 
     _x = np.sqrt(2)
     _vertex_prototypes = (
-        NonLinearVertex(0, [_x, 0, 0]),
-        NonLinearVertex(1, [0, _x, 0]),
-        NonLinearVertex(2, [-_x, 0, 0]),
-        NonLinearVertex(3, [0, -_x, 0]),
-        NonLinearVertex(4, [0, 0, _x]),
-        NonLinearVertex(5, [0, 0, -_x]),
+        NonLinearVertex(0, (_x, 0, 0)),
+        NonLinearVertex(1, (0, _x, 0)),
+        NonLinearVertex(2, (-_x, 0, 0)),
+        NonLinearVertex(3, (0, -_x, 0)),
+        NonLinearVertex(4, (0, 0, _x)),
+        NonLinearVertex(5, (0, 0, -_x)),
 
-        LinearVertex(6, [1, 1, 0], False),
-        LinearVertex(7, [1, -1, 0], False),
-        LinearVertex(8, [1, 0, 1], False),
-        LinearVertex(9, [1, 0, -1], False),
-        LinearVertex(10, [-1, 1, 0], False),
-        LinearVertex(11, [-1, -1, 0], False),
-        LinearVertex(12, [-1, 0, 1], False),
-        LinearVertex(13, [-1, 0, -1], False),
-        LinearVertex(14, [0, 1, 1], False),
-        LinearVertex(15, [0, 1, -1], False),
-        LinearVertex(16, [0, -1, 1], False),
-        LinearVertex(17, [0, -1, -1], False),
+        LinearVertex(6, (1, 1, 0), False),
+        LinearVertex(7, (1, -1, 0), False),
+        LinearVertex(8, (1, 0, 1), False),
+        LinearVertex(9, (1, 0, -1), False),
+        LinearVertex(10, (-1, 1, 0), False),
+        LinearVertex(11, (-1, -1, 0), False),
+        LinearVertex(12, (-1, 0, 1), False),
+        LinearVertex(13, (-1, 0, -1), False),
+        LinearVertex(14, (0, 1, 1), False),
+        LinearVertex(15, (0, 1, -1), False),
+        LinearVertex(16, (0, -1, 1), False),
+        LinearVertex(17, (0, -1, -1), False),
     )
 
     _edge_prototypes = (

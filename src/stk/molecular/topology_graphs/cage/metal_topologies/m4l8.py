@@ -152,22 +152,22 @@ class M4L8(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [1, 0, 0]),
-        NonLinearVertex(1, [0, 1, 0]),
-        NonLinearVertex(2, [-1, 0, 0]),
-        NonLinearVertex(3, [0, -1, 0]),
+        NonLinearVertex(0, (1, 0, 0)),
+        NonLinearVertex(1, (0, 1, 0)),
+        NonLinearVertex(2, (-1, 0, 0)),
+        NonLinearVertex(3, (0, -1, 0)),
 
-        LinearVertex(4, [1, 1, 0.5], False),
-        LinearVertex(5, [1, 1, -0.5], False),
+        LinearVertex(4, (1, 1, 0.5), False),
+        LinearVertex(5, (1, 1, -0.5), False),
 
-        LinearVertex(6, [1, -1, 0.5], False),
-        LinearVertex(7, [1, -1, -0.5], False),
+        LinearVertex(6, (1, -1, 0.5), False),
+        LinearVertex(7, (1, -1, -0.5), False),
 
-        LinearVertex(8, [-1, -1, 0.5], False),
-        LinearVertex(9, [-1, -1, -0.5], False),
+        LinearVertex(8, (-1, -1, 0.5), False),
+        LinearVertex(9, (-1, -1, -0.5), False),
 
-        LinearVertex(10, [-1, 1, 0.5], False),
-        LinearVertex(11, [-1, 1, -0.5], False),
+        LinearVertex(10, (-1, 1, 0.5), False),
+        LinearVertex(11, (-1, 1, -0.5), False),
     )
 
     _edge_prototypes = (
