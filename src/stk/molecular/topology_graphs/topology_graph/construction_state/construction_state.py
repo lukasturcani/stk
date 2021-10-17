@@ -4,12 +4,29 @@ Construction State
 
 """
 
+from __future__ import annotations
+
+import typing
 from collections import abc
+import numpy as np
 
 from .graph_state import _GraphState
 from .molecule_state import _MoleculeState
+from ..edge import Edge
 from ..edge_group import EdgeGroup
+from ..vertex import Vertex
+from ..placement_result import PlacementResult
+from ....building_block import BuildingBlock
 from ....functional_groups import FunctionalGroup
+
+
+__all__ = (
+    'ConstructionState',
+)
+
+_T = typing.TypeVar('_T', bound='ConstructionState')
+
+_LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 
 class ConstructionState:
@@ -20,27 +37,28 @@ class ConstructionState:
 
     def __init__(
         self,
-        building_block_vertices,
-        edges,
-        lattice_constants=(),
-    ):
+        building_block_vertices:
+            dict[BuildingBlock, tuple[Vertex, ...]],
+        edges: tuple[Edge, ...],
+        lattice_constants: typing.Optional[_LatticeConstants] = None,
+    ) -> None:
         """
         Initialize a :class:`.ConstructionState` instance.
 
-        Parameters
-        ----------
-        building_block_vertices : :class:`dict`
-            Maps each :class:`.BuildingBlock` to be placed, to a
-            :class:`tuple` of :class:`.Vertex` instances, on which
-            it should be placed.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
-            The edges of the topology graph.
+            building_block_vertices:
+                Maps each :class:`.BuildingBlock` to be placed, to a
+                :class:`tuple` of :class:`.Vertex` instances, on which
+                it should be placed.
 
-        lattice_constants : :class:`tuple`, optional
-            A :class:`numpy.ndarray` for each lattice constant.
-            Can be an empty :class:`tuple` if the topology graph is
-            not periodic.
+            edges:
+                The edges of the topology graph.
+
+            lattice_constants:
+                A :class:`numpy.ndarray` for each lattice constant.
+                Can be an empty ``None`` if the topology graph is
+                not periodic.
 
         """
 
@@ -51,14 +69,13 @@ class ConstructionState:
         )
         self._molecule_state = _MoleculeState()
 
-    def clone(self):
+    def clone(self) -> ConstructionState:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The clone. Has the same type as the original instance.
+        Returns:
+
+            The clone.
 
         """
 
@@ -68,12 +85,12 @@ class ConstructionState:
         return clone
 
     def _with_placement_results(
-        self,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
+        self: _T,
+        vertices: tuple[Vertex, ...],
+        edges: tuple[Edge, ...],
+        building_blocks: tuple[BuildingBlock, ...],
+        results: tuple[PlacementResult, ...],
+    ) -> _T:
         """
         Modify the instance.
 
@@ -91,36 +108,34 @@ class ConstructionState:
 
     def with_placement_results(
         self,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
+        vertices: tuple[Vertex, ...],
+        edges: tuple[Edge, ...],
+        building_blocks: tuple[BuildingBlock, ...],
+        results: tuple[PlacementResult, ...],
+    ) -> ConstructionState:
         """
         Return a clone holding the placement results.
 
-        Parameters
-        ----------
-        vertices : :class:`tuple` of :class:`.Vertex`
-            The vertices used for placement.
+        Parameters:
 
-        edges : :class:`tuple`
-            For each vertex in `vertices`, a :class:`tuple` of
-            :class:`.Edge` instances connected to it.
+            vertices:
+                The vertices used for placement.
 
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            For each vertex in `vertices`, the building block placed
-            on it.
+            edges:
+                For each vertex in `vertices`, a :class:`tuple` of
+                :class:`.Edge` instances connected to it.
 
-        results : :class:`tuple` of :class:`._PlacementResult`
-            For every vertex in `vertices`, the result of the
-            placement.
+            building_blocks:
+                For each vertex in `vertices`, the building block
+                placed on it.
 
-        Returns
-        -------
-        :class:`.ConstructionState`
-            The clone holding the placement results. Has the same
-            type as the original instance.
+            results:
+                For every vertex in `vertices`, the result of the
+                placement.
+
+        Returns:
+
+            The clone holding the placement results.
 
         """
 
@@ -131,113 +146,112 @@ class ConstructionState:
             results=results,
         )
 
-    def get_lattice_constants(self):
+    def get_lattice_constants(
+        self,
+    ) -> typing.Optional[_LatticeConstants]:
         """
         Get the lattice constants of the state.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`numpy.ndarray`
-            The lattice constants.
+        Returns:
+
+            The lattice constants, or ``None`` if the topology graph
+            is not periodic.
 
         """
 
         return self._graph_state.get_lattice_constants()
 
-    def get_building_block(self, vertex_id):
+    def get_building_block(self, vertex_id: int) -> BuildingBlock:
         """
         Get the building block to be placed on a given vertex.
 
-        Parameters
-        ----------
-        vertex_id : :class:`int`
-            The id of the vertex, on which the building block is to
-            be placed.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.BuildingBlock`
+            vertex_id:
+                The id of the vertex, on which the building block is to
+                be placed.
+
+        Returns:
+
             The building block.
 
         """
 
         return self._graph_state.get_building_block(vertex_id)
 
-    def get_vertices(self, vertex_ids):
+    def get_vertices(
+        self,
+        vertex_ids: abc.Iterable[int],
+    ) -> abc.Iterator[BuildingBlock]:
         """
         Get the building block to be placed on a given vertex.
 
-        Parameters
-        ----------
-        vertex_id : :class:`int`
-            The id of the vertex, on which the building block is to
-            be placed.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.BuildingBlock`
+            vertex_ids:
+                The id of the vertex, on which the building block is to
+                be placed.
+
+        Returns:
+
             The building block.
 
         """
 
         yield from self._graph_state.get_vertices(vertex_ids)
 
-    def get_num_vertices(self):
+    def get_num_vertices(self) -> int:
         """
         Get the number of vertices in the topology graph.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of vertices in the topology graph.
 
         """
 
         return self._graph_state.get_num_vertices()
 
-    def get_edge(self, edge_id):
+    def get_edge(self, edge_id: int) -> Edge:
         """
         Get an edge.
 
-        Parameters
-        ----------
-        edge_id : :class:`int`
-            The id of an edge.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.Edge`
+            edge_id:
+                The id of an edge.
+
+        Returns:
+
             An edge.
 
         """
 
         return self._graph_state.get_edge(edge_id)
 
-    def get_num_edges(self):
+    def get_num_edges(self) -> int:
         """
         Get the number of edges in the topology graph.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of edges.
 
         """
 
         return self._graph_state.get_num_edges()
 
-    def get_edges(self, vertex_id):
+    def get_edges(self, vertex_id: int) -> tuple[Edge, ...]:
         """
         Get the edges connect to a vertex.
 
-        Parameters
-        ----------
-        vertex_id : :class:`int`
-            The id of a vertex.
+        Parameters:
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.Edge`
+            vertex_id:
+                The id of a vertex.
+
+        Returns:
+
             The connected edges.
 
         """
