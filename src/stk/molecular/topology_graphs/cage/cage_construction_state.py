@@ -4,48 +4,69 @@ Cage Construction State
 
 """
 
-from ..topology_graph import ConstructionState
+from __future__ import annotations
+
+import typing
+from collections import abc
+
+from .vertices import CageVertex
+from ...building_block import BuildingBlock
+from ..topology_graph import (
+    ConstructionState,
+    Vertex,
+    Edge,
+    PlacementResult,
+)
+
+__all__ = (
+    'CageConstructionState',
+)
+
+_T = typing.TypeVar('_T', bound='CageConstructionState')
 
 
-class _CageConstructionState(ConstructionState):
+class CageConstructionState(ConstructionState):
     """
     The construction state of a :class:`.Cage`.
 
     """
 
+    _num_placement_stages_done: int
+
     def __init__(
         self,
-        building_block_vertices,
-        edges,
-        num_placement_stages,
-        vertex_degrees,
-    ):
+        building_block_vertices:
+            dict[BuildingBlock, tuple[Vertex, ...]],
+            edges: tuple[Edge, ...],
+        num_placement_stages: int,
+        vertex_degrees: dict[int, int],
+    ) -> None:
         """
         Initialize a :class:`._CageConstructionState` instance.
 
-        Parameters
-        ----------
-        building_block_vertices : :class:`dict`
-            Maps each :class:`.BuildingBlock` to be placed, to a
-            :class:`tuple` of :class:`.Vertex` instances, on which
-            it should be placed.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
-            The edges of the topology graph.
+            building_block_vertices:
+                Maps each :class:`.BuildingBlock` to be placed, to a
+                :class:`tuple` of :class:`.Vertex` instances, on which
+                it should be placed.
 
-        num_placement_stages : :class:`int`
-            The number of placement stages.
+            edges:
+                The edges of the topology graph.
 
-        vertex_degrees : :class:`dict`
-            Maps the id of a vertex to the number of edges it is
-            connected to.
+            num_placement_stages:
+                The number of placement stages.
+
+            vertex_degrees:
+                Maps the id of a vertex to the number of edges it is
+                connected to.
 
         """
 
         super().__init__(
             building_block_vertices=building_block_vertices,
             edges=edges,
-            lattice_constants=(),
+            lattice_constants=None,
         )
         self._num_placement_stages = num_placement_stages
         self._num_placement_stages_done = 0
@@ -53,12 +74,12 @@ class _CageConstructionState(ConstructionState):
         self._neighbor_positions = {}
 
     def _with_placement_results(
-        self,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
+        self: _T,
+        vertices: tuple[Vertex, ...],
+        edges: abc.Iterable[tuple[Edge, ...]],
+        building_blocks: tuple[BuildingBlock, ...],
+        results: tuple[PlacementResult, ...],
+    ) -> _T:
         # Need to iterate multiple times through results.
         results = tuple(results)
         super()._with_placement_results(
@@ -86,11 +107,11 @@ class _CageConstructionState(ConstructionState):
 
     def _update_neighbor_positions(
         self,
-        vertices,
-        edges,
-        building_blocks,
-        results,
-    ):
+        vertices: abc.Iterable[CageVertex],
+        edges: abc.Iterable[tuple[Edge, ...]],
+        building_blocks: tuple[BuildingBlock, ...],
+        results: abc.Iterable[PlacementResult],
+    ) -> None:
         # Use literal docstring here to prevent linter errors stemming
         # from the use of "\" in the docstring.
         r"""
@@ -106,26 +127,26 @@ class _CageConstructionState(ConstructionState):
         to be a linear vertex and ``X`` to be a functional group
         placed on a vertex. If, vertex positions are not updated,
         a linear vertex will be in the middle of the two non-linear
-        vertices:
+        vertices::
 
             X               X
             |               |
             N    X--L--X    N
 
-        Therefore, the bonds made will be bent:
+        Therefore, the bonds made will be bent::
 
             X           X
             | \       / |
             N  X--L--X  N
 
         However, this method updates the position of ``L`` to
-        be in the middle of the functional groups:
+        be in the middle of the functional groups::
 
             X    X--L--X    X
             |               |
             N               N
 
-        Now when bonds are made, they will be straight:
+        Now when bonds are made, they will be straight::
 
             X----X--L--X----X
             |               |
@@ -137,25 +158,21 @@ class _CageConstructionState(ConstructionState):
         neighboring functional groups (the ``X`` in the diagrams
         above), are known.
 
-        Parameters
-        ----------
-        vertices : :class:`iterable` of :class:`vertex`
-            The vertices which were just used to place a set of
-            `building_blocks`.
+        Parameters:
 
-        edges : :class:`iterable`
-            For each vertex in `vertices`, a :class:`tuple` of of the
-            :class:`.Edge` instances it is connected to.
+            vertices:
+                The vertices which were just used to place a set of
+                `building_blocks`.
 
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            The building blocks which are just placed.
+            edges:
+                the :class:`.Edge` instances it is connected to.
 
-        results : :class:`iterable` of :class:`._PlacementResult`
-            For each vertex in `vertices`, the result of the placement.
+            building_blocks:
+                The building blocks which are just placed.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            results:
+                For each vertex in `vertices`, the result of the
+                placement.
 
         """
 
@@ -193,21 +210,24 @@ class _CageConstructionState(ConstructionState):
             vertices=self._get_new_vertices(),
         )
 
-    def _get_neighbors(self, vertex, vertex_edges):
+    def _get_neighbors(
+        self,
+        vertex: CageVertex,
+        vertex_edges: tuple[Edge, ...],
+    ) -> abc.Iterator[tuple[int, int]]:
         """
         Yield the neighbor vertices of `vertex`.
 
-        Parameters
-        ----------
-        vertex : :class:`.Vertex`
-            The vertex whose neighbors are desired.
+        Parameters:
 
-        vertex_edges : :class:`tuple` of :class:`.Edge`
-            The edges connected to `vertex`.
+            vertex:
+                The vertex whose neighbors are desired.
 
-        Yields
-        ------
-        :class:`tuple`
+            vertex_edges:
+                The edges connected to `vertex`.
+
+        Yields:
+
             The first element is the id of a neighbor vertex and
             the second element is the id of the edge through which
             it is connected.
@@ -224,13 +244,12 @@ class _CageConstructionState(ConstructionState):
             if neighbor.use_neighbor_placement():
                 yield neighbor_id, edge.get_id()
 
-    def _get_new_vertices(self):
+    def _get_new_vertices(self) -> abc.Iterator[Vertex]:
         """
         Yield the vertices once new positions have been added.
 
-        Yields
-        ------
-        :class:`.Vertex`
+        Yields:
+
             A vertex of the topology graph.
 
         """
@@ -251,8 +270,8 @@ class _CageConstructionState(ConstructionState):
             else:
                 yield vertex
 
-    def clone(self):
-        clone = super().clone()
+    def _clone(self: _T) -> _T:
+        clone = super()._clone()
         clone._neighbor_positions = {
             key: list(value)
             for key, value in self._neighbor_positions.items()
@@ -263,3 +282,6 @@ class _CageConstructionState(ConstructionState):
         clone._num_placement_stages = self._num_placement_stages
         clone._vertex_degrees = dict(self._vertex_degrees)
         return clone
+
+    def clone(self) -> CageConstructionState:
+        return self._clone()

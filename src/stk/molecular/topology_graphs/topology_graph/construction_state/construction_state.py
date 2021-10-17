@@ -10,7 +10,7 @@ import typing
 from collections import abc
 import numpy as np
 
-from .graph_state import _GraphState
+from .graph_state import GraphState
 from .molecule_state import _MoleculeState
 from ..edge import Edge
 from ..edge_group import EdgeGroup
@@ -30,11 +30,12 @@ __all__ = (
 )
 
 _T = typing.TypeVar('_T', bound='ConstructionState')
+_V = typing.TypeVar('_V', bound=Vertex)
 
 _LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 
-class ConstructionState:
+class ConstructionState(typing.Generic[_V]):
     """
     The state of the molecule and topology graph under construction.
 
@@ -42,8 +43,7 @@ class ConstructionState:
 
     def __init__(
         self,
-        building_block_vertices:
-            dict[BuildingBlock, tuple[Vertex, ...]],
+        building_block_vertices: dict[BuildingBlock, tuple[_V, ...]],
         edges: tuple[Edge, ...],
         lattice_constants: typing.Optional[_LatticeConstants] = None,
     ) -> None:
@@ -67,12 +67,18 @@ class ConstructionState:
 
         """
 
-        self._graph_state = _GraphState(
+        self._graph_state = GraphState(
             building_block_vertices=building_block_vertices,
             edges=edges,
             lattice_constants=lattice_constants,
         )
         self._molecule_state = _MoleculeState()
+
+    def _clone(self: _T) -> _T:
+        clone = self.__class__.__new__(self.__class__)
+        clone._graph_state = self._graph_state
+        clone._molecule_state = self._molecule_state
+        return clone
 
     def clone(self) -> ConstructionState:
         """
@@ -83,16 +89,12 @@ class ConstructionState:
             The clone.
 
         """
-
-        clone = self.__class__.__new__(self.__class__)
-        clone._graph_state = self._graph_state
-        clone._molecule_state = self._molecule_state
-        return clone
+        return self._clone()
 
     def _with_placement_results(
         self: _T,
         vertices: tuple[Vertex, ...],
-        edges: tuple[Edge, ...],
+        edges: abc.Iterable[tuple[Edge, ...]],
         building_blocks: tuple[BuildingBlock, ...],
         results: tuple[PlacementResult, ...],
     ) -> _T:
@@ -114,7 +116,7 @@ class ConstructionState:
     def with_placement_results(
         self,
         vertices: tuple[Vertex, ...],
-        edges: tuple[Edge, ...],
+        edges: abc.Iterable[tuple[Edge, ...]],
         building_blocks: tuple[BuildingBlock, ...],
         results: tuple[PlacementResult, ...],
     ) -> ConstructionState:
@@ -187,9 +189,9 @@ class ConstructionState:
     def get_vertices(
         self,
         vertex_ids: abc.Iterable[int],
-    ) -> abc.Iterator[BuildingBlock]:
+    ) -> abc.Iterator[_V]:
         """
-        Get the building block to be placed on a given vertex.
+        Get some vertices.
 
         Parameters:
 
@@ -197,9 +199,9 @@ class ConstructionState:
                 The id of the vertex, on which the building block is to
                 be placed.
 
-        Returns:
+        Yields:
 
-            The building block.
+            A vertex.
 
         """
 
@@ -246,7 +248,7 @@ class ConstructionState:
 
         return self._graph_state.get_num_edges()
 
-    def get_edges(self, vertex_id: int) -> tuple[Edge, ...]:
+    def get_edges(self, vertex_id: int) -> abc.Collection[Edge]:
         """
         Get the edges connect to a vertex.
 

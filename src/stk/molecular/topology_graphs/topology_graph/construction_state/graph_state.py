@@ -24,9 +24,10 @@ __all__ = (
 _LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 _T = typing.TypeVar('_T', bound='GraphState')
+_V = typing.TypeVar('_V', bound=Vertex)
 
 
-class GraphState:
+class GraphState(typing.Generic[_V]):
     """
     The topology graph of a molecule under construction.
 
@@ -43,8 +44,7 @@ class GraphState:
 
     def __init__(
         self,
-        building_block_vertices:
-            dict[BuildingBlock, tuple[Vertex, ...]],
+        building_block_vertices: dict[BuildingBlock, tuple[_V, ...]],
         edges: tuple[Edge, ...],
         lattice_constants: typing.Optional[_LatticeConstants] = None,
     ) -> None:
@@ -179,7 +179,7 @@ class GraphState:
         )
         return edge.with_position(position)
 
-    def clone(self) -> GraphState:
+    def clone(self) -> GraphState[_V]:
         """
         Get a clone.
 
@@ -232,20 +232,19 @@ class GraphState:
     def get_vertices(
         self,
         vertex_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> abc.Iterator[Vertex]:
+    ) -> abc.Iterator[_V]:
         """
         Yield the topology graph vertices.
 
-        Parameters
-        ----------
-        vertex_ids:
-            The ids of vertices to yield. If ``None``, all vertices
-            will be yielded. Can be a single :class:`int` if a
-            single vertex is to be yielded.
+        Parameters:
 
-        Yields
-        ------
-        :class:`.Vertex`
+            vertex_ids:
+                The ids of vertices to yield. If ``None``, all vertices
+                will be yielded. Can be a single :class:`int` if a
+                single vertex is to be yielded.
+
+        Yields:
+
             A vertex.
 
         """
@@ -336,7 +335,7 @@ class GraphState:
 
     def _with_vertices(
         self: _T,
-        vertices: abc.Iterable[Vertex],
+        vertices: abc.Iterable[_V],
     ) -> _T:
         """
         Modify the instance.
@@ -350,7 +349,7 @@ class GraphState:
 
     def with_vertices(
         self,
-        vertices: abc.Iterable[Vertex],
+        vertices: abc.Iterable[_V],
     ) -> GraphState:
         """
         Returns a clone holding `vertices`.
