@@ -101,15 +101,15 @@ class FourPlusFour(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        NonLinearVertex(0, [-_x, _x, -_x], False),
-        NonLinearVertex(1, [-_x, -_x, -_x], False),
-        NonLinearVertex(2, [_x, _x, -_x], False),
-        NonLinearVertex(3, [_x, -_x, -_x], False),
+        NonLinearVertex(0, (-_x, _x, -_x), False),
+        NonLinearVertex(1, (-_x, -_x, -_x), False),
+        NonLinearVertex(2, (_x, _x, -_x), False),
+        NonLinearVertex(3, (_x, -_x, -_x), False),
 
-        NonLinearVertex(4, [-_x, _x, _x], False),
-        NonLinearVertex(5, [-_x, -_x, _x], False),
-        NonLinearVertex(6, [_x, _x, _x], False),
-        NonLinearVertex(7, [_x, -_x, _x], False)
+        NonLinearVertex(4, (-_x, _x, _x), False),
+        NonLinearVertex(5, (-_x, -_x, _x), False),
+        NonLinearVertex(6, (_x, _x, _x), False),
+        NonLinearVertex(7, (_x, -_x, _x), False)
     )
 
     _edge_prototypes = (
