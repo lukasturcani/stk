@@ -6,7 +6,7 @@ Collapser
 
 from .optimizer import Optimizer
 from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 
 import mchammer as mch
 

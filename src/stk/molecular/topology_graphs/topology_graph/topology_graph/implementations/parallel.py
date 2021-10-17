@@ -8,8 +8,8 @@ import pathos
 import typing
 
 from .utilities import Placement
-from ...construction_state import ConstructionState
 from ...vertex import Vertex
+from .....construction_state import ConstructionState
 
 __all__ = (
     'Parallel',

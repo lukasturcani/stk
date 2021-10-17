@@ -11,7 +11,7 @@ from collections import defaultdict, abc
 
 import mchammer as mch
 
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 
 
 def get_mch_bonds(

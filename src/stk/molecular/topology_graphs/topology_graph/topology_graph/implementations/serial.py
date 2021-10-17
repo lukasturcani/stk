@@ -5,7 +5,7 @@ Serial Topology Graph
 """
 
 from .utilities import Placement
-from ...construction_state import ConstructionState
+from .....construction_state import ConstructionState
 
 __all__ = (
     'Serial',

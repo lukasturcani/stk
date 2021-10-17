@@ -18,7 +18,7 @@ from ....reactions import ReactionFactory
 from ..vertex import Vertex
 from ..edge import Edge
 from ..construction_result import ConstructionResult
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 from ..edge_group import EdgeGroup
 from .implementations import Parallel, Serial
 

@@ -27,7 +27,7 @@ stk.molecular.topology_graphs.topology_graph.optimizers.null\
 
 """
 
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 
 
 class Optimizer:

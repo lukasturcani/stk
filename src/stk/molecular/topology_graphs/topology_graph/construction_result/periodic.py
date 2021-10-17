@@ -4,9 +4,9 @@ Periodic Construction Result
 
 """
 
-from ..construction_state import ConstructionState
 from .construction_result import ConstructionResult
 from ....periodic_info import PeriodicInfo
+from ....construction_state import ConstructionState
 
 
 __all__ = (

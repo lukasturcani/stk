@@ -5,7 +5,7 @@ Null Optimizer
 """
 
 from .optimizer import Optimizer
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 
 
 class NullOptimizer(Optimizer):

@@ -12,7 +12,7 @@ from ....atom_info import AtomInfo
 from ....bond import Bond
 from ....bond_info import BondInfo
 from ....building_block import BuildingBlock
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 
 
 __all__ = (

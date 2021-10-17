@@ -5,7 +5,7 @@ Spinner
 """
 
 from .optimizer import Optimizer
-from ..construction_state import ConstructionState
+from ....construction_state import ConstructionState
 
 import spindry as spd
 
