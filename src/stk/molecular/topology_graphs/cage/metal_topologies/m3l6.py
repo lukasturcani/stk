@@ -158,79 +158,79 @@ class M3L6(Cage):
     _vertex_prototypes = (
         NonLinearVertex(
             id=0,
-            position=[_R*np.cos(_theta), _R*np.sin(_theta), 0]
+            position=(_R*np.cos(_theta), _R*np.sin(_theta), 0)
         ),
         NonLinearVertex(
             id=1,
-            position=[
+            position=(
                 _R*np.cos(_theta+(4*np.pi/3)),
                 _R*np.sin(_theta+(4*np.pi/3)),
                 0
-            ]
+            ),
         ),
         NonLinearVertex(
             id=2,
-            position=[
+            position=(
                 _R*np.cos(_theta+(2*np.pi/3)),
                 _R*np.sin(_theta+(2*np.pi/3)),
                 0
-            ]
+            ),
         ),
 
         LinearVertex(
             id=3,
-            position=[
+            position=(
                 _R*np.cos((_theta+np.pi/4)),
                 _R*np.sin((_theta+np.pi/4)),
                 0.5
-            ],
+            ),
             use_neighbor_placement=False
         ),
         LinearVertex(
             id=4,
-            position=[
+            position=(
                 _R*np.cos((_theta+1*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)),
                 -0.5
-            ],
+            ),
             use_neighbor_placement=False
         ),
 
         LinearVertex(
             id=5,
-            position=[
+            position=(
                 _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(4*np.pi/3)),
                 0.5
-            ],
+            ),
             use_neighbor_placement=False
         ),
         LinearVertex(
             id=6,
-            position=[
+            position=(
                 _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(4*np.pi/3)),
                 -0.5
-            ],
+            ),
             use_neighbor_placement=False
         ),
 
         LinearVertex(
             id=7,
-            position=[
+            position=(
                 _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(2*np.pi/3)),
                 0.5
-            ],
+            ),
             use_neighbor_placement=False
         ),
         LinearVertex(
             id=8,
-            position=[
+            position=(
                 _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
                 _R*np.sin((_theta+1*np.pi/3)+(2*np.pi/3)),
                 -0.5
-            ],
+            ),
             use_neighbor_placement=False
         ),
     )

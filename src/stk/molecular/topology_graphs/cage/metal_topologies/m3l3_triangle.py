@@ -231,7 +231,7 @@ class M3L3Triangle(Cage):
         )
 
         super().__init__(
-            building_blocks,
+            building_blocks=building_blocks,
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,

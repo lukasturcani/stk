@@ -4,10 +4,14 @@ M4L4 Square
 
 """
 
+import typing
+from collections import abc
+
 from ..cage import Cage
 from ..vertices import LinearVertex, AngledVertex
-from ...topology_graph import Edge, NullOptimizer
-from ....reactions import GenericReactionFactory
+from ...topology_graph import Edge, NullOptimizer, Optimizer
+from ....reactions import ReactionFactory, GenericReactionFactory
+from ....building_block import BuildingBlock
 
 
 class M4L4Square(Cage):
@@ -146,61 +150,67 @@ class M4L4Square(Cage):
 
     def __init__(
         self,
-        corners,
-        linkers,
-        vertex_alignments=None,
-        reaction_factory=GenericReactionFactory(),
-        num_processes=1,
-        optimizer=NullOptimizer(),
-    ):
+        corners: typing.Union[
+            BuildingBlock,
+            dict[BuildingBlock, abc.Iterable[int]]
+        ],
+        linkers: typing.Union[
+            BuildingBlock,
+            dict[BuildingBlock, abc.Iterable[int]]
+        ],
+        vertex_alignments: typing.Optional[dict[int, int]] = None,
+        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        num_processes: int = 1,
+        optimizer: Optimizer = NullOptimizer(),
+    ) -> None:
         """
         Initialize a :class:`.M4L4Square`.
 
-        Parameters
-        ----------
-        corners : :class:`dict` or :class:`.BuildingBlock`
-            Can be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+        Parameters:
 
-            Can also be a :class:`.BuildingBlock` instance, which
-            should be placed on all corner vertices on the topology
-            graph.
+            corners:
+                Can be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on.
 
-        linkers : :class:`dict` or :class:`.BuildingBlock`
-            Can be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+                Can also be a :class:`.BuildingBlock` instance, which
+                should be placed on all corner vertices on the topology
+                graph.
 
-            Can also be a :class:`.BuildingBlock` instance, which
-            should be placed on all linker vertices on the topology
-            graph.
+            linkers:
+                Can be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on.
 
-        vertex_alignments : :class:`dict`, optional
-            A mapping from the id of a :class:`.Vertex`
-            to an :class:`.Edge` connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default edge changed need to be present in the
-            :class:`dict`. If ``None`` then the default edge is used
-            for each vertex. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers. The edge is referred to by a number
-            between ``0`` (inclusive) and the number of edges the
-            vertex is connected to (exclusive).
+                Can also be a :class:`.BuildingBlock` instance, which
+                should be placed on all linker vertices on the topology
+                graph.
 
-        reaction_factory : :class:`.ReactionFactory`, optional
-            The reaction factory to use for creating bonds between
-            building blocks.
+            vertex_alignments:
+                A mapping from the id of a :class:`.Vertex`
+                to an :class:`.Edge` connected to it.
+                The :class:`.Edge` is used to align the first
+                :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+                placed on that vertex. Only vertices which need to have
+                their default edge changed need to be present in the
+                :class:`dict`. If ``None`` then the default edge is
+                used for each vertex. Changing which :class:`.Edge` is
+                used will mean that the topology graph represents
+                different structural isomers. The edge is referred to
+                by a number between ``0`` (inclusive) and the number of
+                edges the vertex is connected to (exclusive).
 
-        num_processes : :class:`int`, optional
-            The number of parallel processes to create during
-            :meth:`construct`.
+            reaction_factory:
+                The reaction factory to use for creating bonds between
+                building blocks.
 
-        optimizer : :class:`.Optimizer`, optional
-            Used to optimize the structure of the constructed
-            molecule.
+            num_processes:
+                The number of parallel processes to create during
+                :meth:`construct`.
+
+            optimizer:
+                Used to optimize the structure of the constructed
+                molecule.
 
         """
 
@@ -220,7 +230,7 @@ class M4L4Square(Cage):
         )
 
         super().__init__(
-            building_blocks,
+            building_blocks=building_blocks,
             vertex_alignments=vertex_alignments,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
@@ -228,15 +238,15 @@ class M4L4Square(Cage):
         )
 
     _vertex_prototypes = (
-        AngledVertex(0, [1, 1, 0]),
-        AngledVertex(1, [1, -1, 0]),
-        AngledVertex(2, [-1, -1, 0]),
-        AngledVertex(3, [-1, 1, 0]),
+        AngledVertex(0, (1, 1, 0)),
+        AngledVertex(1, (1, -1, 0)),
+        AngledVertex(2, (-1, -1, 0)),
+        AngledVertex(3, (-1, 1, 0)),
 
-        LinearVertex(4, [1, 0, 0], False),
-        LinearVertex(5, [0, -1, 0], False),
-        LinearVertex(6, [-1, 0, 0], False),
-        LinearVertex(7, [0, 1, 0], False),
+        LinearVertex(4, (1, 0, 0), False),
+        LinearVertex(5, (0, -1, 0), False),
+        LinearVertex(6, (-1, 0, 0), False),
+        LinearVertex(7, (0, 1, 0), False),
     )
 
     _edge_prototypes = (
