@@ -152,13 +152,13 @@ class M2L4Lantern(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0.5, 0]),
-        NonLinearVertex(1, [0, -0.5, 0]),
+        NonLinearVertex(0, (0, 0.5, 0)),
+        NonLinearVertex(1, (0, -0.5, 0)),
 
-        LinearVertex(2, [1, 0, 0], False),
-        LinearVertex(3, [0, 0, 1], False),
-        LinearVertex(4, [-1, 0, 0], False),
-        LinearVertex(5, [0, 0, -1], False),
+        LinearVertex(2, (1, 0, 0), False),
+        LinearVertex(3, (0, 0, 1), False),
+        LinearVertex(4, (-1, 0, 0), False),
+        LinearVertex(5, (0, 0, -1), False),
     )
 
     _edge_prototypes = (
