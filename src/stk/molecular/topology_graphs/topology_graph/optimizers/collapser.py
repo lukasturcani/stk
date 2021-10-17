@@ -6,6 +6,7 @@ Collapser
 
 from .optimizer import Optimizer
 from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
+from ..construction_state import ConstructionState
 
 import mchammer as mch
 
@@ -14,66 +15,70 @@ class Collapser(Optimizer):
     """
     Performs rigid-body collapse of molecules [1]_.
 
-    Examples
-    --------
-    *Structure Optimization*
+    Examples:
 
-    Using :class:`.Collapser` will lead to
-    :class:`.ConstructedMolecule` structures without long bonds.
+        *Structure Optimization*
 
-    .. testcode:: structure-optimization
+        Using :class:`.Collapser` will lead to
+        :class:`.ConstructedMolecule` structures without long bonds.
 
-        import stk
+        .. testcode:: structure-optimization
 
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            import stk
 
-        polymer = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
-                repeating_unit='AB',
-                num_repeating_units=2,
-                optimizer=stk.Collapser(),
-            ),
-        )
+            bb1 = stk.BuildingBlock(
+                smiles='NCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
 
-    Optimisation with :mod:`stk` simply collects the final position
-    matrix. The optimisation's trajectory can be output using the
-    :mod:`MCHammer` implementation if required by the user [1]_.
+            polymer = stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(bb1, bb2),
+                    repeating_unit='AB',
+                    num_repeating_units=2,
+                    optimizer=stk.Collapser(),
+                ),
+            )
 
-    The open-source optimization code :mod:`MCHammer` specializes in
-    the `collapsing` of molecules with long bonds like those
-    constructed by :mod:`stk`. This code is entirely nonphysical and
-    is, therefore, completely general to any chemistry.
+        Optimisation with :mod:`stk` simply collects the final position
+        matrix. The optimisation's trajectory can be output using the
+        :mod:`MCHammer` implementation if required by the user [1]_.
 
-    References
-    ----------
-    .. [1] https://github.com/andrewtarzia/MCHammer
+        The open-source optimization code :mod:`MCHammer` specializes
+        in the `collapsing` of molecules with long bonds like those
+        constructed by :mod:`stk`. This code is entirely nonphysical
+        and is, therefore, completely general to any chemistry.
+
+    References:
+
+        .. [1] https://github.com/andrewtarzia/MCHammer
 
     """
 
     def __init__(
         self,
-        step_size=0.1,
-        distance_threshold=1.5,
-        scale_steps=True,
+        step_size: float = 0.1,
+        distance_threshold: float = 1.5,
+        scale_steps: bool = True,
     ):
         """
         Initialize an instance of :class:`.Collapser`.
 
-        Parameters
-        ----------
-        step_size : :class:`float`, optional
-            The relative size of the step to take during collapse in
-            Angstrom.
+        Parameters:
 
-        distance_threshold : :class:`float`, optional
-            Distance between distinct building blocks to use as
-            threshold for halting collapse in Angstrom.
+            step_size:
+                The relative size of the step to take during collapse
+                in Angstrom.
 
-        scale_steps : :class:`bool`, optional
-            Whether to scale the step of each distinct building block
-            by its relative distance from the molecules centroid.
+            distance_threshold:
+                Distance between distinct building blocks to use as
+                threshold for halting collapse in Angstrom.
+
+            scale_steps:
+                Whether to scale the step of each distinct building
+                block by its relative distance from the molecules
+                centroid.
 
         """
 
@@ -83,7 +88,11 @@ class Collapser(Optimizer):
             scale_steps=scale_steps,
         )
 
-    def optimize(self, state):
+    def optimize(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
+
         # Define MCHammer molecule to optimize.
         mch_mol = mch.Molecule(
             atoms=(

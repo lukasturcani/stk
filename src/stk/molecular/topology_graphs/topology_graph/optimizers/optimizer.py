@@ -27,6 +27,8 @@ stk.molecular.topology_graphs.topology_graph.optimizers.null\
 
 """
 
+from ..construction_state import ConstructionState
+
 
 class Optimizer:
     """
@@ -37,18 +39,20 @@ class Optimizer:
 
     """
 
-    def optimize(self, state):
+    def optimize(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         """
         Optimize the structure of a molecule under construction.
 
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The molecule being constructed.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionState`
+            state:
+                The molecule being constructed.
+
+        Returns:
+
             The optimized construction state.
 
         """
