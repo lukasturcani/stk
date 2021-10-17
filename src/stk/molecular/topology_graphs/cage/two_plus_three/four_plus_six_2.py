@@ -111,27 +111,33 @@ class FourPlusSix2(Cage):
 
     """
 
-    _vertex_prototypes = (
-        NonLinearVertex(0, [1, 0, 1]),
-        NonLinearVertex(1, [-1, 0, 1]),
-        NonLinearVertex(2, [1, 0, -1]),
-        NonLinearVertex(3, [-1, 0, -1]),
+    _initial_vertex_prototypes = (
+        NonLinearVertex(0, (1, 0, 1)),
+        NonLinearVertex(1, (-1, 0, 1)),
+        NonLinearVertex(2, (1, 0, -1)),
+        NonLinearVertex(3, (-1, 0, -1)),
 
-        LinearVertex(4, [0, -1, 1], False),
-        LinearVertex(5, [0, 1, 1], False),
-        LinearVertex(6, [0, -1, -1], False),
-        LinearVertex(7, [0, 1, -1], False),
+        LinearVertex(4, (0, -1, 1), False),
+        LinearVertex(5, (0, 1, 1), False),
+        LinearVertex(6, (0, -1, -1), False),
+        LinearVertex(7, (0, 1, -1), False),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_initial_vertex_prototypes,
         LinearVertex.init_at_center(
             id=8,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
+            vertices=(
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[2],
+            ),
         ),
         LinearVertex.init_at_center(
             id=9,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
+            vertices=(
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[3],
+            ),
         )
     )
 
