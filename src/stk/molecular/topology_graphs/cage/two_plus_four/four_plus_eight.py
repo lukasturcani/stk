@@ -112,23 +112,23 @@ class FourPlusEight(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [-1, -1, 0], False),
-        NonLinearVertex(1, [-1, 1, 0], False),
+        NonLinearVertex(0, (-1, -1, 0), False),
+        NonLinearVertex(1, (-1, 1, 0), False),
 
-        NonLinearVertex(2, [1, -1, 0], False),
-        NonLinearVertex(3, [1, 1, 0], False),
+        NonLinearVertex(2, (1, -1, 0), False),
+        NonLinearVertex(3, (1, 1, 0), False),
 
-        LinearVertex(4, [-2, 0, 1], False),
-        LinearVertex(5, [-2, 0, -1], False),
+        LinearVertex(4, (-2, 0, 1), False),
+        LinearVertex(5, (-2, 0, -1), False),
 
-        LinearVertex(6, [0, 2, 1], False),
-        LinearVertex(7, [0, 2, -1], False),
+        LinearVertex(6, (0, 2, 1), False),
+        LinearVertex(7, (0, 2, -1), False),
 
-        LinearVertex(8, [0, -2, 1], False),
-        LinearVertex(9, [0, -2, -1], False),
+        LinearVertex(8, (0, -2, 1), False),
+        LinearVertex(9, (0, -2, -1), False),
 
-        LinearVertex(10, [2, 0, 1], False),
-        LinearVertex(11, [2, 0, -1], False),
+        LinearVertex(10, (2, 0, 1), False),
+        LinearVertex(11, (2, 0, -1), False),
 
     )
 
