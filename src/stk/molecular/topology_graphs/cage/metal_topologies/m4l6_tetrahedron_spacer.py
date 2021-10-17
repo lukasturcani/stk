@@ -146,61 +146,79 @@ class M4L6TetrahedronSpacer(Cage):
         | 3-functional groups: 0 to 3
         | 2-functional groups: 4 to 9
 
-    Examples
-    --------
-    *Building Metal-Organic Tetrahedron*
+    Examples:
 
-    Many metal-organic cages are built using a process called
-    subcomponent self-assembly, which is a complex chemical process
-    that occurs in solution. In :class:`.Cage`, an example is
-    provided of an alchemical approach using
-    :class:`.M4L6TetrahedronSpacer` to
-    build these types of cages. It is alchemical because the bonds
-    formed during construction are not the same as the experimental
-    reaction. Instead of forming bonds at the metal centre, we create
-    bonds between disconnected ligands.
+        *Building Metal-Organic Tetrahedron*
 
-    The :class:`.M4L6TetrahedronSpacer` topology is provided for cases
-    where the linkers cannot be disconnected symmetrically. However,
-    in the case that the linker can be disconnected
-    in a symmetrical fashion, the
-    :class:`.M4L6Tetrahedron` topology can be used.
+        Many metal-organic cages are built using a process called
+        subcomponent self-assembly, which is a complex chemical process
+        that occurs in solution. In :class:`.Cage`, an example is
+        provided of an alchemical approach using
+        :class:`.M4L6TetrahedronSpacer` to
+        build these types of cages. It is alchemical because the bonds
+        formed during construction are not the same as the experimental
+        reaction. Instead of forming bonds at the metal centre, we
+        create bonds between disconnected ligands.
+
+        The :class:`.M4L6TetrahedronSpacer` topology is provided for
+        cases where the linkers cannot be disconnected symmetrically.
+        However, in the case that the linker can be disconnected
+        in a symmetrical fashion, the
+        :class:`.M4L6Tetrahedron` topology can be used.
 
     """
 
-    _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
-        NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
+    _initial_vertex_prototypes = (
+        NonLinearVertex(0, (0, 0, np.sqrt(6)/2)),
+        NonLinearVertex(1, (-1, -np.sqrt(3)/3, -np.sqrt(6)/6)),
+        NonLinearVertex(2, (1, -np.sqrt(3)/3, -np.sqrt(6)/6)),
+        NonLinearVertex(3, (0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_initial_vertex_prototypes,
 
         LinearVertex.init_at_center(
             id=4,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[1],
+            ),
         ),
         LinearVertex.init_at_center(
             id=5,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
+            vertices=(
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[2],
+            ),
         ),
         LinearVertex.init_at_center(
             id=6,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[3]),
+            vertices=(
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[3],
+            ),
         ),
         LinearVertex.init_at_center(
             id=7,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
+            vertices=(
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[2],
+            ),
         ),
         LinearVertex.init_at_center(
             id=8,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
+            vertices=(
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[3],
+            ),
         ),
         LinearVertex.init_at_center(
             id=9,
-            vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
+            vertices=(
+                _initial_vertex_prototypes[2],
+                _initial_vertex_prototypes[3],
+            ),
         ),
     )
 
