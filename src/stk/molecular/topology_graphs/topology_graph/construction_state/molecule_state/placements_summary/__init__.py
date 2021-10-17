@@ -1,1 +1,1 @@
-from .placements_summary import _PlacementsSummary  # noqa
+from .placements_summary import PlacementsSummary  # noqa

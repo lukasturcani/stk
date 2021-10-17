@@ -12,8 +12,12 @@ from ......atom import Atom
 from ......atom_info import AtomInfo
 from ......building_block import BuildingBlock
 
+__all__ = (
+    'AtomBatch',
+)
 
-class _AtomBatch:
+
+class AtomBatch:
     """
     A batch of atoms.
 
@@ -71,7 +75,7 @@ class _AtomBatch:
         self._atoms = tuple(_atoms)
         self._atom_infos = tuple(atom_infos)
 
-    def get_atoms(self) -> abc.Iterable[Atom]:
+    def get_atoms(self) -> abc.Iterator[Atom]:
         """
         Yield the atoms in the batch.
 
@@ -83,7 +87,7 @@ class _AtomBatch:
 
         yield from self._atoms
 
-    def get_atom_infos(self) -> abc.Iterable[AtomInfo]:
+    def get_atom_infos(self) -> abc.Iterator[AtomInfo]:
         """
         Yield info about the atoms in the batch.
 

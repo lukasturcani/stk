@@ -11,7 +11,7 @@ from collections import defaultdict
 from collections import abc
 
 from .....topology_graph.topology_graph.implementations import (
-    _PlacementResult,
+    PlacementResult,
 )
 from ......functional_groups import FunctionalGroup
 from ......atom import Atom
@@ -19,11 +19,20 @@ from ......atom_info import AtomInfo
 from ......bond import Bond
 from ......bond_info import BondInfo
 from ......building_block import BuildingBlock
-from .atom_batch import _AtomBatch
-from .bond_batch import _BondBatch
+from .atom_batch import AtomBatch
+from .bond_batch import BondBatch
 
 
-class _PlacementsSummary:
+__all__ = (
+    'PlacementsSummary',
+)
+
+
+EdgeId = int
+FunctionalGroups = list[FunctionalGroup]
+
+
+class PlacementsSummary:
     """
     A summary of placement results.
 
@@ -49,12 +58,12 @@ class _PlacementsSummary:
     def __init__(
         self,
         building_blocks: abc.Iterable[BuildingBlock],
-        placement_results: abc.Iterable[_PlacementResult],
+        placement_results: abc.Iterable[PlacementResult],
         num_atoms: int,
         num_previous_placements: int,
     ) -> None:
         """
-        Initialize a :class:`._PlacementsSummary` instance.
+        Initialize a :class:`.PlacementsSummary` instance.
 
         Parameters:
 
@@ -62,7 +71,7 @@ class _PlacementsSummary:
                 The building blocks which were placed.
 
             placement_results:
-                Holds a :class:`_PlacementResults` instance for each
+                Holds a :class:`PlacementResults` instance for each
                 building block in `building_blocks`.
 
             num_atoms:
@@ -96,7 +105,7 @@ class _PlacementsSummary:
         self,
         building_block: BuildingBlock,
         building_block_id: int,
-        result: _PlacementResult,
+        result: PlacementResult,
     ) -> None:
         """
         Add the placement result to the summary.
@@ -116,7 +125,7 @@ class _PlacementsSummary:
 
         self._position_matrices.append(result.position_matrix)
 
-        atom_batch = _AtomBatch(
+        atom_batch = AtomBatch(
             atoms=building_block.get_atoms(),
             num_atoms=self._num_atoms,
             building_block=building_block,
@@ -125,7 +134,7 @@ class _PlacementsSummary:
         self._with_atom_batch(atom_batch)
         id_map = atom_batch.get_id_map()
 
-        bond_batch = _BondBatch(
+        bond_batch = BondBatch(
             bonds=building_block.get_bonds(),
             id_map=id_map,
             building_block=building_block,
@@ -139,36 +148,34 @@ class _PlacementsSummary:
             id_map=id_map,
         )
 
-    def _with_atom_batch(self, batch):
+    def _with_atom_batch(
+        self,
+        batch: AtomBatch,
+    ) -> None:
         """
         Add a batch of atoms to the summary.
 
-        Parameters
-        ----------
-        batch : :class:`._AtomBatch`
-            A batch of atoms.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            batch:
+                A batch of atoms.
 
         """
 
         self._atoms.extend(batch.get_atoms())
         self._atom_infos.extend(batch.get_atom_infos())
 
-    def _with_bond_batch(self, batch):
+    def _with_bond_batch(
+        self,
+        batch: BondBatch,
+    ) -> None:
         """
         Add a batch of bonds to the summary.
 
-        Parameters
-        ----------
-        batch : :class:`.BondBatch`
-            A batch of bonds.
+        Parameters:
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            batch:
+                A batch of bonds.
 
         """
 
@@ -180,7 +187,7 @@ class _PlacementsSummary:
         building_block: BuildingBlock,
         functional_group_edges: dict[int, int],
         id_map: dict[int, int],
-    ):
+    ) -> None:
         """
         Add the mapping from functional groups to edges.
 
@@ -209,78 +216,74 @@ class _PlacementsSummary:
                 functional_group.with_ids(id_map)
             )
 
-    def get_atoms(self):
+    def get_atoms(self) -> abc.Iterator[Atom]:
         """
         Yield the atoms in the summary.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
+
             An atom.
 
         """
 
         yield from self._atoms
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> abc.Iterator[AtomInfo]:
         """
         Yield infos about atoms in the summary.
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+        Yields:
+
             Info about an atom.
 
         """
 
         yield from self._atom_infos
 
-    def get_bonds(self):
+    def get_bonds(self) -> abc.Iterator[Bond]:
         """
         Yield the bonds in the summary.
 
-        Yields
-        ------
-        :class:`.Bond`
+        Yields:
+
             A bond.
 
         """
 
         yield from self._bonds
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> abc.Iterator[BondInfo]:
         """
         Yield infos about the bonds in the summary.
 
-        Yields
-        ------
-        :class:`.BondInfo`
+        Yields:
+
             Info about a bond.
 
         """
 
         yield from self._bond_infos
 
-    def get_position_matrix(self):
+    def get_position_matrix(self) -> np.ndarray:
         """
         Get a position matrix for the atoms in the summary.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The position matrix.
 
         """
 
         return np.vstack(self._position_matrices)
 
-    def get_edge_functional_groups(self):
+    def get_edge_functional_groups(
+        self,
+    ) -> abc.Iterator[tuple[EdgeId, FunctionalGroups]]:
         """
         Yield the edge ids and functional groups associated with them.
 
-        Yields
-        ------
-        :class:`tuple`
+        Yields:
+
             Holds the edge id as the first element, and a
             :class:`tuple` of :class:`.FunctionalGroup` instances
             as the second element.

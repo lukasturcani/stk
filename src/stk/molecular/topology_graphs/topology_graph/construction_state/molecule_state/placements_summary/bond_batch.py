@@ -13,7 +13,12 @@ from ......bond_info import BondInfo
 from ......building_block import BuildingBlock
 
 
-class _BondBatch:
+__all__ = (
+    'BondBatch',
+)
+
+
+class BondBatch:
     """
     A batch of bonds.
 
@@ -65,7 +70,7 @@ class _BondBatch:
                 )
             )
 
-    def get_bonds(self) -> abc.Iterable[Bond]:
+    def get_bonds(self) -> abc.Iterator[Bond]:
         """
         Yield the bonds in the batch.
 
@@ -77,7 +82,7 @@ class _BondBatch:
 
         yield from self._bonds
 
-    def get_bond_infos(self) -> abc.Iterable[BondInfo]:
+    def get_bond_infos(self) -> abc.Iterator[BondInfo]:
         """
         Yield info about the bonds in the batch.
 
