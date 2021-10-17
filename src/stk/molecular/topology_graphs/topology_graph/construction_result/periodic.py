@@ -4,8 +4,14 @@ Periodic Construction Result
 
 """
 
+from ..construction_state import ConstructionState
 from .construction_result import ConstructionResult
 from ....periodic_info import PeriodicInfo
+
+
+__all__ = (
+    'PeriodicConstructionResult',
+)
 
 
 class PeriodicConstructionResult(ConstructionResult):
@@ -20,19 +26,19 @@ class PeriodicConstructionResult(ConstructionResult):
 
     def __init__(
         self,
-        construction_state,
-        lattice_size,
-    ):
+        construction_state: ConstructionState,
+        lattice_size: tuple[int, int, int],
+    ) -> None:
         """
         Initialize a :class:`.ConstructionResult`.
 
-        Parameters
-        ----------
-        construction_state : :class:`.ConstructionState`
-            The state from which the result is initialized.
+        Parameters:
 
-        lattice_size : :class:`tuple` of :class:`int`
-            The size of the lattice in the x, y and z directions.
+            construction_state:
+                The state from which the result is initialized.
+
+            lattice_size:
+                The size of the lattice in the x, y and z directions.
 
         """
 
@@ -47,13 +53,12 @@ class PeriodicConstructionResult(ConstructionResult):
             )
         )
 
-    def get_periodic_info(self):
+    def get_periodic_info(self) -> PeriodicInfo:
         """
         Get the periodic cell information of the constructed molecule.
 
-        Returns
-        -------
-        :class:`.PeriodicInfo`
+        Returns:
+
             The periodic cell information of the constructed molecule.
 
         """

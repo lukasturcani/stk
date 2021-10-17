@@ -15,6 +15,11 @@ from ....building_block import BuildingBlock
 from ..construction_state import ConstructionState
 
 
+__all__ = (
+    'ConstructionResult',
+)
+
+
 class ConstructionResult:
     """
     The result of :meth:`.TopologyGraph.construct`.
