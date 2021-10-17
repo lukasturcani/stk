@@ -150,46 +150,46 @@ class M4L4Tetrahedron(Cage):
 
     """
 
-    _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
-        NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
+    _initial_vertex_prototypes = (
+        NonLinearVertex(0, (0, 0, np.sqrt(6)/2)),
+        NonLinearVertex(1, (-1, -np.sqrt(3)/3, -np.sqrt(6)/6)),
+        NonLinearVertex(2, (1, -np.sqrt(3)/3, -np.sqrt(6)/6)),
+        NonLinearVertex(3, (0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_initial_vertex_prototypes,
 
         NonLinearVertex.init_at_center(
             id=4,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[1],
-                _vertex_prototypes[2],
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[2],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=5,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[1],
-                _vertex_prototypes[3],
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[3],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=6,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[2],
-                _vertex_prototypes[3],
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[2],
+                _initial_vertex_prototypes[3],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=7,
             vertices=(
-                _vertex_prototypes[1],
-                _vertex_prototypes[2],
-                _vertex_prototypes[3],
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[2],
+                _initial_vertex_prototypes[3],
             ),
         ),
     )
