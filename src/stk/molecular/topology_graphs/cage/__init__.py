@@ -1,4 +1,4 @@
-from . import vertices  # noqa
+from .vertices import *  # noqa
 from .three_plus_four import *  # noqa
 from .three_plus_three import *  # noqa
 from .two_plus_five import *  # noqa

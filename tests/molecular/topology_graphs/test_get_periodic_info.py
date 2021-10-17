@@ -73,10 +73,9 @@ def test_get_periodic_info_2(scaled_periodic_case):
     actual_cell = (
         construction_result.get_periodic_info().get_cell_matrix()
     )
-    assert np.all(np.array([
-        np.allclose(i, j, atol=1e-4)
-        for i, j in itertools.zip_longest(
-            actual_cell,
-            scaled_periodic_case.cell,
-        )
-    ]))
+    for i, j in itertools.zip_longest(
+        actual_cell,
+        scaled_periodic_case.cell,
+    ):
+        breakpoint()
+        assert np.allclose(i, j, atol=1e-4)

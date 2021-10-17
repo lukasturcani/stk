@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import itertools as it
 import stk
-from stk.molecular.reactions.reactions.reaction import ReactionResult
+from stk.molecular.reactions.reaction import ReactionResult
 
 from ..case_data import CaseData
 from .utilities import MockEdge, MockConstructionState

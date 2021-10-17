@@ -1,10 +1,10 @@
 import stk
-construction_state = stk.construction_state
-_GraphState = construction_state.graph_state._GraphState
-_MoleculeState = construction_state.molecule_state._MoleculeState
+construction_state = stk.molecular.construction_state
+GraphState = construction_state.graph_state.GraphState
+MoleculeState = construction_state.molecule_state.MoleculeState
 
 
-class MockGraphState(_GraphState):
+class MockGraphState(GraphState):
     def __init__(self, edges):
         self._edges = edges
 
@@ -16,7 +16,7 @@ class MockConstructionState(stk.ConstructionState):
         edge_functional_groups,
         position_matrix=None,
     ):
-        self._molecule_state = _MoleculeState()
+        self._molecule_state = MoleculeState()
         self._molecule_state._position_matrix = position_matrix
         self._molecule_state._edge_functional_groups = (
             edge_functional_groups

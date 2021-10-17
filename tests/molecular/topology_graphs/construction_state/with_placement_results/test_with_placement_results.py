@@ -18,10 +18,7 @@ from .check_position_matrix import check_position_matrix
 from .check_vertices import check_vertices
 
 
-PlacementResult = (
-    stk.topology_graphs.implementations
-    .utilities._PlacementResult
-)
+PlacementResult = stk.molecular.placement_result.PlacementResult
 
 
 @pytest.mark.skip

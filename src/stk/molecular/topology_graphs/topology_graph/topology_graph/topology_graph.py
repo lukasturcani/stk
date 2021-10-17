@@ -328,16 +328,7 @@ class TopologyGraph(typing.Generic[_V]):
 
         return self.clone()._with_building_blocks(building_block_map)
 
-    def clone(self) -> TopologyGraph:
-        """
-        Return a clone.
-
-        Returns:
-
-            The clone.
-
-        """
-
+    def _clone(self: _T) -> _T:
         clone = self.__class__.__new__(self.__class__)
         clone._scale = self._scale
         clone._building_block_vertices = dict(
@@ -349,6 +340,17 @@ class TopologyGraph(typing.Generic[_V]):
         clone._optimizer = self._optimizer
         clone._edge_groups = self._edge_groups
         return clone
+
+    def clone(self) -> TopologyGraph:
+        """
+        Return a clone.
+
+        Returns:
+
+            The clone.
+
+        """
+        return self._clone()
 
     def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:
         """

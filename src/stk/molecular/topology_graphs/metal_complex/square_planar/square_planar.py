@@ -6,7 +6,7 @@ Square Planar
 
 from ..metal_complex import MetalComplex
 from ..vertices import MetalVertex, MonoDentateLigandVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class SquarePlanar(MetalComplex):

@@ -1217,7 +1217,7 @@ class Cage(TopologyGraph):
             )
 
     def _clone(self: _T) -> _T:
-        clone = self._clone()
+        clone = super()._clone()
         clone._vertex_alignments = dict(self._vertex_alignments)
         return clone
 

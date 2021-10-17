@@ -6,7 +6,7 @@ Octahedral Lambda
 
 from ..metal_complex import MetalComplex
 from ..vertices import MetalVertex, BiDentateLigandVertex
-from ...topology_graph import Edge
+from ....edge import Edge
 
 
 class OctahedralLambda(MetalComplex):
