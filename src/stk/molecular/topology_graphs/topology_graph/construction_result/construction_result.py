@@ -4,6 +4,16 @@ Construction Result
 
 """
 
+from collections import abc
+import numpy as np
+
+from ....atom import Atom
+from ....atom_info import AtomInfo
+from ....bond import Bond
+from ....bond_info import BondInfo
+from ....building_block import BuildingBlock
+from ..construction_state import ConstructionState
+
 
 class ConstructionResult:
     """
@@ -20,14 +30,17 @@ class ConstructionResult:
         '_num_building_blocks',
     ]
 
-    def __init__(self, construction_state):
+    def __init__(
+        self,
+        construction_state: ConstructionState,
+    ) -> None:
         """
         Initialize a :class:`.ConstructionResult`.
 
-        Parameters
-        ----------
-        construction_state : :class:`.ConstructionState`
-            The state from which the result is initialized.
+        Parameters:
+
+            construction_state:
+                The state from which the result is initialized.
 
         """
 
@@ -47,84 +60,81 @@ class ConstructionResult:
             in construction_state.get_building_blocks()
         }
 
-    def get_position_matrix(self):
+    def get_position_matrix(self) -> np.ndarray:
         """
         Get the position matrix of the constructed molecule.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The position matrix of the constructed molecule.
 
         """
 
         return self._position_matrix
 
-    def get_atoms(self):
+    def get_atoms(self) -> tuple[Atom, ...]:
         """
         Get the atoms of the constructed molecule.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.Atom`
+        Returns:
+
             The atoms of the constructed molecule.
 
         """
 
         return self._atoms
 
-    def get_bonds(self):
+    def get_bonds(self) -> tuple[Bond, ...]:
         """
         Get the bonds of the constructed molecule.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.Bond`
+        Returns:
+
             The bonds of the constructed molecule.
 
         """
 
         return self._bonds
 
-    def get_atom_infos(self):
+    def get_atom_infos(self) -> tuple[AtomInfo, ...]:
         """
         Get the atom infos of the constructed molecule.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.AtomInfo`
+        Returns:
+
             The atom infos of the constructed molecule.
 
         """
 
         return self._atom_infos
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> tuple[BondInfo, ...]:
         """
         Get the bond infos of the constructed molecule.
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.BondInfo`
+        Returns:
+
             The bond infos of the constructed molecule.
 
         """
 
         return self._bond_infos
 
-    def get_num_building_block(self, building_block):
+    def get_num_building_block(
+        self,
+        building_block: BuildingBlock,
+    ) -> int:
         """
         Get the number of times `building_block` is present.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block whose frequency in the constructed
-            molecule is desired.
+        Parameters:
 
-        Returns
-        -------
-        :class:`int`
+            building_block:
+                The building block whose frequency in the constructed
+                molecule is desired.
+
+        Returns:
+
             The number of times `building_block` was used in the
             construction of the constructed molecule.
 
@@ -132,7 +142,7 @@ class ConstructionResult:
 
         return self._num_building_blocks[building_block]
 
-    def get_building_blocks(self):
+    def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:
         """
         Yield the building blocks.
 
@@ -142,9 +152,8 @@ class ConstructionResult:
         blocks, equivalently positioned building blocks will be
         yielded at the same time.
 
-        Yields
-        ------
-        :class:`.BuildingBlock`
+        Yields:
+
             A building block of the topology graph.
 
         """
