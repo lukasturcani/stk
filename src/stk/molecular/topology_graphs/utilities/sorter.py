@@ -4,6 +4,7 @@ Sorter
 
 """
 
+import typing
 import numpy as np
 
 from collections import abc
@@ -12,7 +13,13 @@ from stk.utilities import vector_angle
 
 __all__ = (
     'Sorter',
+    'IHasPosition',
 )
+
+
+class IHasPosition(typing.Protocol):
+    def get_position(self) -> np.ndarray:
+        pass
 
 
 class Sorter:
@@ -25,7 +32,7 @@ class Sorter:
 
     def __init__(
         self,
-        items: abc.Iterable[object],
+        items: abc.Iterable[IHasPosition],
         reference: np.ndarray,
         axis: np.ndarray,
     ) -> None:
@@ -53,7 +60,7 @@ class Sorter:
 
     def _get_vector(
         self,
-        item: object,
+        item: IHasPosition,
     ) -> np.ndarray:
         """
         Get the vector according to which `item` should be sorted.
@@ -74,7 +81,7 @@ class Sorter:
 
     def _get_angle(
         self,
-        item: object,
+        item: IHasPosition,
     ) -> float:
         """
         Get the angle of `vector` relative to `reference`.

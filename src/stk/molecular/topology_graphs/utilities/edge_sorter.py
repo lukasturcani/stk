@@ -8,7 +8,7 @@ import numpy as np
 from collections import abc
 
 from ..topology_graph import Edge
-from .sorter import Sorter
+from .sorter import Sorter, IHasPosition
 
 
 __all__ = (
@@ -31,7 +31,7 @@ class EdgeSorter(Sorter):
 
     def __init__(
         self,
-        edges: abc.Iterable[Edge],
+        edges: abc.Collection[Edge],
         aligner_edge: Edge,
         axis: np.ndarray,
     ) -> None:
@@ -61,5 +61,8 @@ class EdgeSorter(Sorter):
             reference=aligner_edge.get_position() - edge_centroid,
         )
 
-    def _get_vector(self, item):
+    def _get_vector(
+        self,
+        item: IHasPosition,
+    ) -> np.ndarray:
         return item.get_position() - self._edge_centroid
