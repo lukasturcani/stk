@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import typing
 from collections import abc
+import numpy as np
 
 from .vertices import CageVertex
 from ...building_block import BuildingBlock
@@ -32,6 +33,7 @@ class CageConstructionState(ConstructionState):
     """
 
     _num_placement_stages_done: int
+    _neighbor_positions: dict[int, list[np.ndarray]]
 
     def __init__(
         self,
@@ -75,10 +77,10 @@ class CageConstructionState(ConstructionState):
 
     def _with_placement_results(
         self: _T,
-        vertices: tuple[Vertex, ...],
-        edges: abc.Iterable[tuple[Edge, ...]],
+        vertices: tuple[CageVertex, ...],
+        edges: abc.Iterable[abc.Collection[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
-        results: tuple[PlacementResult, ...],
+        results: abc.Iterable[PlacementResult],
     ) -> _T:
         # Need to iterate multiple times through results.
         results = tuple(results)
@@ -108,7 +110,7 @@ class CageConstructionState(ConstructionState):
     def _update_neighbor_positions(
         self,
         vertices: abc.Iterable[CageVertex],
-        edges: abc.Iterable[tuple[Edge, ...]],
+        edges: abc.Iterable[abc.Collection[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
         results: abc.Iterable[PlacementResult],
     ) -> None:
@@ -213,7 +215,7 @@ class CageConstructionState(ConstructionState):
     def _get_neighbors(
         self,
         vertex: CageVertex,
-        vertex_edges: tuple[Edge, ...],
+        vertex_edges: abc.Collection[Edge],
     ) -> abc.Iterator[tuple[int, int]]:
         """
         Yield the neighbor vertices of `vertex`.
