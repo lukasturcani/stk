@@ -15,14 +15,14 @@ from .molecule_state import MoleculeState
 from ..edge import Edge
 from ..edge_group import EdgeGroup
 from ..vertex import Vertex
-from ..placement_result import PlacementResult
-from ....building_block import BuildingBlock
-from ....atom import Atom
-from ....atom_info import AtomInfo
-from ....bond import Bond
-from ....bond_info import BondInfo
-from ....functional_groups import FunctionalGroup
-from ....reactions import Reaction, ReactionResult
+from ..topology_graphs import PlacementResult
+from ..building_block import BuildingBlock
+from ..atom import Atom
+from ..atom_info import AtomInfo
+from ..bond import Bond
+from ..bond_info import BondInfo
+from ..functional_groups import FunctionalGroup
+from ..reactions import Reaction, ReactionResult
 
 
 __all__ = (

@@ -7,9 +7,9 @@ One-One Reaction
 from collections import abc
 
 from .reaction import Reaction, NewAtom
-from ...functional_groups import GenericFunctionalGroup
-from ...atom import Atom
-from ...bond import Bond
+from ..functional_groups import GenericFunctionalGroup
+from ..atom import Atom
+from ..bond import Bond
 
 __all__ = (
     'OneOneReaction',
@@ -57,8 +57,7 @@ class OneOneReaction(Reaction):
         self._periodicity = periodicity
 
     def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
-        return
-        yield
+        yield from ()
 
     def _get_new_bonds(self) -> abc.Iterator[Bond]:
         bonder1 = next(self._functional_group1.get_bonders())
@@ -75,5 +74,4 @@ class OneOneReaction(Reaction):
         yield from self._functional_group2.get_deleters()
 
     def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
-        return
-        yield
+        yield from ()

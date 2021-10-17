@@ -12,7 +12,8 @@ import collections
 from collections import abc
 
 from stk.utilities.typing import OneOrMany
-from ..topology_graphs import Vertex, Edge
+from ..vertex import Vertex
+from ..edge import Edge
 from ..building_block import BuildingBlock
 
 

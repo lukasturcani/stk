@@ -5,8 +5,8 @@ Reaction Result
 """
 
 
-from ....atom import Atom
-from ....bond import Bond
+from ...atom import Atom
+from ...bond import Bond
 from .new_atom import NewAtom
 
 __all__ = (

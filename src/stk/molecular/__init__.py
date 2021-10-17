@@ -9,6 +9,7 @@ from .molecule import *  # noqa
 from .building_block import *  # noqa
 from .constructed_molecule import *  # noqa
 from .reactions import *  # noqa
+from .reaction_factories import *  # noqa
 from .key_makers import *  # noqa
 from .writers import *  # noqa
 from .periodic_info import *  # noqa

@@ -8,10 +8,10 @@ from collections import abc
 import numpy as np
 
 from .reactions_summary import BondId
-from .....atom import Atom
-from .....atom_info import AtomInfo
-from .....bond import Bond
-from .....bond_info import BondInfo
+from ...atom import Atom
+from ...atom_info import AtomInfo
+from ...bond import Bond
+from ...bond_info import BondInfo
 
 
 __all__ = (

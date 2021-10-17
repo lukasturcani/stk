@@ -21,13 +21,13 @@ from ...vertex import Vertex
 from ...edge import Edge
 from ...edge_group import EdgeGroup
 from ...placement_result import PlacementResult
-from .....building_block import BuildingBlock
-from .....functional_groups import FunctionalGroup
-from .....atom import Atom
-from .....atom_info import AtomInfo
-from .....bond import Bond
-from .....bond_info import BondInfo
-from .....reactions import Reaction, ReactionResult
+from ...building_block import BuildingBlock
+from ...functional_groups import FunctionalGroup
+from ...atom import Atom
+from ...atom_info import AtomInfo
+from ...bond import Bond
+from ...bond_info import BondInfo
+from ...reactions import Reaction, ReactionResult
 
 
 _T = typing.TypeVar('_T', bound='MoleculeState')

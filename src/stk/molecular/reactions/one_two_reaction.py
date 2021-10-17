@@ -7,10 +7,10 @@ One-Two Reaction
 import itertools as it
 from collections import abc
 
-from ...functional_groups import GenericFunctionalGroup
+from ..functional_groups import GenericFunctionalGroup
 from .reaction import Reaction, NewAtom
-from ...atom import Atom
-from ...bond import Bond
+from ..atom import Atom
+from ..bond import Bond
 
 __all__ = (
     'OneTwoReaction',
@@ -59,8 +59,7 @@ class OneTwoReaction(Reaction):
         self._periodicity = periodicity
 
     def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
-        return
-        yield
+        yield from ()
 
     def _get_new_bonds(self) -> abc.Iterator[Bond]:
         bonders1 = self._functional_group1.get_bonders()
@@ -78,5 +77,4 @@ class OneTwoReaction(Reaction):
         yield from self._functional_group2.get_deleters()
 
     def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
-        return
-        yield
+        yield from ()

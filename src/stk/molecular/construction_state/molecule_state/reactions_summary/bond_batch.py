@@ -7,9 +7,9 @@ Bond Batch
 
 from collections import abc
 
-from ......atom import Atom
-from ......bond import Bond
-from ......bond_info import BondInfo
+from ....atom import Atom
+from ....bond import Bond
+from ....bond_info import BondInfo
 
 
 __all__ = (

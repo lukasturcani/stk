@@ -11,7 +11,7 @@ import numpy as np
 from collections import abc
 
 from .edge import Edge
-from ...building_block import BuildingBlock
+from .building_block import BuildingBlock
 
 
 __all__ = (

@@ -8,10 +8,10 @@ import numpy as np
 from collections import abc
 
 from .reaction import Reaction, NewAtom
-from ...atom import Atom
-from ...elements import C, H
-from ...bond import Bond
-from ...functional_groups import RingAmine
+from ..atom import Atom
+from ..elements import C, H
+from ..bond import Bond
+from ..functional_groups import RingAmine
 
 
 __all__ = (

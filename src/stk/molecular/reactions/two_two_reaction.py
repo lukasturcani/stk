@@ -11,9 +11,9 @@ import typing
 import numpy as np
 
 from .reaction import Reaction, NewAtom
-from ...functional_groups import GenericFunctionalGroup
-from ...atom import Atom
-from ...bond import Bond
+from ..functional_groups import GenericFunctionalGroup
+from ..atom import Atom
+from ..bond import Bond
 
 
 class _IConstructionState(typing.Protocol):

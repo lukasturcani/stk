@@ -7,9 +7,9 @@ Atom Batch
 import numpy as np
 from collections import abc
 
-from ......reactions import NewAtom
-from ......atom import Atom
-from ......atom_info import AtomInfo
+from ....reactions import NewAtom
+from ....atom import Atom
+from ....atom_info import AtomInfo
 
 
 __all__ = (

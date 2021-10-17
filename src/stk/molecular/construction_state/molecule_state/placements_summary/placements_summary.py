@@ -10,15 +10,13 @@ import numpy as np
 from collections import defaultdict
 from collections import abc
 
-from .....topology_graph.topology_graph.implementations import (
-    PlacementResult,
-)
-from ......functional_groups import FunctionalGroup
-from ......atom import Atom
-from ......atom_info import AtomInfo
-from ......bond import Bond
-from ......bond_info import BondInfo
-from ......building_block import BuildingBlock
+from ....placement_result import PlacementResult
+from ....functional_groups import FunctionalGroup
+from ....atom import Atom
+from ....atom_info import AtomInfo
+from ....bond import Bond
+from ....bond_info import BondInfo
+from ....building_block import BuildingBlock
 from .atom_batch import AtomBatch
 from .bond_batch import BondBatch
 

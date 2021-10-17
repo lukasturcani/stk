@@ -10,11 +10,11 @@ import numpy as np
 
 from .atom_batch import AtomBatch
 from .bond_batch import BondBatch
-from ......atom import Atom
-from ......atom_info import AtomInfo
-from ......bond import Bond
-from ......bond_info import BondInfo
-from ......reactions import ReactionResult
+from ....atom import Atom
+from ....atom_info import AtomInfo
+from ....bond import Bond
+from ....bond_info import BondInfo
+from ....reactions import ReactionResult
 
 
 __all__ = (
