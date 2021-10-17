@@ -32,7 +32,7 @@ class Placement:
     def __init__(
         self,
         vertex: Vertex,
-        edges: abc.Collection[Edge],
+        edges: abc.Sequence[Edge],
         building_block: BuildingBlock,
     ) -> None:
         """

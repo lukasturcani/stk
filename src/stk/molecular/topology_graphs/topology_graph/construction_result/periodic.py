@@ -43,11 +43,13 @@ class PeriodicConstructionResult(ConstructionResult):
         """
 
         super().__init__(construction_state)
+        lattice_constants = construction_state.get_lattice_constants()
+        assert lattice_constants is not None
         self._periodic_info = PeriodicInfo(
             *(
                 lattice_constant*dim
                 for lattice_constant, dim in zip(
-                    construction_state.get_lattice_constants(),
+                    lattice_constants,
                     lattice_size,
                 )
             )

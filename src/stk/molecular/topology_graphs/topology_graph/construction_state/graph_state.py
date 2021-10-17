@@ -316,7 +316,7 @@ class GraphState(typing.Generic[_V]):
         a, b, c = map(np.array, self._lattice_constants)
         return a, b, c
 
-    def get_edges(self, vertex_id: int) -> abc.Collection[Edge]:
+    def get_edges(self, vertex_id: int) -> abc.Sequence[Edge]:
         """
         Get the edges connect to a vertex.
 

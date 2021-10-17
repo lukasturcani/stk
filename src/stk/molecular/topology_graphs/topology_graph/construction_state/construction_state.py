@@ -248,7 +248,7 @@ class ConstructionState(typing.Generic[_V]):
 
         return self._graph_state.get_num_edges()
 
-    def get_edges(self, vertex_id: int) -> abc.Collection[Edge]:
+    def get_edges(self, vertex_id: int) -> abc.Sequence[Edge]:
         """
         Get the edges connect to a vertex.
 
