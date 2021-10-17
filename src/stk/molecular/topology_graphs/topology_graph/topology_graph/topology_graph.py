@@ -461,13 +461,18 @@ class TopologyGraph(typing.Generic[_V]):
         return ConstructionResult(state)
 
     def _get_construction_state(self) -> ConstructionState:
+        lattice_constants = self._get_lattice_constants()
+        if lattice_constants is not None:
+            a, b, c = tuple(
+                np.array(constant, dtype=np.float64)*self._scale
+                for constant in lattice_constants
+            )
+            lattice_constants = a, b, c
+
         return ConstructionState(
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
-            lattice_constants=tuple(
-                np.array(constant, dtype=np.float64)*self._scale
-                for constant in self._get_lattice_constants()
-            ),
+            lattice_constants=lattice_constants,
         )
 
     def _get_scale(

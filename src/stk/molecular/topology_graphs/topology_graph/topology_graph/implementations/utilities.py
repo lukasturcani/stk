@@ -6,6 +6,7 @@ Topology Graph Implementation Utilities
 
 from __future__ import annotations
 
+from collections import abc
 
 from .....building_block import BuildingBlock
 from ...placement_result import PlacementResult
@@ -31,7 +32,7 @@ class Placement:
     def __init__(
         self,
         vertex: Vertex,
-        edges: tuple[Edge, ...],
+        edges: abc.Collection[Edge],
         building_block: BuildingBlock,
     ) -> None:
         """

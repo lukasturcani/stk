@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import typing
 import numpy as np
+from collections import abc
 
 from .edge import Edge
 from ...building_block import BuildingBlock
@@ -184,7 +185,7 @@ class Vertex:
     def place_building_block(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Collection[Edge],
     ) -> np.ndarray:
         """
         Place `building_block` on the :class:`.Vertex`.
@@ -210,7 +211,7 @@ class Vertex:
     def map_functional_groups_to_edges(
         self,
         building_block: BuildingBlock,
-        edges: tuple[Edge, ...],
+        edges: abc.Collection[Edge],
     ) -> dict[int, int]:
         """
         Map functional groups to edges.

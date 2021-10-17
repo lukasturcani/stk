@@ -5,6 +5,7 @@ Parallel Topology Graph
 """
 
 import pathos
+import typing
 
 from .utilities import Placement
 from ...construction_state import ConstructionState
@@ -13,6 +14,8 @@ from ...vertex import Vertex
 __all__ = (
     'Parallel',
 )
+
+_V = typing.TypeVar('_V', bound=Vertex)
 
 
 class Parallel:
@@ -23,7 +26,7 @@ class Parallel:
 
     def __init__(
         self,
-        stages: tuple[tuple[Vertex, ...], ...],
+        stages: tuple[tuple[int, ...], ...],
         num_processes: int,
     ) -> None:
         """
@@ -34,8 +37,8 @@ class Parallel:
             stages:
                 A :class:`tuple` of the form
                 ``((v1, v2, v3), (v4, v5))``, where each nested
-                :class:`tuple` holds the :class:`.Vertex` objects used
-                for placement in a particular stage.
+                :class:`tuple` holds the id of the :class:`.Vertex`
+                objects used for placement in a particular stage.
 
             num_processes:
                 The number of parallel processes to spawn.
@@ -47,7 +50,7 @@ class Parallel:
 
     def place_building_blocks(
         self,
-        state: ConstructionState,
+        state: ConstructionState[Vertex],
     ) -> ConstructionState:
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:

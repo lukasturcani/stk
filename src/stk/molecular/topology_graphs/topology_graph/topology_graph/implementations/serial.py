@@ -6,7 +6,6 @@ Serial Topology Graph
 
 from .utilities import Placement
 from ...construction_state import ConstructionState
-from ...vertex import Vertex
 
 __all__ = (
     'Serial',
@@ -21,7 +20,7 @@ class Serial:
 
     def __init__(
         self,
-        stages: tuple[tuple[Vertex, ...], ...],
+        stages: tuple[tuple[int, ...], ...],
     ) -> None:
         """
         Initialize a :class:`.Serial` instance.
@@ -31,8 +30,8 @@ class Serial:
             stages:
                 A :class:`tuple` of the form
                 ``((v1, v2, v3), (v4, v5))``, where each nested
-                :class:`tuple` holds the :class:`.Vertex` objects used
-                for placement in a particular stage.
+                :class:`tuple` holds the id of the :class:`.Vertex`
+                objects used for placement in a particular stage.
 
         """
 
