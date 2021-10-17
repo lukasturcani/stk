@@ -109,82 +109,82 @@ class SixPlusEight(Cage):
     """
 
     _x = 1
-    _vertex_prototypes = (
-        NonLinearVertex(0, [-_x, _x, 0]),
-        NonLinearVertex(1, [-_x, -_x, 0]),
-        NonLinearVertex(2, [_x, _x, 0]),
-        NonLinearVertex(3, [_x, -_x, 0]),
+    _initial_vertex_prototypes = (
+        NonLinearVertex(0, (-_x, _x, 0)),
+        NonLinearVertex(1, (-_x, -_x, 0)),
+        NonLinearVertex(2, (_x, _x, 0)),
+        NonLinearVertex(3, (_x, -_x, 0)),
 
-        NonLinearVertex(4, [0, 0, _x]),
-        NonLinearVertex(5, [0, 0, -_x]),
+        NonLinearVertex(4, (0, 0, _x)),
+        NonLinearVertex(5, (0, 0, -_x)),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_initial_vertex_prototypes,
         NonLinearVertex.init_at_center(
             id=6,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[4],
-                _vertex_prototypes[1]
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[4],
+                _initial_vertex_prototypes[1],
             ),
 
         ),
         NonLinearVertex.init_at_center(
             id=7,
             vertices=(
-                _vertex_prototypes[1],
-                _vertex_prototypes[4],
-                _vertex_prototypes[3]
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[4],
+                _initial_vertex_prototypes[3],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=8,
             vertices=(
-                _vertex_prototypes[4],
-                _vertex_prototypes[3],
-                _vertex_prototypes[2]
+                _initial_vertex_prototypes[4],
+                _initial_vertex_prototypes[3],
+                _initial_vertex_prototypes[2],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=9,
             vertices=(
-                _vertex_prototypes[4],
-                _vertex_prototypes[2],
-                _vertex_prototypes[0]
+                _initial_vertex_prototypes[4],
+                _initial_vertex_prototypes[2],
+                _initial_vertex_prototypes[0],
             ),
         ),
 
         NonLinearVertex.init_at_center(
             id=10,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[5],
-                _vertex_prototypes[1]
+                _initial_vertex_prototypes[0],
+                _initial_vertex_prototypes[5],
+                _initial_vertex_prototypes[1],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=11,
             vertices=(
-                _vertex_prototypes[5],
-                _vertex_prototypes[1],
-                _vertex_prototypes[3]
+                _initial_vertex_prototypes[5],
+                _initial_vertex_prototypes[1],
+                _initial_vertex_prototypes[3],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=12,
             vertices=(
-                _vertex_prototypes[3],
-                _vertex_prototypes[5],
-                _vertex_prototypes[2]
+                _initial_vertex_prototypes[3],
+                _initial_vertex_prototypes[5],
+                _initial_vertex_prototypes[2],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=13,
             vertices=(
-                _vertex_prototypes[2],
-                _vertex_prototypes[5],
-                _vertex_prototypes[0]
+                _initial_vertex_prototypes[2],
+                _initial_vertex_prototypes[5],
+                _initial_vertex_prototypes[0],
             ),
         ),
     )
