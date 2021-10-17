@@ -28,10 +28,12 @@ __all__ = (
 )
 
 
+_LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 _T = typing.TypeVar('_T', bound='TopologyGraph')
+_V = typing.TypeVar('_V', bound=Vertex)
 
 
-class TopologyGraph:
+class TopologyGraph(typing.Generic[_V]):
     """
     An abstract base class for topology graphs.
 
@@ -159,7 +161,7 @@ class TopologyGraph:
     def __init__(
         self,
         building_block_vertices:
-            dict[BuildingBlock, tuple[Vertex, ...]],
+            dict[BuildingBlock, tuple[_V, ...]],
         edges: tuple[Edge, ...],
         reaction_factory: ReactionFactory,
         construction_stages:
@@ -406,21 +408,21 @@ class TopologyGraph:
             self._building_block_vertices.get(building_block, [])
         )
 
-    def _get_lattice_constants(self) -> abc.Iterator[np.ndarray]:
+    def _get_lattice_constants(
+        self,
+    ) -> typing.Optional[_LatticeConstants]:
         """
-        Yield the lattice constants of the topology graph.
+        Get the lattice constants of the topology graph.
 
-        The a, b and c lattice constants are yielded, in that order.
+        Returns:
 
-        By default, this is an empty generator.
-
-        Yields:
-
-            A lattice constant.
+            A:class:`tuple` of the a, b and c lattice constants, in
+            that order. Can be ``None`` if the topology  graph is not
+            periodic.
 
         """
 
-        yield from ()
+        return None
 
     def construct(self) -> ConstructionResult:
         """
@@ -471,7 +473,7 @@ class TopologyGraph:
     def _get_scale(
         self,
         building_block_vertices:
-            dict[BuildingBlock, tuple[Vertex, ...]],
+            dict[BuildingBlock, tuple[_V, ...]],
     ) -> float:
         """
         Get the scale, which should be applied to topology graph.

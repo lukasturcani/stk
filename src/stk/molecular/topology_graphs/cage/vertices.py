@@ -41,7 +41,10 @@ class CageVertex(Vertex):
     def __init__(
         self,
         id: int,
-        position: tuple[float, float, float],
+        position: typing.Union[
+            np.ndarray,
+            tuple[float, float, float],
+        ],
         use_neighbor_placement: bool = True,
         aligner_edge: int = 0,
     ) -> None:
