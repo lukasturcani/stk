@@ -115,15 +115,15 @@ class FourPlusSix(Cage):
 
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    _v0, _v1, _v2, _v3 = _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
-        NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
+    _v0, _v1, _v2, _v3 = _initial_vertex_prototypes = (
+        NonLinearVertex(0, (0, 0, np.sqrt(6)/2)),
+        NonLinearVertex(1, (-1, -np.sqrt(3)/3, -np.sqrt(6)/6)),
+        NonLinearVertex(2, (1, -np.sqrt(3)/3, -np.sqrt(6)/6)),
+        NonLinearVertex(3, (0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_initial_vertex_prototypes,
         LinearVertex.init_at_center(4, (_v0, _v1)),
         LinearVertex.init_at_center(5, (_v0, _v2)),
         LinearVertex.init_at_center(6, (_v0, _v3)),
