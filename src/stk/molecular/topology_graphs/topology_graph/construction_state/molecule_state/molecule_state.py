@@ -6,9 +6,9 @@ Molecule State
 
 import numpy as np
 
-from .reactions_summary import _ReactionsSummary
-from .deletions_summary import _DeletionsSummary
-from .placements_summary import _PlacementsSummary
+from .reactions_summary import ReactionsSummary
+from .deletions_summary import DeletionsSummary
+from .placements_summary import PlacementsSummary
 
 
 class _MoleculeState:
@@ -27,9 +27,9 @@ class _MoleculeState:
         '_num_placements',
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
-        Initialize a :class:`._MoleculeState` instance.
+        Initialize a :class:`.MoleculeState` instance.
 
         """
 

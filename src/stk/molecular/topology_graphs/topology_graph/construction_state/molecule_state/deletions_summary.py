@@ -66,29 +66,29 @@ class DeletionsSummary:
         deleted_bond_ids: abc.Iterable[BondId],
     ) -> None:
         """
-        Initialize a :class:`._DeletionsSummary` instance.
+        Initialize a :class:`.DeletionsSummary` instance.
 
         Parameters:
 
-            atoms : :class:`iterable` of :class:`.Atom`
+            atoms:
                 Atoms, some of which are to be deleted.
 
-            atom_infos : :class:`iterable` of :class:`.AtomInfo`
+            atom_infos:
                 Info on every atom in `atoms`.
 
-            bonds : :class:`iterable` of :class:`.Bond`
+            bonds:
                 The bonds of the molecule being constructed.
 
-            bond_infos : :class:`iterable` of :class:`.BondInfo`
+            bond_infos:
                 Info on every bond in `bonds`.
 
-            position_matrix : :class:`numpy.ndarray`
+            position_matrix:
                 The position matrix for all the `atoms`.
 
-            deleted_atom_ids : :class:`iterable` of :class:`int`
+            deleted_atom_ids:
                 The ids of `atoms`, which should be deleted.
 
-            deleted_bond_ids : :class:`iterable` of :class:`._BondId`
+            deleted_bond_ids:
                 Ids of bonds that should be deleted.
 
         """
