@@ -77,5 +77,4 @@ def test_get_periodic_info_2(scaled_periodic_case):
         actual_cell,
         scaled_periodic_case.cell,
     ):
-        breakpoint()
         assert np.allclose(i, j, atol=1e-4)

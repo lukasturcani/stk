@@ -376,12 +376,12 @@ class GraphState(typing.Generic[_V]):
 
         """
 
-        if self._lattice_constants is None:
+        if lattice_constants is None:
             self._lattice_constants = None
         else:
             a, b, c = map(
                 np.array,
-                self._lattice_constants,
+                lattice_constants,
             )
             self._lattice_constants = a, b, c
         return self
