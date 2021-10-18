@@ -76,7 +76,7 @@ class CageConstructionState(ConstructionState):
     def _with_placement_results(
         self: _T,
         vertices: tuple[CageVertex, ...],
-        edges: abc.Iterable[abc.Collection[Edge]],
+        edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
         results: abc.Iterable[PlacementResult],
     ) -> _T:
