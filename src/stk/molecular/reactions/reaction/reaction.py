@@ -6,19 +6,19 @@ Reaction
     :maxdepth: 2
 
     One One Reaction <\
-stk.molecular.reactions.reactions.one_one_reaction\
+stk.molecular.reactions.one_one_reaction\
 >
     One Two Reaction <\
-stk.molecular.reactions.reactions.one_two_reaction\
+stk.molecular.reactions.one_two_reaction\
 >
     Ring Amine Reaction <\
-stk.molecular.reactions.reactions.ring_amine_reaction\
+stk.molecular.reactions.ring_amine_reaction\
 >
     Two Two Reaction <\
-stk.molecular.reactions.reactions.two_two_reaction\
+stk.molecular.reactions.two_two_reaction\
 >
     Dative Reaction <\
-stk.molecular.reactions.reactions.dative_reaction.dative_reaction\
+stk.molecular.reactions.dative_reaction.dative_reaction\
 >
 
 """

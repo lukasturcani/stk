@@ -22,8 +22,8 @@
    Functional Groups <stk.molecular.functional_groups.functional_groups.functional_group>
    Functional Group Factories <stk.molecular.functional_groups.factories.functional_group_factory>
    Key Makers <stk.molecular.key_makers.molecule>
-   Reactions <stk.molecular.reactions.reactions.reaction.reaction>
-   Reaction Factories <stk.molecular.reactions.factories.reaction_factory>
+   Reactions <stk.molecular.reactions.reaction.reaction>
+   Reaction Factories <stk.molecular.reaction_factories.reaction_factory>
    Writers <writers>
 
 .. toctree::

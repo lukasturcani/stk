@@ -6,10 +6,10 @@ Reaction Factory
     :maxdepth: 2
 
     Generic Reaction Factory <\
-stk.molecular.reactions.factories.generic_reaction_factory\
+stk.molecular.reaction_factories.generic_reaction_factory\
 >
     Dative Reaction Factory <\
-stk.molecular.reactions.factories.dative_reaction_factory\
+stk.molecular.reaction_factories.dative_reaction_factory\
 >
 
 """
