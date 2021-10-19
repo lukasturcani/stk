@@ -12,5 +12,16 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   stk.molecular.reactions.factories
-   stk.molecular.reactions.reactions
+   stk.molecular.reactions.dative_reaction
+   stk.molecular.reactions.reaction
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   stk.molecular.reactions.one_one_reaction
+   stk.molecular.reactions.one_two_reaction
+   stk.molecular.reactions.ring_amine_reaction
+   stk.molecular.reactions.two_two_reaction

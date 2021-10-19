@@ -1,0 +1,17 @@
+stk.molecular.construction\_state.molecule\_state.reactions\_summary package
+============================================================================
+
+.. automodule:: stk.molecular.construction_state.molecule_state.reactions_summary
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   stk.molecular.construction_state.molecule_state.reactions_summary.atom_batch
+   stk.molecular.construction_state.molecule_state.reactions_summary.bond_batch
+   stk.molecular.construction_state.molecule_state.reactions_summary.reactions_summary
