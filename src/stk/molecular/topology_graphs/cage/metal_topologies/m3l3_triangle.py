@@ -176,7 +176,8 @@ class M3L3Triangle(Cage):
             corners:
                 Can be a :class:`dict` which maps the
                 :class:`.BuildingBlock` instances to the ids of the
-                vertices it should be placed on.
+                vertices it should be placed on. Valid numbers are
+                0, 1 and 2.
 
                 Can also be a :class:`.BuildingBlock` instance, which
                 should be placed on all corner vertices on the topology
@@ -185,7 +186,8 @@ class M3L3Triangle(Cage):
             linkers:
                 Can be a :class:`dict` which maps the
                 :class:`.BuildingBlock` instances to the ids of the
-                vertices it should be placed on.
+                vertices it should be placed on. Valid numbers are
+                3, 4 and 5.
 
                 Can also be a :class:`.BuildingBlock` instance, which
                 should be placed on all linker vertices on the topology
