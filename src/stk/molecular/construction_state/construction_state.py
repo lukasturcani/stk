@@ -82,7 +82,7 @@ class ConstructionState(typing.Generic[VertexT]):
         clone._molecule_state = self._molecule_state
         return clone
 
-    def clone(self) -> ConstructionState:
+    def clone(self) -> ConstructionState[VertexT]:
         """
         Return a clone.
 
@@ -121,7 +121,7 @@ class ConstructionState(typing.Generic[VertexT]):
         edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
         results: abc.Iterable[PlacementResult],
-    ) -> ConstructionState:
+    ) -> ConstructionState[VertexT]:
         """
         Return a clone holding the placement results.
 
@@ -313,7 +313,7 @@ class ConstructionState(typing.Generic[VertexT]):
         self,
         reactions: tuple[Reaction, ...],
         results: abc.Iterable[ReactionResult],
-    ) -> ConstructionState:
+    ) -> ConstructionState[VertexT]:
         """
         Return a clone holding the reaction results.
 
@@ -352,7 +352,7 @@ class ConstructionState(typing.Generic[VertexT]):
     def with_lattice_constants(
         self,
         lattice_constants: typing.Optional[_LatticeConstants],
-    ) -> ConstructionState:
+    ) -> ConstructionState[VertexT]:
         """
         Return a clone holding the `lattice_constants`.
 
@@ -390,7 +390,7 @@ class ConstructionState(typing.Generic[VertexT]):
     def with_position_matrix(
         self,
         position_matrix: np.ndarray,
-    ) -> ConstructionState:
+    ) -> ConstructionState[VertexT]:
         """
         Return a clone holding the `position_matrix`.
 
@@ -423,7 +423,7 @@ class ConstructionState(typing.Generic[VertexT]):
     def with_vertices(
         self,
         vertices: abc.Iterable[Vertex],
-    ) -> ConstructionState:
+    ) -> ConstructionState[VertexT]:
         """
         Returns a clone holding `vertices`.
 

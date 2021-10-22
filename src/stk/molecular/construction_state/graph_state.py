@@ -353,7 +353,7 @@ class GraphState(typing.Generic[VertexT]):
     def with_vertices(
         self,
         vertices: abc.Iterable[VertexT],
-    ) -> GraphState:
+    ) -> GraphState[VertexT]:
         """
         Returns a clone holding `vertices`.
 
@@ -392,7 +392,7 @@ class GraphState(typing.Generic[VertexT]):
     def with_lattice_constants(
         self,
         lattice_constants: typing.Optional[_LatticeConstants],
-    ) -> GraphState:
+    ) -> GraphState[VertexT]:
         """
         Return a clone holding the `lattice_constants`.
 
