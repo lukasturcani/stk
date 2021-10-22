@@ -30,12 +30,13 @@ __all__ = (
 )
 
 _T = typing.TypeVar('_T', bound='ConstructionState')
-_V = typing.TypeVar('_V', bound=Vertex)
+#: A type variable matching any :class:`.Vertex`.
+V = typing.TypeVar('V', bound=Vertex)
 
 _LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 
-class ConstructionState(typing.Generic[_V]):
+class ConstructionState(typing.Generic[V]):
     """
     The state of the molecule and topology graph under construction.
 
@@ -43,7 +44,7 @@ class ConstructionState(typing.Generic[_V]):
 
     def __init__(
         self,
-        building_block_vertices: dict[BuildingBlock, tuple[_V, ...]],
+        building_block_vertices: dict[BuildingBlock, tuple[V, ...]],
         edges: tuple[Edge, ...],
         lattice_constants: typing.Optional[_LatticeConstants] = None,
     ) -> None:
@@ -93,7 +94,7 @@ class ConstructionState(typing.Generic[_V]):
 
     def _with_placement_results(
         self: _T,
-        vertices: tuple[_V, ...],
+        vertices: tuple[V, ...],
         edges: abc.Iterable[abc.Sequence[Edge]],
         building_blocks: tuple[BuildingBlock, ...],
         results: abc.Iterable[PlacementResult],
@@ -189,7 +190,7 @@ class ConstructionState(typing.Generic[_V]):
     def get_vertices(
         self,
         vertex_ids: abc.Iterable[int],
-    ) -> abc.Iterator[_V]:
+    ) -> abc.Iterator[V]:
         """
         Get some vertices.
 
