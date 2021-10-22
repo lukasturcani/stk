@@ -1227,6 +1227,13 @@ class Cage(TopologyGraph):
     def clone(self) -> Cage:
         return self._clone()
 
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock],
+    ) -> Cage:
+
+        return self._clone()._with_building_blocks(building_block_map)
+
     @classmethod
     def _get_vertices(
         cls,
