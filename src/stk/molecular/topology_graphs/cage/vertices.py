@@ -178,6 +178,12 @@ class CageVertex(Vertex):
 
         return self._aligner_edge
 
+    def with_position(
+        self,
+        position: np.ndarray,
+    ) -> CageVertex:
+        return self._clone()._with_position(position)
+
     def __str__(self) -> str:
         return (
             f'Vertex(id={self._id}, '

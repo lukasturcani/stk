@@ -24,7 +24,7 @@ __all__ = (
 _T = typing.TypeVar('_T', bound='CageConstructionState')
 
 
-class CageConstructionState(ConstructionState):
+class CageConstructionState(ConstructionState[CageVertex]):
     """
     The construction state of a :class:`.Cage`.
 
@@ -36,7 +36,7 @@ class CageConstructionState(ConstructionState):
     def __init__(
         self,
         building_block_vertices:
-            dict[BuildingBlock, tuple[Vertex, ...]],
+            dict[BuildingBlock, tuple[CageVertex, ...]],
         edges: tuple[Edge, ...],
         num_placement_stages: int,
         vertex_degrees: dict[int, int],
@@ -244,7 +244,7 @@ class CageConstructionState(ConstructionState):
             if neighbor.use_neighbor_placement():
                 yield neighbor_id, edge.get_id()
 
-    def _get_new_vertices(self) -> abc.Iterator[Vertex]:
+    def _get_new_vertices(self) -> abc.Iterator[CageVertex]:
         """
         Yield the vertices once new positions have been added.
 
@@ -255,18 +255,22 @@ class CageConstructionState(ConstructionState):
         """
 
         for vertex_id, vertex in enumerate(
-            self._graph_state.get_vertices()
+            self._graph_state.get_vertices(),
         ):
             if (
                 len(self._neighbor_positions.get(vertex_id, []))
                 == self._vertex_degrees[vertex_id]
             ):
-                yield vertex.with_position(
-                    position=(
-                        sum(self._neighbor_positions[vertex_id])
-                        / len(self._neighbor_positions[vertex_id])
-                    ),
+
+                neighbor_positions = self._neighbor_positions[
+                    vertex_id
+                ]
+                position: np.ndarray = (
+                    # I'm sure this is a ndarray.
+                    sum(neighbor_positions)  # type: ignore
+                    / len(neighbor_positions)
                 )
+                yield vertex.with_position(position)
             else:
                 yield vertex
 
