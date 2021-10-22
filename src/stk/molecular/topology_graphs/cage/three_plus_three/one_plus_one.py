@@ -251,11 +251,11 @@ class OnePlusOne(Cage):
     _num_windows = 3
     _num_window_types = 1
 
-    def clone(self) -> OnePlusOneVertex:
+    def clone(self) -> OnePlusOne:
         return self._clone()
 
     def with_building_blocks(
         self,
         building_block_map: dict[BuildingBlock, BuildingBlock]
-    ) -> OnePlusOneVertex:
+    ) -> OnePlusOne:
         return self._clone()._with_building_blocks(building_block_map)
