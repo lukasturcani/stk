@@ -4,9 +4,12 @@ M4L8
 
 """
 
+from __future__ import annotations
+
 from ..cage import Cage
 from ..vertices import NonLinearVertex, LinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M4L8(Cage):
@@ -194,3 +197,12 @@ class M4L8(Cage):
 
     _num_windows = 2
     _num_window_types = 1
+
+    def clone(self) -> M4L8:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M4L8:
+        return self._clone()._with_building_blocks(building_block_map)

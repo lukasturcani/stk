@@ -4,9 +4,12 @@ M12L24
 
 """
 
+from __future__ import annotations
+
 from ..cage import Cage
 from ..vertices import NonLinearVertex, LinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M12L24(Cage):
@@ -197,3 +200,12 @@ class M12L24(Cage):
 
     _num_windows = 14
     _num_window_types = 2
+
+    def clone(self) -> M12L24:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock],
+    ) -> M12L24:
+        return self._clone()._with_building_blocks(building_block_map)

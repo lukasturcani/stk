@@ -4,9 +4,12 @@ M8L6 Cube
 
 """
 
+from __future__ import annotations
+
 from ..cage import Cage
 from ..vertices import NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M8L6Cube(Cage):
@@ -263,3 +266,12 @@ class M8L6Cube(Cage):
 
     _num_windows = 4
     _num_window_types = 1
+
+    def clone(self) -> M8L6Cube:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M8L6Cube:
+        return self._clone()._with_building_blocks(building_block_map)

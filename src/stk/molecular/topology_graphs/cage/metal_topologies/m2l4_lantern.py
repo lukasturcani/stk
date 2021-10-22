@@ -4,9 +4,12 @@ M2L4 Lantern
 
 """
 
+from __future__ import annotations
+
 from ..cage import Cage
 from ..vertices import NonLinearVertex, LinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M2L4Lantern(Cage):
@@ -175,3 +178,12 @@ class M2L4Lantern(Cage):
 
     _num_windows = 4
     _num_window_types = 1
+
+    def clone(self) -> M2L4Lantern:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M2L4Lantern:
+        return self._clone()._with_building_blocks(building_block_map)

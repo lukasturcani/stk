@@ -4,11 +4,14 @@ M4L6 Tetrahedron with Spacer
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex, LinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M4L6TetrahedronSpacer(Cage):
@@ -239,3 +242,12 @@ class M4L6TetrahedronSpacer(Cage):
 
     _num_windows = 4
     _num_window_types = 1
+
+    def clone(self) -> M4L6TetrahedronSpacer:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M4L6TetrahedronSpacer:
+        return self._clone()._with_building_blocks(building_block_map)

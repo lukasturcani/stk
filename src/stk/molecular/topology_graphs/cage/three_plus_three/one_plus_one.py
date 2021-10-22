@@ -6,6 +6,8 @@ One Plus One
 
 from __future__ import annotations
 
+from __future__ import annotations
+
 import typing
 import numpy as np
 from collections import abc
@@ -248,3 +250,12 @@ class OnePlusOne(Cage):
 
     _num_windows = 3
     _num_window_types = 1
+
+    def clone(self) -> OnePlusOneVertex:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> OnePlusOneVertex:
+        return self._clone()._with_building_blocks(building_block_map)

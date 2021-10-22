@@ -4,11 +4,14 @@ M4L4 Tetrahedron
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M4L4Tetrahedron(Cage):
@@ -211,3 +214,12 @@ class M4L4Tetrahedron(Cage):
 
     _num_windows = 4
     _num_window_types = 1
+
+    def clone(self) -> M4L4Tetrahedron:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M4L4Tetrahedron:
+        return self._clone()._with_building_blocks(building_block_map)

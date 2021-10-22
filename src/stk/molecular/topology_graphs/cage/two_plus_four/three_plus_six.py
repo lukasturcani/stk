@@ -4,11 +4,14 @@ Three Plus Six
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class ThreePlusSix(Cage):
@@ -152,3 +155,12 @@ class ThreePlusSix(Cage):
 
     _num_windows = 5
     _num_window_types = 2
+
+    def clone(self) -> ThreePlusSix:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> ThreePlusSix:
+        return self._clone()._with_building_blocks(building_block_map)

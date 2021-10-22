@@ -4,11 +4,14 @@ Five Plus Ten
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class FivePlusTen(Cage):
@@ -173,3 +176,12 @@ class FivePlusTen(Cage):
 
     _num_windows = 7
     _num_window_types = 2
+
+    def clone(self) -> FivePlusTen:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> FivePlusTen:
+        return self._clone()._with_building_blocks(building_block_map)

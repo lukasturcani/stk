@@ -4,6 +4,8 @@ M3L3 Triangle
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 import typing
 
@@ -291,3 +293,12 @@ class M3L3Triangle(Cage):
 
     _num_windows = 1
     _num_window_types = 1
+
+    def clone(self) -> M3L3Triangle:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M3L3Triangle:
+        return self._clone()._with_building_blocks(building_block_map)

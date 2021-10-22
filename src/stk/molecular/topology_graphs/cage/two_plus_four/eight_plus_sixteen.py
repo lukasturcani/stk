@@ -4,11 +4,14 @@ Eight Plus Sixteen
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class EightPlusSixteen(Cage):
@@ -297,3 +300,12 @@ class EightPlusSixteen(Cage):
 
     _num_windows = 10
     _num_window_types = 2
+
+    def clone(self) -> EightPlusSixteen:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> EightPlusSixteen:
+        return self._clone()._with_building_blocks(building_block_map)

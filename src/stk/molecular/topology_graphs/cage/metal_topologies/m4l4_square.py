@@ -4,6 +4,8 @@ M4L4 Square
 
 """
 
+from __future__ import annotations
+
 import typing
 from collections import abc
 
@@ -11,11 +13,11 @@ from ..cage import Cage
 from ..vertices import LinearVertex, AngledVertex
 from ...topology_graph import NullOptimizer, Optimizer
 from ....edge import Edge
+from ....building_block import BuildingBlock
 from ....reaction_factories import (
     ReactionFactory,
     GenericReactionFactory,
 )
-from ....building_block import BuildingBlock
 
 
 class M4L4Square(Cage):
@@ -269,3 +271,12 @@ class M4L4Square(Cage):
 
     _num_windows = 1
     _num_window_types = 1
+
+    def clone(self) -> M4L4Square:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M4L4Square:
+        return self._clone()._with_building_blocks(building_block_map)

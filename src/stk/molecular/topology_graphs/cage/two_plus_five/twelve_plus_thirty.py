@@ -4,11 +4,14 @@ Twelve Plus Thirty
 
 """
 
+from __future__ import annotations
+
 from scipy.constants import golden
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class TwelvePlusThirty(Cage):
@@ -422,3 +425,12 @@ class TwelvePlusThirty(Cage):
 
     _num_windows = 20
     _num_window_types = 1
+
+    def clone(self) -> TwelvePlusThirty:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> TwelvePlusThirty:
+        return self._clone()._with_building_blocks(building_block_map)

@@ -4,11 +4,14 @@ M6L2L3 Prism
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class M6L2L3Prism(Cage):
@@ -338,3 +341,12 @@ class M6L2L3Prism(Cage):
 
     _num_windows = 4
     _num_window_types = 1
+
+    def clone(self) -> M6L2L3Prism:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> M6L2L3Prism:
+        return self._clone()._with_building_blocks(building_block_map)

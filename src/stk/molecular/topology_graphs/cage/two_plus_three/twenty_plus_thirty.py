@@ -4,11 +4,14 @@ Twenty Plus Thirty
 
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class TwentyPlusThirty(Cage):
@@ -388,3 +391,12 @@ class TwentyPlusThirty(Cage):
 
     _num_windows = 12
     _num_window_types = 1
+
+    def clone(self) -> TwentyPlusThirty:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> TwentyPlusThirty:
+        return self._clone()._with_building_blocks(building_block_map)

@@ -4,9 +4,12 @@ Ten Plus Twenty
 
 """
 
+from __future__ import annotations
+
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class TenPlusTwenty(Cage):
@@ -327,3 +330,12 @@ class TenPlusTwenty(Cage):
 
     _num_windows = 12
     _num_window_types = 2
+
+    def clone(self) -> TenPlusTwenty:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> TenPlusTwenty:
+        return self._clone()._with_building_blocks(building_block_map)

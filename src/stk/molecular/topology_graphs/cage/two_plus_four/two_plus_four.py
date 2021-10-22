@@ -4,9 +4,12 @@ Two Plus Four
 
 """
 
+from __future__ import annotations
+
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 from ....edge import Edge
+from ....building_block import BuildingBlock
 
 
 class TwoPlusFour(Cage):
@@ -134,3 +137,12 @@ class TwoPlusFour(Cage):
 
     _num_windows = 4
     _num_window_types = 1
+
+    def clone(self) -> TwoPlusFour:
+        return self._clone()
+
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock]
+    ) -> TwoPlusFour:
+        return self._clone()._with_building_blocks(building_block_map)
