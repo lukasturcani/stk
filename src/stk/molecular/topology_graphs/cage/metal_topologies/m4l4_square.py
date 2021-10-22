@@ -177,7 +177,8 @@ class M4L4Square(Cage):
             corners:
                 Can be a :class:`dict` which maps the
                 :class:`.BuildingBlock` instances to the ids of the
-                vertices it should be placed on.
+                vertices it should be placed on. Valid ids are 0,
+                1, 2, 3 and 4.
 
                 Can also be a :class:`.BuildingBlock` instance, which
                 should be placed on all corner vertices on the topology
@@ -186,7 +187,8 @@ class M4L4Square(Cage):
             linkers:
                 Can be a :class:`dict` which maps the
                 :class:`.BuildingBlock` instances to the ids of the
-                vertices it should be placed on.
+                vertices it should be placed on. Valid ids are 4, 5,
+                6 and 7.
 
                 Can also be a :class:`.BuildingBlock` instance, which
                 should be placed on all linker vertices on the topology
