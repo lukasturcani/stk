@@ -18,10 +18,38 @@ __all__ = (
 
 
 class IVertex(typing.Protocol):
+    """
+    The :class:`.Vertex` interface used by :class:`.Edge`.
+
+    Notes:
+
+        This interface exists to prevent circular dependencies between
+        :class:`.Vertex` and :class:`.Edge`.
+
+    """
+
     def get_position(self) -> np.ndarray:
+        """
+        Get the position of the vertex.
+
+        Returns:
+
+            The position of the vertex.
+
+        """
+
         pass
 
     def get_id(self) -> int:
+        """
+        Get the id of the vertex.
+
+        Returns:
+
+            The id of the vertex.
+
+        """
+
         pass
 
 
