@@ -5,7 +5,6 @@ Reactions Summary
 """
 
 from collections import abc
-from typing import NamedTuple
 import numpy as np
 
 from .atom_batch import AtomBatch
@@ -23,22 +22,37 @@ __all__ = (
 )
 
 
-class BondId(NamedTuple):
+class BondId:
     """
     Identifies a bond in a molecule.
 
-    Attributes:
-
-        atom1_id:
-            The id of the first :class:`.Atom` in the bond.
-
-        atom2_id:
-            The id of the second :class:`.Atom` in the bond.
-
     """
 
-    atom1_id: int
-    atom2_id: int
+    __slots__ = (
+        'atom1_id',
+        'atom2_id',
+    )
+
+    def __init__(
+        self,
+        atom1_id: int,
+        atom2_id: int,
+    ) -> None:
+        """
+        Initialize a :class:`.BondId` instance.
+
+        Parameters:
+
+            atom1_id:
+                The id of the first :class:`.Atom` in the bond.
+
+            atom2_id:
+                The id of the second :class:`.Atom` in the bond.
+
+        """
+
+        self.atom1_id = atom1_id
+        self.atom2_id = atom2_id
 
 
 class ReactionsSummary:
