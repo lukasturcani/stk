@@ -184,6 +184,12 @@ class CageVertex(Vertex):
     ) -> CageVertex:
         return self._clone()._with_position(position)
 
+    def with_scale(
+        self,
+        scale: typing.Union[float, tuple[float, float, float]],
+    ) -> CageVertex:
+        return self._clone()._with_scale(scale)
+
     def __str__(self) -> str:
         return (
             f'Vertex(id={self._id}, '
