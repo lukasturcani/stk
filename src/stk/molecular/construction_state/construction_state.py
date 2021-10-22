@@ -360,8 +360,8 @@ class ConstructionState(typing.Generic[VertexT]):
 
             lattice_constants:
                 The lattice constants of the clone. Requires 3 arrays
-                of size``(3, )``, or ``None`` if the topology graph is
-                not periodic.
+                with shape of ``(3, )``, or ``None`` if the topology
+                graph is not periodic.
 
         Returns:
 

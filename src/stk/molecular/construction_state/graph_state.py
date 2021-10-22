@@ -24,10 +24,12 @@ __all__ = (
 _LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 _T = typing.TypeVar('_T', bound='GraphState')
-_V = typing.TypeVar('_V', bound=Vertex)
+
+#: A type variable matching any :class:`.Vertex`.
+VertexT = typing.TypeVar('VertexT', bound=Vertex)
 
 
-class GraphState(typing.Generic[_V]):
+class GraphState(typing.Generic[VertexT]):
     """
     The topology graph of a molecule under construction.
 
@@ -44,7 +46,8 @@ class GraphState(typing.Generic[_V]):
 
     def __init__(
         self,
-        building_block_vertices: dict[BuildingBlock, tuple[_V, ...]],
+        building_block_vertices:
+            dict[BuildingBlock, tuple[VertexT, ...]],
         edges: tuple[Edge, ...],
         lattice_constants: typing.Optional[_LatticeConstants] = None,
     ) -> None:
@@ -179,7 +182,7 @@ class GraphState(typing.Generic[_V]):
         )
         return edge.with_position(position)
 
-    def clone(self) -> GraphState[_V]:
+    def clone(self) -> GraphState[VertexT]:
         """
         Get a clone.
 
@@ -232,7 +235,7 @@ class GraphState(typing.Generic[_V]):
     def get_vertices(
         self,
         vertex_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> abc.Iterator[_V]:
+    ) -> abc.Iterator[VertexT]:
         """
         Yield the topology graph vertices.
 
@@ -335,7 +338,7 @@ class GraphState(typing.Generic[_V]):
 
     def _with_vertices(
         self: _T,
-        vertices: abc.Iterable[_V],
+        vertices: abc.Iterable[VertexT],
     ) -> _T:
         """
         Modify the instance.
@@ -349,7 +352,7 @@ class GraphState(typing.Generic[_V]):
 
     def with_vertices(
         self,
-        vertices: abc.Iterable[_V],
+        vertices: abc.Iterable[VertexT],
     ) -> GraphState:
         """
         Returns a clone holding `vertices`.
