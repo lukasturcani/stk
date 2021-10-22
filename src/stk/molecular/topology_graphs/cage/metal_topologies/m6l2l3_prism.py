@@ -247,96 +247,24 @@ class M6L2L3Prism(Cage):
     )
 
     _edge_prototypes = (
-        Edge(
-            id=0,
-            vertex1=_vertex_prototypes[0],
-            vertex2=_vertex_prototypes[6],
-        ),
-        Edge(
-            id=1,
-            vertex1=_vertex_prototypes[0],
-            vertex2=_vertex_prototypes[8],
-        ),
-        Edge(
-            id=2,
-            vertex1=_vertex_prototypes[0],
-            vertex2=_vertex_prototypes[10],
-        ),
-        Edge(
-            id=3,
-            vertex1=_vertex_prototypes[1],
-            vertex2=_vertex_prototypes[6],
-        ),
-        Edge(
-            id=4,
-            vertex1=_vertex_prototypes[1],
-            vertex2=_vertex_prototypes[8],
-        ),
-        Edge(
-            id=5,
-            vertex1=_vertex_prototypes[1],
-            vertex2=_vertex_prototypes[9],
-        ),
-        Edge(
-            id=6,
-            vertex1=_vertex_prototypes[2],
-            vertex2=_vertex_prototypes[6],
-        ),
-        Edge(
-            id=7,
-            vertex1=_vertex_prototypes[2],
-            vertex2=_vertex_prototypes[9],
-        ),
-        Edge(
-            id=8,
-            vertex1=_vertex_prototypes[2],
-            vertex2=_vertex_prototypes[10],
-        ),
-        Edge(
-            id=9,
-            vertex1=_vertex_prototypes[3],
-            vertex2=_vertex_prototypes[7],
-        ),
-        Edge(
-            id=10,
-            vertex1=_vertex_prototypes[3],
-            vertex2=_vertex_prototypes[8],
-        ),
-        Edge(
-            id=11,
-            vertex1=_vertex_prototypes[3],
-            vertex2=_vertex_prototypes[10],
-        ),
-        Edge(
-            id=12,
-            vertex1=_vertex_prototypes[4],
-            vertex2=_vertex_prototypes[7],
-        ),
-        Edge(
-            id=13,
-            vertex1=_vertex_prototypes[4],
-            vertex2=_vertex_prototypes[8],
-        ),
-        Edge(
-            id=14,
-            vertex1=_vertex_prototypes[4],
-            vertex2=_vertex_prototypes[9],
-        ),
-        Edge(
-            id=15,
-            vertex1=_vertex_prototypes[5],
-            vertex2=_vertex_prototypes[7],
-        ),
-        Edge(
-            id=16,
-            vertex1=_vertex_prototypes[5],
-            vertex2=_vertex_prototypes[9],
-        ),
-        Edge(
-            id=17,
-            vertex1=_vertex_prototypes[5],
-            vertex2=_vertex_prototypes[10],
-        ),
+        Edge(0, _vertex_prototypes[0], _vertex_prototypes[6]),
+        Edge(1, _vertex_prototypes[0], _vertex_prototypes[8]),
+        Edge(2, _vertex_prototypes[0], _vertex_prototypes[10]),
+        Edge(3, _vertex_prototypes[1], _vertex_prototypes[6]),
+        Edge(4, _vertex_prototypes[1], _vertex_prototypes[8]),
+        Edge(5, _vertex_prototypes[1], _vertex_prototypes[9]),
+        Edge(6, _vertex_prototypes[2], _vertex_prototypes[6]),
+        Edge(7, _vertex_prototypes[2], _vertex_prototypes[9]),
+        Edge(8, _vertex_prototypes[2], _vertex_prototypes[10]),
+        Edge(9, _vertex_prototypes[3], _vertex_prototypes[7]),
+        Edge(10, _vertex_prototypes[3], _vertex_prototypes[8]),
+        Edge(11, _vertex_prototypes[3], _vertex_prototypes[10]),
+        Edge(12, _vertex_prototypes[4], _vertex_prototypes[7]),
+        Edge(13, _vertex_prototypes[4], _vertex_prototypes[8]),
+        Edge(14, _vertex_prototypes[4], _vertex_prototypes[9]),
+        Edge(15, _vertex_prototypes[5], _vertex_prototypes[7]),
+        Edge(16, _vertex_prototypes[5], _vertex_prototypes[9]),
+        Edge(17, _vertex_prototypes[5], _vertex_prototypes[10]),
     )
 
     _num_windows = 4
