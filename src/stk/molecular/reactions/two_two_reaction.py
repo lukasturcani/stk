@@ -33,6 +33,16 @@ class IConstructionState(typing.Protocol):
     """
 
     def get_position_matrix(self) -> np.ndarray:
+        """
+        Get the position matrix of the molecule being constructed.
+
+        Returns:
+
+            The position matrix of the molecule being constructed.
+            Has the shape ``(n, 3)``.
+
+        """
+
         pass
 
 
