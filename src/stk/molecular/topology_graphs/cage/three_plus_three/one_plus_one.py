@@ -18,6 +18,11 @@ from ....building_block import BuildingBlock
 
 
 class OnePlusOneVertex(NonLinearVertex):
+    """
+    A vertex for the :class:`.OnePlusOne` cage topology graph.
+
+    """
+
     def __init__(
         self,
         id: int,
@@ -29,6 +34,30 @@ class OnePlusOneVertex(NonLinearVertex):
         use_neighbor_placement: bool = True,
         aligner_edge: int = 0,
     ) -> None:
+        """
+        Initialize a :class:`.OnePlusOneVertex`.
+
+        Parameters:
+
+            position:
+                The position of the vertex.
+
+            edge_normal:
+                The vector normal to the plane of edges which
+                are connected to the vertex.
+
+            use_neighbor_placement:
+                If ``True``, the position of the vertex will be updated
+                based on the neighboring functional groups.
+
+            aligner_edge:
+                The edge which is used to align the
+                :class:`.BuildingBlock` placed on the vertex. The first
+                :class:`.FunctionalGroup` is rotated such that it lies
+                exactly on this :class:`.Edge`. Must be between ``0``
+                and the number of edges the vertex is connected to.
+
+        """
 
         super().__init__(
             id=id,

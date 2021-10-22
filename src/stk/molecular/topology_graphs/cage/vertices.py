@@ -55,17 +55,17 @@ class CageVertex(Vertex):
 
         Parameters:
 
-            id : :class:`int`
+            id:
                 The id of the vertex.
 
-            position : :class:`tuple` of :class:`float`
+            position:
                 The position of the vertex.
 
-            use_neighbor_placement : :class:`bool`, optional
+            use_neighbor_placement:
                 If ``True``, the position of the vertex will be updated
                 based on the neighboring functional groups.
 
-            aligner_edge : :class:`int`, optional
+            aligner_edge:
                 The edge which is used to align the
                 :class:`.BuildingBlock` placed on the vertex. The first
                 :class:`.FunctionalGroup` is rotated such that it lies
