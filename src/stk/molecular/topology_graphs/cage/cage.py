@@ -1065,7 +1065,7 @@ class Cage(TopologyGraph):
                 valid number of functional groups.
 
             :class:`ValueError`:
-                If the there are multiple building blocks with the
+                If there are multiple building blocks with the
                 same number of functional_groups in `building_blocks`,
                 and they are not explicitly assigned to vertices. The
                 desired placement of building blocks is ambiguous in
