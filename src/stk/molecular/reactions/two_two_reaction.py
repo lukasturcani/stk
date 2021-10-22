@@ -16,14 +16,24 @@ from ..atom import Atom
 from ..bond import Bond
 
 
-class _IConstructionState(typing.Protocol):
-    def get_position_matrix(self) -> np.ndarray:
-        pass
-
-
 __all__ = (
     'TwoTwoReaction',
 )
+
+
+class IConstructionState(typing.Protocol):
+    """
+    An interface for :class:`.ConstructionState`.
+
+    Notes:
+
+        This interface exists to prevent circular dependencies between
+        :class:`.TwoTwoReaction` and :class:`.ConstructionState`.
+
+    """
+
+    def get_position_matrix(self) -> np.ndarray:
+        pass
 
 
 class TwoTwoReaction(Reaction):
@@ -38,7 +48,7 @@ class TwoTwoReaction(Reaction):
 
     def __init__(
         self,
-        construction_state: _IConstructionState,
+        construction_state: IConstructionState,
         functional_group1: GenericFunctionalGroup,
         functional_group2: GenericFunctionalGroup,
         bond_order: int,
