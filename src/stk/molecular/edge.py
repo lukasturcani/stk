@@ -9,48 +9,12 @@ from __future__ import annotations
 from collections import abc
 import typing
 import numpy as np
+import stk
 
 
 __all__ = (
     'Edge',
-    'IVertex',
 )
-
-
-class IVertex(typing.Protocol):
-    """
-    The :class:`.Vertex` interface used by :class:`.Edge`.
-
-    Notes:
-
-        This interface exists to prevent circular dependencies between
-        :class:`.Vertex` and :class:`.Edge`.
-
-    """
-
-    def get_position(self) -> np.ndarray:
-        """
-        Get the position of the vertex.
-
-        Returns:
-
-            The position of the vertex.
-
-        """
-
-        pass
-
-    def get_id(self) -> int:
-        """
-        Get the id of the vertex.
-
-        Returns:
-
-            The id of the vertex.
-
-        """
-
-        pass
 
 
 _T = typing.TypeVar('_T', bound='Edge')
@@ -65,8 +29,8 @@ class Edge:
     def __init__(
         self,
         id: int,
-        vertex1: IVertex,
-        vertex2: IVertex,
+        vertex1: stk.Vertex,
+        vertex2: stk.Vertex,
         periodicity: tuple[int, int, int] = (0, 0, 0),
         position: typing.Optional[np.ndarray] = None,
     ) -> None:

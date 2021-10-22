@@ -4,12 +4,13 @@ Two-Two Reaction
 
 """
 
+from __future__ import annotations
+
 from collections import abc
 import itertools as it
 from scipy.spatial.distance import euclidean
-import typing
-import numpy as np
 
+import stk
 from .reaction import Reaction, NewAtom
 from ..functional_groups import GenericFunctionalGroup
 from ..atom import Atom
@@ -19,31 +20,6 @@ from ..bond import Bond
 __all__ = (
     'TwoTwoReaction',
 )
-
-
-class IConstructionState(typing.Protocol):
-    """
-    An interface for :class:`.ConstructionState`.
-
-    Notes:
-
-        This interface exists to prevent circular dependencies between
-        :class:`.TwoTwoReaction` and :class:`.ConstructionState`.
-
-    """
-
-    def get_position_matrix(self) -> np.ndarray:
-        """
-        Get the position matrix of the molecule being constructed.
-
-        Returns:
-
-            The position matrix of the molecule being constructed.
-            Has the shape ``(n, 3)``.
-
-        """
-
-        pass
 
 
 class TwoTwoReaction(Reaction):
@@ -58,7 +34,7 @@ class TwoTwoReaction(Reaction):
 
     def __init__(
         self,
-        construction_state: IConstructionState,
+        construction_state: stk.ConstructionState,
         functional_group1: GenericFunctionalGroup,
         functional_group2: GenericFunctionalGroup,
         bond_order: int,
