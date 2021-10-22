@@ -39,6 +39,9 @@ class OnePlusOneVertex(NonLinearVertex):
 
         Parameters:
 
+            id:
+                The id of the vertex.
+
             position:
                 The position of the vertex.
 
