@@ -6,8 +6,6 @@ One Plus One
 
 from __future__ import annotations
 
-from __future__ import annotations
-
 import typing
 import numpy as np
 from collections import abc
@@ -17,6 +15,9 @@ from ..vertices import NonLinearVertex
 from ..cage import Cage
 from ....edge import Edge
 from ....building_block import BuildingBlock
+
+
+_T = typing.TypeVar('_T', bound='OnePlusOneVertex')
 
 
 class OnePlusOneVertex(NonLinearVertex):
@@ -72,10 +73,13 @@ class OnePlusOneVertex(NonLinearVertex):
         )
         self._edge_normal = np.array(edge_normal, dtype=np.float64)
 
-    def clone(self) -> OnePlusOneVertex:
+    def _clone(self: _T) -> _T:
         clone = super()._clone()
         clone._edge_normal = np.array(self._edge_normal)
         return clone
+
+    def clone(self) -> OnePlusOneVertex:
+        return self._clone()
 
     def place_building_block(
         self,
