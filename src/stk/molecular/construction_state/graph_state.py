@@ -400,7 +400,7 @@ class GraphState(typing.Generic[VertexT]):
 
             lattice_constants:
                 The lattice constants of the clone. Requires 3 arrays
-                of size``(3, )``.
+                with the shape of ``(3, )``.
 
         Returns:
 
