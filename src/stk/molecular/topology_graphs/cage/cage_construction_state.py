@@ -37,12 +37,12 @@ class CageConstructionState(ConstructionState):
         self,
         building_block_vertices:
             dict[BuildingBlock, tuple[Vertex, ...]],
-            edges: tuple[Edge, ...],
+        edges: tuple[Edge, ...],
         num_placement_stages: int,
         vertex_degrees: dict[int, int],
     ) -> None:
         """
-        Initialize a :class:`._CageConstructionState` instance.
+        Initialize a :class:`.CageConstructionState` instance.
 
         Parameters:
 
