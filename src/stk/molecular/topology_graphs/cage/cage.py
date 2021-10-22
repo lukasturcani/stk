@@ -1005,7 +1005,7 @@ class Cage(TopologyGraph):
         self,
         building_blocks: typing.Union[
             typing.Iterable[BuildingBlock],
-            dict[BuildingBlock, abc.Iterable[int]]
+            dict[BuildingBlock, OneOrMany[int]]
         ],
         vertex_alignments: typing.Optional[dict[int, int]] = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
@@ -1018,16 +1018,19 @@ class Cage(TopologyGraph):
         Parameters:
 
             building_blocks:
-                Can be an :class:`~collections.abc.Iterable` of
-                :class:`.BuildingBlock` instances, which should be
-                placed on the topology graph.
+                Can have one of the following two forms
 
-                Can also be a :class:`dict` which maps the
-                :class:`.BuildingBlock` instances to the ids of the
-                vertices it should be placed on. A :class:`dict` is
-                required when there are multiple building blocks with
-                the same number of functional groups, because in this
-                case the desired placement is ambiguous.
+                    * A list of building blocks to be placed on the
+                      vertices of the topology graph.
+
+                    * A :class:`dict` mapping building blocks to either
+                      an :class:`int` or list of :class:`int`. The
+                      :class:`int` is the id of the vertex on which
+                      the :class:`.BuildingBlock` should be placed.
+                      This form is required when there are multiple
+                      building blocks with the same number of
+                      functional groups, because in this case the
+                      desired placement is ambiguous.
 
             vertex_alignments:
                 A mapping from the id of a :class:`.Vertex`

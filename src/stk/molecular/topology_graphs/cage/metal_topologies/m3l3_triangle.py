@@ -6,8 +6,8 @@ M3L3 Triangle
 
 import numpy as np
 import typing
-from collections import abc
 
+from stk.utilities.typing import OneOrMany
 from ..cage import Cage
 from ..vertices import LinearVertex, AngledVertex
 from ...topology_graph import NullOptimizer, Optimizer
@@ -157,11 +157,11 @@ class M3L3Triangle(Cage):
         self,
         corners: typing.Union[
             BuildingBlock,
-            dict[BuildingBlock, abc.Iterable[int]]
+            dict[BuildingBlock, OneOrMany[int]]
         ],
         linkers: typing.Union[
             BuildingBlock,
-            dict[BuildingBlock, abc.Iterable[int]]
+            dict[BuildingBlock, OneOrMany[int]]
         ],
         vertex_alignments: typing.Optional[dict[int, int]] = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
