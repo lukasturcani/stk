@@ -282,8 +282,8 @@ class PlacementsSummary:
 
         Yields:
 
-            Holds the edge id as the first element, and a
-            sequence of :class:`.FunctionalGroup` instances
+            A :class:`tuple` holding the edge id as the first element,
+            and a sequence of :class:`.FunctionalGroup` instances
             as the second element.
 
         """
