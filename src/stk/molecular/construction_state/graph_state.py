@@ -52,7 +52,7 @@ class GraphState(typing.Generic[VertexT]):
         lattice_constants: typing.Optional[_LatticeConstants] = None,
     ) -> None:
         """
-        Initialize a :class:`._GraphState` instance.
+        Initialize a :class:`.GraphState` instance.
 
         Parameters:
 
