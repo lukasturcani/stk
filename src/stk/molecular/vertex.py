@@ -225,8 +225,8 @@ class Vertex:
                 The building block which is needs to have functional
                 groups assigned to edges.
 
-        edges:
-            The edges to which the vertex is attached.
+            edges:
+                The edges to which the vertex is attached.
 
         Returns:
 
