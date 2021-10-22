@@ -69,7 +69,7 @@ class PlacementsSummary:
                 The building blocks which were placed.
 
             placement_results:
-                Holds a :class:`PlacementResult` instance for each
+                Holds a :class:`.PlacementResult` instance for each
                 building block in `building_blocks`.
 
             num_atoms:
