@@ -1018,9 +1018,9 @@ class Cage(TopologyGraph):
         Parameters:
 
             building_blocks:
-                Can be a :class:`iterable` of :class:`.BuildingBlock`
-                instances, which should be placed on the topology
-                graph.
+                Can be an :class:`~collections.abc.Iterable` of
+                :class:`.BuildingBlock` instances, which should be
+                placed on the topology graph.
 
                 Can also be a :class:`dict` which maps the
                 :class:`.BuildingBlock` instances to the ids of the
