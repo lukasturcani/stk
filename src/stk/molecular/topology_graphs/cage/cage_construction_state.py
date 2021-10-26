@@ -12,7 +12,6 @@ import numpy as np
 
 from .vertices import CageVertex
 from ...building_block import BuildingBlock
-from ...vertex import Vertex
 from ...edge import Edge
 from ...placement_result import PlacementResult
 from ...construction_state import ConstructionState
