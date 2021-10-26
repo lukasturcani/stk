@@ -144,25 +144,7 @@ __all__ = (
 _T = typing.TypeVar('_T', bound='Cage')
 
 
-class UnoccupiedVertexError(Exception):
-    """
-    When a cage vertex is not occupied by a building block.
-
-    """
-
-    pass
-
-
-class OverlyOccupiedVertexError(Exception):
-    """
-    When a cage vertex is occupied by more than one building block.
-
-    """
-
-    pass
-
-
-class Cage(TopologyGraph):
+class Cage(TopologyGraph[CageVertex]):
     """
     Represents a cage topology graph.
 
@@ -920,9 +902,11 @@ class Cage(TopologyGraph):
             )
 
             metal_complex = stk.ConstructedMolecule(
-                topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
-                    metals=metal_atom,
-                    ligands=ligand,
+                topology_graph=(
+                    stk.metal_complex.CisProtectedSquarePlanar(
+                        metals=metal_atom,
+                        ligands=ligand,
+                    )
                 ),
             )
 
@@ -1357,7 +1341,7 @@ class Cage(TopologyGraph):
     def _get_scale(
         self,
         building_block_vertices:
-            dict[BuildingBlock, tuple[Vertex, ...]],
+            dict[BuildingBlock, tuple[CageVertex, ...]],
     ) -> float:
         return max(
             bb.get_maximum_diameter()
@@ -1379,3 +1363,21 @@ class Cage(TopologyGraph):
             else ''
         )
         return f'cage.{self.__class__.__name__}({vertex_alignments})'
+
+
+class UnoccupiedVertexError(Exception):
+    """
+    When a cage vertex is not occupied by a building block.
+
+    """
+
+    pass
+
+
+class OverlyOccupiedVertexError(Exception):
+    """
+    When a cage vertex is occupied by more than one building block.
+
+    """
+
+    pass

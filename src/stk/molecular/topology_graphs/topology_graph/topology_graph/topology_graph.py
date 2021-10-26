@@ -30,10 +30,11 @@ __all__ = (
 
 _LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 _T = typing.TypeVar('_T', bound='TopologyGraph')
-_V = typing.TypeVar('_V', bound=Vertex)
+#: A type variable matching any :class:`.Vertex` subclass.
+VertexT = typing.TypeVar('VertexT', bound=Vertex)
 
 
-class TopologyGraph(typing.Generic[_V]):
+class TopologyGraph(typing.Generic[VertexT]):
     """
     An abstract base class for topology graphs.
 
@@ -161,7 +162,7 @@ class TopologyGraph(typing.Generic[_V]):
     def __init__(
         self,
         building_block_vertices:
-            dict[BuildingBlock, tuple[_V, ...]],
+            dict[BuildingBlock, tuple[VertexT, ...]],
         edges: tuple[Edge, ...],
         reaction_factory: ReactionFactory,
         construction_stages:
@@ -480,7 +481,7 @@ class TopologyGraph(typing.Generic[_V]):
     def _get_scale(
         self,
         building_block_vertices:
-            dict[BuildingBlock, tuple[_V, ...]],
+            dict[BuildingBlock, tuple[VertexT, ...]],
     ) -> float:
         """
         Get the scale, which should be applied to topology graph.

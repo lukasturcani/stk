@@ -19,7 +19,8 @@ __all__ = (
 )
 
 
-_T = typing.TypeVar('_T', bound='Vertex')
+#: A type variable matching any :class:`.Vertex` subclass.
+VertexT = typing.TypeVar('VertexT', bound='Vertex')
 
 
 class Vertex:
@@ -75,9 +76,9 @@ class Vertex:
         return self._id
 
     def _with_scale(
-        self: _T,
+        self: VertexT,
         scale: typing.Union[float, tuple[float, float, float]],
-    ) -> _T:
+    ) -> VertexT:
         """
         Modify the vertex.
 
@@ -87,9 +88,9 @@ class Vertex:
         return self
 
     def with_scale(
-        self,
+        self: VertexT,
         scale: typing.Union[float, tuple[float, float, float]],
-    ) -> Vertex:
+    ) -> VertexT:
         """
         Get a clone with a scaled position.
 
@@ -109,12 +110,12 @@ class Vertex:
 
         return self.clone()._with_scale(scale)
 
-    def _clone(self: _T) -> _T:
+    def _clone(self: VertexT) -> VertexT:
         clone = self.__class__.__new__(self.__class__)
         Vertex.__init__(clone, self._id, self._position)
         return clone
 
-    def clone(self) -> Vertex:
+    def clone(self: VertexT) -> VertexT:
         """
         Return a clone.
 
@@ -139,9 +140,9 @@ class Vertex:
         return np.array(self._position)
 
     def _with_position(
-        self: _T,
+        self: VertexT,
         position: np.ndarray,
-    ) -> _T:
+    ) -> VertexT:
         """
         Modify the vertex.
 
@@ -151,9 +152,9 @@ class Vertex:
         return self
 
     def with_position(
-        self,
+        self: VertexT,
         position: np.ndarray,
-    ) -> Vertex:
+    ) -> VertexT:
         """
         Get a clone at a certain position.
 

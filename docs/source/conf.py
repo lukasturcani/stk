@@ -62,7 +62,8 @@ def setup(app):
 
 add_module_names = False
 numpydoc_class_members_toctree = False
-autodoc_typehints = 'description'
+autodoc_typehints = 'none'
+autodoc_member_order = 'bysource'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
