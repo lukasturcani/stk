@@ -8,7 +8,7 @@ import numpy as np
 from collections import abc
 
 from ...edge import Edge
-from .sorter import Sorter, IHasPosition
+from .angle_sorter import AngleSorter
 
 
 __all__ = (
@@ -16,7 +16,7 @@ __all__ = (
 )
 
 
-class EdgeSorter(Sorter):
+class EdgeSorter(AngleSorter[Edge]):
     """
     Sorted edges according to their angle.
 
@@ -63,6 +63,6 @@ class EdgeSorter(Sorter):
 
     def _get_vector(
         self,
-        item: IHasPosition,
+        item: Edge,
     ) -> np.ndarray:
         return item.get_position() - self._edge_centroid

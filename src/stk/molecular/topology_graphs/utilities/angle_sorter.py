@@ -1,6 +1,6 @@
 """
-Sorter
-======
+Angle Sorter
+============
 
 """
 
@@ -12,20 +12,15 @@ from stk.utilities import vector_angle
 
 
 __all__ = (
-    'Sorter',
-    'IHasPosition',
+    'AngleSorter',
 )
 
 
-class IHasPosition(typing.Protocol):
-    def get_position(self) -> np.ndarray:
-        pass
+#: A type variable matching any type.
+T = typing.TypeVar('T')
 
 
-_T = typing.TypeVar('_T', bound=IHasPosition)
-
-
-class Sorter(typing.Generic[_T]):
+class AngleSorter(typing.Generic[T]):
     """
     Sorts items according to their angle from a reference vector.
 
@@ -35,7 +30,7 @@ class Sorter(typing.Generic[_T]):
 
     def __init__(
         self,
-        items: abc.Iterable[_T],
+        items: abc.Iterable[T],
         reference: np.ndarray,
         axis: np.ndarray,
     ) -> None:
@@ -63,7 +58,7 @@ class Sorter(typing.Generic[_T]):
 
     def _get_vector(
         self,
-        item: _T,
+        item: T,
     ) -> np.ndarray:
         """
         Get the vector according to which `item` should be sorted.
@@ -84,7 +79,7 @@ class Sorter(typing.Generic[_T]):
 
     def _get_angle(
         self,
-        item: _T,
+        item: T,
     ) -> float:
         """
         Get the angle of `vector` relative to `reference`.
@@ -106,7 +101,7 @@ class Sorter(typing.Generic[_T]):
             return 2*np.pi - theta
         return theta
 
-    def get_items(self) -> abc.Iterator[_T]:
+    def get_items(self) -> abc.Iterator[T]:
         """
         Yield the sorted items.
 

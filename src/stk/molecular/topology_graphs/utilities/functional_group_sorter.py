@@ -8,7 +8,7 @@ import numpy as np
 
 from stk.utilities import get_acute_vector
 from ...building_block import BuildingBlock
-from .sorter import Sorter
+from .angle_sorter import AngleSorter
 
 
 __all__ = (
@@ -16,7 +16,7 @@ __all__ = (
 )
 
 
-class FunctionalGroupSorter(Sorter):
+class FunctionalGroupSorter(AngleSorter[int]):
     """
     Sorts functional groups according to their angle.
 
@@ -74,7 +74,10 @@ class FunctionalGroupSorter(Sorter):
             axis=axis,
         )
 
-    def _get_vector(self, item):
+    def _get_vector(
+        self,
+        item: int,
+    ) -> np.ndarray:
         building_block = self._building_block
         fg, = building_block.get_functional_groups(item)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
