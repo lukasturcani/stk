@@ -18,7 +18,7 @@
    :maxdepth: 2
 
    Building Block <stk.molecular.building_block>
-   Constructed Molecule <stk.molecular.constructed_molecule>
+   Constructed Molecule <stk.molecular.constructed_molecule.constructed_molecule>
    Functional Groups <stk.molecular.functional_groups.functional_groups.functional_group>
    Functional Group Factories <stk.molecular.functional_groups.factories.functional_group_factory>
    Key Makers <stk.molecular.key_makers.molecule>

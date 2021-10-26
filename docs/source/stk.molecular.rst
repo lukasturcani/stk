@@ -36,6 +36,7 @@ Submodules
    stk.molecular.edge
    stk.molecular.edge_group
    stk.molecular.elements
+   stk.molecular.imolecule
    stk.molecular.molecular_utilities
    stk.molecular.periodic_info
    stk.molecular.placement_result
