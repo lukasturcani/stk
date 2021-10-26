@@ -15,7 +15,7 @@ from ....construction_state import ConstructionState
 
 
 def get_mch_bonds(
-        state: ConstructionState,
+    state: ConstructionState,
 ) -> abc.Iterator[mch.Bond]:
     """
     Yield the bonds of the :mod:`MCHammer` molecule.
