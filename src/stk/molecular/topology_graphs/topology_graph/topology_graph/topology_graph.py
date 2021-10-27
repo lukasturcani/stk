@@ -492,7 +492,7 @@ class TopologyGraph(typing.Generic[VertexT]):
 
         Parameters:
 
-            building_block_vertices : :class:`dict`
+            building_block_vertices:
                 Maps every :class:`.BuildingBlock` of the topology
                 graph, to a :class:`tuple` of the :class:`.Vertex`
                 instances it is meant to be placed on.
