@@ -270,7 +270,7 @@ class TopologyGraph(typing.Generic[VertexT]):
         # The original scaling first needs to be removed, so that when
         # the scale is recalculated with the new building blocks, it
         # has the same starting geometry.
-        def undo_scale(vertex: Vertex) -> Vertex:
+        def undo_scale(vertex: VertexT) -> VertexT:
             return vertex.with_scale(1/self._scale)
 
         building_block_vertices = {
@@ -281,7 +281,7 @@ class TopologyGraph(typing.Generic[VertexT]):
         }
         scale = self._get_scale(building_block_vertices)
 
-        def scale_vertex(vertex: Vertex) -> Vertex:
+        def scale_vertex(vertex: VertexT) -> VertexT:
             return vertex.with_scale(scale)
 
         self._building_block_vertices = {
