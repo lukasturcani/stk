@@ -5,7 +5,6 @@ Parallel Topology Graph
 """
 
 import pathos
-import typing
 
 from .utilities import Placement
 from .....vertex import Vertex
@@ -14,8 +13,6 @@ from .....construction_state import ConstructionState
 __all__ = (
     'Parallel',
 )
-
-_V = typing.TypeVar('_V', bound=Vertex)
 
 
 class Parallel:
