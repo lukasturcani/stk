@@ -419,7 +419,7 @@ class TopologyGraph(typing.Generic[VertexT]):
 
         Returns:
 
-            A:class:`tuple` of the a, b and c lattice constants, in
+            A :class:`tuple` of the a, b and c lattice constants, in
             that order. Can be ``None`` if the topology  graph is not
             periodic.
 
