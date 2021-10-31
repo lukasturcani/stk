@@ -4,6 +4,8 @@ Reactions Summary
 
 """
 
+from __future__ import annotations
+
 from collections import abc
 import numpy as np
 
@@ -53,6 +55,17 @@ class BondId:
 
         self.atom1_id = atom1_id
         self.atom2_id = atom2_id
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, BondId):
+            return (
+                self.atom1_id == other.atom1_id
+                and self.atom2_id == other.atom2_id
+            )
+        return False
+
+    def __hash__(self) -> int:
+        return hash((self.atom1_id, self.atom2_id))
 
 
 class ReactionsSummary:
