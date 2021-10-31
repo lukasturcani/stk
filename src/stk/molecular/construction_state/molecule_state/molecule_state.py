@@ -148,7 +148,7 @@ class MoleculeState:
                 The vertices used for placement.
 
             edges:
-                For each vertex in `vertices`, a :class:`tuple` of
+                For each vertex in `vertices`, the
                 :class:`.Edge` instances connected to it.
 
             building_blocks:
