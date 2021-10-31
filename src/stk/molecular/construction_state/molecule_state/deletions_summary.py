@@ -153,7 +153,7 @@ class DeletionsSummary:
             return (
                 atom1_id not in deleted_atom_ids
                 and atom2_id not in deleted_atom_ids
-                and (atom1_id, atom2_id) not in deleted_bond_ids
+                and BondId(atom1_id, atom2_id) not in deleted_bond_ids
             )
 
         bonds = self._bonds

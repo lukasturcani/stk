@@ -26,8 +26,8 @@ __all__ = (
 )
 
 
-EdgeId = int
-FunctionalGroups = list[FunctionalGroup]
+_EdgeId = int
+_FunctionalGroups = abc.Sequence[FunctionalGroup]
 
 
 class PlacementsSummary:
@@ -276,7 +276,7 @@ class PlacementsSummary:
 
     def get_edge_functional_groups(
         self,
-    ) -> abc.Iterator[tuple[EdgeId, FunctionalGroups]]:
+    ) -> abc.Iterator[tuple[_EdgeId, _FunctionalGroups]]:
         """
         Yield the edge ids and functional groups associated with them.
 
