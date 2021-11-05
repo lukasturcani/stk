@@ -14,7 +14,7 @@ import rdkit.Chem.AllChem as rdkit
 from .....molecular import BuildingBlock
 
 
-class RandomSmarts(MoleculeMutator):
+class SubstituteSubstructure(MoleculeMutator):
     """
     Substitutes functional groups within building blocks.
 
