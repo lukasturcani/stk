@@ -697,7 +697,8 @@ class BuildingBlock(Molecule):
                    *placer* ids.
 
         """
-
+        # Remove aromatic flags from atoms and bonds in the molecule.
+        rdkit.Kekulize(molecule, clearAromaticFlags=True)
         atoms = tuple(
             Atom(
                 id=a.GetIdx(),
