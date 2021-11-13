@@ -411,7 +411,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def _with_vertices(
         self: _T,
-        vertices: abc.Iterable[Vertex],
+        vertices: abc.Iterable[VertexT],
     ) -> _T:
         """
         Modify the instance.
@@ -423,7 +423,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def with_vertices(
         self,
-        vertices: abc.Iterable[Vertex],
+        vertices: abc.Iterable[VertexT],
     ) -> ConstructionState[VertexT]:
         """
         Returns a clone holding `vertices`.
