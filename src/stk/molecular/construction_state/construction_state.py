@@ -131,8 +131,8 @@ class ConstructionState(typing.Generic[VertexT]):
                 The vertices used for placement.
 
             edges:
-                For each vertex in `vertices`, a :class:`tuple` of
-                :class:`.Edge` instances connected to it.
+                For each vertex in `vertices`, the :class:`.Edge`
+                instances connected to it.
 
             building_blocks:
                 For each vertex in `vertices`, the building block
