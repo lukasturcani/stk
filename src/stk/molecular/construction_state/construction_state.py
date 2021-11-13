@@ -253,7 +253,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def get_edges(self, vertex_id: int) -> abc.Sequence[Edge]:
         """
-        Get the edges connect to a vertex.
+        Get the edges connected to a vertex.
 
         Parameters:
 
