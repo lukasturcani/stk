@@ -10,6 +10,7 @@ import typing
 from collections import abc
 import numpy as np
 
+from stk.utilities.typing import OneOrMany
 from .graph_state import GraphState
 from .molecule_state import MoleculeState
 from ..edge import Edge
@@ -190,7 +191,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def get_vertices(
         self,
-        vertex_ids: abc.Iterable[int],
+        vertex_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> abc.Iterator[VertexT]:
         """
         Get some vertices.
@@ -198,8 +199,8 @@ class ConstructionState(typing.Generic[VertexT]):
         Parameters:
 
             vertex_ids:
-                The id of the vertex, on which the building block is to
-                be placed.
+                The ids of vertices to yield. If ``None``, all vertices
+                will be yielded. Can be a single :class:`int` if a
 
         Yields:
 
