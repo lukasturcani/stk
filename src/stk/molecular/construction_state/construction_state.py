@@ -294,7 +294,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def _with_reaction_results(
         self: _T,
-        reactions: tuple[Reaction, ...],
+        reactions: abc.Collection[Reaction],
         results: abc.Iterable[ReactionResult],
     ) -> _T:
         """
@@ -312,7 +312,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def with_reaction_results(
         self,
-        reactions: tuple[Reaction, ...],
+        reactions: abc.Collection[Reaction],
         results: abc.Iterable[ReactionResult],
     ) -> ConstructionState[VertexT]:
         """
