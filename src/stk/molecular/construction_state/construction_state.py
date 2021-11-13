@@ -47,7 +47,7 @@ class ConstructionState(typing.Generic[VertexT]):
         self,
         building_block_vertices:
             dict[BuildingBlock, tuple[VertexT, ...]],
-        edges: tuple[Edge, ...],
+        edges: abc.Sequence[Edge],
         lattice_constants: typing.Optional[_LatticeConstants] = None,
     ) -> None:
         """
