@@ -15,6 +15,28 @@ jobs:
       - name: Lint with flake8
         run: conda run -n stk flake8 .
 
+  type-check:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/lukasturcani/stk-test-environment
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Run mypy
+        run: conda run -n stk mypy
+          src/stk/molecular/construction_state
+          src/stk/molecular/constructed_molecule
+          src/stk/molecular/functional_groups
+          src/stk/molecular/key_makers
+          src/stk/molecular/molecule
+          src/stk/molecular/reaction_factories
+          src/stk/molecular/reactions
+          src/stk/molecular/topology_graphs/topology_graph
+          src/stk/molecular/topology_graphs/cage
+          src/stk/molecular/writers
+
   pytest-stable-linux:
     runs-on: ubuntu-20.04
     container:
