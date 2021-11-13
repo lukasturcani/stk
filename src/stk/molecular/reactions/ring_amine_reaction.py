@@ -141,5 +141,4 @@ class RingAmineReaction(Reaction):
         yield self._ring_amine2.get_hydrogen2()
 
     def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
-        return
-        yield
+        yield from ()

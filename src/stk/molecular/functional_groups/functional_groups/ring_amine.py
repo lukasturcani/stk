@@ -184,7 +184,7 @@ class RingAmine(FunctionalGroup):
     def with_ids(
         self,
         id_map: dict[int, int],
-    ):
+    ) -> RingAmine:
         atom_map = get_atom_map(
             id_map=id_map,
             atoms=(

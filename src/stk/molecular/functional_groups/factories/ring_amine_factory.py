@@ -31,7 +31,7 @@ class RingAmineFactory(FunctionalGroupFactory):
 
     # Keep this __init__() method, which does nothing, here for the
     # docstring.
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize a :class:`RingAmineFactory` instance.
 

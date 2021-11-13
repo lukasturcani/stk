@@ -138,7 +138,7 @@ class SecondaryAmino(GenericFunctionalGroup):
     def with_ids(
         self,
         id_map: dict[int, int],
-    ):
+    ) -> SecondaryAmino:
         atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
