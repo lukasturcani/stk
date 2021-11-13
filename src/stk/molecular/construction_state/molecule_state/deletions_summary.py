@@ -25,14 +25,6 @@ class DeletionsSummary:
 
     """
 
-    _atoms: tuple[Atom, ...]
-    _atom_infos: tuple[AtomInfo, ...]
-    _bonds: tuple[Bond, ...]
-    _bond_infos: tuple[BondInfo, ...]
-    _position_matrix: np.ndarray
-    _deleted_atom_ids: frozenset[int]
-    _deleted_bond_ids: frozenset[BondId]
-
     _valid_atoms: list[Atom]
     _valid_atom_infos: list[AtomInfo]
     _valid_bonds: list[Bond]
@@ -40,14 +32,6 @@ class DeletionsSummary:
     _valid_positions: list[np.ndarray]
 
     __slots__ = [
-        '_atoms',
-        '_atom_infos',
-        '_bonds',
-        '_bond_infos',
-        '_position_matrix',
-        '_deleted_atom_ids',
-        '_deleted_bond_ids',
-
         '_valid_atoms',
         '_valid_atom_infos',
         '_valid_bonds',
@@ -58,12 +42,12 @@ class DeletionsSummary:
     def __init__(
         self,
         atoms: abc.Iterable[Atom],
-        atom_infos: abc.Iterable[AtomInfo],
+        atom_infos: abc.Sequence[AtomInfo],
         bonds: abc.Iterable[Bond],
-        bond_infos: abc.Iterable[BondInfo],
+        bond_infos: abc.Sequence[BondInfo],
         position_matrix: np.ndarray,
-        deleted_atom_ids: abc.Iterable[int],
-        deleted_bond_ids: abc.Iterable[BondId],
+        deleted_atom_ids: frozenset[int],
+        deleted_bond_ids: frozenset[BondId],
     ) -> None:
         """
         Initialize a :class:`.DeletionsSummary` instance.
@@ -93,32 +77,11 @@ class DeletionsSummary:
 
         """
 
-        self._atoms = tuple(atoms)
-        self._atom_infos = tuple(atom_infos)
-        self._bonds = tuple(bonds)
-        self._bond_infos = tuple(bond_infos)
-        self._position_matrix = np.array(position_matrix)
-        self._deleted_atom_ids = frozenset(deleted_atom_ids)
-        self._deleted_bond_ids = frozenset(deleted_bond_ids)
-
         self._valid_atoms = []
         self._valid_atom_infos = []
         self._valid_bonds = []
         self._valid_bond_infos = []
         self._valid_positions = []
-        self._with_valid_data()
-
-    def _with_valid_data(self) -> None:
-        """
-        Add the data of atoms which aren't deleted.
-
-        """
-
-        atoms = self._atoms
-        atom_infos = self._atom_infos
-        position_matrix = self._position_matrix
-        deleted_atom_ids = self._deleted_atom_ids
-        deleted_bond_ids = self._deleted_bond_ids
 
         def valid_atom(atom: Atom) -> bool:
             return atom.get_id() not in deleted_atom_ids
@@ -156,8 +119,6 @@ class DeletionsSummary:
                 and BondId(atom1_id, atom2_id) not in deleted_bond_ids
             )
 
-        bonds = self._bonds
-        bond_infos = self._bond_infos
         valid_bonds = self._valid_bonds
         valid_bond_infos = self._valid_bond_infos
 
