@@ -143,10 +143,10 @@ class GraphState(typing.Generic[VertexT]):
 
         Parameters:
 
-            edge : :class:`.Edge`
+            edge:
                 The edge whose periodic position must be set.
 
-            reference : :class:`int`
+            reference:
                 The id of the vertex, relative to which the edge
                 position is being calculated.
 
