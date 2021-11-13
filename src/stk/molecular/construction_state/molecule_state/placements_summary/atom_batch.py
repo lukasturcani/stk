@@ -37,7 +37,7 @@ class AtomBatch:
         building_block_id: int,
     ) -> None:
         """
-        Initialize an :class:`._AtomBatch` instance.
+        Initialize an :class:`.AtomBatch` instance.
 
         Parameters:
 
