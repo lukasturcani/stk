@@ -74,9 +74,9 @@ class CageConstructionState(ConstructionState[CageVertex]):
 
     def _with_placement_results(
         self: _T,
-        vertices: tuple[CageVertex, ...],
+        vertices: abc.Collection[CageVertex],
         edges: abc.Iterable[abc.Sequence[Edge]],
-        building_blocks: tuple[BuildingBlock, ...],
+        building_blocks: abc.Iterable[BuildingBlock],
         results: abc.Iterable[PlacementResult],
     ) -> _T:
         # Need to iterate multiple times through results.
@@ -108,7 +108,7 @@ class CageConstructionState(ConstructionState[CageVertex]):
         self,
         vertices: abc.Iterable[CageVertex],
         edges: abc.Iterable[abc.Collection[Edge]],
-        building_blocks: tuple[BuildingBlock, ...],
+        building_blocks: abc.Iterable[BuildingBlock],
         results: abc.Iterable[PlacementResult],
     ) -> None:
         # Use literal docstring here to prevent linter errors stemming
