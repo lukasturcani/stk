@@ -3,148 +3,148 @@ name: tests
 on: [push, pull_request]
 
 jobs:
-    lint:
-        runs-on: ubuntu-20.04
-        container:
-            image: ghcr.io/lukasturcani/stk-test-environment
+  lint:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/lukasturcani/stk-test-environment
 
-        steps:
-            - name: Git checkout
-              uses: actions/checkout@v2
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-            - name: Lint with flake8
-              run: conda run -n stk flake8 .
+      - name: Lint with flake8
+        run: conda run -n stk flake8 .
 
-    pytest-stable-linux:
-        runs-on: ubuntu-20.04
-        container:
-            image: ghcr.io/lukasturcani/stk-test-environment
+  pytest-stable-linux:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/lukasturcani/stk-test-environment
 
-        services:
-            MongoDB:
-                image: mongo
+    services:
+      MongoDB:
+        image: mongo
 
-        steps:
-            - name: Git checkout
-              uses: actions/checkout@v2
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-            - name: Add stk to the conda environment
-              run: conda run -n stk
-                pip install --no-deps -e .
+      - name: Add stk to the conda environment
+        run: conda run -n stk
+          pip install --no-deps -e .
 
-            - name: Run pytest
-              run: conda run -n stk
-                pytest --mongodb_uri='mongodb://MongoDB:27017/'
+      - name: Run pytest
+        run: conda run -n stk
+          pytest --mongodb_uri='mongodb://MongoDB:27017/'
 
-            - name: Dump the database
-              if: ${{ always() }}
-              run: mongodump
-                --forceTableScan
-                -o database-dump/database-dump
-                --uri='mongodb://MongoDB:27017/'
+      - name: Dump the database
+        if: ${{ always() }}
+        run: mongodump
+          --forceTableScan
+          -o database-dump/database-dump
+          --uri='mongodb://MongoDB:27017/'
 
-            - name: Upload the database dump
-              if: ${{ always() }}
-              uses: actions/upload-artifact@v2
-              with:
-                name: database-dump
-                path: database-dump
+      - name: Upload the database dump
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: database-dump
+          path: database-dump
 
-    doctests:
-        runs-on: ubuntu-20.04
-        container:
-            image: ghcr.io/lukasturcani/stk-test-environment
+  doctests:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/lukasturcani/stk-test-environment
 
-        services:
-            MongoDB:
-                image: mongo
+    services:
+      MongoDB:
+        image: mongo
 
-        steps:
-            - name: Git checkout
-              uses: actions/checkout@v2
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-            - name: Add stk to the conda environment
-              run: conda run -n stk
-                pip install --no-deps -e .
+      - name: Add stk to the conda environment
+        run: conda run -n stk
+          pip install --no-deps -e .
 
-            - name: Run doctests
-              run: conda run -n stk
-                MONGODB_URI='mongodb://MongoDB:27017/'
-                make -C docs doctest
+      - name: Run doctests
+        run: conda run -n stk
+          MONGODB_URI='mongodb://MongoDB:27017/'
+          make -C docs doctest
 
-    basic-ea:
-        runs-on: ubuntu-20.04
-        container:
-            image: ghcr.io/lukasturcani/stk-test-environment
+  basic-ea:
+      runs-on: ubuntu-20.04
+      container:
+        image: ghcr.io/lukasturcani/stk-test-environment
 
-        services:
-            MongoDB:
-                image: mongo
+      services:
+        MongoDB:
+          image: mongo
 
-        steps:
-            - name: Git checkout
-              uses: actions/checkout@v2
+      steps:
+        - name: Git checkout
+          uses: actions/checkout@v2
 
-            - name: Add stk to the conda environment
-              run: conda run -n stk
-                pip install --no-deps -e .
+        - name: Add stk to the conda environment
+          run: conda run -n stk
+            pip install --no-deps -e .
 
-            - name: Install dependencies
-              run: git clone https://github.com/lukasturcani/basic_ea
-                --depth 1
+        - name: Install dependencies
+          run: git clone https://github.com/lukasturcani/basic_ea
+            --depth 1
 
-            - name: Run the EA
-              run: conda run -n stk
-                python basic_ea/basic_ea.py
-                    --mongodb_uri mongodb://MongoDB:27017
+        - name: Run the EA
+          run: conda run -n stk
+            python basic_ea/basic_ea.py
+              --mongodb_uri mongodb://MongoDB:27017
 
-            - name: Upload fitness plot
-              uses: actions/upload-artifact@v2
-              with:
-                name: basic-ea-fitness-plot
-                path: fitness_progress.png
+        - name: Upload fitness plot
+          uses: actions/upload-artifact@v2
+          with:
+            name: basic-ea-fitness-plot
+            path: fitness_progress.png
 
-            - name: Upload rotatable bonds plot
-              uses: actions/upload-artifact@v2
-              with:
-                name: basic-ea-rotatable-bonds-plot
-                path: rotatable_bonds_progress.png
+        - name: Upload rotatable bonds plot
+          uses: actions/upload-artifact@v2
+          with:
+            name: basic-ea-rotatable-bonds-plot
+            path: rotatable_bonds_progress.png
 
-    intermediate-ea:
-        runs-on: ubuntu-20.04
-        container:
-            image: ghcr.io/lukasturcani/stk-test-environment
+  intermediate-ea:
+    runs-on: ubuntu-20.04
+    container:
+      image: ghcr.io/lukasturcani/stk-test-environment
 
-        services:
-            MongoDB:
-                image: mongo
+    services:
+      MongoDB:
+        image: mongo
 
-        steps:
-            - name: Git checkout
-              uses: actions/checkout@v2
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-            - name: Add stk to the conda environment
-              run: conda run -n stk
-                pip install --no-deps -e .
+      - name: Add stk to the conda environment
+        run: conda run -n stk
+          pip install --no-deps -e .
 
-            - name: Install dependencies
-              run: git clone
-                https://github.com/lukasturcani/intermediate_ea
-                --depth 1
+      - name: Install dependencies
+        run: git clone
+          https://github.com/lukasturcani/intermediate_ea
+          --depth 1
 
-            - name: Run the EA
-              run: conda run -n stk
-                python intermediate_ea/intermediate_ea.py
-                    --mongodb_uri mongodb://MongoDB:27017
+      - name: Run the EA
+        run: conda run -n stk
+          python intermediate_ea/intermediate_ea.py
+            --mongodb_uri mongodb://MongoDB:27017
 
-            - name: Upload fitness plot
-              uses: actions/upload-artifact@v2
-              with:
-                name: intermediate-ea-fitness-plot
-                path: fitness_progress.png
+      - name: Upload fitness plot
+        uses: actions/upload-artifact@v2
+        with:
+          name: intermediate-ea-fitness-plot
+          path: fitness_progress.png
 
-            - name: Upload rotatable bonds plot
-              uses: actions/upload-artifact@v2
-              with:
-                name: intermediate-ea-rotatable-bonds-plot
-                path: rotatable_bonds_progress.png
+      - name: Upload rotatable bonds plot
+        uses: actions/upload-artifact@v2
+        with:
+          name: intermediate-ea-rotatable-bonds-plot
+          path: rotatable_bonds_progress.png
