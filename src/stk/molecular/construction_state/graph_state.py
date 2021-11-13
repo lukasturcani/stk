@@ -399,8 +399,8 @@ class GraphState(typing.Generic[VertexT]):
         Parameters:
 
             lattice_constants:
-                The lattice constants of the clone. Requires 3 arrays
-                with the shape of ``(3, )``.
+                The lattice constants of the clone. Requires 3 arrays,
+                each of length 3.
 
         Returns:
 
