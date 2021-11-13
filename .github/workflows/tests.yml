@@ -24,6 +24,10 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
 
+      - name: Add stk to the conda environment
+        run: conda run -n stk
+          pip install --no-deps -e .
+
       - name: Run mypy
         run: conda run -n stk mypy
           src/stk/molecular/construction_state
