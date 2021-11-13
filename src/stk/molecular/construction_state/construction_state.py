@@ -64,7 +64,7 @@ class ConstructionState(typing.Generic[VertexT]):
 
             lattice_constants:
                 A :class:`numpy.ndarray` for each lattice constant.
-                Can be an empty ``None`` if the topology graph is
+                Can be ``None`` if the topology graph is
                 not periodic.
 
         """
