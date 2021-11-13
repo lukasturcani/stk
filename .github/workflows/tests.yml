@@ -40,6 +40,19 @@ jobs:
           src/stk/molecular/topology_graphs/topology_graph
           src/stk/molecular/topology_graphs/cage
           src/stk/molecular/writers
+          src/stk/molecular/atom.py
+          src/stk/molecular/atom_info.py
+          src/stk/molecular/bond.py
+          src/stk/molecular/bond_info.py
+          src/stk/molecular/building_block.py
+          src/stk/molecular/edge.py
+          src/stk/molecular/edge_group.py
+          src/stk/molecular/elements.py
+          src/stk/molecular/imolecule.py
+          src/stk/molecular/molecular_utilities.py
+          src/stk/molecular/periodic_info.py
+          src/stk/molecular/placement_result.py
+          src/stk/molecular/vertex.py
 
   pytest-stable-linux:
     runs-on: ubuntu-20.04

@@ -23,7 +23,10 @@ class AtomImpl(Atom):
 
     _atomic_number: typing.ClassVar[int]
 
-    def __init_subclass__(cls: type[AtomImpl], **kwargs) -> None:
+    def __init_subclass__(
+        cls: type[AtomImpl],
+        **kwargs: typing.Any,
+    ) -> None:
         cls._elements[cls._atomic_number] = cls
 
     def __init__(
