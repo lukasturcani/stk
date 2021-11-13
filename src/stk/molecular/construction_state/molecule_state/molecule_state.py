@@ -96,9 +96,9 @@ class MoleculeState:
 
     def _with_placement_results(
         self: _T,
-        vertices: tuple[Vertex, ...],
+        vertices: abc.Collection[Vertex],
         edges: abc.Iterable[abc.Sequence[Edge]],
-        building_blocks: tuple[BuildingBlock, ...],
+        building_blocks: abc.Iterable[BuildingBlock],
         results: abc.Iterable[PlacementResult],
     ) -> _T:
         """
@@ -134,9 +134,9 @@ class MoleculeState:
 
     def with_placement_results(
         self,
-        vertices: tuple[Vertex, ...],
+        vertices: abc.Collection[Vertex],
         edges: abc.Iterable[abc.Sequence[Edge]],
-        building_blocks: tuple[BuildingBlock, ...],
+        building_blocks: abc.Iterable[BuildingBlock],
         results: abc.Iterable[PlacementResult],
     ) -> MoleculeState:
         """

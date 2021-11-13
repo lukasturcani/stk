@@ -95,9 +95,9 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def _with_placement_results(
         self: _T,
-        vertices: tuple[VertexT, ...],
+        vertices: abc.Collection[VertexT],
         edges: abc.Iterable[abc.Sequence[Edge]],
-        building_blocks: tuple[BuildingBlock, ...],
+        building_blocks: abc.Iterable[BuildingBlock],
         results: abc.Iterable[PlacementResult],
     ) -> _T:
         """
@@ -117,9 +117,9 @@ class ConstructionState(typing.Generic[VertexT]):
 
     def with_placement_results(
         self,
-        vertices: tuple[VertexT, ...],
+        vertices: abc.Collection[VertexT],
         edges: abc.Iterable[abc.Sequence[Edge]],
-        building_blocks: tuple[BuildingBlock, ...],
+        building_blocks: abc.Iterable[BuildingBlock],
         results: abc.Iterable[PlacementResult],
     ) -> ConstructionState[VertexT]:
         """
