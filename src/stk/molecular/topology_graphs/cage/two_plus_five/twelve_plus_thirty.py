@@ -115,7 +115,7 @@ class TwelvePlusThirty(Cage):
 
     # Vertices of a regular origin-centred icosahedron
     # Source: http://eusebeia.dyndns.org/4d/icosahedron
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(0, [0, 1, golden]),
         NonLinearVertex(1, [0, -1, golden]),
         NonLinearVertex(2, [0, 1, -golden]),
@@ -131,125 +131,125 @@ class TwelvePlusThirty(Cage):
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
         LinearVertex.init_at_center(
             id=12,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(_non_linears[0], _non_linears[1]),
         ),
         LinearVertex.init_at_center(
             id=13,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[9]),
+            vertices=(_non_linears[0], _non_linears[9]),
         ),
         LinearVertex.init_at_center(
             id=14,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[5]),
+            vertices=(_non_linears[0], _non_linears[5]),
         ),
         LinearVertex.init_at_center(
             id=15,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[4]),
+            vertices=(_non_linears[0], _non_linears[4]),
         ),
         LinearVertex.init_at_center(
             id=16,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[8]),
+            vertices=(_non_linears[0], _non_linears[8]),
         ),
         LinearVertex.init_at_center(
             id=17,
-            vertices=(_vertex_prototypes[8], _vertex_prototypes[1]),),
+            vertices=(_non_linears[8], _non_linears[1]),),
         LinearVertex.init_at_center(
             id=18,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[9]),
+            vertices=(_non_linears[1], _non_linears[9]),
         ),
         LinearVertex.init_at_center(
             id=19,
-            vertices=(_vertex_prototypes[9], _vertex_prototypes[5]),
+            vertices=(_non_linears[9], _non_linears[5]),
         ),
         LinearVertex.init_at_center(
             id=20,
-            vertices=(_vertex_prototypes[5], _vertex_prototypes[4]),
+            vertices=(_non_linears[5], _non_linears[4]),
         ),
         LinearVertex.init_at_center(
             id=21,
-            vertices=(_vertex_prototypes[4], _vertex_prototypes[8]),
+            vertices=(_non_linears[4], _non_linears[8]),
         ),
         LinearVertex.init_at_center(
             id=22,
-            vertices=(_vertex_prototypes[5], _vertex_prototypes[2]),
+            vertices=(_non_linears[5], _non_linears[2]),
         ),
         LinearVertex.init_at_center(
             id=23,
-            vertices=(_vertex_prototypes[5], _vertex_prototypes[11]),
+            vertices=(_non_linears[5], _non_linears[11]),
         ),
         LinearVertex.init_at_center(
             id=24,
-            vertices=(_vertex_prototypes[9], _vertex_prototypes[11]),
+            vertices=(_non_linears[9], _non_linears[11]),
         ),
         LinearVertex.init_at_center(
             id=25,
-            vertices=(_vertex_prototypes[9], _vertex_prototypes[7]),
+            vertices=(_non_linears[9], _non_linears[7]),
         ),
         LinearVertex.init_at_center(
             id=26,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[7]),
+            vertices=(_non_linears[1], _non_linears[7]),
         ),
         LinearVertex.init_at_center(
             id=27,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[6]),
+            vertices=(_non_linears[1], _non_linears[6]),
         ),
         LinearVertex.init_at_center(
             id=28,
-            vertices=(_vertex_prototypes[8], _vertex_prototypes[6]),
+            vertices=(_non_linears[8], _non_linears[6]),
         ),
         LinearVertex.init_at_center(
             id=29,
-            vertices=(_vertex_prototypes[8], _vertex_prototypes[10]),
+            vertices=(_non_linears[8], _non_linears[10]),
         ),
         LinearVertex.init_at_center(
             id=30,
-            vertices=(_vertex_prototypes[4], _vertex_prototypes[10]),
+            vertices=(_non_linears[4], _non_linears[10]),
         ),
         LinearVertex.init_at_center(
             id=31,
-            vertices=(_vertex_prototypes[4], _vertex_prototypes[2]),
+            vertices=(_non_linears[4], _non_linears[2]),
         ),
         LinearVertex.init_at_center(
             id=32,
-            vertices=(_vertex_prototypes[2], _vertex_prototypes[11]),
+            vertices=(_non_linears[2], _non_linears[11]),
         ),
         LinearVertex.init_at_center(
             id=33,
-            vertices=(_vertex_prototypes[11], _vertex_prototypes[7]),
+            vertices=(_non_linears[11], _non_linears[7]),
         ),
         LinearVertex.init_at_center(
             id=34,
-            vertices=(_vertex_prototypes[7], _vertex_prototypes[6]),
+            vertices=(_non_linears[7], _non_linears[6]),
         ),
         LinearVertex.init_at_center(
             id=35,
-            vertices=(_vertex_prototypes[6], _vertex_prototypes[10]),
+            vertices=(_non_linears[6], _non_linears[10]),
         ),
         LinearVertex.init_at_center(
             id=36,
-            vertices=(_vertex_prototypes[10], _vertex_prototypes[2]),
+            vertices=(_non_linears[10], _non_linears[2]),
         ),
         LinearVertex.init_at_center(
             id=37,
-            vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
+            vertices=(_non_linears[2], _non_linears[3]),
         ),
         LinearVertex.init_at_center(
             id=38,
-            vertices=(_vertex_prototypes[11], _vertex_prototypes[3]),
+            vertices=(_non_linears[11], _non_linears[3]),
         ),
         LinearVertex.init_at_center(
             id=39,
-            vertices=(_vertex_prototypes[7], _vertex_prototypes[3]),
+            vertices=(_non_linears[7], _non_linears[3]),
         ),
         LinearVertex.init_at_center(
             id=40,
-            vertices=(_vertex_prototypes[6], _vertex_prototypes[3]),
+            vertices=(_non_linears[6], _non_linears[3]),
         ),
         LinearVertex.init_at_center(
             id=41,
-            vertices=(_vertex_prototypes[10], _vertex_prototypes[3]),
+            vertices=(_non_linears[10], _non_linears[3]),
         )
     )
 

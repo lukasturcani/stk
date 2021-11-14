@@ -7,10 +7,8 @@ Linear
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
 import numpy as np
 
-from ....molecules import BuildingBlock
 from .vertices import (
     HeadVertex,
     TailVertex,
@@ -583,9 +581,9 @@ class Linear(TopologyGraph):
 
     def _get_building_block_vertices(
         self,
-        building_blocks: dict[int, BuildingBlock],
-        vertices: Iterable[Vertex],
-    ) -> dict[BuildingBlock, Vertex]:
+        building_blocks,
+        vertices,
+    ):
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
@@ -602,8 +600,8 @@ class Linear(TopologyGraph):
 
     @staticmethod
     def _with_unaligning_vertices(
-        building_block_vertices: dict[BuildingBlock, Vertex],
-    ) -> dict[BuildingBlock, Vertex]:
+        building_block_vertices,
+    ):
         clone = {}
         for building_block, vertices in (
             building_block_vertices.items()
@@ -625,7 +623,7 @@ class Linear(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[BuildingBlock, Vertex],
+        building_block_vertices,
     ) -> float:
         return max(
             bb.get_maximum_diameter()

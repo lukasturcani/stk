@@ -231,26 +231,26 @@ class M3L3Triangle(Cage):
 
     _x = 2*np.sqrt(3)/4
     _y = 2
-    _vertex_prototypes = (
+    _angled_vertices = (
         AngledVertex(0, [0, _x, 0]),
         AngledVertex(1, [_y/2, -_x, 0]),
         AngledVertex(2, [-_y/2, -_x, 0]),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_angled_vertices,
 
         LinearVertex.init_at_center(
             id=3,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(_angled_vertices[0], _angled_vertices[1]),
         ),
         LinearVertex.init_at_center(
             id=4,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
+            vertices=(_angled_vertices[1], _angled_vertices[2]),
         ),
         LinearVertex.init_at_center(
             id=5,
-            vertices=(_vertex_prototypes[2], _vertex_prototypes[0]),
+            vertices=(_angled_vertices[2], _angled_vertices[0]),
         ),
     )
 

@@ -184,7 +184,7 @@ class M6L2L3Prism(Cage):
 
     """
 
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(0, [-1, -1/np.sqrt(3), 1]),
         NonLinearVertex(1, [1, -1/np.sqrt(3), 1]),
         NonLinearVertex(2, [0, 2/np.sqrt(3), 1]),
@@ -195,50 +195,50 @@ class M6L2L3Prism(Cage):
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
 
         NonLinearVertex.init_at_center(
             id=6,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[1],
-                _vertex_prototypes[2],
+                _non_linears[0],
+                _non_linears[1],
+                _non_linears[2],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=7,
             vertices=(
-                _vertex_prototypes[3],
-                _vertex_prototypes[4],
-                _vertex_prototypes[5],
+                _non_linears[3],
+                _non_linears[4],
+                _non_linears[5],
             ),
         ),
 
         NonLinearVertex.init_at_center(
             id=8,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[1],
-                _vertex_prototypes[3],
-                _vertex_prototypes[4],
+                _non_linears[0],
+                _non_linears[1],
+                _non_linears[3],
+                _non_linears[4],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=9,
             vertices=(
-                _vertex_prototypes[1],
-                _vertex_prototypes[2],
-                _vertex_prototypes[4],
-                _vertex_prototypes[5],
+                _non_linears[1],
+                _non_linears[2],
+                _non_linears[4],
+                _non_linears[5],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=10,
             vertices=(
-                _vertex_prototypes[2],
-                _vertex_prototypes[0],
-                _vertex_prototypes[5],
-                _vertex_prototypes[3],
+                _non_linears[2],
+                _non_linears[0],
+                _non_linears[5],
+                _non_linears[3],
             ),
         ),
     )

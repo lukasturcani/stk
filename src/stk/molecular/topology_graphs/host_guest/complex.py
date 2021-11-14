@@ -518,6 +518,9 @@ class Complex(TopologyGraph):
                 guests=guests,
             )
         elif guest is not None:
+            assert guest_start is not None
+            assert guest_target is not None
+            assert displacement is not None
             warnings.warn(
                 'You defined a Complex topology graph using the old '
                 'API (by defining "guest" and any optional arguments: '
@@ -552,9 +555,9 @@ class Complex(TopologyGraph):
 
     def _get_vertices_from_guests(
         self,
-        host: BuildingBlock,
-        guests: Iterable[Guest],
-    ) -> dict[BuildingBlock, Vertex]:
+        host,
+        guests,
+    ):
         if isinstance(guests, Guest):
             guests = (guests, )
 
@@ -581,7 +584,7 @@ class Complex(TopologyGraph):
         guest_start: tuple[float, float, float],
         guest_target: tuple[float, float, float],
         displacement: tuple[float, float, float],
-    ) -> dict[BuildingBlock, Vertex]:
+    ):
 
         num_nones = sum(
             1 for vector in (guest_start, guest_target)
