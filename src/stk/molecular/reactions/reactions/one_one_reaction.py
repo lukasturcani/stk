@@ -4,16 +4,8 @@ One-One Reaction
 
 """
 
-from collections import abc
-
-from .reaction import Reaction, NewAtom
-from ...functional_groups import GenericFunctionalGroup
-from ...atom import Atom
-from ...bond import Bond
-
-__all__ = (
-    'OneOneReaction',
-)
+from .reaction import Reaction
+from ...bonds import Bond
 
 
 class OneOneReaction(Reaction):
@@ -27,27 +19,27 @@ class OneOneReaction(Reaction):
 
     def __init__(
         self,
-        functional_group1: GenericFunctionalGroup,
-        functional_group2: GenericFunctionalGroup,
-        bond_order: int,
-        periodicity: tuple[int, int, int],
-    ) -> None:
+        functional_group1,
+        functional_group2,
+        bond_order,
+        periodicity,
+    ):
         """
         Initialize a :class:`.OneOneReaction` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        functional_group1 : :class:`.GenericFunctionalGroup`
+            The first functional group in the reaction.
 
-            functional_group1:
-                The first functional group in the reaction.
+        functional_group2 : :class:`.GenericFunctionalGroup`
+            The second functional group in the reaction.
 
-            functional_group2:
-                The second functional group in the reaction.
+        bond_order : :class:`int`
+            The bond order of the bond created by the reaction.
 
-            bond_order:
-                The bond order of the bond created by the reaction.
-
-            periodicity:
-                The periodicity of the bond created by the reaction.
+        periodicity : :class:`tuple` of :class:`int`
+            The periodicity of the bond created by the reaction.
 
         """
 
@@ -56,11 +48,11 @@ class OneOneReaction(Reaction):
         self._bond_order = bond_order
         self._periodicity = periodicity
 
-    def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
+    def _get_new_atoms(self):
         return
         yield
 
-    def _get_new_bonds(self) -> abc.Iterator[Bond]:
+    def _get_new_bonds(self):
         bonder1 = next(self._functional_group1.get_bonders())
         bonder2 = next(self._functional_group2.get_bonders())
         yield Bond(
@@ -70,10 +62,10 @@ class OneOneReaction(Reaction):
             periodicity=self._periodicity,
         )
 
-    def _get_deleted_atoms(self) -> abc.Iterator[Atom]:
+    def _get_deleted_atoms(self):
         yield from self._functional_group1.get_deleters()
         yield from self._functional_group2.get_deleters()
 
-    def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
+    def _get_deleted_bonds(self):
         return
         yield

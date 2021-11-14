@@ -4,19 +4,7 @@ Secondary Amino
 
 """
 
-from __future__ import annotations
-
-import typing
-
-from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
-from ...atom import Atom
-from ...elements import N, H
-
-
-__all__ = (
-    'SecondaryAmino',
-)
 
 
 class SecondaryAmino(GenericFunctionalGroup):
@@ -30,150 +18,115 @@ class SecondaryAmino(GenericFunctionalGroup):
 
     def __init__(
         self,
-        nitrogen: N,
-        hydrogen: H,
-        atom1: Atom,
-        atom2: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: typing.Optional[tuple[Atom, ...]] = None,
-    ) -> None:
+        nitrogen,
+        hydrogen,
+        atom1,
+        atom2,
+        bonders,
+        deleters,
+        placers=None,
+    ):
         """
         Initialize a :class:`.SecondaryAmine` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        nitrogen : :class:`.N`
+            The ``[nitrogen]`` atom
 
-            nitrogen:
-                The ``[nitrogen]`` atom
+        hydrogen : :class:`.H`
+            The ``[hydrogen]`` atom.
 
-            hydrogen:
-                The ``[hydrogen]`` atom.
+        atom1 : :class:`.Atom`
+            The ``[atom]`` atom.
 
-            atom1:
-                The ``[atom]`` atom.
+        atom2 : :class:`.Atom`
+            The ``[atom]`` atom.
 
-            atom2:
-                The ``[atom]`` atom.
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms.
 
-            bonders:
-                The bonder atoms.
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
 
-            deleters:
-                The deleter atoms.
-
-            placers:
-                The placer atoms. If ``None`` the `bonders` will be
-                used.
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
 
         """
 
-        GenericFunctionalGroup.__init__(
-            self=self,
+        self._nitrogen = nitrogen
+        self._hydrogen = hydrogen
+        self._atom1 = atom1
+        self._atom2 = atom2
+        super().__init__(
             atoms=(nitrogen, hydrogen, atom1, atom2),
             bonders=bonders,
             deleters=deleters,
             placers=bonders if placers is None else placers,
         )
-        self._nitrogen = nitrogen
-        self._hydrogen = hydrogen
-        self._atom1 = atom1
-        self._atom2 = atom2
 
-    def get_nitrogen(self) -> N:
+    def get_nitrogen(self):
         """
         Get the ``[nitrogen]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.N`
             The ``[nitrogen]`` atom.
 
         """
 
         return self._nitrogen
 
-    def get_hydrogen(self) -> H:
+    def get_hydrogen(self):
         """
         Get the ``[hydrogen]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.H`
             The ``[hydrogen]`` atom.
 
         """
 
         return self._hydrogen
 
-    def get_atom1(self) -> Atom:
+    def get_atom1(self):
         """
         Get the ``[atom1]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.Atom`
             The ``[atom1]`` atom.
 
         """
 
         return self._atom1
 
-    def get_atom2(self) -> Atom:
+    def get_atom2(self):
         """
         Get the ``[atom2]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.Atom`
             The ``[atom2]`` atom.
 
         """
 
         return self._atom2
 
-    def clone(self) -> SecondaryAmino:
-        clone = self._clone()
+    def clone(self):
+        clone = super().clone()
         clone._nitrogen = self._nitrogen
         clone._hydrogen = self._hydrogen
         clone._atom1 = self._atom1
         clone._atom2 = self._atom2
         return clone
 
-    def with_ids(
-        self,
-        id_map: dict[int, int],
-    ):
-        atom_map = get_atom_map(
-            id_map=id_map,
-            atoms=(
-                *self._atoms,
-                *self._placers,
-                *self._core_atoms,
-                *self._bonders,
-                *self._deleters,
-                self._nitrogen,
-                self._hydrogen,
-                self._atom1,
-                self._atom2,
-            ),
-        )
-        clone = self.__class__.__new__(self.__class__)
-        clone._atoms = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._atoms
-        )
-        clone._placers = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._placers
-        )
-        clone._core_atoms = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._core_atoms
-        )
-        clone._bonders = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._bonders
-        )
-        clone._deleters = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._deleters
-        )
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
         clone._nitrogen = atom_map.get(
             self._nitrogen.get_id(),
             self._nitrogen,
@@ -192,7 +145,7 @@ class SecondaryAmino(GenericFunctionalGroup):
         )
         return clone
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f'{self.__class__.__name__}('
             f'{self._nitrogen}, {self._hydrogen}, {self._atom1}, '

@@ -8,17 +8,15 @@ from __future__ import annotations
 
 import numpy as np
 from collections import defaultdict
-from collections import abc
+from typing import Iterable
 
 from .....topology_graph.topology_graph.implementations import (
     _PlacementResult,
 )
 from ......functional_groups import FunctionalGroup
-from ......atom import Atom
-from ......atom_info import AtomInfo
-from ......bond import Bond
-from ......bond_info import BondInfo
-from ......building_block import BuildingBlock
+from ......atoms import Atom, AtomInfo
+from ......bonds import Bond, BondInfo
+from ......molecules import BuildingBlock
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
 
@@ -48,8 +46,8 @@ class _PlacementsSummary:
 
     def __init__(
         self,
-        building_blocks: abc.Iterable[BuildingBlock],
-        placement_results: abc.Iterable[_PlacementResult],
+        building_blocks: Iterable[BuildingBlock],
+        placement_results: Iterable[_PlacementResult],
         num_atoms: int,
         num_previous_placements: int,
     ) -> None:

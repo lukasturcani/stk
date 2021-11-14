@@ -6,11 +6,10 @@ Bond Batch
 
 from __future__ import annotations
 
-from collections import abc
+from typing import Iterable
 
-from ......bond import Bond
-from ......bond_info import BondInfo
-from ......building_block import BuildingBlock
+from ......bonds import Bond, BondInfo
+from ......molecules import BuildingBlock
 
 
 class _BondBatch:
@@ -26,7 +25,7 @@ class _BondBatch:
 
     def __init__(
         self,
-        bonds: abc.Iterable[Bond],
+        bonds: Iterable[Bond],
         id_map: dict[int, int],
         building_block: BuildingBlock,
         building_block_id: int,
@@ -65,7 +64,7 @@ class _BondBatch:
                 )
             )
 
-    def get_bonds(self) -> abc.Iterable[Bond]:
+    def get_bonds(self) -> Iterable[Bond]:
         """
         Yield the bonds in the batch.
 
@@ -77,7 +76,7 @@ class _BondBatch:
 
         yield from self._bonds
 
-    def get_bond_infos(self) -> abc.Iterable[BondInfo]:
+    def get_bond_infos(self) -> Iterable[BondInfo]:
         """
         Yield info about the bonds in the batch.
 

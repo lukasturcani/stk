@@ -1,16 +1,14 @@
-from __future__ import annotations
-
 import itertools as it
 import stk
 
-from collections import abc
+from typing import Callable, Iterable
 
 from ...utilities import is_clone_functional_group
 
 
 def test_with_ids(
     functional_group: stk.FunctionalGroup,
-    get_id_map: abc.Callable[[stk.FunctionalGroup], dict[int, int]],
+    get_id_map: Callable[[stk.FunctionalGroup], dict[int, int]],
 ) -> None:
     """
     Test :meth:`.FunctionalGroup.with_ids`.
@@ -37,7 +35,7 @@ def test_with_ids(
 
 def _test_with_atoms(
     functional_group: stk.FunctionalGroup,
-    get_id_map: abc.Callable[[stk.FunctionalGroup], dict[int, int]],
+    get_id_map: Callable[[stk.FunctionalGroup], dict[int, int]],
 ) -> None:
     """
     Test :meth:`.FunctionalGroup.with_atoms`.
@@ -76,8 +74,8 @@ def _test_with_atoms(
 
 
 def is_modified_id_sequence(
-    original_ids: abc.Iterable[int],
-    modified_ids: abc.Iterable[int],
+    original_ids: Iterable[int],
+    modified_ids: Iterable[int],
     id_map: dict[int, int],
 ) -> None:
 

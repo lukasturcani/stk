@@ -23,19 +23,7 @@ stk.molecular.reactions.reactions.dative_reaction.dative_reaction\
 
 """
 
-from __future__ import annotations
-
-from collections import abc
-
-from .new_atom import NewAtom
 from .reaction_result import ReactionResult
-from ....atom import Atom
-from ....bond import Bond
-
-
-__all__ = (
-    'Reaction',
-)
 
 
 class Reaction:
@@ -54,41 +42,42 @@ class Reaction:
     not actually care, and you can modify as many atoms and bonds as
     you want in any reaction.
 
-    See Also:
+    See Also
+    --------
+    :mod:`.reaction_factory`
+        Used for automated creation of :class:`.Reaction` instances.
+        Typically, :class:`.Reaction` instances are not created
+        directly, but only through some kind of
+        :class:`.ReactionFactory` instance.
 
-        :mod:`.reaction_factory`
-            Used for automated creation of :class:`.Reaction`
-            instances. Typically, :class:`.Reaction` instances are not
-            created directly, but only through some kind of
-            :class:`.ReactionFactory` instance.
+    Notes
+    -----
+    You might notice that the public method of this abstract
+    base class, :meth:`.get_result`, is implemented. This is purely for
+    convenience when implementing subclasses. The implemented public
+    method is simply a default implementation, which can be safely
+    ignored or overridden, when implementing subclasses. The private
+    methods are an implementation detail of this default
+    implementation. However, they are not implemented. To use the
+    default implementation of :meth:`.get_result`, the private methods
+    it relies on need to be implemented.
 
-    Notes:
+    Examples
+    --------
+    *Subclass Implementation*
 
-        You might notice that the public method of this abstract
-        base class, :meth:`.get_result`, is implemented. This is purely
-        for convenience when implementing subclasses. The implemented
-        public method is simply a default implementation, which can be
-        safely ignored or overridden, when implementing subclasses. The
-        private methods are an implementation detail of this default
-        implementation. However, they are not implemented. To use the
-        default implementation of :meth:`.get_result`, the private
-        methods it relies on need to be implemented.
-
-    Examples:
-
-        *Subclass Implementation*
-
-        The source code of the subclasses, listed in
-        :mod:`~.reaction.reaction`, can serve as good examples.
+    The source code of the subclasses, listed in
+    :mod:`~.reaction.reaction`, can serve as good examples.
 
     """
 
-    def get_result(self) -> ReactionResult:
+    def get_result(self):
         """
         Get the result of carrying out the reaction.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.ReactionResult`
             Holds the results of the reaction.
 
         """
@@ -100,48 +89,57 @@ class Reaction:
             deleted_bonds=tuple(self._get_deleted_bonds()),
         )
 
-    def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
+    def _get_new_atoms(self):
         """
         Yield the atoms added by the reaction.
 
-        Yields:
-
-            An atom added by the reaction.
+        Yields
+        ------
+        :class:`tuple`
+            A :class:`tuple` of the form ``(atom, position)``, holding
+            an :class:`.Atom` added
+            by the reaction and its position as a
+            :class:`numpy.ndarray`. New atoms have a negative id, and
+            will need to be assigned a new one when added to the
+            :class:`.ConstructedMolecule`.
 
         """
 
         raise NotImplementedError()
 
-    def _get_new_bonds(self) -> abc.Iterator[Bond]:
+    def _get_new_bonds(self):
         """
         Yield the bonds added by the reaction.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`.Bond`
             A bond added by the reaction.
 
         """
 
         raise NotImplementedError()
 
-    def _get_deleted_atoms(self) -> abc.Iterator[Atom]:
+    def _get_deleted_atoms(self):
         """
         Yield the atoms removed by the reaction.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`.Atom`
             An atom deleted by the reaction.
 
         """
 
         raise NotImplementedError()
 
-    def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
+    def _get_deleted_bonds(self):
         """
         Yield the bonds removed by the reaction between existing atoms.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`.Bond`
             An bond deleted by the reaction.
 
         """

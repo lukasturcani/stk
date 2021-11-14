@@ -66,14 +66,6 @@ stk.molecular.functional_groups.factories.thiol_factory\
 """
 
 
-from __future__ import annotations
-
-from collections import abc
-
-from ..functional_groups import FunctionalGroup
-from ...molecule import Molecule
-
-
 class FunctionalGroupFactory:
     """
     An abstract base class for functional group factories.
@@ -85,99 +77,95 @@ class FunctionalGroupFactory:
     of this class are made to customize the automatic creation
     process.
 
-    Examples:
+    Examples
+    --------
+    *Using a Single Functional Group From a Factory*
 
-        *Using a Single Functional Group From a Factory*
+    You have a building block with two functional groups, but you want
+    to use just one.
 
-        You have a building block with two functional groups, but you
-        want to use just one.
+    .. testcode:: using-a-single-functional-group-factory
 
-        .. testcode:: using-a-single-functional-group-factory
+        import stk
 
-            import stk
+        amino_factory = stk.PrimaryAminoFactory()
+        building_block = stk.BuildingBlock('NCCN')
+        amino_group1, *rest = amino_factory.get_functional_groups(
+            molecule=building_block,
+        )
+        building_block = building_block.with_functional_groups(
+            functional_groups=(amino_group1, ),
+        )
 
-            amino_factory = stk.PrimaryAminoFactory()
-            building_block = stk.BuildingBlock('NCCN')
-            amino_group1, *rest = amino_factory.get_functional_groups(
-                molecule=building_block,
-            )
-            building_block = building_block.with_functional_groups(
-                functional_groups=(amino_group1, ),
-            )
+    .. testcode:: using-a-single-functional-group-factory
+        :hide:
 
-        .. testcode:: using-a-single-functional-group-factory
-            :hide:
+        assert all(
+            isinstance(functional_group, stk.PrimaryAmino)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 1
 
-            assert all(
-                isinstance(functional_group, stk.PrimaryAmino)
-                for functional_group
-                in building_block.get_functional_groups()
-            )
-            assert building_block.get_num_functional_groups() == 1
+    *Using a Subset of Functional Groups From a Factory*
 
-        *Using a Subset of Functional Groups From a Factory*
+    You have multiple functional groups, but you want the building
+    block to use a specific subset.
 
-        You have multiple functional groups, but you want the building
-        block to use a specific subset.
+    .. testcode:: using-a-subset-of-functional-groups-from-a-factory
 
-        .. testcode:: using-a-subset-of-functional-groups
+        import stk
 
-            import stk
+        bromo_factory = stk.BromoFactory()
+        building_block = stk.BuildingBlock('BrCC(Br)CC(Br)CC(Br)CCBr')
+        bromo_groups = tuple(bromo_factory.get_functional_groups(
+            molecule=building_block,
+        ))
+        building_block = building_block.with_functional_groups(
+            functional_groups=(
+                bromo_groups[0],
+                bromo_groups[3],
+                bromo_groups[4],
+            ),
+        )
 
-            bromo_factory = stk.BromoFactory()
-            building_block = stk.BuildingBlock(
-                smiles='BrCC(Br)CC(Br)CC(Br)CCBr',
-            )
-            bromo_groups = tuple(bromo_factory.get_functional_groups(
-                molecule=building_block,
-            ))
-            building_block = building_block.with_functional_groups(
-                functional_groups=(
-                    bromo_groups[0],
-                    bromo_groups[3],
-                    bromo_groups[4],
-                ),
-            )
+    .. testcode:: using-a-subset-of-functional-groups-from-a-factory
+        :hide:
 
-        .. testcode:: using-a-subset-of-functional-groups
-            :hide:
+        assert all(
+            isinstance(functional_group, stk.Bromo)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 3
 
-            assert all(
-                isinstance(functional_group, stk.Bromo)
-                for functional_group
-                in building_block.get_functional_groups()
-            )
-            assert building_block.get_num_functional_groups() == 3
+    More usage examples can be found in the docstrings of the
+    various subclasses.
 
-        More usage examples can be found in the docstrings of the
-        various subclasses.
+    *Subclass Implementation*
 
-        *Subclass Implementation*
-
-        The source of the subclasses, listed in
-        :mod:`.functional_group_factory`, can serve as good examples.
+    The source of the subclasses, listed in
+    :mod:`.functional_group_factory`, can serve as good examples.
 
     """
 
-    def get_functional_groups(
-        self,
-        molecule: Molecule,
-    ) -> abc.Iterable[FunctionalGroup]:
+    def get_functional_groups(self, molecule):
         """
         Yield functional groups in `molecule`.
 
-        Examples:
+        Parameters
+        ----------
+        molecule : :class:`.Molecule`
+            The molecule, whose functional groups are to be found.
 
-            See :class:`.FunctionalGroupFactory`.
-
-        Parameters:
-
-            molecule:
-                The molecule, whose functional groups are to be found.
-
-        Yields:
-
+        Yields
+        ------
+        :class:`.FunctionalGroup`
             A functional group in `molecule`.
+
+        Examples
+        --------
+        See :class:`.FunctionalGroupFactory`.
 
         """
 

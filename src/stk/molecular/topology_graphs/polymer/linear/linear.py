@@ -7,10 +7,10 @@ Linear
 from __future__ import annotations
 
 from dataclasses import dataclass
-from collections import abc
+from typing import Iterable
 import numpy as np
 
-from ....building_block import BuildingBlock
+from ....molecules import BuildingBlock
 from .vertices import (
     HeadVertex,
     TailVertex,
@@ -584,7 +584,7 @@ class Linear(TopologyGraph):
     def _get_building_block_vertices(
         self,
         building_blocks: dict[int, BuildingBlock],
-        vertices: abc.Iterable[Vertex],
+        vertices: Iterable[Vertex],
     ) -> dict[BuildingBlock, Vertex]:
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}

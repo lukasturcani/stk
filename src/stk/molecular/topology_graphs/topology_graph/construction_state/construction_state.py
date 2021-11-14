@@ -4,12 +4,8 @@ Construction State
 
 """
 
-from collections import abc
-
 from .graph_state import _GraphState
 from .molecule_state import _MoleculeState
-from ..edge_group import EdgeGroup
-from ....functional_groups import FunctionalGroup
 
 
 class ConstructionState:
@@ -244,20 +240,18 @@ class ConstructionState:
 
         return self._graph_state.get_edges(vertex_id)
 
-    def get_edge_group_functional_groups(
-        self,
-        edge_group: EdgeGroup,
-    ) -> abc.Iterator[FunctionalGroup]:
+    def get_edge_group_functional_groups(self, edge_group):
         """
         Yield the functional groups associated with `edge_group`.
 
-        Parameters:
+        Parameters
+        ----------
+        edge_group : :class:`.EdgeGroup`
+            The edge group, whose functional groups are desired.
 
-            edge_group:
-                The edge group, whose functional groups are desired.
-
-        Yields:
-
+        Yields
+        ------
+        :class:`.FunctionalGroup`
             A functional group which belongs to `edge_group`.
 
         """

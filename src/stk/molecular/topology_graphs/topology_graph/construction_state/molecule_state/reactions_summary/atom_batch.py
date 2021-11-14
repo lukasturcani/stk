@@ -4,7 +4,7 @@ Atom Batch
 
 """
 
-from ......atom_info import AtomInfo
+from ......atoms import AtomInfo
 
 
 class _AtomBatch:

@@ -5,15 +5,6 @@ Reaction Result
 """
 
 
-from ....atom import Atom
-from ....bond import Bond
-from .new_atom import NewAtom
-
-__all__ = (
-    'ReactionResult',
-)
-
-
 class ReactionResult:
     """
     The result of a reaction.
@@ -29,27 +20,27 @@ class ReactionResult:
 
     def __init__(
         self,
-        new_atoms: tuple[NewAtom, ...],
-        new_bonds: tuple[Bond, ...],
-        deleted_atoms: tuple[Atom, ...],
-        deleted_bonds: tuple[Bond, ...],
-    ) -> None:
+        new_atoms,
+        new_bonds,
+        deleted_atoms,
+        deleted_bonds,
+    ):
         """
         Initialize a :class:`.ReactionResult` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        new_atoms : :class:`tuple` of :class:`.NewAtom`
+            The new atoms added by the reaction.
 
-            new_atoms:
-                The new atoms added by the reaction.
+        new_bonds : :class:`tuple` of :class:`.Bond`
+            The bonds added by the reaction.
 
-            new_bonds:
-                The bonds added by the reaction.
+        deleted_atoms : :class:`tuple` of :class:`.Atom`
+            The atoms deleted by the reaction.
 
-            deleted_atoms:
-                The atoms deleted by the reaction.
-
-            deleted_bonds:
-                The bonds deleted by the reaction.
+        deleted_bonds : :class:`tuple` of :class:`.Bond`
+            The bonds deleted by the reaction.
 
         """
 
@@ -58,47 +49,51 @@ class ReactionResult:
         self._deleted_atoms = deleted_atoms
         self._deleted_bonds = deleted_bonds
 
-    def get_new_atoms(self) -> tuple[NewAtom, ...]:
+    def get_new_atoms(self):
         """
         Get the new atoms added by the reaction.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`tuple` of :class:`.NewAtom`
             The new atoms added by the reaction.
 
         """
 
         return self._new_atoms
 
-    def get_new_bonds(self) -> tuple[Bond, ...]:
+    def get_new_bonds(self):
         """
         Get the new bonds added by the reaction.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`tuple` of :class:`.Bond`
             The new bonds added by the reaction.
 
         """
         return self._new_bonds
 
-    def get_deleted_atoms(self) -> tuple[Atom, ...]:
+    def get_deleted_atoms(self):
         """
         Get the atoms deleted by the reaction.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`tuple` of :class:`.Atom`
             The atoms deleted by the reaction.
 
         """
 
         return self._deleted_atoms
 
-    def get_deleted_bonds(self) -> tuple[Bond, ...]:
+    def get_deleted_bonds(self):
         """
         Get the bonds deleted by the reaction.
 
         Returns
-
+        -------
+        :class:`tuple` of :class:`.Bond`
             The bonds deleted by the reaction.
 
         """

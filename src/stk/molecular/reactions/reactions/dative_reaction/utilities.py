@@ -6,24 +6,19 @@ Dative Reaction Utilities
 
 from itertools import chain
 
-from ....atom import Atom
 
-__all__ = (
-    'is_metal',
-)
-
-
-def is_metal(atom: Atom) -> bool:
+def is_metal(atom):
     """
     Check if `atom` is a metal atom.
 
-    Parameters:
+    Parameters
+    ----------
+    atom : :class:`.Atom`
+        An atom.
 
-        atom:
-            An atom.
-
-    Returns:
-
+    Returns
+    -------
+    :class:`bool`
         ``True`` if `atom` is a metal atom.
 
     """
