@@ -541,23 +541,25 @@ class Cage(TopologyGraph[CageVertex]):
                 ],
             )
 
+            dative_reaction_factory = stk.DativeReactionFactory(
+                reaction_factory=stk.GenericReactionFactory(
+                    bond_orders={
+                        # Ensure that bonds between the
+                        # GenericFunctionalGroups
+                        # of the ligand and the SingleAtom functional
+                        # groups of the metal are dative, by setting
+                        # the bond order to 9.
+                        frozenset({
+                            stk.GenericFunctionalGroup,
+                            stk.SingleAtom,
+                        }): 9,
+                    },
+                ),
+            )
             cage1 = stk.ConstructedMolecule(
                 stk.cage.M2L4Lantern(
                     building_blocks=(palladium_atom, bb1),
-                    # Ensure that bonds between the
-                    # GenericFunctionalGroups
-                    # of the ligand and the SingleAtom functional
-                    # groups of the metal are dative.
-                    reaction_factory=stk.DativeReactionFactory(
-                        stk.GenericReactionFactory(
-                            bond_orders={
-                                frozenset({
-                                    stk.GenericFunctionalGroup,
-                                    stk.SingleAtom,
-                                }): 9,
-                            },
-                        ),
-                    ),
+                    reaction_factory=dative_reaction_factory,
                 ),
             )
 
@@ -902,11 +904,9 @@ class Cage(TopologyGraph[CageVertex]):
             )
 
             metal_complex = stk.ConstructedMolecule(
-                topology_graph=(
-                    stk.metal_complex.CisProtectedSquarePlanar(
-                        metals=metal_atom,
-                        ligands=ligand,
-                    )
+                topology_graph=stk.metal_complex.CisProtectedSquarePlanar(
+                    metals=metal_atom,
+                    ligands=ligand,
                 ),
             )
 
