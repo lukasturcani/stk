@@ -13,7 +13,7 @@ from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Bromo
 from ...molecule import Molecule
-from ...elements import Br
+from ...atoms import Br
 
 __all__ = (
     'BromoFactory',

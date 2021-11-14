@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import typing
 
-from .atom import Atom
+from ..atoms import Atom
 
 __all__ = (
     'Bond',
@@ -146,10 +146,7 @@ class Bond:
 
         """
 
-        clone = typing.cast(
-            Bond,
-            self.__class__.__new__(self.__class__),
-        )
+        clone = self.__class__.__new__(self.__class__)
         Bond.__init__(
             self=clone,
             atom1=self._atom1,

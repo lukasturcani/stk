@@ -10,8 +10,7 @@ import typing
 
 from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
-from ...atom import Atom
-from ...elements import B, O, H
+from ...atoms import B, O, H, Atom
 
 __all__ = (
     'BoronicAcid',

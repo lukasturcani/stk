@@ -65,7 +65,7 @@ import typing
 from collections import abc
 
 from .utilities import get_atom_map
-from ...atom import Atom
+from ...atoms import Atom
 
 
 __all__ = (

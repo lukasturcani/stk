@@ -14,10 +14,8 @@ from .....topology_graph.topology_graph.implementations import (
     _PlacementResult,
 )
 from ......functional_groups import FunctionalGroup
-from ......atom import Atom
-from ......atom_info import AtomInfo
-from ......bond import Bond
-from ......bond_info import BondInfo
+from ......atoms import Atom, AtomInfo
+from ......bonds import Bond, BondInfo
 from ......building_block import BuildingBlock
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch

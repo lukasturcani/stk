@@ -6,7 +6,7 @@ Dative Reaction Utilities
 
 from itertools import chain
 
-from ....atom import Atom
+from ....atoms import Atom
 
 __all__ = (
     'is_metal',

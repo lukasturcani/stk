@@ -13,7 +13,7 @@ from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import Alkyne
 from ...molecule import Molecule
-from ...elements import C
+from ...atoms import C
 
 
 __all__ = (

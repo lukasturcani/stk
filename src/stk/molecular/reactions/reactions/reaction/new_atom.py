@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from ....atom import Atom
+from ....atoms import Atom
 
 
 __all__ = (

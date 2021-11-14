@@ -11,8 +11,8 @@ import pathlib
 import numpy as np
 
 from stk.utilities import typing as _typing
-from ....atom import Atom
-from ....bond import Bond
+from ....atoms import Atom
+from ....bonds import Bond
 
 
 def write_xyz_file(

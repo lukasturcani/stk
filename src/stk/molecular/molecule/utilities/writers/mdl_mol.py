@@ -10,8 +10,8 @@ import pathlib
 import typing
 import numpy as np
 
-from ....atom import Atom
-from ....bond import Bond
+from ....atoms import Atom
+from ....bonds import Bond
 from stk.utilities import typing as _typing
 
 

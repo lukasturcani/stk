@@ -13,14 +13,11 @@ import rdkit.Chem.AllChem as rdkit
 from collections import abc
 
 from stk.utilities.typing import OneOrMany
-from .utilities import get_bond_info_atom_ids
-from ..molecule import Molecule
-from ..atom import Atom
-from ..atom_info import AtomInfo
-from ..bond import Bond
-from ..bond_info import BondInfo
-from ..molecular_utilities import sort_bond_atoms_by_id
-from ..topology_graphs import TopologyGraph, ConstructionResult
+from .molecule import Molecule
+from .atoms import Atom, AtomInfo
+from .bonds import Bond, BondInfo
+from . import molecular_utilities as _utilities
+from .topology_graphs import TopologyGraph, ConstructionResult
 
 
 _T = typing.TypeVar('_T', bound='ConstructedMolecule')
@@ -380,9 +377,6 @@ class ConstructedMolecule(Molecule):
             old_building_block_atom = (
                 old_atom_info.get_building_block_atom()
             )
-            # This should not be None if old_building_block is not
-            # None.
-            assert old_building_block_atom is not None
 
             canonical_building_block_atom_id = canonical_map[
                 old_building_block
@@ -410,7 +404,7 @@ class ConstructedMolecule(Molecule):
         def get_bond_info(info: BondInfo) -> BondInfo:
             building_block = info.get_building_block()
             return BondInfo(
-                bond=sort_bond_atoms_by_id(
+                bond=_utilities.sort_bond_atoms_by_id(
                     info.get_bond().with_atoms(atom_map)
                 ),
                 building_block=(
@@ -424,7 +418,7 @@ class ConstructedMolecule(Molecule):
         self._atom_infos = tuple(map(get_atom_info, self._atoms))
         self._bond_infos = tuple(sorted(
             map(get_bond_info, self._bond_infos),
-            key=get_bond_info_atom_ids,
+            key=_utilities.get_bond_info_atom_ids,
         ))
         return self
 

@@ -13,7 +13,7 @@ from .functional_group_factory import FunctionalGroupFactory
 from .utilities import get_atom_ids
 from ..functional_groups import CarboxylicAcid
 from ...molecule import Molecule
-from ...elements import C, O, H
+from ...atoms import C, O, H
 
 
 __all__ = (

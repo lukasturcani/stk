@@ -1,4 +1,4 @@
-.. automodule:: stk.molecular.atom
+.. automodule:: stk.molecular.atoms.atom_info
    :members:
    :undoc-members:
    :show-inheritance:

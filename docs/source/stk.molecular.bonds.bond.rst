@@ -1,4 +1,4 @@
-.. automodule:: stk.molecular.bond
+.. automodule:: stk.molecular.bonds.bond
    :members:
    :undoc-members:
    :show-inheritance:

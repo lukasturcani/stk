@@ -8,8 +8,8 @@ from collections import abc
 
 from .reaction import Reaction, NewAtom
 from ...functional_groups import GenericFunctionalGroup
-from ...atom import Atom
-from ...bond import Bond
+from ...atoms import Atom
+from ...bonds import Bond
 
 __all__ = (
     'OneOneReaction',

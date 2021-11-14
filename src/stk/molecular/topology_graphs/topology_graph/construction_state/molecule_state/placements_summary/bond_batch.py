@@ -8,8 +8,7 @@ from __future__ import annotations
 
 from collections import abc
 
-from ......bond import Bond
-from ......bond_info import BondInfo
+from ......bonds import Bond, BondInfo
 from ......building_block import BuildingBlock
 
 
