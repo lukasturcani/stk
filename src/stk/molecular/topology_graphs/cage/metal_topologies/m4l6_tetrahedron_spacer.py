@@ -168,7 +168,7 @@ class M4L6TetrahedronSpacer(Cage):
 
     """
 
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
         NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
         NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
@@ -176,31 +176,31 @@ class M4L6TetrahedronSpacer(Cage):
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
 
         LinearVertex.init_at_center(
             id=4,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(_non_linears[0], _non_linears[1]),
         ),
         LinearVertex.init_at_center(
             id=5,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
+            vertices=(_non_linears[0], _non_linears[2]),
         ),
         LinearVertex.init_at_center(
             id=6,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[3]),
+            vertices=(_non_linears[0], _non_linears[3]),
         ),
         LinearVertex.init_at_center(
             id=7,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
+            vertices=(_non_linears[1], _non_linears[2]),
         ),
         LinearVertex.init_at_center(
             id=8,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
+            vertices=(_non_linears[1], _non_linears[3]),
         ),
         LinearVertex.init_at_center(
             id=9,
-            vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
+            vertices=(_non_linears[2], _non_linears[3]),
         ),
     )
 

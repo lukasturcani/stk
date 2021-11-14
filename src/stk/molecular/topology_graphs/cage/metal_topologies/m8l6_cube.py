@@ -151,7 +151,7 @@ class M8L6Cube(Cage):
 
     """
 
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(
             id=0,
             position=[1, 1, 1],
@@ -195,7 +195,7 @@ class M8L6Cube(Cage):
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
 
         NonLinearVertex(
             id=8,

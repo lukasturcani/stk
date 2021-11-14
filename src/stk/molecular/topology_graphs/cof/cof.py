@@ -26,27 +26,21 @@ stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
 
 """
 
-from __future__ import annotations
-
 import itertools as it
-import typing
-from collections import Counter, abc
+from collections import Counter
 import numpy as np
 from functools import partial
 from operator import getitem
 
 from ..topology_graph import (
     TopologyGraph,
-    Edge,
     NullOptimizer,
     EdgeGroup,
     PeriodicConstructionResult,
 )
-from .vertices import CofVertex, UnaligningVertex
+from .vertices import UnaligningVertex
 from .edge import CofEdge
 from ...reactions import GenericReactionFactory
-
-_LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 
 class UnoccupiedVertexError(Exception):
@@ -331,10 +325,6 @@ class Cof(TopologyGraph):
         )
 
     """
-
-    _vertex_prototypes: typing.ClassVar[abc.Sequence[CofVertex]]
-    _edge_prototypes: typing.ClassVar[abc.Sequence[Edge]]
-    _lattice_constants: typing.ClassVar[_LatticeConstants]
 
     def __init_subclass__(cls, **kwargs):
         vertex_degrees = Counter(

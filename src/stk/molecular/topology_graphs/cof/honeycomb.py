@@ -117,38 +117,29 @@ class Honeycomb(Cof):
         np.array([0, 0, 5/1.7321])
     )
 
-    _non_linear_vertices = (
+    _vertex_prototypes = (
         NonLinearVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
         NonLinearVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
     )
 
     _vertex_prototypes = (
-        *_non_linear_vertices,
+        *_vertex_prototypes,
         LinearVertex.init_at_center(
             id=2,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[1],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
         LinearVertex.init_at_shifted_center(
             id=3,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[1],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=4,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[1],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants,
-        ),
+        )
     )
 
     _edge_prototypes = (

@@ -115,7 +115,7 @@ class Hexagonal(Cof):
         np.array([0, 0, 5/1.7321])
     )
 
-    _non_linear_vertices = (
+    _vertex_prototypes = (
         NonLinearVertex(0, (1/4)*_a + (1/4)*_b + (1/2)*_c),
         NonLinearVertex(1, (1/4)*_a + (3/4)*_b + (1/2)*_c),
         NonLinearVertex(2, (3/4)*_a + (1/4)*_b + (1/2)*_c),
@@ -123,105 +123,69 @@ class Hexagonal(Cof):
     )
 
     _vertex_prototypes = (
-        *_non_linear_vertices,
+        *_vertex_prototypes,
         LinearVertex.init_at_center(
             id=4,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[1],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
         ),
         LinearVertex.init_at_center(
             id=5,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[2],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
         ),
         LinearVertex.init_at_center(
             id=6,
-            vertices=(
-                _non_linear_vertices[1],
-                _non_linear_vertices[2],
-            ),
+            vertices=(_vertex_prototypes[1], _vertex_prototypes[2]),
         ),
         LinearVertex.init_at_center(
             id=7,
-            vertices=(
-                _non_linear_vertices[1],
-                _non_linear_vertices[3],
-            ),
+            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
         ),
         LinearVertex.init_at_center(
             id=8,
-            vertices=(
-                _non_linear_vertices[2],
-                _non_linear_vertices[3],
-            ),
+            vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
         ),
         LinearVertex.init_at_shifted_center(
             id=9,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[2],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=10,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[1],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=11,
-            vertices=(
-                _non_linear_vertices[0],
-                _non_linear_vertices[3],
-            ),
+            vertices=(_vertex_prototypes[0], _vertex_prototypes[3]),
             cell_shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=12,
-            vertices=(
-                _non_linear_vertices[2],
-                _non_linear_vertices[1],
-            ),
+            vertices=(_vertex_prototypes[2], _vertex_prototypes[1]),
             cell_shifts=((0, 0, 0), (1, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=13,
-            vertices=(
-                _non_linear_vertices[2],
-                _non_linear_vertices[3],
-            ),
+            vertices=(_vertex_prototypes[2], _vertex_prototypes[3]),
             cell_shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=14,
-            vertices=(
-                _non_linear_vertices[1],
-                _non_linear_vertices[3],
-            ),
+            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=15,
-            vertices=(
-                _non_linear_vertices[3],
-                _non_linear_vertices[0],
-            ),
+            vertices=(_vertex_prototypes[3], _vertex_prototypes[0]),
             cell_shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants,
-        ),
+        )
     )
 
     _edge_prototypes = (
