@@ -12,15 +12,15 @@ from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
 
 
-class _CofVertex(Vertex):
+class CofVertex(Vertex):
     """
-    A :class:`._CofVertex` .
+    A :class:`.CofVertex` .
 
     """
 
     def __init__(self, id, position, aligner_edge=0, cell=(0, 0, 0)):
         """
-        Initialize a :class:`._CofVertex`.
+        Initialize a :class:`.CofVertex`.
 
         Parameters
         ----------
@@ -71,7 +71,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`._CofVertex` in the middle of `vertices`.
+        Initialize a :class:`.CofVertex` in the middle of `vertices`.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`._CofVertex`
+        :class:`.CofVertex`
             The new vertex.
 
         """
@@ -119,7 +119,7 @@ class _CofVertex(Vertex):
         cell=(0, 0, 0),
     ):
         """
-        Initialize a :class:`._CofVertex` at the center of `vertices`.
+        Initialize a :class:`.CofVertex` at the center of `vertices`.
 
         The `vertices` are shifted according to the lattice constants
         and cell shifts.
@@ -150,7 +150,7 @@ class _CofVertex(Vertex):
 
         Returns
         -------
-        :class:`._CofVertex`
+        :class:`.CofVertex`
             The new vertex.
 
         """
@@ -184,7 +184,7 @@ class _CofVertex(Vertex):
         )
 
 
-class LinearVertex(_CofVertex):
+class LinearVertex(CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() == 2
@@ -240,7 +240,7 @@ class LinearVertex(_CofVertex):
         }
 
 
-class NonLinearVertex(_CofVertex):
+class NonLinearVertex(CofVertex):
     def place_building_block(self, building_block, edges):
         assert (
             building_block.get_num_functional_groups() > 2
@@ -304,7 +304,7 @@ class NonLinearVertex(_CofVertex):
         }
 
 
-class UnaligningVertex(_CofVertex):
+class UnaligningVertex(CofVertex):
     """
     Just places a building block, does not align.
 
