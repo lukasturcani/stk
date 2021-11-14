@@ -1,11 +1,11 @@
-name: Sort imports
+name: Format code
 
 on:
   push:
     branches: [master]
 
 jobs:
-  remake-rst-files:
+  format-code:
     runs-on: ubuntu-20.04
     container:
       image: ghcr.io/lukasturcani/stk-test-environment
@@ -18,7 +18,7 @@ jobs:
         run: conda run -n stk
           pip install --no-deps -e .
 
-      - name: Remake rst files
+      - name: Run isort
         run: conda run -n stk
           isort src tests benchmarks
 
