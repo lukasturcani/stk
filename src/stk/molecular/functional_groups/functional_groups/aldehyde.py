@@ -92,7 +92,7 @@ class Aldehyde(GenericFunctionalGroup):
         return self._carbon
 
     # O is not an ambiguous name.
-    def get_oxygen(self) -> O:  # noqa
+    def get_oxygen(self) -> _atoms.O:  # noqa
         """
         Get the oxygen atom.
 
