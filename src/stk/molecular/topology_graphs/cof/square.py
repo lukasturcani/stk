@@ -123,24 +123,31 @@ class Square(Cof):
         np.array([0., 0., 1.])
     )
 
-    _vertex_prototypes = (
-        NonLinearVertex(0, (0.5)*_a + (0.5)*_b + (0.5)*_c),
+    _non_linear_vertex = NonLinearVertex(
+        id=0,
+        position=(0.5)*_a + (0.5)*_b + (0.5)*_c,
     )
+
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        _non_linear_vertex,
         LinearVertex.init_at_shifted_center(
             id=1,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[0]),
+            vertices=(
+                _non_linear_vertex,
+                _non_linear_vertex,
+            ),
             cell_shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=2,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[0]),
+            vertices=(
+                _non_linear_vertex,
+                _non_linear_vertex,
+            ),
             cell_shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants,
         ),
-
     )
 
     _edge_prototypes = (
