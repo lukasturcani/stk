@@ -13,6 +13,7 @@ import numpy as np
 from .vertices import CageVertex
 from ...building_block import BuildingBlock
 from ...edge import Edge
+from ...reactions import Reaction, ReactionResult
 from ...placement_result import PlacementResult
 from ...construction_state import ConstructionState
 
@@ -21,6 +22,8 @@ __all__ = (
 )
 
 _T = typing.TypeVar('_T', bound='CageConstructionState')
+
+_LatticeConstants = tuple[np.ndarray, np.ndarray, np.ndarray]
 
 
 class CageConstructionState(ConstructionState[CageVertex]):
@@ -288,3 +291,47 @@ class CageConstructionState(ConstructionState[CageVertex]):
 
     def clone(self) -> CageConstructionState:
         return self._clone()
+
+    def with_placement_results(
+        self,
+        vertices: abc.Collection[CageVertex],
+        edges: abc.Iterable[abc.Sequence[Edge]],
+        building_blocks: abc.Iterable[BuildingBlock],
+        results: abc.Iterable[PlacementResult],
+    ) -> CageConstructionState:
+
+        return self.clone()._with_placement_results(
+            vertices=vertices,
+            edges=edges,
+            building_blocks=building_blocks,
+            results=results,
+        )
+
+    def with_reaction_results(
+        self,
+        reactions: abc.Collection[Reaction],
+        results: abc.Iterable[ReactionResult],
+    ) -> CageConstructionState:
+
+        return self.clone()._with_reaction_results(reactions, results)
+
+    def with_lattice_constants(
+        self,
+        lattice_constants: typing.Optional[_LatticeConstants],
+    ) -> CageConstructionState:
+
+        return self.clone()._with_lattice_constants(lattice_constants)
+
+    def with_position_matrix(
+        self,
+        position_matrix: np.ndarray,
+    ) -> CageConstructionState:
+
+        return self.clone()._with_position_matrix(position_matrix)
+
+    def with_vertices(
+        self,
+        vertices: abc.Iterable[CageVertex],
+    ) -> CageConstructionState:
+
+        return self.clone()._with_vertices(vertices)
