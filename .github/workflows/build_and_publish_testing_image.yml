@@ -1,9 +1,9 @@
-name: build-and-publish-image
+name: Build and publish testing image
 
 on: [workflow_dispatch]
 
 jobs:
-  build-and-publish-image:
+  build-and-publish-testing-image:
     runs-on: ubuntu-20.04
     permissions:
       packages: write
