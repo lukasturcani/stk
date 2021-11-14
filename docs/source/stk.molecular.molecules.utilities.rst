@@ -1,4 +1,4 @@
-.. automodule:: stk.molecular.molecule.molecule
+.. automodule:: stk.molecular.molecules.utilities
    :members:
    :undoc-members:
    :show-inheritance:

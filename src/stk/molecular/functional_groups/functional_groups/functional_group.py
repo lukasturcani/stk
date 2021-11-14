@@ -61,14 +61,6 @@ information.
 
 from __future__ import annotations
 
-from typing import Iterable, TypeVar
-
-from .utilities import get_atom_map
-from ...atoms import Atom
-
-
-_T = TypeVar('_T', bound='FunctionalGroup')
-
 
 class FunctionalGroup:
     """
@@ -240,28 +232,23 @@ class FunctionalGroup:
 
     """
 
-    def __init__(
-        self,
-        atoms: tuple[Atom, ...],
-        placers: tuple[Atom, ...],
-        core_atoms: tuple[Atom, ...],
-    ) -> None:
+    def __init__(self, atoms, placers, core_atoms):
         """
         Initialize a :class:`.FunctionalGroup`.
 
-        Parameters:
+        Parameters
+        ----------
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms in the functional group.
 
-            atoms:
-                The atoms in the functional group.
+        placers : :class:`tuple` of :class:`.Atom`
+            The atoms used to calculate the position of the functional
+            group.
 
-            placers:
-                The atoms used to calculate the position of the
-                functional group.
-
-            core_atoms:
-                The atoms of the functional group which also form the
-                core of the :class:`.BuildingBlock`. See
-                :meth:`.BuildingBlock.get_core_atom_ids`.
+        core_atoms : :class:`tuple` of :class:`.Atom`
+            The atoms of the functional group which also form the core
+            of the :class:`.BuildingBlock`. See
+            :meth:`.BuildingBlock.get_core_atom_ids`.
 
         """
 
@@ -269,89 +256,86 @@ class FunctionalGroup:
         self._placers = placers
         self._core_atoms = core_atoms
 
-    def get_atoms(self) -> Iterable[Atom]:
+    def get_atoms(self):
         """
         Yield all the atoms in the functional group.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`.Atom`
             An atom in the functional group.
 
         """
 
         yield from self._atoms
 
-    def get_atom_ids(self) -> Iterable[int]:
+    def get_atom_ids(self):
         """
         Yield the ids of all atoms in the functional group.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`int`
             The id of an :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._atoms)
 
-    def get_placer_ids(self) -> Iterable[int]:
+    def get_placer_ids(self):
         """
         Yield the ids of *placer* atoms.
 
         *Placer* atoms are those, which should be used to calculate
         the position of the functional group.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`int`
             The id of an :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._placers)
 
-    def get_core_atom_ids(self) -> Iterable[int]:
+    def get_core_atom_ids(self):
         """
         Yield the ids of core atoms held by the functional group.
 
-        See Also:
-
-            :meth:`.BuildingBlock.get_core_atom_ids`
-
-        Yields:
-
+        Yields
+        ------
+        :class:`int`
             The id of an :class:`.Atom`.
 
+        See Also
+        --------
+        :meth:`.BuildingBlock.get_core_atom_ids`
 
         """
 
         yield from (a.get_id() for a in self._core_atoms)
 
-    def with_atoms(
-        self,
-        atom_map: dict[int, Atom],
-    ) -> FunctionalGroup:
+    def with_atoms(self, atom_map):
         """
         Return a clone holding different atoms.
 
-        Parameters:
+        Parameters
+        ----------
+        atom_map : :class:`dict`
+            Maps the id of an atom in the functional group to the new
+            atom the clone should hold. If the id of an atom in the
+            functional group is not found in `atom_map`, the atom
+            will not be replaced in the clone.
 
-            atom_map:
-                Maps the id of an atom in the functional group to the
-                new atom the clone should hold. If the id of an atom
-                in the functional group is not found in `atom_map`,
-                the atom will not be replaced in the clone.
-
-        Returns:
-
-            The clone.
+        Returns
+        -------
+        :class:`.FunctionalGroup`
+            The clone. Has the same type as the original functional
+            group.
 
         """
 
-        # The clone needs to be downcasted, otherwise isinstance checks
-        # might break. Consider:
-        # a = stk.Bromo(...).with_atoms(...)
-        # if isinstance(a, stk.Bromo):
-        #     # this is an error
-        #     a.get_bromine()
+        # The clone needs to be downcasted.
         return FunctionalGroup(
             atoms=tuple(
                 atom_map.get(a.get_id(), a) for a in self._atoms
@@ -363,6 +347,33 @@ class FunctionalGroup:
                 atom_map.get(a.get_id(), a) for a in self._core_atoms
             ),
         )
+
+    def _with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
+        self._atoms = tuple(
+            atom.with_id(
+                id=id_map.get(
+                    atom.get_id(),
+                    atom.get_id(),
+                ),
+            ) for atom in self._atoms
+        )
+        self._placers = tuple(
+            atom.with_id(
+                id=id_map.get(
+                    atom.get_id(),
+                    atom.get_id(),
+                ),
+            ) for atom in self._placers
+        )
+        self._core_atoms = tuple(
+            atom.with_id(
+                id=id_map.get(
+                    atom.get_id(),
+                    atom.get_id(),
+                ),
+            ) for atom in self._core_atoms
+        )
+        return self
 
     def with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
         """
@@ -382,35 +393,20 @@ class FunctionalGroup:
 
         """
 
-        atom_map = get_atom_map(
-            id_map=id_map,
-            atoms=(
-                *self._atoms,
-                *self._placers,
-                *self._core_atoms,
-            ),
-        )
+        return self.clone()._with_ids(id_map)
 
-        clone = self.__class__.__new__(self.__class__)
-        FunctionalGroup.__init__(
-            self=clone,
-            atoms=tuple(
-                atom_map.get(atom.get_id(), atom)
-                for atom in self._atoms
-            ),
-            placers=tuple(
-                atom_map.get(atom.get_id(), atom)
-                for atom in self._placers
-            ),
-            core_atoms=tuple(
-                atom_map.get(atom.get_id(), atom)
-                for atom in self._core_atoms
-            ),
+    def clone(self):
+        """
+        Return a clone.
 
-        )
-        return clone
+        Returns
+        -------
+        :class:`.FunctionalGroup`
+            A clone. Has the same type as the original functional
+            group.
 
-    def _clone(self: _T) -> _T:
+        """
+
         clone = self.__class__.__new__(self.__class__)
         FunctionalGroup.__init__(
             self=clone,
@@ -420,22 +416,10 @@ class FunctionalGroup:
         )
         return clone
 
-    def clone(self) -> FunctionalGroup:
-        """
-        Return a clone.
-
-        Returns:
-
-            A clone.
-
-        """
-
-        return self._clone()
-
-    def __str__(self) -> str:
+    def __str__(self):
         return repr(self)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f'{self.__class__.__name__}('
             f'atoms={self._atoms}, '

@@ -4,14 +4,9 @@ Terminal Alkene Factory
 
 """
 
-from typing import Optional, Iterable, Literal
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
+from .utilities import _get_atom_ids
 from ..functional_groups import Alkene
-from ...molecule import Molecule
-
-
-ValidIndices = tuple[Literal[0, 1, 2, 3, 4, 5], ...]
 
 
 class TerminalAlkeneFactory(FunctionalGroupFactory):
@@ -23,104 +18,103 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[*][C]([*])=[C]([H])[H]`` functional group string.
 
-    Examples:
+    Examples
+    --------
+    *Creating Functional Groups with the Factory*
 
-        *Creating Functional Groups with the Factory*
+    You want to create a building block which has
+    :class:`.Alkene` functional groups, but only if they are terminal.
+    You want the non-terminal carbon atom in those functional
+    groups to be the *bonder* atom, and the terminal CH\ :sub:`2`
+    group to be the *deleter* atoms.
 
-        You want to create a building block which has
-        :class:`.Alkene` functional groups, but only if they are
-        terminal. You want the non-terminal carbon atom in those
-        functional groups to be the *bonder* atom, and the terminal
-        CH\ :sub:`2` group to be the *deleter* atoms.
+    .. testcode:: creating-functional-groups-with-the-factory
 
-        .. testcode:: creating-functional-groups-with-the-factory
+        import stk
 
-            import stk
+        building_block = stk.BuildingBlock(
+            smiles='C=CCCCCC=C',
+            functional_groups=(stk.TerminalAlkeneFactory(), ),
+        )
 
-            building_block = stk.BuildingBlock(
-                smiles='C=CCCCCC=C',
-                functional_groups=(stk.TerminalAlkeneFactory(), ),
-            )
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
 
-        .. testcode:: creating-functional-groups-with-the-factory
-            :hide:
+        assert all(
+            isinstance(functional_group, stk.Alkene)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 2
 
-            assert all(
-                isinstance(functional_group, stk.Alkene)
-                for functional_group
-                in building_block.get_functional_groups()
-            )
-            assert building_block.get_num_functional_groups() == 2
+    *Changing the Bonder and Deleter Atoms*
 
-        *Changing the Bonder and Deleter Atoms*
+    You want to create a building block which has
+    :class:`.Alkene` functional groups, but only if they are terminal.
+    You want the carbon atoms to be the *bonder* atoms and you don't
+    want any *deleter* atoms.
 
-        You want to create a building block which has
-        :class:`.Alkene` functional groups, but only if they are
-        terminal. You want the carbon atoms to be the *bonder* atoms
-        and you don't want any *deleter* atoms.
+    .. testcode:: changing-the-bonder-and-deleter-atoms
 
-        .. testcode:: changing-the-bonder-and-deleter-atoms
+        import stk
 
-            import stk
+        terminal_alkene_factory = stk.TerminalAlkeneFactory(
+            # The indices of the carbon atoms in the functional
+            # group string (see docstring) are 1 and 3.
+            bonders=(1, 3),
+            deleters=(),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='C=CCCCCC=C',
+            functional_groups=(terminal_alkene_factory, ),
+        )
 
-            terminal_alkene_factory = stk.TerminalAlkeneFactory(
-                # The indices of the carbon atoms in the functional
-                # group string (see docstring) are 1 and 3.
-                bonders=(1, 3),
-                deleters=(),
-            )
-            building_block = stk.BuildingBlock(
-                smiles='C=CCCCCC=C',
-                functional_groups=(terminal_alkene_factory, ),
-            )
+    .. testcode:: changing-the-bonder-and-deleter-atoms
+        :hide:
 
-        .. testcode:: changing-the-bonder-and-deleter-atoms
-            :hide:
+        fg1, fg2 = building_block.get_functional_groups()
+        assert fg1.get_num_bonders() == 2
+        assert sum(1 for _ in fg1.get_deleters()) == 0
+        assert fg2.get_num_bonders() == 2
+        assert sum(1 for _ in fg2.get_deleters()) == 0
 
-            fg1, fg2 = building_block.get_functional_groups()
-            assert fg1.get_num_bonders() == 2
-            assert sum(1 for _ in fg1.get_deleters()) == 0
-            assert fg2.get_num_bonders() == 2
-            assert sum(1 for _ in fg2.get_deleters()) == 0
+        assert all(
+            isinstance(atom, stk.C)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
 
-            assert all(
-                isinstance(atom, stk.C)
-                for functional_group
-                in building_block.get_functional_groups()
-                for atom
-                in functional_group.get_bonders()
-            )
-
-    See Also:
-
-        :class:`.GenericFunctionalGroup`
-            Defines *bonders* and  *deleters*.
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
 
     """
 
     def __init__(
         self,
-        bonders: ValidIndices = (1, ),
-        deleters: ValidIndices = (3, 4, 5),
-        placers: Optional[ValidIndices] = None,
-    ) -> None:
+        bonders=(1, ),
+        deleters=(3, 4, 5),
+        placers=None,
+    ):
         """
         Initialize a :class:`.TerminalAlkeneFactory` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are *bonder* atoms.
 
-            bonders:
-                The indices of atoms in the functional group string,
-                which are *bonder* atoms.
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are *deleter* atoms.
 
-            deleters:
-                The indices of atoms in the functional group string,
-                which are *deleter* atoms.
-
-            placers:
-                The indices of atoms in the functional group string,
-                which are *placer* atoms. If ``None``, `bonders` will
-                be used.
+        placers : :class:`tuple` of :class:`int`, optional
+            The indices of atoms in the functional group string, which
+            are *placer* atoms. If ``None``, `bonders` will be used.
 
         """
 
@@ -128,12 +122,8 @@ class TerminalAlkeneFactory(FunctionalGroupFactory):
         self._deleters = deleters
         self._placers = bonders if placers is None else placers
 
-    def get_functional_groups(
-        self,
-        molecule: Molecule,
-    ) -> Iterable[Alkene]:
-
-        ids = get_atom_ids('[*][C]([*])=[C]([H])[H]', molecule)
+    def get_functional_groups(self, molecule):
+        ids = _get_atom_ids('[*][C]([*])=[C]([H])[H]', molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Alkene(

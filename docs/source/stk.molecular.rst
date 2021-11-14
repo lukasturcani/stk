@@ -16,7 +16,6 @@ Subpackages
    stk.molecular.bonds
    stk.molecular.functional_groups
    stk.molecular.key_makers
-   stk.molecular.molecule
    stk.molecular.molecules
    stk.molecular.reactions
    stk.molecular.topology_graphs
@@ -28,5 +27,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   stk.molecular.molecular_utilities
    stk.molecular.periodic_info

@@ -4,14 +4,9 @@ Dibromo Factory
 
 """
 
-from typing import Optional, Iterable, Literal
-
 from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
+from .utilities import _get_atom_ids
 from ..functional_groups import Dibromo
-from ...molecule import Molecule
-
-ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
 
 
 class DibromoFactory(FunctionalGroupFactory):
@@ -21,109 +16,103 @@ class DibromoFactory(FunctionalGroupFactory):
     Creates functional groups from substructures, which match the
     ``[Br][#6]~[#6][Br]`` functional group string.
 
-    Examples:
+    Examples
+    --------
+    *Creating Functional Groups with the Factory*
 
-        *Creating Functional Groups with the Factory*
+    You want to create a building block which has :class:`.Dibromo`
+    functional groups. You want the non-bromine atoms of the functional
+    group to be the *bonder* atoms and the bromine atoms to be the
+    *deleter* atoms.
 
-        You want to create a building block which has :class:`.Dibromo`
-        functional groups. You want the non-bromine atoms of the
-        functional group to be the *bonder* atoms and the bromine atoms
-        to be the *deleter* atoms.
+    .. testcode:: creating-functional-groups-with-the-factory
 
-        .. testcode:: creating-functional-groups-with-the-factory
+        import stk
 
-            import stk
+        building_block = stk.BuildingBlock(
+            smiles='BrCC(Br)CCCC',
+            functional_groups=(stk.DibromoFactory(), ),
+        )
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCC(Br)CCCC',
-                functional_groups=(stk.DibromoFactory(), ),
-            )
+    .. testcode:: creating-functional-groups-with-the-factory
+        :hide:
 
-        .. testcode:: creating-functional-groups-with-the-factory
-            :hide:
+        assert all(
+            isinstance(functional_group, stk.Dibromo)
+            for functional_group
+            in building_block.get_functional_groups()
+        )
+        assert building_block.get_num_functional_groups() == 1
 
-            assert all(
-                isinstance(functional_group, stk.Dibromo)
-                for functional_group
-                in building_block.get_functional_groups()
-            )
-            assert building_block.get_num_functional_groups() == 1
+    *Changing the Bonder and Deleter Atoms*
 
-        *Changing the Bonder and Deleter Atoms*
+    You want to create a building block which has :class:`.Dibromo`
+    functional groups, You want only one of non-bromine atoms to be
+    a *bonder* atom and its neighboring bromine atom to be a
+    *deleter* atom.
 
-        You want to create a building block which has :class:`.Dibromo`
-        functional groups, You want only one of non-bromine atoms to be
-        a *bonder* atom and its neighboring bromine atom to be a
-        *deleter* atom.
+    .. testcode:: changing-the-bonder-and-deleter-atoms
 
-        .. testcode:: changing-the-bonder-and-deleter-atoms
+        import stk
 
-            import stk
+        dibromo_factory = stk.DibromoFactory(
+            # The index of one of the non-bromine atoms in the
+            # functional group string (see docstring) is 1.
+            bonders=(1, ),
+            # The neighboring bromine atom has an index of 0.
+            deleters=(0, ),
+        )
+        building_block = stk.BuildingBlock(
+            smiles='BrCC(Br)CCC',
+            functional_groups=(dibromo_factory, ),
+        )
 
-            dibromo_factory = stk.DibromoFactory(
-                # The index of one of the non-bromine atoms in the
-                # functional group string (see docstring) is 1.
-                bonders=(1, ),
-                # The neighboring bromine atom has an index of 0.
-                deleters=(0, ),
-            )
-            building_block = stk.BuildingBlock(
-                smiles='BrCC(Br)CCC',
-                functional_groups=(dibromo_factory, ),
-            )
+    .. testcode:: changing-the-bonder-and-deleter-atoms
+        :hide:
 
-        .. testcode:: changing-the-bonder-and-deleter-atoms
-            :hide:
+        fg, = building_block.get_functional_groups()
+        assert fg.get_num_bonders() == 1
+        assert sum(1 for _ in fg.get_deleters()) == 1
 
-            fg, = building_block.get_functional_groups()
-            assert fg.get_num_bonders() == 1
-            assert sum(1 for _ in fg.get_deleters()) == 1
+        assert all(
+            isinstance(atom, stk.C)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_bonders()
+        )
+        assert all(
+            isinstance(atom, stk.Br)
+            for functional_group
+            in building_block.get_functional_groups()
+            for atom
+            in functional_group.get_deleters()
+        )
 
-            assert all(
-                isinstance(atom, stk.C)
-                for functional_group
-                in building_block.get_functional_groups()
-                for atom
-                in functional_group.get_bonders()
-            )
-            assert all(
-                isinstance(atom, stk.Br)
-                for functional_group
-                in building_block.get_functional_groups()
-                for atom
-                in functional_group.get_deleters()
-            )
-
-    See Also:
-
-        :class:`.GenericFunctionalGroup`
-            Defines *bonders* and  *deleters*.
+    See Also
+    --------
+    :class:`.GenericFunctionalGroup`
+        Defines *bonders* and  *deleters*.
 
     """
 
-    def __init__(
-        self,
-        bonders: ValidIndices = (1, 2),
-        deleters: ValidIndices = (0, 3),
-        placers: Optional[ValidIndices] = None,
-    ) -> None:
+    def __init__(self, bonders=(1, 2), deleters=(0, 3), placers=None):
         """
         Initialize a :class:`.DibromoFactory` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        bonders : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are *bonder* atoms.
 
-            bonders:
-                The indices of atoms in the functional group string,
-                which are *bonder* atoms.
+        deleters : :class:`tuple` of :class:`int`
+            The indices of atoms in the functional group string, which
+            are *deleter* atoms.
 
-            deleters:
-                The indices of atoms in the functional group string,
-                which are *deleter* atoms.
-
-            placers:
-                The indices of atoms in the functional group string,
-                which are *placer* atoms. If ``None``, `bonders` will
-                be used.
+        placers : :class:`tuple` of :class:`int`, optional
+            The indices of atoms in the functional group string, which
+            are *placer* atoms. If ``None``, `bonders` will be used.
 
         """
 
@@ -131,12 +120,8 @@ class DibromoFactory(FunctionalGroupFactory):
         self._deleters = deleters
         self._placers = bonders if placers is None else placers
 
-    def get_functional_groups(
-        self,
-        molecule: Molecule,
-    ) -> Iterable[Dibromo]:
-
-        for atom_ids in get_atom_ids('[Br][#6]~[#6][Br]', molecule):
+    def get_functional_groups(self, molecule):
+        for atom_ids in _get_atom_ids('[Br][#6]~[#6][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Dibromo(
                 atom1=atoms[1],

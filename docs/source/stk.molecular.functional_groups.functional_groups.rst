@@ -33,4 +33,3 @@ Submodules
    stk.molecular.functional_groups.functional_groups.single_atom
    stk.molecular.functional_groups.functional_groups.thioacid
    stk.molecular.functional_groups.functional_groups.thiol
-   stk.molecular.functional_groups.functional_groups.utilities

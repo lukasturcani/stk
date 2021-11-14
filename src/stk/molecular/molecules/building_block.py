@@ -18,7 +18,7 @@ from collections.abc import Collection
 from ..functional_groups import FunctionalGroup
 from ..atoms import Atom
 from ..bonds import Bond
-from ..molecule import Molecule
+from .molecule import Molecule
 from ...utilities import remake, flatten
 
 

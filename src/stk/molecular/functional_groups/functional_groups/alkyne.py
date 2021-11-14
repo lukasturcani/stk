@@ -4,13 +4,7 @@ Alkyne
 
 """
 
-from __future__ import annotations
-
-from typing import Optional
-
-from .utilities import get_atom_map
 from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Atom, C
 
 
 class Alkyne(GenericFunctionalGroup):
@@ -24,151 +18,116 @@ class Alkyne(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon1: C,
-        atom1: Atom,
-        carbon2: C,
-        atom2: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: Optional[tuple[Atom, ...]] = None,
-    ) -> None:
+        carbon1,
+        atom1,
+        carbon2,
+        atom2,
+        bonders,
+        deleters,
+        placers=None,
+    ):
         """
         Initialize a :class:`.Alkyne` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        carbon1 : :class:`.C`
+            The ``[carbon1]`` atom.
 
-            carbon1:
-                The ``[carbon1]`` atom.
+        atom1 : :class:`.Atom`
+            The ``[atom1]`` atom.
 
-            atom1:
-                The ``[atom1]`` atom.
+        carbon2 : :class:`.C`
+            The ``[carbon2]`` atom.
 
-            carbon2:
-                The ``[carbon2]`` atom.
+        atom2 : :class:`.Atom`
+            The ``[atom2]`` atom.
 
-            atom2:
-                The ``[atom2]`` atom.
+        bonders : :class:`tuple` of :class:`.Atom`
+                The bonder atoms.
 
-            bonders:
-                    The bonder atoms.
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms.
 
-            deleters:
-                The deleter atoms.
-
-            placers:
-                The placer atoms. If ``None`` the `bonders` will be
-                used.
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms. If ``None`` the `bonders` will be used.
 
         """
 
-        GenericFunctionalGroup.__init__(
-            self=self,
-            atoms=(carbon1, atom1, carbon2, atom2),
-            bonders=bonders,
-            deleters=deleters,
-            placers=bonders if placers is None else placers,
-        )
         self._carbon1 = carbon1
         self._atom1 = atom1
         self._carbon2 = carbon2
         self._atom2 = atom2
+        atoms = (carbon1, atom1, carbon2, atom2)
+        super().__init__(
+            atoms=atoms,
+            bonders=bonders,
+            deleters=deleters,
+            placers=bonders if placers is None else placers,
+        )
 
-    def get_atom1(self) -> Atom:
+    def get_atom1(self):
         """
         Get the ``[atom1]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.Atom`
             The ``[atom1]`` atom.
 
         """
 
         return self._atom1
 
-    def get_carbon1(self) -> C:
+    def get_carbon1(self):
         """
         Get the ``[carbon1]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.C`
             The ``[carbon1]`` atom.
 
         """
 
         return self._carbon1
 
-    def get_carbon2(self) -> C:
+    def get_carbon2(self):
         """
         Get the ``[carbon2]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.C`
             The ``[carbon2]`` atom.
 
         """
 
         return self._carbon2
 
-    def get_atom2(self) -> Atom:
+    def get_atom2(self):
         """
         Get the ``[atom2]`` atom.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`.Atom`
             The ``[atom2]`` atom.
 
         """
 
         return self._atom2
 
-    def clone(self) -> Alkyne:
-        clone = self._clone()
+    def clone(self):
+        clone = super().clone()
         clone._carbon1 = self._carbon1
         clone._atom1 = self._atom1
         clone._carbon2 = self._carbon2
         clone._atom2 = self._atom2
         return clone
 
-    def with_ids(
-        self,
-        id_map: dict[int, int],
-    ) -> Alkyne:
-
-        atom_map = get_atom_map(
-            id_map=id_map,
-            atoms=(
-                *self._atoms,
-                *self._placers,
-                *self._core_atoms,
-                *self._bonders,
-                *self._deleters,
-                self._carbon1,
-                self._atom1,
-                self._carbon2,
-                self._atom2,
-            ),
-        )
-        clone = self.__class__.__new__(self.__class__)
-        clone._atoms = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._atoms
-        )
-        clone._placers = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._placers
-        )
-        clone._core_atoms = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._core_atoms
-        )
-        clone._bonders = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._bonders
-        )
-        clone._deleters = tuple(
-            atom_map.get(atom.get_id(), atom)
-            for atom in self._deleters
-        )
+    def with_atoms(self, atom_map):
+        clone = super().with_atoms(atom_map)
         clone._carbon1 = atom_map.get(
             self._carbon1.get_id(),
             self._carbon1,
@@ -187,7 +146,7 @@ class Alkyne(GenericFunctionalGroup):
         )
         return clone
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f'{self.__class__.__name__}('
             f'{self._carbon1}, {self._atom1}, {self._carbon2}, '

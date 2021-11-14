@@ -21,10 +21,7 @@ from stk.utilities import (
     rotation_matrix_arbitrary_axis,
 )
 from .utilities import writers, updaters
-from ..molecular_utilities import (
-    sort_bond_atoms_by_id,
-    get_bond_atom_ids,
-)
+from ..utilities import sort_bond_atoms_by_id, get_bond_atom_ids
 
 
 class Molecule:
