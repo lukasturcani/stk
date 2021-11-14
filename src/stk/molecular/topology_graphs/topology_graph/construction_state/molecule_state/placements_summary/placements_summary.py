@@ -11,13 +11,12 @@ from typing import Iterable
 
 import numpy as np
 
+import stk
+
 from ......atoms import Atom, AtomInfo
 from ......bonds import Bond, BondInfo
 from ......functional_groups import FunctionalGroup
 from ......molecules import BuildingBlock
-from .....topology_graph.topology_graph.implementations import (
-    _PlacementResult,
-)
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
 
@@ -48,7 +47,10 @@ class _PlacementsSummary:
     def __init__(
         self,
         building_blocks: Iterable[BuildingBlock],
-        placement_results: Iterable[_PlacementResult],
+        placement_results: Iterable[
+            stk.molecular.topology_graphs.topology_graph
+            .topology_graph.implementations._PlacementResult
+        ],
         num_atoms: int,
         num_previous_placements: int,
     ) -> None:
@@ -73,7 +75,6 @@ class _PlacementsSummary:
                 previously.
 
         """
-
         self._atoms = []
         self._atom_infos = []
         self._bonds = []
@@ -95,7 +96,10 @@ class _PlacementsSummary:
         self,
         building_block: BuildingBlock,
         building_block_id: int,
-        result: _PlacementResult,
+        result: (
+            stk.molecular.topology_graphs.topology_graph
+            .topology_graph.implementations._PlacementResult
+        )
     ) -> None:
         """
         Add the placement result to the summary.
