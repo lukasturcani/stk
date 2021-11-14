@@ -1,0 +1,30 @@
+name: Build and publish testing image
+
+on: [workflow_dispatch]
+
+jobs:
+  build-and-publish-testing-image:
+    runs-on: ubuntu-20.04
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: docker image build
+          -t ghcr.io/lukasturcani/stk-test-environment:latest
+          ./tests/docker
+
+      - name: Publish image
+        run: docker push
+          ghcr.io/lukasturcani/stk-test-environment:latest

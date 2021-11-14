@@ -1,4 +1,4 @@
-name: remake-rst-files
+name: Remake rst files
 
 on:
     push:
