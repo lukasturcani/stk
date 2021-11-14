@@ -4,23 +4,25 @@ XYZ Writing Utilities
 
 """
 
-from __future__ import annotations
-
 import typing
 import pathlib
 import numpy as np
+from collections import abc
 
-from stk.utilities import typing as _typing
-from .... import atoms as _atoms
-from .... import bonds as _bonds
+from ....atoms import atom
+from ....bonds import bond
+
+
+_T = typing.TypeVar('_T')
+OneOrMany = typing.Union[_T, abc.Iterable[_T]]
 
 
 def write_xyz_file(
-    atoms: tuple[_atoms.Atom, ...],
-    bonds: tuple[_bonds.Bond, ...],
+    atoms: tuple[atom.Atom, ...],
+    bonds: tuple[bond.Bond, ...],
     position_matrix: np.ndarray,
     path: typing.Union[pathlib.Path, str],
-    atom_ids: typing.Optional[_typing.OneOrMany[int]],
+    atom_ids: typing.Optional[OneOrMany[int]],
 ) -> None:
     """
     Write to a ``.xyz`` file.

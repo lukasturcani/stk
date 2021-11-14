@@ -1,9 +1,3 @@
-"""
-Typing
-======
-
-"""
-
 import typing
 from collections import abc
 

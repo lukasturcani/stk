@@ -4,86 +4,61 @@ Turbomole Writer
 
 """
 
-from __future__ import annotations
-
-from collections import abc
-import pathlib
-import typing
-
-from stk.utilities.typing import OneOrMany
-from ..molecule import Molecule
-from ..periodic_info import PeriodicInfo
-
-
-__all__ = (
-    'TurbomoleWriter',
-)
-
 
 class TurbomoleWriter:
     """
     A writer class for ``Turbomole`` files.
 
-    Examples:
+    Examples
+    --------
+    *Writing to a File with a Unit Cell*
 
-        *Writing to a File with a Unit Cell*
+    This writer can write to a file with the unit
+    cell included for periodic molecules. Note that this always assumes
+    P1 space group.
 
-        This writer can write to a file with the unit
-        cell included for periodic molecules. Note that this always
-        assumes P1 space group.
+    .. testcode:: writing-to-a-file-with-a-unit-cell
 
-        .. testcode:: writing-to-a-file-with-a-unit-cell
+        import stk
 
-            import stk
+        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+        topology_graph = stk.cof.PeriodicHoneycomb(
+            building_blocks=(bb1, bb2),
+            lattice_size=(3, 3, 1),
+        )
+        construction_result = topology_graph.construct()
+        cof = stk.ConstructedMolecule.init_from_construction_result(
+            construction_result=construction_result,
+        )
+        writer = stk.TurbomoleWriter()
+        writer.write(
+            molecule=cof,
+            path='cof.coord',
+            periodic_info=construction_result.get_periodic_info(),
+        )
 
-            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-            bb2 = stk.BuildingBlock(
-                smiles='BrCC(CBr)CBr',
-                functional_groups=[stk.BromoFactory()],
-            )
-            topology_graph = stk.cof.PeriodicHoneycomb(
-                building_blocks=(bb1, bb2),
-                lattice_size=(3, 3, 1),
-            )
-            construction_result = topology_graph.construct()
-            cof = (
-                stk.ConstructedMolecule.init_from_construction_result(
-                    construction_result=construction_result,
-                )
+    .. testcode:: writing-to-a-file-with-a-unit-cell
+        :hide:
 
-            )
-            writer = stk.TurbomoleWriter()
-            writer.write(
-                molecule=cof,
-                path='cof.coord',
-                periodic_info=construction_result.get_periodic_info(),
-            )
+        import os
 
-        .. testcode:: writing-to-a-file-with-a-unit-cell
-            :hide:
+        assert os.path.exists('cof.coord')
 
-            import os
+    .. testcleanup:: writing-to-a-file-with-a-unit-cell
 
-            assert os.path.exists('cof.coord')
-
-        .. testcleanup:: writing-to-a-file-with-a-unit-cell
-
-            os.remove('cof.coord')
+        os.remove('cof.coord')
 
     """
 
-    def _write_content(
-        self,
-        molecule: Molecule,
-        atom_ids: typing.Optional[OneOrMany[int]],
-        periodic_info: typing.Optional[PeriodicInfo],
-    ) -> abc.Iterable[str]:
+    def _write_content(self, molecule, atom_ids, periodic_info=None):
 
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
             atom_ids = (atom_ids, )
 
+        content = []
         if periodic_info is not None:
             # Input unit cell information.
             a = periodic_info.get_a()
@@ -92,7 +67,7 @@ class TurbomoleWriter:
             alpha = periodic_info.get_alpha()
             beta = periodic_info.get_beta()
             gamma = periodic_info.get_gamma()
-            yield (
+            content.append(
                 '$periodic 3\n'
                 '$cell angs\n'
                 f' {a:>8.3f} {b:>8.3f} {c:>8.3f} '
@@ -100,80 +75,80 @@ class TurbomoleWriter:
             )
 
         coords = molecule.get_position_matrix()
-        yield '$coord angs\n'
+        content.append('$coord angs\n')
         for atom_id in atom_ids:
             atom, = molecule.get_atoms(atom_ids=atom_id)
             element = atom.__class__.__name__
             x, y, z = (i for i in coords[atom_id])
-            yield (
+            content.append(
                 f' {round(x, 4)} {round(y, 4)} {round(z, 4)} '
                 f'{element}\n'
             )
 
-        yield '$end\n'
+        content.append('$end\n')
+
+        return content
 
     def to_string(
         self,
-        molecule: Molecule,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-        periodic_info: typing.Optional[PeriodicInfo] = None
-    ) -> str:
+        molecule,
+        atom_ids=None,
+        periodic_info=None
+    ):
         """
         Get a ``Turbomole`` file format string of `molecule`.
 
-        Parameters:
+        Parameters
+        ----------
+        molecule : :class:`.Molecule`
+            Molecule to write to ``Turbomole`` format.
 
-            molecule:
-                Molecule to write to ``Turbomole`` format.
+        atom_ids : :class:`iterable` of :class:`int`
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
-            atom_ids:
-                The atom ids of atoms to write. Can be a single
-                :class:`int`, if a single atom is to be used, or
-                ``None``, if all atoms are to be used.
+        periodic_info : :class:`.PeriodicInfo`
+            Information about the periodic cell.
 
-            periodic_info:
-                Information about the periodic cell.
-
-        Returns:
-
+        Returns
+        -------
+        :class:`string`
             The content of a `.coord` file.
 
         """
 
-        return ''.join(self._write_content(
+        content = self._write_content(
             molecule=molecule,
             atom_ids=atom_ids,
             periodic_info=periodic_info,
-        ))
+        )
 
-    def write(
-        self,
-        molecule: Molecule,
-        path: typing.Union[pathlib.Path, str],
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-        periodic_info: typing.Optional[PeriodicInfo] = None,
-    ) -> None:
+        return ''.join(content)
+
+    def write(self, molecule, path, atom_ids=None, periodic_info=None):
         """
         Write `molecule` to ``Turbomole`` file format.
 
-        Parameters:
+        Parameters
+        ----------
+        molecule : :class:`.Molecule`
+            Molecule to write to ``Turbomole`` format.
 
-            molecule:
-                Molecule to write to ``Turbomole`` format.
+        path : :class:`str`
+            The full path to the file being written.
 
-            path:
-                The full path to the file being written.
+        atom_ids : :class:`iterable` of :class:`int`
+            The atom ids of atoms to write. Can be a single
+            :class:`int`, if a single atom is to be used, or ``None``,
+            if all atoms are to be used.
 
-            atom_ids:
-                The atom ids of atoms to write. Can be a single
-                :class:`int`, if a single atom is to be used, or
-                ``None``, if all atoms are to be used.
+        periodic_info : :class:`.PeriodicInfo`
+            Information about the periodic cell.
 
-            periodic_info:
-                Information about the periodic cell.
-
-        Returns:
-
+        Returns
+        -------
+        None : :class:`NoneType`
             A file is written.
 
         """
