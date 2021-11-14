@@ -5,14 +5,7 @@ Dative Reaction Factory
 """
 
 from .reaction_factory import ReactionFactory
-from .generic_reaction_factory import GenericReactionFactory
-from ...topology_graphs import ConstructionState, EdgeGroup
 from ..reactions import DativeReaction
-
-
-__all__ = (
-    'DativeReactionFactory',
-)
 
 
 class DativeReactionFactory(ReactionFactory):
@@ -29,38 +22,30 @@ class DativeReactionFactory(ReactionFactory):
 
     """
 
-    def __init__(
-        self,
-        reaction_factory: GenericReactionFactory,
-    ) -> None:
+    def __init__(self, reaction_factory):
         """
         Initialize a :class:`.DativeReactionFactory`.
 
-        Parameters:
-
-            reaction_factory:
-                Used to create reactions.
+        Parameters
+        ----------
+        reaction_factory : :class:`.GenericReactionFactory`
+            Used to create reactions.
 
         """
 
         self._reaction_factory = reaction_factory
 
-    def get_reaction(
-        self,
-        construction_state: ConstructionState,
-        edge_group: EdgeGroup,
-    ) -> DativeReaction:
-
+    def get_reaction(self, construction_state, edge_group):
         reaction = self._reaction_factory.get_reaction(
             construction_state=construction_state,
             edge_group=edge_group,
         )
         return DativeReaction(reaction)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return repr(self)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f'{self.__class__.__name__}'
             f'({self._reaction_factory})'

@@ -4,17 +4,9 @@ Dative Reaction
 
 """
 
-from collections import abc
-
 from .utilities import is_metal
-from ..reaction import Reaction, NewAtom
+from ..reaction import Reaction
 from ....bonds import Bond
-from ....atoms import Atom
-
-
-__all__ = (
-    'DativeReaction',
-)
 
 
 class DativeReaction(Reaction):
@@ -27,23 +19,23 @@ class DativeReaction(Reaction):
 
     """
 
-    def __init__(self, reaction: Reaction) -> None:
+    def __init__(self, reaction):
         """
         Initialize a :class:`.DativeReaction` instance.
 
-        Parameters:
-
-            reaction:
-                A reaction which should be made dative.
+        Parameters
+        ----------
+        reaction : :class:`.Reaction`
+            A reaction which should be made dative.
 
         """
 
         self._reaction = reaction
 
-    def _get_new_atoms(self) -> abc.Iterator[NewAtom]:
+    def _get_new_atoms(self):
         return self._reaction._get_new_atoms()
 
-    def _get_new_bonds(self) -> abc.Iterator[Bond]:
+    def _get_new_bonds(self):
         for bond in self._reaction._get_new_bonds():
             if bond.get_order() == 9 and is_metal(bond.get_atom1()):
                 yield Bond(
@@ -55,8 +47,8 @@ class DativeReaction(Reaction):
             else:
                 yield bond
 
-    def _get_deleted_atoms(self) -> abc.Iterator[Atom]:
+    def _get_deleted_atoms(self):
         return self._reaction._get_deleted_atoms()
 
-    def _get_deleted_bonds(self) -> abc.Iterator[Bond]:
+    def _get_deleted_bonds(self):
         return self._reaction._get_deleted_bonds()
