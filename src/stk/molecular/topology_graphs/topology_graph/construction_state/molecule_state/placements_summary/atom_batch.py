@@ -6,7 +6,7 @@ Atom Batch
 
 from __future__ import annotations
 
-from collections import abc
+from typing import Iterable
 
 from ......atoms import Atom, AtomInfo
 from ......molecules import BuildingBlock
@@ -26,7 +26,7 @@ class _AtomBatch:
 
     def __init__(
         self,
-        atoms: abc.Iterable[Atom],
+        atoms: Iterable[Atom],
         num_atoms: int,
         building_block: BuildingBlock,
         building_block_id: int,
@@ -70,7 +70,7 @@ class _AtomBatch:
         self._atoms = tuple(_atoms)
         self._atom_infos = tuple(atom_infos)
 
-    def get_atoms(self) -> abc.Iterable[Atom]:
+    def get_atoms(self) -> Iterable[Atom]:
         """
         Yield the atoms in the batch.
 
@@ -82,7 +82,7 @@ class _AtomBatch:
 
         yield from self._atoms
 
-    def get_atom_infos(self) -> abc.Iterable[AtomInfo]:
+    def get_atom_infos(self) -> Iterable[AtomInfo]:
         """
         Yield info about the atoms in the batch.
 

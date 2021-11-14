@@ -6,12 +6,12 @@ Bond
 
 from __future__ import annotations
 
-import typing
+from typing import TypeVar
 
-from .. import atoms as _atoms
+from ..atoms import Atom
 
 
-_T = typing.TypeVar('_T', bound='Bond')
+_T = TypeVar('_T', bound='Bond')
 
 
 class Bond:
@@ -45,8 +45,8 @@ class Bond:
 
     def __init__(
         self,
-        atom1: _atoms.Atom,
-        atom2: _atoms.Atom,
+        atom1: Atom,
+        atom2: Atom,
         order: int,
         periodicity: tuple[int, int, int] = (0, 0, 0),
     ) -> None:
@@ -80,7 +80,7 @@ class Bond:
         self._order = order
         self._periodicity = periodicity
 
-    def get_atom1(self) -> _atoms.Atom:
+    def get_atom1(self) -> Atom:
         """
         Get the first atom of the bond.
 
@@ -92,7 +92,7 @@ class Bond:
 
         return self._atom1
 
-    def get_atom2(self) -> _atoms.Atom:
+    def get_atom2(self) -> Atom:
         """
         Get the second atom of the bond.
 
@@ -153,7 +153,7 @@ class Bond:
         )
         return clone
 
-    def _with_atoms(self: _T, atom_map: dict[int, _atoms.Atom]) -> _T:
+    def _with_atoms(self: _T, atom_map: dict[int, Atom]) -> _T:
         """
         Modify the bond.
 
@@ -163,7 +163,7 @@ class Bond:
         self._atom2 = atom_map.get(self._atom2.get_id(), self._atom2)
         return self
 
-    def with_atoms(self, atom_map: dict[int, _atoms.Atom]) -> Bond:
+    def with_atoms(self, atom_map: dict[int, Atom]) -> Bond:
         """
         Return a clone holding different atoms.
 

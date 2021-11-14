@@ -4,29 +4,25 @@ MDL Mol Updating Utilities
 
 """
 
-import typing
-import pathlib
-import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
 from stk.utilities import remake
 
 
-def get_position_matrix_from_mol(
-    path: typing.Union[pathlib.Path, str],
-) -> np.ndarray:
+def _with_structure_from_mol(self, path):
     """
-    Get the position matrix from a ``.mol`` file.
+    Change structure to match a ``.mol`` file.
 
-    Parameters:
+    Parameters
+    ----------
+    path : :class:`str`
+        The full path of the ``.mol`` file from which the structure
+        should be updated.
 
-        path:
-            The full path to the ``.mol`` file which holds the
-            position matrix.
-
-    Returns:
-
-        The position matrix.
+    Returns
+    -------
+    :class:`.Molecule`
+        The molecule.
 
     """
 
@@ -37,4 +33,6 @@ def get_position_matrix_from_mol(
             removeHs=False,
         )
     )
-    return molecule.GetConformer().GetPositions()
+    return self._with_position_matrix(
+        position_matrix=molecule.GetConformer().GetPositions()
+    )

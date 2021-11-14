@@ -6,31 +6,44 @@ XYZ Updating Utilities
 
 import numpy as np
 
-import typing
-import pathlib
 from stk.utilities import periodic_table
 
 
-def get_position_matrix_from_xyz(
-    path: typing.Union[pathlib.Path, str],
-) -> np.ndarray:
+def _with_structure_from_xyz(self, path):
     """
-    Get the position matrix from an ``.xyz`` file.
+    Return a clone, with its structure taken from an ``.xyz`` file.
 
-    Parameters:
+    Parameters
+    ----------
+    path : :class:`str`
+        The full path of the ``.mol`` file from which the structure
+        should be updated.
 
-        path:
-            The full path to the ``.mol`` file which holds the
-            position matrix.
+    Returns
+    -------
+    :class:`.Molecule`
+        A clone with atomic positions found in `path`.
 
-    Returns:
-
-        The position matrix.
+    Raises
+    ------
+    :class:`RuntimeError`
+        If the number of atoms in the file does not match the
+        number of atoms in the molecule or if atom elements in the
+        file do not agree with the atom elements in the molecule.
 
     """
 
     with open(path, 'r') as f:
-        _, _, *content = f.readlines()
+        atom_count, _, *content = f.readlines()
+
+    # Check the atom count is correct.
+    num_atoms = len(self._atoms)
+    if int(atom_count) != num_atoms:
+        raise RuntimeError(
+            f'The number of atoms in the xyz file, {atom_count}, '
+            'does not match the number of atoms in the '
+            f'molecule, {num_atoms}.'
+        )
 
     # Save all the coords in the file.
     new_coords = []
@@ -41,6 +54,22 @@ def get_position_matrix_from_xyz(
         if element.isnumeric():
             element = periodic_table[int(element)]
 
+        if element != self._atoms[i].__class__.__name__:
+            raise RuntimeError(
+                f'Atom {i} element does not match file.'
+            )
+
         new_coords.append([float(i) for i in coords])
 
-    return np.array(new_coords)
+    # Check that the correct number of atom
+    # lines was present in the file.
+    if i+1 != num_atoms:
+        raise RuntimeError(
+            f'The number of atom lines in the xyz file, {i+1}, '
+            'does not match the number of atoms in the '
+            f'molecule, {num_atoms}.'
+        )
+
+    # Update the structure.
+    new_coords = np.array(new_coords)
+    return self._with_position_matrix(new_coords)

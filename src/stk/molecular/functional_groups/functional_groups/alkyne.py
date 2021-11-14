@@ -6,21 +6,14 @@ Alkyne
 
 from __future__ import annotations
 
-import typing
+from typing import Optional
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
-
-
-__all__ = (
-    'Alkyne',
-)
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import Atom, C
 
 
-class Alkyne(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Alkyne(GenericFunctionalGroup):
     """
     Represents an alkyne functional group.
 
@@ -31,13 +24,13 @@ class Alkyne(
 
     def __init__(
         self,
-        carbon1: _atoms.C,
-        atom1: _atoms.Atom,
-        carbon2: _atoms.C,
-        atom2: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        carbon1: C,
+        atom1: Atom,
+        carbon2: C,
+        atom2: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Alkyne` instance.
@@ -68,7 +61,7 @@ class Alkyne(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(carbon1, atom1, carbon2, atom2),
             bonders=bonders,
@@ -80,7 +73,7 @@ class Alkyne(
         self._carbon2 = carbon2
         self._atom2 = atom2
 
-    def get_atom1(self) -> _atoms.Atom:
+    def get_atom1(self) -> Atom:
         """
         Get the ``[atom1]`` atom.
 
@@ -92,7 +85,7 @@ class Alkyne(
 
         return self._atom1
 
-    def get_carbon1(self) -> _atoms.C:
+    def get_carbon1(self) -> C:
         """
         Get the ``[carbon1]`` atom.
 
@@ -104,7 +97,7 @@ class Alkyne(
 
         return self._carbon1
 
-    def get_carbon2(self) -> _atoms.C:
+    def get_carbon2(self) -> C:
         """
         Get the ``[carbon2]`` atom.
 
@@ -116,7 +109,7 @@ class Alkyne(
 
         return self._carbon2
 
-    def get_atom2(self) -> _atoms.Atom:
+    def get_atom2(self) -> Atom:
         """
         Get the ``[atom2]`` atom.
 
@@ -141,7 +134,7 @@ class Alkyne(
         id_map: dict[int, int],
     ) -> Alkyne:
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

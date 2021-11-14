@@ -6,21 +6,14 @@ Carboxylic Acid
 
 from __future__ import annotations
 
-import typing
+from typing import Optional
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
-
-
-__all__ = (
-    'CarboxylicAcid',
-)
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import C, O, H, Atom
 
 
-class CarboxylicAcid(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class CarboxylicAcid(GenericFunctionalGroup):
     """
     Represents a carboxylic acid functional group.
 
@@ -31,16 +24,16 @@ class CarboxylicAcid(
 
     def __init__(
         self,
-        carbon: _atoms.C,
+        carbon: C,
         # O is not an ambiguous name.
-        oxygen1: _atoms.O,  # noqa
+        oxygen1: O,  # noqa
         # O is not an ambiguous name.
-        oxygen2: _atoms.O,  # noqa
-        hydrogen: _atoms.H,
-        atom: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        oxygen2: O,  # noqa
+        hydrogen: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
     ):
         """
         Initialize a :class:`.CarboxylicAcid` instance.
@@ -74,7 +67,7 @@ class CarboxylicAcid(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(carbon, oxygen1, oxygen2, hydrogen, atom),
             bonders=bonders,
@@ -87,7 +80,7 @@ class CarboxylicAcid(
         self._hydrogen = hydrogen
         self._atom = atom
 
-    def get_carbon(self) -> _atoms.C:
+    def get_carbon(self) -> C:
         """
         Get the ``[carbon]`` atom.
 
@@ -100,7 +93,7 @@ class CarboxylicAcid(
         return self._carbon
 
     # O is not an ambiguous name.
-    def get_oxygen1(self) -> _atoms.O:  # noqa
+    def get_oxygen1(self) -> O:  # noqa
         """
         Get the ``[oxygen1]`` atom.
 
@@ -125,7 +118,7 @@ class CarboxylicAcid(
 
         return self._oxygen2
 
-    def get_hydrogen(self) -> _atoms.H:
+    def get_hydrogen(self) -> H:
         """
         Get the ``[hydrogen]`` atom.
 
@@ -137,7 +130,7 @@ class CarboxylicAcid(
 
         return self._hydrogen
 
-    def get_atom(self) -> _atoms.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -163,7 +156,7 @@ class CarboxylicAcid(
         id_map: dict[int, int],
     ) -> CarboxylicAcid:
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

@@ -4,12 +4,7 @@ Turbomole Updating Utilities
 
 """
 
-from __future__ import annotations
-
-import typing
-import pathlib
 import numpy as np
-from collections import abc
 from stk.utilities import periodic_table
 
 
@@ -19,19 +14,17 @@ class _CoordSection:
 
     """
 
-    def __init__(
-        self,
-        lines: abc.Iterable[str],
-    ):
+    def __init__(self, lines):
         """
         Initialize a :class:`._CoordSection`.
 
         This initializer assumes that coordinates used in `lines` are
         defined in angstroms.
 
-        Parameters:
-            lines:
-                The lines of the coord section.
+        Parameters
+        ----------
+        lines : :class:`iterable` of :class:`str`
+            The lines of the coord section.
 
         """
 
@@ -50,23 +43,21 @@ class _CoordSection:
         self._elements = tuple(elements)
 
     @classmethod
-    def init_bohr(
-        cls,
-        lines: abc.Iterable[str],
-    ) -> _CoordSection:
+    def init_bohr(cls, lines):
         """
         Initialize a :class:`._CoordSection`.
 
         This initializer assumes that coordinates used in `lines`
         are defined in bohr units.
 
-        Parameters:
+        Parameters
+        ----------
+        lines : :class:`iterable` of :class:`str`
+            The lines of the coord section.
 
-            lines:
-                The lines of the coord section.
-
-        Returns:
-
+        Returns
+        -------
+        :class:`._CoordSection`
             The coord section.
 
         """
@@ -93,38 +84,41 @@ class _CoordSection:
         obj._position_matrix = np.array(position_matrix)
         return obj
 
-    def get_position_matrix(self) -> np.ndarray:
+    def get_position_matrix(self):
         """
         Get the position matrix defined in the coord section.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`numpy.ndarray`
             The position matrix defined in the coord section.
 
         """
 
         return np.array(self._position_matrix)
 
-    def get_num_atoms(self) -> int:
+    def get_num_atoms(self):
         """
         Get the number of atoms defined in the coord section.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`int`
             The number of atoms defined in the coord section.
 
         """
 
         return len(self._elements)
 
-    def get_elements(self) -> abc.Iterable[str]:
+    def get_elements(self):
         """
         Yield the elements of the atoms in the coord section.
 
         The elements are yielded in order of atom id.
 
-        Yields:
-
+        Yields
+        ------
+        :class:`str`
             The chemical symbol of an atom.
 
         """
@@ -132,33 +126,31 @@ class _CoordSection:
         yield from self._elements
 
 
-def _get_coord_section(
-    path: typing.Union[pathlib.Path, str],
-    num_atoms: int,
-) -> _CoordSection:
+def _get_coord_section(path, num_atoms):
     """
     Get the coord section defined in `path`.
 
-    Parameters:
+    Parameters
+    ----------
+    path : :class:`str`
+        The path to the turbomole file.
 
-        path:
-            The path to the turbomole file.
+    num_atoms : :class:`int`
+        The number of atoms in the molecule.
 
-        num_atoms:
-            The number of atoms in the molecule.
-
-    Returns:
-
+    Returns
+    -------
+    :class:`._CoordSection`
         The coord section defined in `path`.
 
-    Raises:
+    Raises
+    ------
+    :class:`RuntimeError`
+        If `path` uses fractional coordinates, as they are not
+        currently supported.
 
-        :class:`RuntimeError`:
-            If `path` uses fractional coordinates, as they are not
-            currently supported.
-
-        :class:`RuntimeError`:
-            If no coord section in found in `path`.
+    :class:`RuntimeError`
+        If no coord section in found in `path`.
 
     """
 
@@ -184,31 +176,56 @@ def _get_coord_section(
     raise RuntimeError(f'No coord section found in {path}.')
 
 
-def get_position_matrix_from_turbomole(
-    num_atoms: int,
-    path: typing.Union[pathlib.Path, str],
-) -> np.ndarray:
+def _with_structure_from_turbomole(self, path):
     """
-    Get the position matrix from a Turbomole file.
+    Update the structure with one taken from a Turbomole file.
 
     Note that coordinates in ``.coord`` files can be given in Bohr or
     Angstrom, which is handled. Fractional coordinates are not
     currently handled.
 
-    Parameters:
+    Parameters
+    ----------
+    path : :class:`str`
+        The full path of the ``.coord`` file from which the
+        structure should be updated.
 
-        num_atoms:
-            The number of atoms in the molecule.
+    Returns
+    -------
+    :class:`.Molecule`
+        The molecule is returned.
 
-        path:
-            The full path to the ``.coord`` file which holds the
-            position matrix.
+    Raises
+    ------
+    :class:`RuntimeError`
+        If the number of atoms in the file does not match the
+        number of atoms in the molecule.
 
-    Returns:
-
-        The position matrix.
+    :class:`RuntimeError`
+        If atom elements in the file do not agree with the atom
+        elements in the molecule.
 
     """
 
+    num_atoms = len(self._atoms)
     section = _get_coord_section(path, num_atoms)
-    return section.get_position_matrix()
+
+    if section.get_num_atoms() != num_atoms:
+        raise RuntimeError(
+            f'The number of atoms in {path}, '
+            f'{section.get_num_atoms()}, does not match the number '
+            f'of atoms in the molecule, {num_atoms}.'
+        )
+
+    for atom_id, (element, atom) in enumerate(zip(
+        section.get_elements(),
+        self._atoms,
+    )):
+        if element != atom.__class__.__name__:
+            raise RuntimeError(
+                f'The element of atom {atom_id} in {path}, '
+                f'{element}, does not match the element in the '
+                f'molecule, {atom.__class__.__name__}.'
+            )
+
+    return self._with_position_matrix(section.get_position_matrix())

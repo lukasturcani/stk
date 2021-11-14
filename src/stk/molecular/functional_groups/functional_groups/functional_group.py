@@ -61,19 +61,13 @@ information.
 
 from __future__ import annotations
 
-import typing
-from collections import abc
+from typing import Iterable, TypeVar
 
-from . import utilities as _utilities
-from ... import atoms as _atoms
-
-
-__all__ = (
-    'FunctionalGroup',
-)
+from .utilities import get_atom_map
+from ...atoms import Atom
 
 
-_T = typing.TypeVar('_T', bound='FunctionalGroup')
+_T = TypeVar('_T', bound='FunctionalGroup')
 
 
 class FunctionalGroup:
@@ -248,9 +242,9 @@ class FunctionalGroup:
 
     def __init__(
         self,
-        atoms: tuple[_atoms.Atom, ...],
-        placers: tuple[_atoms.Atom, ...],
-        core_atoms: tuple[_atoms.Atom, ...],
+        atoms: tuple[Atom, ...],
+        placers: tuple[Atom, ...],
+        core_atoms: tuple[Atom, ...],
     ) -> None:
         """
         Initialize a :class:`.FunctionalGroup`.
@@ -275,7 +269,7 @@ class FunctionalGroup:
         self._placers = placers
         self._core_atoms = core_atoms
 
-    def get_atoms(self) -> abc.Iterable[_atoms.Atom]:
+    def get_atoms(self) -> Iterable[Atom]:
         """
         Yield all the atoms in the functional group.
 
@@ -287,7 +281,7 @@ class FunctionalGroup:
 
         yield from self._atoms
 
-    def get_atom_ids(self) -> abc.Iterable[int]:
+    def get_atom_ids(self) -> Iterable[int]:
         """
         Yield the ids of all atoms in the functional group.
 
@@ -299,7 +293,7 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._atoms)
 
-    def get_placer_ids(self) -> abc.Iterable[int]:
+    def get_placer_ids(self) -> Iterable[int]:
         """
         Yield the ids of *placer* atoms.
 
@@ -314,7 +308,7 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._placers)
 
-    def get_core_atom_ids(self) -> abc.Iterable[int]:
+    def get_core_atom_ids(self) -> Iterable[int]:
         """
         Yield the ids of core atoms held by the functional group.
 
@@ -333,7 +327,7 @@ class FunctionalGroup:
 
     def with_atoms(
         self,
-        atom_map: dict[int, _atoms.Atom],
+        atom_map: dict[int, Atom],
     ) -> FunctionalGroup:
         """
         Return a clone holding different atoms.
@@ -388,7 +382,7 @@ class FunctionalGroup:
 
         """
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

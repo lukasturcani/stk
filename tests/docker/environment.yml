@@ -137,3 +137,4 @@ dependencies:
     - toml==0.10.2
     - typing-extensions==3.10.0.0
     - urllib3==1.26.6
+    - vabene==0.0.5

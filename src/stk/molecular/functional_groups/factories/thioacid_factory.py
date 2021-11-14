@@ -4,27 +4,17 @@ Thioacid Factory
 
 """
 
-from __future__ import annotations
+from typing import Optional, Iterable, Literal
 
-import typing
-from collections import abc
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import Thioacid
+from ...molecule import Molecule
 
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
-
-__all__ = (
-    'ThioacidFactory',
-)
-
-_ValidIndex = typing.Literal[0, 1, 2, 3, 4]
+ValidIndices = tuple[Literal[0, 1, 2, 3, 4], ...]
 
 
-class ThioacidFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class ThioacidFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Thioacid` instances.
 
@@ -116,9 +106,9 @@ class ThioacidFactory(
 
     def __init__(
         self,
-        bonders: tuple[_ValidIndex, ...] = (1, ),
-        deleters: tuple[_ValidIndex, ...] = (3, 4),
-        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
+        bonders: ValidIndices = (1, ),
+        deleters: ValidIndices = (3, 4),
+        placers: Optional[ValidIndices] = None,
     ) -> None:
         """
         Initialize a :class:`.ThioacidFactory` instance.
@@ -141,19 +131,16 @@ class ThioacidFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.Thioacid]:
+        molecule: Molecule,
+    ) -> Iterable[Thioacid]:
 
-        for atom_ids in _utilities.get_atom_ids(
-            query='[*][C](=[O])[S][H]',
-            molecule=molecule,
-        ):
+        for atom_ids in get_atom_ids('[*][C](=[O])[S][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.Thioacid(
-                carbon=typing.cast(_elements.C, atoms[1]),
-                oxygen=typing.cast(_elements.O, atoms[2]),
-                sulfur=typing.cast(_elements.S, atoms[3]),
-                hydrogen=typing.cast(_elements.H, atoms[4]),
+            yield Thioacid(
+                carbon=atoms[1],
+                oxygen=atoms[2],
+                sulfur=atoms[3],
+                hydrogen=atoms[4],
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

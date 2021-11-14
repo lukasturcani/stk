@@ -6,21 +6,14 @@ Secondary Amino
 
 from __future__ import annotations
 
-import typing
+from typing import Optional
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
-
-
-__all__ = (
-    'SecondaryAmino',
-)
+from .generic_functional_group import GenericFunctionalGroup
+from .utilities import get_atom_map
+from ...atoms import N, H, Atom
 
 
-class SecondaryAmino(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class SecondaryAmino(GenericFunctionalGroup):
     """
     Represents a secondary amino functional group.
 
@@ -31,13 +24,13 @@ class SecondaryAmino(
 
     def __init__(
         self,
-        nitrogen: _atoms.N,
-        hydrogen: _atoms.H,
-        atom1: _atoms.Atom,
-        atom2: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        nitrogen: N,
+        hydrogen: H,
+        atom1: Atom,
+        atom2: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.SecondaryAmine` instance.
@@ -68,7 +61,7 @@ class SecondaryAmino(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(nitrogen, hydrogen, atom1, atom2),
             bonders=bonders,
@@ -80,7 +73,7 @@ class SecondaryAmino(
         self._atom1 = atom1
         self._atom2 = atom2
 
-    def get_nitrogen(self) -> _atoms.N:
+    def get_nitrogen(self) -> N:
         """
         Get the ``[nitrogen]`` atom.
 
@@ -92,7 +85,7 @@ class SecondaryAmino(
 
         return self._nitrogen
 
-    def get_hydrogen(self) -> _atoms.H:
+    def get_hydrogen(self) -> H:
         """
         Get the ``[hydrogen]`` atom.
 
@@ -104,7 +97,7 @@ class SecondaryAmino(
 
         return self._hydrogen
 
-    def get_atom1(self) -> _atoms.Atom:
+    def get_atom1(self) -> Atom:
         """
         Get the ``[atom1]`` atom.
 
@@ -116,7 +109,7 @@ class SecondaryAmino(
 
         return self._atom1
 
-    def get_atom2(self) -> _atoms.Atom:
+    def get_atom2(self) -> Atom:
         """
         Get the ``[atom2]`` atom.
 
@@ -140,7 +133,7 @@ class SecondaryAmino(
         self,
         id_map: dict[int, int],
     ):
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

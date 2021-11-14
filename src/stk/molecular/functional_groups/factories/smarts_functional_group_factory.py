@@ -4,25 +4,15 @@ SMARTS Functional Group Factory
 
 """
 
-from __future__ import annotations
+from typing import Optional, Iterable
 
-from typing import Optional
-from collections import abc
-
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import GenericFunctionalGroup
+from ...molecule import Molecule
 
 
-__all__ = (
-    'SmartsFunctionalGroupFactory',
-)
-
-
-class SmartsFunctionalGroupFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class SmartsFunctionalGroupFactory(FunctionalGroupFactory):
     """
     Creates :class:`.GenericFunctionalGroup` instances.
 
@@ -118,15 +108,12 @@ class SmartsFunctionalGroupFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.GenericFunctionalGroup]:
+        molecule: Molecule,
+    ) -> Iterable[GenericFunctionalGroup]:
 
-        for atom_ids in _utilities.get_atom_ids(
-            query=self._smarts,
-            molecule=molecule,
-        ):
+        for atom_ids in get_atom_ids(self._smarts, molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.GenericFunctionalGroup(
+            yield GenericFunctionalGroup(
                 atoms=atoms,
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

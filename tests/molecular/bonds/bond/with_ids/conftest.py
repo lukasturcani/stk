@@ -2,7 +2,7 @@ import pytest
 import stk
 
 
-from collections import abc
+from typing import Callable
 
 
 @pytest.fixture(
@@ -16,7 +16,7 @@ from collections import abc
         },
     ],
 )
-def get_id_map(request) -> abc.Callable[[stk.Bond], dict[int, int]]:
+def get_id_map(request) -> Callable[[stk.Bond], dict[int, int]]:
     """
     Return a valid `atom_map` parameter for a bond.
 

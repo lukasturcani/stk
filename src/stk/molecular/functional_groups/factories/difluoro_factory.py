@@ -4,27 +4,18 @@ Difluoro Factory
 
 """
 
-from __future__ import annotations
+from typing import Optional, Iterable, Literal
 
-import typing
-from collections import abc
-
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
-
-__all__ = (
-    'DifluoroFactory',
-)
-
-_ValidIndex = typing.Literal[0, 1, 2, 3]
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import Difluoro
+from ...molecule import Molecule
 
 
-class DifluoroFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
+
+
+class DifluoroFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Difluoro` instances.
 
@@ -113,9 +104,9 @@ class DifluoroFactory(
 
     def __init__(
         self,
-        bonders: tuple[_ValidIndex, ...] = (1, 2),
-        deleters: tuple[_ValidIndex, ...] = (0, 3),
-        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
+        bonders: ValidIndices = (1, 2),
+        deleters: ValidIndices = (0, 3),
+        placers: Optional[ValidIndices] = None,
     ) -> None:
         """
         Initialize a :class:`.DifluoroFactory` instance.
@@ -143,19 +134,15 @@ class DifluoroFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.Difluoro]:
-
-        for atom_ids in _utilities.get_atom_ids(
-            query='[F][#6]~[#6][F]',
-            molecule=molecule,
-        ):
+        molecule: Molecule,
+    ) -> Iterable[Difluoro]:
+        for atom_ids in get_atom_ids('[F][#6]~[#6][F]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.Difluoro(
+            yield Difluoro(
                 atom1=atoms[1],
-                fluorine1=typing.cast(_elements.F, atoms[0]),
+                fluorine1=atoms[0],
                 atom2=atoms[2],
-                fluorine2=typing.cast(_elements.F, atoms[3]),
+                fluorine2=atoms[3],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
                 placers=tuple(atoms[i] for i in self._placers),

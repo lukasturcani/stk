@@ -4,28 +4,17 @@ Secondary Amino Factory
 
 """
 
-from __future__ import annotations
+from typing import Optional, Iterable, Literal
 
-import typing
-from collections import abc
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import SecondaryAmino
+from ...molecule import Molecule
 
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
+ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
 
 
-__all__ = (
-    'SecondaryAminoFactory',
-)
-
-_ValidIndex = typing.Literal[0, 1, 2, 3]
-
-
-class SecondaryAminoFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class SecondaryAminoFactory(FunctionalGroupFactory):
     """
     Creates :class:`.SecondaryAmino` instances.
 
@@ -115,9 +104,9 @@ class SecondaryAminoFactory(
 
     def __init__(
         self,
-        bonders: tuple[_ValidIndex, ...] = (1, ),
-        deleters: tuple[_ValidIndex, ...] = (0, ),
-        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
+        bonders: ValidIndices = (1, ),
+        deleters: ValidIndices = (0, ),
+        placers: Optional[ValidIndices] = None,
     ) -> None:
         """
         Initialize a :class:`.SecondaryAminoFactory` instance.
@@ -145,16 +134,13 @@ class SecondaryAminoFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.SecondaryAmino]:
-        for atom_ids in _utilities.get_atom_ids(
-            query='[H][N]([#6])[#6]',
-            molecule=molecule,
-        ):
+        molecule: Molecule,
+    ) -> Iterable[SecondaryAmino]:
+        for atom_ids in get_atom_ids('[H][N]([#6])[#6]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.SecondaryAmino(
-                nitrogen=typing.cast(_elements.N, atoms[1]),
-                hydrogen=typing.cast(_elements.H, atoms[0]),
+            yield SecondaryAmino(
+                nitrogen=atoms[1],
+                hydrogen=atoms[0],
                 atom1=atoms[2],
                 atom2=atoms[3],
                 bonders=tuple(atoms[i] for i in self._bonders),

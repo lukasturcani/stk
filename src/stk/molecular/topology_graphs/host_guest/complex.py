@@ -6,8 +6,7 @@ Host Guest Complex
 
 from __future__ import annotations
 
-from typing import Optional
-from collections import abc
+from typing import Optional, Iterable
 
 from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
@@ -451,7 +450,7 @@ class Complex(TopologyGraph):
         guest_start: Optional[tuple[float, float, float]] = None,
         guest_target: Optional[tuple[float, float, float]] = None,
         displacement: Optional[tuple[float, float, float]] = None,
-        guests: Optional[abc.Iterable[Guest]] = None,
+        guests: Optional[Iterable[Guest]] = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
@@ -554,7 +553,7 @@ class Complex(TopologyGraph):
     def _get_vertices_from_guests(
         self,
         host: BuildingBlock,
-        guests: abc.Iterable[Guest],
+        guests: Iterable[Guest],
     ) -> dict[BuildingBlock, Vertex]:
         if isinstance(guests, Guest):
             guests = (guests, )

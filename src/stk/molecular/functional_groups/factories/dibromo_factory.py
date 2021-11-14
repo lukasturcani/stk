@@ -4,28 +4,17 @@ Dibromo Factory
 
 """
 
-from __future__ import annotations
+from typing import Optional, Iterable, Literal
 
-import typing
-from collections import abc
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import Dibromo
+from ...molecule import Molecule
 
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
+ValidIndices = tuple[Literal[0, 1, 2, 3], ...]
 
 
-__all__ = (
-    'DibromoFactory',
-)
-
-_ValidIndex = typing.Literal[0, 1, 2, 3]
-
-
-class DibromoFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class DibromoFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Dibromo` instances.
 
@@ -114,9 +103,9 @@ class DibromoFactory(
 
     def __init__(
         self,
-        bonders: tuple[_ValidIndex, ...] = (1, 2),
-        deleters: tuple[_ValidIndex, ...] = (0, 3),
-        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
+        bonders: ValidIndices = (1, 2),
+        deleters: ValidIndices = (0, 3),
+        placers: Optional[ValidIndices] = None,
     ) -> None:
         """
         Initialize a :class:`.DibromoFactory` instance.
@@ -144,19 +133,16 @@ class DibromoFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.Dibromo]:
+        molecule: Molecule,
+    ) -> Iterable[Dibromo]:
 
-        for atom_ids in _utilities.get_atom_ids(
-            query='[Br][#6]~[#6][Br]',
-            molecule=molecule,
-        ):
+        for atom_ids in get_atom_ids('[Br][#6]~[#6][Br]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.Dibromo(
+            yield Dibromo(
                 atom1=atoms[1],
-                bromine1=typing.cast(_elements.Br, atoms[0]),
+                bromine1=atoms[0],
                 atom2=atoms[2],
-                bromine2=typing.cast(_elements.Br, atoms[3]),
+                bromine2=atoms[3],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
                 placers=tuple(atoms[i] for i in self._placers),

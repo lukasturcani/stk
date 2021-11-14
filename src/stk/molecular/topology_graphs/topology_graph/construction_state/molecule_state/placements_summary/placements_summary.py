@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import numpy as np
 from collections import defaultdict
-from collections import abc
+from typing import Iterable
 
 from .....topology_graph.topology_graph.implementations import (
     _PlacementResult,
@@ -46,8 +46,8 @@ class _PlacementsSummary:
 
     def __init__(
         self,
-        building_blocks: abc.Iterable[BuildingBlock],
-        placement_results: abc.Iterable[_PlacementResult],
+        building_blocks: Iterable[BuildingBlock],
+        placement_results: Iterable[_PlacementResult],
         num_atoms: int,
         num_previous_placements: int,
     ) -> None:

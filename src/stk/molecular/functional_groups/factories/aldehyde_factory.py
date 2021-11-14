@@ -4,29 +4,16 @@ Aldehyde Factory
 
 """
 
-from __future__ import annotations
 
-import typing
-from collections import abc
+from typing import Iterable, Literal, Optional
 
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import Aldehyde
+from ...molecule import Molecule
 
 
-__all__ = (
-    'AldehydeFactory',
-)
-
-
-_ValidIndex = typing.Literal[0, 1, 2, 3]
-
-
-class AldehydeFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class AldehydeFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Aldehyde` instances.
 
@@ -118,9 +105,9 @@ class AldehydeFactory(
 
     def __init__(
         self,
-        bonders: tuple[_ValidIndex, ...] = (1, ),
-        deleters: tuple[_ValidIndex, ...] = (2, ),
-        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
+        bonders: tuple[Literal[0, 1, 2, 3], ...] = (1, ),
+        deleters: tuple[Literal[0, 1, 2, 3], ...] = (2, ),
+        placers: Optional[tuple[Literal[0, 1, 2, 3], ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.AldehydeFactory` instance.
@@ -148,18 +135,15 @@ class AldehydeFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.Aldehyde]:
+        molecule: Molecule,
+    ) -> Iterable[Aldehyde]:
 
-        for atom_ids in _utilities.get_atom_ids(
-            query='[*][C](=[O])[H]',
-            molecule=molecule,
-        ):
+        for atom_ids in get_atom_ids('[*][C](=[O])[H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.Aldehyde(
-                carbon=typing.cast(_elements.C, atoms[1]),
-                oxygen=typing.cast(_elements.O, atoms[2]),
-                hydrogen=typing.cast(_elements.H, atoms[3]),
+            yield Aldehyde(
+                carbon=atoms[1],
+                oxygen=atoms[2],
+                hydrogen=atoms[3],
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

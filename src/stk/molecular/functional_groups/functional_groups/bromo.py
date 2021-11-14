@@ -6,21 +6,14 @@ Bromo
 
 from __future__ import annotations
 
-import typing
+from typing import Optional
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
-
-
-__all__ = (
-    'Bromo',
-)
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import Atom, Br
 
 
-class Bromo(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Bromo(GenericFunctionalGroup):
     """
     Represents a bromo functional group.
 
@@ -31,11 +24,11 @@ class Bromo(
 
     def __init__(
         self,
-        bromine: _atoms.Br,
-        atom: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        bromine: Br,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Bromo` instance.
@@ -60,7 +53,7 @@ class Bromo(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(bromine, atom),
             bonders=bonders,
@@ -70,7 +63,7 @@ class Bromo(
         self._bromine = bromine
         self._atom = atom
 
-    def get_bromine(self) -> _atoms.Br:
+    def get_bromine(self) -> Br:
         """
         Get the ``[bromine]`` atom.
 
@@ -82,7 +75,7 @@ class Bromo(
 
         return self._bromine
 
-    def get_atom(self) -> _atoms.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -105,7 +98,7 @@ class Bromo(
         id_map: dict[int, int],
     ) -> Bromo:
 
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

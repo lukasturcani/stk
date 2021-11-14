@@ -4,29 +4,18 @@ Amide Factory
 
 """
 
-from __future__ import annotations
+from typing import Optional, Iterable, Literal
 
-import typing
-from collections import abc
-
-from . import functional_group_factory as _functional_group_factory
-from . import utilities as _utilities
-from .. import functional_groups as _functional_groups
-from ... import molecule as _molecule
-from ...atoms import elements as _elements
+from .functional_group_factory import FunctionalGroupFactory
+from .utilities import get_atom_ids
+from ..functional_groups import Amide
+from ...molecule import Molecule
 
 
-__all__ = (
-    'AmideFactory',
-)
+ValidIndices = Literal[0, 1, 2, 3, 4, 5]
 
 
-_ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
-
-
-class AmideFactory(
-    _functional_group_factory.FunctionalGroupFactory,
-):
+class AmideFactory(FunctionalGroupFactory):
     """
     Creates :class:`.Amide` instances.
 
@@ -117,9 +106,9 @@ class AmideFactory(
 
     def __init__(
         self,
-        bonders: tuple[_ValidIndex, ...] = (1, ),
-        deleters: tuple[_ValidIndex, ...] = (3, 4, 5),
-        placers: typing.Optional[tuple[_ValidIndex, ...]] = None,
+        bonders: tuple[ValidIndices, ...] = (1, ),
+        deleters: tuple[ValidIndices, ...] = (3, 4, 5),
+        placers: Optional[tuple[ValidIndices, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.AmideFactory` instance.
@@ -147,20 +136,17 @@ class AmideFactory(
 
     def get_functional_groups(
         self,
-        molecule: _molecule.Molecule,
-    ) -> abc.Iterable[_functional_groups.Amide]:
-
-        for atom_ids in _utilities.get_atom_ids(
-            query='[*][C](=[O])[N]([H])[H]',
-            molecule=molecule,
-        ):
+        molecule: Molecule,
+    ) -> Iterable[Amide]:
+        ids = get_atom_ids('[*][C](=[O])[N]([H])[H]', molecule)
+        for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield _functional_groups.Amide(
-                carbon=typing.cast(_elements.C, atoms[1]),
-                oxygen=typing.cast(_elements.O, atoms[2]),
-                nitrogen=typing.cast(_elements.N, atoms[3]),
-                hydrogen1=typing.cast(_elements.H, atoms[4]),
-                hydrogen2=typing.cast(_elements.H, atoms[5]),
+            yield Amide(
+                carbon=atoms[1],
+                oxygen=atoms[2],
+                nitrogen=atoms[3],
+                hydrogen1=atoms[4],
+                hydrogen2=atoms[5],
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

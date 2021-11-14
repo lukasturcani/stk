@@ -6,21 +6,14 @@ Fluoro
 
 from __future__ import annotations
 
-import typing
+from typing import Optional
 
-from . import utilities as _utilities
-from . import generic_functional_group as _generic_functional_group
-from ... import atoms as _atoms
-
-
-__all__ = (
-    'Fluoro',
-)
+from .utilities import get_atom_map
+from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import F, Atom
 
 
-class Fluoro(
-    _generic_functional_group.GenericFunctionalGroup,
-):
+class Fluoro(GenericFunctionalGroup):
     """
     Represents a fluoro functional group.
 
@@ -31,11 +24,11 @@ class Fluoro(
 
     def __init__(
         self,
-        fluorine: _atoms.F,
-        atom: _atoms.Atom,
-        bonders: tuple[_atoms.Atom, ...],
-        deleters: tuple[_atoms.Atom, ...],
-        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
+        fluorine: F,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Fluoro` instance.
@@ -60,7 +53,7 @@ class Fluoro(
 
         """
 
-        _generic_functional_group.GenericFunctionalGroup.__init__(
+        GenericFunctionalGroup.__init__(
             self=self,
             atoms=(fluorine, atom),
             bonders=bonders,
@@ -70,7 +63,7 @@ class Fluoro(
         self._fluorine = fluorine
         self._atom = atom
 
-    def get_fluorine(self) -> _atoms.F:
+    def get_fluorine(self) -> F:
         """
         Get the ``[fluorine]`` atom.
 
@@ -82,7 +75,7 @@ class Fluoro(
 
         return self._fluorine
 
-    def get_atom(self) -> _atoms.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -104,7 +97,7 @@ class Fluoro(
         self,
         id_map: dict[int, int],
     ) -> Fluoro:
-        atom_map = _utilities.get_atom_map(
+        atom_map = get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

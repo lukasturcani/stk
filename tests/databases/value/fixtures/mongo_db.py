@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 import pytest
 import stk
 import pymongo
 from dataclasses import dataclass
-from collections import abc
+from typing import Callable
 
 
 from ..case_data import CaseData
@@ -30,7 +28,7 @@ class CaseDataData:
 
     """
 
-    get_database: abc.Callable[[pymongo.MongoClient], stk.ValueMongoDb]
+    get_database: Callable[[pymongo.MongoClient], stk.ValueMongoDb]
     molecule: stk.Molecule
     value: object
 
