@@ -17,7 +17,6 @@ from ......atoms import Atom, AtomInfo
 from ......bonds import Bond, BondInfo
 from ......functional_groups import FunctionalGroup
 from ......molecules import BuildingBlock
-from .....topology_graph.topology_graph import implementations
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
 
