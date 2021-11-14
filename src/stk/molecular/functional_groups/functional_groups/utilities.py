@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import abc
 
-from ...atoms import Atom
+from ... import atoms as _atoms
 
 
 __all__ = (
@@ -18,8 +18,8 @@ __all__ = (
 
 def get_atom_map(
     id_map: dict[int, int],
-    atoms: abc.Iterable[Atom],
-) -> dict[int, Atom]:
+    atoms: abc.Iterable[_atoms.Atom],
+) -> dict[int, _atoms.Atom]:
     """
     Get an atom map from an `id_map`.
 

@@ -9,13 +9,13 @@ Defines an :class:`.Atom` class for each element.
 from __future__ import annotations
 
 import typing
-from .atom import Atom
+from . import atom as _atom
 
 
 _T = typing.TypeVar('_T', bound='AtomImpl')
 
 
-class AtomImpl(Atom):
+class AtomImpl(_atom.Atom):
     """
     An implementation of the :class:`.Atom` interface.
 

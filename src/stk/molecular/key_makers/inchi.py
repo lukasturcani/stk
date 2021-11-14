@@ -4,8 +4,8 @@ InChI
 
 """
 
-from .molecule import MoleculeKeyMaker
-from .utilities import get_inchi
+from . import molecule as _molecule
+from . import utilities as _utilities
 
 
 __all__ = (
@@ -13,7 +13,7 @@ __all__ = (
 )
 
 
-class Inchi(MoleculeKeyMaker):
+class Inchi(_molecule.MoleculeKeyMaker):
     """
     Used to get the InChI of molecules.
 
@@ -60,10 +60,10 @@ class Inchi(MoleculeKeyMaker):
 
         """
 
-        MoleculeKeyMaker.__init__(
+        _molecule.MoleculeKeyMaker.__init__(
             self=self,
             key_name='InChI',
-            get_key=get_inchi,
+            get_key=_utilities.get_inchi,
         )
 
     def __str__(self) -> str:

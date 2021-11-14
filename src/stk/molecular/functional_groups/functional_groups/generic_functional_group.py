@@ -10,9 +10,9 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group import FunctionalGroup
-from .utilities import get_atom_map
-from ...atoms import Atom
+from . import functional_group as _functional_group
+from . import utilities as _utilities
+from ... import atoms as _atoms
 
 
 __all__ = (
@@ -23,7 +23,7 @@ __all__ = (
 _T = typing.TypeVar('_T', bound='GenericFunctionalGroup')
 
 
-class GenericFunctionalGroup(FunctionalGroup):
+class GenericFunctionalGroup(_functional_group.FunctionalGroup):
     """
     A functional group which defines general atomic classes.
 
@@ -39,10 +39,10 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     def __init__(
         self,
-        atoms: tuple[Atom, ...],
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: typing.Optional[tuple[Atom, ...]] = None,
+        atoms: tuple[_atoms.Atom, ...],
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.GenericFunctionalGroup`.
@@ -65,7 +65,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         """
 
         deleter_set = set(atom.get_id() for atom in deleters)
-        FunctionalGroup.__init__(
+        _functional_group.FunctionalGroup.__init__(
             self=self,
             atoms=atoms,
             placers=bonders if placers is None else placers,
@@ -88,7 +88,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     def with_atoms(
         self,
-        atom_map: dict[int, Atom],
+        atom_map: dict[int, _atoms.Atom],
     ) -> GenericFunctionalGroup:
 
         clone = GenericFunctionalGroup.__new__(GenericFunctionalGroup)
@@ -114,7 +114,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         id_map: dict[int, int],
     ) -> GenericFunctionalGroup:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,
@@ -125,7 +125,7 @@ class GenericFunctionalGroup(FunctionalGroup):
             ),
         )
         clone = self.__class__.__new__(self.__class__)
-        FunctionalGroup.__init__(
+        _functional_group.FunctionalGroup.__init__(
             self=clone,
             atoms=tuple(
                 atom_map.get(atom.get_id(), atom)
@@ -151,7 +151,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return clone
 
-    def get_bonders(self) -> abc.Iterable[Atom]:
+    def get_bonders(self) -> abc.Iterable[_atoms.Atom]:
         """
         Yield bonder atoms in the functional group.
 
@@ -190,7 +190,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         yield from (a.get_id() for a in self._bonders)
 
-    def get_deleters(self) -> abc.Iterable[Atom]:
+    def get_deleters(self) -> abc.Iterable[_atoms.Atom]:
         """
         Yield the deleter atoms in the functional group.
 

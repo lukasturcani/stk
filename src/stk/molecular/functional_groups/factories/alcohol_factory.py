@@ -9,11 +9,11 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Alcohol
-from ...molecule import Molecule
-from ...atoms import O, H
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 
 __all__ = (
@@ -24,7 +24,7 @@ __all__ = (
 _ValidIndex = typing.Literal[0, 1, 2]
 
 
-class AlcoholFactory(FunctionalGroupFactory):
+class AlcoholFactory(_functional_group_factory.FunctionalGroupFactory):
     """
     Creates :class:`.Alcohol` instances.
 
@@ -149,14 +149,14 @@ class AlcoholFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> abc.Iterable[Alcohol]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Alcohol]:
 
-        for atom_ids in get_atom_ids('[*][O][H]', molecule):
+        for atom_ids in _utilities.get_atom_ids('[*][O][H]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Alcohol(
-                oxygen=typing.cast(O, atoms[1]),
-                hydrogen=typing.cast(H, atoms[2]),
+            yield _functional_groups.Alcohol(
+                oxygen=typing.cast(_elements.O, atoms[1]),
+                hydrogen=typing.cast(_elements.H, atoms[2]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

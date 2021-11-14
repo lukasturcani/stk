@@ -16,11 +16,11 @@ import pathlib
 from collections import abc
 
 from stk.utilities import typing as _typing
-from .functional_groups import FunctionalGroup, FunctionalGroupFactory
-from .atoms import Atom
-from .bonds import Bond
-from .molecule import Molecule
-from .. import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from .. import atoms as _atoms
+from .. import bonds as _bonds
+from .. import molecule as _molecule
+from ... import utilities as _utilities
 
 
 __all__ = (
@@ -44,8 +44,8 @@ class _InitFunc(typing.Protocol):
 
 
 _FunctionalGroups = abc.Iterable[typing.Union[
-    FunctionalGroup,
-    FunctionalGroupFactory,
+    _functional_groups.FunctionalGroup,
+    _functional_groups.FunctionalGroupFactory,
 ]]
 
 
@@ -155,7 +155,7 @@ class IMolecule(typing.Protocol):
         pass
 
 
-class BuildingBlock(Molecule):
+class BuildingBlock(_molecule.Molecule):
     """
     Represents a building block of a :class:`.ConstructedMolecule`.
 
@@ -280,7 +280,7 @@ class BuildingBlock(Molecule):
     @classmethod
     def init_from_molecule(
         cls,
-        molecule: Molecule,
+        molecule: _molecule.Molecule,
         functional_groups: _FunctionalGroups = (),
         placer_ids: typing.Optional[abc.Iterable[int]] = None,
     ) -> BuildingBlock:
@@ -445,8 +445,8 @@ class BuildingBlock(Molecule):
     @classmethod
     def init(
         cls,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: tuple[_atoms.Atom, ...],
+        bonds: tuple[_bonds.Bond, ...],
         position_matrix: np.ndarray,
         functional_groups: _FunctionalGroups = (),
         placer_ids: typing.Optional[abc.Iterable[int]] = None,
@@ -499,7 +499,7 @@ class BuildingBlock(Molecule):
         """
 
         building_block = cls.__new__(cls)
-        Molecule.__init__(
+        _molecule.Molecule.__init__(
             self=building_block,
             atoms=atoms,
             bonds=bonds,
@@ -699,7 +699,7 @@ class BuildingBlock(Molecule):
         """
 
         atoms = tuple(
-            Atom(
+            _atoms.Atom(
                 id=a.GetIdx(),
                 atomic_number=a.GetAtomicNum(),
                 charge=a.GetFormalCharge(),
@@ -707,7 +707,7 @@ class BuildingBlock(Molecule):
             for a in molecule.GetAtoms()
         )
         bonds = tuple(
-            Bond(
+            _bonds.Bond(
                 atom1=atoms[b.GetBeginAtomIdx()],
                 atom2=atoms[b.GetEndAtomIdx()],
                 order=(
@@ -719,7 +719,7 @@ class BuildingBlock(Molecule):
         )
         position_matrix = molecule.GetConformer().GetPositions()
 
-        Molecule.__init__(
+        _molecule.Molecule.__init__(
             self=self,
             atoms=atoms,
             bonds=bonds,
@@ -739,7 +739,8 @@ class BuildingBlock(Molecule):
     def _normalize_placer_ids(
         self,
         placer_ids: typing.Optional[abc.Iterable[int]],
-        functional_groups: abc.Collection[FunctionalGroup],
+        functional_groups:
+            abc.Collection[_functional_groups.FunctionalGroup],
     ) -> frozenset[int]:
         """
         Get the final *placer* ids.
@@ -783,7 +784,8 @@ class BuildingBlock(Molecule):
 
     def _get_core_ids(
         self,
-        functional_groups: abc.Iterable[FunctionalGroup],
+        functional_groups:
+            abc.Iterable[_functional_groups.FunctionalGroup],
     ) -> abc.Iterable[int]:
         """
         Get the final *core* ids.
@@ -819,7 +821,7 @@ class BuildingBlock(Molecule):
     def _extract_functional_groups(
         self,
         functional_groups: _FunctionalGroups,
-    ) -> abc.Iterable[FunctionalGroup]:
+    ) -> abc.Iterable[_functional_groups.FunctionalGroup]:
         """
         Yield functional groups.
 
@@ -845,7 +847,7 @@ class BuildingBlock(Molecule):
         for functional_group in functional_groups:
             if isinstance(
                 functional_group,
-                FunctionalGroup,
+                _functional_groups.FunctionalGroup,
             ):
                 yield functional_group
             else:
@@ -854,7 +856,8 @@ class BuildingBlock(Molecule):
 
     def _with_functional_groups(
         self: _T,
-        functional_groups: abc.Iterable[FunctionalGroup],
+        functional_groups:
+            abc.Iterable[_functional_groups.FunctionalGroup],
     ) -> _T:
         """
         Modify the molecule.
@@ -866,7 +869,8 @@ class BuildingBlock(Molecule):
 
     def with_functional_groups(
         self,
-        functional_groups: abc.Iterable[FunctionalGroup],
+        functional_groups:
+            abc.Iterable[_functional_groups.FunctionalGroup],
     ) -> BuildingBlock:
         """
         Return a clone with specific functional groups.
@@ -923,7 +927,7 @@ class BuildingBlock(Molecule):
     def get_functional_groups(
         self,
         fg_ids: typing.Optional[_typing.OneOrMany[int]] = None,
-    ) -> abc.Iterable[FunctionalGroup]:
+    ) -> abc.Iterable[_functional_groups.FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
 

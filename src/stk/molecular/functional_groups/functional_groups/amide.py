@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import O, C, N, H, Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
 __all__ = (
@@ -18,7 +18,9 @@ __all__ = (
 )
 
 
-class Amide(GenericFunctionalGroup):
+class Amide(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents an amide functional group.
 
@@ -29,16 +31,16 @@ class Amide(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon: C,
+        carbon: _atoms.C,
         # O is not an ambiguous name.
-        oxygen: O,  # noqa
-        nitrogen: N,
-        hydrogen1: H,
-        hydrogen2: H,
-        atom: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: typing.Optional[tuple[Atom, ...]] = None,
+        oxygen: _atoms.O,  # noqa
+        nitrogen: _atoms.N,
+        hydrogen1: _atoms.H,
+        hydrogen2: _atoms.H,
+        atom: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Amide` instance.
@@ -75,7 +77,7 @@ class Amide(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(
                 carbon,
@@ -96,7 +98,7 @@ class Amide(GenericFunctionalGroup):
         self._hydrogen2 = hydrogen2
         self._atom = atom
 
-    def get_carbon(self) -> C:
+    def get_carbon(self) -> _atoms.C:
         """
         Get the ``[carbon]`` atom.
 
@@ -109,7 +111,7 @@ class Amide(GenericFunctionalGroup):
         return self._carbon
 
     # O is not an ambiguous name.
-    def get_oxygen(self) -> O:  # noqa
+    def get_oxygen(self) -> _atoms.O:  # noqa
         """
         Get the ``[oxygen]`` atom.
 
@@ -121,7 +123,7 @@ class Amide(GenericFunctionalGroup):
 
         return self._oxygen
 
-    def get_nitrogen(self) -> N:
+    def get_nitrogen(self) -> _atoms.N:
         """
         Get the ``[nitrogen]`` atom.
 
@@ -133,7 +135,7 @@ class Amide(GenericFunctionalGroup):
 
         return self._nitrogen
 
-    def get_hydrogen1(self) -> H:
+    def get_hydrogen1(self) -> _atoms.H:
         """
         Get the ``[hydrogen1]`` atom.
 
@@ -145,7 +147,7 @@ class Amide(GenericFunctionalGroup):
 
         return self._hydrogen1
 
-    def get_hydrogen2(self) -> H:
+    def get_hydrogen2(self) -> _atoms.H:
         """
         Get the ``[hydrogen2]`` atom.
 
@@ -157,7 +159,7 @@ class Amide(GenericFunctionalGroup):
 
         return self._hydrogen2
 
-    def get_atom(self) -> Atom:
+    def get_atom(self) -> _atoms.Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -184,7 +186,7 @@ class Amide(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Amide:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

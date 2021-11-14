@@ -4,8 +4,8 @@ SMILES
 
 """
 
-from .molecule import MoleculeKeyMaker
-from .utilities import get_smiles
+from . import molecule as _molecule
+from . import utilities as _utilities
 
 
 __all__ = (
@@ -13,7 +13,7 @@ __all__ = (
 )
 
 
-class Smiles(MoleculeKeyMaker):
+class Smiles(_molecule.MoleculeKeyMaker):
     """
     Used to get the SMILES of molecules.
 
@@ -48,10 +48,10 @@ class Smiles(MoleculeKeyMaker):
 
         """
 
-        MoleculeKeyMaker.__init__(
+        _molecule.MoleculeKeyMaker.__init__(
             self=self,
             key_name='SMILES',
-            get_key=get_smiles,
+            get_key=_utilities.get_smiles,
         )
 
     def __str__(self) -> str:

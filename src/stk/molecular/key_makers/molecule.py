@@ -14,7 +14,7 @@ Molecule Key Maker
 from __future__ import annotations
 
 from collections import abc
-from ..molecule import Molecule
+from .. import molecule as _molecule
 
 
 __all__ = (
@@ -80,7 +80,7 @@ class MoleculeKeyMaker:
     def __init__(
         self,
         key_name: str,
-        get_key: abc.Callable[[Molecule], object],
+        get_key: abc.Callable[[_molecule.Molecule], object],
     ) -> None:
         """
         Initialize a :class:`.MoleculeKeyMaker` instance.
@@ -112,7 +112,7 @@ class MoleculeKeyMaker:
 
         return self._key_name
 
-    def get_key(self, molecule: Molecule) -> object:
+    def get_key(self, molecule: _molecule.Molecule) -> object:
         """
         Get the key of `molecule`.
 

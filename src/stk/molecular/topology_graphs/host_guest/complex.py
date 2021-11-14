@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Optional
 from collections import abc
 
-from ...building_block import BuildingBlock
+from ...molecules import BuildingBlock
 from .vertices import HostVertex, GuestVertex
 from ..topology_graph import (
     TopologyGraph,

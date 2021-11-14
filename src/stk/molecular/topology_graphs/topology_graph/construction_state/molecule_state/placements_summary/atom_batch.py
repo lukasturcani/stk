@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections import abc
 
 from ......atoms import Atom, AtomInfo
-from ......building_block import BuildingBlock
+from ......molecules import BuildingBlock
 
 
 class _AtomBatch:

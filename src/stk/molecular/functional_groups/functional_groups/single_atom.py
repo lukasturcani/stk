@@ -6,9 +6,9 @@ Single Atom
 
 from __future__ import annotations
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
 __all__ = (
@@ -16,7 +16,9 @@ __all__ = (
 )
 
 
-class SingleAtom(GenericFunctionalGroup):
+class SingleAtom(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents an abstract single atom functional group.
 
@@ -25,7 +27,7 @@ class SingleAtom(GenericFunctionalGroup):
 
     """
 
-    def __init__(self, atom: Atom) -> None:
+    def __init__(self, atom: _atoms.Atom) -> None:
         """
         Initialize a :class:`.SingleAtom` instance.
 
@@ -36,7 +38,7 @@ class SingleAtom(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(atom, ),
             bonders=(atom, ),
@@ -45,7 +47,7 @@ class SingleAtom(GenericFunctionalGroup):
         )
         self._atom = atom
 
-    def get_atom(self) -> Atom:
+    def get_atom(self) -> _atoms.Atom:
         """
         Get the atom that defines the functional group.
 
@@ -62,7 +64,7 @@ class SingleAtom(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> SingleAtom:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

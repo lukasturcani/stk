@@ -9,11 +9,11 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Diol
-from ...molecule import Molecule
-from ...atoms import O, H
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 __all__ = (
     'DiolFactory',
@@ -22,7 +22,9 @@ __all__ = (
 _ValidIndex = typing.Literal[0, 1, 2, 3, 4, 5]
 
 
-class DiolFactory(FunctionalGroupFactory):
+class DiolFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.Diol` instances.
 
@@ -141,21 +143,21 @@ class DiolFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> abc.Iterable[Diol]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Diol]:
 
-        for atom_ids in get_atom_ids(
+        for atom_ids in _utilities.get_atom_ids(
             query='[H][O][#6]~[#6][O][H]',
             molecule=molecule,
         ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Diol(
-                hydrogen1=typing.cast(H, atoms[0]),
-                oxygen1=typing.cast(O, atoms[1]),
+            yield _functional_groups.Diol(
+                hydrogen1=typing.cast(_elements.H, atoms[0]),
+                oxygen1=typing.cast(_elements.O, atoms[1]),
                 atom1=atoms[2],
                 atom2=atoms[3],
-                oxygen2=typing.cast(O, atoms[4]),
-                hydrogen2=typing.cast(H, atoms[5]),
+                oxygen2=typing.cast(_elements.O, atoms[4]),
+                hydrogen2=typing.cast(_elements.H, atoms[5]),
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),
                 placers=tuple(atoms[i] for i in self._placers),

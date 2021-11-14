@@ -9,11 +9,11 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import CarboxylicAcid
-from ...molecule import Molecule
-from ...atoms import C, O, H
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 
 __all__ = (
@@ -23,7 +23,9 @@ __all__ = (
 _ValidIndex = typing.Literal[0, 1, 2, 3, 4]
 
 
-class CarboxylicAcidFactory(FunctionalGroupFactory):
+class CarboxylicAcidFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.CarboxylicAcid` instances.
 
@@ -146,19 +148,19 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> abc.Iterable[CarboxylicAcid]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.CarboxylicAcid]:
 
-        for atom_ids in get_atom_ids(
+        for atom_ids in _utilities.get_atom_ids(
             query='[*][C](=[O])[O][H]',
             molecule=molecule,
         ):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield CarboxylicAcid(
-                carbon=typing.cast(C, atoms[1]),
-                oxygen1=typing.cast(O, atoms[2]),
-                oxygen2=typing.cast(O, atoms[3]),
-                hydrogen=typing.cast(H, atoms[4]),
+            yield _functional_groups.CarboxylicAcid(
+                carbon=typing.cast(_elements.C, atoms[1]),
+                oxygen1=typing.cast(_elements.O, atoms[2]),
+                oxygen2=typing.cast(_elements.O, atoms[3]),
+                hydrogen=typing.cast(_elements.H, atoms[4]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

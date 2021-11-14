@@ -11,13 +11,13 @@ import typing
 import numpy as np
 
 from stk.utilities import typing as _typing
-from ....atoms import Atom
-from ....bonds import Bond
+from .... import atoms as _atoms
+from .... import bonds as _bonds
 
 
 def write_pdb_file(
-    atoms: tuple[Atom, ...],
-    bonds: tuple[Bond, ...],
+    atoms: tuple[_atoms.Atom, ...],
+    bonds: tuple[_bonds.Bond, ...],
     position_matrix: np.ndarray,
     path: typing.Union[pathlib.Path, str],
     atom_ids: typing.Optional[_typing.OneOrMany[int]],

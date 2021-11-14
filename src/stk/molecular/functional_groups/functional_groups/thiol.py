@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from .utilities import get_atom_map
-from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import S, H, Atom
+from . import utilities as _utilities
+from . import generic_functional_group as _generic_functional_group
+from ... import atoms as _atoms
 
 
 __all__ = (
@@ -18,7 +18,9 @@ __all__ = (
 )
 
 
-class Thiol(GenericFunctionalGroup):
+class Thiol(
+    _generic_functional_group.GenericFunctionalGroup,
+):
     """
     Represents a thiol functional group.
 
@@ -30,12 +32,12 @@ class Thiol(GenericFunctionalGroup):
 
     def __init__(
         self,
-        sulfur: S,
-        hydrogen: H,
-        atom: Atom,
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: typing.Optional[tuple[Atom, ...]] = None,
+        sulfur: _atoms.S,
+        hydrogen: _atoms.H,
+        atom: _atoms.Atom,
+        bonders: tuple[_atoms.Atom, ...],
+        deleters: tuple[_atoms.Atom, ...],
+        placers: typing.Optional[tuple[_atoms.Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.Thiol` instance.
@@ -63,7 +65,7 @@ class Thiol(GenericFunctionalGroup):
 
         """
 
-        GenericFunctionalGroup.__init__(
+        _generic_functional_group.GenericFunctionalGroup.__init__(
             self=self,
             atoms=(sulfur, hydrogen, atom),
             bonders=bonders,
@@ -74,7 +76,7 @@ class Thiol(GenericFunctionalGroup):
         self._hydrogen = hydrogen
         self._atom = atom
 
-    def get_sulfur(self) -> S:
+    def get_sulfur(self) -> _atoms.S:
         """
         Get the ``[sulfur]`` atom.
 
@@ -86,7 +88,7 @@ class Thiol(GenericFunctionalGroup):
 
         return self._sulfur
 
-    def get_hydrogen(self) -> H:
+    def get_hydrogen(self) -> _atoms.H:
         """
         Get the ``[hydrogen]`` atom.
 
@@ -98,7 +100,7 @@ class Thiol(GenericFunctionalGroup):
 
         return self._hydrogen
 
-    def get_atom(self) -> Atom:
+    def get_atom(self) -> _atoms.Atom:
         """
         Get the ``[atom]`` atom.
 
@@ -122,7 +124,7 @@ class Thiol(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Thiol:
 
-        atom_map = get_atom_map(
+        atom_map = _utilities.get_atom_map(
             id_map=id_map,
             atoms=(
                 *self._atoms,

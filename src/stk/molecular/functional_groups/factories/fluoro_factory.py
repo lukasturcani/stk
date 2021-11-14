@@ -9,11 +9,11 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import get_atom_ids
-from ..functional_groups import Fluoro
-from ...molecule import Molecule
-from ...atoms import F
+from . import functional_group_factory as _functional_group_factory
+from . import utilities as _utilities
+from .. import functional_groups as _functional_groups
+from ... import molecule as _molecule
+from ...atoms import elements as _elements
 
 __all__ = (
     'FluoroFactory',
@@ -22,7 +22,9 @@ __all__ = (
 _ValidIndex = typing.Literal[0, 1]
 
 
-class FluoroFactory(FunctionalGroupFactory):
+class FluoroFactory(
+    _functional_group_factory.FunctionalGroupFactory,
+):
     """
     Creates :class:`.Fluoro` instances.
 
@@ -96,13 +98,13 @@ class FluoroFactory(FunctionalGroupFactory):
 
     def get_functional_groups(
         self,
-        molecule: Molecule,
-    ) -> abc.Iterable[Fluoro]:
+        molecule: _molecule.Molecule,
+    ) -> abc.Iterable[_functional_groups.Fluoro]:
 
-        for atom_ids in get_atom_ids('[*][F]', molecule):
+        for atom_ids in _utilities.get_atom_ids('[*][F]', molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
-            yield Fluoro(
-                fluorine=typing.cast(F, atoms[1]),
+            yield _functional_groups.Fluoro(
+                fluorine=typing.cast(_elements.F, atoms[1]),
                 atom=atoms[0],
                 bonders=tuple(atoms[i] for i in self._bonders),
                 deleters=tuple(atoms[i] for i in self._deleters),

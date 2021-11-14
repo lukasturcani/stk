@@ -12,12 +12,12 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from collections import abc
 
-from stk.utilities.typing import OneOrMany
-from .molecule import Molecule
-from .atoms import Atom, AtomInfo
-from .bonds import Bond, BondInfo
-from . import molecular_utilities as _utilities
-from .topology_graphs import TopologyGraph, ConstructionResult
+from stk.utilities import typing as _typing
+from .. import molecule as _molecule
+from .. import atoms as _atoms
+from .. import bonds as _bonds
+from .. import molecular_utilities as _utilities
+from .. import topology_graphs as _topology_graphs
 
 
 _T = typing.TypeVar('_T', bound='ConstructedMolecule')
@@ -28,7 +28,7 @@ __all__ = (
 )
 
 
-class ConstructedMolecule(Molecule):
+class ConstructedMolecule(_molecule.Molecule):
     """
     Represents constructed molecules.
 
@@ -92,13 +92,13 @@ class ConstructedMolecule(Molecule):
 
     """
 
-    _num_building_blocks: dict[Molecule, int]
-    _atom_infos: tuple[AtomInfo, ...]
-    _bond_infos: tuple[BondInfo, ...]
+    _num_building_blocks: dict[_molecule.Molecule, int]
+    _atom_infos: tuple[_atoms.AtomInfo, ...]
+    _bond_infos: tuple[_bonds.BondInfo, ...]
 
     def __init__(
         self,
-        topology_graph: TopologyGraph,
+        topology_graph: _topology_graphs.TopologyGraph,
     ) -> None:
         """
         Initialize a :class:`.ConstructedMolecule`.
@@ -118,12 +118,12 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init(
         cls,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: tuple[_atoms.Atom, ...],
+        bonds: tuple[_bonds.Bond, ...],
         position_matrix: np.ndarray,
-        atom_infos: tuple[AtomInfo, ...],
-        bond_infos: tuple[BondInfo, ...],
-        num_building_blocks: dict[Molecule, int],
+        atom_infos: tuple[_atoms.AtomInfo, ...],
+        bond_infos: tuple[_bonds.BondInfo, ...],
+        num_building_blocks: dict[_molecule.Molecule, int],
     ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule` from its components.
@@ -156,7 +156,7 @@ class ConstructedMolecule(Molecule):
         """
 
         molecule = cls.__new__(cls)
-        Molecule.__init__(
+        _molecule.Molecule.__init__(
             self=molecule,
             atoms=atoms,
             bonds=bonds,
@@ -170,7 +170,7 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init_from_construction_result(
         cls,
-        construction_result: ConstructionResult,
+        construction_result: _topology_graphs.ConstructionResult,
     ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule`.
@@ -195,7 +195,7 @@ class ConstructedMolecule(Molecule):
     @staticmethod
     def _init_from_construction_result(
         obj: ConstructedMolecule,
-        construction_result: ConstructionResult,
+        construction_result: _topology_graphs.ConstructionResult,
     ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule`.
@@ -217,7 +217,7 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        Molecule.__init__(
+        _molecule.Molecule.__init__(
             self=obj,
             atoms=construction_result.get_atoms(),
             bonds=construction_result.get_bonds(),
@@ -244,7 +244,7 @@ class ConstructedMolecule(Molecule):
     def clone(self) -> ConstructedMolecule:
         return self._clone()
 
-    def get_building_blocks(self) -> abc.Iterable[Molecule]:
+    def get_building_blocks(self) -> abc.Iterable[_molecule.Molecule]:
         """
         Yield the building blocks of the constructed molecule.
 
@@ -264,7 +264,7 @@ class ConstructedMolecule(Molecule):
 
     def get_num_building_block(
         self,
-        building_block: Molecule,
+        building_block: _molecule.Molecule,
     ) -> int:
         """
         Get the number of times `building_block` is present.
@@ -286,8 +286,8 @@ class ConstructedMolecule(Molecule):
 
     def get_atom_infos(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> abc.Iterable[AtomInfo]:
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
+    ) -> abc.Iterable[_atoms.AtomInfo]:
         """
         Yield data about atoms in the molecule.
 
@@ -312,7 +312,7 @@ class ConstructedMolecule(Molecule):
         for atom_id in atom_ids:
             yield self._atom_infos[atom_id]
 
-    def get_bond_infos(self) -> abc.Iterable[BondInfo]:
+    def get_bond_infos(self) -> abc.Iterable[_bonds.BondInfo]:
         """
         Yield data about bonds in the molecule.
 
@@ -361,13 +361,13 @@ class ConstructedMolecule(Molecule):
         }
         old_atom_infos = self._atom_infos
 
-        def get_atom_info(atom: Atom) -> AtomInfo:
+        def get_atom_info(atom: _atoms.Atom) -> _atoms.AtomInfo:
 
             old_atom_info = old_atom_infos[id_map[atom.get_id()]]
             old_building_block = old_atom_info.get_building_block()
 
             if old_building_block is None:
-                return AtomInfo(
+                return _atoms.AtomInfo(
                     atom=atom,
                     building_block_atom=None,
                     building_block=None,
@@ -392,7 +392,7 @@ class ConstructedMolecule(Molecule):
                 )
             )
 
-            return AtomInfo(
+            return _atoms.AtomInfo(
                 atom=atom,
                 building_block_atom=canonical_building_block_atom,
                 building_block=canonical_building_block,
@@ -401,9 +401,9 @@ class ConstructedMolecule(Molecule):
                 ),
             )
 
-        def get_bond_info(info: BondInfo) -> BondInfo:
+        def get_bond_info(info: _bonds.BondInfo) -> _bonds.BondInfo:
             building_block = info.get_building_block()
-            return BondInfo(
+            return _bonds.BondInfo(
                 bond=_utilities.sort_bond_atoms_by_id(
                     info.get_bond().with_atoms(atom_map)
                 ),
@@ -428,7 +428,7 @@ class ConstructedMolecule(Molecule):
     def with_centroid(
         self,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> ConstructedMolecule:
 
         return self.clone()._with_centroid(position, atom_ids)
@@ -499,7 +499,7 @@ class ConstructedMolecule(Molecule):
     def write(
         self,
         path: typing.Union[pathlib.Path, str],
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: typing.Optional[_typing.OneOrMany[int]] = None,
     ) -> ConstructedMolecule:
 
         return self._write(path, atom_ids)
