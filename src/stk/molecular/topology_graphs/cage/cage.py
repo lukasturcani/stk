@@ -956,7 +956,7 @@ class Cage(TopologyGraph[CageVertex]):
                     corners=metal_complex,
                     linkers=linker,
                     reaction_factory=stk.DativeReactionFactory(
-                        stk.GenericReactionFactory(
+                        reaction_factory=stk.GenericReactionFactory(
                             bond_orders={
                                 frozenset({
                                     stk.GenericFunctionalGroup,
