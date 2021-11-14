@@ -6,32 +6,25 @@ Key Maker Utilities
 
 import rdkit.Chem.AllChem as rdkit
 
-from .. import molecule as _molecule
 
-__all__ = (
-    'get_inchi',
-    'get_inchi_key',
-    'get_smiles',
-)
-
-
-def get_inchi(molecule: _molecule.Molecule) -> str:
+def get_inchi(molecule):
     """
     Get the InChI of `molecule`.
 
-    Parameters:
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule whose InChI is required.
 
-        molecule:
-            The molecule whose InChI is required.
-
-    Returns:
-
+    Returns
+    -------
+    :class:`str`
         The InChI.
 
-    Raises:
-
-        :class:`ValueError`:
-            If the InChI of `molecule` cannot be generated.
+    Raises
+    ------
+    :class:`ValueError`
+        If the InChI of `molecule` cannot be generated.
 
     """
 
@@ -41,25 +34,24 @@ def get_inchi(molecule: _molecule.Molecule) -> str:
     raise ValueError('The InChI of {molecule} was empty.')
 
 
-def get_inchi_key(
-    molecule: _molecule.Molecule,
-) -> str:
+def get_inchi_key(molecule):
     """
     Get the InChIKey of `molecule`.
 
-    Parameters:
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule whose InChIKey is needed.
 
-        molecule:
-            The molecule whose InChIKey is needed.
-
-    Returns:
-
+    Returns
+    -------
+    :class:`str`
         The InChIKey.
 
-    Raises:
-
-        :class:`ValueError`:
-            If the InChIKey of `molecule` cannot be generated.
+    Raises
+    ------
+    :class:`ValueError`
+        If the InChIKey of `molecule` cannot be generated.
 
     """
 
@@ -69,19 +61,18 @@ def get_inchi_key(
     return key
 
 
-def get_smiles(
-    molecule: _molecule.Molecule,
-) -> str:
+def get_smiles(molecule):
     """
     Get the RDKit canonical, isomeric SMILES of `molecule`.
 
-    Parameters:
+    Parameters
+    ----------
+    molecule : :class:`.Molecule`
+        The molecule whose SMILES is required.
 
-        molecule:
-            The molecule whose SMILES is required.
-
-    Returns:
-
+    Returns
+    -------
+    :class:`str`
         The SMILES.
 
     """

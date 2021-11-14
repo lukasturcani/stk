@@ -4,58 +4,49 @@ SMILES
 
 """
 
-from . import molecule as _molecule
-from . import utilities as _utilities
+from .molecule import MoleculeKeyMaker
+from .utilities import get_smiles
 
 
-__all__ = (
-    'Smiles',
-)
-
-
-class Smiles(_molecule.MoleculeKeyMaker):
+class Smiles(MoleculeKeyMaker):
     """
     Used to get the SMILES of molecules.
 
-    Examples:
+    Examples
+    --------
+    *Adding SMILES to a Molecule's JSON*
 
-        *Adding SMILES to a Molecule's JSON*
+    You want to use the isomeric, canonical SMILES from RDKit as part
+    of a JSON representation of a molecule
 
-        You want to use the isomeric, canonical SMILES from RDKit as
-        part of a JSON representation of a molecule
+    .. testcode:: adding-smiles-to-a-molecules-json
 
-        .. testcode:: adding-smiles-to-a-molecules-json
+        import stk
 
-            import stk
+        jsonizer = stk.MoleculeJsonizer(
+            key_makers=(stk.Smiles(), ),
+        )
+        # Get the JSON representation, including an SMILES.
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-            jsonizer = stk.MoleculeJsonizer(
-                key_makers=(stk.Smiles(), ),
-            )
-            # Get the JSON representation, including an SMILES.
-            json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+    .. testcode:: adding-smiles-to-a-molecules-json
+        :hide:
 
-        .. testcode:: adding-smiles-to-a-molecules-json
-            :hide:
-
-            assert json['molecule']['SMILES'] == 'NCCN'
-            assert json['matrix']['SMILES'] == 'NCCN'
+        assert json['molecule']['SMILES'] == 'NCCN'
+        assert json['matrix']['SMILES'] == 'NCCN'
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         """
         Initialize a :class:`.Smiles` instance.
 
         """
 
-        _molecule.MoleculeKeyMaker.__init__(
-            self=self,
-            key_name='SMILES',
-            get_key=_utilities.get_smiles,
-        )
+        super().__init__('SMILES', get_smiles)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return repr(self)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return 'Smiles()'

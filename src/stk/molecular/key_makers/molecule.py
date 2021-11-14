@@ -11,16 +11,6 @@ Molecule Key Maker
 
 """
 
-from __future__ import annotations
-
-from collections import abc
-from .. import molecule as _molecule
-
-
-__all__ = (
-    'MoleculeKeyMaker',
-)
-
 
 class MoleculeKeyMaker:
     """
@@ -29,110 +19,108 @@ class MoleculeKeyMaker:
     Keys are used in :mod:`stk` to determine if two molecules are
     duplicates of each other.
 
-    Notes:
+    Notes
+    -----
+    You might notice that the public methods of this abstract base
+    class are implemented. This is purely for convenience when
+    implementing subclasses. The implemented public methods are
+    simply default implementations, which can be safely ignored or
+    overridden, when implementing subclasses.
 
-        You might notice that the public methods of this abstract base
-        class are implemented. This is purely for convenience when
-        implementing subclasses. The implemented public methods are
-        simply default implementations, which can be safely ignored or
-        overridden, when implementing subclasses.
+    Examples
+    --------
+    *Subclass Implementation*
 
-    Examples:
+    The source code of any of the subclasses, listed in
+    :mod:`molecule_key_maker <.key_makers.molecule>`, can
+    serve as good examples.
 
-        *Subclass Implementation*
+    *Creating a New Key Maker Directly*
 
-        The source code of any of the subclasses, listed in
-        :mod:`molecule_key_maker <.key_makers.molecule>`, can
-        serve as good examples.
+    Apart from using the subclasses provided, a
+    :class:`.MoleculeKeyMaker` can be used directly , if you don't
+    feel like writing a subclass
 
-        *Creating a New Key Maker Directly*
+    .. testcode:: creating-a-new-key-maker-directly
 
-        Apart from using the subclasses provided, a
-        :class:`.MoleculeKeyMaker` can be used directly , if you don't
-        feel like writing a subclass
+        import stk
 
-        .. testcode:: creating-a-new-key-maker-directly
+        # Create a MoleculeKeyMaker instance with a custom get_key
+        # method.
+        get_num_atoms = stk.MoleculeKeyMaker(
+            key_name='num_atoms',
+            get_key=lambda molecule: molecule.get_num_atoms(),
+        )
 
-            import stk
+        # Use the MoleculeKeyMaker instance.
+        jsonizer = stk.MoleculeJsonizer(
+            key_makers=(get_num_atoms, ),
+        )
+        # Get the JSON representation of a molecule.
+        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-            # Create a MoleculeKeyMaker instance with a custom get_key
-            # method.
-            get_num_atoms = stk.MoleculeKeyMaker(
-                key_name='num_atoms',
-                get_key=lambda molecule: molecule.get_num_atoms(),
-            )
+    .. testcode:: creating-a-new-key-maker-directly
+        :hide:
 
-            # Use the MoleculeKeyMaker instance.
-            jsonizer = stk.MoleculeJsonizer(
-                key_makers=(get_num_atoms, ),
-            )
-            # Get the JSON representation of a molecule.
-            json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
-
-        .. testcode:: creating-a-new-key-maker-directly
-            :hide:
-
-            assert json['molecule']['num_atoms'] == 12
-            assert json['matrix']['num_atoms'] == 12
+        assert json['molecule']['num_atoms'] == 12
+        assert json['matrix']['num_atoms'] == 12
 
     """
 
-    def __init__(
-        self,
-        key_name: str,
-        get_key: abc.Callable[[_molecule.Molecule], object],
-    ) -> None:
+    def __init__(self, key_name, get_key):
         """
         Initialize a :class:`.MoleculeKeyMaker` instance.
 
-        Parameters:
+        Parameters
+        ----------
+        key_name : :class:`str`
+            The name of the key.
 
-            key_name:
-                The name of the key.
-
-            get_key:
-                Takes a single parameter, `molecule`, and returns the
-                key to use for that molecule. The value passed to the
-                parameter must be a :class:`.Molecule` instance.
+        get_key : :class:`callable`
+            Takes a single parameter, `molecule`, and returns the
+            key to use for that molecule. The value passed to the
+            parameter must be a :class:`.Molecule` instance.
 
         """
 
         self._key_name = key_name
         self._get_key = get_key
 
-    def get_key_name(self) -> str:
+    def get_key_name(self):
         """
         Get the name of the key.
 
-        Returns:
-
+        Returns
+        -------
+        :class:`str`
             The name of the key.
 
         """
 
         return self._key_name
 
-    def get_key(self, molecule: _molecule.Molecule) -> object:
+    def get_key(self, molecule):
         """
         Get the key of `molecule`.
 
-        Parameters:
+        Parameters
+        ----------
+        molecule : :class:`.Molecule`
+            The molecule for which a key is needed.
 
-            molecule:
-                The molecule for which a key is needed.
-
-        Returns:
-
+        Returns
+        -------
+        :class:`object`
             The key of `molecule`.
 
         """
 
         return self._get_key(molecule)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return repr(self)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f'{self.__class__.__name__}('
             f'{self._key_name!r}, {self._get_key!r}'
