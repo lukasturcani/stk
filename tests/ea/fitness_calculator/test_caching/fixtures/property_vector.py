@@ -1,9 +1,9 @@
 import pytest
+
 import stk
 
-from .utilities import Counter
 from ..case_data import CaseData
-
+from .utilities import Counter
 
 _counter = Counter()
 

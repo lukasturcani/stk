@@ -1,6 +1,8 @@
 import itertools as it
-import stk
+
 import numpy as np
+
+import stk
 
 
 def is_clone(construction_state, clone):

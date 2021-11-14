@@ -7,9 +7,9 @@ Genetic Recombination
 import itertools as it
 from collections import defaultdict
 
-from .crosser import MoleculeCrosser
-from ...records import CrossoverRecord
 from ....molecule_records import MoleculeRecord
+from ...records import CrossoverRecord
+from .crosser import MoleculeCrosser
 
 
 class GeneticRecombination(MoleculeCrosser):

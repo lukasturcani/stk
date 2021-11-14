@@ -115,10 +115,10 @@ stk.molecular.topology_graphs.cage.metal_topologies.m24l48\
 from collections import Counter, defaultdict
 from functools import partial
 
-from .vertices import UnaligningVertex
-from .cage_construction_state import _CageConstructionState
-from ..topology_graph import TopologyGraph, NullOptimizer
 from ...reactions import GenericReactionFactory
+from ..topology_graph import NullOptimizer, TopologyGraph
+from .cage_construction_state import _CageConstructionState
+from .vertices import UnaligningVertex
 
 
 class UnoccupiedVertexError(Exception):

@@ -4,9 +4,9 @@ M2L4 Lantern
 
 """
 
-from ..cage import Cage
-from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
+from ..cage import Cage
+from ..vertices import LinearVertex, NonLinearVertex
 
 
 class M2L4Lantern(Cage):

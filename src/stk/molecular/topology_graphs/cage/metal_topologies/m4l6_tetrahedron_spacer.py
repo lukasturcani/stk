@@ -6,9 +6,9 @@ M4L6 Tetrahedron with Spacer
 
 import numpy as np
 
-from ..cage import Cage
-from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
+from ..cage import Cage
+from ..vertices import LinearVertex, NonLinearVertex
 
 
 class M4L6TetrahedronSpacer(Cage):

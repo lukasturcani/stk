@@ -1,9 +1,9 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
+from .case_data import CaseData
 # Fixtures need to be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
-from .case_data import CaseData
 
 
 @pytest.fixture(

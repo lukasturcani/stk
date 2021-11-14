@@ -1,11 +1,12 @@
 import pytest
+
 import stk
 
+from ....case_data import CaseData
 from ...building_blocks import (
     get_other_linker,
     get_palladium_cispbi_sqpl,
 )
-from ....case_data import CaseData
 
 
 @pytest.fixture(

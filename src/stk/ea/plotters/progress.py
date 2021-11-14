@@ -4,11 +4,10 @@ Progress Plotter
 
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-
 
 plt.switch_backend('agg')
 

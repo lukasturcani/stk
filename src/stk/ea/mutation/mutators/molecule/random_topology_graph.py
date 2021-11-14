@@ -6,9 +6,9 @@ Random Topology Graph
 
 import numpy as np
 
-from .mutator import MoleculeMutator
-from ...records import MutationRecord
 from ....molecule_records import MoleculeRecord
+from ...records import MutationRecord
+from .mutator import MoleculeMutator
 
 
 class RandomTopologyGraph(MoleculeMutator):

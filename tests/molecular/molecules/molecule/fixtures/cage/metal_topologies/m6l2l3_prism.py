@@ -1,12 +1,13 @@
 import pytest
+
 import stk
 
+from ....case_data import CaseData
 from ...building_blocks import (
+    get_iron_complex,
     get_tetratopic_linker,
     get_tritopic_linker,
-    get_iron_complex,
 )
-from ....case_data import CaseData
 
 
 @pytest.fixture(

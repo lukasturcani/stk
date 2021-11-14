@@ -1,6 +1,7 @@
-import pytest
 import numpy as np
+import pytest
 from pytest_lazyfixture import lazy_fixture
+
 import stk
 
 # Fixtures need to be visible for lazy_fixture() calls.

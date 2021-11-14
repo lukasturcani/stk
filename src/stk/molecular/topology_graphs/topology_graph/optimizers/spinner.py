@@ -4,10 +4,10 @@ Spinner
 
 """
 
-from .optimizer import Optimizer
-from ..construction_state import ConstructionState
-
 import spindry as spd
+
+from ..construction_state import ConstructionState
+from .optimizer import Optimizer
 
 
 class Spinner(Optimizer):

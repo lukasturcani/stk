@@ -4,9 +4,9 @@ Thioacid Factory
 
 """
 
+from ..functional_groups import Thioacid
 from .functional_group_factory import FunctionalGroupFactory
 from .utilities import _get_atom_ids
-from ..functional_groups import Thioacid
 
 
 class ThioacidFactory(FunctionalGroupFactory):

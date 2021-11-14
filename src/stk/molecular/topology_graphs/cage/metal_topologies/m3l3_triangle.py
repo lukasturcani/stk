@@ -6,10 +6,10 @@ M3L3 Triangle
 
 import numpy as np
 
-from ..cage import Cage
-from ..vertices import LinearVertex, AngledVertex
-from ...topology_graph import Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
+from ...topology_graph import Edge, NullOptimizer
+from ..cage import Cage
+from ..vertices import AngledVertex, LinearVertex
 
 
 class M3L3Triangle(Cage):

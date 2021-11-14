@@ -4,9 +4,9 @@ Paddlewheel
 
 """
 
-from ..metal_complex import MetalComplex
-from ..vertices import MetalVertex, BiDentateLigandVertex
 from ...topology_graph import Edge
+from ..metal_complex import MetalComplex
+from ..vertices import BiDentateLigandVertex, MetalVertex
 
 
 class Paddlewheel(MetalComplex):

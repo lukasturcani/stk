@@ -1,8 +1,8 @@
-import pytest
-import stk
-
-
 from typing import Callable
+
+import pytest
+
+import stk
 
 
 @pytest.fixture(

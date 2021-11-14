@@ -6,8 +6,8 @@ One-Two Reaction
 
 import itertools as it
 
-from .reaction import Reaction
 from ...bonds import Bond
+from .reaction import Reaction
 
 
 class OneTwoReaction(Reaction):

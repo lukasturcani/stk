@@ -1,5 +1,6 @@
-import stk
 import numpy as np
+
+import stk
 
 
 def test_put_caching(mongo_client):

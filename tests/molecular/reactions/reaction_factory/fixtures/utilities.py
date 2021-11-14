@@ -1,4 +1,5 @@
 import stk
+
 construction_state = stk.construction_state
 _GraphState = construction_state.graph_state._GraphState
 _MoleculeState = construction_state.molecule_state._MoleculeState

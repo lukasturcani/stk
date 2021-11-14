@@ -6,10 +6,9 @@ Square
 
 import numpy as np
 
-
+from ..topology_graph import Edge
 from .cof import Cof
 from .vertices import LinearVertex, NonLinearVertex
-from ..topology_graph import Edge
 
 
 class Square(Cof):

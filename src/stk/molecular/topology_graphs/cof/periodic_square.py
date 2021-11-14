@@ -4,13 +4,15 @@ Periodic Square
 
 """
 
-import numpy as np
 import warnings
+
+import numpy as np
+
+from ...periodic_info import PeriodicInfo
 from ...reactions import GenericReactionFactory
+from ..topology_graph import Edge, NullOptimizer
 from .cof import Cof
 from .vertices import LinearVertex, NonLinearVertex
-from ..topology_graph import Edge, NullOptimizer
-from ...periodic_info import PeriodicInfo
 
 
 class PeriodicSquare(Cof):

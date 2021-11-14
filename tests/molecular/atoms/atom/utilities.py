@@ -1,5 +1,6 @@
-import stk
 import rdkit.Chem.AllChem as rdkit
+
+import stk
 
 
 def is_equivalent_atom(atom1, atom2):

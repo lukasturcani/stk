@@ -1,7 +1,7 @@
 import stk
 
-from .molecule import is_equivalent_molecule
 from .constructed_molecule import is_equivalent_constructed_molecule
+from .molecule import is_equivalent_molecule
 
 
 def is_equivalent(molecule1, molecule2):

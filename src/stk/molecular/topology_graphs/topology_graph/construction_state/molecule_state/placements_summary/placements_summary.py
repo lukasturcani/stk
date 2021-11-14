@@ -6,17 +6,18 @@ Placements Summary
 
 from __future__ import annotations
 
-import numpy as np
 from collections import defaultdict
 from typing import Iterable
 
+import numpy as np
+
+from ......atoms import Atom, AtomInfo
+from ......bonds import Bond, BondInfo
+from ......functional_groups import FunctionalGroup
+from ......molecules import BuildingBlock
 from .....topology_graph.topology_graph.implementations import (
     _PlacementResult,
 )
-from ......functional_groups import FunctionalGroup
-from ......atoms import Atom, AtomInfo
-from ......bonds import Bond, BondInfo
-from ......molecules import BuildingBlock
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
 

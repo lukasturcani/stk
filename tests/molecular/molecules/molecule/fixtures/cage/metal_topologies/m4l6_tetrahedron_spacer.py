@@ -1,11 +1,9 @@
 import pytest
+
 import stk
 
-from ...building_blocks import (
-    get_iron_complex,
-    get_ditopic_linker,
-)
 from ....case_data import CaseData
+from ...building_blocks import get_ditopic_linker, get_iron_complex
 
 
 @pytest.fixture(

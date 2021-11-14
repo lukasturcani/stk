@@ -6,21 +6,20 @@ Building Block
 
 from __future__ import annotations
 
-
 import logging
 import os
-import rdkit.Chem.AllChem as rdkit
-from functools import partial
-import numpy as np
-from typing import Optional, Union, Iterable, Iterator
 from collections.abc import Collection
+from functools import partial
+from typing import Iterable, Iterator, Optional, Union
 
-from ..functional_groups import FunctionalGroup
+import numpy as np
+import rdkit.Chem.AllChem as rdkit
+
+from ...utilities import flatten, remake
 from ..atoms import Atom
 from ..bonds import Bond
+from ..functional_groups import FunctionalGroup
 from .molecule import Molecule
-from ...utilities import remake, flatten
-
 
 logger = logging.getLogger(__name__)
 

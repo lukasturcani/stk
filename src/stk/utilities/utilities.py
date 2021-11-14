@@ -10,17 +10,17 @@ part of ``stk``. They must be completely self-sufficient.
 
 """
 
-from scipy.spatial.transform import Rotation
-import rdkit.Chem.AllChem as rdkit
-from rdkit.Geometry import Point3D
-import numpy as np
-import time
-from contextlib import contextmanager
 import os
 import re
-from collections import deque
 import tarfile
+import time
+from collections import deque
+from contextlib import contextmanager
 
+import numpy as np
+import rdkit.Chem.AllChem as rdkit
+from rdkit.Geometry import Point3D
+from scipy.spatial.transform import Rotation
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {

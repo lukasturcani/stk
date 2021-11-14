@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from pytest_lazyfixture import lazy_fixture
+
 import stk
 
 from ..case_data import CaseData

@@ -1,4 +1,5 @@
 import itertools as it
+
 import numpy as np
 
 from tests.utilities import is_equivalent

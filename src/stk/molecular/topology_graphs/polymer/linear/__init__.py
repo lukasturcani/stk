@@ -1,2 +1,2 @@
-from .linear import *  # noqa
 from . import vertices  # noqa
+from .linear import *  # noqa

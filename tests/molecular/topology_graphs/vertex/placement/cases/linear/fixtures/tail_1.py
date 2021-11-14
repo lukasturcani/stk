@@ -1,8 +1,9 @@
 import pytest
+
 import stk
 
-from .utilities import get_closest_point, get_centroid, get_edges
 from ....case_data import CaseData
+from .utilities import get_centroid, get_closest_point, get_edges
 
 
 @pytest.fixture

@@ -1,7 +1,9 @@
-import pytest
-import stk
 from functools import partial
+
+import pytest
 from scipy.spatial.distance import euclidean
+
+import stk
 
 from ....case_data import CaseData
 

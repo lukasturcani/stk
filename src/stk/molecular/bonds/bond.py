@@ -10,7 +10,6 @@ from typing import TypeVar
 
 from ..atoms import Atom
 
-
 _T = TypeVar('_T', bound='Bond')
 
 

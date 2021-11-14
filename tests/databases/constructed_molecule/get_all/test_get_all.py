@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import stk
-
 from tests.utilities import is_equivalent_constructed_molecule
+
 from .case_data import CaseData
 
 

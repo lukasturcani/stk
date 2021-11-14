@@ -4,9 +4,9 @@ Four Plus Eight
 
 """
 
+from ...topology_graph import Edge
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
-from ...topology_graph import Edge
 
 
 class FourPlusEight(Cage):

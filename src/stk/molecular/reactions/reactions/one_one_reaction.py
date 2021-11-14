@@ -4,8 +4,8 @@ One-One Reaction
 
 """
 
-from .reaction import Reaction
 from ...bonds import Bond
+from .reaction import Reaction
 
 
 class OneOneReaction(Reaction):

@@ -5,10 +5,11 @@ Two-Two Reaction
 """
 
 import itertools as it
+
 from scipy.spatial.distance import euclidean
 
-from .reaction import Reaction
 from ...bonds import Bond
+from .reaction import Reaction
 
 
 class TwoTwoReaction(Reaction):

@@ -20,8 +20,8 @@ stk.ea.selection.selectors.stochastic_universal_sampling\
 
 """
 
-import logging
 import itertools as it
+import logging
 
 from ..batch import Batch
 from .utilities import YieldedBatches

@@ -5,10 +5,11 @@ Constructed Molecule DeJSONizer
 """
 
 import numpy as np
+
 from stk.molecular import ConstructedMolecule
 
-from .utilities import to_atom, to_bond, to_atom_info, to_bond_info
 from .molecule import MoleculeDejsonizer
+from .utilities import to_atom, to_atom_info, to_bond, to_bond_info
 
 
 class ConstructedMoleculeDejsonizer:

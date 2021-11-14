@@ -1,9 +1,9 @@
 import itertools as it
 
 from .molecule import (
-    is_equivalent_molecule,
     is_equivalent_atom,
     is_equivalent_bond,
+    is_equivalent_molecule,
 )
 
 

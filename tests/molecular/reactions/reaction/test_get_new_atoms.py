@@ -1,5 +1,6 @@
-import numpy as np
 import itertools as it
+
+import numpy as np
 
 from .utilities import is_equivalent_atom
 

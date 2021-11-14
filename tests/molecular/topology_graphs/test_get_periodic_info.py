@@ -1,5 +1,6 @@
-import numpy as np
 import itertools
+
+import numpy as np
 
 
 def test_get_periodic_info(unscaled_periodic_case):

@@ -2,8 +2,8 @@ import itertools as it
 
 from ..utilities import (
     are_clone_sequences,
-    atom_id,
     are_same_id_sequences,
+    atom_id,
 )
 
 

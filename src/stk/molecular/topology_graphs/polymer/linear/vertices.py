@@ -8,7 +8,6 @@ import logging
 
 from ...topology_graph import Vertex
 
-
 logger = logging.getLogger(__name__)
 
 

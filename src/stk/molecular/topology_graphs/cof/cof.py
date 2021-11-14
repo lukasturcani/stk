@@ -28,19 +28,20 @@ stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
 
 import itertools as it
 from collections import Counter
-import numpy as np
 from functools import partial
 from operator import getitem
 
-from ..topology_graph import (
-    TopologyGraph,
-    NullOptimizer,
-    EdgeGroup,
-    PeriodicConstructionResult,
-)
-from .vertices import UnaligningVertex
-from .edge import CofEdge
+import numpy as np
+
 from ...reactions import GenericReactionFactory
+from ..topology_graph import (
+    EdgeGroup,
+    NullOptimizer,
+    PeriodicConstructionResult,
+    TopologyGraph,
+)
+from .edge import CofEdge
+from .vertices import UnaligningVertex
 
 
 class UnoccupiedVertexError(Exception):

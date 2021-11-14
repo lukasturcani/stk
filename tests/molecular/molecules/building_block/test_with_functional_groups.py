@@ -1,8 +1,8 @@
 from ..utilities import (
-    has_same_structure,
-    is_equivalent_molecule,
-    is_equivalent_building_block,
     are_equivalent_functional_groups,
+    has_same_structure,
+    is_equivalent_building_block,
+    is_equivalent_molecule,
 )
 
 

@@ -6,18 +6,18 @@ Host Guest Complex
 
 from __future__ import annotations
 
-from typing import Optional, Iterable
+import warnings
+from typing import Iterable, Optional
 
 from ...molecules import BuildingBlock
-from .vertices import HostVertex, GuestVertex
 from ..topology_graph import (
-    TopologyGraph,
+    ConstructionState,
     NullOptimizer,
     Optimizer,
-    ConstructionState,
+    TopologyGraph,
     Vertex,
 )
-import warnings
+from .vertices import GuestVertex, HostVertex
 
 
 class Guest:

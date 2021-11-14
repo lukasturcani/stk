@@ -4,16 +4,17 @@ Constructed Molecule MongoDB
 
 """
 
-from functools import lru_cache
 import itertools
+from functools import lru_cache
 
 from stk.serialization import (
-    ConstructedMoleculeJsonizer,
     ConstructedMoleculeDejsonizer,
+    ConstructedMoleculeJsonizer,
 )
-from ..constructed_molecule import ConstructedMoleculeDatabase
-from .utilities import get_any_value, HashableDict
 from stk.utilities import dedupe
+
+from ..constructed_molecule import ConstructedMoleculeDatabase
+from .utilities import HashableDict, get_any_value
 
 
 class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):

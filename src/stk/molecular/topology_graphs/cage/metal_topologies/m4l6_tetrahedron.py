@@ -6,9 +6,9 @@ M4L6 Tetrahedron
 
 import numpy as np
 
+from ...topology_graph import Edge
 from ..cage import Cage
 from ..vertices import NonLinearVertex
-from ...topology_graph import Edge
 
 
 class M4L6Tetrahedron(Cage):

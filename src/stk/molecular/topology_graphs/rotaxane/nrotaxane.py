@@ -6,8 +6,8 @@
 
 import numpy as np
 
+from ..topology_graph import NullOptimizer, TopologyGraph
 from .vertices import AxleVertex, CycleVertex
-from ..topology_graph import TopologyGraph, NullOptimizer
 
 
 class NRotaxane(TopologyGraph):

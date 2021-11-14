@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import stk
-
 from typing import Callable
+
+import stk
 
 
 def test_with_ids(

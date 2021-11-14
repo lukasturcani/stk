@@ -1,9 +1,10 @@
-import pytest
-import stk
-from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
 from functools import partial
+
+import pytest
 from scipy.spatial.distance import euclidean
 
+import stk
+from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
 
 from ....case_data import CaseData
 

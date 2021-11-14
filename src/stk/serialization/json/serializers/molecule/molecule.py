@@ -5,6 +5,7 @@ Molecule JSONizer
 """
 
 from stk.molecular import InchiKey
+
 from .utilities import atom_to_json, bond_to_json
 
 

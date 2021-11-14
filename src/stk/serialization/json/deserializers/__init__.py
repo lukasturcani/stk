@@ -1,2 +1,2 @@
+from .constructed_molecule import *
 from .molecule import *  # noqa
-from . constructed_molecule import *  # noqa

@@ -1,6 +1,7 @@
-import pytest
-import stk
 import pandas as pd
+import pytest
+
+import stk
 
 from .case_data import CaseData
 

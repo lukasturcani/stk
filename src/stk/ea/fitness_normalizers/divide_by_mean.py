@@ -6,10 +6,10 @@ Divide By Mean
 
 import logging
 from functools import partial
+
 import numpy as np
 
 from .fitness_normalizer import FitnessNormalizer
-
 
 logger = logging.getLogger(__name__)
 

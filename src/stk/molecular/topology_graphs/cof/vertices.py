@@ -6,10 +6,11 @@ COF Vertices
 
 import numpy as np
 from scipy.spatial.distance import euclidean
+
 from stk.utilities import get_acute_vector
 
-from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
+from ..utilities import _EdgeSorter, _FunctionalGroupSorter
 
 
 class _CofVertex(Vertex):

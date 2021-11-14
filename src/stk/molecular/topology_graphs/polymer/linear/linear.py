@@ -7,21 +7,22 @@ Linear
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 import numpy as np
 
-from .vertices import (
-    HeadVertex,
-    TailVertex,
-    LinearVertex,
-    UnaligningVertex,
-)
+from ....reactions import GenericReactionFactory
 from ...topology_graph import (
-    TopologyGraph,
     Edge,
     NullOptimizer,
+    TopologyGraph,
     Vertex,
 )
-from ....reactions import GenericReactionFactory
+from .vertices import (
+    HeadVertex,
+    LinearVertex,
+    TailVertex,
+    UnaligningVertex,
+)
 
 
 class Linear(TopologyGraph):

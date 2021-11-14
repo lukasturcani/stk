@@ -6,9 +6,9 @@ Two Plus Three
 
 import numpy as np
 
+from ...topology_graph import Edge
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
-from ...topology_graph import Edge
 
 
 class TwoPlusThree(Cage):

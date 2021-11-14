@@ -7,6 +7,7 @@ Best
 import itertools as it
 
 from stk.molecular import Inchi
+
 from .selector import Selector
 
 

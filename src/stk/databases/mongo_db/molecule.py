@@ -4,16 +4,14 @@ Molecule MongoDB
 
 """
 
-from functools import lru_cache
 import itertools
+from functools import lru_cache
 
-from stk.serialization import (
-    MoleculeJsonizer,
-    MoleculeDejsonizer,
-)
-from ..molecule import MoleculeDatabase
-from .utilities import get_any_value, HashableDict
+from stk.serialization import MoleculeDejsonizer, MoleculeJsonizer
 from stk.utilities import dedupe
+
+from ..molecule import MoleculeDatabase
+from .utilities import HashableDict, get_any_value
 
 
 class MoleculeMongoDb(MoleculeDatabase):

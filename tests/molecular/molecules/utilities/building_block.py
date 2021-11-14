@@ -1,9 +1,6 @@
 import itertools as it
 
-from tests.utilities import (
-    is_equivalent_atom,
-    is_equivalent_molecule,
-)
+from tests.utilities import is_equivalent_atom, is_equivalent_molecule
 
 
 def are_equivalent_functional_groups(

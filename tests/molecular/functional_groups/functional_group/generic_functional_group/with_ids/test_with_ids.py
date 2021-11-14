@@ -1,7 +1,7 @@
 import itertools as it
-import stk
-
 from typing import Callable, Iterable
+
+import stk
 
 from ...utilities import is_clone_functional_group
 

@@ -4,10 +4,8 @@ Constructed Molecule JSONizer
 
 """
 
-from stk.molecular import (
-    MoleculeKeyMaker,
-    InchiKey,
-)
+from stk.molecular import InchiKey, MoleculeKeyMaker
+
 from ..molecule import MoleculeJsonizer
 
 

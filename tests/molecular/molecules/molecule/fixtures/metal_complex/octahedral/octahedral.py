@@ -1,8 +1,9 @@
 import pytest
+
 import stk
 
-from ...building_blocks import get_fe_atom, get_mo_1
 from ....case_data import CaseData
+from ...building_blocks import get_fe_atom, get_mo_1
 
 
 @pytest.fixture(

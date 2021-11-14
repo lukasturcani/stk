@@ -4,8 +4,9 @@ Shift Up
 
 """
 
-import numpy as np
 from functools import partial
+
+import numpy as np
 
 from .fitness_normalizer import FitnessNormalizer
 

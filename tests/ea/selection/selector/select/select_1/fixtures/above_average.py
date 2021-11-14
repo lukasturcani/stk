@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import pytest
 from pytest_lazyfixture import lazy_fixture
+
 import stk
 
-from .utilities import get_rank_fitness
 from ..case_data import CaseData
+from .utilities import get_rank_fitness
 
 
 def get_topology_graph(num_repeating_units):
