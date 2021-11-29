@@ -490,8 +490,8 @@ class BuildingBlock(Molecule):
         """
         Initialize from an :mod:`rdkit` molecule.
 
-        Note
-        ----
+        Notes
+        -----
         For rdkit molecules with aromatic rings of bond order 1.5,
         the molecule should be kekulized prior calling this method.
         Otherwise, all bond orders will be set to 1 in the
