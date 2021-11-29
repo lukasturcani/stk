@@ -158,7 +158,7 @@ class SubstituteSubstructure(MoleculeMutator):
             A single building block will be substituted at random from
             all the ones which are liable for substitution.
 
-        replacement_functional_groups : :class:`iterable` of
+        replacement_functional_groups : :class:`iterable` of \
         :class:`.FunctionalGroupFactory`
             The functional group factories used to recreate the
             constructed molecule following the mutation.
