@@ -1,5 +1,5 @@
 """
-Random SMARTS
+
 =============
 
 """
@@ -16,7 +16,7 @@ from .....molecular import BuildingBlock
 
 class SubstituteSubstructure(MoleculeMutator):
     """
-    Substitutes functional groups within building blocks.
+    Substitutes substructures within building blocks.
 
     This mutator takes a :class:`.ConstructedMolecule` and substitutes
     the existing building blocks with ones containing
@@ -28,7 +28,7 @@ class SubstituteSubstructure(MoleculeMutator):
 
     Examples
     --------
-    *Smarts Mutation*
+    *Substructure Mutation*
 
     .. testcode:: constructed-molecule-mutation
 
@@ -41,7 +41,7 @@ class SubstituteSubstructure(MoleculeMutator):
         )
         bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
         polymer = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear((bb1, bb2), 'AB', 3),
+            topology_graph=stk.polymer.Linear((bb1, bb2), 'AB', 1),
         )
 
         # Create the mutator.
@@ -51,8 +51,8 @@ class SubstituteSubstructure(MoleculeMutator):
             return type(fg) is stk.PrimaryAmino
 
         random_smarts = stk.RandomSmarts(
-            query_smarts="F",
-            replacement_smiles="Br",
+            query_smarts='F',
+            replacement_smiles='Br',
             is_replaceable=has_primary_amino_group,
             replacement_fgs=[stk.PrimaryAminoFactory()],
         )
@@ -63,13 +63,64 @@ class SubstituteSubstructure(MoleculeMutator):
         # Create a mutator that will fail.
 
         random_smarts_failed = stk.RandomSmarts(
-            query_smarts="N",
-            replacement_smiles="Br",
+            query_smarts='N',
+            replacement_smiles='Br',
             is_replaceable=has_primary_amino_group,
             replacement_fgs=[stk.PrimaryAminoFactory()],
         )
-        # This will raise an exception`.
+        # This will raise an exception.
         mutation_record2 = random_smarts.mutate(polymer)
+
+    The molecule prior to mutation is shown below, and the mutated
+    molecule shown underneath.
+
+    .. moldoc::
+
+        import moldoc.molecule as molecule
+        import stk
+
+        bb1 = stk.BuildingBlock(
+            smiles='NCC(CF)CCN',
+            functional_groups=(stk.PrimaryAminoFactory()),
+        )
+        bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
+        polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='AB',
+                num_repeating_units=1,
+            ),
+        )
+        moldoc_display_molecule = molecule.Molecule(
+            atoms=(
+                molecule.Atom(
+                    atomic_number=atom.get_atomic_number(),
+                    position=position,
+                ) for atom, position in zip(
+                    polymer.get_atoms(),
+                    polymer.get_position_matrix(),
+                )
+            ),
+            bonds=(
+                molecule.Bond(
+                    atom1_id=bond.get_atom1().get_id(),
+                    atom2_id=bond.get_atom2().get_id(),
+                    order=bond.get_order(),
+                ) for bond in polymer.get_bonds()
+            ),
+        )
+        bb3 = stk.BuildingBlock(
+            smiles='NCC(CBr)CCN',
+            functional_groups=(stk.PrimaryAminoFactory()),
+        )
+        mutated_polymer = stk.ConstructedMolecule(
+            topology_graph=stk.polymer.Linear(
+                building_blocks=(bb3, bb2),
+                repeating_unit='AB',
+                num_repeating_units=1,
+            ),
+        )
+
 
     """
 
@@ -79,20 +130,23 @@ class SubstituteSubstructure(MoleculeMutator):
         replacement_smiles,
         is_replaceable,
         replacement_functional_groups,
-        name='RandomSmarts',
+        name='SubstituteSubstructure',
         random_seed=None,
     ):
         """
-        Initialize a :class:`.RandomSmarts` instance.
+        Initialize a :class:`.SubstituteSubstructure` instance.
 
         Parameters
         ----------
         query_smarts : :class:`str`
-            SMARTS string to match on the :class:`.BuildingBlock`
+            SMARTS string to match on the :class:`.BuildingBlock`.
+            Used to select substructures which are replaced.
 
         replacement_smiles : :class`str`
             SMILES string to replace those in `query_smarts` on the
-            :class: `.BuildingBlock`
+            :class: `.BuildingBlock`.
+            The first atom in the string is used as the connection
+            point to the building block.
 
         is_replaceable : :class:`callable`
             A function which takes a :class:`.BuildingBlock` and
@@ -100,11 +154,13 @@ class SubstituteSubstructure(MoleculeMutator):
             every building block in the molecule being mutated.
             Building blocks which returned ``True`` are liable for
             substitution.
+            A single building block will be substituted at random from
+            all the ones which are liable for substitution.
 
         replacement_functional_groups : :class:`iterable` of
         :class:`.FunctionalGroupFactory`
-            The functional group factories functional groups to the
-            mutated building block.
+            The functional group factories used to recreate the
+            constructed molecule following the mutation.
 
         name : :class:`str`, optional
             A name to help identify the mutator instance.
