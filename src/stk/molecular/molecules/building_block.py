@@ -470,7 +470,7 @@ class BuildingBlock(Molecule):
             )
         # This remake needs to be here because molecules loaded
         # with rdkit often have issues, because rdkit tries to do
-        # bits of structural analysis like stereocenters. remake
+        # bits of structural analysis like stereocenters. Remake
         # gets rid of all this problematic metadata.
         molecule = remake(cls._init_funcs[extension](path))
 
@@ -489,6 +489,12 @@ class BuildingBlock(Molecule):
     ):
         """
         Initialize from an :mod:`rdkit` molecule.
+
+        Note
+        ----
+        For rdkit molecules with aromatic rings of bond order 1.5,
+        the molecule should be kekulized prior calling this method.
+        Otherwise, all bond orders will be set to 1 in the building block.
 
         Parameters
         ----------
