@@ -14,7 +14,7 @@ stk.ea.mutation.mutators.molecule.random_topology_graph\
     Similar Building Block <\
 stk.ea.mutation.mutators.molecule.similar_building_block\
 >
-....Substitute Substructure <\
+    Substitute Substructure <\
 stk.ea.mutation.mutators.molecule.substitute_substructure\
 >
 
