@@ -24,7 +24,7 @@ class SubstituteSubstructure(MoleculeMutator):
     Atoms in functional groups used to
     construct the :class: `.ConstructedMolecule` cannot be changed,
     and will result in an error being raised, unless the
-    new functional groups are specified in `replacement_fgs`.
+    new functional groups are specified in `replacement_functional_groups`.
 
     Examples
     --------
@@ -50,26 +50,26 @@ class SubstituteSubstructure(MoleculeMutator):
             fg, = building_block.get_functional_groups(0)
             return type(fg) is stk.PrimaryAmino
 
-        random_smarts = stk.RandomSmarts(
+        substitute_substructure = stk.SubstituteSubstructure(
             query_smarts='F',
             replacement_smiles='Br',
             is_replaceable=has_primary_amino_group,
-            replacement_fgs=[stk.PrimaryAminoFactory()],
+            replacement_functional_groups=[stk.PrimaryAminoFactory()],
         )
 
         # Mutate a molecule.
-        mutation_record1 = random_smarts.mutate(polymer)
+        mutation_record1 = substitute_substructure.mutate(polymer)
 
         # Create a mutator that will fail.
 
-        random_smarts_failed = stk.RandomSmarts(
+        substitute_substructure_failed = stk.SubstituteSubstructure(
             query_smarts='N',
             replacement_smiles='Br',
             is_replaceable=has_primary_amino_group,
-            replacement_fgs=[stk.PrimaryAminoFactory()],
+            replacement_functional_groups=(stk.PrimaryAminoFactory(),),
         )
         # This will raise an exception.
-        mutation_record2 = random_smarts.mutate(polymer)
+        mutation_record2 = substitute_substructure.mutate(polymer)
 
     The molecule prior to mutation is shown below, and the mutated
     molecule shown underneath.
@@ -81,9 +81,9 @@ class SubstituteSubstructure(MoleculeMutator):
 
         bb1 = stk.BuildingBlock(
             smiles='NCC(CF)CCN',
-            functional_groups=(stk.PrimaryAminoFactory()),
+            functional_groups=(stk.PrimaryAminoFactory(),),
         )
-        bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
+        bb2 = stk.BuildingBlock('O=CCCCC=O', (stk.AldehydeFactory(),))
         polymer = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2),
@@ -111,7 +111,7 @@ class SubstituteSubstructure(MoleculeMutator):
         )
         bb3 = stk.BuildingBlock(
             smiles='NCC(CBr)CCN',
-            functional_groups=(stk.PrimaryAminoFactory()),
+            functional_groups=(stk.PrimaryAminoFactory(),),
         )
         mutated_polymer = stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(

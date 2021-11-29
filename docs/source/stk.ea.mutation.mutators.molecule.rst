@@ -16,3 +16,4 @@ Submodules
    stk.ea.mutation.mutators.molecule.random_building_block
    stk.ea.mutation.mutators.molecule.random_topology_graph
    stk.ea.mutation.mutators.molecule.similar_building_block
+   stk.ea.mutation.mutators.molecule.substitute_substructure
