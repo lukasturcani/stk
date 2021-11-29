@@ -494,7 +494,8 @@ class BuildingBlock(Molecule):
         ----
         For rdkit molecules with aromatic rings of bond order 1.5,
         the molecule should be kekulized prior calling this method.
-        Otherwise, all bond orders will be set to 1 in the building block.
+        Otherwise, all bond orders will be set to 1 in the
+        building block.
 
         Parameters
         ----------
