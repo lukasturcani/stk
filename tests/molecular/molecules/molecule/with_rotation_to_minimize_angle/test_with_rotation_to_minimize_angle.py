@@ -1,9 +1,10 @@
-import stk
 import numpy as np
 
+import stk
+
 from ...utilities import (
-    has_same_structure,
     get_displacement_vector,
+    has_same_structure,
     is_clone,
 )
 

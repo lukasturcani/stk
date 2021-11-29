@@ -11,7 +11,6 @@ from typing import TypeVar
 
 from .functional_group import FunctionalGroup
 
-
 _T = TypeVar('_T', bound='GenericFunctionalGroup')
 
 

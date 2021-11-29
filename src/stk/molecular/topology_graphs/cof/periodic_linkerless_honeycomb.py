@@ -4,14 +4,15 @@ Periodic Linkerless Honeycomb
 
 """
 
-import numpy as np
 import warnings
 
+import numpy as np
+
+from ...periodic_info import PeriodicInfo
 from ...reactions import GenericReactionFactory
+from ..topology_graph import Edge, NullOptimizer
 from .cof import Cof
 from .vertices import NonLinearVertex
-from ..topology_graph import Edge, NullOptimizer
-from ...periodic_info import PeriodicInfo
 
 
 class PeriodicLinkerlessHoneycomb(Cof):

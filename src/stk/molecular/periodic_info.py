@@ -7,7 +7,9 @@ Class holding periodic cell information.
 """
 
 import logging
+
 import numpy as np
+
 from ..utilities import cap_absolute_value
 
 logger = logging.getLogger(__name__)

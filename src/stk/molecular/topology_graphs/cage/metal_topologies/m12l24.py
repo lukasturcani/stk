@@ -4,9 +4,9 @@ M12L24
 
 """
 
-from ..cage import Cage
-from ..vertices import NonLinearVertex, LinearVertex
 from ...topology_graph import Edge
+from ..cage import Cage
+from ..vertices import LinearVertex, NonLinearVertex
 
 
 class M12L24(Cage):

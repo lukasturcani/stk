@@ -4,12 +4,13 @@ Macrocycle
 
 """
 
-import numpy as np
 import warnings
 
-from .vertices import CycleVertex
-from ..topology_graph import TopologyGraph, NullOptimizer, Edge
+import numpy as np
+
 from ...reactions import GenericReactionFactory
+from ..topology_graph import Edge, NullOptimizer, TopologyGraph
+from .vertices import CycleVertex
 
 
 class Macrocycle(TopologyGraph):

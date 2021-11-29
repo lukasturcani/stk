@@ -1,12 +1,13 @@
-import stk
 import numpy as np
 
-from .utilities import get_database_state
+import stk
+
 from ...utilities import (
     DatabaseEntry,
     DatabaseState,
     assert_database_state,
 )
+from .utilities import get_database_state
 
 
 def to_hashable(json):

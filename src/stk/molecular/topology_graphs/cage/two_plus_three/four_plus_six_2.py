@@ -4,9 +4,9 @@ Four Plus Six 2
 
 """
 
+from ...topology_graph import Edge
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
-from ...topology_graph import Edge
 
 
 class FourPlusSix2(Cage):
@@ -111,7 +111,7 @@ class FourPlusSix2(Cage):
 
     """
 
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(0, [1, 0, 1]),
         NonLinearVertex(1, [-1, 0, 1]),
         NonLinearVertex(2, [1, 0, -1]),
@@ -124,14 +124,14 @@ class FourPlusSix2(Cage):
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
         LinearVertex.init_at_center(
             id=8,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[2]),
+            vertices=(_non_linears[0], _non_linears[2]),
         ),
         LinearVertex.init_at_center(
             id=9,
-            vertices=(_vertex_prototypes[1], _vertex_prototypes[3]),
+            vertices=(_non_linears[1], _non_linears[3]),
         )
     )
 

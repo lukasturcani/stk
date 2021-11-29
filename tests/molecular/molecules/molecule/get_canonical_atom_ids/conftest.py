@@ -1,5 +1,6 @@
-import stk
 import pytest
+
+import stk
 
 from .case_data import CaseData
 

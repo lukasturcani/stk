@@ -4,8 +4,8 @@ Dative Reaction Factory
 
 """
 
-from .reaction_factory import ReactionFactory
 from ..reactions import DativeReaction
+from .reaction_factory import ReactionFactory
 
 
 class DativeReactionFactory(ReactionFactory):

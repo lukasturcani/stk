@@ -1,9 +1,10 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture
+
 import stk
 
-from .utilities import atomic_numbers
 from .case_data import CaseData
+from .utilities import atomic_numbers
 
 
 @pytest.fixture(

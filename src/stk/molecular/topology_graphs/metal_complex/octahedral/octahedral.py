@@ -4,9 +4,9 @@ Octahedral
 
 """
 
+from ...topology_graph import Edge
 from ..metal_complex import MetalComplex
 from ..vertices import MetalVertex, MonoDentateLigandVertex
-from ...topology_graph import Edge
 
 
 class Octahedral(MetalComplex):

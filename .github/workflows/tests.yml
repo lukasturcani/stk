@@ -1,4 +1,4 @@
-name: tests
+name: Tests
 
 on: [push, pull_request]
 
@@ -13,12 +13,24 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Lint with flake8
+              run: conda run -n stk flake8 .
+
+    type-check:
+        runs-on: ubuntu-20.04
+        container:
+            image: ghcr.io/lukasturcani/stk-test-environment
+
+        steps:
+            - name: Git checkout
+              uses: actions/checkout@v2
+
+            - name: Add stk to the conda environment
               run: conda run -n stk
-                flake8 .
-                    --count
-                    --show-source
-                    --max-line-length=71
-                    --statistics
+                pip install --no-deps -e .
+
+            - name: Run mypy
+              run: conda run -n stk
+                mypy src/stk
 
     pytest-stable-linux:
         runs-on: ubuntu-20.04

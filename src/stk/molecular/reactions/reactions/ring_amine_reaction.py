@@ -6,9 +6,9 @@ Ring Amine Reaction
 
 import numpy as np
 
-from .reaction import Reaction, NewAtom
 from ... import atoms
 from ...bonds import Bond
+from .reaction import NewAtom, Reaction
 
 
 class RingAmineReaction(Reaction):

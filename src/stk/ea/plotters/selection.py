@@ -6,12 +6,12 @@ Selection Plotter
 
 from collections import Counter
 from functools import wraps
+
 import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
+import seaborn as sns
 
 from stk.molecular import InchiKey
-
 
 plt.switch_backend('agg')
 

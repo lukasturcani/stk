@@ -5,6 +5,7 @@ Turbomole Updating Utilities
 """
 
 import numpy as np
+
 from stk.utilities import periodic_table
 
 

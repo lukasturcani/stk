@@ -5,11 +5,12 @@ Constructed Molecule
 """
 
 import logging
+
 import rdkit.Chem.AllChem as rdkit
 
-from .molecule import Molecule
 from ..atoms import AtomInfo
 from ..bonds import BondInfo
+from .molecule import Molecule
 from .utilities import get_bond_info_atom_ids, sort_bond_atoms_by_id
 
 logger = logging.getLogger(__name__)

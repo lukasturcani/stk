@@ -4,19 +4,15 @@ Generic Reaction Factory
 
 """
 
-from .reaction_factory import ReactionFactory
-from ..reactions import (
-    OneOneReaction,
-    OneTwoReaction,
-    TwoTwoReaction,
-)
 from ...functional_groups import (
+    Aldehyde,
     Alkene,
     Alkyne,
-    PrimaryAmino,
-    Aldehyde,
     Amide,
+    PrimaryAmino,
 )
+from ..reactions import OneOneReaction, OneTwoReaction, TwoTwoReaction
+from .reaction_factory import ReactionFactory
 
 # Impose the same interface on all reaction initializers.
 

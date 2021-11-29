@@ -1,5 +1,5 @@
-import rdkit.Chem.AllChem as rdkit
 import numpy as np
+import rdkit.Chem.AllChem as rdkit
 
 from ...utilities import is_clone
 

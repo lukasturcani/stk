@@ -4,10 +4,10 @@ MCHammer
 
 """
 
-from .optimizer import Optimizer
-from .utilities import get_mch_bonds, get_long_bond_ids, get_subunits
-
 import mchammer as mch
+
+from .optimizer import Optimizer
+from .utilities import get_long_bond_ids, get_mch_bonds, get_subunits
 
 
 class MCHammer(Optimizer):

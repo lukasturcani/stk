@@ -7,10 +7,10 @@ Defines an :class:`.Atom` class for each element.
 """
 
 from __future__ import annotations
+
 from typing import ClassVar, TypeVar
 
 from .atom import Atom
-
 
 _T = TypeVar('_T', bound='AtomImpl')
 

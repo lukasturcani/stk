@@ -4,23 +4,25 @@ Linear
 
 """
 
-from dataclasses import dataclass
-import numpy as np
-from typing import Tuple
+from __future__ import annotations
 
-from .vertices import (
-    HeadVertex,
-    TailVertex,
-    LinearVertex,
-    UnaligningVertex,
-)
+from dataclasses import dataclass
+
+import numpy as np
+
+from ....reactions import GenericReactionFactory
 from ...topology_graph import (
-    TopologyGraph,
     Edge,
     NullOptimizer,
+    TopologyGraph,
     Vertex,
 )
-from ....reactions import GenericReactionFactory
+from .vertices import (
+    HeadVertex,
+    LinearVertex,
+    TailVertex,
+    UnaligningVertex,
+)
 
 
 class Linear(TopologyGraph):
@@ -578,7 +580,11 @@ class Linear(TopologyGraph):
         base = ord('A')
         return tuple(ord(letter)-base for letter in repeating_unit)
 
-    def _get_building_block_vertices(self, building_blocks, vertices):
+    def _get_building_block_vertices(
+        self,
+        building_blocks,
+        vertices,
+    ):
         polymer = self._repeating_unit*self._num_repeating_units
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
@@ -587,9 +593,39 @@ class Linear(TopologyGraph):
                 building_block_vertices.get(bb, [])
             )
             building_block_vertices[bb].append(vertex)
+
+        building_block_vertices = self._with_unaligning_vertices(
+            building_block_vertices=building_block_vertices,
+        )
         return building_block_vertices
 
-    def _get_scale(self, building_block_vertices):
+    @staticmethod
+    def _with_unaligning_vertices(
+        building_block_vertices,
+    ):
+        clone = {}
+        for building_block, vertices in (
+            building_block_vertices.items()
+        ):
+            # Building blocks with 1 placer, cannot be aligned and
+            # must therefore use an UnaligningVertex.
+            if building_block.get_num_placers() == 1:
+                clone[building_block] = tuple(
+                    UnaligningVertex(
+                        id=vertex.get_id(),
+                        position=vertex.get_position(),
+                        flip=vertex.get_flip(),
+                    ) for vertex in vertices
+                )
+            else:
+                clone[building_block] = vertices
+
+        return clone
+
+    def _get_scale(
+        self,
+        building_block_vertices,
+    ) -> float:
         return max(
             bb.get_maximum_diameter()
             for bb in building_block_vertices
@@ -605,5 +641,5 @@ class Linear(TopologyGraph):
 
 @dataclass(frozen=True)
 class _VerticesAndEdges:
-    vertices: Tuple[Vertex]
-    edges: Tuple[Edge]
+    vertices: tuple[Vertex]
+    edges: tuple[Edge]

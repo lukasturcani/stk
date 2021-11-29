@@ -1,9 +1,11 @@
-import pytest
 import os
-from pytest_lazyfixture import lazy_fixture
-import stk
+
 import numpy as np
+import pytest
+from pytest_lazyfixture import lazy_fixture
 from rdkit.Chem import AllChem as rdkit
+
+import stk
 
 from .case_data import CaseData
 # Fixtures need to be visible for lazy_fixture() calls.

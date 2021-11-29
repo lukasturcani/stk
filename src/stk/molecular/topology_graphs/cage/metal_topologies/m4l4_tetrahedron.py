@@ -6,9 +6,9 @@ M4L4 Tetrahedron
 
 import numpy as np
 
+from ...topology_graph import Edge
 from ..cage import Cage
 from ..vertices import NonLinearVertex
-from ...topology_graph import Edge
 
 
 class M4L4Tetrahedron(Cage):
@@ -150,7 +150,7 @@ class M4L4Tetrahedron(Cage):
 
     """
 
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
         NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
         NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
@@ -158,38 +158,38 @@ class M4L4Tetrahedron(Cage):
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
 
         NonLinearVertex.init_at_center(
             id=4,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[1],
-                _vertex_prototypes[2],
+                _non_linears[0],
+                _non_linears[1],
+                _non_linears[2],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=5,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[1],
-                _vertex_prototypes[3],
+                _non_linears[0],
+                _non_linears[1],
+                _non_linears[3],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=6,
             vertices=(
-                _vertex_prototypes[0],
-                _vertex_prototypes[2],
-                _vertex_prototypes[3],
+                _non_linears[0],
+                _non_linears[2],
+                _non_linears[3],
             ),
         ),
         NonLinearVertex.init_at_center(
             id=7,
             vertices=(
-                _vertex_prototypes[1],
-                _vertex_prototypes[2],
-                _vertex_prototypes[3],
+                _non_linears[1],
+                _non_linears[2],
+                _non_linears[3],
             ),
         ),
     )

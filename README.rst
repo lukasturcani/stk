@@ -1,6 +1,6 @@
 :author: Lukas Turcani
 :Documentation: https://stk.readthedocs.io
-:Discord: https://discord.gg/YvwdcjKf
+:Discord: https://discord.gg/zbCUzuxe2B
 
 .. figure:: docs/source/figures/stk.png
 

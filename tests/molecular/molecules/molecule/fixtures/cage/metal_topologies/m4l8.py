@@ -1,8 +1,9 @@
 import pytest
+
 import stk
 
-from ...building_blocks import get_pd_atom, get_linker
 from ....case_data import CaseData
+from ...building_blocks import get_linker, get_pd_atom
 
 
 @pytest.fixture(

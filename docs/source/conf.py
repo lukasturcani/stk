@@ -29,6 +29,7 @@ import types
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 extensions = [
+    'sphinx.ext.intersphinx',
     'sphinx.ext.autodoc',
     'sphinx.ext.imgmath',
     'sphinx.ext.githubpages',
@@ -62,6 +63,10 @@ def setup(app):
 add_module_names = False
 numpydoc_class_members_toctree = False
 autodoc_typehints = 'description'
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+}
 
 
 # Add any paths that contain templates here, relative to this

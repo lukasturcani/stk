@@ -6,9 +6,9 @@ Molecule State
 
 import numpy as np
 
-from .reactions_summary import _ReactionsSummary
 from .deletions_summary import _DeletionsSummary
 from .placements_summary import _PlacementsSummary
+from .reactions_summary import _ReactionsSummary
 
 
 class _MoleculeState:

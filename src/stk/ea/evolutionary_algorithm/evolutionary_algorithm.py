@@ -6,10 +6,10 @@ Evolutionary Algorithm
 
 import logging
 
-from ..fitness_normalizers import NullFitnessNormalizer
 from stk.molecular import Inchi
-from .implementations import Serial, Parallel
 
+from ..fitness_normalizers import NullFitnessNormalizer
+from .implementations import Parallel, Serial
 
 logger = logging.getLogger(__name__)
 

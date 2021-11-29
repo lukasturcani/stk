@@ -7,6 +7,7 @@ Roulette
 import numpy as np
 
 from stk.molecular import Inchi
+
 from .selector import Selector
 
 

@@ -1,7 +1,9 @@
-import stk
 import itertools as it
+
 import pytest
 from pytest_lazyfixture import lazy_fixture
+
+import stk
 
 # Fixtures need be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa

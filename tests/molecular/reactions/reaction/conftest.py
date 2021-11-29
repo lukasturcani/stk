@@ -1,5 +1,6 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture
+
 import stk
 
 # Fixtures need to visible for lazy_fixture() calls.

@@ -5,6 +5,7 @@ Molecule DeJSONizer
 """
 
 import numpy as np
+
 from stk.molecular import Molecule
 
 from .utilities import to_atom, to_bond

@@ -1,8 +1,9 @@
 import pytest
+
 import stk
 
-from ...building_blocks import get_pd_atom
 from ....case_data import CaseData
+from ...building_blocks import get_pd_atom
 
 
 def _get_bi_1() -> stk.BuildingBlock:

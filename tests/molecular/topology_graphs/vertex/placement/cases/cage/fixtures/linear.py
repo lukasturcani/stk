@@ -1,8 +1,10 @@
-import pytest
-import numpy as np
-import stk
 from functools import partial
+
+import numpy as np
+import pytest
 from scipy.spatial.distance import euclidean
+
+import stk
 
 from ....case_data import CaseData
 

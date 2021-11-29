@@ -1,5 +1,7 @@
-import pytest
 import itertools as it
+
+import pytest
+
 import stk
 from stk.molecular.reactions.reactions.reaction import ReactionResult
 

@@ -4,10 +4,12 @@ Above Average
 
 """
 
-import numpy as np
 import itertools as it
 
+import numpy as np
+
 from stk.molecular import Inchi
+
 from .selector import Selector
 
 

@@ -1,22 +1,23 @@
 import itertools as it
-import pytest
 from functools import partial
-import stk
+
 import numpy as np
+import pytest
+
+import stk
 
 from ..utilities import is_clone
-from .check_atoms import check_atoms
 from .check_atom_infos import check_atom_infos
-from .check_bonds import check_bonds
+from .check_atoms import check_atoms
 from .check_bond_infos import check_bond_infos
-from .check_building_blocks import check_building_blocks
+from .check_bonds import check_bonds
 from .check_building_block_counts import check_building_block_counts
-from .check_edges import check_edges
-from .check_vertex_edges import check_vertex_edges
+from .check_building_blocks import check_building_blocks
 from .check_edge_functional_groups import check_edge_functional_groups
+from .check_edges import check_edges
 from .check_position_matrix import check_position_matrix
+from .check_vertex_edges import check_vertex_edges
 from .check_vertices import check_vertices
-
 
 PlacementResult = (
     stk.topology_graphs.implementations

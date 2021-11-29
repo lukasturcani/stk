@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-
 import pytest
-import stk
 
+import stk
 
 from .utilities import is_clone
 

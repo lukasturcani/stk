@@ -1,12 +1,13 @@
-import pytest
-import stk
 import numpy as np
+import pytest
+
+import stk
 
 from ....case_data import CaseData
 from .utilities import (
     get_closest_point,
-    get_fg_position,
     get_edges,
+    get_fg_position,
     get_points,
 )
 

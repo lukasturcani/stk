@@ -56,3 +56,4 @@ def get_any_value(
     for key in keys:
         if key in mapping and len(mapping[key]) > 0:
             return mapping[key][0]
+    return None

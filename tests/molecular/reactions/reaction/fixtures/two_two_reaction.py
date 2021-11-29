@@ -1,6 +1,8 @@
 import itertools as it
+
 import numpy as np
 import pytest
+
 import stk
 from stk.molecular.topology_graphs.topology_graph import (
     ConstructionState,

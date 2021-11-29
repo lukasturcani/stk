@@ -4,9 +4,9 @@ Dative Reaction
 
 """
 
-from .utilities import is_metal
-from ..reaction import Reaction
 from ....bonds import Bond
+from ..reaction import Reaction
+from .utilities import is_metal
 
 
 class DativeReaction(Reaction):

@@ -11,17 +11,19 @@ Molecule
 """
 
 import os
+
 import numpy as np
-from scipy.spatial.distance import euclidean
 import rdkit.Chem.AllChem as rdkit
+from scipy.spatial.distance import euclidean
 
 from stk.utilities import (
-    vector_angle,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
+    vector_angle,
 )
-from .utilities import writers, updaters
-from ..utilities import sort_bond_atoms_by_id, get_bond_atom_ids
+
+from ..utilities import get_bond_atom_ids, sort_bond_atoms_by_id
+from .utilities import updaters, writers
 
 
 class Molecule:

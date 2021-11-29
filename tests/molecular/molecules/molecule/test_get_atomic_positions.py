@@ -1,4 +1,5 @@
 import itertools as it
+
 import numpy as np
 
 from ..utilities import normalize_ids

@@ -5,9 +5,11 @@ Topology Graph
 """
 
 from functools import partial
+
 import numpy as np
 
 from stk.utilities import flatten
+
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
 from ..edge_group import EdgeGroup

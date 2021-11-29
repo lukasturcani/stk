@@ -1,10 +1,10 @@
-import pytest
 import numpy as np
-import stk
+import pytest
 from rdkit.Chem import AllChem as rdkit
 
-from ....case_data import CaseData
+import stk
 
+from ....case_data import CaseData
 
 single_atom = rdkit.MolFromSmiles('[Fe]')
 single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))

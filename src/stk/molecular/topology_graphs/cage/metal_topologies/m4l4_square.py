@@ -4,10 +4,10 @@ M4L4 Square
 
 """
 
-from ..cage import Cage
-from ..vertices import LinearVertex
-from ...topology_graph import Edge, NullOptimizer
 from ....reactions import GenericReactionFactory
+from ...topology_graph import Edge, NullOptimizer
+from ..cage import Cage
+from ..vertices import AngledVertex, LinearVertex
 
 
 class M4L4Square(Cage):
@@ -228,10 +228,10 @@ class M4L4Square(Cage):
         )
 
     _vertex_prototypes = (
-        LinearVertex(0, [1, 1, 0]),
-        LinearVertex(1, [1, -1, 0]),
-        LinearVertex(2, [-1, -1, 0]),
-        LinearVertex(3, [-1, 1, 0]),
+        AngledVertex(0, [1, 1, 0]),
+        AngledVertex(1, [1, -1, 0]),
+        AngledVertex(2, [-1, -1, 0]),
+        AngledVertex(3, [-1, 1, 0]),
 
         LinearVertex(4, [1, 0, 0], False),
         LinearVertex(5, [0, -1, 0], False),

@@ -28,19 +28,20 @@ stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
 
 import itertools as it
 from collections import Counter
-import numpy as np
 from functools import partial
 from operator import getitem
 
-from ..topology_graph import (
-    TopologyGraph,
-    NullOptimizer,
-    EdgeGroup,
-    PeriodicConstructionResult,
-)
-from .vertices import UnaligningVertex
-from .edge import CofEdge
+import numpy as np
+
 from ...reactions import GenericReactionFactory
+from ..topology_graph import (
+    EdgeGroup,
+    NullOptimizer,
+    PeriodicConstructionResult,
+    TopologyGraph,
+)
+from .edge import CofEdge
+from .vertices import UnaligningVertex
 
 
 class UnoccupiedVertexError(Exception):
@@ -486,11 +487,16 @@ class Cof(TopologyGraph):
         for building_block, vertices in clone.items():
             # Building blocks with 1 placer, cannot be aligned and
             # must therefore use an UnaligningVertex.
-            if len(set(building_block.get_placer_ids())) == 1:
-                clone[building_block] = tuple(map(
-                    UnaligningVertex,
-                    vertices,
-                ))
+            if building_block.get_num_placers() == 1:
+                clone[building_block] = tuple(
+                    UnaligningVertex(
+                        id=v.get_id(),
+                        position=v.get_position(),
+                        aligner_edge=v.get_aligner_edge(),
+                        cell=v.get_cell(),
+                    )
+                    for v in vertices
+                )
 
         return clone
 

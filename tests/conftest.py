@@ -1,5 +1,5 @@
-import pytest
 import pymongo
+import pytest
 
 
 def pytest_addoption(parser):

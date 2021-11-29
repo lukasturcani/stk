@@ -4,14 +4,15 @@ Periodic Honeycomb
 
 """
 
-import numpy as np
 import warnings
 
+import numpy as np
+
+from ...periodic_info import PeriodicInfo
 from ...reactions import GenericReactionFactory
+from ..topology_graph import Edge, NullOptimizer
 from .cof import Cof
 from .vertices import LinearVertex, NonLinearVertex
-from ..topology_graph import Edge, NullOptimizer
-from ...periodic_info import PeriodicInfo
 
 
 class PeriodicHoneycomb(Cof):
@@ -245,26 +246,26 @@ class PeriodicHoneycomb(Cof):
         np.array([0, 0, 5/1.7321])
     )
 
-    _vertex_prototypes = (
+    _non_linears = (
         NonLinearVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
         NonLinearVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
     )
 
     _vertex_prototypes = (
-        *_vertex_prototypes,
+        *_non_linears,
         LinearVertex.init_at_center(
             id=2,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(_non_linears[0], _non_linears[1]),
         ),
         LinearVertex.init_at_shifted_center(
             id=3,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(_non_linears[0], _non_linears[1]),
             cell_shifts=((0, 0, 0), (0, -1, 0)),
             lattice_constants=_lattice_constants,
         ),
         LinearVertex.init_at_shifted_center(
             id=4,
-            vertices=(_vertex_prototypes[0], _vertex_prototypes[1]),
+            vertices=(_non_linears[0], _non_linears[1]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants,
         )

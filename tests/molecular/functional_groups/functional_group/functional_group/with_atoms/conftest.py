@@ -1,5 +1,6 @@
-import stk
 import pytest
+
+import stk
 
 
 def get_atom_map_0(functional_group):

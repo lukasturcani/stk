@@ -6,10 +6,11 @@ COF Vertices
 
 import numpy as np
 from scipy.spatial.distance import euclidean
+
 from stk.utilities import get_acute_vector
 
-from ..utilities import _FunctionalGroupSorter, _EdgeSorter
 from ..topology_graph import Vertex
+from ..utilities import _EdgeSorter, _FunctionalGroupSorter
 
 
 class _CofVertex(Vertex):
@@ -309,14 +310,6 @@ class UnaligningVertex(_CofVertex):
     Just places a building block, does not align.
 
     """
-
-    def __init__(self, vertex):
-        super().__init__(
-            id=vertex.get_id(),
-            position=vertex.get_position(),
-            aligner_edge=vertex.get_aligner_edge(),
-            cell=vertex.get_cell(),
-        )
 
     def place_building_block(self, building_block, edges):
         return building_block.with_centroid(

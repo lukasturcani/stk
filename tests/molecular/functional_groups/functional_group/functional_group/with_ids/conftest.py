@@ -1,7 +1,8 @@
-import stk
+from typing import Callable
+
 import pytest
 
-from typing import Callable
+import stk
 
 
 def get_id_map_0(

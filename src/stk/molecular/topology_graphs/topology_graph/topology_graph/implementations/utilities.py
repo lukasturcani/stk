@@ -6,8 +6,9 @@ Topology Graph Implementation Utilities
 
 from __future__ import annotations
 
-import numpy as np
 from typing import NamedTuple
+
+import numpy as np
 
 
 class _PlacementResult(NamedTuple):

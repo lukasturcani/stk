@@ -1,11 +1,12 @@
+from functools import partial
+
+import numpy as np
 import pytest
 from pytest_lazyfixture import lazy_fixture
-import numpy as np
-import stk
-from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
-from functools import partial
 from scipy.spatial.distance import euclidean
 
+import stk
+from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
 
 from ....case_data import CaseData
 

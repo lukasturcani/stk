@@ -6,9 +6,9 @@ Linkerless Honeycomb
 
 import numpy as np
 
+from ..topology_graph import Edge
 from .cof import Cof
 from .vertices import NonLinearVertex
-from ..topology_graph import Edge
 
 
 class LinkerlessHoneycomb(Cof):

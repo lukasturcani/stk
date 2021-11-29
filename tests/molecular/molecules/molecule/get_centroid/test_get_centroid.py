@@ -1,7 +1,7 @@
 import numpy as np
 
-from ..utilities import get_centroid
 from ...utilities import normalize_ids
+from ..utilities import get_centroid
 
 
 def test_get_centroid(case_data, get_atom_ids):
