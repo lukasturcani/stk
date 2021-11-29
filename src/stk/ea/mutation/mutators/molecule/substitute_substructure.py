@@ -1,6 +1,6 @@
 """
-
-=============
+Substitute Substructure
+=======================
 
 """
 
@@ -24,7 +24,8 @@ class SubstituteSubstructure(MoleculeMutator):
     Atoms in functional groups used to
     construct the :class: `.ConstructedMolecule` cannot be changed,
     and will result in an error being raised, unless the
-    new functional groups are specified in `replacement_functional_groups`.
+    new functional groups are specified in
+    `replacement_functional_groups`.
 
     Examples
     --------
