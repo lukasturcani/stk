@@ -493,7 +493,7 @@ class BuildingBlock(Molecule):
         Notes
         -----
         For :mod:`rdkit` molecules with non-integer bond orders,
-        such as 1.5, the molecule should be kekulized prior 
+        such as 1.5, the molecule should be kekulized prior to
         calling this method. Otherwise, all bond orders will be 
         set to an integer value in the building block.
 
