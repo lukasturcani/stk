@@ -31,7 +31,8 @@ class M2L4Lantern(Cage):
 
         bb2 = stk.BuildingBlock(
             smiles=(
-                'C1=CC(=CC(=C1)C2=CN=CC=C2)C3=CN=CC=C3'
+                'C1=NC=CC(C2=CC=CC(C3=C'
+                'C=NC=C3)=C2)=C1'
             ),
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -89,7 +90,8 @@ class M2L4Lantern(Cage):
 
         bb2 = stk.BuildingBlock(
             smiles=(
-                'C1=CC(=CC(=C1)C2=CN=CC=C2)C3=CN=CC=C3'
+                'C1=NC=CC(C2=CC=CC(C3=C'
+                'C=NC=C3)=C2)=C1'
             ),
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
