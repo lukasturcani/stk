@@ -78,11 +78,11 @@ class M6L2L3Prism(Cage):
         # Build an M4L6 Tetrahedron with a spacer.
         cage2 = stk.ConstructedMolecule(
             topology_graph=stk.cage.M6L2L3Prism(
-                building_blocks=(
+                building_blocks={
                     iron_oct_delta: range(6),
                     bb3: (6, 7),
                     bb4: range(8, 11),
-                ),
+                },
             ),
         )
 
@@ -172,11 +172,11 @@ class M6L2L3Prism(Cage):
         # Build an M4L6 Tetrahedron with a spacer.
         cage2 = stk.ConstructedMolecule(
             topology_graph=stk.cage.M6L2L3Prism(
-                building_blocks=(
+                building_blocks={
                     iron_oct_delta: range(6),
                     bb3: (6, 7),
                     bb4: range(8, 11),
-                ),
+                },
                 optimizer=stk.MCHammer(),
             ),
         )
