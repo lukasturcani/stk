@@ -23,11 +23,11 @@ class FivePlusTen(Cage):
         import stk
 
         bb1 = stk.BuildingBlock(
-            smiles='BrCCBr',
+            smiles='C1=CC(=CC=C1Br)Br',
             functional_groups=[stk.BromoFactory()],
         )
         bb2 = stk.BuildingBlock(
-            smiles='Brc1c(Br)cc(Br)c(Br)c1',
+            smiles='C1(=C(C(=C1Br)Br)Br)Br',
             functional_groups=[stk.BromoFactory()],
         )
         cage = stk.ConstructedMolecule(
@@ -61,11 +61,11 @@ class FivePlusTen(Cage):
         import stk
 
         bb1 = stk.BuildingBlock(
-            smiles='BrCCBr',
+            smiles='C1=CC(=CC=C1Br)Br',
             functional_groups=[stk.BromoFactory()],
         )
         bb2 = stk.BuildingBlock(
-            smiles='Brc1c(Br)cc(Br)c(Br)c1',
+            smiles='C1(=C(C(=C1Br)Br)Br)Br',
             functional_groups=[stk.BromoFactory()],
         )
         cage = stk.ConstructedMolecule(
