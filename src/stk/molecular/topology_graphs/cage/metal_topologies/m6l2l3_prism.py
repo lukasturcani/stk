@@ -109,7 +109,7 @@ class M6L2L3Prism(Cage):
             ),
         )
 
-    :class:`.MCHammer` optimized construction
+    :class:`.Collapser` optimized construction
 
     .. moldoc::
 
@@ -177,7 +177,7 @@ class M6L2L3Prism(Cage):
                     bb3: (6, 7),
                     bb4: range(8, 11),
                 },
-                optimizer=stk.MCHammer(),
+                optimizer=stk.Collapser(),
             ),
         )
 
