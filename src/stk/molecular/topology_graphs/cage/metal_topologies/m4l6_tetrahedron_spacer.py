@@ -22,21 +22,23 @@ class M4L6TetrahedronSpacer(Cage):
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
             functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(3)
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
             ),
             position_matrix=[[0, 0, 0]],
         )
 
         bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
-            ),
+            smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
                 stk.SmartsFunctionalGroupFactory(
                     smarts='[#6]~[#7X2]~[#6]',
                     bonders=(1, ),
@@ -45,9 +47,34 @@ class M4L6TetrahedronSpacer(Cage):
             ],
         )
 
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        # Assign Bromo functional groups to the metal complex.
+        iron_oct_delta = stk.BuildingBlock.init_from_molecule(
+            molecule=complex,
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        # Define building blocks.
+        bb3 = stk.BuildingBlock(
+            smiles=(
+                'C1=CC(=CC=C1C2=CC=C(C=C2)Br)Br'
+            ),
+            functional_groups=[stk.BromoFactory()],
+        )
+
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M4L6TetrahedronSpacer(
-                building_blocks=(bb1, bb2),
+                building_blocks={
+                    iron_oct_delta: range(3),
+                    bb3: range(3, 9),
+                },
             ),
         )
 
@@ -81,21 +108,23 @@ class M4L6TetrahedronSpacer(Cage):
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
             functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(3)
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
             ),
             position_matrix=[[0, 0, 0]],
         )
 
         bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
-            ),
+            smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
                 stk.SmartsFunctionalGroupFactory(
                     smarts='[#6]~[#7X2]~[#6]',
                     bonders=(1, ),
@@ -104,9 +133,34 @@ class M4L6TetrahedronSpacer(Cage):
             ],
         )
 
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        # Assign Bromo functional groups to the metal complex.
+        iron_oct_delta = stk.BuildingBlock.init_from_molecule(
+            molecule=complex,
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        # Define building blocks.
+        bb3 = stk.BuildingBlock(
+            smiles=(
+                'C1=CC(=CC=C1C2=CC=C(C=C2)Br)Br'
+            ),
+            functional_groups=[stk.BromoFactory()],
+        )
+
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M4L6TetrahedronSpacer(
-                building_blocks=(bb1, bb2),
+                building_blocks={
+                    iron_oct_delta: range(3),
+                    bb3: range(3, 9),
+                },
                 optimizer=stk.MCHammer(),
             ),
         )

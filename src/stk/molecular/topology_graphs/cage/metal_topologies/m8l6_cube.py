@@ -68,7 +68,6 @@ class M8L6Cube(Cage):
             functional_groups=[stk.BromoFactory()],
         )
 
-        # Build an M4L6 Tetrahedron with a spacer.
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M8L6Cube(
                 building_blocks=(iron_oct_delta, bb4),
@@ -153,7 +152,6 @@ class M8L6Cube(Cage):
             functional_groups=[stk.BromoFactory()],
         )
 
-        # Build an M4L6 Tetrahedron with a spacer.
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M8L6Cube(
                 building_blocks=(iron_oct_delta, bb4),

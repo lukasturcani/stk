@@ -76,7 +76,6 @@ class M6L2L3Prism(Cage):
             functional_groups=[stk.BromoFactory()],
         )
 
-        # Build an M4L6 Tetrahedron with a spacer.
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M6L2L3Prism(
                 building_blocks={
@@ -146,7 +145,7 @@ class M6L2L3Prism(Cage):
             topology_graph=stk.metal_complex.OctahedralDelta(
                 metals=iron_atom,
                 ligands=bb2,
-                optimizer=stk.Collapser(),
+                optimizer=stk.MCHammer(),
             ),
         )
 
@@ -171,7 +170,6 @@ class M6L2L3Prism(Cage):
             functional_groups=[stk.BromoFactory()],
         )
 
-        # Build an M4L6 Tetrahedron with a spacer.
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M6L2L3Prism(
                 building_blocks={
