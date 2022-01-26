@@ -72,8 +72,8 @@ class M4L6TetrahedronSpacer(Cage):
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M4L6TetrahedronSpacer(
                 building_blocks={
-                    iron_oct_delta: range(3),
-                    bb3: range(3, 9),
+                    iron_oct_delta: (0, 1, 2, 3),
+                    bb3: (4, 5, 6, 7, 8, 9),
                 },
             ),
         )
@@ -158,8 +158,8 @@ class M4L6TetrahedronSpacer(Cage):
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M4L6TetrahedronSpacer(
                 building_blocks={
-                    iron_oct_delta: range(3),
-                    bb3: range(3, 9),
+                    iron_oct_delta: (0, 1, 2, 3),
+                    bb3: (4, 5, 6, 7, 8, 9),
                 },
                 optimizer=stk.MCHammer(),
             ),

@@ -72,8 +72,8 @@ class M4L4Tetrahedron(Cage):
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M4L4Tetrahedron(
                 building_blocks={
-                    iron_oct_delta: range(3),
-                    bb3: range(3, 7),
+                    iron_oct_delta: (0, 1, 2, 3),
+                    bb3: (4, 5, 6, 7),
                 },
             ),
         )
@@ -158,8 +158,8 @@ class M4L4Tetrahedron(Cage):
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M4L4Tetrahedron(
                 building_blocks={
-                    iron_oct_delta: range(3),
-                    bb3: range(3, 7),
+                    iron_oct_delta: (0, 1, 2, 3),
+                    bb3: (4, 5, 6, 7),
                 },
                 optimizer=stk.MCHammer(),
             ),

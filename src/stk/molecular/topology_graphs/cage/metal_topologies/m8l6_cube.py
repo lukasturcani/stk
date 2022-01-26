@@ -97,7 +97,7 @@ class M8L6Cube(Cage):
             ),
         )
 
-    :class:`.MCHammer` optimized construction
+    :class:`.Collapser` optimized construction
 
     .. moldoc::
 
@@ -155,7 +155,7 @@ class M8L6Cube(Cage):
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M8L6Cube(
                 building_blocks=(iron_oct_delta, bb4),
-                optimizer=stk.MCHammer(),
+                optimizer=stk.Collapser(),
             ),
         )
 
