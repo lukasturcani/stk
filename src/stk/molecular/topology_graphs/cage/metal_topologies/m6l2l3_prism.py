@@ -22,18 +22,23 @@ class M6L2L3Prism(Cage):
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
             functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(3)
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
             ),
             position_matrix=[[0, 0, 0]],
         )
 
         bb2 = stk.BuildingBlock(
-            smiles='c2cnccc2c1cc(c4ccncc4)cc(c3ccncc3)c1',
+            smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
                 stk.SmartsFunctionalGroupFactory(
                     smarts='[#6]~[#7X2]~[#6]',
                     bonders=(1, ),
@@ -42,26 +47,41 @@ class M6L2L3Prism(Cage):
             ],
         )
 
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        # Assign Bromo functional groups to the metal complex.
+        iron_oct_delta = stk.BuildingBlock.init_from_molecule(
+            molecule=complex,
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        # Define building blocks.
         bb3 = stk.BuildingBlock(
             smiles=(
-                'c2cnccc2C#Cc1c(C#Cc4ccncc4)cc'
-                '(C#Cc3ccncc3)c(C#Cc5ccncc5)c1'
+                'C1=C(C=C(C=C1Br)Br)Br'
             ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
+            functional_groups=[stk.BromoFactory()],
+        )
+        bb4 = stk.BuildingBlock(
+            smiles=(
+                'C1=CC(=CC=C1C2=CC(=C(C=C2C3=CC=C(C=C3)Br)C4=CC=C(C=C'
+                '4)Br)C5=CC=C(C=C5)Br)Br'
+            ),
+            functional_groups=[stk.BromoFactory()],
         )
 
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M6L2L3Prism(
                 building_blocks={
-                    bb1: range(6),
-                    bb2: (6, 7),
-                    bb3: range(8, 11),
+                    iron_oct_delta: range(6),
+                    bb3: (6, 7),
+                    bb4: range(8, 11),
                 },
             ),
         )
@@ -96,18 +116,23 @@ class M6L2L3Prism(Cage):
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
+        iron_atom = stk.BuildingBlock(
+            smiles='[Fe+2]',
             functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(3)
+                stk.SingleAtom(stk.Fe(0, charge=2))
+                for i in range(6)
             ),
             position_matrix=[[0, 0, 0]],
         )
 
         bb2 = stk.BuildingBlock(
-            smiles='c2cnccc2c1cc(c4ccncc4)cc(c3ccncc3)c1',
+            smiles='C1=NC(C=NBr)=CC=C1',
             functional_groups=[
+                stk.SmartsFunctionalGroupFactory(
+                    smarts='[#6]~[#7X2]~[#35]',
+                    bonders=(1, ),
+                    deleters=(),
+                ),
                 stk.SmartsFunctionalGroupFactory(
                     smarts='[#6]~[#7X2]~[#6]',
                     bonders=(1, ),
@@ -116,26 +141,41 @@ class M6L2L3Prism(Cage):
             ],
         )
 
+        complex = stk.ConstructedMolecule(
+            topology_graph=stk.metal_complex.OctahedralDelta(
+                metals=iron_atom,
+                ligands=bb2,
+                optimizer=stk.MCHammer(),
+            ),
+        )
+
+        # Assign Bromo functional groups to the metal complex.
+        iron_oct_delta = stk.BuildingBlock.init_from_molecule(
+            molecule=complex,
+            functional_groups=[stk.BromoFactory()],
+        )
+
+        # Define building blocks.
         bb3 = stk.BuildingBlock(
             smiles=(
-                'c2cnccc2C#Cc1c(C#Cc4ccncc4)cc'
-                '(C#Cc3ccncc3)c(C#Cc5ccncc5)c1'
+                'C1=C(C=C(C=C1Br)Br)Br'
             ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
+            functional_groups=[stk.BromoFactory()],
+        )
+        bb4 = stk.BuildingBlock(
+            smiles=(
+                'C1=CC(=CC=C1C2=CC(=C(C=C2C3=CC=C(C=C3)Br)C4=CC=C(C=C'
+                '4)Br)C5=CC=C(C=C5)Br)Br'
+            ),
+            functional_groups=[stk.BromoFactory()],
         )
 
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M6L2L3Prism(
                 building_blocks={
-                    bb1: range(6),
-                    bb2: (6, 7),
-                    bb3: range(8, 11),
+                    iron_oct_delta: range(6),
+                    bb3: (6, 7),
+                    bb4: range(8, 11),
                 },
                 optimizer=stk.Collapser(),
             ),

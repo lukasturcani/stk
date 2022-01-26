@@ -34,8 +34,7 @@ class M3L3Triangle(Cage):
 
         bb2 = stk.BuildingBlock(
             smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
+                'C1=CC(=CC=C1C2=CC=NC=C2)C3=CC=NC=C3'
             ),
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
@@ -94,8 +93,7 @@ class M3L3Triangle(Cage):
 
         bb2 = stk.BuildingBlock(
             smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
+                'C1=CC(=CC=C1C2=CC=NC=C2)C3=CC=NC=C3'
             ),
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
