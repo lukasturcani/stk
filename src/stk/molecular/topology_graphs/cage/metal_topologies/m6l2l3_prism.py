@@ -56,7 +56,7 @@ class M6L2L3Prism(Cage):
 
         # Assign Bromo functional groups to the metal complex.
         iron_oct_delta = stk.BuildingBlock.init_from_molecule(
-            molecule=iron_oct_delta,
+            molecule=complex,
             functional_groups=[stk.BromoFactory()],
         )
 
@@ -150,7 +150,7 @@ class M6L2L3Prism(Cage):
 
         # Assign Bromo functional groups to the metal complex.
         iron_oct_delta = stk.BuildingBlock.init_from_molecule(
-            molecule=iron_oct_delta,
+            molecule=complex,
             functional_groups=[stk.BromoFactory()],
         )
 
