@@ -51,6 +51,7 @@ class M6L2L3Prism(Cage):
             topology_graph=stk.metal_complex.OctahedralDelta(
                 metals=iron_atom,
                 ligands=bb2,
+                optimizer=stk.MCHammer(),
             ),
         )
 
@@ -145,6 +146,7 @@ class M6L2L3Prism(Cage):
             topology_graph=stk.metal_complex.OctahedralDelta(
                 metals=iron_atom,
                 ligands=bb2,
+                optimizer=stk.Collapser(),
             ),
         )
 
