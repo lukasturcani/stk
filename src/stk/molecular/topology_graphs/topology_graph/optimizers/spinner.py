@@ -73,7 +73,6 @@ class Spinner(Optimizer):
         num_conformers: int = 50,
         max_attempts: int = 1000,
         nonbond_epsilon: float = 5.,
-        nonbond_sigma: float = 1.2,
         beta: float = 2.,
         random_seed: int = 1000,
     ) -> None:
@@ -96,9 +95,6 @@ class Spinner(Optimizer):
                 potential in MC moves. Determines strength of the
                 nonbonded potential.
 
-            nonbond_sigma: Value of sigma used in the nonbonded
-                potential in MC moves.
-
             beta: Value of beta used in the in MC moves. Beta takes the
                 place of the inverse boltzmann temperature.
 
@@ -111,8 +107,9 @@ class Spinner(Optimizer):
             rotation_step_size=rotation_step_size,
             num_conformers=num_conformers,
             max_attempts=max_attempts,
-            nonbond_epsilon=nonbond_epsilon,
-            nonbond_sigma=nonbond_sigma,
+            potential_function=spd.SpdPotential(
+                nonbond_epsilon=nonbond_epsilon,
+            ),
             beta=beta,
             random_seed=random_seed,
         )
