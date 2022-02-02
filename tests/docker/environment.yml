@@ -134,7 +134,7 @@ dependencies:
     - sphinxcontrib-jsmath==1.0.1
     - sphinxcontrib-qthelp==1.0.3
     - sphinxcontrib-serializinghtml==1.1.5
-    - spindry==0.0.3
+    - spindry==0.0.5
     - toml==0.10.2
     - typing-extensions==3.10.0.0
     - urllib3==1.26.6
