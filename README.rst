@@ -1,6 +1,8 @@
-:author: Lukas Turcani
-:Documentation: https://stk.readthedocs.io
-:Discord: https://discord.gg/zbCUzuxe2B
+:maintainers:
+    `lukasturcani <https://github.com/lukasturcani/>`_,
+    `andrewtarzia <https://github.com/andrewtarzia/>`_
+:documentation: https://stk.readthedocs.io
+:discord: https://discord.gg/zbCUzuxe2B
 
 .. figure:: docs/source/figures/stk.png
 
