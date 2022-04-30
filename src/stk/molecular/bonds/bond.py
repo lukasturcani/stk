@@ -52,25 +52,23 @@ class Bond:
         """
         Initialize a :class:`Bond`.
 
-        Parameters
-        ----------
-        atom1:
-            The first atom in the bond.
+        Parameters:
+            atom1:
+                The first atom in the bond.
 
-        atom2:
-            The second atom in the bond.
+            atom2:
+                The second atom in the bond.
 
-        order:
-            The bond order.
+            order:
+                The bond order.
 
-        periodicity:
-
-            The directions across which the bond is periodic. For
-            example, ``(1, 0, -1)`` means that when going from
-            `atom1` to `atom2` the bond is
-            periodic across the x axis in the positive direction, is
-            not periodic across the y axis and is periodic across the z
-            axis in the negative direction.
+            periodicity:
+                The directions across which the bond is periodic. For
+                example, ``(1, 0, -1)`` means that when going from
+                `atom1` to `atom2` the bond is
+                periodic across the x axis in the positive direction,
+                is not periodic across the y axis and is periodic
+                across the z axis in the negative direction.
 
         """
 
