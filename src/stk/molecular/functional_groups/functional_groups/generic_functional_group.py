@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import TypeVar
 
+from ...atoms import Atom
 from .functional_group import FunctionalGroup
 
 _T = TypeVar('_T', bound='GenericFunctionalGroup')
@@ -28,24 +29,29 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     """
 
-    def __init__(self, atoms, bonders, deleters, placers=None):
+    def __init__(
+        self,
+        atoms: tuple[Atom, ...],
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: tuple[Atom, ...] | None = None,
+    ) -> None:
         """
         Initialize a :class:`.GenericFunctionalGroup`.
 
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms in the functional group.
+        Parameters:
+            atoms:
+                The atoms in the functional group.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms in the functional group.
+            bonders:
+                The bonder atoms in the functional group.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms in the functional group.
+            deleters:
+                The deleter atoms in the functional group.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms of the functional group. If ``None``,
-            the `bonders` will be used.
+            placers:
+                The placer atoms of the functional group. If ``None``,
+                the `bonders` will be used.
 
         """
 
