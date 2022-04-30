@@ -61,6 +61,9 @@ information.
 
 from __future__ import annotations
 
+import typing
+from ...atoms import Atom
+
 
 class FunctionalGroup:
     """
@@ -232,23 +235,27 @@ class FunctionalGroup:
 
     """
 
-    def __init__(self, atoms, placers, core_atoms):
+    def __init__(
+        self,
+        atoms: tuple[Atom, ...],
+        placers: tuple[Atom, ...],
+        core_atoms: tuple[Atom, ...],
+    ):
         """
         Initialize a :class:`.FunctionalGroup`.
 
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms in the functional group.
+        Parameters:
+            atoms:
+                The atoms in the functional group.
 
-        placers : :class:`tuple` of :class:`.Atom`
-            The atoms used to calculate the position of the functional
-            group.
+            placers:
+                The atoms used to calculate the position of the
+                functional group.
 
-        core_atoms : :class:`tuple` of :class:`.Atom`
-            The atoms of the functional group which also form the core
-            of the :class:`.BuildingBlock`. See
-            :meth:`.BuildingBlock.get_core_atom_ids`.
+            core_atoms:
+                The atoms of the functional group which also form the
+                core of the :class:`.BuildingBlock`. See
+                :meth:`.BuildingBlock.get_core_atom_ids`.
 
         """
 
@@ -256,80 +263,71 @@ class FunctionalGroup:
         self._placers = placers
         self._core_atoms = core_atoms
 
-    def get_atoms(self):
+    def get_atoms(self) -> typing.Iterator[Atom]:
         """
         Yield all the atoms in the functional group.
 
-        Yields
-        ------
-        :class:`.Atom`
+        Yields:
             An atom in the functional group.
 
         """
 
         yield from self._atoms
 
-    def get_atom_ids(self):
+    def get_atom_ids(self) -> typing.Iterator[int]:
         """
         Yield the ids of all atoms in the functional group.
 
-        Yields
-        ------
-        :class:`int`
+        Yields:
             The id of an :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._atoms)
 
-    def get_placer_ids(self):
+    def get_placer_ids(self) -> typing.Iterator[int]:
         """
         Yield the ids of *placer* atoms.
 
         *Placer* atoms are those, which should be used to calculate
         the position of the functional group.
 
-        Yields
-        ------
-        :class:`int`
+        Yields:
             The id of an :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._placers)
 
-    def get_core_atom_ids(self):
+    def get_core_atom_ids(self) -> typing.Iterator[int]:
         """
         Yield the ids of core atoms held by the functional group.
 
-        Yields
-        ------
-        :class:`int`
+        Yields:
             The id of an :class:`.Atom`.
 
-        See Also
-        --------
-        :meth:`.BuildingBlock.get_core_atom_ids`
+        See Also:
+            :meth:`.BuildingBlock.get_core_atom_ids`
 
         """
 
         yield from (a.get_id() for a in self._core_atoms)
 
-    def with_atoms(self, atom_map):
+    def with_atoms(
+        self,
+        atom_map: dict[int, Atom]
+    ) -> FunctionalGroup:
         """
         Return a clone holding different atoms.
 
-        Parameters
-        ----------
-        atom_map : :class:`dict`
-            Maps the id of an atom in the functional group to the new
-            atom the clone should hold. If the id of an atom in the
-            functional group is not found in `atom_map`, the atom
-            will not be replaced in the clone.
+        Parameters:
+            atom_map:
+                Maps the id of an atom in the functional group to the
+                new atom the clone should hold. If the id of an atom in
+                the functional group is not found in `atom_map`, the
+                atom will not be replaced in the clone.
 
-        Returns
-        -------
-        :class:`.FunctionalGroup`
+        Returns:
             The clone. Has the same type as the original functional
             group.
 
@@ -375,12 +373,14 @@ class FunctionalGroup:
         )
         return self
 
-    def with_ids(self, id_map: dict[int, int]) -> FunctionalGroup:
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> FunctionalGroup:
         """
         Return a clone holding different atom ids.
 
         Parameters:
-
             id_map:
                 Maps the id of an atom in the functional group to the
                 new id the clone should hold. If the id of an atom in
@@ -395,13 +395,11 @@ class FunctionalGroup:
 
         return self.clone()._with_ids(id_map)
 
-    def clone(self):
+    def clone(self) -> FunctionalGroup:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.FunctionalGroup`
+        Returns:
             A clone. Has the same type as the original functional
             group.
 
@@ -416,10 +414,10 @@ class FunctionalGroup:
         )
         return clone
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'atoms={self._atoms}, '
