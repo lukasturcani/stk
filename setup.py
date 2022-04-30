@@ -18,6 +18,7 @@ setup(
     version=get_version(),
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
+    package_data={'stk': ['py.typed']},
     install_requires=(
         'scipy',
         'matplotlib',
