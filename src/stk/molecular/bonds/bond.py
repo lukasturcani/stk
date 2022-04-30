@@ -53,6 +53,7 @@ class Bond:
         Initialize a :class:`Bond`.
 
         Parameters:
+
             atom1:
                 The first atom in the bond.
 
