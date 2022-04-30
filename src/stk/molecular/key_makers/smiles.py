@@ -4,6 +4,8 @@ SMILES
 
 """
 
+from __future__ import annotations
+
 from .molecule import MoleculeKeyMaker
 from .utilities import get_smiles
 
@@ -12,32 +14,32 @@ class Smiles(MoleculeKeyMaker):
     """
     Used to get the SMILES of molecules.
 
-    Examples
-    --------
-    *Adding SMILES to a Molecule's JSON*
+    Examples:
 
-    You want to use the isomeric, canonical SMILES from RDKit as part
-    of a JSON representation of a molecule
+        *Adding SMILES to a Molecule's JSON*
 
-    .. testcode:: adding-smiles-to-a-molecules-json
+        You want to use the isomeric, canonical SMILES from RDKit as
+        part of a JSON representation of a molecule
 
-        import stk
+        .. testcode:: adding-smiles-to-a-molecules-json
 
-        jsonizer = stk.MoleculeJsonizer(
-            key_makers=(stk.Smiles(), ),
-        )
-        # Get the JSON representation, including an SMILES.
-        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+            import stk
 
-    .. testcode:: adding-smiles-to-a-molecules-json
-        :hide:
+            jsonizer = stk.MoleculeJsonizer(
+                key_makers=(stk.Smiles(), ),
+            )
+            # Get the JSON representation, including an SMILES.
+            json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-        assert json['molecule']['SMILES'] == 'NCCN'
-        assert json['matrix']['SMILES'] == 'NCCN'
+        .. testcode:: adding-smiles-to-a-molecules-json
+            :hide:
+
+            assert json['molecule']['SMILES'] == 'NCCN'
+            assert json['matrix']['SMILES'] == 'NCCN'
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize a :class:`.Smiles` instance.
 
@@ -45,8 +47,8 @@ class Smiles(MoleculeKeyMaker):
 
         super().__init__('SMILES', get_smiles)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Smiles()'

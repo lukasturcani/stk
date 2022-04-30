@@ -4,6 +4,8 @@ InChIKey
 
 """
 
+from __future__ import annotations
+
 from .molecule import MoleculeKeyMaker
 from .utilities import get_inchi_key
 
@@ -12,47 +14,47 @@ class InchiKey(MoleculeKeyMaker):
     """
     Used to get the InChIKey of molecules.
 
-    Examples
-    --------
-    *Adding InChIKey to a Molecule's JSON*
+    Examples:
 
-    You want to use the InChIKey as part of a JSON representation of a
-    molecule
+        *Adding InChIKey to a Molecule's JSON*
 
-    .. testcode:: adding-inchikey-to-a-molecules-json
+        You want to use the InChIKey as part of a JSON representation
+        of a molecule
 
-        import stk
+        .. testcode:: adding-inchikey-to-a-molecules-json
 
-        jsonizer = stk.MoleculeJsonizer(
-            key_makers=(stk.InchiKey(), ),
-        )
-        # Get the JSON representation, including an InChIKey.
-        json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
+            import stk
 
-    .. testcode:: adding-inchikey-to-a-molecules-json
-        :hide:
+            jsonizer = stk.MoleculeJsonizer(
+                key_makers=(stk.InchiKey(), ),
+            )
+            # Get the JSON representation, including an InChIKey.
+            json = jsonizer.to_json(stk.BuildingBlock('NCCN'))
 
-        assert (
-            json['molecule']['InChIKey']
-            == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
-        )
-        assert (
-            json['molecule']['InChIKey']
-            == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
-        )
+        .. testcode:: adding-inchikey-to-a-molecules-json
+            :hide:
+
+            assert (
+                json['molecule']['InChIKey']
+                == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
+            )
+            assert (
+                json['molecule']['InChIKey']
+                == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
+            )
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
-        Initialize an :class:`InchiKey` instance.
+        Initialize an :class:`.InchiKey` instance.
 
         """
 
         super().__init__('InChIKey', get_inchi_key)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'InchiKey()'
