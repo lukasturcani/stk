@@ -240,11 +240,12 @@ class FunctionalGroup:
         atoms: tuple[Atom, ...],
         placers: tuple[Atom, ...],
         core_atoms: tuple[Atom, ...],
-    ):
+    ) -> None:
         """
         Initialize a :class:`.FunctionalGroup`.
 
         Parameters:
+
             atoms:
                 The atoms in the functional group.
 

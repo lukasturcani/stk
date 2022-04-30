@@ -4,7 +4,12 @@ Alcohol
 
 """
 
+from __future__ import annotations
+
+import typing
+
 from .generic_functional_group import GenericFunctionalGroup
+from ...atoms import Atom, O, H
 
 
 class Alcohol(GenericFunctionalGroup):
@@ -18,35 +23,35 @@ class Alcohol(GenericFunctionalGroup):
 
     def __init__(
         self,
-        oxygen,
-        hydrogen,
-        atom,
-        bonders,
-        deleters,
-        placers=None,
+        oxygen: O,  # noqa: Not an ambiguous name.
+        hydrogen: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
     ):
         """
         Initialize a :class:`.Alcohol` instance.
 
-        Parameters
-        ----------
-        oxygen : :class:`.O`
-            The oxygen atom.
+        Parameters:
+            oxygen:
+                The oxygen atom.
 
-        hydrogen : :class:`.H`
-            The hydrogen atom.
+            hydrogen:
+                The hydrogen atom.
 
-        atom : :class:`.Atom`
-            The atom to which the alcohol is attached.
+            atom:
+                The atom to which the alcohol is attached.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
+            bonders:
+                The bonder atoms.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            deleters:
+                The deleter atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 

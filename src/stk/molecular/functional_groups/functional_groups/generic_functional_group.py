@@ -34,12 +34,13 @@ class GenericFunctionalGroup(FunctionalGroup):
         atoms: tuple[Atom, ...],
         bonders: tuple[Atom, ...],
         deleters: tuple[Atom, ...],
-        placers: tuple[Atom, ...] | None = None,
+        placers: typing.Optional[tuple[Atom, ...]] = None,
     ) -> None:
         """
         Initialize a :class:`.GenericFunctionalGroup`.
 
         Parameters:
+
             atoms:
                 The atoms in the functional group.
 
