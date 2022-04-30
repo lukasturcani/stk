@@ -67,8 +67,8 @@ class GenericFunctionalGroup(FunctionalGroup):
         self._bonders = bonders
         self._deleters = deleters
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> GenericFunctionalGroup:
+        clone = typing.cast(GenericFunctionalGroup, super().clone())
         clone._bonders = self._bonders
         clone._deleters = self._deleters
         return clone
