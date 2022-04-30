@@ -328,8 +328,7 @@ class FunctionalGroup:
                 atom will not be replaced in the clone.
 
         Returns:
-            The clone. Has the same type as the original functional
-            group.
+            The clone.
 
         """
 
@@ -388,7 +387,6 @@ class FunctionalGroup:
                 atom will not be replaced in the clone.
 
         Returns:
-
             The clone.
 
         """
@@ -400,8 +398,7 @@ class FunctionalGroup:
         Return a clone.
 
         Returns:
-            A clone. Has the same type as the original functional
-            group.
+            A clone.
 
         """
 
