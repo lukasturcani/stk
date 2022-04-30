@@ -4,6 +4,8 @@ Key Maker Utilities
 
 """
 
+from __future__ import annotations
+
 import rdkit.Chem.AllChem as rdkit
 
 from ..molecules import Molecule

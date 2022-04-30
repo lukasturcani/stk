@@ -4,6 +4,8 @@ InChI
 
 """
 
+from __future__ import annotations
+
 from .molecule import MoleculeKeyMaker
 from .utilities import get_inchi
 
