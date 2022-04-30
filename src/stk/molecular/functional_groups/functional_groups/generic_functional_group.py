@@ -7,12 +7,12 @@ Generic Functional Group
 
 from __future__ import annotations
 
-from typing import TypeVar
+import typing
 
 from ...atoms import Atom
 from .functional_group import FunctionalGroup
 
-_T = TypeVar('_T', bound='GenericFunctionalGroup')
+_T = typing.TypeVar('_T', bound='GenericFunctionalGroup')
 
 
 class GenericFunctionalGroup(FunctionalGroup):
