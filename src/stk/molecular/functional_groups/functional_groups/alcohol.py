@@ -29,7 +29,7 @@ class Alcohol(GenericFunctionalGroup):
         bonders: tuple[Atom, ...],
         deleters: tuple[Atom, ...],
         placers: typing.Optional[tuple[Atom, ...]] = None,
-    ):
+    ) -> None:
         """
         Initialize a :class:`.Alcohol` instance.
 
