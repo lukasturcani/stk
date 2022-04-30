@@ -7,12 +7,11 @@ Generic Functional Group
 
 from __future__ import annotations
 
-import typing
+from typing import TypeVar
 
-from ...atoms import Atom
 from .functional_group import FunctionalGroup
 
-_T = typing.TypeVar('_T', bound='GenericFunctionalGroup')
+_T = TypeVar('_T', bound='GenericFunctionalGroup')
 
 
 class GenericFunctionalGroup(FunctionalGroup):
@@ -29,29 +28,24 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     """
 
-    def __init__(
-        self,
-        atoms: tuple[Atom, ...],
-        bonders: tuple[Atom, ...],
-        deleters: tuple[Atom, ...],
-        placers: tuple[Atom, ...] | None = None,
-    ):
+    def __init__(self, atoms, bonders, deleters, placers=None):
         """
         Initialize a :class:`.GenericFunctionalGroup`.
 
-        Parameters:
-            atoms:
-                The atoms in the functional group.
+        Parameters
+        ----------
+        atoms : :class:`tuple` of :class:`.Atom`
+            The atoms in the functional group.
 
-            bonders:
-                The bonder atoms in the functional group.
+        bonders : :class:`tuple` of :class:`.Atom`
+            The bonder atoms in the functional group.
 
-            deleters:
-                The deleter atoms in the functional group.
+        deleters : :class:`tuple` of :class:`.Atom`
+            The deleter atoms in the functional group.
 
-            placers:
-                The placer atoms of the functional group. If ``None``,
-                the `bonders` will be used.
+        placers : :class:`tuple` of :class:`.Atom`, optional
+            The placer atoms of the functional group. If ``None``,
+            the `bonders` will be used.
 
         """
 
@@ -104,75 +98,78 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return self
 
-    def with_ids(
-        self,
-        id_map: dict[int, int],
-    ) -> GenericFunctionalGroup:
-
-        return self._with_ids(id_map)
-
-    def get_bonders(self) -> typing.Iterator[Atom]:
+    def get_bonders(self):
         """
         Yield bonder atoms in the functional group.
 
         These are atoms which have bonds added during
         :class:`.ConstructedMolecule` construction.
 
-        Yields:
+        Yields
+        ------
+        :class:`.Atom`
             A bonder atom.
 
         """
 
         yield from self._bonders
 
-    def get_num_bonders(self) -> int:
+    def get_num_bonders(self):
         """
         Get the number of bonder atoms.
 
-        Returns:
+        Returns
+        -------
+        :class:`int`
             The number of bonder atoms.
 
         """
 
         return len(self._bonders)
 
-    def get_bonder_ids(self) -> typing.Iterator[int]:
+    def get_bonder_ids(self):
         """
         Yield the ids of bonder atoms.
 
-        Yields:
+        Yields
+        ------
+        :class:`int`
             The id of a bonder :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._bonders)
 
-    def get_deleters(self) -> typing.Iterator[Atom]:
+    def get_deleters(self):
         """
         Yield the deleter atoms in the functional group.
 
         These are atoms which are removed during
         :class:`.ConstructedMolecule` construction.
 
-        Yields:
+        Yields
+        ------
+        :class:`.Atom`
             A deleter atom.
 
         """
 
         yield from self._deleters
 
-    def get_deleter_ids(self) -> typing.Iterator[int]:
+    def get_deleter_ids(self):
         """
         Yield the ids of deleter atoms.
 
-        Yields:
+        Yields
+        -------
+        :class:`int`
             The id of a deleter :class:`.Atom`.
 
         """
 
         yield from (a.get_id() for a in self._deleters)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f'{self.__class__.__name__}('
             f'atoms={self._atoms}, '
