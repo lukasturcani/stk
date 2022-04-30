@@ -10,7 +10,11 @@ Molecule
 
 """
 
+
+from __future__ import annotations
+
 import os
+import typing
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
@@ -22,95 +26,107 @@ from stk.utilities import (
     vector_angle,
 )
 
+from ...atoms import Atom
+from ...bonds import Bond
 from ..utilities import get_bond_atom_ids, sort_bond_atoms_by_id
+from ....utilities import OneOrMany
 from .utilities import updaters, writers
+
+
+_T = typing.TypeVar('_T', bound='Molecule')
 
 
 class Molecule:
     """
     An abstract base class for molecules.
 
-    Notes
-    -----
-    You might notice that some of the methods of this abstract base
-    class are implemented. This is purely for convenience when
-    implementing subclasses. The implemented public methods are simply
-    default implementations, which can be safely ignored
-    or overridden, when implementing subclasses. Any private methods
-    are implementation details of these default implementations.
+    Notes:
 
-    Examples
-    --------
-    *Aligning a Molecule with a Vector*
+        You might notice that some of the methods of this abstract base
+        class are implemented. This is purely for convenience when
+        implementing subclasses. The implemented public methods are
+        simply default implementations, which can be safely ignored
+        or overridden, when implementing subclasses. Any private
+        methods are implementation details of these default
+        implementations.
 
-    You want to rotate a molecule, such that it is aligned along
-    with a specific direction.
+    Examples:
 
-    .. testcode:: aligning-a-molecule-with-a-vector
+        *Aligning a Molecule with a Vector*
 
-        import stk
-        import numpy as np
+        You want to rotate a molecule, such that it is aligned along
+        with a specific direction.
 
-        molecule1 = stk.BuildingBlock('CCCCC')
-        # Align molecule1 along x-axis.
-        molecule1 = molecule1.with_rotation_between_vectors(
-            start=molecule1.get_direction(),
-            target=np.array([1., 0., 0.]),
-            origin=molecule1.get_centroid(),
-        )
+        .. testcode:: aligning-a-molecule-with-a-vector
 
-        molecule2 = stk.ConstructedMolecule(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCCBr',
-                        functional_groups=(stk.BromoFactory(), ),
+            import stk
+            import numpy as np
+
+            molecule1 = stk.BuildingBlock('CCCCC')
+            # Align molecule1 along x-axis.
+            molecule1 = molecule1.with_rotation_between_vectors(
+                start=molecule1.get_direction(),
+                target=np.array([1., 0., 0.]),
+                origin=molecule1.get_centroid(),
+            )
+
+            molecule2 = stk.ConstructedMolecule(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCCBr',
+                            functional_groups=(stk.BromoFactory(), ),
+                        ),
                     ),
+                    repeating_unit='A',
+                    num_repeating_units=15,
                 ),
-                repeating_unit='A',
-                num_repeating_units=15,
-            ),
-        )
-        # Align molecule2 along the [1, 4, -3] vector.
-        molecule2 = molecule2.with_rotation_between_vectors(
-            start=molecule2.get_direction(),
-            target=np.array([1., 4., -3.]),
-            origin=molecule2.get_centroid(),
-        )
+            )
+            # Align molecule2 along the [1, 4, -3] vector.
+            molecule2 = molecule2.with_rotation_between_vectors(
+                start=molecule2.get_direction(),
+                target=np.array([1., 4., -3.]),
+                origin=molecule2.get_centroid(),
+            )
 
-    *Aligning a Molecule along a Plane*
+        *Aligning a Molecule along a Plane*
 
-    You want to place the benzene flat along the xy plane.
+        You want to place the benzene flat along the xy plane.
 
-    .. testcode:: aligning-a-molecule-along-a-plane
+        .. testcode:: aligning-a-molecule-along-a-plane
 
-        import stk
-        import numpy as np
+            import stk
+            import numpy as np
 
-        benzene = stk.BuildingBlock('c1ccccc1')
-        benzene = benzene.with_rotation_between_vectors(
-            start=benzene.get_plane_normal(),
-            target=np.array([0., 0., 1.]),
-            origin=benzene.get_centroid(),
-        )
+            benzene = stk.BuildingBlock('c1ccccc1')
+            benzene = benzene.with_rotation_between_vectors(
+                start=benzene.get_plane_normal(),
+                target=np.array([0., 0., 1.]),
+                origin=benzene.get_centroid(),
+            )
 
     """
 
-    def __init__(self, atoms, bonds, position_matrix):
+    def __init__(
+        self,
+        atoms: tuple[Atom, ...],
+        bonds: tuple[Bond, ...],
+        position_matrix: np.ndarray,
+    ) -> None:
         """
         Initialize a :class:`.Molecule`.
 
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms which compose the molecule.
+        Parameters:
 
-        bonds : :class:`tuple` of :class:`.Bond`
-            The bonds of the molecule.
+            atoms:
+                The atoms which compose the molecule.
 
-        position_matrix : :class:`numpy.ndarray`
-            A ``(n, 3)`` matrix holding the position of every atom in
-            the :class:`.Molecule`.
+            bonds:
+                The bonds of the molecule.
+
+            position_matrix:
+                A ``(n, 3)`` matrix holding the position of every atom
+                in the :class:`.Molecule`.
 
         """
 
@@ -123,7 +139,10 @@ class Molecule:
             dtype=np.float64,
         )
 
-    def _with_displacement(self, displacement):
+    def _with_displacement(
+        self: _T,
+        displacement: np.ndarray,
+    ) -> _T:
         """
         Modify molecule.
 
@@ -134,26 +153,32 @@ class Molecule:
         ).T
         return self
 
-    def with_displacement(self, displacement):
+    def with_displacement(
+        self,
+        displacement: np.ndarray,
+    ) -> Molecule:
         """
         Return a displaced clone.
 
-        Parameters
-        ----------
-        displacement : :class:`numpy.ndarray`
-            The displacement vector to be applied.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.Molecule`
-            A displaced clone. Has the same type as the original
-            molecule.
+            displacement:
+                The displacement vector to be applied.
+
+        Returns:
+
+            A displaced clone.
 
         """
 
         return self.clone()._with_displacement(displacement)
 
-    def _with_rotation_about_axis(self, angle, axis, origin):
+    def _with_rotation_about_axis(
+        self: _T,
+        angle: float,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> _T:
         """
         Modify molecule.
 
@@ -171,30 +196,33 @@ class Molecule:
         self._with_displacement(origin)
         return self
 
-    def with_rotation_about_axis(self, angle, axis, origin):
+    def with_rotation_about_axis(
+        self,
+        angle: float,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> Molecule:
         """
         Return a rotated clone.
 
         The clone is rotated by `angle` about `axis` on the
         `origin`.
 
-        Parameters
-        ----------
-        angle : :class:`float`
-            The size of the rotation in radians.
+        Parameters:
 
-        axis : :class:`numpy.ndarray`
-            The axis about which the rotation happens. Must have unit
-            magnitude.
+            angle:
+                The size of the rotation in radians.
 
-        origin : :class:`numpy.ndarray`
-            The origin about which the rotation happens.
+            axis:
+                The axis about which the rotation happens. Must have
+                unit magnitude.
 
-        Returns
-        -------
-        :class:`.Molecule`
-            A rotated clone. Has the same type as the original
-            molecule.
+            origin:
+                The origin about which the rotation happens.
+
+        Returns:
+
+            A rotated clone.
 
         """
 
@@ -204,7 +232,12 @@ class Molecule:
             origin=origin
         )
 
-    def _with_rotation_between_vectors(self, start, target, origin):
+    def _with_rotation_between_vectors(
+        self: _T,
+        start: np.ndarray,
+        target: np.ndarray,
+        origin: np.ndarray,
+    ) -> _T:
         """
         Modify molecule.
 
@@ -222,7 +255,12 @@ class Molecule:
         self._with_displacement(origin)
         return self
 
-    def with_rotation_between_vectors(self, start, target, origin):
+    def with_rotation_between_vectors(
+        self,
+        start: np.ndarray,
+        target: np.ndarray,
+        origin: np.ndarray,
+    ) -> Molecule:
         """
         Return a rotated clone.
 
@@ -244,23 +282,21 @@ class Molecule:
         anything. This means that any geometric feature of the molecule
         can be easily aligned with any arbitrary direction.
 
-        Parameters
-        ----------
-        start : :class:`numpy.ndarray`
-            A vector which is to be rotated so that it transforms into
-            the `target` vector.
+        Parameters:
 
-        target : :class:`numpy.ndarray`
-            The vector onto which `start` is rotated.
+            start:
+                A vector which is to be rotated so that it transforms
+                into the `target` vector.
 
-        origin : :class:`numpy.ndarray`
-            The point about which the rotation occurs.
+            target:
+                The vector onto which `start` is rotated.
 
-        Returns
-        -------
-        :class:`.Molecule`
-            A rotated clone. Has the same type as the original
-            molecule.
+            origin:
+                The point about which the rotation occurs.
+
+        Returns:
+
+            A rotated clone.
 
         """
 
@@ -271,12 +307,13 @@ class Molecule:
         )
 
     def _with_rotation_to_minimize_angle(
-        self,
-        start,
-        target,
-        axis,
-        origin,
-    ):
+        self: _T,
+        start: np.ndarray,
+        target: np.ndarray,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> _T:
+
         # If the vector being rotated is not finite, exit. This is
         # probably due to a planar molecule.
         if not all(np.isfinite(x) for x in start):
@@ -319,11 +356,11 @@ class Molecule:
 
     def with_rotation_to_minimize_angle(
         self,
-        start,
-        target,
-        axis,
-        origin,
-    ):
+        start: np.ndarray,
+        target: np.ndarray,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> Molecule:
         """
         Return a rotated clone.
 
@@ -334,33 +371,31 @@ class Molecule:
         `start` and `target` vectors. This is because the possible
         rotation is restricted to the `axis`.
 
-        Parameters
-        ----------
-        start : :class:`numpy.ndarray`
-            The vector which is rotated.
+        Parameters:
 
-        target : :class:`numpy.ndarray`
-            The vector which is stationary.
+            start:
+                The vector which is rotated.
 
-        axis : :class:`numpy.ndarray`
-            The vector about which the rotation happens. Must have
-            unit magnitude.
+            target:
+                The vector which is stationary.
 
-        origin : :class:`numpy.ndarray`
-            The origin about which the rotation happens.
+            axis:
+                The vector about which the rotation happens. Must have
+                unit magnitude.
 
-        Returns
-        -------
-        :class:`.Molecule`
-            A rotated clone. Has the same type as the original
-            molecule.
+            origin:
+                The origin about which the rotation happens.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If `target` has a magnitude of 0. In this case it is
-            not possible to calculate an angle between `start` and
-            `target`.
+        Returns:
+
+            A rotated clone.
+
+        Raises:
+
+            :class:`ValueError`
+                If `target` has a magnitude of 0. In this case it is
+                not possible to calculate an angle between `start` and
+                `target`.
 
         """
 
@@ -371,14 +406,12 @@ class Molecule:
             origin=origin,
         )
 
-    def clone(self):
+    def clone(self) -> Molecule:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.Molecule`
-            The clone. Has the same type as the original molecule.
+        Returns:
+            The clone.
 
         """
 
@@ -391,21 +424,23 @@ class Molecule:
         )
         return clone
 
-    def get_atomic_positions(self, atom_ids=None):
+    def get_atomic_positions(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> typing.Iterator[np.ndarray]:
         """
         Yield the positions of atoms.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of the atoms whose positions are desired.
-            If ``None``, then the positions of all atoms will be
-            yielded. Can be a single :class:`int`, if the position of
-            a single atom is desired.
+        Parameters:
 
-        Yields
-        ------
-        :class:`numpy.ndarray`
+            atom_ids:
+                The ids of the atoms whose positions are desired.
+                If ``None``, then the positions of all atoms will be
+                yielded. Can be a single :class:`int`, if the position
+                of a single atom is desired.
+
+        Yields:
+
             The x, y and z coordinates of an atom.
 
         """
@@ -421,20 +456,22 @@ class Molecule:
         for atomic_position in positions:
             yield atomic_position
 
-    def get_atoms(self, atom_ids=None):
+    def get_atoms(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ):
         """
         Yield the atoms in the molecule, ordered by id.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms to yield. Can be a single
-            :class:`int` if a single atom is wanted, or ``None`` if
-            all atoms are wanted.
+        Parameters:
 
-        Yields
-        ------
-        :class:`.Atom`
+            atom_ids:
+                The ids of atoms to yield. Can be a single
+                :class:`int` if a single atom is wanted, or ``None`` if
+                all atoms are wanted.
+
+        Yields:
+
             An atom in the molecule.
 
         """
@@ -447,26 +484,24 @@ class Molecule:
         for atom_id in atom_ids:
             yield self._atoms[atom_id]
 
-    def get_num_atoms(self):
+    def get_num_atoms(self) -> int:
         """
         Return the number of atoms in the molecule.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of atoms in the molecule.
 
         """
 
         return len(self._atoms)
 
-    def get_bonds(self):
+    def get_bonds(self) -> typing.Iterator[Bond]:
         """
         Yield the bond in the molecule.
 
-        Yields
-        ------
-        :class:`.Bond`
+        Yields:
+
             A bond in the molecule.
 
         """
@@ -474,40 +509,41 @@ class Molecule:
         for bond in self._bonds:
             yield bond
 
-    def get_num_bonds(self):
+    def get_num_bonds(self) -> int:
         """
         Return the number of bonds in the molecule.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of bonds in the molecule.
 
         """
 
         return len(self._bonds)
 
-    def get_centroid(self, atom_ids=None):
+    def get_centroid(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> np.ndarray:
         """
         Return the centroid.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms which are used to calculate the
-            centroid. Can be a single :class:`int`, if a single
-            atom is to be used, or ``None`` if all atoms are to be
-            used.
+        Parameters:
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+            atom_ids:
+                The ids of atoms which are used to calculate the
+                centroid. Can be a single :class:`int`, if a single
+                atom is to be used, or ``None`` if all atoms are to be
+                used.
+
+        Returns:
+
             The centroid of atoms specified by `atom_ids`.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If `atom_ids` has a length of ``0``.
+        Raises:
+
+            :class:`ValueError`
+                If `atom_ids` has a length of ``0``.
 
         """
 
@@ -526,26 +562,29 @@ class Molecule:
             len(atom_ids)
         )
 
-    def get_direction(self, atom_ids=None):
+    def get_direction(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ):
         """
         Return a vector of best fit through the atoms.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms which should be used to calculate the
-            vector. Can be a single :class:`int`, if a single atom
-            is to be used, or ``None``, if all atoms are to be used.
+        Parameters:
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+            atom_ids:
+                The ids of atoms which should be used to calculate the
+                vector. Can be a single :class:`int`, if a single atom
+                is to be used, or ``None``, if all atoms are to be
+                used.
+
+        Returns:
+
             The vector of best fit.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If `atom_ids` has a length of ``0``.
+        Raises:
+
+            :class:`ValueError`
+                If `atom_ids` has a length of ``0``.
 
         """
 
@@ -565,30 +604,32 @@ class Molecule:
             decimals=14,
         )
 
-    def get_maximum_diameter(self, atom_ids=None):
+    def get_maximum_diameter(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> float:
         """
         Return the maximum diameter.
 
         This method does not account for the van der Waals radius of
         atoms.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms which are considered when looking for the
-            maximum diameter. Can be a single :class:`int`, if a
-            single atom is to be used, or ``None``, if all atoms are to
-            be used.
+        Parameters:
 
-        Returns
-        -------
-        :class:`float`
+            atom_ids:
+                The ids of atoms which are considered when looking for
+                the maximum diameter. Can be a single :class:`int`, if
+                a single atom is to be used, or ``None``, if all atoms
+                are to be used.
+
+        Returns:
+
             The maximum diameter in the molecule.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If `atom_ids` has a length of ``0``.
+        Raises:
+
+            :class:`ValueError`
+                If `atom_ids` has a length of ``0``.
 
         """
 
@@ -605,27 +646,29 @@ class Molecule:
         coords = self._position_matrix[:, atom_ids]
         return float(euclidean(coords.min(axis=1), coords.max(axis=1)))
 
-    def get_plane_normal(self, atom_ids=None):
+    def get_plane_normal(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> np.ndarray:
         """
         Return the normal to the plane of best fit.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms which should be used to calculate the
-            plane. Can be a single :class:`int`, if a
-            single atom is to be used, or ``None``, if all atoms are to
-            be used.
+        Parameters:
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+            atom_ids:
+                The ids of atoms which should be used to calculate the
+                plane. Can be a single :class:`int`, if a
+                single atom is to be used, or ``None``, if all atoms
+                are to be used.
+
+        Returns:
+
             Vector orthonormal to the plane of the molecule.
 
-        Raises
-        ------
-        :class:`ValueError`
-            If `atom_ids` has a length of ``0``.
+        Raises:
+
+            :class:`ValueError`
+                If `atom_ids` has a length of ``0``.
 
         """
 
@@ -643,13 +686,12 @@ class Molecule:
         centroid = self.get_centroid(atom_ids)
         return np.around(np.linalg.svd(pos - centroid)[-1][2, :], 14)
 
-    def get_position_matrix(self):
+    def get_position_matrix(self) -> np.ndarray:
         """
         Return a matrix holding the atomic positions.
 
-        Returns
-        -------
-        :class:`numpy.ndarray`
+        Returns:
+
             The array has the shape ``(n, 3)``. Each row holds the
             x, y and z coordinates of an atom.
 
@@ -657,26 +699,35 @@ class Molecule:
 
         return np.array(self._position_matrix.T)
 
-    def _with_centroid(self, position, atom_ids):
+    def _with_centroid(
+        self: _T,
+        position: np.ndarray,
+        atom_ids: typing.Optional[OneOrMany[int]],
+    ) -> _T:
+
         centroid = self.get_centroid(atom_ids=atom_ids)
         self._with_displacement(position-centroid)
         return self
 
-    def with_centroid(self, position, atom_ids=None):
+    def with_centroid(
+        self,
+        position: np.ndarray,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> Molecule:
         """
         Return a clone with its centroid at `position`.
 
-        Parameters
-        ----------
-        position : :class:`numpy.ndarray`
-            This array holds the position on which the centroid of the
-            clone is going to be placed.
+        Parameters:
 
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms which should have their centroid set to
-            `position`. Can be a single :class:`int`, if a
-            single atom is to be used, or ``None``, if all atoms are to
-            be used.
+            position:
+                This array holds the position on which the centroid of
+                the clone is going to be placed.
+
+            atom_ids:
+                The ids of atoms which should have their centroid set
+                to `position`. Can be a single :class:`int`, if a
+                single atom is to be used, or ``None``, if all atoms
+                are to be used.
 
         Returns
         -------
@@ -688,7 +739,10 @@ class Molecule:
 
         return self.clone()._with_centroid(position, atom_ids)
 
-    def _with_position_matrix(self, position_matrix):
+    def _with_position_matrix(
+        self: _T,
+        position_matrix: np.ndarray,
+    ) -> _T:
         """
         Modify molecule.
 
@@ -697,31 +751,32 @@ class Molecule:
         self._position_matrix = np.array(position_matrix.T)
         return self
 
-    def with_position_matrix(self, position_matrix):
+    def with_position_matrix(
+        self,
+        position_matrix: np.ndarray,
+    ) -> Molecule:
         """
         Return a clone with atomic positions set by `position_matrix`.
 
-        Parameters
-        ----------
-        position_matrix : :class:`numpy.ndarray`
-            The position matrix of the clone. The shape of the matrix
-            is ``(n, 3)``.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.Molecule`
-            The clone. Has the same type as the original molecule.
+            position_matrix:
+                The position matrix of the clone. The shape of the
+                matrix is ``(n, 3)``.
+
+        Returns:
+
+            The clone.
 
         """
         return self.clone()._with_position_matrix(position_matrix)
 
-    def to_rdkit_mol(self):
+    def to_rdkit_mol(self) -> rdkit.Mol:
         """
         Return an :mod:`rdkit` representation.
 
-        Returns
-        -------
-        :class:`rdkit.Mol`
+        Returns:
+
             The molecule in :mod:`rdkit` format.
 
         """
@@ -750,7 +805,11 @@ class Molecule:
         mol.AddConformer(rdkit_conf)
         return mol
 
-    def with_structure_from_file(self, path, extension=None):
+    def with_structure_from_file(
+        self,
+        path: str,
+        extension: typing.Optional[str] = None,
+    ) -> Molecule:
         """
         Return a clone, with its structure taken from a file.
 
@@ -762,19 +821,18 @@ class Molecule:
         #. ``.coord`` - Turbomole files
         #. ``.pdb`` - PDB files
 
-        Parameters
-        ----------
-        path : :class:`str`
-            The path to a molecular structure file holding updated
-            coordinates for the :class:`.Molecule`.
+        Parameters:
 
-        extension : :class:`str`, optional
-            If you want to treat the file as though it has a
-            particular extension, put it here. Include the dot.
+            path:
+                The path to a molecular structure file holding updated
+                coordinates for the :class:`.Molecule`.
 
-        Returns
-        -------
-        :class:`.Molecule`
+            extension:
+                If you want to treat the file as though it has a
+                particular extension, put it here. Include the dot.
+
+        Returns:
+
             A clone with atomic positions found in `path`. Has the same
             type as the original molecule.
 
@@ -792,20 +850,19 @@ class Molecule:
             '.pdb': updaters._with_structure_from_pdb,
         }[extension](self.clone(), path)
 
-    def with_canonical_atom_ordering(self):
+    def with_canonical_atom_ordering(self) -> Molecule:
         """
         Return a clone, with canonically ordered atoms.
 
-        Returns
-        -------
-        :class:`.Molecule`
-            The clone. Has the same type as the original molecule.
+        Returns:
+
+            The clone.
 
         """
 
         return self.clone()._with_canonical_atom_ordering()
 
-    def _with_canonical_atom_ordering(self):
+    def _with_canonical_atom_ordering(self: _T) -> _T:
         """
         Modify the molecule.
 
@@ -838,13 +895,12 @@ class Molecule:
         ]).T)
         return self
 
-    def get_canonical_atom_ids(self):
+    def get_canonical_atom_ids(self) -> dict[int, int]:
         """
         Map the id of each atom to its id under canonical ordering.
 
-        Returns
-        -------
-        :class:`dict`
+        Returns:
+
             Maps the id of each atom in the molecule to the id it would
             have under canonical ordering.
 
@@ -857,7 +913,11 @@ class Molecule:
             )
         }
 
-    def write(self, path, atom_ids=None):
+    def write(
+        self,
+        path: str,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ):
         """
         Write the structure to a file.
 
@@ -868,21 +928,20 @@ class Molecule:
         #. ``.xyz`` - XYZ file
         #. ``.pdb`` - PDB file
 
-        Parameters
-        ----------
-        path : :class:`str`
-            The `path` to which the molecule should be written.
+        Parameters:
 
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or
-            ``None``, if all atoms are to be used. If you use this
-            parameter, the atom ids in the file may not correspond to
-            the atom ids in the molecule.
+            path:
+                The `path` to which the molecule should be written.
 
-        Returns
-        -------
-        :class:`.Molecule`
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used. If you use this
+                parameter, the atom ids in the file may not correspond
+                to the atom ids in the molecule.
+
+        Returns:
+
             The molecule.
 
         """
@@ -896,8 +955,8 @@ class Molecule:
         }[extension](self, path, atom_ids)
         return self
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<{self.__class__.__name__} at {id(self)}>'

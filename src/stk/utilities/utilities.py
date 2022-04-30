@@ -16,6 +16,7 @@ import tarfile
 import time
 from collections import deque
 from contextlib import contextmanager
+import typing
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
@@ -79,6 +80,10 @@ periodic_table = {
     113: 'Uut', 114: 'Fl', 115: 'Uup', 116: 'Lv',
     117: 'Uus', 118: 'Uuo'
 }
+
+
+T = typing.TypeVar('T')
+OneOrMany = typing.Union[T, typing.Iterable[T]]
 
 
 class Cell:
