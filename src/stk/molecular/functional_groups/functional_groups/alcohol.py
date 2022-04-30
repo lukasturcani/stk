@@ -66,69 +66,74 @@ class Alcohol(GenericFunctionalGroup):
             placers=bonders if placers is None else placers,
         )
 
-    def get_oxygen(self):
+    def get_oxygen(self) -> O:  # noqa: Not an ambiguous name.
         """
         Get the oxygen atom.
 
-        Returns
-        -------
-        :class:`.O`
+        Returns:
             The oxygen atom.
 
         """
 
         return self._oxygen
 
-    def get_hydrogen(self):
+    def get_hydrogen(self) -> H:
         """
         Get the hydrogen atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
             The hydrogen atom.
 
         """
 
         return self._hydrogen
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the atom to which the functional group is attached.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
             The atom to which the functional group is attached.
 
         """
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> Alcohol:
+        clone = self._clone()
         clone._oxygen = self._oxygen
         clone._hydrogen = self._hydrogen
         clone._atom = self._atom
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
-        clone._oxygen = atom_map.get(
-            self._oxygen.get_id(),
-            self._oxygen,
-        )
-        clone._hydrogen = atom_map.get(
-            self._hydrogen.get_id(),
-            self._hydrogen,
-        )
-        clone._atom = atom_map.get(
-            self._atom.get_id(),
-            self._atom,
-        )
+    def _with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Alcohol:
+
+        clone = super()._with_ids(id_map)
+
+        if (oxygen_id := self._oxygen.get_id()) in id_map:
+            clone._oxygen = self._oxygen.with_id(id_map[oxygen_id])
+
+        if (hydrogen_id := self._hydrogen.get_id()) in id_map:
+            clone._hydrogen = self._hydrogen.with_id(
+                id=id_map[hydrogen_id],
+            )
+
+        if (atom_id := self._atom.get_id()) in id_map:
+            clone._atom = self._atom.with_id(id_map[atom_id])
+
         return clone
 
-    def __repr__(self):
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Alcohol:
+
+        return self.clone()._with_ids(id_map)
+
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._oxygen}, {self._hydrogen}, {self._atom}, '

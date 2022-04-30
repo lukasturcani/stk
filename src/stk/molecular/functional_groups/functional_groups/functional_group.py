@@ -65,6 +65,9 @@ import typing
 from ...atoms import Atom
 
 
+_T = typing.TypeVar('_T', bound='FunctionalGroup')
+
+
 class FunctionalGroup:
     """
     An abstract base class for functional groups.
@@ -394,9 +397,19 @@ class FunctionalGroup:
 
         return self.clone()._with_ids(id_map)
 
-    def clone(self) -> FunctionalGroup:
+    def _clone(self: _T) -> _T:
         """
         Return a clone.
+
+        Notes:
+
+            This method exists so that subclasses can use it and have
+            correct type information, because the type variable
+            ``_T`` is used. However, I do not want the docs to show
+            ``_T`` I want them to show a proper class, such as
+            :class:`.Oxygen`. So this method exists for re-use and
+            type checking, while the public methods exist to provide
+            a readable type for the docs.
 
         Returns:
             A clone.
@@ -411,6 +424,17 @@ class FunctionalGroup:
             core_atoms=self._core_atoms,
         )
         return clone
+
+    def clone(self) -> FunctionalGroup:
+        """
+        Return a clone.
+
+        Returns:
+            A clone.
+
+        """
+
+        return self._clone()
 
     def __str__(self) -> str:
         return repr(self)
