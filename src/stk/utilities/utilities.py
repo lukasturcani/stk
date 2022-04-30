@@ -14,9 +14,9 @@ import os
 import re
 import tarfile
 import time
+import typing
 from collections import deque
 from contextlib import contextmanager
-import typing
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit

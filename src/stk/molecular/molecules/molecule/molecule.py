@@ -26,12 +26,11 @@ from stk.utilities import (
     vector_angle,
 )
 
+from ....utilities import OneOrMany
 from ...atoms import Atom
 from ...bonds import Bond
 from ..utilities import get_bond_atom_ids, sort_bond_atoms_by_id
-from ....utilities import OneOrMany
 from .utilities import updaters, writers
-
 
 _T = typing.TypeVar('_T', bound='Molecule')
 
