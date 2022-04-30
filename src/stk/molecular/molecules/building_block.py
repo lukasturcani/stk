@@ -8,15 +8,15 @@ from __future__ import annotations
 
 import logging
 import os
+import typing
 from collections.abc import Collection
 from functools import partial
-import typing
-import vabene
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
+import vabene
 
-from ...utilities import flatten, remake, OneOrMany
+from ...utilities import OneOrMany, flatten, remake
 from ..atoms import Atom
 from ..bonds import Bond
 from ..functional_groups import FunctionalGroup, FunctionalGroupFactory
