@@ -73,8 +73,15 @@ class GenericFunctionalGroup(FunctionalGroup):
         clone._deleters = self._deleters
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
+    def with_atoms(
+        self,
+        atom_map: dict[int, Atom],
+    ) -> GenericFunctionalGroup:
+
+        clone = typing.cast(
+            GenericFunctionalGroup,
+            super().with_atoms(atom_map),
+        )
         clone.__class__ = GenericFunctionalGroup
         clone._bonders = tuple(
             atom_map.get(a.get_id(), a) for a in self._bonders
