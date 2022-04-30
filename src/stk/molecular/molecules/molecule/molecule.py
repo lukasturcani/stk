@@ -228,7 +228,7 @@ class Molecule:
         return self.clone()._with_rotation_about_axis(
             angle=angle,
             axis=axis,
-            origin=origin
+            origin=origin,
         )
 
     def _with_rotation_between_vectors(
@@ -405,6 +405,16 @@ class Molecule:
             origin=origin,
         )
 
+    def _clone(self: _T) -> _T:
+        clone = self.__class__.__new__(self.__class__)
+        Molecule.__init__(
+            self=clone,
+            atoms=self._atoms,
+            bonds=self._bonds,
+            position_matrix=self._position_matrix.T,
+        )
+        return clone
+
     def clone(self) -> Molecule:
         """
         Return a clone.
@@ -414,14 +424,7 @@ class Molecule:
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
-        Molecule.__init__(
-            self=clone,
-            atoms=self._atoms,
-            bonds=self._bonds,
-            position_matrix=self._position_matrix.T,
-        )
-        return clone
+        return self._clone()
 
     def get_atomic_positions(
         self,
@@ -458,7 +461,7 @@ class Molecule:
     def get_atoms(
         self,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ):
+    ) -> typing.Iterator[Atom]:
         """
         Yield the atoms in the molecule, ordered by id.
 
@@ -564,7 +567,7 @@ class Molecule:
     def get_direction(
         self,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ):
+    ) -> np.ndarray:
         """
         Return a vector of best fit through the atoms.
 
@@ -728,11 +731,9 @@ class Molecule:
                 single atom is to be used, or ``None``, if all atoms
                 are to be used.
 
-        Returns
-        -------
-        :class:`.Molecule`
-            A clone with its centroid at `position`. Has the same type
-            as the original molecule.
+        Returns:
+
+            A clone with its centroid at `position`.
 
         """
 
@@ -832,8 +833,7 @@ class Molecule:
 
         Returns:
 
-            A clone with atomic positions found in `path`. Has the same
-            type as the original molecule.
+            A clone with atomic positions found in `path`.
 
         """
 
@@ -916,7 +916,7 @@ class Molecule:
         self,
         path: str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ):
+    ) -> Molecule:
         """
         Write the structure to a file.
 
