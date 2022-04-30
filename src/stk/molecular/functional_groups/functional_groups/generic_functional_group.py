@@ -111,6 +111,13 @@ class GenericFunctionalGroup(FunctionalGroup):
         )
         return self
 
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> GenericFunctionalGroup:
+
+        return self.clone()._with_ids(id_map)
+
     def get_bonders(self) -> typing.Iterator[Atom]:
         """
         Yield bonder atoms in the functional group.
