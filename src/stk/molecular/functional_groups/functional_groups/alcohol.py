@@ -34,6 +34,7 @@ class Alcohol(GenericFunctionalGroup):
         Initialize a :class:`.Alcohol` instance.
 
         Parameters:
+
             oxygen:
                 The oxygen atom.
 
