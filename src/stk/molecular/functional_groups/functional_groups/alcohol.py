@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import typing
 
+from ...atoms import Atom, H, O
 from .generic_functional_group import GenericFunctionalGroup
-from ...atoms import Atom, O, H
 
 
 class Alcohol(GenericFunctionalGroup):

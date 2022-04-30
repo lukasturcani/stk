@@ -62,8 +62,8 @@ information.
 from __future__ import annotations
 
 import typing
-from ...atoms import Atom
 
+from ...atoms import Atom
 
 _T = typing.TypeVar('_T', bound='FunctionalGroup')
 
