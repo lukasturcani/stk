@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from ..periodic_info import PeriodicInfo
-from ..molecules import Molecule
 from ...utilities import OneOrMany
+from ..molecules import Molecule
+from ..periodic_info import PeriodicInfo
 
 
 class PdbWriter:

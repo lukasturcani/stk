@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import typing
 
-from ..molecules import Molecule
 from ...utilities import OneOrMany
+from ..molecules import Molecule
 
 
 class XyzWriter:
