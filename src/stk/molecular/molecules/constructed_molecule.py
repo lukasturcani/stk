@@ -314,6 +314,9 @@ class ConstructedMolecule(Molecule):
 
         yield from self._bond_infos
 
+    def with_canonical_atom_ordering(self) -> ConstructedMolecule:
+        return self.clone()._with_canonical_atom_ordering()
+
     def _with_canonical_atom_ordering(self) -> ConstructedMolecule:
         # Make all building blocks canonically ordered too.
         building_blocks = {
@@ -411,3 +414,88 @@ class ConstructedMolecule(Molecule):
             key=get_bond_info_atom_ids,
         ))
         return self
+
+    def with_centroid(
+        self,
+        position: np.ndarray,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_centroid(position, atom_ids)
+
+    def with_displacement(
+        self,
+        displacement: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_displacement(displacement)
+
+    def with_position_matrix(
+        self,
+        position_matrix: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_position_matrix(position_matrix)
+
+    def with_rotation_about_axis(
+        self,
+        angle: float,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_rotation_about_axis(
+            angle=angle,
+            axis=axis,
+            origin=origin,
+        )
+
+    def with_rotation_between_vectors(
+        self,
+        start: np.ndarray,
+        target: np.ndarray,
+        origin: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_rotation_between_vectors(
+            start=start,
+            target=target,
+            origin=origin,
+        )
+
+    def with_rotation_to_minimize_angle(
+        self,
+        start: np.ndarray,
+        target: np.ndarray,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_rotation_to_minimize_angle(
+            start=start,
+            target=target,
+            axis=axis,
+            origin=origin,
+        )
+
+    def with_structure_from_file(
+        self,
+        path: str,
+        extension: typing.Optional[str] = None,
+    ) -> ConstructedMolecule:
+
+        return typing.cast(
+            ConstructedMolecule,
+            super().with_structure_from_file(path, extension),
+        )
+
+    def write(
+        self,
+        path: str,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> ConstructedMolecule:
+
+        return typing.cast(
+            ConstructedMolecule,
+            super().write(path, atom_ids),
+        )
