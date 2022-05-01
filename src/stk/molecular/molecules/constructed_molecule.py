@@ -4,14 +4,25 @@ Constructed Molecule
 
 """
 
+from __future__ import annotations
+
 import logging
+import numpy as np
+import typing
 
 import rdkit.Chem.AllChem as rdkit
 
-from ..atoms import AtomInfo
-from ..bonds import BondInfo
+from ...utilities import OneOrMany
+from ..atoms import Atom, AtomInfo
+from ..bonds import Bond, BondInfo
 from .molecule import Molecule
+from .building_block import BuildingBlock
 from .utilities import get_bond_info_atom_ids, sort_bond_atoms_by_id
+from ..topology_graphs import TopologyGraph
+from ..topology_graphs.topology_graph.construction_result import (
+    ConstructionResult,
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,66 +31,81 @@ class ConstructedMolecule(Molecule):
     """
     Represents constructed molecules.
 
-    Examples
-    --------
-    *Initialization*
+    Examples:
 
-    A :class:`.ConstructedMolecule` is initialized from a
-    :class:`.TopologyGraph`, which is typically initialized from some
-    :class:`.BuildingBlock` instances.
+        *Initialization*
 
-    .. testcode:: initialization
+        A :class:`.ConstructedMolecule` is initialized from a
+        :class:`.TopologyGraph`, which is typically initialized from
+        some :class:`.BuildingBlock` instances.
 
-        import stk
+        .. testcode:: initialization
 
-        bb1 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock(
-            smiles='O=CC(C=O)CC=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
-        cage = stk.ConstructedMolecule(tetrahedron)
+            import stk
 
-    *Hierarchical Construction*
+            bb1 = stk.BuildingBlock(
+                smiles='NCCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock(
+                smiles='O=CC(C=O)CC=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+            tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
+            cage = stk.ConstructedMolecule(tetrahedron)
 
-    A :class:`ConstructedMolecule` may be used to construct other
-    :class:`ConstructedMolecule` instances, though you will probably
-    have to convert it to a :class:`.BuildingBlock` first
+        *Hierarchical Construction*
 
-    .. testcode:: hierarchical-construction
+        A :class:`ConstructedMolecule` may be used to construct other
+        :class:`ConstructedMolecule` instances, though you will
+        probably have to convert it to a :class:`.BuildingBlock` first
 
-        import stk
+        .. testcode:: hierarchical-construction
 
-        bb1 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock(
-            smiles='O=CC(C=O)CC=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
-        cage = stk.ConstructedMolecule(tetrahedron)
+            import stk
 
-        benzene = stk.host_guest.Guest(stk.BuildingBlock('c1ccccc1'))
-        cage_complex = stk.host_guest.Complex(
-            host=stk.BuildingBlock.init_from_molecule(cage),
-            guests=benzene,
-        )
-        cage_complex = stk.ConstructedMolecule(cage_complex)
+            bb1 = stk.BuildingBlock(
+                smiles='NCCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock(
+                smiles='O=CC(C=O)CC=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+            tetrahedron = stk.cage.FourPlusSix((bb1, bb2))
+            cage = stk.ConstructedMolecule(tetrahedron)
 
-    Obviously, the initialization of the :class:`.ConstructedMolecule`
-    depends mostly on the specifics of the :class:`.TopologyGraph`
-    used, and the documentation of those classes should be examined
-    for more examples.
+            benzene = stk.host_guest.Guest(
+                building_block=stk.BuildingBlock('c1ccccc1'),
+            )
+            cage_complex = stk.host_guest.Complex(
+                host=stk.BuildingBlock.init_from_molecule(cage),
+                guests=benzene,
+            )
+            cage_complex = stk.ConstructedMolecule(cage_complex)
+
+        Obviously, the initialization of the
+        :class:`.ConstructedMolecule` depends mostly on the specifics
+        of the :class:`.TopologyGraph` used, and the documentation of
+        those classes should be examined for more examples.
 
     """
 
-    def __init__(self, topology_graph):
+    _atom_infos:  tuple[AtomInfo, ...]
+    _bond_infos: tuple[BondInfo, ...]
+    _num_building_blocks: dict[Molecule, int]
+
+    def __init__(
+        self,
+        topology_graph: TopologyGraph,
+    ) -> None:
         """
         Initialize a :class:`.ConstructedMolecule`.
 
-        Parameters
-        ----------
-        topology_graph : :class:`.TopologyGraph`
-            The topology graph of the constructed molecule.
+        Parameters:
+
+            topology_graph:
+                The topology graph of the constructed molecule.
 
         """
 
@@ -91,40 +117,39 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init(
         cls,
-        atoms,
-        bonds,
-        position_matrix,
-        atom_infos,
-        bond_infos,
-        num_building_blocks,
-    ):
+        atoms: tuple[Atom, ...],
+        bonds: tuple[Bond, ...],
+        position_matrix: np.ndarray,
+        atom_infos: tuple[AtomInfo, ...],
+        bond_infos: tuple[BondInfo, ...],
+        num_building_blocks: dict[BuildingBlock, int],
+    ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule` from its components.
 
-        Parameters
-        ----------
-        atoms : :class:`tuple` of :class:`.Atom`
-            The atoms of the molecule.
+        Parameters:
 
-        bond : :class:`tuple` of :class:`.Bond`
-            The bonds of the molecule.
+            atoms:
+                The atoms of the molecule.
 
-        position_matrix : :class:`numpy.ndarray`
-            A ``(n, 3)`` position matrix of the molecule.
+            bond:
+                The bonds of the molecule.
 
-        atom_infos : :class:`tuple` of :class:`.AtomInfo`
-            The atom infos of the molecule.
+            position_matrix:
+                A ``(n, 3)`` position matrix of the molecule.
 
-        bond_infos : :class:`tuple` of :class:`.BondInfo`
-            The bond infos of the molecule.
+            atom_infos:
+                The atom infos of the molecule.
 
-        num_building_blocks : :class:`dict`
-            Maps each building block of the constructed molecule to
-            the number of times it is present in it.
+            bond_infos:
+                The bond infos of the molecule.
 
-        Returns
-        -------
-        :class:`.ConstructedMolecule`
+            num_building_blocks:
+                Maps each building block of the constructed molecule to
+                the number of times it is present in it.
+
+        Returns:
+
             The constructed molecule.
 
         """
@@ -139,20 +164,19 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init_from_construction_result(
         cls,
-        construction_result,
-    ):
+        construction_result: ConstructionResult,
+    ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule`.
 
-        Parameters
-        ----------
-        construction_result : :class:`.ConstructionResult`
-            The result of a construction, from which the
-            :class:`.ConstructedMolecule` should be initialized.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructedMolecule`
+            construction_result:
+                The result of a construction, from which the
+                :class:`.ConstructedMolecule` should be initialized.
+
+        Returns:
+
             The constructed molecule.
 
         """
@@ -164,26 +188,25 @@ class ConstructedMolecule(Molecule):
 
     @staticmethod
     def _init_from_construction_result(
-        obj,
-        construction_result,
-    ):
+        obj: ConstructedMolecule,
+        construction_result: ConstructionResult,
+    ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule`.
 
         This modifies `obj`.
 
-        Parameters
-        ----------
-        obj : :class:`.ConstructedMolecule`
-            The constructed molecule to initialize.
+        Parameters:
 
-        construction_result : :class:`.ConstructionResult`
-            The result of a construction, from which the
-            :class:`.ConstructedMolecule` should be initialized.
+            obj:
+                The constructed molecule to initialize.
 
-        Returns
-        -------
-        :class:`.ConstructedMolecule`
+            construction_result:
+                The result of a construction, from which the
+                :class:`.ConstructedMolecule` should be initialized.
+
+        Returns:
+
             The `obj` instance.
 
         """
@@ -204,14 +227,14 @@ class ConstructedMolecule(Molecule):
         }
         return obj
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> ConstructedMolecule:
+        clone = self._clone()
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
         clone._num_building_blocks = dict(self._num_building_blocks)
         return clone
 
-    def get_building_blocks(self):
+    def get_building_blocks(self) -> typing.Iterator[Molecule]:
         """
         Yield the building blocks of the constructed molecule.
 
@@ -221,28 +244,29 @@ class ConstructedMolecule(Molecule):
         blocks, equivalently positioned building blocks will be
         yielded at the same time.
 
-        Yields
-        ------
-        :class:`.Molecule`
+        Yields:
+
             A building block of the constructed molecule.
 
         """
 
         yield from self._num_building_blocks
 
-    def get_num_building_block(self, building_block):
+    def get_num_building_block(
+        self,
+        building_block: Molecule,
+    ) -> int:
         """
         Get the number of times `building_block` is present.
 
-        Parameters
-        ----------
-        building_block : :class:`.Molecule`
-            The building block whose frequency in the constructed
-            molecule is desired.
+        Parameters:
 
-        Returns
-        -------
-        :class:`int`
+            building_block:
+                The building block whose frequency in the constructed
+                molecule is desired.
+
+        Returns:
+
             The number of times `building_block` was used in the
             construction of the constructed molecule.
 
@@ -250,20 +274,22 @@ class ConstructedMolecule(Molecule):
 
         return self._num_building_blocks[building_block]
 
-    def get_atom_infos(self, atom_ids=None):
+    def get_atom_infos(
+        self,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> typing.Iterator[AtomInfo]:
         """
         Yield data about atoms in the molecule.
 
-        Parameters
-        ----------
-        atom_ids : :class:`iterable` of :class:`int`, optional
-            The ids of atoms whose data is desired. If ``None``,
-            data on all atoms will be yielded. Can be a single
-            :class:`int`, if data on a single atom is desired.
+        Parameters:
 
-        Yields
-        ------
-        :class:`.AtomInfo`
+            atom_ids:
+                The ids of atoms whose data is desired. If ``None``,
+                data on all atoms will be yielded. Can be a single
+                :class:`int`, if data on a single atom is desired.
+
+        Yields:
+
             Data about an atom.
 
         """
@@ -276,20 +302,22 @@ class ConstructedMolecule(Molecule):
         for atom_id in atom_ids:
             yield self._atom_infos[atom_id]
 
-    def get_bond_infos(self):
+    def get_bond_infos(self) -> typing.Iterator[BondInfo]:
         """
         Yield data about bonds in the molecule.
 
-        Yields
-        ------
-        :class:`.BondInfo`
+        Yields:
+
             Data about a bond.
 
         """
 
         yield from self._bond_infos
 
-    def _with_canonical_atom_ordering(self):
+    def with_canonical_atom_ordering(self) -> ConstructedMolecule:
+        return self.clone()._with_canonical_atom_ordering()
+
+    def _with_canonical_atom_ordering(self) -> ConstructedMolecule:
         # Make all building blocks canonically ordered too.
         building_blocks = {
             building_block:
@@ -326,7 +354,7 @@ class ConstructedMolecule(Molecule):
         }
         old_atom_infos = self._atom_infos
 
-        def get_atom_info(atom):
+        def get_atom_info(atom: Atom) -> AtomInfo:
 
             old_atom_info = old_atom_infos[id_map[atom.get_id()]]
             old_building_block = old_atom_info.get_building_block()
@@ -366,7 +394,7 @@ class ConstructedMolecule(Molecule):
                 ),
             )
 
-        def get_bond_info(info):
+        def get_bond_info(info: BondInfo) -> BondInfo:
             building_block = info.get_building_block()
             return BondInfo(
                 bond=sort_bond_atoms_by_id(
@@ -386,3 +414,88 @@ class ConstructedMolecule(Molecule):
             key=get_bond_info_atom_ids,
         ))
         return self
+
+    def with_centroid(
+        self,
+        position: np.ndarray,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_centroid(position, atom_ids)
+
+    def with_displacement(
+        self,
+        displacement: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_displacement(displacement)
+
+    def with_position_matrix(
+        self,
+        position_matrix: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_position_matrix(position_matrix)
+
+    def with_rotation_about_axis(
+        self,
+        angle: float,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_rotation_about_axis(
+            angle=angle,
+            axis=axis,
+            origin=origin,
+        )
+
+    def with_rotation_between_vectors(
+        self,
+        start: np.ndarray,
+        target: np.ndarray,
+        origin: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_rotation_between_vectors(
+            start=start,
+            target=target,
+            origin=origin,
+        )
+
+    def with_rotation_to_minimize_angle(
+        self,
+        start: np.ndarray,
+        target: np.ndarray,
+        axis: np.ndarray,
+        origin: np.ndarray,
+    ) -> ConstructedMolecule:
+
+        return self.clone()._with_rotation_to_minimize_angle(
+            start=start,
+            target=target,
+            axis=axis,
+            origin=origin,
+        )
+
+    def with_structure_from_file(
+        self,
+        path: str,
+        extension: typing.Optional[str] = None,
+    ) -> ConstructedMolecule:
+
+        return typing.cast(
+            ConstructedMolecule,
+            super().with_structure_from_file(path, extension),
+        )
+
+    def write(
+        self,
+        path: str,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+    ) -> ConstructedMolecule:
+
+        return typing.cast(
+            ConstructedMolecule,
+            super().write(path, atom_ids),
+        )
