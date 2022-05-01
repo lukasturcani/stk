@@ -7,22 +7,21 @@ Constructed Molecule
 from __future__ import annotations
 
 import logging
-import numpy as np
 import typing
 
+import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
 from ...utilities import OneOrMany
 from ..atoms import Atom, AtomInfo
 from ..bonds import Bond, BondInfo
-from .molecule import Molecule
-from .building_block import BuildingBlock
-from .utilities import get_bond_info_atom_ids, sort_bond_atoms_by_id
 from ..topology_graphs import TopologyGraph
 from ..topology_graphs.topology_graph.construction_result import (
     ConstructionResult,
 )
-
+from .building_block import BuildingBlock
+from .molecule import Molecule
+from .utilities import get_bond_info_atom_ids, sort_bond_atoms_by_id
 
 logger = logging.getLogger(__name__)
 
