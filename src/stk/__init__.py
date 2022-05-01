@@ -4,4 +4,4 @@ from .molecular import *  # noqa
 from .serialization import *  # noqa
 from .utilities import *  # noqa
 
-__version__ = '2022.5.1.0'
+__version__ = '2022.5.1.1'
