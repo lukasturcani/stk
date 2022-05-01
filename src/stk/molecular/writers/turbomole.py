@@ -4,54 +4,72 @@ Turbomole Writer
 
 """
 
+from __future__ import annotations
+
+import typing
+
+from ..molecules import Molecule
+from ...utilities import OneOrMany
+from ..periodic_info import PeriodicInfo
+
 
 class TurbomoleWriter:
     """
     A writer class for ``Turbomole`` files.
 
-    Examples
-    --------
-    *Writing to a File with a Unit Cell*
+    Examples:
 
-    This writer can write to a file with the unit
-    cell included for periodic molecules. Note that this always assumes
-    P1 space group.
+        *Writing to a File with a Unit Cell*
 
-    .. testcode:: writing-to-a-file-with-a-unit-cell
+        This writer can write to a file with the unit
+        cell included for periodic molecules. Note that this always
+        assumes P1 space group.
 
-        import stk
+        .. testcode:: writing-to-a-file-with-a-unit-cell
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-        topology_graph = stk.cof.PeriodicHoneycomb(
-            building_blocks=(bb1, bb2),
-            lattice_size=(3, 3, 1),
-        )
-        construction_result = topology_graph.construct()
-        cof = stk.ConstructedMolecule.init_from_construction_result(
-            construction_result=construction_result,
-        )
-        writer = stk.TurbomoleWriter()
-        writer.write(
-            molecule=cof,
-            path='cof.coord',
-            periodic_info=construction_result.get_periodic_info(),
-        )
+            import stk
 
-    .. testcode:: writing-to-a-file-with-a-unit-cell
-        :hide:
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock(
+                smiles='BrCC(CBr)CBr',
+                functional_groups=[stk.BromoFactory()],
+            )
+            topology_graph = stk.cof.PeriodicHoneycomb(
+                building_blocks=(bb1, bb2),
+                lattice_size=(3, 3, 1),
+            )
+            construction_result = topology_graph.construct()
+            cof = (
+                stk.ConstructedMolecule.init_from_construction_result(
+                    construction_result=construction_result,
+                )
+            )
+            writer = stk.TurbomoleWriter()
+            writer.write(
+                molecule=cof,
+                path='cof.coord',
+                periodic_info=construction_result.get_periodic_info(),
+            )
 
-        import os
+        .. testcode:: writing-to-a-file-with-a-unit-cell
+            :hide:
 
-        assert os.path.exists('cof.coord')
+            import os
 
-    .. testcleanup:: writing-to-a-file-with-a-unit-cell
+            assert os.path.exists('cof.coord')
 
-        os.remove('cof.coord')
+        .. testcleanup:: writing-to-a-file-with-a-unit-cell
+
+            os.remove('cof.coord')
 
     """
 
-    def _write_content(self, molecule, atom_ids, periodic_info=None):
+    def _write_content(
+        self,
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]],
+        periodic_info: typing.Optional[PeriodicInfo] = None,
+    ) -> list[str]:
 
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
@@ -91,29 +109,28 @@ class TurbomoleWriter:
 
     def to_string(
         self,
-        molecule,
-        atom_ids=None,
-        periodic_info=None
-    ):
+        molecule: Molecule,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        periodic_info: typing.Optional[PeriodicInfo] = None,
+    ) -> str:
         """
         Get a ``Turbomole`` file format string of `molecule`.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to ``Turbomole`` format.
+        Parameters:
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            molecule:
+                Molecule to write to ``Turbomole`` format.
 
-        periodic_info : :class:`.PeriodicInfo`
-            Information about the periodic cell.
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
 
-        Returns
-        -------
-        :class:`string`
+            periodic_info:
+                Information about the periodic cell.
+
+        Returns:
+
             The content of a `.coord` file.
 
         """
@@ -126,29 +143,34 @@ class TurbomoleWriter:
 
         return ''.join(content)
 
-    def write(self, molecule, path, atom_ids=None, periodic_info=None):
+    def write(
+        self,
+        molecule: Molecule,
+        path: str,
+        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        periodic_info: typing.Optional[PeriodicInfo] = None,
+    ) -> None:
         """
         Write `molecule` to ``Turbomole`` file format.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to write to ``Turbomole`` format.
+        Parameters:
 
-        path : :class:`str`
-            The full path to the file being written.
+            molecule:
+                Molecule to write to ``Turbomole`` format.
 
-        atom_ids : :class:`iterable` of :class:`int`
-            The atom ids of atoms to write. Can be a single
-            :class:`int`, if a single atom is to be used, or ``None``,
-            if all atoms are to be used.
+            path:
+                The full path to the file being written.
 
-        periodic_info : :class:`.PeriodicInfo`
-            Information about the periodic cell.
+            atom_ids:
+                The atom ids of atoms to write. Can be a single
+                :class:`int`, if a single atom is to be used, or
+                ``None``, if all atoms are to be used.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+            periodic_info:
+                Information about the periodic cell.
+
+        Returns:
+
             A file is written.
 
         """
