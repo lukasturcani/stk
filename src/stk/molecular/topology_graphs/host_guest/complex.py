@@ -7,6 +7,7 @@ Host Guest Complex
 from __future__ import annotations
 
 import warnings
+from collections import abc
 from typing import Iterable, Optional
 
 from ...molecules import BuildingBlock
@@ -629,7 +630,7 @@ class Complex(TopologyGraph):
     def _get_scale(
         self,
         building_block_vertices: dict[
-            BuildingBlock, tuple[Vertex, ...]
+            BuildingBlock, abc.Sequence[Vertex]
         ],
     ) -> float:
         return 1.
