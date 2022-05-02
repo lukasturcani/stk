@@ -87,12 +87,12 @@ class OctahedralDelta(MetalComplex):
     """
 
     _metal_vertex_prototypes = (
-        MetalVertex(0, [0, 0, 0]),
+        MetalVertex(0, (0, 0, 0)),
     )
     _ligand_vertex_prototypes = (
-        BiDentateLigandVertex(1, [2.5, 2.5, 0]),
-        BiDentateLigandVertex(2, [0, -2.5, 2.5]),
-        BiDentateLigandVertex(3, [-2.5, 0, -2.5]),
+        BiDentateLigandVertex(1, (2.5, 2.5, 0)),
+        BiDentateLigandVertex(2, (0, -2.5, 2.5)),
+        BiDentateLigandVertex(3, (-2.5, 0, -2.5)),
     )
 
     # The ordering here matters for the stereochemistry.
@@ -103,36 +103,36 @@ class OctahedralDelta(MetalComplex):
             id=0,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[0],
-            position=[2.5, 0, 0],
+            position=(2.5, 0, 0),
         ),
         Edge(
             id=1,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[0],
-            position=[0, 2.5, 0],
+            position=(0, 2.5, 0),
         ),
         Edge(
             id=4,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[1],
-            position=[0, -2.5, 0],
+            position=(0, -2.5, 0),
         ),
         Edge(
             id=2,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[1],
-            position=[0, 0, 2.5],
+            position=(0, 0, 2.5),
         ),
         Edge(
             id=5,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[2],
-            position=[0, 0, -2.5],
+            position=(0, 0, -2.5),
         ),
         Edge(
             id=3,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[2],
-            position=[-2.5, 0, 0],
+            position=(-2.5, 0, 0),
         ),
     )

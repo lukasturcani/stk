@@ -11,7 +11,7 @@ import numpy as np
 from ...molecules import BuildingBlock
 from .edge import Edge
 
-_Vertex = typing.TypeVar('_Vertex', bound='Vertex')
+_VertexT = typing.TypeVar('_VertexT', bound='Vertex')
 
 
 class Vertex:
@@ -64,9 +64,9 @@ class Vertex:
         return self._id
 
     def _with_scale(
-        self: _Vertex,
+        self: _VertexT,
         scale: typing.Union[float, tuple[float, float, float]],
-    ) -> _Vertex:
+    ) -> _VertexT:
         """
         Modify the vertex.
 
@@ -125,9 +125,9 @@ class Vertex:
         return np.array(self._position)
 
     def _with_position(
-        self: _Vertex,
+        self: _VertexT,
         position: np.ndarray,
-    ) -> _Vertex:
+    ) -> _VertexT:
         """
         Modify the vertex.
 

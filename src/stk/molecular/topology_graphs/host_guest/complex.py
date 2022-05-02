@@ -9,6 +9,7 @@ from __future__ import annotations
 import warnings
 from typing import Iterable, Optional
 
+from ...reactions import GenericReactionFactory
 from ...molecules import BuildingBlock
 from ..topology_graph import (
     ConstructionState,
@@ -546,7 +547,7 @@ class Complex(TopologyGraph):
         super().__init__(
             building_block_vertices=building_block_vertices,
             edges=(),
-            reaction_factory=None,
+            reaction_factory=GenericReactionFactory(),
             construction_stages=(),
             num_processes=num_processes,
             optimizer=optimizer,
@@ -617,8 +618,7 @@ class Complex(TopologyGraph):
         return building_block_vertices
 
     def clone(self) -> Complex:
-        clone = super().clone()
-        return clone
+        return self._clone()
 
     def _run_reactions(
         self,
@@ -628,7 +628,9 @@ class Complex(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[BuildingBlock, Vertex],
+        building_block_vertices: dict[
+            BuildingBlock, tuple[Vertex, ...]
+        ],
     ) -> float:
         return 1.
 

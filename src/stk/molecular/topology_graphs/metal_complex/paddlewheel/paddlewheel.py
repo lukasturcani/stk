@@ -99,14 +99,14 @@ class Paddlewheel(MetalComplex):
     """
 
     _metal_vertex_prototypes = (
-        MetalVertex(0, [0, 1, 0]),
-        MetalVertex(1, [0, -1, 0]),
+        MetalVertex(0, (0, 1, 0)),
+        MetalVertex(1, (0, -1, 0)),
     )
     _ligand_vertex_prototypes = (
-        BiDentateLigandVertex(2, [2, 0, 0]),
-        BiDentateLigandVertex(3, [0, 0, 2]),
-        BiDentateLigandVertex(4, [-2, 0, 0]),
-        BiDentateLigandVertex(5, [0, 0, -2]),
+        BiDentateLigandVertex(2, (2, 0, 0)),
+        BiDentateLigandVertex(3, (0, 0, 2)),
+        BiDentateLigandVertex(4, (-2, 0, 0)),
+        BiDentateLigandVertex(5, (0, 0, -2)),
     )
 
     _edge_prototypes = (
@@ -114,51 +114,51 @@ class Paddlewheel(MetalComplex):
             id=0,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[0],
-            position=[0.1, 0.5, 0],
+            position=(0.1, 0.5, 0),
         ),
         Edge(
             id=1,
             vertex1=_metal_vertex_prototypes[1],
             vertex2=_ligand_vertex_prototypes[0],
-            position=[0.1, -0.5, 0],
+            position=(0.1, -0.5, 0),
         ),
 
         Edge(
             id=2,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[1],
-            position=[0, 0.5, 0.1],
+            position=(0, 0.5, 0.1),
         ),
         Edge(
             id=3,
             vertex1=_metal_vertex_prototypes[1],
             vertex2=_ligand_vertex_prototypes[1],
-            position=[0, -0.5, 0.1],
+            position=(0, -0.5, 0.1),
         ),
 
         Edge(
             id=4,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[2],
-            position=[-0.1, 0.5, 0],
+            position=(-0.1, 0.5, 0),
         ),
         Edge(
             id=5,
             vertex1=_metal_vertex_prototypes[1],
             vertex2=_ligand_vertex_prototypes[2],
-            position=[-0.1, -0.5, 0],
+            position=(-0.1, -0.5, 0),
         ),
 
         Edge(
             id=6,
             vertex1=_metal_vertex_prototypes[0],
             vertex2=_ligand_vertex_prototypes[3],
-            position=[0, 0.5, -0.1],
+            position=(0, 0.5, -0.1),
         ),
         Edge(
             id=7,
             vertex1=_metal_vertex_prototypes[1],
             vertex2=_ligand_vertex_prototypes[3],
-            position=[0, -0.5, -0.1],
+            position=(0, -0.5, -0.1),
         ),
     )

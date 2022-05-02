@@ -344,6 +344,9 @@ class TopologyGraph:
 
         """
 
+        return self._clone()
+
+    def _clone(self: _TopologyGraphT) -> _TopologyGraphT:
         clone = self.__class__.__new__(self.__class__)
         clone._scale = self._scale
         clone._building_block_vertices = dict(
