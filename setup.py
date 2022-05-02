@@ -31,6 +31,7 @@ setup(
         'MCHammer',
         'SpinDry',
         'vabene',
+        'rdkit-pypi',
     ),
     python_requires='>=3.9',
 )

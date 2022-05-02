@@ -21,7 +21,7 @@ def get_mch_bonds(state):
         The state of the molecule under construction.
 
     Yields
-    -------
+    ------
     :class:`MCHammer.Bond`
         A bond in the molecule.
 
@@ -46,7 +46,7 @@ def get_long_bond_ids(state):
         The state of the molecule under construction.
 
     Yields
-    -------
+    ------
     :class:`tuple` of :class:`int`
         A pair of atom ids that identify a bond to be optimized.
 

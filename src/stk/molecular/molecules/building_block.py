@@ -60,6 +60,9 @@ class BuildingBlock(Molecule):
         ),
     }
 
+    _placer_ids: frozenset[int]
+    _core_ids: frozenset[int]
+
     def __init__(
         self,
         smiles: str,

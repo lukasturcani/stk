@@ -29,10 +29,6 @@ To get ``stk``, you can install it with pip::
 
     $ pip install stk
 
-Make sure you also install rdkit, which is a dependency::
-
-    $ conda install -c conda-forge rdkit
-
 If you would like to get updated when a new release of ``stk`` comes
 out, which happens pretty regularly, click on the ``watch`` button on
 the top right corner of the GitHub page. Then select ``Releases only``

@@ -40,7 +40,7 @@ class MoleculeCrosser:
             performed.
 
         Yields
-        -------
+        ------
         :class:`.CrossoverRecord`
             A record of a crossover operation.
 
