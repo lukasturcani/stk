@@ -4,8 +4,11 @@ Parallel Topology Graph
 
 """
 
+from __future__ import annotations
+
 import pathos
 
+from ...construction_state import ConstructionState
 from .utilities import _Placement
 
 
@@ -35,7 +38,10 @@ class _Parallel:
         self._stages = stages
         self._num_processes = num_processes
 
-    def _place_building_blocks(self, state):
+    def _place_building_blocks(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         with pathos.pools.ProcessPool(self._num_processes) as pool:
             for stage in self._stages:
                 vertices = tuple(state.get_vertices(stage))
@@ -61,13 +67,12 @@ class _Parallel:
                 )
         return state
 
-    def get_num_stages(self):
+    def get_num_stages(self) -> int:
         """
         Get the number of placement stages.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of placement stages.
 
         """
