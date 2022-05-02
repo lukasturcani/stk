@@ -314,8 +314,8 @@ class ProgressPlotter:
         self._plot_data = self._get_plot_data(generations)
 
     def _get_plot_data(self, generations):
-        df = pd.DataFrame()
         self._num_generations = 0
+        data = []
         for id_, generation in enumerate(generations):
             self._num_generations += 1
 
@@ -330,26 +330,21 @@ class ProgressPlotter:
             if not properties:
                 continue
 
-            data = [
-                {
-                    'Generation': id_,
-                    self._y_label: max(properties),
-                    'Type': 'Max'
-                },
-                {
-                    'Generation': id_,
-                    self._y_label: np.mean(properties),
-                    'Type': 'Mean'
-                },
-                {
-                    'Generation': id_,
-                    self._y_label: min(properties),
-                    'Type': 'Min'
-                },
-            ]
-
-            df = df.append(data, ignore_index=True)
-        return df
+            data.append(
+                pd.DataFrame(
+                    data={
+                        'Generation': [id_, id_, id_],
+                        self._y_label: [
+                            max(properties),
+                            np.mean(properties),
+                            min(properties),
+                        ],
+                        'Type': ['Max', 'Mean', 'Min'],
+                    },
+                    index=['Generation', 'Generation', 'Generation'],
+                ),
+            )
+        return pd.concat(data, ignore_index=True)
 
     def get_plot_data(self):
         """
