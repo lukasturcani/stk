@@ -24,122 +24,125 @@ class TopologyGraph:
     a new topology graph, you want to subclass and implement this
     abstract base class.
 
-    Notes
-    -----
-    *Adding New Topology Graphs*
+    Notes:
 
-    You might notice that some of the methods of this abstract base
-    class are implemented. This is purely for convenience when
-    implementing subclasses. The implemented public methods are
-    simply default implementations, which can safely be ignored or
-    overridden, when implementing subclasses. Any private methods are
-    implementation details of these default implementations.
+        *Adding New Topology Graphs*
 
-    Many classes, such as :class:`.Vertex`, :class:`.Edge`,
-    :class:`.EdgeGroup` and :class:`.ConstructionState`, exist as
-    implementation details of this default :class:`.TopologyGraph`
-    implementation. You could ignore all of them, and define a new
-    :meth:`.construct` method from scratch. In fact, your topology
-    graph does not have to be represented as a graph at all. However,
-    using the default implementation of :class:`.TopologyGraph` makes
-    it significantly easier to implement a construction process. When
-    using the default implementation of :class:`.TopologyGraph`, you
-    mostly just need to implement a :class:`.Vertex` subclass, which
-    is much easier than figuring out the whole construction process
-    from scratch. In addition, you get benefits like parallel
-    construction for free, as it is included in the default
-    implementation.
+        You might notice that some of the methods of this abstract base
+        class are implemented. This is purely for convenience when
+        implementing subclasses. The implemented public methods are
+        simply default implementations, which can safely be ignored or
+        overridden, when implementing subclasses. Any private methods
+        are implementation details of these default implementations.
 
-    Typically, adding a new topology graph will involve implementing
-    any pure virtual methods of :class:`.TopologyGraph`, in a new
-    subclass, as well as implementing any pure virtual methods of
-    :class:`.Vertex`, again in a new subclass. Combined, this is just a
-    handful of simple methods to implement. Sometimes, rarely, you
-    might also want to subclass :class:`.ConstructionState`, when you
-    want to add additional hooks during construction, by extending
-    the methods of this class. If you do this, make sure
-    to override :meth:`._get_construction_state` to return your
-    subclass of :class:`.ConstructionState`, rather than the base
-    class, as is done by default. You can subclass and extend the
-    methods of any class as you wish, but it would be unusual if this
-    doesn't cover all your requirements.
+        Many classes, such as :class:`.Vertex`, :class:`.Edge`,
+        :class:`.EdgeGroup` and :class:`.ConstructionState`, exist as
+        implementation details of this default :class:`.TopologyGraph`
+        implementation. You could ignore all of them, and define a new
+        :meth:`.construct` method from scratch. In fact, your topology
+        graph does not have to be represented as a graph at all.
+        However, using the default implementation of
+        :class:`.TopologyGraph` makes it significantly easier to
+        implement a construction process. When using the default
+        implementation of :class:`.TopologyGraph`, you mostly just
+        need to implement a :class:`.Vertex` subclass, which is much
+        easier than figuring out the whole construction process from
+        scratch. In addition, you get benefits like parallel
+        construction for free, as it is included in the default
+        implementation.
 
-    *The Default Implementation*
+        Typically, adding a new topology graph will involve
+        implementing any pure virtual methods of
+        :class:`.TopologyGraph`, in a new subclass, as well as
+        implementing any pure virtual methods of :class:`.Vertex`,
+        again in a new subclass. Combined, this is just a handful of
+        simple methods to implement. Sometimes, rarely, you might also
+        want to subclass :class:`.ConstructionState`, when you want to
+        add additional hooks during construction, by extending
+        the methods of this class. If you do this, make sure to
+        override :meth:`._get_construction_state` to return your
+        subclass of :class:`.ConstructionState`, rather than the base
+        class, as is done by default. You can subclass and extend the
+        methods of any class as you wish, but it would be unusual if
+        this doesn't cover all your requirements.
 
-    The default implementation of :class:`.TopologyGraph` represents
-    the constructed molecule through a graph. The vertices indicate
-    where building blocks are placed and the edges indicate which
-    building blocks have bonds formed between them by the construction
-    process.
+        *The Default Implementation*
 
-    :class:`.Vertex` instances are responsible for placing the building
-    block molecules. By initializing the vertices with different
-    parameters, you can alter how they position the building block
-    molecules, and therefore allow the user to easily specify a
-    different structural isomer.
+        The default implementation of :class:`.TopologyGraph`
+        represents the constructed molecule through a graph. The
+        vertices indicate where building blocks are placed and the
+        edges indicate which building blocks have bonds formed between
+        them by the construction process.
 
-    Once a building block is placed on a vertex, the functional groups
-    on the building block must be mapped to the different edges
-    connected to the vertex. The number of functional groups in the
-    building block must match the number of edges connected to the
-    vertex.
+        :class:`.Vertex` instances are responsible for placing the
+        building block molecules. By initializing the vertices with
+        different parameters, you can alter how they position the
+        building block molecules, and therefore allow the user to
+        easily specify a different structural isomer.
 
-    Once the functional groups are mapped to edges, the edges are
-    used to perform reactions on the building blocks. Edges are
-    grouped in an :class:`.EdgeGroup`, and all functional groups
-    present in the edge group are reacted together. Normally, unless
-    you are doing something very exotic, an :class:`.EdgeGroup` will
-    hold just one :class:`.Edge`, and the two functional groups on
-    that edge will be reacted together through a single
-    :class:`.Reaction`. This reaction will normally add the bonds which
-    are required to form the joined-up constructed molecule, but note
-    that it does not have to add any bonds at all. In addition, a
-    :class:`.Reaction` can add and remove atoms from the constructed
-    molecule. Which reaction is selected to join the functional groups
-    depends on the :class:`.ReactionFactory` given to the
-    :class:`.TopologyGraph` during initialization.
+        Once a building block is placed on a vertex, the functional
+        groups on the building block must be mapped to the different
+        edges connected to the vertex. The number of functional groups
+        in the building block must match the number of edges connected
+        to the vertex.
 
-    Once this is done, you have a :class:`.ConstructedMolecule`.
+        Once the functional groups are mapped to edges, the edges are
+        used to perform reactions on the building blocks. Edges are
+        grouped in an :class:`.EdgeGroup`, and all functional groups
+        present in the edge group are reacted together. Normally,
+        unless you are doing something very exotic, an
+        :class:`.EdgeGroup` will hold just one :class:`.Edge`, and the
+        two functional groups on that edge will be reacted together
+        through a single :class:`.Reaction`. This reaction will
+        normally add the bonds which are required to form the
+        joined-up constructed molecule, but note that it does not have
+        to add any bonds at all. In addition, a :class:`.Reaction` can
+        add and remove atoms from the constructed molecule. Which
+        reaction is selected to join the functional groups depends on
+        the :class:`.ReactionFactory` given to the
+        :class:`.TopologyGraph` during initialization.
 
-    Examples
-    --------
-    *Subclass Implementation*
+        Once this is done, you have a :class:`.ConstructedMolecule`.
 
-    The source code of subclasses, listed in
-    :mod:`~.topology_graph.topology_graph.topology_graph`, can serve
-    as good examples.
+    Examples:
 
-    *Changing the Building Blocks of a Topology Graph*
+        *Subclass Implementation*
 
-    To change the building blocks used by a topology graph you
-    can use :meth:`.with_building_blocks` to get a clone of the
-    topology graph holding the new building blocks
+        The source code of subclasses, listed in
+        :mod:`~.topology_graph.topology_graph.topology_graph`, can
+        serve as good examples.
 
-    .. testcode:: changing-the-building-blocks-of-a-topology-graph
+        *Changing the Building Blocks of a Topology Graph*
 
-        import stk
+        To change the building blocks used by a topology graph you
+        can use :meth:`.with_building_blocks` to get a clone of the
+        topology graph holding the new building blocks
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+        .. testcode:: changing-the-building-blocks-of-a-topology-graph
 
-        linear = stk.polymer.Linear(
-            building_blocks=(bb1, bb2),
-            repeating_unit='A',
-            num_repeating_units=15,
-        )
+            import stk
 
-        bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
-        # All bb1 instances are replaced by bb3, but bb2 remains
-        # in place.
-        clone = linear.with_building_blocks({
-            bb1: bb3,
-        })
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+
+            linear = stk.polymer.Linear(
+                building_blocks=(bb1, bb2),
+                repeating_unit='A',
+                num_repeating_units=15,
+            )
+
+            bb3 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+            # All bb1 instances are replaced by bb3, but bb2 remains
+            # in place.
+            clone = linear.with_building_blocks({
+                bb1: bb3,
+            })
 
     """
 
     def __init__(
         self,
-        building_block_vertices,
+        building_block_vertices: dict[BuildingBlock, tuple[Vertex, ...],
         edges,
         reaction_factory,
         construction_stages,
@@ -150,51 +153,53 @@ class TopologyGraph:
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
-        Parameters
-        ----------
-        building_block_vertices : :class:`dict`
-            Maps each :class:`.BuildingBlock` to be placed, to a
-            :class:`tuple` of :class:`.Vertex` instances, on which
-            it should be placed.
+        Parameters:
 
-        edges : :class:`tuple` of :class:`.Edge`
-            The edges which make up the topology graph.
+            building_block_vertices : :class:`dict`
+                Maps each :class:`.BuildingBlock` to be placed, to a
+                :class:`tuple` of :class:`.Vertex` instances, on which
+                it should be placed.
 
-        reaction_factory : :class:`.ReactionFactory`
-            Used to pick which :class:`.Reaction` is used on each
-            :class:`.EdgeGroup` of the topology graph.
+            edges : :class:`tuple` of :class:`.Edge`
+                The edges which make up the topology graph.
 
-        construction_stages : :class:`tuple` of :class:`callable`
-            A collection of callables, each of which takes a
-            :class:`.Vertex` and returns ``True`` or ``False``.
-            If the first :class:`callable` is applied to a  vertex in
-            the topology graph, and the result is ``True``, that vertex
-            is a part of the first construction stage. The second
-            :class:`callable` is then applied to all vertices not in
-            the first stage and those which return ``True`` belong to
-            the second stage and so on.
+            reaction_factory : :class:`.ReactionFactory`
+                Used to pick which :class:`.Reaction` is used on each
+                :class:`.EdgeGroup` of the topology graph.
 
-            Vertices which belong to the same construction stage
-            all place building blocks together in parallel, before
-            placement is done by any vertices which are part of a later
-            stage. This breaks down parallel construction into
-            serial stages if synchronization between stages is needed.
+            construction_stages : :class:`tuple` of :class:`callable`
+                A collection of callables, each of which takes a
+                :class:`.Vertex` and returns ``True`` or ``False``.
+                If the first :class:`callable` is applied to a  vertex
+                in the topology graph, and the result is ``True``, that
+                vertex is a part of the first construction stage. The
+                second :class:`callable` is then applied to all
+                vertices not in the first stage and those which return
+                ``True`` belong to the second stage and so on.
 
-            If the topology graph is performing construction serially,
-            then all vertices which belong to an earlier stage will
-            place their building block before those at a later stage.
+                Vertices which belong to the same construction stage
+                all place building blocks together in parallel, before
+                placement is done by any vertices which are part of a
+                later stage. This breaks down parallel construction
+                into serial stages if synchronization between stages
+                is needed.
 
-        num_processes : :class:`int`
-            The number of parallel processes to create during
-            :meth:`construct`.
+                If the topology graph is performing construction
+                serially, then all vertices which belong to an earlier
+                stage will place their building block before those at
+                a later stage.
 
-        optimizer : :class:`.Optimizer`
-            Used to optimize the structure of the constructed
-            molecule.
+            num_processes : :class:`int`
+                The number of parallel processes to create during
+                :meth:`construct`.
 
-        edge_groups : :class:`tuple` of :class:`.EdgeGroup`, optional
-            The edge groups of the topology graph, if ``None``, every
-            :class:`.Edge` is in its own edge group.
+            optimizer : :class:`.Optimizer`
+                Used to optimize the structure of the constructed
+                molecule.
+
+            edge_groups : :class:`tuple` of :class:`.EdgeGroup`, optional
+                The edge groups of the topology graph, if ``None``,
+                every :class:`.Edge` is in its own edge group.
 
         """
 
