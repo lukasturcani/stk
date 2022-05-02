@@ -7,8 +7,8 @@ Topology Graph
 from __future__ import annotations
 
 import typing
-from functools import partial
 from collections import abc
+from functools import partial
 
 import numpy as np
 

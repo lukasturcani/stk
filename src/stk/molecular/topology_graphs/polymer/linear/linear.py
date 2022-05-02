@@ -6,21 +6,21 @@ Linear
 
 from __future__ import annotations
 
+import typing
+from collections import abc
 from dataclasses import dataclass
 
-from collections import abc
 import numpy as np
-import typing
 
 from ....molecules import BuildingBlock
-from ....reactions import ReactionFactory, GenericReactionFactory
-from ...topology_graph.optimizers import Optimizer
+from ....reactions import GenericReactionFactory, ReactionFactory
 from ...topology_graph import (
     Edge,
     NullOptimizer,
     TopologyGraph,
     Vertex,
 )
+from ...topology_graph.optimizers import Optimizer
 from .vertices import (
     HeadVertex,
     LinearVertex,
