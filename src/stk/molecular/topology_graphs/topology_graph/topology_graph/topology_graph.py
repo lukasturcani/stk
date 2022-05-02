@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import typing
 from functools import partial
+from collections import abc
 
 import numpy as np
 
@@ -162,7 +163,7 @@ class TopologyGraph:
     def __init__(
         self,
         building_block_vertices: dict[
-            BuildingBlock, tuple[Vertex, ...]
+            BuildingBlock, abc.Sequence[Vertex],
         ],
         edges: tuple[Edge, ...],
         reaction_factory: ReactionFactory,
@@ -182,9 +183,9 @@ class TopologyGraph:
         Parameters:
 
             building_block_vertices:
-                Maps each :class:`.BuildingBlock` to be placed, to a
-                :class:`tuple` of :class:`.Vertex` instances, on which
-                it should be placed.
+                Maps each :class:`.BuildingBlock` to be placed, to the
+                :class:`.Vertex` instances, on which it should be
+                placed.
 
             edges:
                 The edges which make up the topology graph.
@@ -277,6 +278,9 @@ class TopologyGraph:
         def undo_scale(vertex):
             return vertex.with_scale(1/self._scale)
 
+        building_block_vertices: dict[
+            BuildingBlock, abc.Sequence[Vertex]
+        ]
         building_block_vertices = {
             building_block_map.get(building_block, building_block):
                 tuple(map(undo_scale, vertices))
@@ -482,7 +486,7 @@ class TopologyGraph:
     def _get_scale(
         self,
         building_block_vertices: dict[
-            BuildingBlock, tuple[Vertex, ...]
+            BuildingBlock, abc.Sequence[Vertex],
         ],
     ) -> float:
         """
@@ -496,8 +500,8 @@ class TopologyGraph:
 
             building_block_vertices:
                 Maps every :class:`.BuildingBlock` of the topology
-                graph, to a :class:`tuple` of the :class:`.Vertex`
-                instances it is meant to be placed on.
+                graph, to the :class:`.Vertex` instances it is meant
+                to be placed on.
 
         Returns:
 
