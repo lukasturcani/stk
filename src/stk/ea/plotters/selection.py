@@ -195,16 +195,21 @@ class SelectionPlotter:
 
         self._plots += 1
         sns.set(style='darkgrid')
-        df = pd.DataFrame()
+        data = []
         for record, selection_count in counter.items():
             label = self._record_label(record)
-            data = {
-                self._x_label: label,
-                'Number of Times Selected': selection_count,
-                'order': self._order_by(record),
-                'heat_map': self._heat_map_value(record)
-            }
-            df = df.append(data, ignore_index=True)
+            data.append(
+                pd.DataFrame(
+                    data={
+                        self._x_label: label,
+                        'Number of Times Selected': selection_count,
+                        'order': self._order_by(record),
+                        'heat_map': self._heat_map_value(record)
+                    },
+                    index=[self._x_label],
+                )
+            )
+        df = pd.concat(data, ignore_index=True)
 
         df = df.sort_values(
             ['Number of Times Selected', 'order'],
@@ -229,6 +234,8 @@ class SelectionPlotter:
             ax=ax,
         )
         ax.get_legend().remove()
+        # https://tinyurl.com/2p9drmkh
+        plt.rcParams['axes.grid'] = False
         ax.figure.colorbar(sm).set_label(self._heat_map_label)
         plt.tight_layout()
         fig.savefig(f'{self._filename}_{self._plots}.png', dpi=fig.dpi)

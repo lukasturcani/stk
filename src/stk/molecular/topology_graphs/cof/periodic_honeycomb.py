@@ -4,11 +4,9 @@ Periodic Honeycomb
 
 """
 
-import warnings
 
 import numpy as np
 
-from ...periodic_info import PeriodicInfo
 from ...reactions import GenericReactionFactory
 from ..topology_graph import Edge, NullOptimizer
 from .cof import Cof
@@ -204,40 +202,6 @@ class PeriodicHoneycomb(Cof):
             reaction_factory=reaction_factory,
             num_processes=num_processes,
             optimizer=optimizer,
-        )
-
-    def get_periodic_info(self):
-        """
-        Get unit cell information of periodic topology graph.
-
-        Returns
-        -------
-        :class:`.PeriodicInfo`
-            Periodic cell information.
-
-        """
-
-        warnings.warn(
-            'You called get_periodic_info() on a topology graph '
-            'instance. This method will be removed in any version '
-            'of stk released on, or after, 21/10/21. Please call '
-            'the construct() method instead. This will return a '
-            'PeriodicConstructionResult which provides the new '
-            'get_periodic_info() method.'
-        )
-
-        lattice_constants = self._get_lattice_constants()
-
-        return PeriodicInfo(
-            vector_1=(
-                lattice_constants[0]*self._lattice_size[0]*self._scale
-            ),
-            vector_2=(
-                lattice_constants[1]*self._lattice_size[1]*self._scale
-            ),
-            vector_3=(
-                lattice_constants[2]*self._lattice_size[2]*self._scale
-            ),
         )
 
     _lattice_constants = _a, _b, _c = (

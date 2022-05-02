@@ -688,6 +688,7 @@ basic tutorial, we get our final version
             get_property=lambda record: record.get_fitness_value(),
             y_label='Fitness Value',
         )
+        fitness_progress.get_plot_data().to_csv('fitness_progress.csv')
         fitness_progress.write('fitness_progress.png')
 
         logger.info('Making rotatable bonds plot.')
