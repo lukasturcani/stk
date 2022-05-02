@@ -4,11 +4,9 @@ Periodic Linkerless Honeycomb
 
 """
 
-import warnings
 
 import numpy as np
 
-from ...periodic_info import PeriodicInfo
 from ...reactions import GenericReactionFactory
 from ..topology_graph import Edge, NullOptimizer
 from .cof import Cof
