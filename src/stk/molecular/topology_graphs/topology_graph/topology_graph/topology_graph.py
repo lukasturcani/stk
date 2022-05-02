@@ -4,16 +4,28 @@ Topology Graph
 
 """
 
+from __future__ import annotations
+
 from functools import partial
+import typing
 
 import numpy as np
 
 from stk.utilities import flatten
 
+from ..vertex import Vertex
+from ....molecules import BuildingBlock
+from ..optimizers import Optimizer
+from ....reactions import ReactionFactory
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
 from ..edge_group import EdgeGroup
-from .implementations import _Parallel, _Serial
+from ..edge import Edge
+from .implementations import (
+    _Parallel,
+    _Serial,
+    _TopologyGraphImplementation,
+)
 
 
 class TopologyGraph:
@@ -140,42 +152,53 @@ class TopologyGraph:
 
     """
 
+    _implementation: _TopologyGraphImplementation
+
     def __init__(
         self,
-        building_block_vertices: dict[BuildingBlock, tuple[Vertex, ...],
-        edges,
-        reaction_factory,
-        construction_stages,
-        num_processes,
-        optimizer,
-        edge_groups=None,
-    ):
+        building_block_vertices: dict[
+            BuildingBlock, tuple[Vertex, ...]
+        ],
+        edges: tuple[Edge, ...],
+        reaction_factory: ReactionFactory,
+        construction_stages: tuple[
+            # TODO: Use typing.Callable here for now so that Sphinx
+            # generates hyperlinks in the compiled docs. This should
+            # eventually be replaced by abc.Callable.
+            typing.Callable[[Vertex], bool], ...
+        ],
+        num_processes: int,
+        optimizer: Optimizer,
+        edge_groups: typing.Optional[tuple[EdgeGroup, ...]] = None,
+    ) -> None:
         """
         Initialize an instance of :class:`.TopologyGraph`.
 
         Parameters:
 
-            building_block_vertices : :class:`dict`
+            building_block_vertices:
                 Maps each :class:`.BuildingBlock` to be placed, to a
                 :class:`tuple` of :class:`.Vertex` instances, on which
                 it should be placed.
 
-            edges : :class:`tuple` of :class:`.Edge`
+            edges:
                 The edges which make up the topology graph.
 
-            reaction_factory : :class:`.ReactionFactory`
+            reaction_factory:
                 Used to pick which :class:`.Reaction` is used on each
                 :class:`.EdgeGroup` of the topology graph.
 
-            construction_stages : :class:`tuple` of :class:`callable`
-                A collection of callables, each of which takes a
-                :class:`.Vertex` and returns ``True`` or ``False``.
-                If the first :class:`callable` is applied to a  vertex
-                in the topology graph, and the result is ``True``, that
-                vertex is a part of the first construction stage. The
-                second :class:`callable` is then applied to all
-                vertices not in the first stage and those which return
-                ``True`` belong to the second stage and so on.
+            construction_stages:
+                A collection of :class:`~collections.abc.Callable`,
+                each of which takes a :class:`.Vertex` and returns
+                ``True`` or ``False``. If the first
+                :class:`~collections.abc.Callable` is applied
+                to a  vertex in the topology graph, and the result is
+                ``True``, that vertex is a part of the first
+                construction stage. The second :class:`callable` is
+                then applied to all vertices not in the first stage
+                and those which return ``True`` belong to the second
+                stage and so on.
 
                 Vertices which belong to the same construction stage
                 all place building blocks together in parallel, before
@@ -189,15 +212,15 @@ class TopologyGraph:
                 stage will place their building block before those at
                 a later stage.
 
-            num_processes : :class:`int`
+            num_processes:
                 The number of parallel processes to create during
                 :meth:`construct`.
 
-            optimizer : :class:`.Optimizer`
+            optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
 
-            edge_groups : :class:`tuple` of :class:`.EdgeGroup`, optional
+            edge_groups:
                 The edge groups of the topology graph, if ``None``,
                 every :class:`.Edge` is in its own edge group.
 

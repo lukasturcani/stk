@@ -4,7 +4,10 @@ Serial Topology Graph
 
 """
 
+from __future__ import annotations
+
 from .utilities import _Placement
+from ...construction_state import ConstructionState
 
 
 class _Serial:
@@ -29,7 +32,11 @@ class _Serial:
 
         self._stages = stages
 
-    def _place_building_blocks(self, state):
+    def _place_building_blocks(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
+
         for stage in self._stages:
             vertices = tuple(state.get_vertices(stage))
             building_blocks = tuple(
@@ -58,9 +65,8 @@ class _Serial:
         """
         Get the number of placement stages.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The number of placement stages.
 
         """

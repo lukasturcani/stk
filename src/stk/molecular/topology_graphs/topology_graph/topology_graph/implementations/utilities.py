@@ -6,12 +6,24 @@ Topology Graph Implementation Utilities
 
 from __future__ import annotations
 
-from typing import NamedTuple
 
+import typing
 import numpy as np
+from ...construction_state import ConstructionState
 
 
-class _PlacementResult(NamedTuple):
+class _TopologyGraphImplementation(typing.Protocol):
+    def _place_building_blocks(
+        self,
+        state: ConstructionState
+    ) -> ConstructionState:
+        pass
+
+    def get_num_stages(self) -> int:
+        pass
+
+
+class _PlacementResult(typing.NamedTuple):
     """
     The result of a building block placement.
 
