@@ -6,8 +6,8 @@ Serial Topology Graph
 
 from __future__ import annotations
 
-from .utilities import _Placement
 from ...construction_state import ConstructionState
+from .utilities import _Placement
 
 
 class _Serial:

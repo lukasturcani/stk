@@ -6,9 +6,10 @@ Topology Graph Implementation Utilities
 
 from __future__ import annotations
 
-
 import typing
+
 import numpy as np
+
 from ...construction_state import ConstructionState
 
 

@@ -6,27 +6,26 @@ Topology Graph
 
 from __future__ import annotations
 
-from functools import partial
 import typing
+from functools import partial
 
 import numpy as np
 
 from stk.utilities import flatten
 
-from ..vertex import Vertex
 from ....molecules import BuildingBlock
-from ..optimizers import Optimizer
 from ....reactions import ReactionFactory
 from ..construction_result import ConstructionResult
 from ..construction_state import ConstructionState
-from ..edge_group import EdgeGroup
 from ..edge import Edge
+from ..edge_group import EdgeGroup
+from ..optimizers import Optimizer
+from ..vertex import Vertex
 from .implementations import (
     _Parallel,
     _Serial,
     _TopologyGraphImplementation,
 )
-
 
 _TopologyGraphT = typing.TypeVar(
     '_TopologyGraphT',

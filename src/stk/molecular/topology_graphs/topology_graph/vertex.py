@@ -7,7 +7,9 @@ Vertex
 from __future__ import annotations
 
 import typing
+
 import numpy as np
+
 from ...molecules import BuildingBlock
 from .edge import Edge
 

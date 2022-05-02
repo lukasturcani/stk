@@ -9,8 +9,8 @@ from __future__ import annotations
 import warnings
 from typing import Iterable, Optional
 
-from ...reactions import GenericReactionFactory
 from ...molecules import BuildingBlock
+from ...reactions import GenericReactionFactory
 from ..topology_graph import (
     ConstructionState,
     NullOptimizer,
