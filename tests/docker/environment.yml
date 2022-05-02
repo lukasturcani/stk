@@ -26,7 +26,12 @@ dependencies:
     - alabaster==0.7.12
     - attrs==21.4.0
     - babel==2.10.1
+    - bleach==5.0.0
+    - build==0.7.0
+    - cffi==1.15.0
     - charset-normalizer==2.0.12
+    - commonmark==0.9.1
+    - cryptography==37.0.1
     - cycler==0.11.0
     - dill==0.3.4
     - dnspython==2.2.1
@@ -38,7 +43,9 @@ dependencies:
     - importlib-metadata==4.11.3
     - iniconfig==1.1.1
     - isort==5.10.1
+    - jeepney==0.8.0
     - jinja2==3.1.2
+    - keyring==23.5.0
     - kiwisolver==1.4.2
     - markupsafe==2.1.1
     - matplotlib==3.5.1
@@ -54,13 +61,16 @@ dependencies:
     - packaging==21.3
     - pandas==1.4.2
     - pathos==0.2.8
+    - pep517==0.12.0
     - pillow==9.1.0
+    - pkginfo==1.8.2
     - pluggy==1.0.0
     - pox==0.3.0
     - ppft==1.6.6.4
     - py==1.11.0
     - py-cpuinfo==8.0.0
     - pycodestyle==2.8.0
+    - pycparser==2.21
     - pyflakes==2.4.0
     - pygments==2.12.0
     - pymongo==4.1.1
@@ -72,9 +82,14 @@ dependencies:
     - python-dateutil==2.8.2
     - pytz==2022.1
     - rdkit-pypi==2022.3.2
+    - readme-renderer==35.0
     - requests==2.27.1
+    - requests-toolbelt==0.9.1
+    - rfc3986==2.0.0
+    - rich==12.3.0
     - scipy==1.8.0
     - seaborn==0.11.2
+    - secretstorage==3.3.2
     - six==1.16.0
     - snowballstemmer==2.2.0
     - sphinx==4.5.0
@@ -88,7 +103,9 @@ dependencies:
     - sphinxcontrib-serializinghtml==1.1.5
     - spindry==0.0.91
     - tomli==2.0.1
+    - twine==4.0.0
     - typing-extensions==4.2.0
     - urllib3==1.26.9
     - vabene==0.0.5
+    - webencodings==0.5.1
     - zipp==3.8.0
