@@ -87,11 +87,6 @@ To get :mod:`.stk`, you can install it with pip::
 
     $ pip install stk
 
-Make sure you also install :mod:`rdkit`, which is a dependency::
-
-    $ conda install -c conda-forge rdkit
-
-
 Overview
 --------
 
