@@ -19,7 +19,6 @@ from ..topology_graphs import TopologyGraph
 from ..topology_graphs.topology_graph.construction_result import (
     ConstructionResult,
 )
-from .building_block import BuildingBlock
 from .molecule import Molecule
 from .utilities import get_bond_info_atom_ids, sort_bond_atoms_by_id
 
