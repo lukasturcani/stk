@@ -380,12 +380,12 @@ class Linear(TopologyGraph):
 
             bb1 = stk.BuildingBlock(
                 smiles='NCCN',
-                functional_group=[stk.PrimaryAminoFactory()],
+                functional_groups=[stk.PrimaryAminoFactory()],
             )
             bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
             bb3 = stk.BuildingBlock(
                 smiles='NCCN',
-                functional_group=[stk.PrimaryAminoFactory()],
+                functional_groups=[stk.PrimaryAminoFactory()],
             )
 
             # p1 and p2 are different ways to write the same thing.
