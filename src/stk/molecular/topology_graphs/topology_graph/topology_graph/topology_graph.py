@@ -28,6 +28,12 @@ from .implementations import (
 )
 
 
+_TopologyGraphT = typing.TypeVar(
+    '_TopologyGraphT',
+    bound='TopologyGraph',
+)
+
+
 class TopologyGraph:
     """
     An abstract base class for topology graphs.
@@ -257,7 +263,10 @@ class TopologyGraph:
 
         self._optimizer = optimizer
 
-    def _with_building_blocks(self, building_block_map):
+    def _with_building_blocks(
+        self: _TopologyGraphT,
+        building_block_map: dict[BuildingBlock, BuildingBlock],
+    ) -> _TopologyGraphT:
         """
         Modify the topology graph.
 
@@ -302,37 +311,36 @@ class TopologyGraph:
         self._scale = scale
         return self
 
-    def with_building_blocks(self, building_block_map):
+    def with_building_blocks(
+        self,
+        building_block_map: dict[BuildingBlock, BuildingBlock],
+    ) -> TopologyGraph:
         """
         Return a clone holding different building blocks.
 
-        Parameters
-        ----------
-        building_block_map : :class:`dict`
-            Maps a building block in the current topology
-            graph to the building block which should replace
-            it in the clone. If a building block should be not replaced
-            in the clone, it can be omitted from the map.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.TopologyGraph`
-            The clone. Has the same type as the original topology
-            graph.
+            building_block_map:
+                Maps a building block in the current topology
+                graph to the building block which should replace
+                it in the clone. If a building block should be not
+                replaced in the clone, it can be omitted from the map.
+
+        Returns:
+
+            The clone.
 
         """
 
         return self.clone()._with_building_blocks(building_block_map)
 
-    def clone(self):
+    def clone(self) -> TopologyGraph:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.TopologyGraph`
-            The clone. Has the same type as the original topology
-            graph.
+        Returns:
+
+            The clone.
 
         """
 
@@ -348,7 +356,7 @@ class TopologyGraph:
         clone._edge_groups = self._edge_groups
         return clone
 
-    def get_building_blocks(self):
+    def get_building_blocks(self) -> typing.Iterator[BuildingBlock]:
         """
         Yield the building blocks.
 
@@ -358,9 +366,8 @@ class TopologyGraph:
         equivalently positioned building blocks will be yielded at the
         same time.
 
-        Yields
-        ------
-        :class:`.BuildingBlock`
+        Yields:
+
             A building block of the topology graph.
 
         """
@@ -383,19 +390,21 @@ class TopologyGraph:
                 yielded.add(building_block)
                 yield building_block
 
-    def get_num_building_block(self, building_block):
+    def get_num_building_block(
+        self,
+        building_block: BuildingBlock,
+    ) -> int:
         """
         Get the number of times `building_block` is present.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block whose frequency in the topology graph
-            is desired.
+        Parameters:
 
-        Returns
-        -------
-        :class:`int`
+            building_block:
+                The building block whose frequency in the topology
+                graph is desired.
+
+        Returns:
+
             The number of times `building_block` is present in the
             topology graph.
 
@@ -405,7 +414,7 @@ class TopologyGraph:
             self._building_block_vertices.get(building_block, [])
         )
 
-    def _get_lattice_constants(self):
+    def _get_lattice_constants(self) -> typing.Iterator[np.ndarray]:
         """
         Yield the lattice constants of the topology graph.
 
@@ -413,9 +422,8 @@ class TopologyGraph:
 
         By default, this is an empty generator.
 
-        Yields
-        ------
-        :class:`numpy.ndarray`
+        Yields:
+
             A lattice constant.
 
         """
@@ -423,13 +431,12 @@ class TopologyGraph:
         return
         yield
 
-    def construct(self):
+    def construct(self) -> ConstructionResult:
         """
         Construct a :class:`.ConstructedMolecule`.
 
-        Returns
-        -------
-        :class:`.ConstructionResult`
+        Returns:
+
             The data describing the :class:`.ConstructedMolecule`.
 
         """
@@ -440,25 +447,27 @@ class TopologyGraph:
         state = self._optimizer.optimize(state)
         return self._get_construction_result(state)
 
-    def _get_construction_result(self, state):
+    def _get_construction_result(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionResult:
         """
         Get the result of the construction.
 
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The state of the molecule being constructed.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionResult`
+            state:
+                The state of the molecule being constructed.
+
+        Returns:
+
             The data describing the :class:`.ConstructedMolecule`.
 
         """
 
         return ConstructionResult(state)
 
-    def _get_construction_state(self):
+    def _get_construction_state(self) -> ConstructionState:
         return ConstructionState(
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
@@ -468,7 +477,12 @@ class TopologyGraph:
             ),
         )
 
-    def _get_scale(self, building_block_vertices):
+    def _get_scale(
+        self,
+        building_block_vertices: dict[
+            BuildingBlock, tuple[Vertex, ...]
+        ],
+    ) -> float:
         """
         Get the scale, which should be applied to topology graph.
 
@@ -476,34 +490,35 @@ class TopologyGraph:
         and edge of topology graph. This allows to graph to adjust
         based on the size of the building blocks.
 
-        Parameters
-        ----------
-        building_block_vertices : :class:`dict`
-            Maps every :class:`.BuildingBlock` of the topology graph,
-            to a :class:`tuple` of the :class:`.Vertex` instances it
-            is meant to be placed on.
+        Parameters:
 
-        Returns
-        -------
-        :class:`float`
+            building_block_vertices:
+                Maps every :class:`.BuildingBlock` of the topology
+                graph, to a :class:`tuple` of the :class:`.Vertex`
+                instances it is meant to be placed on.
+
+        Returns:
+
             The scale.
 
         """
 
         raise NotImplementedError()
 
-    def _place_building_blocks(self, state):
+    def _place_building_blocks(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         """
         Place the building blocks onto the vertices.
 
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            Holds data necessary to construct the molecule.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionState`
+            state:
+                Holds data necessary to construct the molecule.
+
+        Returns:
+
             The new construction state, updated to account for the
             placed building blocks.
 
@@ -511,18 +526,20 @@ class TopologyGraph:
 
         return self._implementation._place_building_blocks(state)
 
-    def _run_reactions(self, state):
+    def _run_reactions(
+        self,
+        state: ConstructionState,
+    ) -> ConstructionState:
         """
         Perform the reactions on the building blocks.
 
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The current state of the construction process.
+        Parameters:
 
-        Returns
-        -------
-        :class:`.ConstructionState`
+            state:
+                The current state of the construction process.
+
+        Returns:
+
             The new construction state, updated to account for the
             reactions between building blocks.
 
@@ -539,18 +556,20 @@ class TopologyGraph:
         )
         return state.with_reaction_results(reactions, results)
 
-    def _get_stages(self, construction_stages):
+    def _get_stages(
+        self,
+        construction_stages,
+    ) -> typing.Iterator[tuple[int, ...]]:
         """
         Yield the parallelizable stages of construction.
 
-        Yields
-        ------
-        :class:`tuple` of :class:`.Vertex`
-            Vertices, which can be placed in parallel.
+        Yields:
+
+            Vertices ids, which can be placed in parallel.
 
         """
 
-        stages = tuple(
+        stages: tuple[list[int], ...] = tuple(
             [] for i in range(len(construction_stages)+1)
         )
         vertices = flatten(self._building_block_vertices.values())
