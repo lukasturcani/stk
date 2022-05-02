@@ -121,7 +121,7 @@ class ConstructedMolecule(Molecule):
         position_matrix: np.ndarray,
         atom_infos: tuple[AtomInfo, ...],
         bond_infos: tuple[BondInfo, ...],
-        num_building_blocks: dict[BuildingBlock, int],
+        num_building_blocks: dict[Molecule, int],
     ) -> ConstructedMolecule:
         """
         Initialize a :class:`.ConstructedMolecule` from its components.
