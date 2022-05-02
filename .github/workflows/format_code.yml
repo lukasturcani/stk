@@ -11,6 +11,11 @@ jobs:
       image: ghcr.io/lukasturcani/stk-test-environment
 
     steps:
+
+      # https://github.com/actions/checkout/issues/760#issuecomment-1097501613
+      - name: Work around permission issue
+        run: git config --global --add safe.directory /__w/stk/stk
+
       - name: Git checkout
         uses: actions/checkout@v2
 
