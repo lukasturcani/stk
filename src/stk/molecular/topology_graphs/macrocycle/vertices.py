@@ -5,12 +5,16 @@ Macrocycle Vertices
 """
 
 from __future__ import annotations
+
+import typing
+
 import numpy as np
 from scipy.spatial.distance import euclidean
 import typing
 
 from ..topology_graph import Vertex, Edge
 from ...molecules import BuildingBlock
+from ..topology_graph import Edge, Vertex
 
 
 class CycleVertex(Vertex):
