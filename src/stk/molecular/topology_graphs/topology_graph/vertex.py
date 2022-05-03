@@ -100,6 +100,11 @@ class Vertex:
 
         return self.clone()._with_scale(scale)
 
+    def _clone(self: _VertexT) -> _VertexT:
+        clone = self.__class__.__new__(self.__class__)
+        Vertex.__init__(clone, self._id, self._position)
+        return clone
+
     def clone(self) -> Vertex:
         """
         Return a clone.
@@ -110,9 +115,7 @@ class Vertex:
 
         """
 
-        clone = self.__class__.__new__(self.__class__)
-        Vertex.__init__(clone, self._id, self._position)
-        return clone
+        return self._clone()
 
     def get_position(self) -> np.ndarray:
         """
