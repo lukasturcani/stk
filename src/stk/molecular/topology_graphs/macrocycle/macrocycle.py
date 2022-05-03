@@ -6,18 +6,18 @@ Macrocycle
 
 from __future__ import annotations
 
+import typing
 import warnings
 from collections import abc
 
-import typing
 import numpy as np
 
 from ...molecules import BuildingBlock
-from ...reactions import ReactionFactory, GenericReactionFactory
+from ...reactions import GenericReactionFactory, ReactionFactory
 from ..topology_graph import (
     Edge,
-    Optimizer,
     NullOptimizer,
+    Optimizer,
     TopologyGraph,
     Vertex,
 )
