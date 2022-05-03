@@ -103,14 +103,19 @@ class CycleVertex(Vertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
+
         fg0_position = building_block.get_centroid(
             atom_ids=next(
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
 
-        def fg0_distance(edge):
+        def fg0_distance(edge: Edge) -> float:
             return euclidean(edge.get_position(), fg0_position)
 
         edge0 = min(edges, key=fg0_distance)
