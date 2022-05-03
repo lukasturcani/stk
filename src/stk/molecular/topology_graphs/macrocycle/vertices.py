@@ -4,10 +4,13 @@ Macrocycle Vertices
 
 """
 
+from __future__ import annotations
 import numpy as np
 from scipy.spatial.distance import euclidean
+import typing
 
-from ..topology_graph import Vertex
+from ..topology_graph import Vertex, Edge
+from ...molecules import BuildingBlock
 
 
 class CycleVertex(Vertex):
@@ -16,25 +19,31 @@ class CycleVertex(Vertex):
 
     """
 
-    def __init__(self, id, position, flip, angle):
+    def __init__(
+        self,
+        id: int,
+        position: typing.Union[np.ndarray, tuple[float, float, float]],
+        flip: bool,
+        angle: float,
+    ) -> None:
         """
         Initialize a :class:`.CycleVertex` instance.
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the vertex.
+        Parameters:
 
-        position : :class:`tuple` of :class:`float`
-            The position of the vertex.
+            id:
+                The id of the vertex.
 
-        flip : :class:`bool`
-            If ``True``, the orientation of building blocks placed by
-            the vertex will be flipped.
+            position:
+                The position of the vertex.
 
-        angle : :class:`float`
-            The position of the vertex along the cycle, specified by
-            the `angle`.
+            flip:
+                If ``True``, the orientation of building blocks placed
+                by the vertex will be flipped.
+
+            angle:
+                The position of the vertex along the cycle, specified
+                by the `angle`.
 
         """
 
@@ -42,26 +51,30 @@ class CycleVertex(Vertex):
         self._flip = flip
         self._angle = angle
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> CycleVertex:
+        clone = self._clone()
         clone._flip = self._flip
         clone._angle = self._angle
         return clone
 
-    def get_flip(self):
+    def get_flip(self) -> bool:
         """
         Return ``True`` if the vertex flips building blocks it places.
 
-        Returns
-        -------
-        :class:`bool`
+        Returns:
+
             ``True`` if the vertex flips building blocks it places.
 
         """
 
         return self._flip
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
+
         assert (
             building_block.get_num_functional_groups() == 2
         ), (
@@ -82,7 +95,7 @@ class CycleVertex(Vertex):
         )
         return building_block.with_rotation_between_vectors(
             start=fg1_position - fg0_position,
-            target=[-1 if self._flip else 1, 0, 0],
+            target=np.array([-1 if self._flip else 1, 0, 0]),
             origin=self._position,
         ).with_rotation_about_axis(
             angle=self._angle-(np.pi/2),
@@ -110,10 +123,10 @@ class CycleVertex(Vertex):
             ),
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f'Vertex(id={self._id}, '
-            f'position={self._position.tolist()}, '
+            f'position={tuple(self._position.tolist())}, '
             f'flip={self._flip}, '
             f'angle={self._angle})'
         )
