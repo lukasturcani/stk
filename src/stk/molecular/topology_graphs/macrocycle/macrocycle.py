@@ -10,10 +10,7 @@ import typing
 import warnings
 from collections import abc
 
-import warnings
-from collections import abc
 
-import typing
 import numpy as np
 
 from ...molecules import BuildingBlock
@@ -24,7 +21,7 @@ from ..topology_graph import (
     NullOptimizer,
     TopologyGraph,
     Vertex,
-from ...reactions import GenericReactionFactory, ReactionFactory
+)
 from .vertices import CycleVertex
 
 
