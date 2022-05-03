@@ -123,10 +123,10 @@ class CycleVertex(Vertex):
             ),
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f'Vertex(id={self._id}, '
-            f'position={self._position.tolist()}, '
+            f'position={tuple(self._position.tolist())}, '
             f'flip={self._flip}, '
             f'angle={self._angle})'
         )

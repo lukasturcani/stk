@@ -260,7 +260,7 @@ class Macrocycle(TopologyGraph):
 
             # c4 and c5 are guaranteed to be the same because they used
             # the same topology graph. However, they may be different
-            i# to c2 and c3.
+            # to c2 and c3.
             c4 = stk.ConstructedMolecule(cycle2)
             c5 = stk.ConstructedMolecule(cycle2)
 
