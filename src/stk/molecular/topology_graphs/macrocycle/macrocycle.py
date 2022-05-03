@@ -432,7 +432,7 @@ class Macrocycle(TopologyGraph):
             vertices.append(
                 CycleVertex(
                     id=vertex_id,
-                    position=[np.cos(theta), np.sin(theta), 0],
+                    position=(np.cos(theta), np.sin(theta), 0),
                     flip=generator.choice(
                         choices,
                         p=[flip_chance, 1-flip_chance],
