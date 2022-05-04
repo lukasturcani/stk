@@ -10,14 +10,15 @@ import typing
 import warnings
 from collections import abc
 
+
 import numpy as np
 
 from ...molecules import BuildingBlock
-from ...reactions import GenericReactionFactory, ReactionFactory
+from ...reactions import ReactionFactory, GenericReactionFactory
 from ..topology_graph import (
     Edge,
-    NullOptimizer,
     Optimizer,
+    NullOptimizer,
     TopologyGraph,
     Vertex,
 )
