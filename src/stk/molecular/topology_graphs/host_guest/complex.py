@@ -6,8 +6,8 @@ Host Guest Complex
 
 from __future__ import annotations
 
-from collections import abc
 import typing
+from collections import abc
 
 from ...molecules import BuildingBlock
 from ...reactions import GenericReactionFactory
