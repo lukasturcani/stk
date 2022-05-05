@@ -6,9 +6,8 @@ Host Guest Complex
 
 from __future__ import annotations
 
-import warnings
 from collections import abc
-from typing import Iterable, Optional
+import typing
 
 from ...molecules import BuildingBlock
 from ...reactions import GenericReactionFactory
@@ -448,11 +447,7 @@ class Complex(TopologyGraph):
     def __init__(
         self,
         host: BuildingBlock,
-        guest: Optional[BuildingBlock] = None,
-        guest_start: Optional[tuple[float, float, float]] = None,
-        guest_target: Optional[tuple[float, float, float]] = None,
-        displacement: Optional[tuple[float, float, float]] = None,
-        guests: Optional[Iterable[Guest]] = None,
+        guests: typing.Union[Guest, typing.Iterable[Guest]],
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
@@ -466,84 +461,18 @@ class Complex(TopologyGraph):
                 :class:`.Guest` instance if only one guest is being
                 used.
 
-            guest: The guest molecule. This API is deprecated and will
-                be removed in any :mod:`.stk` version released on, or
-                after, 01/01/2022. Use the `guests` parameter instead.
-
-            guest_start: A direction vector which gets aligned with
-                `guest_target`. This API is deprecated and will be
-                removed in any :mod:`.stk` version released on, or
-                after, 01/01/2022. Use the `guests` parameter instead.
-
-            guest_target: A direction vector which determines the
-                rotation applied to the `guest`. A rotation such that
-                `guest_start` is transformed into `guest_target` is
-                applied. This API is deprecated and will be removed in
-                any :mod:`.stk` version released on, or after,
-                01/01/2022. Use the `guests` parameter instead.
-
-            displacement: The translational offset of the guest. This
-                API is deprecated and will be removed in any
-                :mod:`.stk` version released on, or after, 01/01/2022.
-                Use the `guests` parameter instead.
-
             num_processes: The number of parallel processes to create
                 during :meth:`construct`.
 
             optimizer: Used to optimize the structure of the
                 constructed molecule.
 
-        Raises:
-            :class:`TypeError`: If `guest_start` or `guest_target` is
-                defined but the other is not.
-
-            :class:`ValueError`: If the old API and new API are used
-                simultaneously.
-
-            :class:`RuntimeError`: If no guests are provided.
-
         """
 
-        old_params = (guest, displacement, guest_start, guest_target)
-
-        if guests is not None and any(
-            param is not None for param in old_params
-        ):
-            raise ValueError(
-                'You are attempting to use the old API with the new '
-                'API. Use the stk.host_guest.Guest API and "guests".'
-            )
-
-        if guests is not None:
-            building_block_vertices = self._get_vertices_from_guests(
-                host=host,
-                guests=guests,
-            )
-        elif guest is not None:
-            assert guest_start is not None
-            assert guest_target is not None
-            assert displacement is not None
-            warnings.warn(
-                'You defined a Complex topology graph using the old '
-                'API (by defining "guest" and any optional arguments: '
-                '"guest_start", "guest_target" and "displacement"). '
-                'This API will be removed from any version of stk '
-                'released on, or after, 01/01/22. Please use the '
-                '"guests" argument and the stk.host_guest.Guest '
-                'class to define all necessary attributes.',
-                category=FutureWarning,
-            )
-            building_block_vertices = self._get_vertices_from_guest(
-                host=host,
-                guest=guest,
-                guest_start=guest_start,
-                guest_target=guest_target,
-                displacement=displacement,
-            )
-        else:
-            raise RuntimeError(
-                'The "guests" parameter must be provided.'
-            )
+        building_block_vertices = self._get_vertices_from_guests(
+            host=host,
+            guests=guests,
+        )
 
         super().__init__(
             building_block_vertices=building_block_vertices,
@@ -557,12 +486,16 @@ class Complex(TopologyGraph):
 
     def _get_vertices_from_guests(
         self,
-        host,
-        guests,
-    ):
+        host: BuildingBlock,
+        guests: typing.Union[Guest, typing.Iterable[Guest]],
+    ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
+
         if isinstance(guests, Guest):
             guests = (guests, )
 
+        building_block_vertices: dict[
+            BuildingBlock, abc.Sequence[Vertex]
+        ]
         building_block_vertices = {
             host: (HostVertex(0, (0., 0., 0.)), )
         }
@@ -576,45 +509,6 @@ class Complex(TopologyGraph):
             for i, guest in enumerate(guests)
         }
         building_block_vertices.update(guest_vertices)
-
-        return building_block_vertices
-
-    def _get_vertices_from_guest(
-        self,
-        host: BuildingBlock,
-        guest: BuildingBlock,
-        guest_start: tuple[float, float, float],
-        guest_target: tuple[float, float, float],
-        displacement: tuple[float, float, float],
-    ):
-
-        num_nones = sum(
-            1 for vector in (guest_start, guest_target)
-            if vector is None
-        )
-        if num_nones == 1:
-            raise TypeError(
-                'If "guest_start" or "guest_target" is defined, '
-                'the other must be too.'
-            )
-
-        if guest_start is None:
-            guest_start = guest_target = (1., 0., 0.)
-
-        if displacement is None:
-            displacement = (0., 0., 0.)
-
-        building_block_vertices = {
-            host: (HostVertex(0, (0., 0., 0.)), ),
-            guest: (
-                GuestVertex(
-                    id=1,
-                    position=displacement,
-                    start=guest_start,
-                    target=guest_target,
-                ),
-            ),
-        }
 
         return building_block_vertices
 
