@@ -1,6 +1,7 @@
-from setuptools import find_packages, setup
 import re
 from os.path import join
+
+from setuptools import find_packages, setup
 
 
 def get_version():
