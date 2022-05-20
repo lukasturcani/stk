@@ -11,9 +11,9 @@ from stk.utilities import get_projection
 from ..topology_graph import Vertex
 
 
-class MetalVertex(Vertex):
+class UnaligningVertex(Vertex):
     """
-    Places the metal in a :class:`.MetalComplex`.
+    A vertex which does no rotations.
 
     """
 
@@ -28,6 +28,15 @@ class MetalVertex(Vertex):
         return {
             fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
         }
+
+
+class MetalVertex(UnaligningVertex):
+    """
+    Places the metal in a :class:`.MetalComplex`.
+
+    """
+
+    pass
 
 
 class MonoDentateLigandVertex(Vertex):

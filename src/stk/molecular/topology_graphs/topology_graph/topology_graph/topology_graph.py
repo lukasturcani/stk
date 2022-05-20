@@ -590,8 +590,8 @@ class TopologyGraph:
                 stages[-1].append(vertex.get_id())
         yield from (tuple(stage) for stage in stages if stage)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         raise NotImplementedError()
