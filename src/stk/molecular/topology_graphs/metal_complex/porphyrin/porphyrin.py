@@ -6,7 +6,7 @@ Porphyrin
 
 from ...topology_graph import Edge
 from ..metal_complex import MetalComplex
-from ..vertices import MetalVertex
+from ..vertices import MetalVertex, UnaligningVertex
 
 
 class Porphyrin(MetalComplex):
@@ -87,7 +87,7 @@ class Porphyrin(MetalComplex):
     """
 
     _metal_vertex_prototypes = (MetalVertex(0, (0, 0, 0)), )
-    _ligand_vertex_prototypes = (MetalVertex(1, (0, 0, 0)), )
+    _ligand_vertex_prototypes = (UnaligningVertex(1, (0, 0, 0)), )
 
     _edge_prototypes = (
         Edge(
