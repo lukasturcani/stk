@@ -112,20 +112,20 @@ class Alcohol(GenericFunctionalGroup):
         id_map: dict[int, int],
     ) -> Alcohol:
 
-        clone = super()._with_ids(id_map)
+        super()._with_ids(id_map)
 
         if (oxygen_id := self._oxygen.get_id()) in id_map:
-            clone._oxygen = self._oxygen.with_id(id_map[oxygen_id])
+            self._oxygen = self._oxygen.with_id(id_map[oxygen_id])
 
         if (hydrogen_id := self._hydrogen.get_id()) in id_map:
-            clone._hydrogen = self._hydrogen.with_id(
+            self._hydrogen = self._hydrogen.with_id(
                 id=id_map[hydrogen_id],
             )
 
         if (atom_id := self._atom.get_id()) in id_map:
-            clone._atom = self._atom.with_id(id_map[atom_id])
+            self._atom = self._atom.with_id(id_map[atom_id])
 
-        return clone
+        return self
 
     def with_ids(
         self,
