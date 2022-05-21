@@ -4,6 +4,11 @@ Aldehyde
 
 """
 
+from __future__ import annotations
+
+import typing
+
+from ...atoms import Atom, C, H, O
 from .generic_functional_group import GenericFunctionalGroup
 
 
@@ -18,39 +23,40 @@ class Aldehyde(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon,
-        oxygen,
-        hydrogen,
-        atom,
-        bonders,
-        deleters,
-        placers=None,
-    ):
+        carbon: C,
+        oxygen: O,  # noqa: Not an ambiguous name.
+        hydrogen: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.Aldehyde` instance.
 
-        Parameters
-        ----------
-        carbon : :class:`.C`
-            The carbon atom.
+        Parameters:
 
-        oxygen : :class:`.O`
-            The oxygen atom.
+            carbon:
+                The carbon atom.
 
-        hydrogen : :class:`.H`
-            The hydrogen atom.
+            oxygen:
+                The oxygen atom.
 
-        atom : :class:`.Atom`
-            The atom to which the functional group is attached.
+            hydrogen:
+                The hydrogen atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
+            atom:
+                The atom to which the functional group is attached.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
@@ -66,86 +72,92 @@ class Aldehyde(GenericFunctionalGroup):
             placers=bonders if placers is None else placers,
         )
 
-    def get_carbon(self):
+    def get_carbon(self) -> C:
         """
         Get the carbon atom.
 
-        Returns
-        -------
-        :class:`.C`
+        Returns:
+
             The carbon atom.
 
         """
 
         return self._carbon
 
-    def get_oxygen(self):
+    def get_oxygen(self) -> O:  # noqa: Not an ambiguous name.
         """
         Get the oxygen atom.
 
-        Returns
-        -------
-        :class:`.O`
+        Returns:
+
             The oxygen atom.
 
         """
         return self._oxygen
 
-    def get_hydrogen(self):
+    def get_hydrogen(self) -> H:
         """
         Get the hydrogen atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
+
             The hydrogen atom.
 
         """
 
         return self._hydrogen
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the atom to which the functional group is attached.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The atom to which the functional group is attached.
 
         """
 
         return self._atom
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
-        clone._carbon = atom_map.get(
-            self._carbon.get_id(),
-            self._carbon,
-        )
-        clone._oxygen = atom_map.get(
-            self._oxygen.get_id(),
-            self._oxygen,
-        )
-        clone._hydrogen = atom_map.get(
-            self._hydrogen.get_id(),
-            self._hydrogen,
-        )
-        clone._atom = atom_map.get(
-            self._atom.get_id(),
-            self._atom,
-        )
-        return clone
+    def _with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Aldehyde:
 
-    def clone(self):
-        clone = super().clone()
+        super()._with_ids(id_map)
+
+        if (carbon_id := self._carbon.get_id()) in id_map:
+            self._carbon = self._carbon.with_id(id_map[carbon_id])
+
+        if (oxygen_id := self._oxygen.get_id()) in id_map:
+            self._oxygen = self._oxygen.with_id(id_map[oxygen_id])
+
+        if (hydrogen_id := self._hydrogen.get_id()) in id_map:
+            self._hydrogen = self._hydrogen.with_id(
+                id=id_map[hydrogen_id],
+            )
+
+        if (atom_id := self._atom.get_id()) in id_map:
+            self._atom = self._atom.with_id(id_map[atom_id])
+
+        return self
+
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Aldehyde:
+
+        return self.clone()._with_ids(id_map)
+
+    def clone(self) -> Aldehyde:
+        clone = super()._clone()
         clone._carbon = self._carbon
         clone._oxygen = self._oxygen
         clone._hydrogen = self._hydrogen
         clone._atom = self._atom
         return clone
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._carbon}, {self._oxygen}, {self._hydrogen}, '
