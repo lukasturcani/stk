@@ -14,6 +14,7 @@ from functools import partial
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
+import warnings
 import vabene
 
 from ...utilities import OneOrMany, flatten, remake
@@ -437,7 +438,6 @@ class BuildingBlock(Molecule):
                 types are:
 
                     #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
-                    #. ``.pdb`` - PDB file
 
             functional_groups:
                 An :class:`iterable` of :class:`.FunctionalGroup` or
@@ -483,6 +483,15 @@ class BuildingBlock(Molecule):
         """
 
         _, extension = os.path.splitext(path)
+
+        if extension == '.pdb':
+            warnings.warn(
+                'Loading from .pdb files is deprecated and will be '
+                'removed from stk versions released after 1st Nov '
+                '2022. Please use .mol files for loading molecules '
+                'instead.',
+                category=FutureWarning,
+            )
 
         if extension not in cls._init_funcs:
             raise ValueError(
