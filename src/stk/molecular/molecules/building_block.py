@@ -9,12 +9,12 @@ from __future__ import annotations
 import logging
 import os
 import typing
+import warnings
 from collections.abc import Collection
 from functools import partial
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
-import warnings
 import vabene
 
 from ...utilities import OneOrMany, flatten, remake
