@@ -4,6 +4,11 @@ Boronic Acid
 
 """
 
+from __future__ import annotations
+
+import typing
+
+from ...atoms import Atom, B, H, O
 from .generic_functional_group import GenericFunctionalGroup
 
 
@@ -18,47 +23,48 @@ class BoronicAcid(GenericFunctionalGroup):
 
     def __init__(
         self,
-        boron,
-        oxygen1,
-        hydrogen1,
-        oxygen2,
-        hydrogen2,
-        atom,
-        bonders,
-        deleters,
-        placers=None,
-    ):
+        boron: B,
+        oxygen1: O,  # noqa: Not an ambiguous name.
+        hydrogen1: H,
+        oxygen2: O,  # noqa: Not an ambiguous name.
+        hydrogen2: H,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.BoronicAcid` instance.
 
-        Parameters
-        ----------
-        boron : :class:`.B`
-            The ``[boron]`` atom.
+        Parameters:
 
-        oxygen1 : :class:`.O`
-            The ``[oxygen1]`` atom.
+            boron:
+                The ``[boron]`` atom.
 
-        hydrogen1 : :class:`.H`
-            The ``[hydrogen]`` atom.
+            oxygen1:
+                The ``[oxygen1]`` atom.
 
-        oxygen2 : :class:`.O`
-            The ``[oyxgen2]`` atom.
+            hydrogen1:
+                The ``[hydrogen]`` atom.
 
-        hydrogen2 : :class:`.H`
-            The ``[hydrogen2]`` atom.
+            oxygen2:
+                The ``[oyxgen2]`` atom.
 
-        atom : :class:`.Atom`
-            The ``[atom]`` atom.
+            hydrogen2:
+                The ``[hydrogen2]`` atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            the bonder atoms.
+            atom:
+                The ``[atom]`` atom.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
@@ -76,86 +82,80 @@ class BoronicAcid(GenericFunctionalGroup):
             placers=bonders if placers is None else placers,
         )
 
-    def get_boron(self):
+    def get_boron(self) -> B:
         """
         Get the ``[boron]`` atom.
 
-        Returns
-        -------
-        :class:`.B`
+        Returns:
+
             The ``[boron]`` atom.
 
         """
 
         return self._boron
 
-    def get_oxygen1(self):
+    def get_oxygen1(self) -> O:  # noqa: Not an ambiguous name.
         """
         Get the ``[oxygen1]`` atom.
 
-        Returns
-        -------
-        :class:`.O`
+        Returns:
+
             The ``[oxygen1]`` atom.
 
         """
 
         return self._oxygen1
 
-    def get_hydrogen1(self):
+    def get_hydrogen1(self) -> H:
         """
         Get the ``[hydrogen1]`` atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
+
             The ``[hydrogen1]`` atom.
 
         """
 
         return self._hydrogen1
 
-    def get_oxygen2(self):
+    def get_oxygen2(self) -> O:  # noqa: Not an ambiguous name.
         """
         Get the ``[oxygen2]`` atom.
 
-        Returns
-        -------
-        :class:`.O`
+        Returns:
+
             The ``[oxygen2]`` atom.
 
         """
 
         return self._oxygen2
 
-    def get_hydrogen2(self):
+    def get_hydrogen2(self) -> H:
         """
         Get the ``[hydrogen2]`` atom.
 
-        Returns
-        -------
-        :class:`.H`
+        Returns:
+
             The ``[hydrogen2]`` atom.
 
         """
 
         return self._hydrogen2
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The ``[atom]`` atom.
 
         """
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> BoronicAcid:
+        clone = super()._clone()
         clone._boron = self._boron
         clone._oxygen1 = self._oxygen1
         clone._hydrogen1 = self._hydrogen1
@@ -164,35 +164,44 @@ class BoronicAcid(GenericFunctionalGroup):
         clone._atom = self._atom
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
-        clone._boron = atom_map.get(
-            self._boron.get_id(),
-            self._boron,
-        )
-        clone._oxygen1 = atom_map.get(
-            self._oxygen1.get_id(),
-            self._oxygen1,
-        )
-        clone._hydrogen1 = atom_map.get(
-            self._hydrogen1.get_id(),
-            self._hydrogen1,
-        )
-        clone._oxygen2 = atom_map.get(
-            self._oxygen2.get_id(),
-            self._oxygen2,
-        )
-        clone._hydrogen2 = atom_map.get(
-            self._hydrogen2.get_id(),
-            self._hydrogen2,
-        )
-        clone._atom = atom_map.get(
-            self._atom.get_id(),
-            self._atom,
-        )
-        return clone
+    def _with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> BoronicAcid:
 
-    def __repr__(self):
+        super()._with_ids(id_map)
+
+        if (boron_id := self._boron.get_id()) in id_map:
+            self._boron = self._boron.with_id(id_map[boron_id])
+
+        if (oxygen1_id := self._oxygen1.get_id()) in id_map:
+            self._oxygen1 = self._oxygen1.with_id(id_map[oxygen1_id])
+
+        if (hydrogen1_id := self._hydrogen1.get_id()) in id_map:
+            self._hydrogen1 = self._hydrogen1.with_id(
+                id=id_map[hydrogen1_id],
+            )
+
+        if (oxygen2_id := self._oxygen2.get_id()) in id_map:
+            self._oxygen2 = self._oxygen2.with_id(id_map[oxygen2_id])
+
+        if (hydrogen2_id := self._hydrogen2.get_id()) in id_map:
+            self._hydrogen2 = self._hydrogen2.with_id(
+                id=id_map[hydrogen2_id],
+            )
+
+        if (atom_id := self._atom.get_id()) in id_map:
+            self._atom = self._atom.with_id(id_map[atom_id])
+
+        return self
+
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> BoronicAcid:
+        return self.clone()._with_ids(id_map)
+
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._boron}, {self._oxygen1}, {self._hydrogen1}, '
