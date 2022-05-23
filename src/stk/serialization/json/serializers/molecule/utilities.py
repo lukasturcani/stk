@@ -4,19 +4,40 @@ JSON Serialization Utilities for Molecules
 
 """
 
+from __future__ import annotations
 
-def atom_to_json(atom):
+from .....molecular import Atom, Bond
+
+AtomicNumber = int
+AtomicCharge = int
+AtomJson = tuple[
+    AtomicNumber,
+    AtomicCharge,
+]
+AtomId = int
+BondOrder = int
+BondPeriodicity = tuple[int, int, int]
+BondJson = tuple[
+    AtomId,
+    AtomId,
+    BondOrder,
+    BondPeriodicity,
+]
+
+
+def atom_to_json(
+    atom: Atom,
+) -> AtomJson:
     """
     Return a JSON representation of `atom`.
 
-    Parameters
-    ----------
-    atom : :class:`.Atom`
-        The atom to serialize.
+    Parameters:
 
-    Returns
-    -------
-    :class:`dict`
+        atom:
+            The atom to serialize.
+
+    Returns:
+
         A JSON representation of `atom`.
 
     """
@@ -27,18 +48,19 @@ def atom_to_json(atom):
     )
 
 
-def bond_to_json(bond):
+def bond_to_json(
+    bond: Bond,
+) -> BondJson:
     """
     Return a JSON representation of `bond`.
 
-    Parameters
-    ----------
-    bond : :class:`.Bond`
-        The bond to serialize.
+    Parameters:
 
-    Returns
-    -------
-    :class:`dict`
+        bond:
+            The bond to serialize.
+
+    Returns:
+
         A JSON representation of `bond`.
 
     """
