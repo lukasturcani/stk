@@ -4,6 +4,11 @@ Bromo
 
 """
 
+from __future__ import annotations
+
+import typing
+
+from ...atoms import Atom, Br
 from .generic_functional_group import GenericFunctionalGroup
 
 
@@ -16,26 +21,34 @@ class Bromo(GenericFunctionalGroup):
 
     """
 
-    def __init__(self, bromine, atom, bonders, deleters, placers=None):
+    def __init__(
+        self,
+        bromine: Br,
+        atom: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.Bromo` instance.
 
-        Parameters
-        ----------
-        bromine : :class:`.Br`
-            The ``[bromine]`` atom.
+        Parameters:
 
-        atom : :class:`.Atom`
-            The ``[atom]`` atom.
+            bromine:
+                The ``[bromine]`` atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-            The bonder atoms.
+            atom:
+                The ``[atom]`` atom.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
@@ -48,51 +61,57 @@ class Bromo(GenericFunctionalGroup):
             placers=bonders if placers is None else placers,
         )
 
-    def get_bromine(self):
+    def get_bromine(self) -> Br:
         """
         Get the ``[bromine]`` atom.
 
-        Returns
-        -------
-        :class:`.Br`
+        Returns:
+
             The ``[bromine]`` atom.
 
         """
 
         return self._bromine
 
-    def get_atom(self):
+    def get_atom(self) -> Atom:
         """
         Get the ``[atom]`` atom.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The ``[atom]`` atom.
 
         """
 
         return self._atom
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> Bromo:
+        clone = super()._clone()
         clone._bromine = self._bromine
         clone._atom = self._atom
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
-        clone._bromine = atom_map.get(
-            self._bromine.get_id(),
-            self._bromine,
-        )
-        clone._atom = atom_map.get(
-            self._atom.get_id(),
-            self._atom,
-        )
-        return clone
+    def _with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Bromo:
 
-    def __repr__(self):
+        super()._with_ids(id_map)
+        if (bromine_id := self._bromine.get_id()) in id_map:
+            self._bromine = self._bromine.with_id(id_map[bromine_id])
+
+        if (atom_id := self._atom.get_id()) in id_map:
+            self._atom = self._atom.with_id(id_map[atom_id])
+
+        return self
+
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Bromo:
+        return self.clone()._with_ids(id_map)
+
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._bromine}, {self._atom}, '

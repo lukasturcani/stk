@@ -4,6 +4,11 @@ Alkyne
 
 """
 
+from __future__ import annotations
+
+import typing
+
+from ...atoms import Atom, C
 from .generic_functional_group import GenericFunctionalGroup
 
 
@@ -18,39 +23,40 @@ class Alkyne(GenericFunctionalGroup):
 
     def __init__(
         self,
-        carbon1,
-        atom1,
-        carbon2,
-        atom2,
-        bonders,
-        deleters,
-        placers=None,
-    ):
+        carbon1: C,
+        atom1: Atom,
+        carbon2: C,
+        atom2: Atom,
+        bonders: tuple[Atom, ...],
+        deleters: tuple[Atom, ...],
+        placers: typing.Optional[tuple[Atom, ...]] = None,
+    ) -> None:
         """
         Initialize a :class:`.Alkyne` instance.
 
-        Parameters
-        ----------
-        carbon1 : :class:`.C`
-            The ``[carbon1]`` atom.
+        Parameters:
 
-        atom1 : :class:`.Atom`
-            The ``[atom1]`` atom.
+            carbon1:
+                The ``[carbon1]`` atom.
 
-        carbon2 : :class:`.C`
-            The ``[carbon2]`` atom.
+            atom1:
+                The ``[atom1]`` atom.
 
-        atom2 : :class:`.Atom`
-            The ``[atom2]`` atom.
+            carbon2:
+                The ``[carbon2]`` atom.
 
-        bonders : :class:`tuple` of :class:`.Atom`
-                The bonder atoms.
+            atom2:
+                The ``[atom2]`` atom.
 
-        deleters : :class:`tuple` of :class:`.Atom`
-            The deleter atoms.
+            bonders:
+                    The bonder atoms.
 
-        placers : :class:`tuple` of :class:`.Atom`, optional
-            The placer atoms. If ``None`` the `bonders` will be used.
+            deleters:
+                The deleter atoms.
+
+            placers:
+                The placer atoms. If ``None`` the `bonders` will be
+                used.
 
         """
 
@@ -66,87 +72,90 @@ class Alkyne(GenericFunctionalGroup):
             placers=bonders if placers is None else placers,
         )
 
-    def get_atom1(self):
+    def get_atom1(self) -> Atom:
         """
         Get the ``[atom1]`` atom.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The ``[atom1]`` atom.
 
         """
 
         return self._atom1
 
-    def get_carbon1(self):
+    def get_carbon1(self) -> C:
         """
         Get the ``[carbon1]`` atom.
 
-        Returns
-        -------
-        :class:`.C`
+        Returns:
+
             The ``[carbon1]`` atom.
 
         """
 
         return self._carbon1
 
-    def get_carbon2(self):
+    def get_carbon2(self) -> C:
         """
         Get the ``[carbon2]`` atom.
 
-        Returns
-        -------
-        :class:`.C`
+        Returns:
+
             The ``[carbon2]`` atom.
 
         """
 
         return self._carbon2
 
-    def get_atom2(self):
+    def get_atom2(self) -> Atom:
         """
         Get the ``[atom2]`` atom.
 
-        Returns
-        -------
-        :class:`.Atom`
+        Returns:
+
             The ``[atom2]`` atom.
 
         """
 
         return self._atom2
 
-    def clone(self):
-        clone = super().clone()
+    def clone(self) -> Alkyne:
+        clone = super()._clone()
         clone._carbon1 = self._carbon1
         clone._atom1 = self._atom1
         clone._carbon2 = self._carbon2
         clone._atom2 = self._atom2
         return clone
 
-    def with_atoms(self, atom_map):
-        clone = super().with_atoms(atom_map)
-        clone._carbon1 = atom_map.get(
-            self._carbon1.get_id(),
-            self._carbon1,
-        )
-        clone._atom1 = atom_map.get(
-            self._atom1.get_id(),
-            self._atom1,
-        )
-        clone._carbon2 = atom_map.get(
-            self._carbon2.get_id(),
-            self._carbon2,
-        )
-        clone._atom2 = atom_map.get(
-            self._atom2.get_id(),
-            self._atom2,
-        )
-        return clone
+    def _with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Alkyne:
 
-    def __repr__(self):
+        super()._with_ids(id_map)
+        if (carbon1_id := self._carbon1.get_id()) in id_map:
+            self._carbon1 = self._carbon1.with_id(id_map[carbon1_id])
+
+        if (atom1_id := self._atom1.get_id()) in id_map:
+            self._atom1 = self._atom1.with_id(id_map[atom1_id])
+
+        if (carbon2_id := self._carbon2.get_id()) in id_map:
+            self._carbon2 = self._carbon2.with_id(id_map[carbon2_id])
+
+        if (atom2_id := self._atom2.get_id()) in id_map:
+            self._atom2 = self._atom2.with_id(id_map[atom2_id])
+
+        return self
+
+    def with_ids(
+        self,
+        id_map: dict[int, int],
+    ) -> Alkyne:
+
+        return self.clone()._with_ids(id_map)
+
+    def __repr__(self) -> str:
         return (
             f'{self.__class__.__name__}('
             f'{self._carbon1}, {self._atom1}, {self._carbon2}, '
