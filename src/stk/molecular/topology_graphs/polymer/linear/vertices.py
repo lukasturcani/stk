@@ -128,14 +128,16 @@ class TerminalVertex(LinearVertex):
     """
 
     def place_building_block(self, building_block, edges):
-        if building_block.get_num_functional_groups() != 1:
+        _check1 = building_block.get_num_functional_groups() != 1
+        _check2 = building_block.get_num_placers() > 1
+        if _check1 and _check2:
             return super().place_building_block(building_block, edges)
 
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        fg, = building_block.get_functional_groups()
+        fg = tuple(building_block.get_functional_groups())[0]
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
         )

@@ -659,6 +659,12 @@ class Linear(TopologyGraph):
 
         clone: dict[BuildingBlock, abc.Sequence[Vertex]]
         clone = {}
+        _head_id = 0
+        _tail_id = max([
+            vertex.get_id()
+            for vertex_list in building_block_vertices.values()
+            for vertex in vertex_list
+        ])
         for building_block, vertices in (
             building_block_vertices.items()
         ):
@@ -669,8 +675,6 @@ class Linear(TopologyGraph):
             # This can be discerned based on the knowledge that the
             # first and last vertex are the Head and Tail,
             # respectively.
-            _head_id = 0
-            _tail_id = max([vertex.get_id() for vertex in vertices])
             if building_block.get_num_placers() == 1:
                 clone[building_block] = tuple(
                     (
@@ -681,11 +685,7 @@ class Linear(TopologyGraph):
                         )
                         if vertex.get_id() not in (_head_id, _tail_id)
                         else
-                        vertex.__class__(
-                            id=vertex.get_id(),
-                            position=vertex.get_position(),
-                            flip=vertex.get_flip(),
-                        )
+                        vertex
                     ) for vertex in vertices
                 )
             else:
