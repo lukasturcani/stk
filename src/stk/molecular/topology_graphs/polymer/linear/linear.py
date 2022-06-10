@@ -662,14 +662,30 @@ class Linear(TopologyGraph):
         for building_block, vertices in (
             building_block_vertices.items()
         ):
-            # Building blocks with 1 placer, cannot be aligned and
-            # must therefore use an UnaligningVertex.
+            # Building blocks with 1 placer, cannot be aligned on
+            # linear vertices and must therefore use an
+            # UnaligningVertex.Building blocks with 1 placer can be
+            # placed on terminal vertices (HeadVertex or TailVertex).
+            # This can be discerned based on the knowledge that the
+            # first and last vertex are the Head and Tail,
+            # respectively.
+            _head_id = 0
+            _tail_id = max([vertex.get_id() for vertex in vertices])
             if building_block.get_num_placers() == 1:
                 clone[building_block] = tuple(
-                    UnaligningVertex(
-                        id=vertex.get_id(),
-                        position=vertex.get_position(),
-                        flip=vertex.get_flip(),
+                    (
+                        UnaligningVertex(
+                            id=vertex.get_id(),
+                            position=vertex.get_position(),
+                            flip=vertex.get_flip(),
+                        )
+                        if vertex.get_id() not in (_head_id, _tail_id)
+                        else
+                        vertex.__class__(
+                            id=vertex.get_id(),
+                            position=vertex.get_position(),
+                            flip=vertex.get_flip(),
+                        )
                     ) for vertex in vertices
                 )
             else:
