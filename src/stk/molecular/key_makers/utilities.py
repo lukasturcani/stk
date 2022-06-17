@@ -13,7 +13,7 @@ from ..molecules import Molecule
 
 def get_inchi(
     molecule: Molecule,
-):
+) -> str:
     """
     Get the InChI of `molecule`.
 

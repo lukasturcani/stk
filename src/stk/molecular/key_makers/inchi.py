@@ -6,6 +6,7 @@ InChI
 
 from __future__ import annotations
 
+from ..molecules import Molecule
 from .molecule import MoleculeKeyMaker
 from .utilities import get_inchi
 
@@ -57,7 +58,13 @@ class Inchi(MoleculeKeyMaker):
 
         """
 
-        super().__init__('InChI', get_inchi)
+        pass
+
+    def get_key_name(self) -> str:
+        return 'InChI'
+
+    def get_key(self, molecule: Molecule) -> str:
+        return get_inchi(molecule)
 
     def __str__(self) -> str:
         return repr(self)
