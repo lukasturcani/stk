@@ -331,14 +331,12 @@ class ConstructedMolecule(Molecule):
             for building_block in self._num_building_blocks
         }
 
-        self._num_building_blocks = {
-            building_block: num
-            for building_block, num
-            in zip(
+        self._num_building_blocks = dict(
+            zip(
                 building_blocks.values(),
                 self._num_building_blocks.values(),
-            )
-        }
+            ),
+        )
 
         ordering = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
         id_map = {
@@ -365,8 +363,11 @@ class ConstructedMolecule(Molecule):
                     building_block_id=None,
                 )
 
-            old_building_block_atom = (
-                old_atom_info.get_building_block_atom()
+            # If old_building_block is not None then neither is the
+            # old_building_block_atom.
+            old_building_block_atom = typing.cast(
+                Atom,
+                old_atom_info.get_building_block_atom(),
             )
 
             canonical_building_block_atom_id = canonical_map[
