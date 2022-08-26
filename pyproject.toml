@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stk"
+maintainers = [
+  { name = "Lukas Turcani", email = "lukasturcani@mailbox.org" },
+  { name = "Andrew Tarzia", email = "andrew.tarzia@gmail.com" },
+]
+dependencies = [
+  "scipy",
+  "matplotlib",
+  "pandas",
+  "pathos",
+  "seaborn",
+  "numpy",
+  "pymongo[srv]",
+  "MCHammer",
+  "SpinDry",
+  "vabene",
+  "rdkit-pypi",
+]
+requires-python = ">=3.9"
+dynamic = ["version"]
+
+
+
+[project.urls]
+github = "https://github.com/lukasturcani/stk"
+documentation = "https://stk.readthedocs.io"
+
+[tool.setuptools.package-data]
+stk = [
+  "py.typed",
+]
+
+[tool.setuptools_scm]
+write_to = "src/stk/_version.py"
