@@ -1,5 +1,5 @@
 [flake8]
-max-line-length = 71
+ignore = E501
 count = True
 show-source = True
 statistics = True
