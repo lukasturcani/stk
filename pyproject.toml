@@ -44,6 +44,21 @@ line-length = 71
 [tool.isort]
 profile = "black"
 
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+    "benchmark_*.py",
+    "*_benchmark.py",
+]
+python_functions = [
+  "test_*",
+  "benchmark_*"
+]
+
 [tool.mypy]
 show_error_codes = true
 no_implicit_optional = true
