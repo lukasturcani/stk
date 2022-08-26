@@ -3,3 +3,4 @@ max-line-length = 71
 count = True
 show-source = True
 statistics = True
+exclude = .venv
