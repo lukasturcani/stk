@@ -45,18 +45,8 @@ from itertools import product
 
 from ....utilities import OneOrMany
 from ...molecules import BuildingBlock
-from ...reactions import (
-    DativeReactionFactory,
-    GenericReactionFactory,
-    ReactionFactory,
-)
-from ..topology_graph import (
-    Edge,
-    NullOptimizer,
-    Optimizer,
-    TopologyGraph,
-    Vertex,
-)
+from ...reactions import DativeReactionFactory, GenericReactionFactory, ReactionFactory
+from ..topology_graph import Edge, NullOptimizer, Optimizer, TopologyGraph, Vertex
 from .vertices import (
     BiDentateLigandVertex,
     MetalVertex,

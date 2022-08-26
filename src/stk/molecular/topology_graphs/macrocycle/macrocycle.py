@@ -14,13 +14,7 @@ import numpy as np
 
 from ...molecules import BuildingBlock
 from ...reactions import GenericReactionFactory, ReactionFactory
-from ..topology_graph import (
-    Edge,
-    NullOptimizer,
-    Optimizer,
-    TopologyGraph,
-    Vertex,
-)
+from ..topology_graph import Edge, NullOptimizer, Optimizer, TopologyGraph, Vertex
 from .vertices import CycleVertex
 
 

@@ -4,12 +4,7 @@ import pytest
 import stk
 
 from ....case_data import CaseData
-from .utilities import (
-    get_closest_point,
-    get_edges,
-    get_fg_position,
-    get_points,
-)
+from .utilities import get_closest_point, get_edges, get_fg_position, get_points
 
 
 @pytest.fixture

@@ -14,19 +14,9 @@ import numpy as np
 
 from ....molecules import BuildingBlock
 from ....reactions import GenericReactionFactory, ReactionFactory
-from ...topology_graph import (
-    Edge,
-    NullOptimizer,
-    TopologyGraph,
-    Vertex,
-)
+from ...topology_graph import Edge, NullOptimizer, TopologyGraph, Vertex
 from ...topology_graph.optimizers import Optimizer
-from .vertices import (
-    HeadVertex,
-    LinearVertex,
-    TailVertex,
-    UnaligningVertex,
-)
+from .vertices import HeadVertex, LinearVertex, TailVertex, UnaligningVertex
 
 
 class Linear(TopologyGraph):

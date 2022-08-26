@@ -4,9 +4,7 @@ import numpy as np
 import pytest
 
 import stk
-from stk.molecular.topology_graphs.topology_graph import (
-    ConstructionState,
-)
+from stk.molecular.topology_graphs.topology_graph import ConstructionState
 
 from ..case_data import CaseData
 

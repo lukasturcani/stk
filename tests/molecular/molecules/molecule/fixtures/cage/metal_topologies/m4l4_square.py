@@ -3,11 +3,7 @@ import pytest
 import stk
 
 from ....case_data import CaseData
-from ...building_blocks import (
-    get_other_linker,
-    get_palladium_bi_1,
-    get_pd_atom,
-)
+from ...building_blocks import get_other_linker, get_palladium_bi_1, get_pd_atom
 
 
 def _get_palladium_cispbi_sqpl() -> stk.BuildingBlock:

@@ -22,11 +22,7 @@ from ..edge import Edge
 from ..edge_group import EdgeGroup
 from ..optimizers import Optimizer
 from ..vertex import Vertex
-from .implementations import (
-    _Parallel,
-    _Serial,
-    _TopologyGraphImplementation,
-)
+from .implementations import _Parallel, _Serial, _TopologyGraphImplementation
 
 _TopologyGraphT = typing.TypeVar(
     "_TopologyGraphT",
