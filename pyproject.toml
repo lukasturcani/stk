@@ -43,7 +43,6 @@ line-length = 71
 
 [tool.isort]
 profile = "black"
-include_trailing_comma = true
 
 [tool.mypy]
 show_error_codes = true
