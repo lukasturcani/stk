@@ -1,6 +1,9 @@
 name: Build and publish testing image
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '* * * * 0'
 
 jobs:
   build-and-publish-testing-image:
