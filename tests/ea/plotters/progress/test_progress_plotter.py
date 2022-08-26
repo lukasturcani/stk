@@ -19,7 +19,7 @@ def test_progress_plotter(tmp_path, case_data):
 
     _test_progress_plotter(
         plotter=case_data.plotter,
-        path=tmp_path / 'plot.png',
+        path=tmp_path / "plot.png",
         plot_data=case_data.plot_data,
     )
 

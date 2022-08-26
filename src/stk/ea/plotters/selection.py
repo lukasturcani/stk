@@ -13,7 +13,7 @@ import seaborn as sns
 
 from stk.molecular import InchiKey
 
-plt.switch_backend('agg')
+plt.switch_backend("agg")
 
 
 class SelectionPlotter:
@@ -85,13 +85,13 @@ class SelectionPlotter:
         self,
         filename,
         selector,
-        x_label='Molecule: InChIKey - Fitness Value',
+        x_label="Molecule: InChIKey - Fitness Value",
         record_label=lambda record: (
-            f'{InchiKey().get_key(record.get_molecule())} - '
-            f'{record.get_fitness_value()}'
+            f"{InchiKey().get_key(record.get_molecule())} - "
+            f"{record.get_fitness_value()}"
         ),
         heat_map_value=lambda record: record.get_fitness_value(),
-        heat_map_label='Fitness',
+        heat_map_label="Fitness",
         order_by=lambda record: record.get_fitness_value(),
     ):
         """
@@ -194,7 +194,7 @@ class SelectionPlotter:
         """
 
         self._plots += 1
-        sns.set(style='darkgrid')
+        sns.set(style="darkgrid")
         data = []
         for record, selection_count in counter.items():
             label = self._record_label(record)
@@ -202,9 +202,9 @@ class SelectionPlotter:
                 pd.DataFrame(
                     data={
                         self._x_label: label,
-                        'Number of Times Selected': selection_count,
-                        'order': self._order_by(record),
-                        'heat_map': self._heat_map_value(record)
+                        "Number of Times Selected": selection_count,
+                        "order": self._order_by(record),
+                        "heat_map": self._heat_map_value(record),
                     },
                     index=[self._x_label],
                 )
@@ -212,31 +212,30 @@ class SelectionPlotter:
         df = pd.concat(data, ignore_index=True)
 
         df = df.sort_values(
-            ['Number of Times Selected', 'order'],
-            ascending=[False, False]
+            ["Number of Times Selected", "order"],
+            ascending=[False, False],
         )
         norm = plt.Normalize(
-            df['heat_map'].min(),
-            df['heat_map'].max()
+            df["heat_map"].min(), df["heat_map"].max()
         )
-        sm = plt.cm.ScalarMappable(cmap='magma_r', norm=norm)
+        sm = plt.cm.ScalarMappable(cmap="magma_r", norm=norm)
         sm.set_array([])
 
-        df.to_csv(f'{self._filename}_{self._plots}.csv')
+        df.to_csv(f"{self._filename}_{self._plots}.csv")
         fig, ax = plt.subplots(figsize=(11.7, 8.28))
         sns.scatterplot(
-            x='Number of Times Selected',
+            x="Number of Times Selected",
             y=self._x_label,
-            hue='heat_map',
-            palette='magma_r',
+            hue="heat_map",
+            palette="magma_r",
             data=df,
             s=[200 for i in range(len(counter.keys()))],
             ax=ax,
         )
         ax.get_legend().remove()
         # https://tinyurl.com/2p9drmkh
-        plt.rcParams['axes.grid'] = False
+        plt.rcParams["axes.grid"] = False
         ax.figure.colorbar(sm).set_label(self._heat_map_label)
         plt.tight_layout()
-        fig.savefig(f'{self._filename}_{self._plots}.png', dpi=fig.dpi)
-        plt.close('all')
+        fig.savefig(f"{self._filename}_{self._plots}.png", dpi=fig.dpi)
+        plt.close("all")

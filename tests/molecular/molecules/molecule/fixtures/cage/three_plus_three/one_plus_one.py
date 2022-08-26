@@ -6,7 +6,7 @@ from ....case_data import CaseData
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
@@ -14,8 +14,8 @@ from ....case_data import CaseData
                     building_blocks=(
                         stk.BuildingBlock(
                             smiles=(
-                                'Br[C+]1[C+2][C+](Br)[C+]2[C+](F)[C+2]'
-                                'C2(Br)[C+2]1'
+                                "Br[C+]1[C+2][C+](Br)[C+]2[C+](F)[C+2]"
+                                "C2(Br)[C+2]1"
                             ),
                             functional_groups=[stk.BromoFactory()],
                         ),
@@ -23,8 +23,8 @@ from ....case_data import CaseData
                 ),
             ),
             smiles=(
-                'F[C+]1[C+2]C23[C+2][C+]4[C+2][C+]([C+]12)C12[C+2][C+]'
-                '(F)[C+]1[C+]3[C+2][C+]4[C+2]2'
+                "F[C+]1[C+2]C23[C+2][C+]4[C+2][C+]([C+]12)C12[C+2][C+]"
+                "(F)[C+]1[C+]3[C+2][C+]4[C+2]2"
             ),
             name=name,
         ),
@@ -32,5 +32,5 @@ from ....case_data import CaseData
 )
 def cage_one_plus_one(request) -> CaseData:
     return request.param(
-        f'{request.fixturename}{request.param_index}',
+        f"{request.fixturename}{request.param_index}",
     )

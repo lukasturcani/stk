@@ -393,25 +393,25 @@ class Macrocycle(TopologyGraph):
 
         if orientations is None:
             orientations = tuple(
-                0. for i in range(len(repeating_unit))
+                0.0 for i in range(len(repeating_unit))
             )
 
         if len(orientations) == len(repeating_unit):
-            orientations = orientations*num_repeating_units
+            orientations = orientations * num_repeating_units
 
-        chain_length = len(repeating_unit)*num_repeating_units
+        chain_length = len(repeating_unit) * num_repeating_units
         if chain_length == 2:
             warnings.warn(
-                'The orientation of macrocycles with chain length '
-                f'{chain_length} is not expected to provide robust '
-                'alignment and bonding.'
+                "The orientation of macrocycles with chain length "
+                f"{chain_length} is not expected to provide robust "
+                "alignment and bonding."
             )
 
         if len(orientations) != chain_length:
             raise ValueError(
-                'The length of orientations must match either '
-                'the length of repeating_unit or the '
-                'total number of vertices.'
+                "The length of orientations must match either "
+                "the length of repeating_unit or the "
+                "total number of vertices."
             )
 
         generator = np.random.RandomState(random_seed)
@@ -423,19 +423,19 @@ class Macrocycle(TopologyGraph):
         self._num_repeating_units = num_repeating_units
 
         # Each monomer in the macrocycle is separated by angle_diff.
-        angle_diff = (2*np.pi)/chain_length
+        angle_diff = (2 * np.pi) / chain_length
         vertices: list[CycleVertex] = []
         edges: list[Edge] = []
         choices = [True, False]
         for vertex_id, flip_chance in enumerate(orientations):
-            theta = vertex_id*angle_diff
+            theta = vertex_id * angle_diff
             vertices.append(
                 CycleVertex(
                     id=vertex_id,
                     position=(np.cos(theta), np.sin(theta), 0),
                     flip=generator.choice(
                         choices,
-                        p=[flip_chance, 1-flip_chance],
+                        p=[flip_chance, 1 - flip_chance],
                     ),
                     angle=theta,
                 )
@@ -445,7 +445,7 @@ class Macrocycle(TopologyGraph):
                 edges.append(
                     Edge(
                         id=len(edges),
-                        vertex1=vertices[vertex_id-1],
+                        vertex1=vertices[vertex_id - 1],
                         vertex2=vertices[vertex_id],
                     )
                 )
@@ -483,8 +483,8 @@ class Macrocycle(TopologyGraph):
 
         if isinstance(repeating_unit, tuple):
             return repeating_unit
-        base = ord('A')
-        return tuple(ord(letter)-base for letter in repeating_unit)
+        base = ord("A")
+        return tuple(ord(letter) - base for letter in repeating_unit)
 
     def _get_building_block_vertices(
         self,
@@ -492,13 +492,13 @@ class Macrocycle(TopologyGraph):
         vertices: abc.Sequence[CycleVertex],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
 
-        polymer = self._repeating_unit*self._num_repeating_units
+        polymer = self._repeating_unit * self._num_repeating_units
         building_block_vertices: dict[BuildingBlock, list[Vertex]]
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
             bb = building_blocks[bb_index]
-            building_block_vertices[bb] = (
-                building_block_vertices.get(bb, [])
+            building_block_vertices[bb] = building_block_vertices.get(
+                bb, []
             )
             building_block_vertices[bb].append(vertex)
         return typing.cast(
@@ -509,15 +509,18 @@ class Macrocycle(TopologyGraph):
     def _get_scale(
         self,
         building_block_vertices: dict[
-            BuildingBlock,
-            abc.Sequence[Vertex]
+            BuildingBlock, abc.Sequence[Vertex]
         ],
     ) -> float:
 
-        length = len(self._repeating_unit)*self._num_repeating_units
-        return length*0.25*max(
-            bb.get_maximum_diameter()
-            for bb in building_block_vertices
+        length = len(self._repeating_unit) * self._num_repeating_units
+        return (
+            length
+            * 0.25
+            * max(
+                bb.get_maximum_diameter()
+                for bb in building_block_vertices
+            )
         )
 
     def with_building_blocks(
@@ -528,7 +531,7 @@ class Macrocycle(TopologyGraph):
 
     def __repr__(self) -> str:
         return (
-            f'macrocycle.Macrocycle({self._repeating_unit!r}, '
-            f'{self._num_repeating_units!r}, '
-            f'{self._orientations!r})'
+            f"macrocycle.Macrocycle({self._repeating_unit!r}, "
+            f"{self._num_repeating_units!r}, "
+            f"{self._orientations!r})"
         )

@@ -5,6 +5,5 @@ def get_rank_fitness(population):
         reverse=True,
     )
     return {
-        record: 1/rank
-        for rank, record in enumerate(population, 1)
+        record: 1 / rank for rank, record in enumerate(population, 1)
     }

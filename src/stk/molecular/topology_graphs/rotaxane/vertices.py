@@ -68,21 +68,25 @@ class CycleVertex(Vertex):
     def place_building_block(self, building_block, edges):
         rdkit_mol = building_block.to_rdkit_mol()
         macrocycle = max(rdkit.GetSymmSSSR(rdkit_mol), key=len)
-        return building_block.with_centroid(
-            position=self._position,
-            atom_ids=macrocycle,
-        ).with_rotation_between_vectors(
-            start=building_block.get_plane_normal(macrocycle),
-            target=[-1 if self._flip else 1, 0, 0],
-            origin=self._position
-        ).get_position_matrix()
+        return (
+            building_block.with_centroid(
+                position=self._position,
+                atom_ids=macrocycle,
+            )
+            .with_rotation_between_vectors(
+                start=building_block.get_plane_normal(macrocycle),
+                target=[-1 if self._flip else 1, 0, 0],
+                origin=self._position,
+            )
+            .get_position_matrix()
+        )
 
     def map_functional_groups_to_edges(self, building_block, edges):
         return {}
 
     def __str__(self):
         return (
-            f'Vertex(id={self._id}, '
-            f'position={self._position.tolist()}, '
-            f'flip={self._flip})'
+            f"Vertex(id={self._id}, "
+            f"position={self._position.tolist()}, "
+            f"flip={self._flip})"
         )

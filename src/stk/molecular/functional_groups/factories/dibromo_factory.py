@@ -121,7 +121,7 @@ class DibromoFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[Br][#6]~[#6][Br]', molecule):
+        for atom_ids in _get_atom_ids("[Br][#6]~[#6][Br]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Dibromo(
                 atom1=atoms[1],

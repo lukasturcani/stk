@@ -12,7 +12,7 @@ import typing
 from ...atoms import Atom
 from .functional_group import FunctionalGroup
 
-_T = typing.TypeVar('_T', bound='GenericFunctionalGroup')
+_T = typing.TypeVar("_T", bound="GenericFunctionalGroup")
 
 
 class GenericFunctionalGroup(FunctionalGroup):
@@ -61,7 +61,8 @@ class GenericFunctionalGroup(FunctionalGroup):
             atoms=atoms,
             placers=bonders if placers is None else placers,
             core_atoms=tuple(
-                atom for atom in atoms
+                atom
+                for atom in atoms
                 if atom.get_id() not in deleter_set
             ),
         )
@@ -105,7 +106,8 @@ class GenericFunctionalGroup(FunctionalGroup):
                     bonder.get_id(),
                     bonder.get_id(),
                 )
-            ) for bonder in self._bonders
+            )
+            for bonder in self._bonders
         )
         self._deleters = tuple(
             deleter.with_id(
@@ -113,7 +115,8 @@ class GenericFunctionalGroup(FunctionalGroup):
                     deleter.get_id(),
                     deleter.get_id(),
                 ),
-            ) for deleter in self._deleters
+            )
+            for deleter in self._deleters
         )
         return self
 
@@ -187,9 +190,9 @@ class GenericFunctionalGroup(FunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'atoms={self._atoms}, '
-            f'bonders={self._bonders}, '
-            f'deleters={self._deleters}'
-            ')'
+            f"{self.__class__.__name__}("
+            f"atoms={self._atoms}, "
+            f"bonders={self._bonders}, "
+            f"deleters={self._deleters}"
+            ")"
         )

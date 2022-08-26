@@ -10,13 +10,13 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('center'),
-        lazy_fixture('head_1'),
-        lazy_fixture('head_2'),
-        lazy_fixture('head_3'),
-        lazy_fixture('tail_1'),
-        lazy_fixture('tail_2'),
-        lazy_fixture('tail_3'),
+        lazy_fixture("center"),
+        lazy_fixture("head_1"),
+        lazy_fixture("head_2"),
+        lazy_fixture("head_3"),
+        lazy_fixture("tail_1"),
+        lazy_fixture("tail_2"),
+        lazy_fixture("tail_3"),
     ),
 )
 def case_data(request):
@@ -31,7 +31,7 @@ def case_data(request):
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrCCNCBr',
+            smiles="BrCCNCBr",
             functional_groups=[stk.BromoFactory()],
         ),
     ),
@@ -48,7 +48,7 @@ def building_block_2(request) -> stk.BuildingBlock:
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrCC',
+            smiles="BrCC",
             functional_groups=[stk.BromoFactory()],
         ),
     ),

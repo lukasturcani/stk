@@ -89,7 +89,7 @@ class ConstructedMolecule(Molecule):
 
     """
 
-    _atom_infos:  tuple[AtomInfo, ...]
+    _atom_infos: tuple[AtomInfo, ...]
     _bond_infos: tuple[BondInfo, ...]
     _num_building_blocks: dict[Molecule, int]
 
@@ -220,8 +220,7 @@ class ConstructedMolecule(Molecule):
             building_block: construction_result.get_num_building_block(
                 building_block=building_block,
             )
-            for building_block
-            in construction_result.get_building_blocks()
+            for building_block in construction_result.get_building_blocks()
         }
         return obj
 
@@ -295,7 +294,7 @@ class ConstructedMolecule(Molecule):
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
 
         for atom_id in atom_ids:
             yield self._atom_infos[atom_id]
@@ -318,9 +317,7 @@ class ConstructedMolecule(Molecule):
     def _with_canonical_atom_ordering(self) -> ConstructedMolecule:
         # Make all building blocks canonically ordered too.
         building_blocks = {
-            building_block:
-                building_block.with_canonical_atom_ordering()
-
+            building_block: building_block.with_canonical_atom_ordering()
             for building_block in self._num_building_blocks
         }
 
@@ -378,10 +375,10 @@ class ConstructedMolecule(Molecule):
                 old_building_block
             ]
 
-            canonical_building_block_atom, = (
-                canonical_building_block.get_atoms(
-                    atom_ids=canonical_building_block_atom_id,
-                )
+            (
+                canonical_building_block_atom,
+            ) = canonical_building_block.get_atoms(
+                atom_ids=canonical_building_block_atom_id,
             )
 
             return AtomInfo(
@@ -408,10 +405,12 @@ class ConstructedMolecule(Molecule):
             )
 
         self._atom_infos = tuple(map(get_atom_info, self._atoms))
-        self._bond_infos = tuple(sorted(
-            map(get_bond_info, self._bond_infos),
-            key=get_bond_info_atom_ids,
-        ))
+        self._bond_infos = tuple(
+            sorted(
+                map(get_bond_info, self._bond_infos),
+                key=get_bond_info_atom_ids,
+            )
+        )
         return self
 
     def with_centroid(

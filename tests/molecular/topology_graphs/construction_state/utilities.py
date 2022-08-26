@@ -40,21 +40,21 @@ def is_clone(construction_state, clone):
     )
 
     for vertex_id in range(clone.get_num_vertices()):
-        assert (
-            construction_state.get_vertex(vertex_id)
-            is clone.get_vertex(vertex_id)
-        )
+        assert construction_state.get_vertex(
+            vertex_id
+        ) is clone.get_vertex(vertex_id)
 
-    assert np.all(np.equal(
-        construction_state.get_position_matrix(),
-        clone.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            construction_state.get_position_matrix(),
+            clone.get_position_matrix(),
+        )
+    )
 
     assert construction_state.get_num_edges() == clone.get_num_edges()
     for edge_id in range(clone.get_num_edges()):
-        assert (
-            construction_state.get_edge(edge_id)
-            is clone.get_edge(edge_id)
+        assert construction_state.get_edge(edge_id) is clone.get_edge(
+            edge_id
         )
 
     edge_group = stk.EdgeGroup(
@@ -77,8 +77,7 @@ def is_clone(construction_state, clone):
 
     assert all(
         np.all(np.equal(actual_constant, expected_constant))
-        for actual_constant, expected_constant
-        in it.zip_longest(
+        for actual_constant, expected_constant in it.zip_longest(
             construction_state.get_lattice_constants(),
             clone.get_lattice_constants(),
         )

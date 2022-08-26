@@ -90,7 +90,7 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(2, 3), placers=None):
+    def __init__(self, bonders=(1,), deleters=(2, 3), placers=None):
         """
         Initialize a :class:`.TerminalAlkyneFactory` instance.
 
@@ -115,7 +115,7 @@ class TerminalAlkyneFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[*][C]#[C][H]', molecule):
+        for atom_ids in _get_atom_ids("[*][C]#[C][H]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Alkyne(
                 atom1=atoms[0],

@@ -156,16 +156,12 @@ class M4L8(Cage):
         NonLinearVertex(1, [0, 1, 0]),
         NonLinearVertex(2, [-1, 0, 0]),
         NonLinearVertex(3, [0, -1, 0]),
-
         LinearVertex(4, [1, 1, 0.5], False),
         LinearVertex(5, [1, 1, -0.5], False),
-
         LinearVertex(6, [1, -1, 0.5], False),
         LinearVertex(7, [1, -1, -0.5], False),
-
         LinearVertex(8, [-1, -1, 0.5], False),
         LinearVertex(9, [-1, -1, -0.5], False),
-
         LinearVertex(10, [-1, 1, 0.5], False),
         LinearVertex(11, [-1, 1, -0.5], False),
     )
@@ -175,17 +171,14 @@ class M4L8(Cage):
         Edge(1, _vertex_prototypes[0], _vertex_prototypes[5]),
         Edge(2, _vertex_prototypes[0], _vertex_prototypes[6]),
         Edge(3, _vertex_prototypes[0], _vertex_prototypes[7]),
-
         Edge(4, _vertex_prototypes[1], _vertex_prototypes[4]),
         Edge(5, _vertex_prototypes[1], _vertex_prototypes[5]),
         Edge(6, _vertex_prototypes[1], _vertex_prototypes[10]),
         Edge(7, _vertex_prototypes[1], _vertex_prototypes[11]),
-
         Edge(8, _vertex_prototypes[2], _vertex_prototypes[10]),
         Edge(9, _vertex_prototypes[2], _vertex_prototypes[11]),
         Edge(10, _vertex_prototypes[2], _vertex_prototypes[8]),
         Edge(11, _vertex_prototypes[2], _vertex_prototypes[9]),
-
         Edge(12, _vertex_prototypes[3], _vertex_prototypes[8]),
         Edge(13, _vertex_prototypes[3], _vertex_prototypes[9]),
         Edge(14, _vertex_prototypes[3], _vertex_prototypes[6]),

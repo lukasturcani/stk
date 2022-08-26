@@ -6,26 +6,26 @@ from ...case_data import CaseData
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrC1=C(Br)[C+]=N1',
+                            smiles="BrC1=C(Br)[C+]=N1",
                             functional_groups=[stk.BromoFactory()],
                         ),
                         stk.BuildingBlock(
-                            smiles='Br[C+]=NC#CBr',
+                            smiles="Br[C+]=NC#CBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='AB',
-                    num_repeating_units=2
+                    repeating_unit="AB",
+                    num_repeating_units=2,
                 ),
             ),
-            smiles='BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1',
+            smiles="BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1",
             name=name,
         ),
         lambda name: CaseData(
@@ -33,20 +33,20 @@ from ...case_data import CaseData
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrC1=C(Br)[C+]=N1',
+                            smiles="BrC1=C(Br)[C+]=N1",
                             functional_groups=[stk.BromoFactory()],
                         ),
                         stk.BuildingBlock(
-                            smiles='Br[C+]=NC#CBr',
+                            smiles="Br[C+]=NC#CBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='AB',
+                    repeating_unit="AB",
                     num_repeating_units=2,
                     optimizer=stk.Collapser(scale_steps=False),
                 ),
             ),
-            smiles='BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1',
+            smiles="BrC#CN=[C+]C1=C(C#CN=[C+]C2=C(Br)N=[C+]2)N=[C+]1",
             name=name,
         ),
         lambda name: CaseData(
@@ -54,15 +54,15 @@ from ...case_data import CaseData
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrC1=C(Br)N=[C+]1',
+                            smiles="BrC1=C(Br)N=[C+]1",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='A',
+                    repeating_unit="A",
                     num_repeating_units=1,
                 ),
             ),
-            smiles='BrC1=C(Br)N=[C+]1',
+            smiles="BrC1=C(Br)N=[C+]1",
             name=name,
         ),
         lambda name: CaseData(
@@ -70,22 +70,22 @@ from ...case_data import CaseData
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrCBr',
+                            smiles="BrCBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                         stk.BuildingBlock(
-                            smiles='BrCCCBr',
+                            smiles="BrCCCBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='AB',
+                    repeating_unit="AB",
                     num_repeating_units=3,
                 ),
             ),
             smiles=(
-                '[H]C([H])(Br)C([H])([H])C([H])([H])C([H])([H])C([H])('
-                '[H])C([H])([H])C([H])([H])C([H])([H])C([H])([H])C([H]'
-                ')([H])C([H])([H])C([H])([H])Br'
+                "[H]C([H])(Br)C([H])([H])C([H])([H])C([H])([H])C([H])("
+                "[H])C([H])([H])C([H])([H])C([H])([H])C([H])([H])C([H]"
+                ")([H])C([H])([H])C([H])([H])Br"
             ),
             name=name,
         ),
@@ -93,5 +93,5 @@ from ...case_data import CaseData
 )
 def polymer_linear(request) -> CaseData:
     return request.param(
-        f'{request.fixturename}{request.param_index}',
+        f"{request.fixturename}{request.param_index}",
     )

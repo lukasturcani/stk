@@ -10,14 +10,14 @@ from ..case_data import CaseData
 def get_topology_graph(num_repeating_units):
     return stk.polymer.Linear(
         building_blocks=(
-            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
         ),
-        repeating_unit='A',
+        repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
     return (
         stk.MoleculeRecord(
@@ -39,7 +39,7 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda population: CaseData(
             selector=stk.Roulette(
@@ -48,27 +48,27 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[0], ),
+                    records=(population[0],),
                     fitness_values={population[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], ),
+                    records=(population[1],),
                     fitness_values={population[1]: 9},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], ),
+                    records=(population[2],),
                     fitness_values={population[2]: 2},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[3], ),
+                    records=(population[3],),
                     fitness_values={population[3]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[4], ),
+                    records=(population[4],),
                     fitness_values={population[4]: 1},
                     key_maker=stk.Inchi(),
                 ),
@@ -81,27 +81,27 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[0], ),
+                    records=(population[0],),
                     fitness_values={population[0]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], ),
+                    records=(population[1],),
                     fitness_values={population[1]: 9},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], ),
+                    records=(population[2],),
                     fitness_values={population[2]: 2},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[3], ),
+                    records=(population[3],),
                     fitness_values={population[3]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[4], ),
+                    records=(population[4],),
                     fitness_values={population[4]: 1},
                     key_maker=stk.Inchi(),
                 ),
@@ -109,8 +109,7 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
         ),
         lambda population: CaseData(
             selector=stk.Roulette(
-                batch_size=2,
-                duplicate_batches=False
+                batch_size=2, duplicate_batches=False
             ),
             population=population,
             selected=(
@@ -123,7 +122,10 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], population[2], ),
+                    records=(
+                        population[0],
+                        population[2],
+                    ),
                     fitness_values={
                         population[0]: 10,
                         population[2]: 2,
@@ -147,7 +149,10 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], population[2], ),
+                    records=(
+                        population[1],
+                        population[2],
+                    ),
                     fitness_values={
                         population[1]: 9,
                         population[2]: 2,
@@ -171,7 +176,10 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], population[3], ),
+                    records=(
+                        population[2],
+                        population[3],
+                    ),
                     fitness_values={
                         population[2]: 2,
                         population[3]: 1,
@@ -179,7 +187,10 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], population[4], ),
+                    records=(
+                        population[2],
+                        population[4],
+                    ),
                     fitness_values={
                         population[2]: 2,
                         population[4]: 1,
@@ -187,7 +198,10 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[3], population[4], ),
+                    records=(
+                        population[3],
+                        population[4],
+                    ),
                     fitness_values={
                         population[3]: 1,
                         population[4]: 1,

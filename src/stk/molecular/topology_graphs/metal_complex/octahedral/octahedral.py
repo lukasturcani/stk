@@ -83,9 +83,7 @@ class Octahedral(MetalComplex):
 
     """
 
-    _metal_vertex_prototypes = (
-        MetalVertex(0, (0, 0, 0)),
-    )
+    _metal_vertex_prototypes = (MetalVertex(0, (0, 0, 0)),)
     _ligand_vertex_prototypes = (
         MonoDentateLigandVertex(1, (2.5, 0, 0)),
         MonoDentateLigandVertex(2, (0, 2.5, 0)),

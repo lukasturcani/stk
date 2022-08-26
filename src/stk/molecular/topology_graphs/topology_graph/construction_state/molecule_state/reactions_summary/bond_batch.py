@@ -14,7 +14,7 @@ class _BondBatch:
 
     """
 
-    __slots__ = ['_bonds', '_bond_infos']
+    __slots__ = ["_bonds", "_bond_infos"]
 
     def __init__(self, bonds, atom_map):
         """

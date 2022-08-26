@@ -2,8 +2,8 @@ import stk
 
 
 def test_put_caching(mongo_client):
-    collection = '_test_put_caching'
-    database_name = '_test_put_caching'
+    collection = "_test_put_caching"
+    database_name = "_test_put_caching"
     mongo_client.drop_database(database_name)
 
     database = stk.ValueMongoDb(
@@ -11,7 +11,7 @@ def test_put_caching(mongo_client):
         collection=collection,
         database=database_name,
     )
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
     database.put(molecule, 43)
     database.put(molecule, 43)
 
@@ -26,8 +26,8 @@ def test_put_caching(mongo_client):
 
 
 def test_get_caching(mongo_client):
-    collection = '_test_get_caching'
-    database_name = '_test_get_caching'
+    collection = "_test_get_caching"
+    database_name = "_test_get_caching"
     mongo_client.drop_database(database_name)
 
     database = stk.ValueMongoDb(
@@ -35,7 +35,7 @@ def test_get_caching(mongo_client):
         collection=collection,
         database=database_name,
     )
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
     database.put(molecule, 43)
     database.get(molecule)
     database.get(molecule)

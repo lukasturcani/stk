@@ -10,53 +10,53 @@ from ..case_data import CaseData
 
 @pytest.fixture
 def molecules() -> tuple[stk.ConstructedMolecule, ...]:
-    bb1 = stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()])
-    bb2 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-    bb3 = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
-    bb4 = stk.BuildingBlock('BrCCCCBr', [stk.BromoFactory()])
-    bb5 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
-    bb6 = stk.BuildingBlock('BrCCNCBr', [stk.BromoFactory()])
+    bb1 = stk.BuildingBlock("BrC#CBr", [stk.BromoFactory()])
+    bb2 = stk.BuildingBlock("BrCCBr", [stk.BromoFactory()])
+    bb3 = stk.BuildingBlock("BrCCCBr", [stk.BromoFactory()])
+    bb4 = stk.BuildingBlock("BrCCCCBr", [stk.BromoFactory()])
+    bb5 = stk.BuildingBlock("BrCNCBr", [stk.BromoFactory()])
+    bb6 = stk.BuildingBlock("BrCCNCBr", [stk.BromoFactory()])
 
     return (
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
-                building_blocks=(bb1, ),
-                repeating_unit='A',
+                building_blocks=(bb1,),
+                repeating_unit="A",
                 num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb1, bb2),
-                repeating_unit='AB',
+                repeating_unit="AB",
                 num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
-                building_blocks=(bb3, ),
-                repeating_unit='A',
+                building_blocks=(bb3,),
+                repeating_unit="A",
                 num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb3, bb4),
-                repeating_unit='AB',
+                repeating_unit="AB",
                 num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
-                building_blocks=(bb5, ),
-                repeating_unit='A',
+                building_blocks=(bb5,),
+                repeating_unit="A",
                 num_repeating_units=3,
             ),
         ),
         stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(bb5, bb6),
-                repeating_unit='AB',
+                repeating_unit="AB",
                 num_repeating_units=3,
             ),
         ),
@@ -88,7 +88,7 @@ def constructed_molecule_mongo_db(
 
     inchi = stk.Inchi()
     smiles = stk.Smiles()
-    database_name = '_test_get_all_constructed_molecules'
+    database_name = "_test_get_all_constructed_molecules"
     mongo_client.drop_database(database_name)
 
     inchi_molecules = molecules[:2]
@@ -98,14 +98,14 @@ def constructed_molecule_mongo_db(
     inchi_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        key_makers=(inchi, ),
-        indices=(inchi.get_key_name(), ),
+        key_makers=(inchi,),
+        indices=(inchi.get_key_name(),),
     )
     smiles_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        key_makers=(smiles, ),
-        indices=(smiles.get_key_name(), ),
+        key_makers=(smiles,),
+        indices=(smiles.get_key_name(),),
     )
 
     inchi_and_smiles_database = get_database(
@@ -127,13 +127,12 @@ def constructed_molecule_mongo_db(
     inchi_key_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        key_makers=(stk.InchiKey(), ),
+        key_makers=(stk.InchiKey(),),
         indices=(),
     )
 
     expected_molecules = {
-        smiles.get_key(molecule): molecule
-        for molecule in molecules
+        smiles.get_key(molecule): molecule for molecule in molecules
     }
 
     return CaseData(

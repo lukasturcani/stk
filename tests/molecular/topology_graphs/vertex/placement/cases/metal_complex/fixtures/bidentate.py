@@ -63,29 +63,29 @@ def get_edges(vertex):
         id=0,
         vertex1=vertex,
         vertex2=vertex2,
-        position=vertex.get_position() + [-1, 0, 0]
+        position=vertex.get_position() + [-1, 0, 0],
     )
     yield stk.Edge(
         id=1,
         vertex1=vertex,
         vertex2=vertex2,
-        position=vertex.get_position() + [0, -1, 0]
+        position=vertex.get_position() + [0, -1, 0],
     )
 
 
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='C=NC/C=N/Br',
+            smiles="C=NC/C=N/Br",
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#35]',
-                    bonders=(1, ),
+                    smarts="[#6]~[#7X2]~[#35]",
+                    bonders=(1,),
                     deleters=(),
                 ),
                 stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
+                    smarts="[#6]~[#7X2]~[#6]",
+                    bonders=(1,),
                     deleters=(),
                 ),
             ],

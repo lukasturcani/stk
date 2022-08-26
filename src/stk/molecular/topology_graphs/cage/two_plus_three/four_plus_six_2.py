@@ -116,7 +116,6 @@ class FourPlusSix2(Cage):
         NonLinearVertex(1, [-1, 0, 1]),
         NonLinearVertex(2, [1, 0, -1]),
         NonLinearVertex(3, [-1, 0, -1]),
-
         LinearVertex(4, [0, -1, 1], False),
         LinearVertex(5, [0, 1, 1], False),
         LinearVertex(6, [0, -1, -1], False),
@@ -132,7 +131,7 @@ class FourPlusSix2(Cage):
         LinearVertex.init_at_center(
             id=9,
             vertices=(_non_linears[1], _non_linears[3]),
-        )
+        ),
     )
 
     _edge_prototypes = (

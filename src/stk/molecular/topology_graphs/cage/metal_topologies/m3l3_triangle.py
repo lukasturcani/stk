@@ -227,17 +227,16 @@ class M3L3Triangle(Cage):
             optimizer=optimizer,
         )
 
-    _x = 2*np.sqrt(3)/4
+    _x = 2 * np.sqrt(3) / 4
     _y = 2
     _angled_vertices = (
         AngledVertex(0, [0, _x, 0]),
-        AngledVertex(1, [_y/2, -_x, 0]),
-        AngledVertex(2, [-_y/2, -_x, 0]),
+        AngledVertex(1, [_y / 2, -_x, 0]),
+        AngledVertex(2, [-_y / 2, -_x, 0]),
     )
 
     _vertex_prototypes = (
         *_angled_vertices,
-
         LinearVertex.init_at_center(
             id=3,
             vertices=(_angled_vertices[0], _angled_vertices[1]),
@@ -255,10 +254,8 @@ class M3L3Triangle(Cage):
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[0], _vertex_prototypes[3]),
         Edge(1, _vertex_prototypes[1], _vertex_prototypes[3]),
-
         Edge(2, _vertex_prototypes[1], _vertex_prototypes[4]),
         Edge(3, _vertex_prototypes[2], _vertex_prototypes[4]),
-
         Edge(4, _vertex_prototypes[2], _vertex_prototypes[5]),
         Edge(5, _vertex_prototypes[0], _vertex_prototypes[5]),
     )

@@ -80,9 +80,7 @@ class RemoveMolecules(Selector):
             excluded_batches=excluded_batches,
         )
         removed = {
-            record
-            for batch in remover_batches
-            for record in batch
+            record for batch in remover_batches for record in batch
         }
         valid_population = tuple(
             record for record in population if record not in removed

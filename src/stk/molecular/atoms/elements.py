@@ -12,7 +12,7 @@ from typing import ClassVar, TypeVar
 
 from .atom import Atom
 
-_T = TypeVar('_T', bound='AtomImpl')
+_T = TypeVar("_T", bound="AtomImpl")
 
 
 class AtomImpl(Atom):
@@ -61,9 +61,9 @@ class AtomImpl(Atom):
 
     def __repr__(self) -> str:
         charge = (
-            f', charge={self._charge}' if self._charge != 0 else ''
+            f", charge={self._charge}" if self._charge != 0 else ""
         )
-        return f'{self.__class__.__name__}({self._id}{charge})'
+        return f"{self.__class__.__name__}({self._id}{charge})"
 
     def __str__(self) -> str:
         return repr(self)

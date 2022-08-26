@@ -487,18 +487,18 @@ class Linear(TopologyGraph):
 
         if orientations is None:
             orientations = tuple(
-                0. for i in range(len(repeating_unit))
+                0.0 for i in range(len(repeating_unit))
             )
 
         if len(orientations) == len(repeating_unit):
-            orientations = orientations*num_repeating_units
+            orientations = orientations * num_repeating_units
 
-        polymer_length = len(repeating_unit)*num_repeating_units
+        polymer_length = len(repeating_unit) * num_repeating_units
         if len(orientations) != polymer_length:
             raise ValueError(
-                'The length of orientations must match either '
-                'the length of repeating_unit or the '
-                'total number of vertices.'
+                "The length of orientations must match either "
+                "the length of repeating_unit or the "
+                "total number of vertices."
             )
 
         # Keep these for __repr__.
@@ -519,9 +519,7 @@ class Linear(TopologyGraph):
             edges = vertices_and_edges.edges
 
         except ValueError:
-            vertices = (
-                UnaligningVertex(0, (0., 0., 0.), False),
-            )
+            vertices = (UnaligningVertex(0, (0.0, 0.0, 0.0), False),)
             edges = ()
 
         # Save the chosen orientations for __repr__.
@@ -579,17 +577,19 @@ class Linear(TopologyGraph):
                 position=np.array([0, 0, 0]),
                 flip=generator.choice(
                     a=choices,
-                    p=[head_orientation, 1-head_orientation],
+                    p=[head_orientation, 1 - head_orientation],
                 ),
             ),
         ]
         edges: list[Edge] = []
         for i, p in enumerate(body_orientations, 1):
-            flip = generator.choice(choices, p=[p, 1-p])
+            flip = generator.choice(choices, p=[p, 1 - p])
             vertices.append(
                 LinearVertex(i, np.array([i, 0, 0]), flip),
             )
-            edges.append(Edge(len(edges), vertices[i-1], vertices[i]))
+            edges.append(
+                Edge(len(edges), vertices[i - 1], vertices[i])
+            )
 
         vertices.append(
             TailVertex(
@@ -597,7 +597,7 @@ class Linear(TopologyGraph):
                 position=np.array([len(vertices), 0, 0]),
                 flip=generator.choice(
                     a=choices,
-                    p=[tail_orientation, 1-tail_orientation],
+                    p=[tail_orientation, 1 - tail_orientation],
                 ),
             ),
         )
@@ -624,8 +624,8 @@ class Linear(TopologyGraph):
         if isinstance(repeating_unit, tuple):
             return repeating_unit
 
-        base = ord('A')
-        return tuple(ord(letter)-base for letter in repeating_unit)
+        base = ord("A")
+        return tuple(ord(letter) - base for letter in repeating_unit)
 
     def _get_building_block_vertices(
         self,
@@ -633,7 +633,7 @@ class Linear(TopologyGraph):
         vertices: tuple[LinearVertex, ...],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
 
-        polymer = self._repeating_unit*self._num_repeating_units
+        polymer = self._repeating_unit * self._num_repeating_units
 
         building_block_vertices: dict[
             BuildingBlock, list[LinearVertex]
@@ -641,8 +641,8 @@ class Linear(TopologyGraph):
 
         for bb_index, vertex in zip(polymer, vertices):
             bb = building_blocks[bb_index]
-            building_block_vertices[bb] = (
-                building_block_vertices.get(bb, [])
+            building_block_vertices[bb] = building_block_vertices.get(
+                bb, []
             )
             building_block_vertices[bb].append(vertex)
 
@@ -665,11 +665,12 @@ class Linear(TopologyGraph):
                 vertex.get_id()
                 for vertex_list in building_block_vertices.values()
                 for vertex in vertex_list
-            )
+            ),
         }
-        for building_block, vertices in (
-            building_block_vertices.items()
-        ):
+        for (
+            building_block,
+            vertices,
+        ) in building_block_vertices.items():
             # Building blocks with 1 placer, cannot be aligned on
             # linear vertices and must therefore use an
             # UnaligningVertex. Building blocks with 1 placer can be
@@ -687,7 +688,8 @@ class Linear(TopologyGraph):
                         )
                         if vertex.get_id() not in terminal_ids
                         else vertex
-                    ) for vertex in vertices
+                    )
+                    for vertex in vertices
                 )
             else:
                 clone[building_block] = vertices
@@ -701,8 +703,7 @@ class Linear(TopologyGraph):
         ],
     ) -> float:
         return max(
-            bb.get_maximum_diameter()
-            for bb in building_block_vertices
+            bb.get_maximum_diameter() for bb in building_block_vertices
         )
 
     def with_building_blocks(
@@ -713,9 +714,9 @@ class Linear(TopologyGraph):
 
     def __repr__(self) -> str:
         return (
-            f'polymer.Linear({self._repeating_unit!r}, '
-            f'{self._num_repeating_units!r}, '
-            f'{self._orientations!r})'
+            f"polymer.Linear({self._repeating_unit!r}, "
+            f"{self._num_repeating_units!r}, "
+            f"{self._orientations!r})"
         )
 
 

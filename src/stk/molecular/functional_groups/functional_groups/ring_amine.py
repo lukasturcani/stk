@@ -73,8 +73,8 @@ class RingAmine(FunctionalGroup):
         )
         super().__init__(
             atoms=atoms,
-            placers=(nitrogen, ),
-            core_atoms=(nitrogen, ),
+            placers=(nitrogen,),
+            core_atoms=(nitrogen,),
         )
 
     def get_nitrogen(self):
@@ -213,8 +213,8 @@ class RingAmine(FunctionalGroup):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self._nitrogen}, {self._hydrogen1}, {self._hydrogen2}, '
-            f'{self._carbon1}, {self._carbon2}, {self._hydrogen3}, '
-            f'{self._carbon3})'
+            f"{self.__class__.__name__}("
+            f"{self._nitrogen}, {self._hydrogen1}, {self._hydrogen2}, "
+            f"{self._carbon1}, {self._carbon2}, {self._hydrogen3}, "
+            f"{self._carbon3})"
         )

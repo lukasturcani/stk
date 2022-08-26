@@ -8,21 +8,21 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('cof1'),
-        lazy_fixture('cof2'),
-        lazy_fixture('cof3'),
+        lazy_fixture("cof1"),
+        lazy_fixture("cof2"),
+        lazy_fixture("cof3"),
     ),
 )
 def case_data(request):
     return request.param
 
 
-@pytest.fixture(params=(0, ))
+@pytest.fixture(params=(0,))
 def aligner_edge(request):
     return request.param
 
 
-@pytest.fixture(params=(0, ))
+@pytest.fixture(params=(0,))
 def id(request):
     return request.param
 

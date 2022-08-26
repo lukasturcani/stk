@@ -122,7 +122,6 @@ class Paddlewheel(MetalComplex):
             vertex2=_ligand_vertex_prototypes[0],
             position=(0.1, -0.5, 0),
         ),
-
         Edge(
             id=2,
             vertex1=_metal_vertex_prototypes[0],
@@ -135,7 +134,6 @@ class Paddlewheel(MetalComplex):
             vertex2=_ligand_vertex_prototypes[1],
             position=(0, -0.5, 0.1),
         ),
-
         Edge(
             id=4,
             vertex1=_metal_vertex_prototypes[0],
@@ -148,7 +146,6 @@ class Paddlewheel(MetalComplex):
             vertex2=_ligand_vertex_prototypes[2],
             position=(-0.1, -0.5, 0),
         ),
-
         Edge(
             id=6,
             vertex1=_metal_vertex_prototypes[0],

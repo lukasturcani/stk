@@ -10,7 +10,7 @@ from typing import TypeVar
 
 from ..atoms import Atom
 
-_T = TypeVar('_T', bound='Bond')
+_T = TypeVar("_T", bound="Bond")
 
 
 class Bond:
@@ -227,15 +227,15 @@ class Bond:
 
     def __repr__(self) -> str:
         periodicity = (
-            f', periodicity={self._periodicity}'
+            f", periodicity={self._periodicity}"
             if self.is_periodic()
-            else ''
+            else ""
         )
 
         cls_name = self.__class__.__name__
         return (
-            f'{cls_name}({self._atom1!r}, {self._atom2!r}, '
-            f'{self._order}{periodicity})'
+            f"{cls_name}({self._atom1!r}, {self._atom2!r}, "
+            f"{self._order}{periodicity})"
         )
 
     def __str__(self) -> str:

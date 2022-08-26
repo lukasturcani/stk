@@ -111,7 +111,7 @@ class Tournament(Selector):
 
         self._generator = np.random.RandomState(random_seed)
         if num_batches is None:
-            num_batches = float('inf')
+            num_batches = float("inf")
 
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
@@ -130,13 +130,10 @@ class Tournament(Selector):
             and yielded_batches.get_num() < self._num_batches
         ):
             tournament_size = self._generator.randint(
-                low=2,
-                high=len(batches)+1
+                low=2, high=len(batches) + 1
             )
             competitors = self._generator.choice(
-                a=batches,
-                size=tournament_size,
-                replace=False
+                a=batches, size=tournament_size, replace=False
             )
             yield max(competitors)
 

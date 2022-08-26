@@ -114,7 +114,6 @@ class TwoPlusFour(Cage):
     _vertex_prototypes = (
         NonLinearVertex(0, [0, 0, -1]),
         NonLinearVertex(1, [0, 0, 1]),
-
         LinearVertex(2, [2, 0, 0], False),
         LinearVertex(3, [-2, 0, 0], False),
         LinearVertex(4, [0, 2, 0], False),
@@ -129,7 +128,7 @@ class TwoPlusFour(Cage):
         Edge(4, _vertex_prototypes[4], _vertex_prototypes[0]),
         Edge(5, _vertex_prototypes[4], _vertex_prototypes[1]),
         Edge(6, _vertex_prototypes[5], _vertex_prototypes[0]),
-        Edge(7, _vertex_prototypes[5], _vertex_prototypes[1])
+        Edge(7, _vertex_prototypes[5], _vertex_prototypes[1]),
     )
 
     _num_windows = 4

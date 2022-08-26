@@ -5,34 +5,40 @@ from .utilities import get_plane_normal
 
 
 @pytest.mark.parametrize(
-    argnames=('position_matrix', 'atom_ids', 'normal'),
+    argnames=("position_matrix", "atom_ids", "normal"),
     argvalues=(
         (
-            np.array([
-                [1., 2., 0.],
-                [3., 4., 0.],
-                [123., 423, 0.],
-            ]),
+            np.array(
+                [
+                    [1.0, 2.0, 0.0],
+                    [3.0, 4.0, 0.0],
+                    [123.0, 423, 0.0],
+                ]
+            ),
             (0, 1, 2),
-            np.array([0., 0., 1.]),
+            np.array([0.0, 0.0, 1.0]),
         ),
         (
-            np.array([
-                [1., 2., 0.],
-                [3., 4., 0.],
-                [123., 423, 105.],
-            ]),
+            np.array(
+                [
+                    [1.0, 2.0, 0.0],
+                    [3.0, 4.0, 0.0],
+                    [123.0, 423, 105.0],
+                ]
+            ),
             (0, 1),
-            np.array([0., 0., 1.]),
+            np.array([0.0, 0.0, 1.0]),
         ),
         (
-            np.array([
-                [0., 2., 3.],
-                [0., 4., 1.],
-                [0., 423, 12.],
-            ]),
+            np.array(
+                [
+                    [0.0, 2.0, 3.0],
+                    [0.0, 4.0, 1.0],
+                    [0.0, 423, 12.0],
+                ]
+            ),
             (0, 1, 2),
-            np.array([1., 0., 0.]),
+            np.array([1.0, 0.0, 0.0]),
         ),
     ),
 )

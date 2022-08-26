@@ -100,7 +100,7 @@ class AmideFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders=(1, ),
+        bonders=(1,),
         deleters=(3, 4, 5),
         placers=None,
     ):
@@ -128,7 +128,7 @@ class AmideFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        ids = _get_atom_ids('[*][C](=[O])[N]([H])[H]', molecule)
+        ids = _get_atom_ids("[*][C](=[O])[N]([H])[H]", molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Amide(

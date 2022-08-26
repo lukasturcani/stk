@@ -135,12 +135,14 @@ class Selector:
 
         """
 
-        batches = tuple(self._get_batches(
-            population=population,
-            fitness_values=self._fitness_modifier(population),
-            included_batches=included_batches,
-            excluded_batches=excluded_batches,
-        ))
+        batches = tuple(
+            self._get_batches(
+                population=population,
+                fitness_values=self._fitness_modifier(population),
+                included_batches=included_batches,
+                excluded_batches=excluded_batches,
+            )
+        )
 
         yielded_batches = YieldedBatches(self._key_maker)
         for batch in self._select_from_batches(
@@ -152,7 +154,7 @@ class Selector:
 
         cls_name = self.__class__.__name__
         logger.debug(
-            f'{cls_name} yielded {yielded_batches.get_num()} batches.'
+            f"{cls_name} yielded {yielded_batches.get_num()} batches."
         )
 
     def _get_batches(

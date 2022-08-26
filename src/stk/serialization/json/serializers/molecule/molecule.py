@@ -99,7 +99,7 @@ class MoleculeJsonizer:
 
     def __init__(
         self,
-        key_makers: OneOrMany[MoleculeKeyMaker] = (InchiKey(), ),
+        key_makers: OneOrMany[MoleculeKeyMaker] = (InchiKey(),),
     ) -> None:
         """
         Initialize a :class:`.MoleculeJsonizer` instance.
@@ -115,7 +115,7 @@ class MoleculeJsonizer:
         """
 
         if isinstance(key_makers, MoleculeKeyMaker):
-            key_makers = (key_makers, )
+            key_makers = (key_makers,)
 
         self._key_makers = tuple(key_makers)
 
@@ -138,11 +138,11 @@ class MoleculeJsonizer:
         """
 
         json: _MolecularGraphJson = {
-            'a': tuple(map(atom_to_json, molecule.get_atoms())),
-            'b': tuple(map(bond_to_json, molecule.get_bonds())),
+            "a": tuple(map(atom_to_json, molecule.get_atoms())),
+            "b": tuple(map(bond_to_json, molecule.get_bonds())),
         }
         position_matrix: _PositionMatrixJson = {
-            'm': molecule.get_position_matrix().tolist(),
+            "m": molecule.get_position_matrix().tolist(),
         }
         for key_maker in self._key_makers:
             key_name = key_maker.get_key_name()
@@ -154,12 +154,12 @@ class MoleculeJsonizer:
             json[key_name] = key  # type: ignore
             position_matrix[key_name] = key  # type: ignore
         return {
-            'molecule': json,
-            'matrix': position_matrix,
+            "molecule": json,
+            "matrix": position_matrix,
         }
 
     def __str__(self) -> str:
         return repr(self)
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self._key_makers!r})'
+        return f"{self.__class__.__name__}({self._key_makers!r})"

@@ -109,16 +109,16 @@ class Hexagonal(Cof):
     """
 
     _lattice_constants = _a, _b, _c = (
-        np.array([1., 0., 0.]),
+        np.array([1.0, 0.0, 0.0]),
         np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
+        np.array([0, 0, 5 / 1.7321]),
     )
 
     _non_linears = (
-        NonLinearVertex(0, (1/4)*_a + (1/4)*_b + (1/2)*_c),
-        NonLinearVertex(1, (1/4)*_a + (3/4)*_b + (1/2)*_c),
-        NonLinearVertex(2, (3/4)*_a + (1/4)*_b + (1/2)*_c),
-        NonLinearVertex(3, (3/4)*_a + (3/4)*_b + (1/2)*_c),
+        NonLinearVertex(0, (1 / 4) * _a + (1 / 4) * _b + (1 / 2) * _c),
+        NonLinearVertex(1, (1 / 4) * _a + (3 / 4) * _b + (1 / 2) * _c),
+        NonLinearVertex(2, (3 / 4) * _a + (1 / 4) * _b + (1 / 2) * _c),
+        NonLinearVertex(3, (3 / 4) * _a + (3 / 4) * _b + (1 / 2) * _c),
     )
 
     _vertex_prototypes = (
@@ -184,25 +184,20 @@ class Hexagonal(Cof):
             vertices=(_non_linears[3], _non_linears[0]),
             cell_shifts=((0, 0, 0), (1, 0, 0)),
             lattice_constants=_lattice_constants,
-        )
+        ),
     )
 
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[4], _vertex_prototypes[0]),
         Edge(1, _vertex_prototypes[4], _vertex_prototypes[1]),
-
         Edge(2, _vertex_prototypes[5], _vertex_prototypes[0]),
         Edge(3, _vertex_prototypes[5], _vertex_prototypes[2]),
-
         Edge(4, _vertex_prototypes[6], _vertex_prototypes[1]),
         Edge(5, _vertex_prototypes[6], _vertex_prototypes[2]),
-
         Edge(6, _vertex_prototypes[7], _vertex_prototypes[1]),
         Edge(7, _vertex_prototypes[7], _vertex_prototypes[3]),
-
         Edge(8, _vertex_prototypes[8], _vertex_prototypes[2]),
         Edge(9, _vertex_prototypes[8], _vertex_prototypes[3]),
-
         Edge(10, _vertex_prototypes[9], _vertex_prototypes[0]),
         Edge(
             id=11,
@@ -210,7 +205,6 @@ class Hexagonal(Cof):
             vertex2=_vertex_prototypes[2],
             periodicity=(-1, 0, 0),
         ),
-
         Edge(12, _vertex_prototypes[10], _vertex_prototypes[0]),
         Edge(
             id=13,
@@ -218,7 +212,6 @@ class Hexagonal(Cof):
             vertex2=_vertex_prototypes[1],
             periodicity=(0, -1, 0),
         ),
-
         Edge(14, _vertex_prototypes[11], _vertex_prototypes[0]),
         Edge(
             id=15,
@@ -226,7 +219,6 @@ class Hexagonal(Cof):
             vertex2=_vertex_prototypes[3],
             periodicity=(0, -1, 0),
         ),
-
         Edge(16, _vertex_prototypes[12], _vertex_prototypes[2]),
         Edge(
             id=17,
@@ -234,7 +226,6 @@ class Hexagonal(Cof):
             vertex2=_vertex_prototypes[1],
             periodicity=(1, -1, 0),
         ),
-
         Edge(18, _vertex_prototypes[13], _vertex_prototypes[2]),
         Edge(
             id=19,
@@ -242,7 +233,6 @@ class Hexagonal(Cof):
             vertex2=_vertex_prototypes[3],
             periodicity=(0, -1, 0),
         ),
-
         Edge(20, _vertex_prototypes[14], _vertex_prototypes[1]),
         Edge(
             id=21,
@@ -250,7 +240,6 @@ class Hexagonal(Cof):
             vertex2=_vertex_prototypes[3],
             periodicity=(-1, 0, 0),
         ),
-
         Edge(22, _vertex_prototypes[15], _vertex_prototypes[3]),
         Edge(
             id=23,

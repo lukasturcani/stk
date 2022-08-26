@@ -63,7 +63,9 @@ def _test_from_json(
         stk.ConstructedMolecule: is_equivalent_constructed_molecule,
     }[type(molecule)](result, molecule)
 
-    assert np.all(np.equal(
-        molecule.get_position_matrix(),
-        result.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            molecule.get_position_matrix(),
+            result.get_position_matrix(),
+        )
+    )

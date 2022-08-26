@@ -8,9 +8,9 @@ from ..case_data import CaseData
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
         building_blocks=(
-            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
         ),
-        repeating_unit='A',
+        repeating_unit="A",
         num_repeating_units=2,
     )
     return CaseData(
@@ -18,12 +18,12 @@ def _get_case_data_1() -> CaseData:
             fitness_normalizers=(
                 stk.Multiply(
                     coefficient=(1, 2, 4),
-                    filter=lambda population, record:
-                        record.get_fitness_value() is not None,
+                    filter=lambda population, record: record.get_fitness_value()
+                    is not None,
                 ),
                 stk.Sum(
-                    filter=lambda population, record:
-                        record.get_fitness_value() is not None,
+                    filter=lambda population, record: record.get_fitness_value()
+                    is not None,
                 ),
             ),
         ),
@@ -55,10 +55,8 @@ def _get_case_data_1() -> CaseData:
 
 
 @pytest.fixture(
-    scope='session',
-    params=(
-        _get_case_data_1,
-    ),
+    scope="session",
+    params=(_get_case_data_1,),
 )
 def sequence(request) -> CaseData:
     return request.param()

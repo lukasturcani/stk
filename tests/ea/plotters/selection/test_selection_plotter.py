@@ -23,7 +23,7 @@ def test_selection_plotter(tmp_path, case_data):
     _test_selection_plotter(
         selector=case_data.selector,
         population=case_data.population,
-        filename=tmp_path / 'selection',
+        filename=tmp_path / "selection",
     )
 
 

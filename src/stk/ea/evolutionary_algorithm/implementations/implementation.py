@@ -56,12 +56,14 @@ class Implementation:
         population = self._initial_population
 
         self._logger.info(
-            'Calculating fitness values of initial population.'
+            "Calculating fitness values of initial population."
         )
         population = tuple(self._with_fitness_values(map_, population))
-        population = tuple(self._fitness_normalizer.normalize(
-            population=population,
-        ))
+        population = tuple(
+            self._fitness_normalizer.normalize(
+                population=population,
+            )
+        )
         yield Generation(
             molecule_records=population,
             mutation_records=(),
@@ -69,26 +71,25 @@ class Implementation:
         )
 
         for generation in range(1, num_generations):
-            self._logger.info(f'Starting generation {generation}.')
-            self._logger.info(
-                f'Population size is {len(population)}.'
-            )
+            self._logger.info(f"Starting generation {generation}.")
+            self._logger.info(f"Population size is {len(population)}.")
 
-            self._logger.info('Doing crossovers.')
+            self._logger.info("Doing crossovers.")
             crossover_records = tuple(
                 self._get_crossover_records(population)
             )
 
-            self._logger.info('Doing mutations.')
+            self._logger.info("Doing mutations.")
             mutation_records = tuple(
-                record for record in map(
+                record
+                for record in map(
                     get_mutation_record,
                     self._mutation_selector.select(population),
                 )
                 if record is not None
             )
 
-            self._logger.info('Calculating fitness values.')
+            self._logger.info("Calculating fitness values.")
 
             offspring = (
                 record.get_molecule_record()
@@ -99,21 +100,28 @@ class Implementation:
                 for record in mutation_records
             )
 
-            population = tuple(self._with_fitness_values(
-                map_=map_,
-                population=tuple(dedupe(
-                    iterable=it.chain(population, offspring, mutants),
-                    key=get_key,
-                )),
-            ))
+            population = tuple(
+                self._with_fitness_values(
+                    map_=map_,
+                    population=tuple(
+                        dedupe(
+                            iterable=it.chain(
+                                population, offspring, mutants
+                            ),
+                            key=get_key,
+                        )
+                    ),
+                )
+            )
             population = tuple(
                 self._fitness_normalizer.normalize(population)
             )
 
             population = tuple(
                 molecule_record
-                for molecule_record,
-                in self._generation_selector.select(population)
+                for molecule_record, in self._generation_selector.select(
+                    population
+                )
             )
 
             yield Generation(

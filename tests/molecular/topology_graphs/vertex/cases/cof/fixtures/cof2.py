@@ -11,7 +11,7 @@ def cof2(init_at_center, id, vertices_, aligner_edge, cell):
         vertex=init_at_center(id, vertices_, aligner_edge, cell),
         id=id,
         position=(
-            sum(v.get_position() for v in vertices_)/len(vertices_)
+            sum(v.get_position() for v in vertices_) / len(vertices_)
         ),
         cell=cell,
     )
@@ -30,7 +30,7 @@ def init_at_center(request):
 
 @pytest.fixture(
     params=(
-        lambda: (stk.Vertex(0, [1, 2, 3]), ),
+        lambda: (stk.Vertex(0, [1, 2, 3]),),
         lambda: (
             stk.Vertex(0, [1, 2, 3]),
             stk.Vertex(1, [-1, 2, -32]),

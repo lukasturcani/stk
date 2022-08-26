@@ -111,14 +111,14 @@ class Honeycomb(Cof):
     """
 
     _lattice_constants = _a, _b, _c = (
-        np.array([1., 0., 0.]),
+        np.array([1.0, 0.0, 0.0]),
         np.array([0.5, 0.866, 0]),
-        np.array([0, 0, 5/1.7321])
+        np.array([0, 0, 5 / 1.7321]),
     )
 
     _non_linears = (
-        NonLinearVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
-        NonLinearVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
+        NonLinearVertex(0, (1 / 3) * _a + (1 / 3) * _b + (1 / 2) * _c),
+        NonLinearVertex(1, (2 / 3) * _a + (2 / 3) * _b + (1 / 2) * _c),
     )
 
     _vertex_prototypes = (
@@ -138,13 +138,12 @@ class Honeycomb(Cof):
             vertices=(_non_linears[0], _non_linears[1]),
             cell_shifts=((0, 0, 0), (-1, 0, 0)),
             lattice_constants=_lattice_constants,
-        )
+        ),
     )
 
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[2], _vertex_prototypes[0]),
         Edge(1, _vertex_prototypes[2], _vertex_prototypes[1]),
-
         Edge(2, _vertex_prototypes[3], _vertex_prototypes[0]),
         Edge(
             id=3,
@@ -152,12 +151,11 @@ class Honeycomb(Cof):
             vertex2=_vertex_prototypes[1],
             periodicity=(0, -1, 0),
         ),
-
         Edge(4, _vertex_prototypes[4], _vertex_prototypes[0]),
         Edge(
             id=5,
             vertex1=_vertex_prototypes[4],
             vertex2=_vertex_prototypes[1],
             periodicity=(-1, 0, 0),
-        )
+        ),
     )

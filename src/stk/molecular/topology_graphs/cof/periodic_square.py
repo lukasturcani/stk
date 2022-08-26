@@ -209,13 +209,13 @@ class PeriodicSquare(Cof):
         )
 
     _lattice_constants = _a, _b, _c = (
-        np.array([1., 0., 0.]),
-        np.array([0., 1., 0.]),
-        np.array([0., 0., 1.])
+        np.array([1.0, 0.0, 0.0]),
+        np.array([0.0, 1.0, 0.0]),
+        np.array([0.0, 0.0, 1.0]),
     )
 
     _non_linears = (
-        NonLinearVertex(0, (0.5)*_a + (0.5)*_b + (0.5)*_c),
+        NonLinearVertex(0, (0.5) * _a + (0.5) * _b + (0.5) * _c),
     )
     _vertex_prototypes = (
         *_non_linears,
@@ -231,7 +231,6 @@ class PeriodicSquare(Cof):
             cell_shifts=((0, 0, 0), (0, 1, 0)),
             lattice_constants=_lattice_constants,
         ),
-
     )
 
     _edge_prototypes = (

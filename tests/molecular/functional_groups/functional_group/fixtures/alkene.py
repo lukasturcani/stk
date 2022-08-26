@@ -19,7 +19,7 @@ def alkene(get_atom_ids):
 
 
 def _alkene(carbon1, atom1, atom2, carbon2, atom3, atom4):
-    bonders = (carbon2, )
+    bonders = (carbon2,)
     deleters = (carbon1, atom1, atom2)
     return GenericCaseData(
         functional_group=stk.Alkene(

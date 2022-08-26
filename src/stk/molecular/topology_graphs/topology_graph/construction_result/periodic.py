@@ -15,7 +15,7 @@ class PeriodicConstructionResult(ConstructionResult):
     """
 
     __slots__ = [
-        '_periodic_info',
+        "_periodic_info",
     ]
 
     def __init__(
@@ -39,7 +39,7 @@ class PeriodicConstructionResult(ConstructionResult):
         super().__init__(construction_state)
         self._periodic_info = PeriodicInfo(
             *(
-                lattice_constant*dim
+                lattice_constant * dim
                 for lattice_constant, dim in zip(
                     construction_state.get_lattice_constants(),
                     lattice_size,

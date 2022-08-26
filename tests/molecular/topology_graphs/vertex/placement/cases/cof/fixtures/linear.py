@@ -81,7 +81,7 @@ def linear_aligner_edge(request):
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrCCNCBr',
+            smiles="BrCCNCBr",
             functional_groups=[stk.BromoFactory()],
         ),
     ),

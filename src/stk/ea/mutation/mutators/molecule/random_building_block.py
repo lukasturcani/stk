@@ -72,7 +72,7 @@ class RandomBuildingBlock(MoleculeMutator):
         self,
         building_blocks,
         is_replaceable,
-        name='RandomBuildingBlock',
+        name="RandomBuildingBlock",
         random_seed=None,
     ):
         """
@@ -106,10 +106,12 @@ class RandomBuildingBlock(MoleculeMutator):
 
     def mutate(self, record):
         # Choose the building block which undergoes mutation.
-        replaceable_building_blocks = tuple(filter(
-            self._is_replaceable,
-            record.get_molecule().get_building_blocks(),
-        ))
+        replaceable_building_blocks = tuple(
+            filter(
+                self._is_replaceable,
+                record.get_molecule().get_building_blocks(),
+            )
+        )
         replaced_building_block = self._generator.choice(
             a=replaceable_building_blocks,
         )
@@ -117,9 +119,11 @@ class RandomBuildingBlock(MoleculeMutator):
         replacement = self._generator.choice(self._building_blocks)
 
         # Build the new ConstructedMolecule.
-        graph = record.get_topology_graph().with_building_blocks({
-            replaced_building_block: replacement,
-        })
+        graph = record.get_topology_graph().with_building_blocks(
+            {
+                replaced_building_block: replacement,
+            }
+        )
         return MutationRecord(
             molecule_record=MoleculeRecord(graph),
             mutator_name=self._name,

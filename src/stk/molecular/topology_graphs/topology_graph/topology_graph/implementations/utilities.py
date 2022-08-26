@@ -15,8 +15,7 @@ from ...construction_state import ConstructionState
 
 class _TopologyGraphImplementation(typing.Protocol):
     def _place_building_blocks(
-        self,
-        state: ConstructionState
+        self, state: ConstructionState
     ) -> ConstructionState:
         pass
 

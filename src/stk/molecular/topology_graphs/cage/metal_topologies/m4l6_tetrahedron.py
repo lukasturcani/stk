@@ -269,7 +269,7 @@ class M4L6Tetrahedron(Cage):
 
     """
 
-    _x = 1/(2*np.sqrt(2))
+    _x = 1 / (2 * np.sqrt(2))
     _y = 0.5
     _vertex_prototypes = (
         NonLinearVertex(0, [_y, 0, -_x]),

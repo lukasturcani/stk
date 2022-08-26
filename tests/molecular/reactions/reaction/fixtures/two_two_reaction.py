@@ -53,10 +53,12 @@ def two_two_reaction(
                 periodicity=periodicity,
             ),
         ),
-        deleted_atoms=tuple(it.chain(
-            functional_group2_2.get_deleters(),
-            functional_group2.get_deleters(),
-        )),
+        deleted_atoms=tuple(
+            it.chain(
+                functional_group2_2.get_deleters(),
+                functional_group2.get_deleters(),
+            )
+        ),
         deleted_bonds=(),
     )
 
@@ -93,11 +95,13 @@ class MockConstructionState(ConstructionState):
 
 
 def get_construction_state(functional_group1, functional_group2):
-    size = max(it.chain(
-        functional_group1.get_bonder_ids(),
-        functional_group2.get_bonder_ids(),
-    ))
-    position_matrix = np.zeros((size+1, 3))
+    size = max(
+        it.chain(
+            functional_group1.get_bonder_ids(),
+            functional_group2.get_bonder_ids(),
+        )
+    )
+    position_matrix = np.zeros((size + 1, 3))
     b1, b2 = functional_group1.get_bonder_ids()
     b3, b4 = functional_group2.get_bonder_ids()
     position_matrix[b1] = [100, 100, 100]

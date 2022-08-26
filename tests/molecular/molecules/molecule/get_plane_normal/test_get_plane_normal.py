@@ -50,10 +50,12 @@ def test_get_plane_normal(case_data, get_atom_ids):
         get_atom_ids=get_atom_ids,
         normal=get_plane_normal(
             position_matrix=case_data.position_matrix,
-            atom_ids=tuple(normalize_ids(
-                molecule=case_data.molecule,
-                ids=get_atom_ids(case_data.molecule),
-            )),
+            atom_ids=tuple(
+                normalize_ids(
+                    molecule=case_data.molecule,
+                    ids=get_atom_ids(case_data.molecule),
+                )
+            ),
         ),
     )
 

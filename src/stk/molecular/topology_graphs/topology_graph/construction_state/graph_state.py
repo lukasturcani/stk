@@ -16,12 +16,12 @@ class _GraphState:
     """
 
     __slots__ = [
-        '_vertex_building_blocks',
-        '_vertices',
-        '_edges',
-        '_lattice_constants',
-        '_vertex_edges',
-        '_num_building_blocks',
+        "_vertex_building_blocks",
+        "_vertices",
+        "_edges",
+        "_lattice_constants",
+        "_vertex_edges",
+        "_num_building_blocks",
     ]
 
     def __init__(
@@ -52,14 +52,12 @@ class _GraphState:
 
         self._vertex_building_blocks = {
             vertex.get_id(): building_block
-            for building_block, vertices
-            in building_block_vertices.items()
+            for building_block, vertices in building_block_vertices.items()
             for vertex in vertices
         }
         self._num_building_blocks = {
             building_block: len(vertices)
-            for building_block, vertices
-            in building_block_vertices.items()
+            for building_block, vertices in building_block_vertices.items()
         }
         self._vertices = {
             vertex.get_id(): vertex
@@ -67,10 +65,12 @@ class _GraphState:
             for vertex in vertices
         }
         self._edges = edges
-        self._lattice_constants = tuple(map(
-            np.array,
-            lattice_constants,
-        ))
+        self._lattice_constants = tuple(
+            map(
+                np.array,
+                lattice_constants,
+            )
+        )
         self._vertex_edges = self._get_vertex_edges()
 
     def _get_vertex_edges(self):
@@ -135,19 +135,19 @@ class _GraphState:
 
         direction = 1 if reference == id1 else -1
         periodicity = np.array(edge.get_periodicity())
-        end_cell = vertex1.get_cell() + direction*periodicity
+        end_cell = vertex1.get_cell() + direction * periodicity
         cell_shift = end_cell - vertex2.get_cell()
 
         shift = sum(
-            axis_shift*constant
+            axis_shift * constant
             for axis_shift, constant in zip(
                 cell_shift,
                 self._lattice_constants,
             )
         )
         position = (
-            (vertex2.get_position()+shift+vertex1.get_position()) / 2
-        )
+            vertex2.get_position() + shift + vertex1.get_position()
+        ) / 2
         return edge.with_position(position)
 
     def clone(self):
@@ -168,10 +168,12 @@ class _GraphState:
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
-        clone._lattice_constants = tuple(map(
-            np.array,
-            self._lattice_constants,
-        ))
+        clone._lattice_constants = tuple(
+            map(
+                np.array,
+                self._lattice_constants,
+            )
+        )
         clone._num_building_blocks = dict(self._num_building_blocks)
         return clone
 
@@ -215,7 +217,7 @@ class _GraphState:
         if vertex_ids is None:
             vertex_ids = range(len(self._vertices))
         elif isinstance(vertex_ids, int):
-            vertex_ids = (vertex_ids, )
+            vertex_ids = (vertex_ids,)
 
         for vertex_id in vertex_ids:
             yield self._vertices[vertex_id]
@@ -330,10 +332,12 @@ class _GraphState:
 
         """
 
-        self._lattice_constants = tuple(map(
-            np.array,
-            lattice_constants,
-        ))
+        self._lattice_constants = tuple(
+            map(
+                np.array,
+                lattice_constants,
+            )
+        )
         return self
 
     def with_lattice_constants(self, lattice_constants):
@@ -394,7 +398,7 @@ class _GraphState:
         """
 
         yielded = set()
-        for vertex_id in range(max(self._vertex_building_blocks)+1):
+        for vertex_id in range(max(self._vertex_building_blocks) + 1):
             building_block = self._vertex_building_blocks[vertex_id]
             if building_block not in yielded:
                 yielded.add(building_block)

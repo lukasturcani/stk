@@ -157,8 +157,8 @@ class Alkyne(GenericFunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._carbon1}, {self._atom1}, {self._carbon2}, '
-            f'{self._atom2}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._carbon1}, {self._atom1}, {self._carbon2}, "
+            f"{self._atom2}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

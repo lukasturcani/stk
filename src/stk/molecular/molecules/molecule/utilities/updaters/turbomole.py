@@ -75,11 +75,13 @@ class _CoordSection:
                 element = periodic_table[int(element)]
 
             elements.append(element)
-            position_matrix.append([
-                float(x)*bohr_to_ang,
-                float(y)*bohr_to_ang,
-                float(z)*bohr_to_ang,
-            ])
+            position_matrix.append(
+                [
+                    float(x) * bohr_to_ang,
+                    float(y) * bohr_to_ang,
+                    float(z) * bohr_to_ang,
+                ]
+            )
 
         obj._elements = tuple(elements)
         obj._position_matrix = np.array(position_matrix)
@@ -155,26 +157,28 @@ def _get_coord_section(path, num_atoms):
 
     """
 
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         content = f.readlines()
 
     for line_number, line in enumerate(content):
-        if '$coord' in line:
+        if "$coord" in line:
 
-            lines = content[line_number+1:line_number+1+num_atoms]
+            lines = content[
+                line_number + 1 : line_number + 1 + num_atoms
+            ]
 
-            if 'angs' in line:
+            if "angs" in line:
                 return _CoordSection(lines)
 
-            elif 'frac' in line:
+            elif "frac" in line:
                 raise RuntimeError(
-                    f'{path} uses fractional coordinates, which are '
-                    'not currently supported.'
+                    f"{path} uses fractional coordinates, which are "
+                    "not currently supported."
                 )
 
             return _CoordSection.init_bohr(lines)
 
-    raise RuntimeError(f'No coord section found in {path}.')
+    raise RuntimeError(f"No coord section found in {path}.")
 
 
 def _with_structure_from_turbomole(self, path):
@@ -213,20 +217,22 @@ def _with_structure_from_turbomole(self, path):
 
     if section.get_num_atoms() != num_atoms:
         raise RuntimeError(
-            f'The number of atoms in {path}, '
-            f'{section.get_num_atoms()}, does not match the number '
-            f'of atoms in the molecule, {num_atoms}.'
+            f"The number of atoms in {path}, "
+            f"{section.get_num_atoms()}, does not match the number "
+            f"of atoms in the molecule, {num_atoms}."
         )
 
-    for atom_id, (element, atom) in enumerate(zip(
-        section.get_elements(),
-        self._atoms,
-    )):
+    for atom_id, (element, atom) in enumerate(
+        zip(
+            section.get_elements(),
+            self._atoms,
+        )
+    ):
         if element != atom.__class__.__name__:
             raise RuntimeError(
-                f'The element of atom {atom_id} in {path}, '
-                f'{element}, does not match the element in the '
-                f'molecule, {atom.__class__.__name__}.'
+                f"The element of atom {atom_id} in {path}, "
+                f"{element}, does not match the element in the "
+                f"molecule, {atom.__class__.__name__}."
             )
 
     return self._with_position_matrix(section.get_position_matrix())

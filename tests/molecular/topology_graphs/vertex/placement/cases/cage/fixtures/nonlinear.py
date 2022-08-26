@@ -12,8 +12,8 @@ from ....case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lazy_fixture('nonlinear_3'),
-        lazy_fixture('nonlinear_4'),
+        lazy_fixture("nonlinear_3"),
+        lazy_fixture("nonlinear_4"),
     ),
 )
 def nonlinear(request):
@@ -38,7 +38,7 @@ def aligner_3(request):
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrCC(Br)C(CCCC)NCBr',
+            smiles="BrCC(Br)C(CCCC)NCBr",
             functional_groups=[stk.BromoFactory()],
         ),
     ),
@@ -70,7 +70,7 @@ def aligner_4(request):
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrC(CCCCCC)C(Br)CC(Br)CNCBr',
+            smiles="BrC(CCCCCC)C(Br)CC(Br)CNCBr",
             functional_groups=[stk.BromoFactory()],
         ),
     ),
@@ -146,8 +146,7 @@ def _nonlinear(position, aligner_edge, building_block):
         position=position,
         alignment_tests=alignment_tests,
         functional_group_edges={
-            fg_id: (fg_id+aligner_edge) % n
-            for fg_id in range(n)
+            fg_id: (fg_id + aligner_edge) % n for fg_id in range(n)
         },
     )
 
@@ -180,11 +179,13 @@ def get_points(center, num_points):
     # extra theta.
     thetas = np.arange(
         start=0,
-        stop=direction*2*np.pi,
-        step=direction*2*np.pi/num_points
+        stop=direction * 2 * np.pi,
+        step=direction * 2 * np.pi / num_points,
     )[:num_points]
     for theta in thetas:
-        yield center + 10*np.array([np.sin(theta), np.cos(theta), 0.])
+        yield center + 10 * np.array(
+            [np.sin(theta), np.cos(theta), 0.0]
+        )
 
 
 def get_fg_point(points, fg_id, building_block):
@@ -273,11 +274,10 @@ def get_nonlinear_edges(num_edges, vertex):
 
     """
 
-    for id_, point in enumerate(get_points(
-        center=vertex.get_position(),
-        num_points=num_edges
-    )):
-        yield stk.Edge(id_, vertex, stk.Vertex(id_+1, point))
+    for id_, point in enumerate(
+        get_points(center=vertex.get_position(), num_points=num_edges)
+    ):
+        yield stk.Edge(id_, vertex, stk.Vertex(id_ + 1, point))
 
 
 def order_functional_groups(building_block):
@@ -334,7 +334,7 @@ def functional_group_angle(building_block):
 
         projection = fg_direction @ axis
         if theta > 0 and projection < 0:
-            return 2*np.pi - theta
+            return 2 * np.pi - theta
         return theta
 
     return inner

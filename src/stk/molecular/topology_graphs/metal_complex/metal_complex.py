@@ -624,8 +624,9 @@ class MetalComplex(TopologyGraph):
         building_block_vertices = self._normalize_metals(metals)
         building_block_vertices.update(
             (building_block, vertices)
-            for building_block, vertices
-            in self._normalize_ligands(ligands).items()
+            for building_block, vertices in self._normalize_ligands(
+                ligands
+            ).items()
         )
 
         # By default, assign a dative bond order to available
@@ -695,19 +696,15 @@ class MetalComplex(TopologyGraph):
             }
         elif isinstance(metals, tuple):
             functional_group_counter = Counter(
-                metal.get_num_functional_groups()
-                for metal in metals
+                metal.get_num_functional_groups() for metal in metals
             )
-            assert (
-                all(
-                    count == 1
-                    for count
-                    in functional_group_counter.values()
-                )
+            assert all(
+                count == 1
+                for count in functional_group_counter.values()
             ), (
-                'Cannot use a tuple when multiple metals '
-                'have the same number of functional groups. '
-                'Use a dictionary instead.'
+                "Cannot use a tuple when multiple metals "
+                "have the same number of functional groups. "
+                "Use a dictionary instead."
             )
             metals_dict = {
                 metal: tuple(
@@ -767,16 +764,13 @@ class MetalComplex(TopologyGraph):
                 ligand.get_num_functional_groups()
                 for ligand in ligands
             )
-            assert (
-                all(
-                    count == 1
-                    for count
-                    in functional_group_counter.values()
-                )
+            assert all(
+                count == 1
+                for count in functional_group_counter.values()
             ), (
-                'Cannot use a tuple when multiple ligands '
-                'have the same number of functional groups. '
-                'Use a dictionary instead.'
+                "Cannot use a tuple when multiple ligands "
+                "have the same number of functional groups. "
+                "Use a dictionary instead."
             )
             ligands_dict = {
                 ligand: tuple(
@@ -816,7 +810,7 @@ class MetalComplex(TopologyGraph):
         """
 
         if isinstance(vertex_ids, int):
-            vertex_ids = (vertex_ids, )
+            vertex_ids = (vertex_ids,)
 
         for vertex_id in vertex_ids:
             yield self._metal_vertex_prototypes[vertex_id]
@@ -840,7 +834,7 @@ class MetalComplex(TopologyGraph):
         """
 
         if isinstance(vertex_ids, int):
-            vertex_ids = (vertex_ids, )
+            vertex_ids = (vertex_ids,)
 
         for vertex_id in vertex_ids:
             yield self._ligand_vertex_prototypes[vertex_id]
@@ -848,8 +842,7 @@ class MetalComplex(TopologyGraph):
     def _get_scale(
         self,
         building_block_vertices: dict[
-            BuildingBlock,
-            abc.Sequence[Vertex]
+            BuildingBlock, abc.Sequence[Vertex]
         ],
     ) -> float:
         return 1
@@ -864,7 +857,4 @@ class MetalComplex(TopologyGraph):
         return self.clone()._with_building_blocks(building_block_map)
 
     def __repr__(self) -> str:
-        return (
-            f'metal_complex.{self.__class__.__name__}'
-            f'()'
-        )
+        return f"metal_complex.{self.__class__.__name__}" f"()"

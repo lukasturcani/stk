@@ -147,8 +147,8 @@ class Dibromo(GenericFunctionalGroup):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self._bromine1}, {self._atom1}, {self._bromine2}, '
-            f'{self._atom2}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._bromine1}, {self._atom1}, {self._bromine2}, "
+            f"{self._atom2}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

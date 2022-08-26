@@ -22,7 +22,7 @@ def _one_one_reaction(
     functional_group1,
     functional_group2,
     bond_order,
-    periodicity
+    periodicity,
 ):
     return OneOneReaction(
         functional_group1=functional_group1,
@@ -37,7 +37,7 @@ def _one_two_reaction(
     functional_group1,
     functional_group2,
     bond_order,
-    periodicity
+    periodicity,
 ):
     return OneTwoReaction(
         functional_group1=functional_group1,
@@ -52,7 +52,7 @@ def _two_two_reaction(
     functional_group1,
     functional_group2,
     bond_order,
-    periodicity
+    periodicity,
 ):
     return TwoTwoReaction(
         construction_state=construction_state,
@@ -199,6 +199,6 @@ class GenericReactionFactory(ReactionFactory):
 
     def __repr__(self):
         bond_orders = (
-            '' if self._default_bond_orders else f'{self._bond_orders}'
+            "" if self._default_bond_orders else f"{self._bond_orders}"
         )
-        return f'{self.__class__.__name__}({bond_orders})'
+        return f"{self.__class__.__name__}({bond_orders})"

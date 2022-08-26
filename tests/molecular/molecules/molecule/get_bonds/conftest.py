@@ -8,7 +8,7 @@ from .case_data import CaseData
 @pytest.fixture(
     params=(
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
+            molecule=stk.BuildingBlock("NCCN"),
             bonds=(
                 stk.Bond(stk.N(0), stk.C(1), 1),
                 stk.Bond(stk.C(1), stk.C(2), 1),

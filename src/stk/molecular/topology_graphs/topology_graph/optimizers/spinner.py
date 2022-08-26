@@ -69,11 +69,11 @@ class Spinner(Optimizer):
     def __init__(
         self,
         step_size: float = 1.5,
-        rotation_step_size: float = 5.,
+        rotation_step_size: float = 5.0,
         num_conformers: int = 50,
         max_attempts: int = 1000,
-        nonbond_epsilon: float = 5.,
-        beta: float = 2.,
+        nonbond_epsilon: float = 5.0,
+        beta: float = 2.0,
         random_seed: int = 1000,
     ) -> None:
         """
@@ -120,7 +120,8 @@ class Spinner(Optimizer):
                 spd.Atom(
                     id=atom.get_id(),
                     element_string=atom.__class__.__name__,
-                ) for atom in state.get_atoms()
+                )
+                for atom in state.get_atoms()
             ),
             bonds=(
                 spd.Bond(
@@ -128,8 +129,9 @@ class Spinner(Optimizer):
                     atom_ids=(
                         bond.get_atom1().get_id(),
                         bond.get_atom2().get_id(),
-                    )
-                ) for i, bond in enumerate(state.get_bonds())
+                    ),
+                )
+                for i, bond in enumerate(state.get_bonds())
             ),
             position_matrix=state.get_position_matrix(),
         )

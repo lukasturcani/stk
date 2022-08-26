@@ -12,12 +12,12 @@ class ConstructionResult:
     """
 
     __slots__ = [
-        '_atoms',
-        '_bonds',
-        '_atom_infos',
-        '_bond_infos',
-        '_position_matrix',
-        '_num_building_blocks',
+        "_atoms",
+        "_bonds",
+        "_atom_infos",
+        "_bond_infos",
+        "_position_matrix",
+        "_num_building_blocks",
     ]
 
     def __init__(self, construction_state):
@@ -43,8 +43,7 @@ class ConstructionResult:
             building_block: construction_state.get_num_building_block(
                 building_block=building_block,
             )
-            for building_block
-            in construction_state.get_building_blocks()
+            for building_block in construction_state.get_building_blocks()
         }
 
     def get_position_matrix(self):

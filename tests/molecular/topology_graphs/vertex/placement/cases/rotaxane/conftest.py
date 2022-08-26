@@ -7,8 +7,8 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('axle'),
-        lazy_fixture('cycle'),
+        lazy_fixture("axle"),
+        lazy_fixture("cycle"),
     ),
 )
 def case_data(request):

@@ -34,7 +34,7 @@ def get_direction(building_block):
             ),
             edges=(),
             building_block=get_aligned_building_block(
-                building_block=stk.BuildingBlock('BrCCBr'),
+                building_block=stk.BuildingBlock("BrCCBr"),
                 target=(1, 2, 3),
             ),
             position=np.array([1, 2, 3], dtype=np.float64),

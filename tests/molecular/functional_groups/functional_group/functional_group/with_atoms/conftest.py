@@ -13,7 +13,7 @@ def get_atom_map_0(functional_group):
     # biggest on in the functional group. This prevents two atoms in
     # the functional group from having the same id.
     new_id = max(functional_group.get_atom_ids()) + 1
-    atoms = (stk.Li(new_id), )
+    atoms = (stk.Li(new_id),)
     return dict(zip(functional_group.get_atom_ids(), atoms))
 
 

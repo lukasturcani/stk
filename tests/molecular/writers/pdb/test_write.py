@@ -21,7 +21,7 @@ def test_write(case_data, tmp_path):
         writer=case_data.writer,
         string=case_data.string,
         periodic_info=case_data.periodic_info,
-        file_path=tmp_path/'tmp.pdb',
+        file_path=tmp_path / "tmp.pdb",
     )
 
 
@@ -64,7 +64,7 @@ def _test_write(
         periodic_info=periodic_info,
     )
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         content = f.read()
 
     assert content == string

@@ -130,7 +130,7 @@ class MoleculeKeyMaker:
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._key_name!r}, {self._get_key!r}'
-            ')'
+            f"{self.__class__.__name__}("
+            f"{self._key_name!r}, {self._get_key!r}"
+            ")"
         )

@@ -158,80 +158,85 @@ class M3L6(Cage):
     _vertex_prototypes = (
         NonLinearVertex(
             id=0,
-            position=[_R*np.cos(_theta), _R*np.sin(_theta), 0]
+            position=[_R * np.cos(_theta), _R * np.sin(_theta), 0],
         ),
         NonLinearVertex(
             id=1,
             position=[
-                _R*np.cos(_theta+(4*np.pi/3)),
-                _R*np.sin(_theta+(4*np.pi/3)),
-                0
-            ]
+                _R * np.cos(_theta + (4 * np.pi / 3)),
+                _R * np.sin(_theta + (4 * np.pi / 3)),
+                0,
+            ],
         ),
         NonLinearVertex(
             id=2,
             position=[
-                _R*np.cos(_theta+(2*np.pi/3)),
-                _R*np.sin(_theta+(2*np.pi/3)),
-                0
-            ]
+                _R * np.cos(_theta + (2 * np.pi / 3)),
+                _R * np.sin(_theta + (2 * np.pi / 3)),
+                0,
+            ],
         ),
-
         LinearVertex(
             id=3,
             position=[
-                _R*np.cos((_theta+np.pi/4)),
-                _R*np.sin((_theta+np.pi/4)),
-                0.5
+                _R * np.cos((_theta + np.pi / 4)),
+                _R * np.sin((_theta + np.pi / 4)),
+                0.5,
             ],
-            use_neighbor_placement=False
+            use_neighbor_placement=False,
         ),
         LinearVertex(
             id=4,
             position=[
-                _R*np.cos((_theta+1*np.pi/3)),
-                _R*np.sin((_theta+1*np.pi/3)),
-                -0.5
+                _R * np.cos((_theta + 1 * np.pi / 3)),
+                _R * np.sin((_theta + 1 * np.pi / 3)),
+                -0.5,
             ],
-            use_neighbor_placement=False
+            use_neighbor_placement=False,
         ),
-
         LinearVertex(
             id=5,
             position=[
-                _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
-                _R*np.sin((_theta+1*np.pi/3)+(4*np.pi/3)),
-                0.5
+                _R
+                * np.cos((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                _R
+                * np.sin((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                0.5,
             ],
-            use_neighbor_placement=False
+            use_neighbor_placement=False,
         ),
         LinearVertex(
             id=6,
             position=[
-                _R*np.cos((_theta+1*np.pi/3)+(4*np.pi/3)),
-                _R*np.sin((_theta+1*np.pi/3)+(4*np.pi/3)),
-                -0.5
+                _R
+                * np.cos((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                _R
+                * np.sin((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                -0.5,
             ],
-            use_neighbor_placement=False
+            use_neighbor_placement=False,
         ),
-
         LinearVertex(
             id=7,
             position=[
-                _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
-                _R*np.sin((_theta+1*np.pi/3)+(2*np.pi/3)),
-                0.5
+                _R
+                * np.cos((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                _R
+                * np.sin((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                0.5,
             ],
-            use_neighbor_placement=False
+            use_neighbor_placement=False,
         ),
         LinearVertex(
             id=8,
             position=[
-                _R*np.cos((_theta+1*np.pi/3)+(2*np.pi/3)),
-                _R*np.sin((_theta+1*np.pi/3)+(2*np.pi/3)),
-                -0.5
+                _R
+                * np.cos((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                _R
+                * np.sin((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                -0.5,
             ],
-            use_neighbor_placement=False
+            use_neighbor_placement=False,
         ),
     )
 
@@ -240,12 +245,10 @@ class M3L6(Cage):
         Edge(1, _vertex_prototypes[0], _vertex_prototypes[4]),
         Edge(2, _vertex_prototypes[0], _vertex_prototypes[5]),
         Edge(3, _vertex_prototypes[0], _vertex_prototypes[6]),
-
         Edge(4, _vertex_prototypes[1], _vertex_prototypes[5]),
         Edge(5, _vertex_prototypes[1], _vertex_prototypes[6]),
         Edge(6, _vertex_prototypes[1], _vertex_prototypes[7]),
         Edge(7, _vertex_prototypes[1], _vertex_prototypes[8]),
-
         Edge(8, _vertex_prototypes[2], _vertex_prototypes[3]),
         Edge(9, _vertex_prototypes[2], _vertex_prototypes[4]),
         Edge(10, _vertex_prototypes[2], _vertex_prototypes[7]),

@@ -38,6 +38,4 @@ def _test_get_num_placers(
 
     """
 
-    assert (
-        building_block.get_num_placers() == expected_num_placers
-    )
+    assert building_block.get_num_placers() == expected_num_placers

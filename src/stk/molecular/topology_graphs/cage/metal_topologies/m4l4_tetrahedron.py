@@ -205,15 +205,14 @@ class M4L4Tetrahedron(Cage):
     """
 
     _non_linears = (
-        NonLinearVertex(0, [0, 0, np.sqrt(6)/2]),
-        NonLinearVertex(1, [-1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(2, [1, -np.sqrt(3)/3, -np.sqrt(6)/6]),
-        NonLinearVertex(3, [0, 2*np.sqrt(3)/3, -np.sqrt(6)/6]),
+        NonLinearVertex(0, [0, 0, np.sqrt(6) / 2]),
+        NonLinearVertex(1, [-1, -np.sqrt(3) / 3, -np.sqrt(6) / 6]),
+        NonLinearVertex(2, [1, -np.sqrt(3) / 3, -np.sqrt(6) / 6]),
+        NonLinearVertex(3, [0, 2 * np.sqrt(3) / 3, -np.sqrt(6) / 6]),
     )
 
     _vertex_prototypes = (
         *_non_linears,
-
         NonLinearVertex.init_at_center(
             id=4,
             vertices=(

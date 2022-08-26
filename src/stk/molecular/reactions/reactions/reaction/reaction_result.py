@@ -12,10 +12,10 @@ class ReactionResult:
     """
 
     __slots__ = [
-        '_new_atoms',
-        '_new_bonds',
-        '_deleted_atoms',
-        '_deleted_bonds',
+        "_new_atoms",
+        "_new_bonds",
+        "_deleted_atoms",
+        "_deleted_bonds",
     ]
 
     def __init__(

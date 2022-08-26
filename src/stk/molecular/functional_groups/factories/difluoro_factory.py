@@ -121,7 +121,7 @@ class DifluoroFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[F][#6]~[#6][F]', molecule):
+        for atom_ids in _get_atom_ids("[F][#6]~[#6][F]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Difluoro(
                 atom1=atoms[1],

@@ -7,7 +7,7 @@ import stk
 
 
 def get_fg_position(id, building_block):
-    functional_group, = building_block.get_functional_groups(id)
+    (functional_group,) = building_block.get_functional_groups(id)
     return building_block.get_centroid(
         atom_ids=functional_group.get_placer_ids(),
     )
@@ -34,9 +34,15 @@ def get_points(position, angle):
         angle=angle,
         axis=np.array([0, 0, 1], dtype=np.float64),
     )
-    points = rotation_matrix @ np.array([
-        [-10, 0, 0],
-        [10, 0, 0],
-    ], dtype=np.float64).T
+    points = (
+        rotation_matrix
+        @ np.array(
+            [
+                [-10, 0, 0],
+                [10, 0, 0],
+            ],
+            dtype=np.float64,
+        ).T
+    )
 
     yield from (position + point for point in points.T)

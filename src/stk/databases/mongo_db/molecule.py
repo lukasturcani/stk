@@ -318,14 +318,14 @@ class MoleculeMongoDb(MoleculeDatabase):
     def __init__(
         self,
         mongo_client,
-        database='stk',
-        molecule_collection='molecules',
-        position_matrix_collection='building_block_position_matrices',
+        database="stk",
+        molecule_collection="molecules",
+        position_matrix_collection="building_block_position_matrices",
         jsonizer=MoleculeJsonizer(),
         dejsonizer=MoleculeDejsonizer(),
         put_lru_cache_size=128,
         get_lru_cache_size=128,
-        indices=('InChIKey', ),
+        indices=("InChIKey",),
     ):
         """
         Initialize a :class:`.MoleculeMongoDb` instance.
@@ -384,10 +384,10 @@ class MoleculeMongoDb(MoleculeDatabase):
 
         for index in indices:
             # Do not create the same index twice.
-            if f'{index}_1' not in self._molecules.index_information():
+            if f"{index}_1" not in self._molecules.index_information():
                 self._molecules.create_index(index)
             if (
-                f'{index}_1'
+                f"{index}_1"
                 not in self._position_matrices.index_information()
             ):
                 self._position_matrices.create_index(index)
@@ -397,32 +397,32 @@ class MoleculeMongoDb(MoleculeDatabase):
         json = self._jsonizer.to_json(molecule)
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
-        json['matrix']['m'] = tuple(
-            tuple(row) for row in json['matrix']['m']
+        json["matrix"]["m"] = tuple(
+            tuple(row) for row in json["matrix"]["m"]
         )
-        json['matrix'] = HashableDict(json['matrix'])
-        json['molecule'] = HashableDict(json['molecule'])
+        json["matrix"] = HashableDict(json["matrix"])
+        json["molecule"] = HashableDict(json["molecule"])
         return self._put(HashableDict(json))
 
     def _put(self, json):
-        keys = dict(json['matrix'])
-        keys.pop('m')
+        keys = dict(json["matrix"])
+        keys.pop("m")
 
-        query = {'$or': []}
+        query = {"$or": []}
         for key, value in keys.items():
-            query['$or'].append({key: value})
+            query["$or"].append({key: value})
 
         self._molecules.update_many(
             filter=query,
             update={
-                '$set': json['molecule'],
+                "$set": json["molecule"],
             },
             upsert=True,
         )
         self._position_matrices.update_many(
             filter=query,
             update={
-                '$set': json['matrix'],
+                "$set": json["matrix"],
             },
             upsert=True,
         )
@@ -452,20 +452,22 @@ class MoleculeMongoDb(MoleculeDatabase):
         json = self._molecules.find_one(key)
         if json is None:
             raise KeyError(
-                'No molecule found in the database with a key of: '
-                f'{key}'
+                "No molecule found in the database with a key of: "
+                f"{key}"
             )
         position_matrix = self._position_matrices.find_one(key)
         if position_matrix is None:
             raise KeyError(
-                'No position matrix found in the database with a key '
-                f'of: {key}'
+                "No position matrix found in the database with a key "
+                f"of: {key}"
             )
 
-        return self._dejsonizer.from_json({
-            'molecule': json,
-            'matrix': position_matrix,
-        })
+        return self._dejsonizer.from_json(
+            {
+                "molecule": json,
+                "matrix": position_matrix,
+            }
+        )
 
     def get_all(self):
         # Get all potential indices.
@@ -473,45 +475,44 @@ class MoleculeMongoDb(MoleculeDatabase):
             self._position_matrices.index_information().values(),
             self._molecules.index_information().values(),
         )
-        keys = tuple(dedupe(
-            index['key'][0][0]
-            for index in indices
-            # Ignore "_id" index which is unique in a collection and
-            # cannot be used to match molecular data split across
-            # collections.
-            if index['key'][0][0] != '_id'
-        ))
+        keys = tuple(
+            dedupe(
+                index["key"][0][0]
+                for index in indices
+                # Ignore "_id" index which is unique in a collection and
+                # cannot be used to match molecular data split across
+                # collections.
+                if index["key"][0][0] != "_id"
+            )
+        )
 
         query = [
             {
-                '$match': {
-                    '$or': [
-                        {key: {'$exists': True}}
-                        for key in keys
-                    ],
+                "$match": {
+                    "$or": [{key: {"$exists": True}} for key in keys],
                 },
             },
         ]
         query.extend(
             {
-                '$lookup': {
-                    'from': self._position_matrices.name,
-                    'let': {
-                        'molecule_key': f'${key}',
+                "$lookup": {
+                    "from": self._position_matrices.name,
+                    "let": {
+                        "molecule_key": f"${key}",
                     },
-                    'as': f'posmat_{key}',
-                    'pipeline': [
+                    "as": f"posmat_{key}",
+                    "pipeline": [
                         {
-                            '$match': {
-                                key: {'$ne': None},
+                            "$match": {
+                                key: {"$ne": None},
                             },
                         },
                         {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        f'${key}',
-                                        '$$molecule_key',
+                            "$match": {
+                                "$expr": {
+                                    "$eq": [
+                                        f"${key}",
+                                        "$$molecule_key",
                                     ],
                                 },
                             },
@@ -523,13 +524,13 @@ class MoleculeMongoDb(MoleculeDatabase):
         )
         query.append(
             {
-                '$match': {
-                    '$expr': {
-                        '$or': [
+                "$match": {
+                    "$expr": {
+                        "$or": [
                             {
-                                '$gt': [
-                                    {'$size': f'$posmat_{key}'},
-                                    0
+                                "$gt": [
+                                    {"$size": f"$posmat_{key}"},
+                                    0,
                                 ],
                             }
                             for key in keys
@@ -543,10 +544,12 @@ class MoleculeMongoDb(MoleculeDatabase):
         for entry in cursor:
             position_matrix_document = get_any_value(
                 mapping=entry,
-                keys=(f'posmat_{key}' for key in keys),
+                keys=(f"posmat_{key}" for key in keys),
             )
             if position_matrix_document is not None:
-                yield self._dejsonizer.from_json({
-                    'molecule': entry,
-                    'matrix': position_matrix_document,
-                })
+                yield self._dejsonizer.from_json(
+                    {
+                        "molecule": entry,
+                        "matrix": position_matrix_document,
+                    }
+                )

@@ -16,12 +16,13 @@ def check_edge_functional_groups(
     )
 
     for edge_id in range(old_state.get_num_edges()):
-        edge_group = stk.EdgeGroup((old_state.get_edge(edge_id), ))
+        edge_group = stk.EdgeGroup((old_state.get_edge(edge_id),))
         expected_fgs = {get_fg_key(fg): fg for fg in expected[edge_id]}
         new_state_fgs = {
             get_fg_key(fg): fg
-            for fg
-            in new_state.get_edge_group_functional_groups(edge_group)
+            for fg in new_state.get_edge_group_functional_groups(
+                edge_group
+            )
         }
         assert expected_fgs.keys() == new_state_fgs.keys()
         for fg_key in expected_fgs:
@@ -38,7 +39,7 @@ def get_expected_edge_functional_groups(
 ):
     expected = defaultdict(list)
     for edge_id in range(old_state.get_num_edges()):
-        edge_group = stk.EdgeGroup((old_state.get_edge(edge_id), ))
+        edge_group = stk.EdgeGroup((old_state.get_edge(edge_id),))
         expected[edge_id].extend(
             old_state.get_edge_group_functional_groups(edge_group)
         )

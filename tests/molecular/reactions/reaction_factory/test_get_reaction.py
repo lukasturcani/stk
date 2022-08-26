@@ -120,6 +120,6 @@ def is_same_bond(bond1, bond2):
         atoms2=sorted(
             (bond2.get_atom1(), bond2.get_atom2()),
             key=lambda atom: atom.get_id(),
-        )
+        ),
     )
     assert bond1.get_periodicity() == bond2.get_periodicity()

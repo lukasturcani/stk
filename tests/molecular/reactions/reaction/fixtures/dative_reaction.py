@@ -37,10 +37,12 @@ def dative_reaction(
                 periodicity=periodicity,
             ),
         ),
-        deleted_atoms=tuple(it.chain(
-            functional_group1.get_deleters(),
-            functional_group1_2.get_deleters(),
-        )),
+        deleted_atoms=tuple(
+            it.chain(
+                functional_group1.get_deleters(),
+                functional_group1_2.get_deleters(),
+            )
+        ),
         deleted_bonds=(),
     )
 
@@ -52,8 +54,8 @@ def get_bond(
     periodicity,
 ):
 
-    bonder1, = functional_group1.get_bonders()
-    bonder2, = functional_group2.get_bonders()
+    (bonder1,) = functional_group1.get_bonders()
+    (bonder2,) = functional_group2.get_bonders()
 
     if is_metal(bonder1):
         return stk.Bond(
@@ -72,9 +74,11 @@ def get_bond(
 
 
 def is_metal(atom):
-    metal_atomic_numbers = set(it.chain(
-        range(21, 31),
-        range(39, 49),
-        range(72, 81),
-    ))
+    metal_atomic_numbers = set(
+        it.chain(
+            range(21, 31),
+            range(39, 49),
+            range(72, 81),
+        )
+    )
     return atom.get_atomic_number() in metal_atomic_numbers

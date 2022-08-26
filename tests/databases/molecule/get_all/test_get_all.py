@@ -47,4 +47,4 @@ def _test_get_all(
             molecule2=retrieved.with_canonical_atom_ordering(),
         )
 
-    assert i+1 == len(expected_molecules)
+    assert i + 1 == len(expected_molecules)

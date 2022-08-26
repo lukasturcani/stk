@@ -41,57 +41,56 @@ class CaseDataData:
         lambda: CaseDataData(
             get_database=lambda mongo_client: stk.MoleculeMongoDb(
                 mongo_client=mongo_client,
-                database='_stk_test_database_for_testing',
+                database="_stk_test_database_for_testing",
                 put_lru_cache_size=0,
                 get_lru_cache_size=0,
             ),
-            molecule=stk.BuildingBlock('BrCCBr'),
+            molecule=stk.BuildingBlock("BrCCBr"),
             key={
-                'InChIKey':
-                    rdkit.MolToInchiKey(rdkit.MolFromSmiles('BrCCBr'))
+                "InChIKey": rdkit.MolToInchiKey(
+                    rdkit.MolFromSmiles("BrCCBr")
+                )
             },
         ),
         lambda: CaseDataData(
             get_database=lambda mongo_client: stk.MoleculeMongoDb(
                 mongo_client=mongo_client,
-                database='_stk_test_database_for_testing',
+                database="_stk_test_database_for_testing",
                 put_lru_cache_size=0,
                 get_lru_cache_size=0,
                 jsonizer=stk.MoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
-                            key_name='SMILES',
-                            get_key=lambda molecule:
-                                rdkit.MolToSmiles(
-                                    molecule.to_rdkit_mol()
-                                )
+                            key_name="SMILES",
+                            get_key=lambda molecule: rdkit.MolToSmiles(
+                                molecule.to_rdkit_mol()
+                            ),
                         ),
                     ),
                 ),
             ),
-            molecule=stk.BuildingBlock('BrBr'),
-            key={'SMILES': 'BrBr'},
+            molecule=stk.BuildingBlock("BrBr"),
+            key={"SMILES": "BrBr"},
         ),
         lambda: CaseDataData(
             get_database=lambda mongo_client: stk.MoleculeMongoDb(
                 mongo_client=mongo_client,
-                database='_stk_test_database_for_testing',
+                database="_stk_test_database_for_testing",
                 put_lru_cache_size=128,
                 get_lru_cache_size=128,
                 jsonizer=stk.MoleculeJsonizer(
                     key_makers=(
                         stk.MoleculeKeyMaker(
-                            key_name='SMILES',
-                            get_key=lambda molecule:
-                                rdkit.MolToSmiles(
-                                    molecule.to_rdkit_mol()
-                                )
+                            key_name="SMILES",
+                            get_key=lambda molecule: rdkit.MolToSmiles(
+                                molecule.to_rdkit_mol()
+                            ),
                         ),
                     ),
                 ),
             ),
-            molecule=stk.BuildingBlock('BrBr'),
-            key={'SMILES': 'BrBr'},
+            molecule=stk.BuildingBlock("BrBr"),
+            key={"SMILES": "BrBr"},
         ),
     ),
 )

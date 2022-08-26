@@ -9,9 +9,9 @@ def build_kagome(
     lattice_size: tuple[int, int, int],
 ) -> stk.ConstructedMolecule:
 
-    bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+    bb1 = stk.BuildingBlock("BrCCBr", [stk.BromoFactory()])
     bb2 = stk.BuildingBlock(
-        smiles='BrC1C(Br)CC(Br)C(Br)C1',
+        smiles="BrC1C(Br)CC(Br)C(Br)C1",
         functional_groups=[stk.BromoFactory()],
     )
     cof = stk.ConstructedMolecule(

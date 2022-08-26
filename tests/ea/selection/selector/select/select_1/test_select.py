@@ -56,11 +56,9 @@ def _test_select(selector, population, selected):
         selected,
     ):
         inchis1 = tuple(
-            inchi.get_key(record.get_molecule())
-            for record in batch1
+            inchi.get_key(record.get_molecule()) for record in batch1
         )
         inchis2 = tuple(
-            inchi.get_key(record.get_molecule())
-            for record in batch2
+            inchi.get_key(record.get_molecule()) for record in batch2
         )
         assert inchis1 == inchis2

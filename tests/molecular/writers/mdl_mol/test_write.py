@@ -20,7 +20,7 @@ def test_write(case_data, tmp_path):
         molecule=case_data.molecule,
         writer=case_data.writer,
         string=case_data.string,
-        file_path=tmp_path/'tmp.mol',
+        file_path=tmp_path / "tmp.mol",
     )
 
 
@@ -50,7 +50,7 @@ def _test_write(molecule, writer, string, file_path):
 
     writer.write(molecule, file_path)
 
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         content = f.read()
 
     assert content == string

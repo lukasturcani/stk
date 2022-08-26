@@ -7,8 +7,8 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('host'),
-        lazy_fixture('guest'),
+        lazy_fixture("host"),
+        lazy_fixture("guest"),
     ),
 )
 def case_data(request):

@@ -20,21 +20,24 @@ from .check_vertex_edges import check_vertex_edges
 from .check_vertices import check_vertices
 
 PlacementResult = (
-    stk.topology_graphs.implementations
-    .utilities._PlacementResult
+    stk.topology_graphs.implementations.utilities._PlacementResult
 )
 
 
 @pytest.mark.skip
 def test_with_placement_results(construction_state):
-    building_blocks = tuple(map(
-        construction_state.get_building_block,
-        range(construction_state.get_num_vertices()),
-    ))
-    placement_results = tuple(map(
-        partial(get_placement_result, construction_state),
-        building_blocks,
-    ))
+    building_blocks = tuple(
+        map(
+            construction_state.get_building_block,
+            range(construction_state.get_num_vertices()),
+        )
+    )
+    placement_results = tuple(
+        map(
+            partial(get_placement_result, construction_state),
+            building_blocks,
+        )
+    )
 
     # Clone for testing immutability.
     clone = construction_state.clone()
@@ -71,7 +74,8 @@ def get_placement_result(construction_state, building_block):
         ),
         functional_group_edges={
             fg_id: next(edges)
-            for fg_id
-            in range(building_block.get_num_functional_groups())
+            for fg_id in range(
+                building_block.get_num_functional_groups()
+            )
         },
     )

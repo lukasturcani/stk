@@ -12,31 +12,31 @@ class HashableDict(dict):
 
 def to_hashable(items):
     for key, value in items:
-        if key == 'a':
+        if key == "a":
             yield key, tuple(tuple(v) for v in value)
 
-        elif key == 'b':
+        elif key == "b":
             yield (
                 key,
                 tuple(
                     (atom1, atom2, order, tuple(periodicity))
                     for atom1, atom2, order, periodicity in value
-                )
+                ),
             )
 
-        elif key == 'm':
+        elif key == "m":
             yield key, tuple(tuple(v) for v in value)
 
-        elif key == 'BB':
+        elif key == "BB":
             yield key, tuple(map(HashableDict, value))
 
-        elif key == 'aI':
+        elif key == "aI":
             yield key, tuple(tuple(v) for v in value)
 
-        elif key == 'bI':
+        elif key == "bI":
             yield key, tuple(tuple(v) for v in value)
 
-        elif key == 'nBB':
+        elif key == "nBB":
             yield key, tuple(value)
 
         else:
@@ -59,10 +59,13 @@ def get_entry(item):
 
     """
 
-    return DatabaseEntry(**{
-        key: value
-        for key, value in to_hashable(item.items()) if key != '_id'
-    })
+    return DatabaseEntry(
+        **{
+            key: value
+            for key, value in to_hashable(item.items())
+            if key != "_id"
+        }
+    )
 
 
 class DatabaseEntry:
@@ -88,13 +91,15 @@ class DatabaseEntry:
         return self._items == other._items
 
     def __hash__(self):
-        return hash((
-            frozenset(self._items),
-            frozenset(self._items.values()),
-        ))
+        return hash(
+            (
+                frozenset(self._items),
+                frozenset(self._items.values()),
+            )
+        )
 
     def __repr__(self):
-        return f'DatabaseEntry({self._items})'
+        return f"DatabaseEntry({self._items})"
 
     def __str__(self):
         return repr(self)
@@ -124,7 +129,7 @@ class DatabaseState:
         return self._entries == other._entries
 
     def __repr__(self):
-        return f'DatabaseState({self._entries})'
+        return f"DatabaseState({self._entries})"
 
     def __str__(self):
         return repr(self)

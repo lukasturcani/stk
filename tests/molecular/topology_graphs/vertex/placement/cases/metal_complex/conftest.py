@@ -8,9 +8,9 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('metal'),
-        lazy_fixture('monodentate'),
-        lazy_fixture('bidentate'),
+        lazy_fixture("metal"),
+        lazy_fixture("monodentate"),
+        lazy_fixture("bidentate"),
     ),
 )
 def case_data(request):
@@ -23,9 +23,7 @@ def case_data(request):
 
 
 @pytest.fixture(
-    params=(
-        [1, 2, -20],
-    ),
+    params=([1, 2, -20],),
 )
 def position(request):
     """

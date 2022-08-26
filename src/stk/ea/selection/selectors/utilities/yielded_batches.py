@@ -11,7 +11,7 @@ class YieldedBatches:
 
     """
 
-    __slots__ = ('_molecules', '_batches', '_num', '_key_maker')
+    __slots__ = ("_molecules", "_batches", "_num", "_key_maker")
 
     def __init__(self, key_maker):
         self._key_maker = key_maker

@@ -113,34 +113,27 @@ class FivePlusTen(Cage):
 
     """
 
-    _c1 = np.cos(2*np.pi/5)
-    _c2 = np.cos(np.pi/5)
-    _s1 = np.sin(2*np.pi/5)
-    _s2 = np.sin(4*np.pi/5)
+    _c1 = np.cos(2 * np.pi / 5)
+    _c2 = np.cos(np.pi / 5)
+    _s1 = np.sin(2 * np.pi / 5)
+    _s2 = np.sin(4 * np.pi / 5)
 
     _vertex_prototypes = (
         NonLinearVertex(0, [0, 1, 0], False),
         NonLinearVertex(1, [_s1, _c1, 0], False),
         NonLinearVertex(2, [_s2, -_c2, 0], False),
-
         NonLinearVertex(3, [-_s2, -_c2, 0], False),
         NonLinearVertex(4, [-_s1, _c1, 0], False),
-
-        LinearVertex(5, [_s1, 1+_c1, 0.5], False),
-        LinearVertex(6, [_s1, 1+_c1, -0.5], False),
-
-        LinearVertex(7, [_s1+_s2, _c1-_c2, 0.5], False),
-        LinearVertex(8, [_s1+_s2, _c1-_c2, -0.5], False),
-
-        LinearVertex(9, [0, -2*_c2, 0.5], False),
-        LinearVertex(10, [0, -2*_c2, -0.5], False),
-
-        LinearVertex(11, [-_s2-_s1, -_c2+_c1, 0.5], False),
-        LinearVertex(12, [-_s2-_s1, -_c2+_c1, -0.5], False),
-
-        LinearVertex(13, [-_s1, 1+_c1, 0.5], False),
-        LinearVertex(14, [-_s1, 1+_c1, -0.5], False),
-
+        LinearVertex(5, [_s1, 1 + _c1, 0.5], False),
+        LinearVertex(6, [_s1, 1 + _c1, -0.5], False),
+        LinearVertex(7, [_s1 + _s2, _c1 - _c2, 0.5], False),
+        LinearVertex(8, [_s1 + _s2, _c1 - _c2, -0.5], False),
+        LinearVertex(9, [0, -2 * _c2, 0.5], False),
+        LinearVertex(10, [0, -2 * _c2, -0.5], False),
+        LinearVertex(11, [-_s2 - _s1, -_c2 + _c1, 0.5], False),
+        LinearVertex(12, [-_s2 - _s1, -_c2 + _c1, -0.5], False),
+        LinearVertex(13, [-_s1, 1 + _c1, 0.5], False),
+        LinearVertex(14, [-_s1, 1 + _c1, -0.5], False),
     )
 
     _edge_prototypes = (
@@ -148,27 +141,22 @@ class FivePlusTen(Cage):
         Edge(1, _vertex_prototypes[5], _vertex_prototypes[1]),
         Edge(2, _vertex_prototypes[6], _vertex_prototypes[0]),
         Edge(3, _vertex_prototypes[6], _vertex_prototypes[1]),
-
         Edge(4, _vertex_prototypes[7], _vertex_prototypes[1]),
         Edge(5, _vertex_prototypes[7], _vertex_prototypes[2]),
         Edge(6, _vertex_prototypes[8], _vertex_prototypes[1]),
         Edge(7, _vertex_prototypes[8], _vertex_prototypes[2]),
-
         Edge(8, _vertex_prototypes[9], _vertex_prototypes[2]),
         Edge(9, _vertex_prototypes[9], _vertex_prototypes[3]),
         Edge(10, _vertex_prototypes[10], _vertex_prototypes[2]),
         Edge(11, _vertex_prototypes[10], _vertex_prototypes[3]),
-
         Edge(12, _vertex_prototypes[11], _vertex_prototypes[3]),
         Edge(13, _vertex_prototypes[11], _vertex_prototypes[4]),
         Edge(14, _vertex_prototypes[12], _vertex_prototypes[3]),
         Edge(15, _vertex_prototypes[12], _vertex_prototypes[4]),
-
         Edge(16, _vertex_prototypes[13], _vertex_prototypes[4]),
         Edge(17, _vertex_prototypes[13], _vertex_prototypes[0]),
         Edge(18, _vertex_prototypes[14], _vertex_prototypes[4]),
         Edge(19, _vertex_prototypes[14], _vertex_prototypes[0]),
-
     )
 
     _num_windows = 7

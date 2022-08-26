@@ -115,39 +115,30 @@ class ThreePlusSix(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        NonLinearVertex(0, [-2*_x, -_x*np.sqrt(3), 0], False),
-        NonLinearVertex(1, [2*_x, -_x*np.sqrt(3), 0], False),
-        NonLinearVertex(2, [0, _x*np.sqrt(3), 0], False),
-
-        LinearVertex(3, [0, -2*_x*np.sqrt(3), _x], False),
-        LinearVertex(4, [0, -2*_x*np.sqrt(3), -_x], False),
-
-        LinearVertex(5, [2*_x, 0, _x], False),
-        LinearVertex(6, [2*_x, 0, -_x], False),
-
-        LinearVertex(7, [-2*_x, 0, _x], False),
-        LinearVertex(8, [-2*_x, 0, -_x], False),
+        NonLinearVertex(0, [-2 * _x, -_x * np.sqrt(3), 0], False),
+        NonLinearVertex(1, [2 * _x, -_x * np.sqrt(3), 0], False),
+        NonLinearVertex(2, [0, _x * np.sqrt(3), 0], False),
+        LinearVertex(3, [0, -2 * _x * np.sqrt(3), _x], False),
+        LinearVertex(4, [0, -2 * _x * np.sqrt(3), -_x], False),
+        LinearVertex(5, [2 * _x, 0, _x], False),
+        LinearVertex(6, [2 * _x, 0, -_x], False),
+        LinearVertex(7, [-2 * _x, 0, _x], False),
+        LinearVertex(8, [-2 * _x, 0, -_x], False),
     )
 
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[3], _vertex_prototypes[0]),
         Edge(1, _vertex_prototypes[3], _vertex_prototypes[1]),
-
         Edge(2, _vertex_prototypes[4], _vertex_prototypes[0]),
         Edge(3, _vertex_prototypes[4], _vertex_prototypes[1]),
-
         Edge(4, _vertex_prototypes[5], _vertex_prototypes[1]),
         Edge(5, _vertex_prototypes[5], _vertex_prototypes[2]),
-
         Edge(6, _vertex_prototypes[6], _vertex_prototypes[1]),
         Edge(7, _vertex_prototypes[6], _vertex_prototypes[2]),
-
         Edge(8, _vertex_prototypes[7], _vertex_prototypes[0]),
         Edge(9, _vertex_prototypes[7], _vertex_prototypes[2]),
-
         Edge(10, _vertex_prototypes[8], _vertex_prototypes[0]),
         Edge(11, _vertex_prototypes[8], _vertex_prototypes[2]),
-
     )
 
     _num_windows = 5

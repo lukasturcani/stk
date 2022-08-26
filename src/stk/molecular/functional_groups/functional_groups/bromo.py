@@ -113,7 +113,7 @@ class Bromo(GenericFunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._bromine}, {self._atom}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._bromine}, {self._atom}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

@@ -47,6 +47,5 @@ class DativeReactionFactory(ReactionFactory):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}'
-            f'({self._reaction_factory})'
+            f"{self.__class__.__name__}" f"({self._reaction_factory})"
         )

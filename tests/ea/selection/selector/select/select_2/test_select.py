@@ -56,12 +56,10 @@ def _test_select(selector, population, selected):
         sorted(selected, key=get_inchis),
     ):
         inchis1 = tuple(
-            inchi.get_key(record.get_molecule())
-            for record in batch1
+            inchi.get_key(record.get_molecule()) for record in batch1
         )
         inchis2 = tuple(
-            inchi.get_key(record.get_molecule())
-            for record in batch2
+            inchi.get_key(record.get_molecule()) for record in batch2
         )
         assert inchis1 == inchis2
 
@@ -69,6 +67,5 @@ def _test_select(selector, population, selected):
 def get_inchis(batch):
     inchi = stk.Inchi()
     return tuple(
-        inchi.get_key(record.get_molecule())
-        for record in batch
+        inchi.get_key(record.get_molecule()) for record in batch
     )

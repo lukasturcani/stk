@@ -39,18 +39,14 @@ def building_block_vertices(building_block1, building_block2):
 
 
 @pytest.fixture(
-    params=(
-        stk.BuildingBlock('BrCC', [stk.BromoFactory()]),
-    ),
+    params=(stk.BuildingBlock("BrCC", [stk.BromoFactory()]),),
 )
 def building_block1(request):
     return request.param
 
 
 @pytest.fixture(
-    params=(
-        stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
-    ),
+    params=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
 )
 def building_block2(request):
     return request.param

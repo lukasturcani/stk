@@ -203,8 +203,8 @@ class BoronicAcid(GenericFunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._boron}, {self._oxygen1}, {self._hydrogen1}, '
-            f'{self._oxygen2}, {self._hydrogen2}, {self._atom}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._boron}, {self._oxygen1}, {self._hydrogen1}, "
+            f"{self._oxygen2}, {self._hydrogen2}, {self._atom}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

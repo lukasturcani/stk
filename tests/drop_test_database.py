@@ -12,13 +12,13 @@ import pymongo
 
 def main():
     databases_to_drop = (
-        '_stk_pytest_database',
-        '_stk_test_database_for_testing',
+        "_stk_pytest_database",
+        "_stk_test_database_for_testing",
     )
     client = pymongo.MongoClient()
     for database in databases_to_drop:
         client.drop_database(database)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

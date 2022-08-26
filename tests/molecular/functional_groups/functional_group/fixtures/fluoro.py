@@ -12,8 +12,8 @@ def fluoro(get_atom_ids):
 
 
 def _fluoro(fluorine, atom):
-    bonders = (atom, )
-    deleters = (fluorine, )
+    bonders = (atom,)
+    deleters = (fluorine,)
     return GenericCaseData(
         functional_group=stk.Fluoro(
             fluorine=fluorine,

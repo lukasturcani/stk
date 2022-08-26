@@ -9,10 +9,10 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lazy_fixture('center'),
-        lazy_fixture('head'),
-        lazy_fixture('tail'),
-        lazy_fixture('unaligning'),
+        lazy_fixture("center"),
+        lazy_fixture("head"),
+        lazy_fixture("tail"),
+        lazy_fixture("unaligning"),
     ),
 )
 def case_data(request):
@@ -63,7 +63,7 @@ def unaligning(id, position, flip):
     )
 
 
-@pytest.fixture(params=(0, ))
+@pytest.fixture(params=(0,))
 def id(request):
     return request.param
 

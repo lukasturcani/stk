@@ -28,13 +28,13 @@ class _PlacementsSummary:
     """
 
     __slots__ = [
-        '_atoms',
-        '_atom_infos',
-        '_bonds',
-        '_bond_infos',
-        '_edge_functional_groups',
-        '_position_matrices',
-        '_num_atoms',
+        "_atoms",
+        "_atom_infos",
+        "_bonds",
+        "_bond_infos",
+        "_edge_functional_groups",
+        "_position_matrices",
+        "_num_atoms",
     ]
 
     _atoms: list[Atom]
@@ -48,8 +48,7 @@ class _PlacementsSummary:
         self,
         building_blocks: Iterable[BuildingBlock],
         placement_results: Iterable[
-            stk.molecular.topology_graphs.topology_graph
-            .topology_graph.implementations._PlacementResult
+            stk.molecular.topology_graphs.topology_graph.topology_graph.implementations._PlacementResult
         ],
         num_atoms: int,
         num_previous_placements: int,
@@ -97,9 +96,8 @@ class _PlacementsSummary:
         building_block: BuildingBlock,
         building_block_id: int,
         result: (
-            stk.molecular.topology_graphs.topology_graph
-            .topology_graph.implementations._PlacementResult
-        )
+            stk.molecular.topology_graphs.topology_graph.topology_graph.implementations._PlacementResult
+        ),
     ) -> None:
         """
         Add the placement result to the summary.

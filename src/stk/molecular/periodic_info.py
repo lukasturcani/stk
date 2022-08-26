@@ -64,7 +64,7 @@ lattice.html
         )
 
         a, b, c = tuple(
-            np.sqrt(np.sum(i ** 2)).tolist() for i in self._cell_matrix
+            np.sqrt(np.sum(i**2)).tolist() for i in self._cell_matrix
         )
         self._a = a
         self._b = b
@@ -77,9 +77,8 @@ lattice.html
             k = (i + 2) % 3
             angles[i] = cap_absolute_value(
                 value=(
-                    np.dot(
-                        self._cell_matrix[j], self._cell_matrix[k]
-                    ) / (lengths[j] * lengths[k])
+                    np.dot(self._cell_matrix[j], self._cell_matrix[k])
+                    / (lengths[j] * lengths[k])
                 ),
             )
         angles = np.arccos(angles) * 180.0 / np.pi
@@ -238,9 +237,9 @@ lattice.html
     def __str__(self) -> str:
 
         return (
-            f'{self.__class__.__name__}(a={self._a}, b={self._b}, '
-            f'c={self._c}, alpha={self._alpha}, beta={self._beta}, '
-            f'gamma={self._gamma})'
+            f"{self.__class__.__name__}(a={self._a}, b={self._b}, "
+            f"c={self._c}, alpha={self._alpha}, beta={self._beta}, "
+            f"gamma={self._gamma})"
         )
 
     def __repr__(self) -> str:

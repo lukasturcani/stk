@@ -5,10 +5,10 @@ import stk
 
 from .case_data import CaseData
 
-bb1 = stk.BuildingBlock('[C+2][N+]Br', [stk.BromoFactory()])
+bb1 = stk.BuildingBlock("[C+2][N+]Br", [stk.BromoFactory()])
 canonical_bb1 = bb1.with_canonical_atom_ordering()
 
-bb2 = stk.BuildingBlock('IS[O+]', [stk.IodoFactory()])
+bb2 = stk.BuildingBlock("IS[O+]", [stk.IodoFactory()])
 canonical_bb2 = bb2.with_canonical_atom_ordering()
 
 
@@ -16,9 +16,9 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
     params=(
         lambda: CaseData(
             molecule=stk.BuildingBlock(
-                smiles='Br[C+2][N+]Cl',
+                smiles="Br[C+2][N+]Cl",
                 functional_groups=[stk.BromoFactory()],
-                placer_ids=(0, ),
+                placer_ids=(0,),
             ),
             result=stk.BuildingBlock.init(
                 atoms=(
@@ -32,24 +32,23 @@ canonical_bb2 = bb2.with_canonical_atom_ordering()
                     stk.Bond(stk.Br(1), stk.C(2, 2), 1),
                     stk.Bond(stk.C(2, 2), stk.N(3, 1), 1),
                 ),
-                position_matrix=np.array([
-                ]),
+                position_matrix=np.array([]),
                 functional_groups=(
                     stk.Bromo(
                         bromine=stk.Br(1),
                         atom=stk.C(2, 2),
-                        bonders=(stk.C(2, 2), ),
-                        deleters=(stk.Br(1), ),
+                        bonders=(stk.C(2, 2),),
+                        deleters=(stk.Br(1),),
                     ),
                 ),
-                placer_ids=(1, ),
-            )
+                placer_ids=(1,),
+            ),
         ),
         lambda: CaseData(
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(bb1, bb2),
-                    repeating_unit='AB',
+                    repeating_unit="AB",
                     num_repeating_units=1,
                 ),
             ),

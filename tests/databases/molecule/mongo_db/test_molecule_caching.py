@@ -4,19 +4,17 @@ import stk
 
 
 def test_put_caching(mongo_client):
-    database_name = '_test_put_caching'
+    database_name = "_test_put_caching"
     mongo_client.drop_database(database_name)
 
     database = stk.MoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
         jsonizer=stk.MoleculeJsonizer(
-            key_makers=(
-                stk.InchiKey(),
-            ),
+            key_makers=(stk.InchiKey(),),
         ),
     )
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
     database.put(molecule)
     database.put(molecule)
 
@@ -35,28 +33,32 @@ def test_put_caching(mongo_client):
 
 
 def test_get_caching(mongo_client):
-    database_name = '_test_get_caching'
+    database_name = "_test_get_caching"
     mongo_client.drop_database(database_name)
 
     database = stk.MoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
         jsonizer=stk.MoleculeJsonizer(
-            key_makers=(
-                stk.InchiKey(),
-            ),
+            key_makers=(stk.InchiKey(),),
         ),
     )
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
     database.put(molecule)
-    database.get({
-        stk.InchiKey().get_key_name():
-            stk.InchiKey().get_key(molecule),
-    })
-    database.get({
-        stk.InchiKey().get_key_name():
-            stk.InchiKey().get_key(molecule),
-    })
+    database.get(
+        {
+            stk.InchiKey()
+            .get_key_name(): stk.InchiKey()
+            .get_key(molecule),
+        }
+    )
+    database.get(
+        {
+            stk.InchiKey()
+            .get_key_name(): stk.InchiKey()
+            .get_key(molecule),
+        }
+    )
 
     cache_info = database._get.cache_info()
     assert cache_info.hits == 1

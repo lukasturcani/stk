@@ -86,9 +86,7 @@ class OctahedralLambda(MetalComplex):
 
     """
 
-    _metal_vertex_prototypes = (
-        MetalVertex(0, (0, 0, 0)),
-    )
+    _metal_vertex_prototypes = (MetalVertex(0, (0, 0, 0)),)
     _ligand_vertex_prototypes = (
         BiDentateLigandVertex(1, (2.5, 2.5, 0)),
         BiDentateLigandVertex(2, (0, -2.5, -2.5)),

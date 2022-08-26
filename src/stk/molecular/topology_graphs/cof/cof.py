@@ -436,20 +436,22 @@ class Cof(TopologyGraph):
                     building_block.get_num_functional_groups()
                     in self._allowed_degrees
                 ), (
-                    'The number of functional groups in '
-                    f'{building_block} needs to be one of '
-                    f'{tuple(self._allowed_degrees)}, but is '
-                    'currently '
-                    f'{building_block.get_num_functional_groups()}.'
+                    "The number of functional groups in "
+                    f"{building_block} needs to be one of "
+                    f"{tuple(self._allowed_degrees)}, but is "
+                    "currently "
+                    f"{building_block.get_num_functional_groups()}."
                 )
             get_vertex = partial(getitem, vertices)
             building_block_vertices = {
-                building_block: tuple(map(
-                    get_vertex,
-                    # Account for the fact that a building block can
-                    # be mapped to a single int.
-                    (ids, ) if isinstance(ids, int) else ids
-                ))
+                building_block: tuple(
+                    map(
+                        get_vertex,
+                        # Account for the fact that a building block can
+                        # be mapped to a single int.
+                        (ids,) if isinstance(ids, int) else ids,
+                    )
+                )
                 for building_block, ids in building_blocks.items()
             }
         else:
@@ -467,7 +469,7 @@ class Cof(TopologyGraph):
 
         self._check_building_block_vertices(
             num_vertices=(
-                np.product(lattice_size)*len(self._vertex_prototypes)
+                np.product(lattice_size) * len(self._vertex_prototypes)
             ),
             building_block_vertices=building_block_vertices,
         )
@@ -516,16 +518,16 @@ class Cof(TopologyGraph):
         for vertex in vertices:
             if vertex.get_id() in assigned_ids:
                 raise OverlyOccupiedVertexError(
-                    f'Vertex {vertex.get_id()} has multiple building '
-                    'blocks placed on it.'
+                    f"Vertex {vertex.get_id()} has multiple building "
+                    "blocks placed on it."
                 )
             assigned_ids.add(vertex.get_id())
             unassigned_ids.remove(vertex.get_id())
 
         if unassigned_ids:
             raise UnoccupiedVertexError(
-                'The following vertices are unoccupied '
-                f'{unassigned_ids}.'
+                "The following vertices are unoccupied "
+                f"{unassigned_ids}."
             )
 
     def clone(self):
@@ -561,7 +563,8 @@ class Cof(TopologyGraph):
             return None
 
         return tuple(
-            EdgeGroup((edge,)) for edge in edges
+            EdgeGroup((edge,))
+            for edge in edges
             if not edge.is_periodic()
         )
 
@@ -584,7 +587,9 @@ class Cof(TopologyGraph):
         """
 
         xdim, ydim, zdim = self._lattice_size
-        num_vertices = xdim*ydim*zdim*len(self._vertex_prototypes)
+        num_vertices = (
+            xdim * ydim * zdim * len(self._vertex_prototypes)
+        )
         vertices = [None for i in range(num_vertices)]
         for x, y, z in it.product(
             range(xdim),
@@ -628,15 +633,7 @@ class Cof(TopologyGraph):
 
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         # vertex_clones is indexed as vertex_clones[x][y][z]
-        lattice = [
-            [
-                [
-                    {} for _ in zdim
-                ]
-                for _ in ydim
-            ]
-            for _ in xdim
-        ]
+        lattice = [[[{} for _ in zdim] for _ in ydim] for _ in xdim]
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
         vertices = it.product(cells, self._vertex_prototypes)
@@ -686,28 +683,28 @@ class Cof(TopologyGraph):
             # Wrap around periodic cells, ie those that are less than 0
             # or greater than the lattice size along any dimension.
             dims = zip(periodic_cell, self._lattice_size)
-            x2, y2, z2 = np.array([
-                (dim+max_dim) % max_dim
-                for dim, max_dim in dims
-            ])
+            x2, y2, z2 = np.array(
+                [(dim + max_dim) % max_dim for dim, max_dim in dims]
+            )
             # The edge is not periodic if periodic_cell did not
             # have to wrap around.
             dims = zip(periodic_cell, self._lattice_size)
             edge_is_not_periodic = all(
-                dim >= 0 and dim < max_dim
-                for dim, max_dim in dims
+                dim >= 0 and dim < max_dim for dim, max_dim in dims
             )
-            edge_clones.append(CofEdge(
-                parent_id=edge.get_id(),
-                id=id_,
-                vertex1=lattice[x][y][z][edge.get_vertex1_id()],
-                vertex2=lattice[x2][y2][z2][edge.get_vertex2_id()],
-                periodicity=(
-                    (0, 0, 0)
-                    if edge_is_not_periodic
-                    else edge.get_periodicity()
-                ),
-            ))
+            edge_clones.append(
+                CofEdge(
+                    parent_id=edge.get_id(),
+                    id=id_,
+                    vertex1=lattice[x][y][z][edge.get_vertex1_id()],
+                    vertex2=lattice[x2][y2][z2][edge.get_vertex2_id()],
+                    periodicity=(
+                        (0, 0, 0)
+                        if edge_is_not_periodic
+                        else edge.get_periodicity()
+                    ),
+                )
+            )
 
         return tuple(edge_clones)
 
@@ -755,20 +752,18 @@ class Cof(TopologyGraph):
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
-            assert (
-                num_fgs in cls._allowed_degrees
-            ), (
-                'The number of functional groups in '
-                f'{building_block} needs to be one of '
-                f'{tuple(cls._allowed_degrees)}, but is '
-                'currently '
-                f'{building_block.get_num_functional_groups()}.'
+            assert num_fgs in cls._allowed_degrees, (
+                "The number of functional groups in "
+                f"{building_block} needs to be one of "
+                f"{tuple(cls._allowed_degrees)}, but is "
+                "currently "
+                f"{building_block.get_num_functional_groups()}."
             )
             if num_fgs in building_blocks_by_degree:
                 raise ValueError(
-                    'If there are multiple building blocks with the '
-                    'same number of functional groups, '
-                    'building_block_vertices must be set explicitly.'
+                    "If there are multiple building blocks with the "
+                    "same number of functional groups, "
+                    "building_block_vertices must be set explicitly."
                 )
             building_blocks_by_degree[num_fgs] = building_block
 
@@ -782,9 +777,9 @@ class Cof(TopologyGraph):
         for vertex in vertices:
             vertex_degree = vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
-            building_block_vertices[building_block] = (
-                building_block_vertices.get(building_block, [])
-            )
+            building_block_vertices[
+                building_block
+            ] = building_block_vertices.get(building_block, [])
             building_block_vertices[building_block].append(vertex)
         return building_block_vertices
 
@@ -808,22 +803,21 @@ class Cof(TopologyGraph):
         return PeriodicConstructionResult(state, self._lattice_size)
 
     def _get_scale(self, building_block_vertices):
-        return 5*max(
-            bb.get_maximum_diameter()
-            for bb in building_block_vertices
+        return 5 * max(
+            bb.get_maximum_diameter() for bb in building_block_vertices
         )
 
     def __repr__(self):
         x, y, z = self._lattice_size
-        periodic = ', periodic=True' if self._periodic else ''
+        periodic = ", periodic=True" if self._periodic else ""
         vertex_alignments = (
-            f', vertex_alignments={self._vertex_alignments}'
+            f", vertex_alignments={self._vertex_alignments}"
             if self._vertex_alignments
-            else ''
+            else ""
         )
         return (
-            f'cof.{self.__class__.__name__}('
-            f'({x}, {y}, {z})'
-            f'{vertex_alignments}'
-            f'{periodic})'
+            f"cof.{self.__class__.__name__}("
+            f"({x}, {y}, {z})"
+            f"{vertex_alignments}"
+            f"{periodic})"
         )

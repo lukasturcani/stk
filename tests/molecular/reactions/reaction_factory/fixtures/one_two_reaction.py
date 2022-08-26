@@ -16,10 +16,12 @@ def one_two_reaction(
     functional_group2,
     bond_order,
 ):
-    bond_order_key = frozenset({
-        type(functional_group1),
-        type(functional_group2),
-    })
+    bond_order_key = frozenset(
+        {
+            type(functional_group1),
+            type(functional_group2),
+        }
+    )
     edge = MockEdge(0, periodicity)
     return CaseData(
         factory=stk.GenericReactionFactory(
@@ -28,7 +30,7 @@ def one_two_reaction(
             },
         ),
         construction_state=MockConstructionState(
-            edges=(edge, ),
+            edges=(edge,),
             edge_functional_groups={
                 0: (
                     functional_group1,
@@ -37,7 +39,7 @@ def one_two_reaction(
             },
         ),
         edge_group=stk.EdgeGroup(
-            edges=(edge, ),
+            edges=(edge,),
         ),
         reaction_result=ReactionResult(
             new_atoms=(),

@@ -230,7 +230,6 @@ class M4L4Square(Cage):
         AngledVertex(1, [1, -1, 0]),
         AngledVertex(2, [-1, -1, 0]),
         AngledVertex(3, [-1, 1, 0]),
-
         LinearVertex(4, [1, 0, 0], False),
         LinearVertex(5, [0, -1, 0], False),
         LinearVertex(6, [-1, 0, 0], False),
@@ -240,13 +239,10 @@ class M4L4Square(Cage):
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[0], _vertex_prototypes[4]),
         Edge(1, _vertex_prototypes[1], _vertex_prototypes[4]),
-
         Edge(2, _vertex_prototypes[1], _vertex_prototypes[5]),
         Edge(3, _vertex_prototypes[2], _vertex_prototypes[5]),
-
         Edge(4, _vertex_prototypes[2], _vertex_prototypes[6]),
         Edge(5, _vertex_prototypes[3], _vertex_prototypes[6]),
-
         Edge(6, _vertex_prototypes[3], _vertex_prototypes[7]),
         Edge(7, _vertex_prototypes[0], _vertex_prototypes[7]),
     )

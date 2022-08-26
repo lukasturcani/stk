@@ -18,13 +18,13 @@ class _MoleculeState:
     """
 
     __slots__ = [
-        '_position_matrix',
-        '_atoms',
-        '_atom_infos',
-        '_bonds',
-        '_bond_infos',
-        '_edge_functional_groups',
-        '_num_placements',
+        "_position_matrix",
+        "_atoms",
+        "_atom_infos",
+        "_bonds",
+        "_bond_infos",
+        "_edge_functional_groups",
+        "_num_placements",
     ]
 
     def __init__(self):
@@ -61,8 +61,7 @@ class _MoleculeState:
         clone._num_placements = self._num_placements
         clone._edge_functional_groups = {
             edge_id: list(functional_groups)
-            for edge_id, functional_groups
-            in self._edge_functional_groups.items()
+            for edge_id, functional_groups in self._edge_functional_groups.items()
         }
         return clone
 
@@ -89,16 +88,19 @@ class _MoleculeState:
         self._atom_infos.extend(summary.get_atom_infos())
         self._bonds.extend(summary.get_bonds())
         self._bond_infos.extend(summary.get_bond_infos())
-        self._position_matrix = np.concatenate([
-            self._position_matrix,
-            summary.get_position_matrix(),
-        ])
-        for edge_id, functional_groups in (
-            summary.get_edge_functional_groups()
-        ):
-            self._edge_functional_groups[edge_id] = (
-                self._edge_functional_groups.get(edge_id, [])
-            )
+        self._position_matrix = np.concatenate(
+            [
+                self._position_matrix,
+                summary.get_position_matrix(),
+            ]
+        )
+        for (
+            edge_id,
+            functional_groups,
+        ) in summary.get_edge_functional_groups():
+            self._edge_functional_groups[
+                edge_id
+            ] = self._edge_functional_groups.get(edge_id, [])
             self._edge_functional_groups[edge_id].extend(
                 functional_groups
             )
@@ -292,15 +294,17 @@ class _MoleculeState:
             reaction_results=results,
         )
         self._with_reactions_summary(reactions_summary)
-        self._with_deletions_summary(_DeletionsSummary(
-            atoms=self._atoms,
-            atom_infos=self._atom_infos,
-            bonds=self._bonds,
-            bond_infos=self._bond_infos,
-            position_matrix=self._position_matrix,
-            deleted_atom_ids=reactions_summary.get_deleted_atom_ids(),
-            deleted_bond_ids=reactions_summary.get_deleted_bond_ids(),
-        ))
+        self._with_deletions_summary(
+            _DeletionsSummary(
+                atoms=self._atoms,
+                atom_infos=self._atom_infos,
+                bonds=self._bonds,
+                bond_infos=self._bond_infos,
+                position_matrix=self._position_matrix,
+                deleted_atom_ids=reactions_summary.get_deleted_atom_ids(),
+                deleted_bond_ids=reactions_summary.get_deleted_bond_ids(),
+            )
+        )
         return self
 
     def _with_reactions_summary(self, summary):
@@ -325,10 +329,12 @@ class _MoleculeState:
 
         positions = tuple(summary.get_positions())
         if positions:
-            self._position_matrix = np.vstack([
-                self._position_matrix,
-                positions,
-            ])
+            self._position_matrix = np.vstack(
+                [
+                    self._position_matrix,
+                    positions,
+                ]
+            )
 
     def _with_deletions_summary(self, summary):
         """

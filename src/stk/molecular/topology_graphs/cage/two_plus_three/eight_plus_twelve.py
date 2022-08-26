@@ -116,16 +116,14 @@ class EightPlusTwelve(Cage):
         NonLinearVertex(1, [-1, -1, -1]),
         NonLinearVertex(2, [1, 1, -1]),
         NonLinearVertex(3, [1, -1, -1]),
-
         NonLinearVertex(4, [-1, 1, 1]),
         NonLinearVertex(5, [-1, -1, 1]),
         NonLinearVertex(6, [1, 1, 1]),
-        NonLinearVertex(7, [1, -1, 1])
+        NonLinearVertex(7, [1, -1, 1]),
     )
 
     _vertex_prototypes = (
         *_non_linears,
-
         LinearVertex.init_at_center(
             id=8,
             vertices=(_non_linears[0], _non_linears[2]),
@@ -142,7 +140,6 @@ class EightPlusTwelve(Cage):
             id=11,
             vertices=(_non_linears[2], _non_linears[3]),
         ),
-
         LinearVertex.init_at_center(
             id=12,
             vertices=(_non_linears[4], _non_linears[6]),
@@ -159,7 +156,6 @@ class EightPlusTwelve(Cage):
             id=15,
             vertices=(_non_linears[6], _non_linears[7]),
         ),
-
         LinearVertex.init_at_center(
             id=16,
             vertices=(_non_linears[0], _non_linears[4]),
@@ -181,40 +177,28 @@ class EightPlusTwelve(Cage):
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[8], _vertex_prototypes[0]),
         Edge(1, _vertex_prototypes[8], _vertex_prototypes[2]),
-
         Edge(2, _vertex_prototypes[9], _vertex_prototypes[0]),
         Edge(3, _vertex_prototypes[9], _vertex_prototypes[1]),
-
         Edge(4, _vertex_prototypes[10], _vertex_prototypes[1]),
         Edge(5, _vertex_prototypes[10], _vertex_prototypes[3]),
-
         Edge(6, _vertex_prototypes[11], _vertex_prototypes[2]),
         Edge(7, _vertex_prototypes[11], _vertex_prototypes[3]),
-
         Edge(8, _vertex_prototypes[12], _vertex_prototypes[4]),
         Edge(9, _vertex_prototypes[12], _vertex_prototypes[6]),
-
         Edge(10, _vertex_prototypes[13], _vertex_prototypes[4]),
         Edge(11, _vertex_prototypes[13], _vertex_prototypes[5]),
-
         Edge(12, _vertex_prototypes[14], _vertex_prototypes[5]),
         Edge(13, _vertex_prototypes[14], _vertex_prototypes[7]),
-
         Edge(14, _vertex_prototypes[15], _vertex_prototypes[6]),
         Edge(15, _vertex_prototypes[15], _vertex_prototypes[7]),
-
         Edge(16, _vertex_prototypes[16], _vertex_prototypes[0]),
         Edge(17, _vertex_prototypes[16], _vertex_prototypes[4]),
-
         Edge(18, _vertex_prototypes[17], _vertex_prototypes[1]),
         Edge(19, _vertex_prototypes[17], _vertex_prototypes[5]),
-
         Edge(20, _vertex_prototypes[18], _vertex_prototypes[2]),
         Edge(21, _vertex_prototypes[18], _vertex_prototypes[6]),
-
         Edge(22, _vertex_prototypes[19], _vertex_prototypes[3]),
         Edge(23, _vertex_prototypes[19], _vertex_prototypes[7]),
-
     )
 
     _num_windows = 6

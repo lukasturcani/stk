@@ -6,9 +6,7 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
-    params=(
-        stk.C(0),
-    ),
+    params=(stk.C(0),),
 )
 def atom(request):
     """
@@ -36,7 +34,7 @@ def building_block_atom(request):
 
 @pytest.fixture(
     params=(
-        stk.BuildingBlock('NCCN'),
+        stk.BuildingBlock("NCCN"),
         None,
     ),
 )

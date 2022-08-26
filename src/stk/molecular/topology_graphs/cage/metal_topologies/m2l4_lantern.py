@@ -154,7 +154,6 @@ class M2L4Lantern(Cage):
     _vertex_prototypes = (
         NonLinearVertex(0, [0, 0.5, 0]),
         NonLinearVertex(1, [0, -0.5, 0]),
-
         LinearVertex(2, [1, 0, 0], False),
         LinearVertex(3, [0, 0, 1], False),
         LinearVertex(4, [-1, 0, 0], False),
@@ -166,7 +165,6 @@ class M2L4Lantern(Cage):
         Edge(1, _vertex_prototypes[0], _vertex_prototypes[3]),
         Edge(2, _vertex_prototypes[0], _vertex_prototypes[4]),
         Edge(3, _vertex_prototypes[0], _vertex_prototypes[5]),
-
         Edge(4, _vertex_prototypes[1], _vertex_prototypes[2]),
         Edge(5, _vertex_prototypes[1], _vertex_prototypes[3]),
         Edge(6, _vertex_prototypes[1], _vertex_prototypes[4]),

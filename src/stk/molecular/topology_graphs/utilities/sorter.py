@@ -15,7 +15,7 @@ class _Sorter:
 
     """
 
-    __slots__ = ['_items', '_reference', '_axis']
+    __slots__ = ["_items", "_reference", "_axis"]
 
     def __init__(self, items, reference, axis):
         """
@@ -79,7 +79,7 @@ class _Sorter:
         theta = vector_angle(self._reference, vector)
         projection = vector @ self._axis
         if theta > 0 and projection < 0:
-            return 2*np.pi - theta
+            return 2 * np.pi - theta
         return theta
 
     def get_items(self):

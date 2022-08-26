@@ -11,7 +11,7 @@ from ....case_data import CaseData
         lambda: CaseData(
             vertex=stk.rotaxane.AxleVertex(0, (1, 2, 3)),
             edges=(),
-            building_block=stk.BuildingBlock('BrCCBr'),
+            building_block=stk.BuildingBlock("BrCCBr"),
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},
             functional_group_edges={},

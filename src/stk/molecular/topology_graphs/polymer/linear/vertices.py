@@ -57,12 +57,10 @@ class LinearVertex(Vertex):
         return clone
 
     def place_building_block(self, building_block, edges):
-        assert (
-            building_block.get_num_functional_groups() == 2
-        ), (
-            f'{building_block} needs to have exactly 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 2, (
+            f"{building_block} needs to have exactly 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         building_block = building_block.with_centroid(
             position=self._position,
@@ -112,9 +110,9 @@ class LinearVertex(Vertex):
 
     def __str__(self):
         return (
-            f'Vertex(id={self._id}, '
-            f'position={self._position.tolist()}, '
-            f'flip={self._flip})'
+            f"Vertex(id={self._id}, "
+            f"position={self._position.tolist()}, "
+            f"flip={self._flip})"
         )
 
 
@@ -165,8 +163,8 @@ class TerminalVertex(LinearVertex):
 
         else:
             raise ValueError(
-                'The building block of a polymer '
-                'must have 1 or 2 functional groups.'
+                "The building block of a polymer "
+                "must have 1 or 2 functional groups."
             )
 
 

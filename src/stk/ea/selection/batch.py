@@ -184,7 +184,7 @@ class Batch:
 
     """
 
-    __slots__ = ('_records', '_fitness_value', '_identity_key')
+    __slots__ = ("_records", "_fitness_value", "_identity_key")
 
     def __init__(self, records, fitness_values, key_maker):
         """
@@ -279,7 +279,7 @@ class Batch:
         return self._fitness_value <= other._fitness_value
 
     def __repr__(self):
-        return f'Batch({self._fitness_value})'
+        return f"Batch({self._fitness_value})"
 
     def __str__(self):
         return repr(self)

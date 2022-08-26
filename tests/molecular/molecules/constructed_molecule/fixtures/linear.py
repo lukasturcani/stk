@@ -90,17 +90,17 @@ class LinearData:
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: LinearData(
             building_blocks=(
-                stk.BuildingBlock('BrC#CBr', [stk.BromoFactory()]),
+                stk.BuildingBlock("BrC#CBr", [stk.BromoFactory()]),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
-            repeating_unit='AB',
+            repeating_unit="AB",
             num_repeating_units=2,
             num_new_atoms=0,
             num_new_bonds=3,

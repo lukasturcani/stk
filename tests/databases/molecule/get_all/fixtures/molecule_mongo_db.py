@@ -11,13 +11,13 @@ from ..case_data import CaseData
 @pytest.fixture
 def molecules() -> tuple[stk.BuildingBlock, ...]:
     return (
-        stk.BuildingBlock('CCC'),
-        stk.BuildingBlock('BrCCCBr'),
-        stk.BuildingBlock('NCCN'),
-        stk.BuildingBlock('CCCCC'),
-        stk.BuildingBlock('NCCCCN'),
-        stk.BuildingBlock('NCC(CCBr)CCN'),
-        stk.BuildingBlock('NCCNCCC(CCBr)CCN'),
+        stk.BuildingBlock("CCC"),
+        stk.BuildingBlock("BrCCCBr"),
+        stk.BuildingBlock("NCCN"),
+        stk.BuildingBlock("CCCCC"),
+        stk.BuildingBlock("NCCCCN"),
+        stk.BuildingBlock("NCC(CCBr)CCN"),
+        stk.BuildingBlock("NCCNCCC(CCBr)CCN"),
     )
 
 
@@ -46,7 +46,7 @@ def molecule_mongo_db(
 
     inchi = stk.Inchi()
     smiles = stk.Smiles()
-    database_name = '_test_get_all_molecules'
+    database_name = "_test_get_all_molecules"
     mongo_client.drop_database(database_name)
 
     inchi_molecules = molecules[:2]
@@ -56,14 +56,14 @@ def molecule_mongo_db(
     inchi_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        key_makers=(inchi, ),
-        indices=(inchi.get_key_name(), ),
+        key_makers=(inchi,),
+        indices=(inchi.get_key_name(),),
     )
     smiles_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        key_makers=(smiles, ),
-        indices=(smiles.get_key_name(), ),
+        key_makers=(smiles,),
+        indices=(smiles.get_key_name(),),
     )
 
     inchi_and_smiles_database = get_database(
@@ -85,13 +85,12 @@ def molecule_mongo_db(
     inchi_key_database = get_database(
         database_name=database_name,
         mongo_client=mongo_client,
-        key_makers=(stk.InchiKey(), ),
+        key_makers=(stk.InchiKey(),),
         indices=(),
     )
 
     expected_molecules = {
-        smiles.get_key(molecule): molecule
-        for molecule in molecules
+        smiles.get_key(molecule): molecule for molecule in molecules
     }
 
     return CaseData(

@@ -129,7 +129,7 @@ class DivideByMean(FitnessNormalizer):
             a=[record.get_fitness_value() for record in filtered],
             axis=0,
         )
-        logger.debug(f'Means used: {mean}')
+        logger.debug(f"Means used: {mean}")
 
         for record in population:
             if self._filter(population, record):

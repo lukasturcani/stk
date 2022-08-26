@@ -50,7 +50,7 @@ class BromoFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(0, ), deleters=(1, ), placers=None):
+    def __init__(self, bonders=(0,), deleters=(1,), placers=None):
         """
         Initialize a :class:`.BromoFactory` instance.
 
@@ -75,7 +75,7 @@ class BromoFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[*][Br]', molecule):
+        for atom_ids in _get_atom_ids("[*][Br]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Bromo(
                 bromine=atoms[1],

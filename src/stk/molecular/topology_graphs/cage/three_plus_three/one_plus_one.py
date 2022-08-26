@@ -40,9 +40,9 @@ class OnePlusOneVertex(NonLinearVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
@@ -177,28 +177,27 @@ class OnePlusOne(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        OnePlusOneVertex(0, [_x, 0., 0.], [1, 0, 0], False),
-        OnePlusOneVertex(1, [-_x, 0., 0.], [-1, 0, 0], False),
-
+        OnePlusOneVertex(0, [_x, 0.0, 0.0], [1, 0, 0], False),
+        OnePlusOneVertex(1, [-_x, 0.0, 0.0], [-1, 0, 0], False),
     )
     _edge_prototypes = (
         Edge(
             id=0,
             vertex1=_vertex_prototypes[0],
             vertex2=_vertex_prototypes[1],
-            position=np.array([0., 1., 0.]),
+            position=np.array([0.0, 1.0, 0.0]),
         ),
         Edge(
             id=1,
             vertex1=_vertex_prototypes[0],
             vertex2=_vertex_prototypes[1],
-            position=np.array([0., -1., 1.]),
+            position=np.array([0.0, -1.0, 1.0]),
         ),
         Edge(
             id=2,
             vertex1=_vertex_prototypes[0],
             vertex2=_vertex_prototypes[1],
-            position=np.array([0., -1., -1.]),
+            position=np.array([0.0, -1.0, -1.0]),
         ),
     )
 

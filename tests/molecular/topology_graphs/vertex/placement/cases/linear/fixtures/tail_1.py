@@ -22,7 +22,7 @@ def tail_1(position, flip, building_block_1):
     vertex = stk.polymer.linear.TailVertex(0, position, flip)
     return CaseData(
         vertex=vertex,
-        edges=(tuple(get_edges(vertex))[0], ),
+        edges=(tuple(get_edges(vertex))[0],),
         building_block=building_block_1,
         position=position,
         alignment_tests={get_centroid_point: point2},

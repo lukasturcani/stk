@@ -7,8 +7,8 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('fitness_function'),
-        lazy_fixture('property_vector'),
+        lazy_fixture("fitness_function"),
+        lazy_fixture("property_vector"),
     ),
 )
 def case_data(request):

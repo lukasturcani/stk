@@ -6,7 +6,7 @@ import stk
 
 
 def get_fg_position(id, building_block):
-    functional_group, = building_block.get_functional_groups(id)
+    (functional_group,) = building_block.get_functional_groups(id)
     return building_block.get_centroid(
         atom_ids=functional_group.get_placer_ids(),
     )

@@ -6,11 +6,11 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: CaseData(
             factory=stk.RingAmineFactory(),
-            molecule=stk.BuildingBlock('NCC(Br)c1c(Br)cccc1'),
+            molecule=stk.BuildingBlock("NCC(Br)c1c(Br)cccc1"),
             functional_groups=(
                 stk.RingAmine(
                     nitrogen=stk.N(0),

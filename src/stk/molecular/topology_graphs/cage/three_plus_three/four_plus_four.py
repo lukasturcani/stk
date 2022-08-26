@@ -105,11 +105,10 @@ class FourPlusFour(Cage):
         NonLinearVertex(1, [-_x, -_x, -_x], False),
         NonLinearVertex(2, [_x, _x, -_x], False),
         NonLinearVertex(3, [_x, -_x, -_x], False),
-
         NonLinearVertex(4, [-_x, _x, _x], False),
         NonLinearVertex(5, [-_x, -_x, _x], False),
         NonLinearVertex(6, [_x, _x, _x], False),
-        NonLinearVertex(7, [_x, -_x, _x], False)
+        NonLinearVertex(7, [_x, -_x, _x], False),
     )
 
     _edge_prototypes = (
@@ -124,7 +123,7 @@ class FourPlusFour(Cage):
         Edge(8, _vertex_prototypes[4], _vertex_prototypes[6]),
         Edge(9, _vertex_prototypes[4], _vertex_prototypes[5]),
         Edge(10, _vertex_prototypes[5], _vertex_prototypes[7]),
-        Edge(11, _vertex_prototypes[6], _vertex_prototypes[7])
+        Edge(11, _vertex_prototypes[6], _vertex_prototypes[7]),
     )
 
     _num_windows = 6

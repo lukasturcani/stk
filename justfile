@@ -10,6 +10,7 @@ check:
     pytest
     isort .
     mypy src
-    flake8 src tests benchmarks
+    flake8 .
+    black .
 
     test $err = 0

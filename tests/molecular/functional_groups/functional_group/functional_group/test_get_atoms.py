@@ -42,7 +42,6 @@ def _test_get_atoms(functional_group, atoms):
     """
 
     for atom1, atom2 in it.zip_longest(
-        functional_group.get_atoms(),
-        atoms
+        functional_group.get_atoms(), atoms
     ):
         assert atom1 is atom2

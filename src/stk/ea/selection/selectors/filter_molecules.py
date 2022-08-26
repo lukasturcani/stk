@@ -80,9 +80,7 @@ class FilterMolecules(Selector):
             excluded_batches=excluded_batches,
         )
         valid_population = tuple(
-            record
-            for batch in valid_batches
-            for record in batch
+            record for batch in valid_batches for record in batch
         )
         yield from self._selector.select(
             population=valid_population,

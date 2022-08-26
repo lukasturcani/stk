@@ -14,7 +14,6 @@ def test_get_num_functional_groups(case_data):
 
     """
 
-    assert (
-        case_data.building_block.get_num_functional_groups()
-        == len(case_data.functional_groups)
+    assert case_data.building_block.get_num_functional_groups() == len(
+        case_data.functional_groups
     )

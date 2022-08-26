@@ -74,7 +74,7 @@ class PdbWriter:
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
 
         content = []
         if periodic_info is not None:
@@ -86,55 +86,55 @@ class PdbWriter:
             beta = periodic_info.get_beta()
             gamma = periodic_info.get_gamma()
             content.append(
-                f'CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}'
-                f' {alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f} '
-                f'P 1\n'
+                f"CRYST1 {a:>8.3f} {b:>8.3f} {c:>8.3f}"
+                f" {alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f} "
+                f"P 1\n"
             )
 
         atom_counts: dict[str, int] = {}
-        hetatm = 'HETATM'
-        alt_loc = ''
-        res_name = 'UNL'
-        chain_id = ''
-        res_seq = '1'
-        i_code = ''
-        occupancy = '1.00'
-        temp_factor = '0.00'
+        hetatm = "HETATM"
+        alt_loc = ""
+        res_name = "UNL"
+        chain_id = ""
+        res_seq = "1"
+        i_code = ""
+        occupancy = "1.00"
+        temp_factor = "0.00"
 
         coords = molecule.get_position_matrix()
         # This set will be used by bonds.
         atoms = set()
         for atom_id in atom_ids:
             atoms.add(atom_id)
-            atom, = molecule.get_atoms(atom_ids=atom_id)
-            serial = atom_id+1
+            (atom,) = molecule.get_atoms(atom_ids=atom_id)
+            serial = atom_id + 1
             element = atom.__class__.__name__
             charge = atom.get_charge()
             atom_counts[element] = atom_counts.get(element, 0) + 1
-            name = f'{element}{atom_counts[element]}'
+            name = f"{element}{atom_counts[element]}"
             # Make sure the coords are no more than 8 columns wide
             # each.
             x, y, z = (i for i in coords[atom_id])
 
             content.append(
-                f'{hetatm:<6}{serial:>5} {name:<4}'
-                f'{alt_loc:<1}{res_name:<3} {chain_id:<1}'
-                f'{res_seq:>4}{i_code:<1}   '
-                f' {x:>7.3f} {y:>7.3f} {z:>7.3f}'
-                f'{occupancy:>6}{temp_factor:>6}          '
-                f'{element:>2}{charge:>2}\n'
+                f"{hetatm:<6}{serial:>5} {name:<4}"
+                f"{alt_loc:<1}{res_name:<3} {chain_id:<1}"
+                f"{res_seq:>4}{i_code:<1}   "
+                f" {x:>7.3f} {y:>7.3f} {z:>7.3f}"
+                f"{occupancy:>6}{temp_factor:>6}          "
+                f"{element:>2}{charge:>2}\n"
             )
 
-        conect = 'CONECT'
+        conect = "CONECT"
         for bond in molecule.get_bonds():
             a1 = bond.get_atom1().get_id()
             a2 = bond.get_atom2().get_id()
             if a1 in atoms and a2 in atoms:
                 content.append(
-                    f'{conect:<6}{a1+1:>5}{a2+1:>5}               \n'
+                    f"{conect:<6}{a1+1:>5}{a2+1:>5}               \n"
                 )
 
-        content.append('END\n')
+        content.append("END\n")
 
         return content
 
@@ -142,7 +142,7 @@ class PdbWriter:
         self,
         molecule: Molecule,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-        periodic_info: typing.Optional[PeriodicInfo] = None
+        periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> str:
         """
         Get a ``.pdb`` file format string of `molecule`.
@@ -172,14 +172,14 @@ class PdbWriter:
             periodic_info=periodic_info,
         )
 
-        return ''.join(content)
+        return "".join(content)
 
     def write(
         self,
         molecule: Molecule,
         path: str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
-        periodic_info: typing.Optional[PeriodicInfo] = None
+        periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> None:
         """
         Write `molecule` to ``.pdb`` file format.
@@ -208,5 +208,5 @@ class PdbWriter:
             periodic_info=periodic_info,
         )
 
-        with open(path, 'w') as f:
-            f.write(''.join(content))
+        with open(path, "w") as f:
+            f.write("".join(content))

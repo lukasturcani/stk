@@ -23,7 +23,7 @@ def _test_with_vertices(construction_state, vertices):
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         (
             lambda: stk.Vertex(0, [0, 0, 0]),

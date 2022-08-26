@@ -109,9 +109,9 @@ class CaseData:
 
     def __str__(self):
         return (
-            f'CaseData({self.vertex}, {self.edges}, '
-            f'{self.building_block}, {self.position}, '
-            f'{self.alignment_tests}, {self.functional_group_edges})'
+            f"CaseData({self.vertex}, {self.edges}, "
+            f"{self.building_block}, {self.position}, "
+            f"{self.alignment_tests}, {self.functional_group_edges})"
         )
 
     def __repr__(self):

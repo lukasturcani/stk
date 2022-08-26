@@ -37,3 +37,48 @@ stk = [
 
 [tool.setuptools_scm]
 write_to = "src/stk/_version.py"
+
+[tool.black]
+line-length = 71
+
+[tool.isort]
+line_length = 71
+profile = "black"
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+    "benchmark_*.py",
+    "*_benchmark.py",
+]
+python_functions = [
+  "test_*",
+  "benchmark_*",
+]
+
+[tool.mypy]
+show_error_codes = true
+no_implicit_optional = true
+warn_no_return = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+  "rdkit.*",
+  "scipy.*",
+  "pytest_lazyfixture.*",
+  "pathos.*",
+  "matplotlib.*",
+  "pandas.*",
+  "seaborn.*",
+  "mchammer.*",
+  "spindry.*",
+  "pymongo.*",
+  "vabene.*",
+  "setuptools.*"
+]
+ignore_missing_imports = true

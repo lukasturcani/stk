@@ -6,9 +6,7 @@ from .fixtures import *  # noqa
 
 
 @pytest.fixture(
-    params=(
-        lazy_fixture('molecule_mongo_db'),
-    ),
+    params=(lazy_fixture("molecule_mongo_db"),),
 )
 def case_data(request):
     return request.param

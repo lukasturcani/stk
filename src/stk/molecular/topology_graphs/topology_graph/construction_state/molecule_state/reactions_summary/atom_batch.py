@@ -13,7 +13,7 @@ class _AtomBatch:
 
     """
 
-    __slots__ = ['_atoms', '_atom_infos', '_atom_map', '_positions']
+    __slots__ = ["_atoms", "_atom_infos", "_atom_map", "_positions"]
 
     def __init__(self, atoms, num_atoms):
         """
@@ -38,12 +38,14 @@ class _AtomBatch:
         for id_, (atom, position) in enumerate(atoms, num_atoms):
             _atoms.append(atom.with_id(id_))
             atom_map[atom.get_id()] = _atoms[-1]
-            atom_infos.append(AtomInfo(
-                atom=_atoms[-1],
-                building_block_atom=None,
-                building_block=None,
-                building_block_id=None,
-            ))
+            atom_infos.append(
+                AtomInfo(
+                    atom=_atoms[-1],
+                    building_block_atom=None,
+                    building_block=None,
+                    building_block_id=None,
+                )
+            )
             positions.append(position)
 
     def get_positions(self):

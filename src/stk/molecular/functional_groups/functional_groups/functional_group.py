@@ -65,7 +65,7 @@ import typing
 
 from ...atoms import Atom
 
-_T = typing.TypeVar('_T', bound='FunctionalGroup')
+_T = typing.TypeVar("_T", bound="FunctionalGroup")
 
 
 class FunctionalGroup:
@@ -317,10 +317,7 @@ class FunctionalGroup:
 
         yield from (a.get_id() for a in self._core_atoms)
 
-    def with_atoms(
-        self,
-        atom_map: dict[int, Atom]
-    ) -> FunctionalGroup:
+    def with_atoms(self, atom_map: dict[int, Atom]) -> FunctionalGroup:
         """
         Return a clone holding different atoms.
 
@@ -356,7 +353,8 @@ class FunctionalGroup:
                     atom.get_id(),
                     atom.get_id(),
                 ),
-            ) for atom in self._atoms
+            )
+            for atom in self._atoms
         )
         self._placers = tuple(
             atom.with_id(
@@ -364,7 +362,8 @@ class FunctionalGroup:
                     atom.get_id(),
                     atom.get_id(),
                 ),
-            ) for atom in self._placers
+            )
+            for atom in self._placers
         )
         self._core_atoms = tuple(
             atom.with_id(
@@ -372,7 +371,8 @@ class FunctionalGroup:
                     atom.get_id(),
                     atom.get_id(),
                 ),
-            ) for atom in self._core_atoms
+            )
+            for atom in self._core_atoms
         )
         return self
 
@@ -441,9 +441,9 @@ class FunctionalGroup:
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'atoms={self._atoms}, '
-            f'placers={self._placers}, '
-            f'core_atoms={self._core_atoms}'
-            ')'
+            f"{self.__class__.__name__}("
+            f"atoms={self._atoms}, "
+            f"placers={self._placers}, "
+            f"core_atoms={self._core_atoms}"
+            ")"
         )

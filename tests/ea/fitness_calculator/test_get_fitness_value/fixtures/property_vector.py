@@ -7,7 +7,7 @@ from ..case_data import CaseData
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: CaseData(
             fitness_calculator=stk.PropertyVector(
@@ -17,17 +17,20 @@ from ..case_data import CaseData
                     stk.Molecule.get_maximum_diameter,
                 ),
             ),
-            molecule=stk.BuildingBlock('BrCCBr').with_position_matrix(
-                position_matrix=np.array([
-                    [0, 0, 0],
-                    [10, 0, 0],
-                    [0, 0, 0],
-                    [0, 0, 0],
-                    [0, 0, 0],
-                    [0, 0, 0],
-                    [0, 0, 0],
-                    [0, 0, 0],
-                ], dtype=np.float64),
+            molecule=stk.BuildingBlock("BrCCBr").with_position_matrix(
+                position_matrix=np.array(
+                    [
+                        [0, 0, 0],
+                        [10, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0],
+                    ],
+                    dtype=np.float64,
+                ),
             ),
             fitness_value=(8, 7, 10),
         ),

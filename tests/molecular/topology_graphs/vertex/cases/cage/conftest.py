@@ -11,9 +11,9 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lazy_fixture('cage1'),
-        lazy_fixture('cage2'),
-        lazy_fixture('cage3'),
+        lazy_fixture("cage1"),
+        lazy_fixture("cage2"),
+        lazy_fixture("cage3"),
     ),
 )
 def case_data(request):
@@ -97,7 +97,7 @@ def init_at_center(request) -> stk.Vertex:
 
 @pytest.fixture(
     params=(
-        lambda: (stk.Vertex(0, [1, 2, 3]), ),
+        lambda: (stk.Vertex(0, [1, 2, 3]),),
         lambda: (
             stk.Vertex(0, [1, 2, 3]),
             stk.Vertex(1, [-1, 2, -32]),

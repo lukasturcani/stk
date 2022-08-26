@@ -116,7 +116,7 @@ class StochasticUniversalSampling(Selector):
             fitness_modifier = self._get_fitness_values
 
         if num_batches is None:
-            num_batches = float('inf')
+            num_batches = float("inf")
 
         self._generator = np.random.RandomState(random_seed)
         self._duplicate_molecules = duplicate_molecules
@@ -142,8 +142,7 @@ class StochasticUniversalSampling(Selector):
         # of batches has been yielded, or there are no more valid
         # batches.
         while (
-            batches
-            and yielded_batches.get_num() < self._num_batches
+            batches and yielded_batches.get_num() < self._num_batches
         ):
             yield from self._select_with_stochastic_universal_sampling(
                 batches=batches,
@@ -177,14 +176,13 @@ class StochasticUniversalSampling(Selector):
         batch_positions = []
         batch_position = 0
         for batch in batches:
-            batch_position += batch.get_fitness_value()/total
+            batch_position += batch.get_fitness_value() / total
             batch_positions.append(batch_position)
 
         num_batches = min(
-            self._num_batches - yielded_batches.get_num(),
-            len(batches)
+            self._num_batches - yielded_batches.get_num(), len(batches)
         )
-        pointer_distance = 1/num_batches
+        pointer_distance = 1 / num_batches
         pointers = []
         pointer = self._generator.uniform(0, pointer_distance)
         for i in range(num_batches):

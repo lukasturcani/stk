@@ -987,7 +987,7 @@ class Cage(TopologyGraph):
         self,
         building_blocks: typing.Union[
             typing.Iterable[BuildingBlock],
-            dict[BuildingBlock, tuple[int, ...]]
+            dict[BuildingBlock, tuple[int, ...]],
         ],
         vertex_alignments: typing.Optional[dict[int, int]] = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
@@ -1085,8 +1085,9 @@ class Cage(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=tuple(
                 partial(self._has_degree, degree)
-                for degree
-                in sorted(self._vertices_of_degree, reverse=True)
+                for degree in sorted(
+                    self._vertices_of_degree, reverse=True
+                )
             ),
             num_processes=num_processes,
             optimizer=optimizer,
@@ -1098,7 +1099,7 @@ class Cage(TopologyGraph):
         cls,
         building_blocks: typing.Union[
             typing.Iterable[BuildingBlock],
-            dict[BuildingBlock, tuple[int, ...]]
+            dict[BuildingBlock, tuple[int, ...]],
         ],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
 
@@ -1110,11 +1111,11 @@ class Cage(TopologyGraph):
                     building_block.get_num_functional_groups()
                     in cls._vertices_of_degree.keys()
                 ), (
-                    'The number of functional groups in '
-                    f'{building_block} needs to be one of '
-                    f'{allowed_degrees}, but is '
-                    'currently '
-                    f'{building_block.get_num_functional_groups()}.'
+                    "The number of functional groups in "
+                    f"{building_block} needs to be one of "
+                    f"{allowed_degrees}, but is "
+                    "currently "
+                    f"{building_block.get_num_functional_groups()}."
                 )
             return {
                 building_block: tuple(cls._get_vertices(ids))
@@ -1160,7 +1161,6 @@ class Cage(TopologyGraph):
         ],
         vertex_alignments: dict[int, int],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
-
         def with_aligner(vertex: _CageVertex) -> _CageVertex:
             return vertex.with_aligner_edge(
                 aligner_edge=vertex_alignments.get(vertex.get_id(), 0),
@@ -1168,8 +1168,7 @@ class Cage(TopologyGraph):
 
         return {
             building_block: tuple(map(with_aligner, vertices))
-            for building_block, vertices
-            in building_block_vertices.items()
+            for building_block, vertices in building_block_vertices.items()
         }
 
     @classmethod
@@ -1192,16 +1191,16 @@ class Cage(TopologyGraph):
         for vertex in vertices:
             if vertex.get_id() in assigned_ids:
                 raise OverlyOccupiedVertexError(
-                    f'Vertex {vertex.get_id()} has multiple building '
-                    'blocks placed on it.'
+                    f"Vertex {vertex.get_id()} has multiple building "
+                    "blocks placed on it."
                 )
             assigned_ids.add(vertex.get_id())
             unassigned_ids.remove(vertex.get_id())
 
         if unassigned_ids:
             raise UnoccupiedVertexError(
-                'The following vertices are unoccupied '
-                f'{unassigned_ids}.'
+                "The following vertices are unoccupied "
+                f"{unassigned_ids}."
             )
 
     def clone(self) -> Cage:
@@ -1229,7 +1228,7 @@ class Cage(TopologyGraph):
         """
 
         if isinstance(vertex_ids, int):
-            vertex_ids = (vertex_ids, )
+            vertex_ids = (vertex_ids,)
 
         for vertex_id in vertex_ids:
             yield cls._vertex_prototypes[vertex_id]
@@ -1296,21 +1295,19 @@ class Cage(TopologyGraph):
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
-            assert (
-                num_fgs in cls._vertices_of_degree.keys()
-            ), (
-                'The number of functional groups in '
-                f'{building_block} needs to be one of '
-                f'{allowed_degrees}, but is '
-                'currently '
-                f'{building_block.get_num_functional_groups()}.'
+            assert num_fgs in cls._vertices_of_degree.keys(), (
+                "The number of functional groups in "
+                f"{building_block} needs to be one of "
+                f"{allowed_degrees}, but is "
+                "currently "
+                f"{building_block.get_num_functional_groups()}."
             )
 
             if num_fgs in building_blocks_by_degree:
                 raise ValueError(
-                    'If there are multiple building blocks with the '
-                    'same number of functional groups, '
-                    'building_block_vertices must be set explicitly.'
+                    "If there are multiple building blocks with the "
+                    "same number of functional groups, "
+                    "building_block_vertices must be set explicitly."
                 )
             building_blocks_by_degree[num_fgs] = building_block
 
@@ -1319,9 +1316,9 @@ class Cage(TopologyGraph):
         for vertex in cls._vertex_prototypes:
             vertex_degree = cls._vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
-            building_block_vertices[building_block] = (
-                building_block_vertices.get(building_block, [])
-            )
+            building_block_vertices[
+                building_block
+            ] = building_block_vertices.get(building_block, [])
             building_block_vertices[building_block].append(vertex)
         return typing.cast(
             dict[BuildingBlock, abc.Sequence[_CageVertex]],
@@ -1336,8 +1333,7 @@ class Cage(TopologyGraph):
     ) -> float:
 
         return max(
-            bb.get_maximum_diameter()
-            for bb in building_block_vertices
+            bb.get_maximum_diameter() for bb in building_block_vertices
         )
 
     def _get_construction_state(self) -> _CageConstructionState:
@@ -1350,11 +1346,11 @@ class Cage(TopologyGraph):
 
     def __repr__(self) -> str:
         vertex_alignments = (
-            f'vertex_alignments={self._vertex_alignments}'
+            f"vertex_alignments={self._vertex_alignments}"
             if self._vertex_alignments
-            else ''
+            else ""
         )
-        return f'cage.{self.__class__.__name__}({vertex_alignments})'
+        return f"cage.{self.__class__.__name__}({vertex_alignments})"
 
     def with_building_blocks(
         self,

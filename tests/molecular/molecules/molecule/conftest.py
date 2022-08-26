@@ -8,26 +8,29 @@ from rdkit.Chem import AllChem as rdkit
 import stk
 
 from .case_data import CaseData
+
 # Fixtures need to be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=[
         lambda: stk.BuildingBlock.init(
-            atoms=(stk.C(0, 4), ),
+            atoms=(stk.C(0, 4),),
             bonds=(),
             position_matrix=np.array([[0.0, 0.0, 0.0]]),
             functional_groups=(),
         ),
         lambda: stk.BuildingBlock.init(
             atoms=(stk.C(0, 3), stk.H(1)),
-            bonds=(stk.Bond(stk.C(0, 3), stk.H(1), 1), ),
-            position_matrix=np.array([
-                [0.39382080513175644, 0.0, 0.0],
-                [-0.39382080513175644, 0.0, 0.0],
-            ]),
+            bonds=(stk.Bond(stk.C(0, 3), stk.H(1), 1),),
+            position_matrix=np.array(
+                [
+                    [0.39382080513175644, 0.0, 0.0],
+                    [-0.39382080513175644, 0.0, 0.0],
+                ]
+            ),
             functional_groups=(),
         ),
         lambda: stk.BuildingBlock.init(
@@ -36,34 +39,40 @@ from .fixtures import *  # noqa
                 stk.Bond(stk.C(0, 2), stk.H(1), 1),
                 stk.Bond(stk.C(0, 2), stk.H(2), 1),
             ),
-            position_matrix=np.array([
-                [-0.002271396061231665, 0.034037398527897535, -0.0],
-                [-1.0494595365731274, -0.017073891221884126, -0.0],
-                [1.0517309326343591, -0.016963507306017023, 0.0],
-            ]),
+            position_matrix=np.array(
+                [
+                    [
+                        -0.002271396061231665,
+                        0.034037398527897535,
+                        -0.0,
+                    ],
+                    [-1.0494595365731274, -0.017073891221884126, -0.0],
+                    [1.0517309326343591, -0.016963507306017023, 0.0],
+                ]
+            ),
             functional_groups=(),
         ),
-        lambda: stk.BuildingBlock('NCCN'),
+        lambda: stk.BuildingBlock("NCCN"),
         lambda: stk.BuildingBlock(
-            'C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc'
-            '(C#Cc4cccc5cnccc54)cc3c2c1'
+            "C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc"
+            "(C#Cc4cccc5cnccc54)cc3c2c1"
         ),
         lambda: stk.BuildingBlock(
-            'C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc'
-            '(C#Cc4cccc5ccncc45)cc3c2c1'
+            "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc"
+            "(C#Cc4cccc5ccncc45)cc3c2c1"
         ),
-        lambda: stk.BuildingBlock('N[C+][C+2]N'),
-        lambda: stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()]),
+        lambda: stk.BuildingBlock("N[C+][C+2]N"),
+        lambda: stk.BuildingBlock("NCCN", [stk.PrimaryAminoFactory()]),
         lambda: stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(
-                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
                     stk.BuildingBlock(
-                        smiles='BrCNCCBr',
+                        smiles="BrCNCCBr",
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
-                repeating_unit='AB',
+                repeating_unit="AB",
                 num_repeating_units=2,
             ),
         ),
@@ -90,9 +99,12 @@ def get_random_position_matrix(molecule):
 @pytest.fixture(
     params=(
         lambda molecule: np.zeros((molecule.get_num_atoms(), 3)),
-        lambda molecule: np.array([
-            [i, -i, 10.12*i] for i in range(molecule.get_num_atoms())
-        ]),
+        lambda molecule: np.array(
+            [
+                [i, -i, 10.12 * i]
+                for i in range(molecule.get_num_atoms())
+            ]
+        ),
         lambda molecule: molecule.get_position_matrix(),
         get_random_position_matrix,
     ),
@@ -136,7 +148,7 @@ def get_origin_0(origin):
 @pytest.fixture(
     params=[
         lambda molecule: molecule.get_centroid(),
-        lazy_fixture('get_origin_0'),
+        lazy_fixture("get_origin_0"),
     ],
 )
 def get_origin(request):
@@ -199,7 +211,7 @@ def get_atom_ids(request):
 
 
 def _get_dative_molecule() -> rdkit.Mol:
-    dative_molecule = rdkit.MolFromSmiles('[Fe+2]<-N')
+    dative_molecule = rdkit.MolFromSmiles("[Fe+2]<-N")
     dative_molecule.AddConformer(
         conf=rdkit.Conformer(dative_molecule.GetNumAtoms()),
     )
@@ -209,26 +221,27 @@ def _get_dative_molecule() -> rdkit.Mol:
 @pytest.fixture(
     params=(
         lambda name: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            molecule=stk.BuildingBlock("NCCN"),
+            smiles="[H]N([H])C([H])([H])C([H])([H])N([H])[H]",
             name=name,
         ),
         lambda name: CaseData(
-            molecule=stk.BuildingBlock('[H]NCCN'),
-            smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            molecule=stk.BuildingBlock("[H]NCCN"),
+            smiles="[H]N([H])C([H])([H])C([H])([H])N([H])[H]",
             name=name,
         ),
         lambda name: CaseData(
-            molecule=stk.BuildingBlock('C(N)CN'),
-            smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            molecule=stk.BuildingBlock("C(N)CN"),
+            smiles="[H]N([H])C([H])([H])C([H])([H])N([H])[H]",
             name=name,
         ),
         lambda name: CaseData(
             molecule=(
-                stk.BuildingBlock('C(N)CN')
-                .with_canonical_atom_ordering()
+                stk.BuildingBlock(
+                    "C(N)CN"
+                ).with_canonical_atom_ordering()
             ),
-            smiles='[H]N([H])C([H])([H])C([H])([H])N([H])[H]',
+            smiles="[H]N([H])C([H])([H])C([H])([H])N([H])[H]",
             name=name,
         ),
         lambda name: CaseData(
@@ -237,43 +250,43 @@ def _get_dative_molecule() -> rdkit.Mol:
                     molecule=_get_dative_molecule(),
                 )
             ),
-            smiles='N->[Fe+2]',
+            smiles="N->[Fe+2]",
             name=name,
         ),
         lambda name: CaseData(
             molecule=stk.BuildingBlock(
-                smiles='[Fe+2]',
+                smiles="[Fe+2]",
                 position_matrix=[[0, 0, 0]],
             ),
-            smiles='[Fe+2]',
+            smiles="[Fe+2]",
             name=name,
         ),
         lambda name: CaseData(
             molecule=stk.BuildingBlock(
-                smiles='[Fe+2]',
+                smiles="[Fe+2]",
                 position_matrix=np.array([[0, 0, 0]]),
             ),
-            smiles='[Fe+2]',
+            smiles="[Fe+2]",
             name=name,
         ),
     ),
 )
 def building_block(request) -> CaseData:
     return request.param(
-        f'{request.fixturename}{request.param_index}',
+        f"{request.fixturename}{request.param_index}",
     )
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture('building_block'),
-        lazy_fixture('cage'),
-        lazy_fixture('cof'),
-        lazy_fixture('polymer'),
-        lazy_fixture('host_guest'),
-        lazy_fixture('macrocycle'),
-        lazy_fixture('metal_complex'),
-        lazy_fixture('rotaxane'),
+        lazy_fixture("building_block"),
+        lazy_fixture("cage"),
+        lazy_fixture("cof"),
+        lazy_fixture("polymer"),
+        lazy_fixture("host_guest"),
+        lazy_fixture("macrocycle"),
+        lazy_fixture("metal_complex"),
+        lazy_fixture("rotaxane"),
     ),
 )
 def case_data(request):
@@ -299,9 +312,9 @@ def case_data(request):
 
     path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        'fixtures',
-        'position_matrices',
-        f'{request.param.name}.npy',
+        "fixtures",
+        "position_matrices",
+        f"{request.param.name}.npy",
     )
 
     if not os.path.exists(path):
@@ -315,7 +328,7 @@ def case_data(request):
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
 )
 def molecule_db(mongo_client):
     """
@@ -325,20 +338,16 @@ def molecule_db(mongo_client):
 
     return stk.MoleculeMongoDb(
         mongo_client=mongo_client,
-        database='_stk_pytest_database',
+        database="_stk_pytest_database",
         jsonizer=stk.MoleculeJsonizer(
-            key_makers=(
-                stk.Smiles(),
-            ),
+            key_makers=(stk.Smiles(),),
         ),
-        indices=(
-            stk.Smiles().get_key_name(),
-        ),
+        indices=(stk.Smiles().get_key_name(),),
     )
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
 )
 def name_db(mongo_client):
     """
@@ -348,12 +357,8 @@ def name_db(mongo_client):
 
     return stk.ValueMongoDb(
         mongo_client=mongo_client,
-        database='_stk_pytest_database',
-        collection='name',
-        key_makers=(
-            stk.Smiles(),
-        ),
-        indices=(
-            stk.Smiles().get_key_name(),
-        ),
+        database="_stk_pytest_database",
+        collection="name",
+        key_makers=(stk.Smiles(),),
+        indices=(stk.Smiles().get_key_name(),),
     )
