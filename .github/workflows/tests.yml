@@ -107,7 +107,7 @@ jobs:
                 name: database-dump
                 path: database-dump
 
-    doctests:
+    doctest:
         runs-on: ubuntu-20.04
         container:
             image: ghcr.io/lukasturcani/stk-test-environment
@@ -124,7 +124,7 @@ jobs:
               run: conda run -n stk
                 pip install --no-deps -e .
 
-            - name: Run doctests
+            - name: Run doctest
               run: conda run -n stk
                 MONGODB_URI='mongodb://MongoDB:27017/'
                 make -C docs doctest
