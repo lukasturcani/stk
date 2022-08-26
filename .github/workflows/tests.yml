@@ -36,6 +36,41 @@ jobs:
               run: conda run -n stk
                 mypy src/stk
 
+    check-import-ordering:
+        runs-on: ubuntu-20.04
+        container:
+            image: ghcr.io/lukasturcani/stk-test-environment
+
+        steps:
+            - name: Git checkout
+              uses: actions/checkout@v2
+
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
+
+            - name: Run mypy
+              run: conda run -n stk
+                isort --check .
+
+    check-code-formatting:
+        runs-on: ubuntu-20.04
+        container:
+            image: ghcr.io/lukasturcani/stk-test-environment
+
+        steps:
+            - name: Git checkout
+              uses: actions/checkout@v2
+
+            - name: Add stk to the conda environment
+              run: conda run -n stk
+                pip install --no-deps -e .
+
+            - name: Run mypy
+              run: conda run -n stk
+                black --check src tests benchmarks docs *.py
+
+
     pytest-stable-linux:
         runs-on: ubuntu-20.04
         container:
