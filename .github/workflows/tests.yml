@@ -37,7 +37,7 @@ jobs:
               run: conda run -n stk
                 mypy src
 
-    check-import-ordering:
+    isort:
         runs-on: ubuntu-20.04
         container:
             image: ghcr.io/lukasturcani/stk-test-environment
@@ -54,7 +54,7 @@ jobs:
               run: conda run -n stk
                 isort --check .
 
-    check-code-formatting:
+    black:
         runs-on: ubuntu-20.04
         container:
             image: ghcr.io/lukasturcani/stk-test-environment
