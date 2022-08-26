@@ -20,7 +20,11 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
 
-from stk.utilities import rotation_matrix, rotation_matrix_arbitrary_axis, vector_angle
+from stk.utilities import (
+    rotation_matrix,
+    rotation_matrix_arbitrary_axis,
+    vector_angle,
+)
 
 from ....utilities import OneOrMany
 from ...atoms import Atom

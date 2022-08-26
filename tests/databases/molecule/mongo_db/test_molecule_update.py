@@ -2,7 +2,11 @@ import numpy as np
 
 import stk
 
-from ...utilities import DatabaseEntry, DatabaseState, assert_database_state
+from ...utilities import (
+    DatabaseEntry,
+    DatabaseState,
+    assert_database_state,
+)
 from .utilities import get_database_state
 
 

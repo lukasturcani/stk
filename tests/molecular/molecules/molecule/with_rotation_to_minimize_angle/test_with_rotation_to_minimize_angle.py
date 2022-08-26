@@ -2,7 +2,11 @@ import numpy as np
 
 import stk
 
-from ...utilities import get_displacement_vector, has_same_structure, is_clone
+from ...utilities import (
+    get_displacement_vector,
+    has_same_structure,
+    is_clone,
+)
 
 
 def test_with_rotation_to_minimize_angle(molecule):

@@ -7,7 +7,10 @@ Constructed Molecule MongoDB
 import itertools
 from functools import lru_cache
 
-from stk.serialization import ConstructedMoleculeDejsonizer, ConstructedMoleculeJsonizer
+from stk.serialization import (
+    ConstructedMoleculeDejsonizer,
+    ConstructedMoleculeJsonizer,
+)
 from stk.utilities import dedupe
 
 from ..constructed_molecule import ConstructedMoleculeDatabase

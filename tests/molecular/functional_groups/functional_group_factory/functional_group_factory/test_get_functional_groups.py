@@ -1,6 +1,10 @@
 import itertools as it
 
-from ..utilities import are_clone_sequences, are_same_id_sequences, atom_id
+from ..utilities import (
+    are_clone_sequences,
+    are_same_id_sequences,
+    atom_id,
+)
 
 
 def test_get_functional_groups(case_data):

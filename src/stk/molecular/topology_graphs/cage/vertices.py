@@ -7,7 +7,11 @@ Cage Vertices
 import numpy as np
 from scipy.spatial.distance import euclidean
 
-from stk.utilities import get_acute_vector, get_plane_normal, normalize_vector
+from stk.utilities import (
+    get_acute_vector,
+    get_plane_normal,
+    normalize_vector,
+)
 
 from ..topology_graph import Vertex
 from ..utilities import _EdgeSorter, _FunctionalGroupSorter

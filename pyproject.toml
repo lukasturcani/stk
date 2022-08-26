@@ -42,6 +42,7 @@ write_to = "src/stk/_version.py"
 line-length = 71
 
 [tool.isort]
+line_length = 71
 profile = "black"
 
 [tool.pytest.ini_options]

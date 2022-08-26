@@ -1,6 +1,10 @@
 import itertools as it
 
-from .molecule import is_equivalent_atom, is_equivalent_bond, is_equivalent_molecule
+from .molecule import (
+    is_equivalent_atom,
+    is_equivalent_bond,
+    is_equivalent_molecule,
+)
 
 
 def is_equivalent_constructed_molecule(

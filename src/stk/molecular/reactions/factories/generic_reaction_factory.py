@@ -4,7 +4,13 @@ Generic Reaction Factory
 
 """
 
-from ...functional_groups import Aldehyde, Alkene, Alkyne, Amide, PrimaryAmino
+from ...functional_groups import (
+    Aldehyde,
+    Alkene,
+    Alkyne,
+    Amide,
+    PrimaryAmino,
+)
 from ..reactions import OneOneReaction, OneTwoReaction, TwoTwoReaction
 from .reaction_factory import ReactionFactory
 
