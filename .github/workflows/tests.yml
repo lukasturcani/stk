@@ -50,7 +50,7 @@ jobs:
               run: conda run -n stk
                 pip install --no-deps -e .
 
-            - name: Run mypy
+            - name: Run isort
               run: conda run -n stk
                 isort --check .
 
@@ -67,7 +67,7 @@ jobs:
               run: conda run -n stk
                 pip install --no-deps -e .
 
-            - name: Run mypy
+            - name: Run black
               run: conda run -n stk
                 black --check .
 
