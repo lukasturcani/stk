@@ -37,3 +37,9 @@ stk = [
 
 [tool.setuptools_scm]
 write_to = "src/stk/_version.py"
+
+[tool.black]
+line-length = 71
+
+[tool.isort]
+profile = "black"
