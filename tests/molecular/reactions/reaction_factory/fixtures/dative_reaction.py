@@ -16,10 +16,12 @@ def dative_reaction(
     periodicity,
     bond_order,
 ):
-    bond_order_key = frozenset({
-        type(functional_group1),
-        type(functional_group1_2),
-    })
+    bond_order_key = frozenset(
+        {
+            type(functional_group1),
+            type(functional_group1_2),
+        }
+    )
     edge = MockEdge(0, periodicity)
     return CaseData(
         factory=stk.DativeReactionFactory(
@@ -30,17 +32,15 @@ def dative_reaction(
             )
         ),
         construction_state=MockConstructionState(
-            edges=(edge, ),
+            edges=(edge,),
             edge_functional_groups={
                 0: (
                     functional_group1,
                     functional_group1_2,
                 )
-            }
+            },
         ),
-        edge_group=stk.EdgeGroup(
-            edges=(edge, )
-        ),
+        edge_group=stk.EdgeGroup(edges=(edge,)),
         reaction_result=ReactionResult(
             new_atoms=(),
             new_bonds=get_new_bonds(
@@ -59,11 +59,13 @@ def dative_reaction(
 
 
 def is_metal(atom):
-    metal_atomic_numbers = set(it.chain(
-        range(21, 31),
-        range(39, 49),
-        range(72, 81),
-    ))
+    metal_atomic_numbers = set(
+        it.chain(
+            range(21, 31),
+            range(39, 49),
+            range(72, 81),
+        )
+    )
 
     return atom.get_atomic_number() in metal_atomic_numbers
 
@@ -75,8 +77,8 @@ def get_new_bonds(
     periodicity,
 ):
 
-    bonder1, = functional_group1.get_bonders()
-    bonder2, = functional_group2.get_bonders()
+    (bonder1,) = functional_group1.get_bonders()
+    (bonder2,) = functional_group2.get_bonders()
 
     if is_metal(bonder1):
         yield stk.Bond(

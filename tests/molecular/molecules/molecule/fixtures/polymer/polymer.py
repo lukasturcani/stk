@@ -6,9 +6,7 @@ from .linear import *  # noqa
 
 
 @pytest.fixture(
-    params=(
-        lazy_fixture('polymer_linear'),
-    ),
+    params=(lazy_fixture("polymer_linear"),),
 )
 def polymer(request):
     return request.param

@@ -41,19 +41,13 @@ class BuildingBlock(Molecule):
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
     _init_funcs = {
-        '.mol': partial(
-            rdkit.MolFromMolFile,
-            sanitize=False,
-            removeHs=False
+        ".mol": partial(
+            rdkit.MolFromMolFile, sanitize=False, removeHs=False
         ),
-
-        '.sdf': partial(
-            rdkit.MolFromMolFile,
-            sanitize=False,
-            removeHs=False
+        ".sdf": partial(
+            rdkit.MolFromMolFile, sanitize=False, removeHs=False
         ),
-
-        '.pdb': partial(
+        ".pdb": partial(
             rdkit.MolFromPDBFile,
             sanitize=False,
             removeHs=False,
@@ -137,8 +131,8 @@ class BuildingBlock(Molecule):
             params.randomSeed = random_seed
             if rdkit.EmbedMolecule(molecule, params) == -1:
                 raise RuntimeError(
-                    f'Embedding with seed value of {random_seed} '
-                    'failed.'
+                    f"Embedding with seed value of {random_seed} "
+                    "failed."
                 )
             rdkit.Kekulize(molecule)
         else:
@@ -316,8 +310,8 @@ class BuildingBlock(Molecule):
             params.randomSeed = random_seed
             if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
                 raise RuntimeError(
-                    f'Embedding with seed value of {random_seed} '
-                    'failed.'
+                    f"Embedding with seed value of {random_seed} "
+                    "failed."
                 )
         else:
             # Make sure the position matrix always holds floats.
@@ -484,12 +478,12 @@ class BuildingBlock(Molecule):
 
         _, extension = os.path.splitext(path)
 
-        if extension == '.pdb':
+        if extension == ".pdb":
             warnings.warn(
-                'Loading from .pdb files is deprecated and will be '
-                'removed from stk versions released after 1st Nov '
-                '2022. Please use .mol files for loading molecules '
-                'instead.',
+                "Loading from .pdb files is deprecated and will be "
+                "removed from stk versions released after 1st Nov "
+                "2022. Please use .mol files for loading molecules "
+                "instead.",
                 category=FutureWarning,
             )
 
@@ -638,25 +632,30 @@ class BuildingBlock(Molecule):
                 atom1=atoms[b.GetBeginAtomIdx()],
                 atom2=atoms[b.GetEndAtomIdx()],
                 order=(
-                    9 if b.GetBondType() == rdkit.BondType.DATIVE
+                    9
+                    if b.GetBondType() == rdkit.BondType.DATIVE
                     else b.GetBondTypeAsDouble()
-                )
+                ),
             )
             for b in molecule.GetBonds()
         )
         position_matrix = molecule.GetConformer().GetPositions()
 
         super().__init__(atoms, bonds, position_matrix)
-        self._with_functional_groups(self._extract_functional_groups(
-            functional_groups=functional_groups,
-        ))
+        self._with_functional_groups(
+            self._extract_functional_groups(
+                functional_groups=functional_groups,
+            )
+        )
         self._placer_ids = self._normalize_placer_ids(
             placer_ids=placer_ids,
             functional_groups=self._functional_groups,
         )
-        self._core_ids = frozenset(self._get_core_ids(
-            functional_groups=self._functional_groups,
-        ))
+        self._core_ids = frozenset(
+            self._get_core_ids(
+                functional_groups=self._functional_groups,
+            )
+        )
 
     def _normalize_placer_ids(
         self,
@@ -696,10 +695,12 @@ class BuildingBlock(Molecule):
             return frozenset(placer_ids)
 
         if functional_groups:
-            return frozenset(flatten(
-                functional_group.get_placer_ids()
-                for functional_group in functional_groups
-            ))
+            return frozenset(
+                flatten(
+                    functional_group.get_placer_ids()
+                    for functional_group in functional_groups
+                )
+            )
 
         return frozenset(atom.get_id() for atom in self._atoms)
 
@@ -811,20 +812,17 @@ class BuildingBlock(Molecule):
         ordering = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
         super()._with_canonical_atom_ordering()
         id_map = {
-            old_id: new_id
-            for old_id, new_id in enumerate(ordering)
+            old_id: new_id for old_id, new_id in enumerate(ordering)
         }
         self._functional_groups = tuple(
             functional_group.with_ids(id_map)
             for functional_group in self._functional_groups
         )
         self._placer_ids = frozenset(
-            id_map[placer_id]
-            for placer_id in self._placer_ids
+            id_map[placer_id] for placer_id in self._placer_ids
         )
         self._core_ids = frozenset(
-            id_map[core_id]
-            for core_id in self._core_ids
+            id_map[core_id] for core_id in self._core_ids
         )
         return self
 
@@ -864,7 +862,7 @@ class BuildingBlock(Molecule):
         if fg_ids is None:
             fg_ids = range(len(self._functional_groups))
         elif isinstance(fg_ids, int):
-            fg_ids = (fg_ids, )
+            fg_ids = (fg_ids,)
 
         for fg_id in fg_ids:
             yield self._functional_groups[fg_id]
@@ -1005,7 +1003,7 @@ class BuildingBlock(Molecule):
             super().with_structure_from_file(
                 path=path,
                 extension=extension,
-            )
+            ),
         )
 
     def write(
@@ -1015,20 +1013,19 @@ class BuildingBlock(Molecule):
     ) -> BuildingBlock:
 
         return typing.cast(
-            BuildingBlock,
-            super().write(path, atom_ids)
+            BuildingBlock, super().write(path, atom_ids)
         )
 
     def __str__(self) -> str:
         if self._functional_groups:
-            fg_repr = f', {self._functional_groups!r}'
+            fg_repr = f", {self._functional_groups!r}"
         else:
-            fg_repr = ''
+            fg_repr = ""
 
         smiles = rdkit.MolToSmiles(
             mol=rdkit.RemoveHs(self.to_rdkit_mol()),
         )
-        return f'{self.__class__.__name__}({smiles!r}{fg_repr})'
+        return f"{self.__class__.__name__}({smiles!r}{fg_repr})"
 
     def __repr__(self) -> str:
         return str(self)

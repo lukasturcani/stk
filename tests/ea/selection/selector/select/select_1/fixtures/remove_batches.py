@@ -10,14 +10,14 @@ from ..case_data import CaseData
 def get_topology_graph(num_repeating_units):
     return stk.polymer.Linear(
         building_blocks=(
-            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
         ),
-        repeating_unit='A',
+        repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def remove_batches_population_1() -> tuple[stk.MoleculeRecord, ...]:
     return (
         stk.MoleculeRecord(
@@ -39,7 +39,7 @@ def remove_batches_population_1() -> tuple[stk.MoleculeRecord, ...]:
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda population: CaseData(
             selector=stk.RemoveBatches(
@@ -49,7 +49,7 @@ def remove_batches_population_1() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[0], ),
+                    records=(population[0],),
                     fitness_values={population[0]: 10},
                     key_maker=stk.Inchi(),
                 ),

@@ -36,7 +36,7 @@ def get_inchi(
     inchi = rdkit.MolToInchi(molecule.to_rdkit_mol())
     if inchi:
         return inchi
-    raise ValueError('The InChI of {molecule} was empty.')
+    raise ValueError("The InChI of {molecule} was empty.")
 
 
 def get_inchi_key(
@@ -63,7 +63,7 @@ def get_inchi_key(
 
     key = rdkit.MolToInchiKey(molecule.to_rdkit_mol())
     if not key:
-        raise ValueError(f'InChIKey of {molecule} is empty.')
+        raise ValueError(f"InChIKey of {molecule} is empty.")
     return key
 
 

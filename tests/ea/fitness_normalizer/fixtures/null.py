@@ -9,9 +9,9 @@ def _get_case_data_1() -> CaseData:
 
     topology_graph = stk.polymer.Linear(
         building_blocks=(
-            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
         ),
-        repeating_unit='A',
+        repeating_unit="A",
         num_repeating_units=2,
     )
 
@@ -43,10 +43,8 @@ def _get_case_data_1() -> CaseData:
 
 
 @pytest.fixture(
-    scope='session',
-    params=(
-        _get_case_data_1,
-    ),
+    scope="session",
+    params=(_get_case_data_1,),
 )
 def null(request) -> CaseData:
     return request.param()

@@ -11,14 +11,14 @@ from ..case_data import CaseData
 def get_topology_graph(num_repeating_units):
     return stk.polymer.Linear(
         building_blocks=(
-            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
         ),
-        repeating_unit='A',
+        repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def worst_population_1() -> tuple[stk.MoleculeRecord, ...]:
     return (
         stk.MoleculeRecord(
@@ -39,7 +39,7 @@ def worst_population_1() -> tuple[stk.MoleculeRecord, ...]:
     )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
     return (
         stk.MoleculeRecord(
@@ -55,34 +55,34 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda population: CaseData(
             selector=stk.Worst(),
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[4], ),
+                    records=(population[4],),
                     fitness_values={population[4]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[3], ),
+                    records=(population[3],),
                     fitness_values={population[3]: 2},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], ),
+                    records=(population[2],),
                     fitness_values={population[2]: 9},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], ),
+                    records=(population[1],),
                     fitness_values={population[1]: 10},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], ),
+                    records=(population[0],),
                     fitness_values={population[0]: 11},
                     key_maker=stk.Inchi(),
                 ),
@@ -93,12 +93,12 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[4], ),
+                    records=(population[4],),
                     fitness_values={population[4]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[3], ),
+                    records=(population[3],),
                     fitness_values={population[3]: 2},
                     key_maker=stk.Inchi(),
                 ),
@@ -111,7 +111,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[3], population[4], ),
+                    records=(
+                        population[3],
+                        population[4],
+                    ),
                     fitness_values={
                         population[3]: 2,
                         population[4]: 1,
@@ -119,7 +122,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], population[4], ),
+                    records=(
+                        population[2],
+                        population[4],
+                    ),
                     fitness_values={
                         population[2]: 9,
                         population[4]: 1,
@@ -127,7 +133,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], population[4], ),
+                    records=(
+                        population[1],
+                        population[4],
+                    ),
                     fitness_values={
                         population[1]: 10,
                         population[4]: 1,
@@ -135,7 +144,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], population[3], ),
+                    records=(
+                        population[2],
+                        population[3],
+                    ),
                     fitness_values={
                         population[2]: 9,
                         population[3]: 2,
@@ -143,7 +155,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], population[4], ),
+                    records=(
+                        population[0],
+                        population[4],
+                    ),
                     fitness_values={
                         population[0]: 11,
                         population[4]: 1,
@@ -151,7 +166,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], population[3], ),
+                    records=(
+                        population[1],
+                        population[3],
+                    ),
                     fitness_values={
                         population[1]: 10,
                         population[3]: 2,
@@ -159,7 +177,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], population[3], ),
+                    records=(
+                        population[0],
+                        population[3],
+                    ),
                     fitness_values={
                         population[0]: 11,
                         population[3]: 2,
@@ -167,7 +188,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], population[2], ),
+                    records=(
+                        population[1],
+                        population[2],
+                    ),
                     fitness_values={
                         population[1]: 10,
                         population[2]: 9,
@@ -175,7 +199,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], population[2], ),
+                    records=(
+                        population[0],
+                        population[2],
+                    ),
                     fitness_values={
                         population[0]: 11,
                         population[2]: 9,
@@ -200,7 +227,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[3], population[4], ),
+                    records=(
+                        population[3],
+                        population[4],
+                    ),
                     fitness_values={
                         population[3]: 2,
                         population[4]: 1,
@@ -208,7 +238,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[2], population[4], ),
+                    records=(
+                        population[2],
+                        population[4],
+                    ),
                     fitness_values={
                         population[2]: 9,
                         population[4]: 1,
@@ -216,7 +249,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], population[4], ),
+                    records=(
+                        population[1],
+                        population[4],
+                    ),
                     fitness_values={
                         population[1]: 10,
                         population[4]: 1,
@@ -233,7 +269,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[3], population[4], ),
+                    records=(
+                        population[3],
+                        population[4],
+                    ),
                     fitness_values={
                         population[3]: 2,
                         population[4]: 1,
@@ -241,7 +280,10 @@ def worst_population_2() -> tuple[stk.MoleculeRecord, ...]:
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[1], population[2], ),
+                    records=(
+                        population[1],
+                        population[2],
+                    ),
                     fitness_values={
                         population[1]: 10,
                         population[2]: 9,
@@ -260,7 +302,7 @@ def worst_population_1_case_data(
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda population: CaseData(
             selector=stk.Worst(
@@ -269,12 +311,12 @@ def worst_population_1_case_data(
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[2], ),
+                    records=(population[2],),
                     fitness_values={population[2]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], ),
+                    records=(population[0],),
                     fitness_values={population[0]: 100},
                     key_maker=stk.Inchi(),
                 ),
@@ -287,12 +329,12 @@ def worst_population_1_case_data(
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[2], ),
+                    records=(population[2],),
                     fitness_values={population[2]: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(population[0], ),
+                    records=(population[0],),
                     fitness_values={population[0]: 100},
                     key_maker=stk.Inchi(),
                 ),
@@ -306,7 +348,10 @@ def worst_population_1_case_data(
             population=population,
             selected=(
                 stk.Batch(
-                    records=(population[0], population[2], ),
+                    records=(
+                        population[0],
+                        population[2],
+                    ),
                     fitness_values={
                         population[0]: 100,
                         population[2]: 1,
@@ -333,10 +378,10 @@ def worst_population_2_case_data(
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
-        lazy_fixture('worst_population_1_case_data'),
-        lazy_fixture('worst_population_2_case_data'),
+        lazy_fixture("worst_population_1_case_data"),
+        lazy_fixture("worst_population_2_case_data"),
     ),
 )
 def worst(request):

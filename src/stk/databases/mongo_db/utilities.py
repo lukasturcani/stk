@@ -10,10 +10,12 @@ from typing import Iterable, Optional
 
 class HashableDict(dict):
     def __hash__(self):
-        return hash((
-            frozenset(self),
-            frozenset(_to_hashable(list(self.values()))),
-        ))
+        return hash(
+            (
+                frozenset(self),
+                frozenset(_to_hashable(list(self.values()))),
+            )
+        )
 
     def __eq__(self, other):
         return super().__eq__(other)

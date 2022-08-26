@@ -30,10 +30,12 @@ def test_with_structure_from_file(datadir, case_data):
         molecule=case_data.molecule,
         path=str(datadir / case_data.path),
     )
-    assert np.all(np.equal(
-        position_matrix,
-        case_data.molecule.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            position_matrix,
+            case_data.molecule.get_position_matrix(),
+        )
+    )
 
 
 def _test_with_structure_from_file(molecule, path):
@@ -57,7 +59,6 @@ def _test_with_structure_from_file(molecule, path):
     new = molecule.with_structure_from_file(path)
     is_clone(new, molecule)
     size_diff = abs(
-        molecule.get_maximum_diameter()
-        - new.get_maximum_diameter()
+        molecule.get_maximum_diameter() - new.get_maximum_diameter()
     )
     assert size_diff > 1

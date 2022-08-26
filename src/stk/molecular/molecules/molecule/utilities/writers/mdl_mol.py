@@ -28,7 +28,7 @@ def _write_mdl_mol_file(self, path, atom_ids):
 
     """
 
-    with open(path, 'w') as f:
+    with open(path, "w") as f:
         f.write(_to_mdl_mol_block(self, atom_ids))
 
 
@@ -53,7 +53,7 @@ def _to_mdl_mol_block(self, atom_ids=None):
     if atom_ids is None:
         atom_ids = range(len(self._atoms))
     elif isinstance(atom_ids, int):
-        atom_ids = (atom_ids, )
+        atom_ids = (atom_ids,)
 
     atom_lines = []
     # This set gets used by bonds.
@@ -65,12 +65,12 @@ def _to_mdl_mol_block(self, atom_ids=None):
         atom = self._atoms[old_atom_id]
         symbol = atom.__class__.__name__
         charge = atom.get_charge()
-        charge = f' CHG={charge}' if charge else ''
+        charge = f" CHG={charge}" if charge else ""
         atom_lines.append(
-            f'M  V30 {new_atom_id} {symbol} {x:.4f} '
-            f'{y:.4f} {z:.4f} 0{charge}\n'
+            f"M  V30 {new_atom_id} {symbol} {x:.4f} "
+            f"{y:.4f} {z:.4f} 0{charge}\n"
         )
-    atom_block = ''.join(atom_lines)
+    atom_block = "".join(atom_lines)
 
     bond_lines = []
     for bond in self._bonds:
@@ -78,28 +78,28 @@ def _to_mdl_mol_block(self, atom_ids=None):
         a2 = bond.get_atom2().get_id()
         if a1 in id_map and a2 in id_map:
             bond_lines.append(
-                f'M  V30 {len(bond_lines)+1} '
-                f'{int(bond.get_order())} '
-                f'{id_map[a1]} {id_map[a2]}\n'
+                f"M  V30 {len(bond_lines)+1} "
+                f"{int(bond.get_order())} "
+                f"{id_map[a1]} {id_map[a2]}\n"
             )
 
     num_bonds = len(bond_lines)
-    bond_block = ''.join(bond_lines)
+    bond_block = "".join(bond_lines)
     return (
-        '\n'
-        '     RDKit          3D\n'
-        '\n'
-        '  0  0  0  0  0  0  0  0  0  0999 V3000\n'
-        'M  V30 BEGIN CTAB\n'
-        f'M  V30 COUNTS {len(id_map)} {num_bonds} 0 0 0\n'
-        'M  V30 BEGIN ATOM\n'
-        f'{atom_block}'
-        'M  V30 END ATOM\n'
-        'M  V30 BEGIN BOND\n'
-        f'{bond_block}'
-        'M  V30 END BOND\n'
-        'M  V30 END CTAB\n'
-        'M  END\n'
-        '\n'
-        '$$$$\n'
+        "\n"
+        "     RDKit          3D\n"
+        "\n"
+        "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
+        "M  V30 BEGIN CTAB\n"
+        f"M  V30 COUNTS {len(id_map)} {num_bonds} 0 0 0\n"
+        "M  V30 BEGIN ATOM\n"
+        f"{atom_block}"
+        "M  V30 END ATOM\n"
+        "M  V30 BEGIN BOND\n"
+        f"{bond_block}"
+        "M  V30 END BOND\n"
+        "M  V30 END CTAB\n"
+        "M  END\n"
+        "\n"
+        "$$$$\n"
     )

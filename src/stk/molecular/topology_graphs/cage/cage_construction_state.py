@@ -168,21 +168,23 @@ class _CageConstructionState(ConstructionState):
             building_block = building_block.with_position_matrix(
                 position_matrix=result.position_matrix,
             )
-            edge_functional_groups = dict(zip(
-                result.functional_group_edges.values(),
-                result.functional_group_edges.keys(),
-            ))
+            edge_functional_groups = dict(
+                zip(
+                    result.functional_group_edges.values(),
+                    result.functional_group_edges.keys(),
+                )
+            )
             for neighbor_id, edge_id in self._get_neighbors(
                 vertex=vertex,
                 vertex_edges=vertex_edges,
             ):
                 fg_id = edge_functional_groups[edge_id]
-                functional_group, = (
-                    building_block.get_functional_groups(fg_id)
-                )
-                self._neighbor_positions[neighbor_id] = (
-                    self._neighbor_positions.get(neighbor_id, [])
-                )
+                (
+                    functional_group,
+                ) = building_block.get_functional_groups(fg_id)
+                self._neighbor_positions[
+                    neighbor_id
+                ] = self._neighbor_positions.get(neighbor_id, [])
                 self._neighbor_positions[neighbor_id].append(
                     building_block.get_centroid(
                         atom_ids=functional_group.get_placer_ids(),
@@ -220,7 +222,7 @@ class _CageConstructionState(ConstructionState):
                 if vertex.get_id() != edge.get_vertex1_id()
                 else edge.get_vertex2_id()
             )
-            neighbor, = self._graph_state.get_vertices(neighbor_id)
+            (neighbor,) = self._graph_state.get_vertices(neighbor_id)
             if neighbor.use_neighbor_placement():
                 yield neighbor_id, edge.get_id()
 

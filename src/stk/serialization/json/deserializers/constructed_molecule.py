@@ -54,38 +54,41 @@ class ConstructedMoleculeDejsonizer:
 
         """
 
-        building_blocks = tuple(map(
-            self._dejsonizer.from_json,
-            json['buildingBlocks'],
-        ))
+        building_blocks = tuple(
+            map(
+                self._dejsonizer.from_json,
+                json["buildingBlocks"],
+            )
+        )
 
         num_building_blocks = (
             (building_block, num)
             for building_block, num in zip(
                 building_blocks,
-                json['constructedMolecule']['nBB'],
+                json["constructedMolecule"]["nBB"],
             )
         )
         atoms = tuple(
             to_atom(atom_id, atom_json)
-            for atom_id, atom_json in enumerate(json['molecule']['a'])
+            for atom_id, atom_json in enumerate(json["molecule"]["a"])
         )
         bonds = tuple(
             to_bond(atoms, bond_json)
-            for bond_json in json['molecule']['b']
+            for bond_json in json["molecule"]["b"]
         )
         return ConstructedMolecule.init(
             atoms=atoms,
             bonds=bonds,
-            position_matrix=np.array(json['matrix']['m']),
+            position_matrix=np.array(json["matrix"]["m"]),
             atom_infos=tuple(
                 to_atom_info(
                     building_blocks=building_blocks,
                     atom=atoms[atom_id],
                     json=atom_info_json,
                 )
-                for atom_id, atom_info_json
-                in enumerate(json['constructedMolecule']['aI'])
+                for atom_id, atom_info_json in enumerate(
+                    json["constructedMolecule"]["aI"]
+                )
             ),
             bond_infos=tuple(
                 to_bond_info(
@@ -93,8 +96,9 @@ class ConstructedMoleculeDejsonizer:
                     bond=bonds[bond_id],
                     json=bond_info_json,
                 )
-                for bond_id, bond_info_json
-                in enumerate(json['constructedMolecule']['bI'])
+                for bond_id, bond_info_json in enumerate(
+                    json["constructedMolecule"]["bI"]
+                )
             ),
             num_building_blocks=num_building_blocks,
         )
@@ -103,4 +107,4 @@ class ConstructedMoleculeDejsonizer:
         return repr(self)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"

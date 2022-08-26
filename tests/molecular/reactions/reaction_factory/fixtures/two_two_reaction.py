@@ -27,10 +27,12 @@ def two_two_reaction(
     functional_group2_2,
     bond_order,
 ):
-    bond_order_key = frozenset({
-        type(functional_group2),
-        type(functional_group2_2),
-    })
+    bond_order_key = frozenset(
+        {
+            type(functional_group2),
+            type(functional_group2_2),
+        }
+    )
     position_matrix = get_position_matrix(
         functional_group1=functional_group2,
         functional_group2=functional_group2_2,
@@ -43,7 +45,7 @@ def two_two_reaction(
             },
         ),
         construction_state=MockConstructionState(
-            edges=(edge, ),
+            edges=(edge,),
             edge_functional_groups={
                 0: (
                     functional_group2,
@@ -53,7 +55,7 @@ def two_two_reaction(
             position_matrix=position_matrix,
         ),
         edge_group=stk.EdgeGroup(
-            edges=(edge, ),
+            edges=(edge,),
         ),
         reaction_result=ReactionResult(
             new_atoms=(),
@@ -95,10 +97,15 @@ def get_new_bonds(
 
 
 def get_position_matrix(functional_group1, functional_group2):
-    size = max(it.chain(
-        functional_group1.get_bonder_ids(),
-        functional_group2.get_bonder_ids(),
-    )) + 1
+    size = (
+        max(
+            it.chain(
+                functional_group1.get_bonder_ids(),
+                functional_group2.get_bonder_ids(),
+            )
+        )
+        + 1
+    )
     position_matrix = np.zeros((size, 3))
     bonder1, bonder2 = functional_group1.get_bonder_ids()
     bonder3, bonder4 = functional_group2.get_bonder_ids()

@@ -12,8 +12,8 @@ def bromo(get_atom_ids):
 
 
 def _bromo(bromine, atom):
-    bonders = (atom, )
-    deleters = (bromine, )
+    bonders = (atom,)
+    deleters = (bromine,)
     return GenericCaseData(
         functional_group=stk.Bromo(
             bromine=bromine,

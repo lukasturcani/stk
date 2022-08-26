@@ -35,10 +35,12 @@ def one_two_reaction(
                 periodicity=periodicity,
             ),
         ),
-        deleted_atoms=tuple(it.chain(
-            functional_group1.get_deleters(),
-            functional_group2.get_deleters(),
-        )),
+        deleted_atoms=tuple(
+            it.chain(
+                functional_group1.get_deleters(),
+                functional_group2.get_deleters(),
+            )
+        ),
         deleted_bonds=(),
     )
 

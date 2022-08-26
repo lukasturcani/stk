@@ -6,9 +6,7 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
-    params=(
-        stk.Bond(stk.C(0), stk.N(1), 1),
-    ),
+    params=(stk.Bond(stk.C(0), stk.N(1), 1),),
 )
 def bond(request):
     """
@@ -21,7 +19,7 @@ def bond(request):
 
 @pytest.fixture(
     params=(
-        stk.BuildingBlock('NCCN'),
+        stk.BuildingBlock("NCCN"),
         None,
     ),
 )

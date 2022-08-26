@@ -119,11 +119,11 @@ class PrimaryAmino(GenericFunctionalGroup):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self._nitrogen}, {self._hydrogen1}, {self._hydrogen2}, '
-            f'{self._atom}, bonders={self._bonders}, '
-            f'deleters={self._deleters}'
-            ')'
+            f"{self.__class__.__name__}("
+            f"{self._nitrogen}, {self._hydrogen1}, {self._hydrogen2}, "
+            f"{self._atom}, bonders={self._bonders}, "
+            f"deleters={self._deleters}"
+            ")"
         )
 
     def clone(self):

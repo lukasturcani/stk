@@ -159,9 +159,10 @@ class _CofVertex(Vertex):
         positions = []
         for vertex, cell_shift in zip(vertices, cell_shifts):
             shift = sum(
-                dim_shift*constant
-                for dim_shift, constant
-                in zip(cell_shift, lattice_constants)
+                dim_shift * constant
+                for dim_shift, constant in zip(
+                    cell_shift, lattice_constants
+                )
             )
             positions.append(vertex.get_position() + shift)
 
@@ -179,20 +180,18 @@ class _CofVertex(Vertex):
 
     def __str__(self):
         return (
-            f'Vertex(id={self._id}, '
-            f'position={self._position.tolist()}, '
-            f'aligner_edge={self._aligner_edge})'
+            f"Vertex(id={self._id}, "
+            f"position={self._position.tolist()}, "
+            f"aligner_edge={self._aligner_edge})"
         )
 
 
 class LinearVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
-        assert (
-            building_block.get_num_functional_groups() == 2
-        ), (
-            f'{building_block} needs to have exactly 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 2, (
+            f"{building_block} needs to have exactly 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         building_block = building_block.with_centroid(
             position=self._position,
@@ -216,7 +215,7 @@ class LinearVertex(_CofVertex):
         )
 
         # Rotate to place fg-fg vector along edge-edge vector.
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(fg.get_placer_ids())
         target = edges[0].get_position() - edges[1].get_position()
         target *= 1 if self._aligner_edge == 0 else -1
@@ -229,7 +228,7 @@ class LinearVertex(_CofVertex):
         return building_block.get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
 
         def fg_distance(edge):
@@ -243,12 +242,10 @@ class LinearVertex(_CofVertex):
 
 class NonLinearVertex(_CofVertex):
     def place_building_block(self, building_block, edges):
-        assert (
-            building_block.get_num_functional_groups() > 2
-        ), (
-            f'{building_block} needs to have more than 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() > 2, (
+            f"{building_block} needs to have more than 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         # Sort to ensure that for two vertices, which are periodically
         # equivalent, "edges" has identical ordering. This means that
@@ -274,7 +271,7 @@ class NonLinearVertex(_CofVertex):
             target=[0, 0, 1],
             origin=self._position,
         )
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(fg.get_placer_ids())
         edge_position = edges[self._aligner_edge].get_position()
         return building_block.with_rotation_to_minimize_angle(
@@ -334,10 +331,9 @@ class UnaligningVertex(_CofVertex):
 
         vertex = cls.__new__(cls)
         vertex._id = id
-        vertex._position = (
-            sum(vertex.get_position() for vertex in vertices)
-            / len(vertices)
-        )
+        vertex._position = sum(
+            vertex.get_position() for vertex in vertices
+        ) / len(vertices)
         vertex._cell = np.array(cell)
         vertex._aligner_edge = aligner_edge
         return vertex
@@ -358,9 +354,10 @@ class UnaligningVertex(_CofVertex):
         positions = []
         for vertex, cell_shift in zip(vertices, cell_shifts):
             shift = sum(
-                dim_shift*constant
-                for dim_shift, constant
-                in zip(cell_shift, lattice_constants)
+                dim_shift * constant
+                for dim_shift, constant in zip(
+                    cell_shift, lattice_constants
+                )
             )
             positions.append(vertex.get_position() + shift)
 

@@ -57,7 +57,7 @@ class RandomTopologyGraph(MoleculeMutator):
     def __init__(
         self,
         replacement_funcs,
-        name='RandomTopologyGraph',
+        name="RandomTopologyGraph",
         random_seed=None,
     ):
         """

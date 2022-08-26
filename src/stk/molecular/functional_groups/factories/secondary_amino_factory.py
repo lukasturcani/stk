@@ -97,7 +97,7 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(0, ), placers=None):
+    def __init__(self, bonders=(1,), deleters=(0,), placers=None):
         """
         Initialize a :class:`.SecondaryAminoFactory` instance.
 
@@ -122,7 +122,7 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[H][N]([#6])[#6]', molecule):
+        for atom_ids in _get_atom_ids("[H][N]([#6])[#6]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield SecondaryAmino(
                 nitrogen=atoms[1],

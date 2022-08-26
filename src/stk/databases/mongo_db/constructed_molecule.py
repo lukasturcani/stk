@@ -354,18 +354,18 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     def __init__(
         self,
         mongo_client,
-        database='stk',
-        molecule_collection='molecules',
-        constructed_molecule_collection='constructed_molecules',
-        position_matrix_collection='position_matrices',
+        database="stk",
+        molecule_collection="molecules",
+        constructed_molecule_collection="constructed_molecules",
+        position_matrix_collection="position_matrices",
         building_block_position_matrix_collection=(
-            'building_block_position_matrices'
+            "building_block_position_matrices"
         ),
         jsonizer=ConstructedMoleculeJsonizer(),
         dejsonizer=ConstructedMoleculeDejsonizer(),
         put_lru_cache_size=128,
         get_lru_cache_size=128,
-        indices=('InChIKey', ),
+        indices=("InChIKey",),
     ):
         """
         Initialize a :class:`.ConstructedMoleculeMongoDb`.
@@ -440,24 +440,22 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         for index in indices:
             # Do not create the same index twice.
-            if f'{index}_1' not in self._molecules.index_information():
+            if f"{index}_1" not in self._molecules.index_information():
                 self._molecules.create_index(index)
             if (
-                f'{index}_1'
+                f"{index}_1"
                 not in self._constructed_molecules.index_information()
             ):
                 self._constructed_molecules.create_index(index)
             if (
-                f'{index}_1'
+                f"{index}_1"
                 not in self._position_matrices.index_information()
             ):
                 self._position_matrices.create_index(index)
 
             if (
-                f'{index}_1'
-                not in
-                self._building_block_position_matrices
-                .index_information()
+                f"{index}_1"
+                not in self._building_block_position_matrices.index_information()
             ):
                 self._building_block_position_matrices.create_index(
                     index,
@@ -468,41 +466,45 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         json = self._jsonizer.to_json(molecule)
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
-        json['matrix']['m'] = tuple(
-            tuple(row) for row in json['matrix']['m']
+        json["matrix"]["m"] = tuple(
+            tuple(row) for row in json["matrix"]["m"]
         )
-        json['matrix'] = HashableDict(json['matrix'])
-        json['molecule'] = HashableDict(json['molecule'])
-        json['constructedMolecule'] = HashableDict(
-            json['constructedMolecule']
+        json["matrix"] = HashableDict(json["matrix"])
+        json["molecule"] = HashableDict(json["molecule"])
+        json["constructedMolecule"] = HashableDict(
+            json["constructedMolecule"]
         )
-        json['constructedMolecule']['BB'] = tuple(map(
-            HashableDict,
-            json['constructedMolecule']['BB'],
-        ))
+        json["constructedMolecule"]["BB"] = tuple(
+            map(
+                HashableDict,
+                json["constructedMolecule"]["BB"],
+            )
+        )
 
         def make_hashable(json):
-            json['matrix']['m'] = tuple(
-                tuple(row) for row in json['matrix']['m']
+            json["matrix"]["m"] = tuple(
+                tuple(row) for row in json["matrix"]["m"]
             )
-            json['matrix'] = HashableDict(json['matrix'])
-            json['molecule'] = HashableDict(json['molecule'])
+            json["matrix"] = HashableDict(json["matrix"])
+            json["molecule"] = HashableDict(json["molecule"])
             return HashableDict(json)
 
-        json['buildingBlocks'] = tuple(map(
-            make_hashable,
-            json['buildingBlocks'],
-        ))
+        json["buildingBlocks"] = tuple(
+            map(
+                make_hashable,
+                json["buildingBlocks"],
+            )
+        )
         return self._put(HashableDict(json))
 
     @staticmethod
     def _get_query(json):
-        keys = dict(json['matrix'])
-        keys.pop('m')
+        keys = dict(json["matrix"])
+        keys.pop("m")
 
-        query = {'$or': []}
+        query = {"$or": []}
         for key, value in keys.items():
-            query['$or'].append({key: value})
+            query["$or"].append({key: value})
         return query
 
     def _put(self, json):
@@ -510,43 +512,43 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         self._molecules.update_many(
             filter=query,
             update={
-                '$set': json['molecule'],
+                "$set": json["molecule"],
             },
             upsert=True,
         )
         self._position_matrices.update_many(
             filter=query,
             update={
-                '$set': json['matrix'],
+                "$set": json["matrix"],
             },
             upsert=True,
         )
 
         self._add_building_block_keys_from_database(
             query=query,
-            building_block_keys=json['constructedMolecule']['BB'],
+            building_block_keys=json["constructedMolecule"]["BB"],
         )
 
         self._constructed_molecules.update_many(
             filter=query,
             update={
-                '$set': json['constructedMolecule'],
+                "$set": json["constructedMolecule"],
             },
             upsert=True,
         )
-        for building_block_json in json['buildingBlocks']:
+        for building_block_json in json["buildingBlocks"]:
             building_block_query = self._get_query(building_block_json)
             self._molecules.update_many(
                 filter=building_block_query,
                 update={
-                    '$set': building_block_json['molecule'],
+                    "$set": building_block_json["molecule"],
                 },
                 upsert=True,
             )
             self._building_block_position_matrices.update_many(
                 filter=building_block_query,
                 update={
-                    '$set': building_block_json['matrix'],
+                    "$set": building_block_json["matrix"],
                 },
                 upsert=True,
             )
@@ -608,9 +610,10 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         """
 
         database_building_block_keys = (
-            molecule_entry['BB']
-            for molecule_entry
-            in self._constructed_molecules.find(query)
+            molecule_entry["BB"]
+            for molecule_entry in self._constructed_molecules.find(
+                query
+            )
         )
         for entry_building_block_keys in database_building_block_keys:
             for keys1, keys2 in zip(
@@ -644,8 +647,8 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         molecule_json = self._molecules.find_one(key)
         if molecule_json is None:
             raise KeyError(
-                'No molecule found in the database with a key of: '
-                f'{key}'
+                "No molecule found in the database with a key of: "
+                f"{key}"
             )
 
         constructed_molecule_json = (
@@ -653,34 +656,37 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         )
         if constructed_molecule_json is None:
             raise KeyError(
-                'No molecule found in the database with a key of: '
-                f'{key}'
+                "No molecule found in the database with a key of: "
+                f"{key}"
             )
 
         position_matrix = self._position_matrices.find_one(key)
         if position_matrix is None:
             raise KeyError(
-                'No position matrix found in the database with a key '
-                f'of: {key}'
+                "No position matrix found in the database with a key "
+                f"of: {key}"
             )
 
         return self._dejsonizer.from_json(
             json={
-                'molecule': molecule_json,
-                'constructedMolecule': constructed_molecule_json,
-                'matrix': position_matrix,
-                'buildingBlocks': tuple(map(
-                    self._get_building_block,
-                    constructed_molecule_json['BB'],
-                ))
+                "molecule": molecule_json,
+                "constructedMolecule": constructed_molecule_json,
+                "matrix": position_matrix,
+                "buildingBlocks": tuple(
+                    map(
+                        self._get_building_block,
+                        constructed_molecule_json["BB"],
+                    )
+                ),
             },
         )
 
     def _get_building_block(self, key):
         return {
-            'molecule': self._molecules.find_one(key),
-            'matrix':
-                self._building_block_position_matrices.find_one(key),
+            "molecule": self._molecules.find_one(key),
+            "matrix": self._building_block_position_matrices.find_one(
+                key
+            ),
         }
 
     def get_all(self):
@@ -690,45 +696,44 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
             self._molecules.index_information().values(),
             self._constructed_molecules.index_information().values(),
         )
-        keys = tuple(dedupe(
-            index['key'][0][0]
-            for index in indices
-            # Ignore "_id" index which is unique in a collection and
-            # cannot be used to match molecular data split across
-            # collections.
-            if index['key'][0][0] != '_id'
-        ))
+        keys = tuple(
+            dedupe(
+                index["key"][0][0]
+                for index in indices
+                # Ignore "_id" index which is unique in a collection and
+                # cannot be used to match molecular data split across
+                # collections.
+                if index["key"][0][0] != "_id"
+            )
+        )
 
         query = [
             {
-                '$match': {
-                    '$or': [
-                        {key: {'$exists': True}}
-                        for key in keys
-                    ],
+                "$match": {
+                    "$or": [{key: {"$exists": True}} for key in keys],
                 },
             },
         ]
         query.extend(
             {
-                '$lookup': {
-                    'from': self._position_matrices.name,
-                    'let': {
-                        'molecule_key': f'${key}',
+                "$lookup": {
+                    "from": self._position_matrices.name,
+                    "let": {
+                        "molecule_key": f"${key}",
                     },
-                    'as': f'posmat_{key}',
-                    'pipeline': [
+                    "as": f"posmat_{key}",
+                    "pipeline": [
                         {
-                            '$match': {
-                                key: {'$ne': None},
+                            "$match": {
+                                key: {"$ne": None},
                             },
                         },
                         {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        f'${key}',
-                                        '$$molecule_key',
+                            "$match": {
+                                "$expr": {
+                                    "$eq": [
+                                        f"${key}",
+                                        "$$molecule_key",
                                     ],
                                 },
                             },
@@ -740,24 +745,24 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         )
         query.extend(
             {
-                '$lookup': {
-                    'from': self._molecules.name,
-                    'let': {
-                        'molecule_key': f'${key}',
+                "$lookup": {
+                    "from": self._molecules.name,
+                    "let": {
+                        "molecule_key": f"${key}",
                     },
-                    'as': f'mol_{key}',
-                    'pipeline': [
+                    "as": f"mol_{key}",
+                    "pipeline": [
                         {
-                            '$match': {
-                                key: {'$ne': None},
+                            "$match": {
+                                key: {"$ne": None},
                             },
                         },
                         {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        f'${key}',
-                                        '$$molecule_key',
+                            "$match": {
+                                "$expr": {
+                                    "$eq": [
+                                        f"${key}",
+                                        "$$molecule_key",
                                     ],
                                 },
                             },
@@ -769,13 +774,13 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         )
         query.append(
             {
-                '$match': {
-                    '$expr': {
-                        '$or': [
+                "$match": {
+                    "$expr": {
+                        "$or": [
                             {
-                                '$gt': [
-                                    {'$size': f'$posmat_{key}'},
-                                    0
+                                "$gt": [
+                                    {"$size": f"$posmat_{key}"},
+                                    0,
                                 ],
                             }
                             for key in keys
@@ -786,14 +791,11 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         )
         query.append(
             {
-                '$match': {
-                    '$expr': {
-                        '$or': [
+                "$match": {
+                    "$expr": {
+                        "$or": [
                             {
-                                '$gt': [
-                                    {'$size': f'$mol_{key}'},
-                                    0
-                                ],
+                                "$gt": [{"$size": f"$mol_{key}"}, 0],
                             }
                             for key in keys
                         ],
@@ -806,22 +808,26 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         for entry in cursor:
             molecule_document = get_any_value(
                 mapping=entry,
-                keys=(f'mol_{key}' for key in keys),
+                keys=(f"mol_{key}" for key in keys),
             )
             position_matrix_document = get_any_value(
                 mapping=entry,
-                keys=(f'posmat_{key}' for key in keys),
+                keys=(f"posmat_{key}" for key in keys),
             )
             if (
                 molecule_document is not None
                 and position_matrix_document is not None
             ):
-                yield self._dejsonizer.from_json({
-                    'molecule': molecule_document,
-                    'constructedMolecule': entry,
-                    'matrix': position_matrix_document,
-                    'buildingBlocks': tuple(map(
-                        self._get_building_block,
-                        entry['BB'],
-                    )),
-                })
+                yield self._dejsonizer.from_json(
+                    {
+                        "molecule": molecule_document,
+                        "constructedMolecule": entry,
+                        "matrix": position_matrix_document,
+                        "buildingBlocks": tuple(
+                            map(
+                                self._get_building_block,
+                                entry["BB"],
+                            )
+                        ),
+                    }
+                )

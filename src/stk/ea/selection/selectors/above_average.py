@@ -165,15 +165,14 @@ class AboveAverage(Selector):
         )
 
     def _select_from_batches(self, batches, yielded_batches):
-        mean = np.mean([
-            batch.get_fitness_value() for batch in batches
-        ])
+        mean = np.mean(
+            [batch.get_fitness_value() for batch in batches]
+        )
         # Yield highest fitness batches first.
         batches = sorted(batches, reverse=True)
         # Yield only batches with a fitness larger than the mean.
         batches = it.takewhile(
-            lambda batch: batch.get_fitness_value() > mean,
-            batches
+            lambda batch: batch.get_fitness_value() > mean, batches
         )
         # Yield batches which are multiple times better than the mean
         # multiple times.

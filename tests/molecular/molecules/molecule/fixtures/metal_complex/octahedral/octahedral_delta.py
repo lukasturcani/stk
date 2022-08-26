@@ -7,7 +7,7 @@ from ...building_blocks import get_fe_atom, get_iron_bi_1
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
@@ -17,23 +17,24 @@ from ...building_blocks import get_fe_atom, get_iron_bi_1
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
-                                frozenset({
-                                    stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
+                                frozenset(
+                                    {
+                                        stk.GenericFunctionalGroup,
+                                        stk.SingleAtom,
+                                    }
+                                ): 9
                             }
                         )
-                    )
+                    ),
                 )
             ),
             smiles=(
-                '[H]C1=C([H])C([H])=N2->[Fe+2]34(<-N(Br)=C([H])C2=C1[H'
-                '])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)'
-                '<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41'
+                "[H]C1=C([H])C([H])=N2->[Fe+2]34(<-N(Br)=C([H])C2=C1[H"
+                "])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)"
+                "<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41"
             ),
             name=name,
         ),
-
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
                 stk.metal_complex.OctahedralDelta(
@@ -42,19 +43,21 @@ from ...building_blocks import get_fe_atom, get_iron_bi_1
                     reaction_factory=stk.DativeReactionFactory(
                         stk.GenericReactionFactory(
                             bond_orders={
-                                frozenset({
-                                    stk.GenericFunctionalGroup,
-                                    stk.SingleAtom
-                                }): 9
+                                frozenset(
+                                    {
+                                        stk.GenericFunctionalGroup,
+                                        stk.SingleAtom,
+                                    }
+                                ): 9
                             }
                         )
-                    )
+                    ),
                 )
             ),
             smiles=(
-                '[H]C1=C([H])C([H])=N2->[Fe+2]34(<-N(Br)=C([H])C2=C1[H'
-                '])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)'
-                '<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41'
+                "[H]C1=C([H])C([H])=N2->[Fe+2]34(<-N(Br)=C([H])C2=C1[H"
+                "])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)"
+                "<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41"
             ),
             name=name,
         ),
@@ -62,5 +65,5 @@ from ...building_blocks import get_fe_atom, get_iron_bi_1
 )
 def metal_complex_octahedral_delta(request) -> CaseData:
     return request.param(
-        f'{request.fixturename}{request.param_index}',
+        f"{request.fixturename}{request.param_index}",
     )

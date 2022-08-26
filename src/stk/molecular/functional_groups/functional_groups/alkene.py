@@ -193,8 +193,8 @@ class Alkene(GenericFunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._carbon1}, {self._atom1}, {self._atom2}, '
-            f'{self._carbon2}, {self._atom3}, {self._atom4}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._carbon1}, {self._atom1}, {self._atom2}, "
+            f"{self._carbon2}, {self._atom3}, {self._atom4}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

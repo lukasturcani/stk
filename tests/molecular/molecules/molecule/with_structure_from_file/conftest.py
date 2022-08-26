@@ -5,8 +5,8 @@ import pytest
 
 @pytest.fixture(
     params=[
-        'molecule.mol',
-        'molecule.xyz',
+        "molecule.mol",
+        "molecule.xyz",
     ],
 )
 def path(request, tmpdir):

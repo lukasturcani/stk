@@ -6,46 +6,39 @@ from .case_data import CaseData
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN.mae',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN.mae",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN.xyz',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN.xyz",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN.pdb',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN.pdb",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN_with_cell.pdb',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN_with_cell.pdb",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN.mol',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN.mol",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN.coord',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN.coord",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN_with_cell1.coord',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN_with_cell1.coord",
         ),
-
         lambda: CaseData(
-            molecule=stk.BuildingBlock('NCCN'),
-            path='NCCN_with_cell2.coord',
+            molecule=stk.BuildingBlock("NCCN"),
+            path="NCCN_with_cell2.coord",
         ),
     ),
 )

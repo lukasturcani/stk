@@ -4,18 +4,18 @@ import stk
 
 
 def test_put_caching(mongo_client):
-    database_name = '_test_put_caching'
+    database_name = "_test_put_caching"
     mongo_client.drop_database(database_name)
 
     database = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
     )
-    molecule = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+    molecule = stk.BuildingBlock("BrCCCBr", [stk.BromoFactory()])
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear(
-            building_blocks=(molecule, ),
-            repeating_unit='A',
+            building_blocks=(molecule,),
+            repeating_unit="A",
             num_repeating_units=3,
         ),
     )
@@ -37,30 +37,36 @@ def test_put_caching(mongo_client):
 
 
 def test_get_caching(mongo_client):
-    database_name = '_test_get_caching'
+    database_name = "_test_get_caching"
     mongo_client.drop_database(database_name)
 
     database = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
     )
-    molecule = stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()])
+    molecule = stk.BuildingBlock("BrCCCBr", [stk.BromoFactory()])
     polymer = stk.ConstructedMolecule(
         topology_graph=stk.polymer.Linear(
-            building_blocks=(molecule, ),
-            repeating_unit='A',
+            building_blocks=(molecule,),
+            repeating_unit="A",
             num_repeating_units=3,
         ),
     )
     database.put(polymer)
-    database.get({
-        stk.InchiKey().get_key_name():
-            stk.InchiKey().get_key(polymer),
-    })
-    database.get({
-        stk.InchiKey().get_key_name():
-            stk.InchiKey().get_key(polymer),
-    })
+    database.get(
+        {
+            stk.InchiKey()
+            .get_key_name(): stk.InchiKey()
+            .get_key(polymer),
+        }
+    )
+    database.get(
+        {
+            stk.InchiKey()
+            .get_key_name(): stk.InchiKey()
+            .get_key(polymer),
+        }
+    )
 
     cache_info = database._get.cache_info()
     assert cache_info.hits == 1

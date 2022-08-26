@@ -6,7 +6,7 @@ import stk
 
 from ....case_data import CaseData
 
-single_atom = rdkit.MolFromSmiles('[Fe]')
+single_atom = rdkit.MolFromSmiles("[Fe]")
 single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
 
 

@@ -51,4 +51,4 @@ def _test_get_all(
             ),
         )
 
-    assert i+1 == len(expected_molecules)
+    assert i + 1 == len(expected_molecules)

@@ -104,11 +104,11 @@ class ValueMongoDb(ValueDatabase):
         self,
         mongo_client,
         collection,
-        database='stk',
-        key_makers=(InchiKey(), ),
+        database="stk",
+        key_makers=(InchiKey(),),
         put_lru_cache_size=128,
         get_lru_cache_size=128,
-        indices=('InChIKey', ),
+        indices=("InChIKey",),
     ):
         """
         Initialize a :class:`.ValueMongoDb` instance.
@@ -155,19 +155,19 @@ class ValueMongoDb(ValueDatabase):
         self._get = lru_cache(maxsize=get_lru_cache_size)(self._get)
 
         index_information = self._values.index_information()
-        if 'v_1' not in index_information:
-            self._values.create_index('v')
+        if "v_1" not in index_information:
+            self._values.create_index("v")
 
         for index in indices:
             # Do not create the same index twice.
-            if f'{index}_1' not in index_information:
+            if f"{index}_1" not in index_information:
                 self._values.create_index(index)
 
     def put(self, molecule, value):
-        json = {'v': value}
+        json = {"v": value}
         for key_maker in self._key_makers:
-            json[key_maker.get_key_name()] = (
-                key_maker.get_key(molecule)
+            json[key_maker.get_key_name()] = key_maker.get_key(
+                molecule
             )
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
@@ -175,29 +175,25 @@ class ValueMongoDb(ValueDatabase):
 
     def _put(self, json):
         keys = dict(json)
-        keys.pop('v')
+        keys.pop("v")
 
-        query = {'$or': []}
+        query = {"$or": []}
         for key, value in keys.items():
-            query['$or'].append({key: value})
+            query["$or"].append({key: value})
 
         self._values.update_many(
             filter=query,
-            update={
-                '$set': json
-            },
+            update={"$set": json},
             upsert=True,
         )
 
     def get(self, molecule):
-
         def make_dict(key_maker):
-            return HashableDict({
-                key_maker.get_key_name():
-                key_maker.get_key(molecule)
-            })
+            return HashableDict(
+                {key_maker.get_key_name(): key_maker.get_key(molecule)}
+            )
 
-        key = {'$or': tuple(map(make_dict, self._key_makers))}
+        key = {"$or": tuple(map(make_dict, self._key_makers))}
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
         return self._get(HashableDict(key))
@@ -206,7 +202,7 @@ class ValueMongoDb(ValueDatabase):
         value = self._values.find_one(key)
         if value is None:
             raise KeyError(
-                'No molecule found in the database with a key of: '
-                f'{key}'
+                "No molecule found in the database with a key of: "
+                f"{key}"
             )
-        return value['v']
+        return value["v"]

@@ -7,9 +7,9 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('roulette'),
-        lazy_fixture('stochastic_universal_sampling'),
-        lazy_fixture('tournament'),
+        lazy_fixture("roulette"),
+        lazy_fixture("stochastic_universal_sampling"),
+        lazy_fixture("tournament"),
     ),
 )
 def case_data(request):

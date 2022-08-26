@@ -5,25 +5,29 @@ from ..utilities import get_centroid
 
 
 @pytest.mark.parametrize(
-    argnames=('position_matrix', 'atom_ids', 'centroid'),
+    argnames=("position_matrix", "atom_ids", "centroid"),
     argvalues=(
         (
-            np.array([
-                [1., 2., 3.],
-                [0., 0., 0.],
-                [-1., -2., -3.],
-            ]),
+            np.array(
+                [
+                    [1.0, 2.0, 3.0],
+                    [0.0, 0.0, 0.0],
+                    [-1.0, -2.0, -3.0],
+                ]
+            ),
             (0, 1, 2),
-            np.array([0., 0., 0.]),
+            np.array([0.0, 0.0, 0.0]),
         ),
         (
-            np.array([
-                [1., 2., 3.],
-                [0., 0., 0.],
-                [-1., -2., -3.],
-            ]),
+            np.array(
+                [
+                    [1.0, 2.0, 3.0],
+                    [0.0, 0.0, 0.0],
+                    [-1.0, -2.0, -3.0],
+                ]
+            ),
             (0, 1),
-            np.array([.5, 1., 1.5]),
+            np.array([0.5, 1.0, 1.5]),
         ),
     ),
 )

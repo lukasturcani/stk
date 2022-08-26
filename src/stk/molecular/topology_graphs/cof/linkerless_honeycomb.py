@@ -107,14 +107,14 @@ class LinkerlessHoneycomb(Cof):
     """
 
     _lattice_constants = _a, _b, _c = (
-        np.array([1., 0., 0.]),
-        np.array([0.5, 0.866, 0.]),
-        np.array([0., 0., 5/1.7321]),
+        np.array([1.0, 0.0, 0.0]),
+        np.array([0.5, 0.866, 0.0]),
+        np.array([0.0, 0.0, 5 / 1.7321]),
     )
 
     _vertex_prototypes = (
-        NonLinearVertex(0, (1/3)*_a + (1/3)*_b + (1/2)*_c),
-        NonLinearVertex(1, (2/3)*_a + (2/3)*_b + (1/2)*_c),
+        NonLinearVertex(0, (1 / 3) * _a + (1 / 3) * _b + (1 / 2) * _c),
+        NonLinearVertex(1, (2 / 3) * _a + (2 / 3) * _b + (1 / 2) * _c),
     )
 
     _edge_prototypes = (

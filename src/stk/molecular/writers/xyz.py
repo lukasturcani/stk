@@ -51,17 +51,17 @@ class XyzWriter:
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
 
         coords = molecule.get_position_matrix()
-        content = ['']
+        content = [""]
         for i, atom_id in enumerate(atom_ids, 1):
             x, y, z = (i for i in coords[atom_id])
-            atom, = molecule.get_atoms(atom_ids=atom_id)
+            (atom,) = molecule.get_atoms(atom_ids=atom_id)
             symbol = atom.__class__.__name__
-            content.append(f'{symbol} {x:f} {y:f} {z:f}\n')
+            content.append(f"{symbol} {x:f} {y:f} {z:f}\n")
         # Set first line to the atom_count.
-        content[0] = f'{i}\n\n'
+        content[0] = f"{i}\n\n"
 
         return content
 
@@ -91,7 +91,7 @@ class XyzWriter:
 
         content = self._write_content(molecule, atom_ids)
 
-        return ''.join(content)
+        return "".join(content)
 
     def write(
         self,
@@ -119,5 +119,5 @@ class XyzWriter:
 
         content = self._write_content(molecule, atom_ids)
 
-        with open(path, 'w') as f:
-            f.write(''.join(content))
+        with open(path, "w") as f:
+            f.write("".join(content))

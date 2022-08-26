@@ -55,8 +55,7 @@ def angled(
             ),
         },
         functional_group_edges=(
-            {0: 0, 1: 1}
-            if angled_aligner_edge == 0 else {0: 1, 1: 0}
+            {0: 0, 1: 1} if angled_aligner_edge == 0 else {0: 1, 1: 0}
         ),
     )
 
@@ -93,7 +92,7 @@ def angled_aligner_edge(request) -> int:
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrCCNCBr',
+            smiles="BrCCNCBr",
             functional_groups=[stk.BromoFactory()],
         ),
     ),
@@ -103,9 +102,7 @@ def building_block_2(request) -> stk.BuildingBlock:
 
 
 @pytest.fixture(
-    params=(
-        [1, 2, -20],
-    ),
+    params=([1, 2, -20],),
 )
 def position(request) -> np.ndarray:
     """

@@ -65,8 +65,7 @@ def _test_normalize(
         if isinstance(fitness_value, np.ndarray):
             fitness_value = tuple(fitness_value)
 
-        assert (fitness_value == record2.get_fitness_value())
-        assert (
-            record1.get_fitness_value(normalized=False)
-            == record2.get_fitness_value(normalized=False)
-        )
+        assert fitness_value == record2.get_fitness_value()
+        assert record1.get_fitness_value(
+            normalized=False
+        ) == record2.get_fitness_value(normalized=False)

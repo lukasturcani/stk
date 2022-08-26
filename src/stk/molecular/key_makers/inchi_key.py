@@ -55,7 +55,7 @@ class InchiKey(MoleculeKeyMaker):
         pass
 
     def get_key_name(self) -> str:
-        return 'InChIKey'
+        return "InChIKey"
 
     def get_key(self, molecule: Molecule) -> str:
         return get_inchi_key(molecule)
@@ -64,4 +64,4 @@ class InchiKey(MoleculeKeyMaker):
         return repr(self)
 
     def __repr__(self) -> str:
-        return 'InchiKey()'
+        return "InchiKey()"

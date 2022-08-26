@@ -33,16 +33,16 @@ def _with_structure_from_xyz(self, path):
 
     """
 
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         atom_count, _, *content = f.readlines()
 
     # Check the atom count is correct.
     num_atoms = len(self._atoms)
     if int(atom_count) != num_atoms:
         raise RuntimeError(
-            f'The number of atoms in the xyz file, {atom_count}, '
-            'does not match the number of atoms in the '
-            f'molecule, {num_atoms}.'
+            f"The number of atoms in the xyz file, {atom_count}, "
+            "does not match the number of atoms in the "
+            f"molecule, {num_atoms}."
         )
 
     # Save all the coords in the file.
@@ -56,18 +56,18 @@ def _with_structure_from_xyz(self, path):
 
         if element != self._atoms[i].__class__.__name__:
             raise RuntimeError(
-                f'Atom {i} element does not match file.'
+                f"Atom {i} element does not match file."
             )
 
         new_coords.append([float(i) for i in coords])
 
     # Check that the correct number of atom
     # lines was present in the file.
-    if i+1 != num_atoms:
+    if i + 1 != num_atoms:
         raise RuntimeError(
-            f'The number of atom lines in the xyz file, {i+1}, '
-            'does not match the number of atoms in the '
-            f'molecule, {num_atoms}.'
+            f"The number of atom lines in the xyz file, {i+1}, "
+            "does not match the number of atoms in the "
+            f"molecule, {num_atoms}."
         )
 
     # Update the structure.

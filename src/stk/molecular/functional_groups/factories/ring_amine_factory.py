@@ -30,7 +30,7 @@ class RingAmineFactory(FunctionalGroupFactory):
 
     def get_functional_groups(self, molecule):
         ids = _get_atom_ids(
-            query='[N]([H])([H])[#6]~[#6]([H])~[#6R1]',
+            query="[N]([H])([H])[#6]~[#6]([H])~[#6R1]",
             molecule=molecule,
         )
         for atom_ids in ids:

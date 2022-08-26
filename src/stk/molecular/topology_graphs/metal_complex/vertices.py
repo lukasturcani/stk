@@ -50,23 +50,21 @@ class MonoDentateLigandVertex(Vertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        assert (
-            building_block.get_num_functional_groups() == 1
-        ), (
-            f'{building_block} needs to have exactly 1 functional '
-            'group but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 1, (
+            f"{building_block} needs to have exactly 1 functional "
+            "group but has "
+            f"{building_block.get_num_functional_groups()}."
         )
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_centroid = building_block.get_centroid(
             atom_ids=fg.get_placer_ids(),
         )
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         return building_block.with_rotation_between_vectors(
             start=fg_centroid - core_centroid,
             target=edge_centroid - self._position,
@@ -89,12 +87,10 @@ class BiDentateLigandVertex(Vertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        assert (
-            building_block.get_num_functional_groups() == 2
-        ), (
-            f'{building_block} needs to have exactly 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 2, (
+            f"{building_block} needs to have exactly 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
 
         fg0_position, fg1_position = (
@@ -105,8 +101,8 @@ class BiDentateLigandVertex(Vertex):
             edge.get_position() for edge in edges
         )
         building_block = building_block.with_rotation_between_vectors(
-            start=fg1_position-fg0_position,
-            target=edge_position2-edge_position1,
+            start=fg1_position - fg0_position,
+            target=edge_position2 - edge_position1,
             origin=building_block.get_centroid(),
         )
 
@@ -129,9 +125,9 @@ class BiDentateLigandVertex(Vertex):
             target=fg_vector,
         )
 
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         building_block = building_block.with_rotation_between_vectors(
             start=core_to_placer - fg_vector_projection,
             target=edge_centroid - self._position,
@@ -144,7 +140,7 @@ class BiDentateLigandVertex(Vertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
 
         def fg_distance(edge):

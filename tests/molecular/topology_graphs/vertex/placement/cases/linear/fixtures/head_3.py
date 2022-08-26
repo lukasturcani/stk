@@ -28,7 +28,7 @@ def head_3(position, building_block_2):
     vertex = stk.polymer.linear.HeadVertex(0, position, True)
     return CaseData(
         vertex=vertex,
-        edges=(tuple(get_edges(vertex))[1], ),
+        edges=(tuple(get_edges(vertex))[1],),
         building_block=building_block_2,
         position=position,
         alignment_tests={

@@ -47,19 +47,19 @@ class MoleculeDejsonizer:
 
         atoms = tuple(
             to_atom(atom_id, atom_json)
-            for atom_id, atom_json in enumerate(json['molecule']['a'])
+            for atom_id, atom_json in enumerate(json["molecule"]["a"])
         )
         return Molecule(
             atoms=atoms,
             bonds=tuple(
                 to_bond(atoms, bond_json)
-                for bond_json in json['molecule']['b']
+                for bond_json in json["molecule"]["b"]
             ),
-            position_matrix=np.array(json['matrix']['m']),
+            position_matrix=np.array(json["matrix"]["m"]),
         )
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"

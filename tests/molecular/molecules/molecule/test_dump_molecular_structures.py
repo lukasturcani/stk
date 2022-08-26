@@ -31,6 +31,6 @@ def test_dump_molecular_structures(
 
     """
 
-    case_data.molecule.write(tmp_path / f'{request.node.name}.mol')
+    case_data.molecule.write(tmp_path / f"{request.node.name}.mol")
     molecule_db.put(case_data.molecule)
     name_db.put(case_data.molecule, request.node.name)

@@ -11,11 +11,11 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('default_init'),
-        lazy_fixture('init_from_file'),
-        lazy_fixture('init'),
-        lazy_fixture('init_from_molecule'),
-        lazy_fixture('init_from_rdkit_mol'),
+        lazy_fixture("default_init"),
+        lazy_fixture("init_from_file"),
+        lazy_fixture("init"),
+        lazy_fixture("init_from_molecule"),
+        lazy_fixture("init_from_rdkit_mol"),
     ),
 )
 def case_data(request):
@@ -39,13 +39,16 @@ def building_block(case_data):
 
 @pytest.fixture(
     params=(
-        lambda molecule:
-            stk.BromoFactory().get_functional_groups(molecule),
-        lambda molecule:
-            stk.PrimaryAminoFactory().get_functional_groups(molecule),
+        lambda molecule: stk.BromoFactory().get_functional_groups(
+            molecule
+        ),
+        lambda molecule: stk.PrimaryAminoFactory().get_functional_groups(
+            molecule
+        ),
         lambda molecule: it.chain(
             stk.PrimaryAminoFactory().get_functional_groups(molecule),
-            stk.BromoFactory().get_functional_groups(molecule)),
+            stk.BromoFactory().get_functional_groups(molecule),
+        ),
     )
 )
 def get_functional_groups(request):

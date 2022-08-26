@@ -65,14 +65,18 @@ class GuestVertex(Vertex):
         return clone
 
     def place_building_block(self, building_block, edges):
-        return building_block.with_centroid(
-            position=self._position,
-            atom_ids=building_block.get_placer_ids(),
-        ).with_rotation_between_vectors(
-            start=self._start,
-            target=self._target,
-            origin=self._position,
-        ).get_position_matrix()
+        return (
+            building_block.with_centroid(
+                position=self._position,
+                atom_ids=building_block.get_placer_ids(),
+            )
+            .with_rotation_between_vectors(
+                start=self._start,
+                target=self._target,
+                origin=self._position,
+            )
+            .get_position_matrix()
+        )
 
     def map_functional_groups_to_edges(self, building_block, edges):
         return {}

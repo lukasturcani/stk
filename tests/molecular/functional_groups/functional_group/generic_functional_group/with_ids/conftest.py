@@ -17,7 +17,7 @@ def get_id_map_0(
     # biggest on in the functional group. This prevents two atoms in
     # the functional group from having the same id.
     new_id = max(functional_group.get_atom_ids()) + 1
-    ids = (new_id, )
+    ids = (new_id,)
     return dict(zip(functional_group.get_atom_ids(), ids))
 
 
@@ -27,7 +27,7 @@ def get_id_map_1(
 
     new_id = max(functional_group.get_atom_ids()) + 1
     num_atoms = sum(1 for _ in functional_group.get_atoms())
-    ids = range(new_id, new_id+num_atoms)
+    ids = range(new_id, new_id + num_atoms)
     return dict(zip(functional_group.get_atom_ids(), ids))
 
 

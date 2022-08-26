@@ -14,10 +14,10 @@ class _EdgeSorter(_Sorter):
     """
 
     __slots__ = [
-        '_items',
-        '_reference',
-        '_axis',
-        '_edge_centroid',
+        "_items",
+        "_reference",
+        "_axis",
+        "_edge_centroid",
     ]
 
     def __init__(self, edges, aligner_edge, axis):
@@ -38,9 +38,9 @@ class _EdgeSorter(_Sorter):
 
         """
 
-        self._edge_centroid = edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        self._edge_centroid = edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         super().__init__(
             items=edges,
             axis=axis,

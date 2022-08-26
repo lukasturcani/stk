@@ -28,7 +28,7 @@ class SingleAtom(GenericFunctionalGroup):
         """
 
         self._atom = atom
-        atoms = (atom, )
+        atoms = (atom,)
         super().__init__(atoms, atoms, ())
 
     def get_atom(self):
@@ -59,6 +59,4 @@ class SingleAtom(GenericFunctionalGroup):
         return clone
 
     def __repr__(self):
-        return (
-            f'{self.__class__.__name__}({self._atom})'
-        )
+        return f"{self.__class__.__name__}({self._atom})"

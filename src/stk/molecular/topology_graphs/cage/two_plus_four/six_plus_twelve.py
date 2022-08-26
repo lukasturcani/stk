@@ -134,7 +134,6 @@ class SixPlusTwelve(Cage):
             id=8,
             vertices=(_non_linears[3], _non_linears[2]),
         ),
-
         LinearVertex.init_at_center(
             id=9,
             vertices=(_non_linears[0], _non_linears[2]),
@@ -147,7 +146,6 @@ class SixPlusTwelve(Cage):
             id=11,
             vertices=(_non_linears[4], _non_linears[1]),
         ),
-
         LinearVertex.init_at_center(
             id=12,
             vertices=(_non_linears[4], _non_linears[2]),
@@ -160,7 +158,6 @@ class SixPlusTwelve(Cage):
             id=14,
             vertices=(_non_linears[5], _non_linears[0]),
         ),
-
         LinearVertex.init_at_center(
             id=15,
             vertices=(_non_linears[5], _non_linears[1]),
@@ -172,7 +169,7 @@ class SixPlusTwelve(Cage):
         LinearVertex.init_at_center(
             id=17,
             vertices=(_non_linears[5], _non_linears[3]),
-        )
+        ),
     )
 
     _edge_prototypes = (
@@ -182,21 +179,18 @@ class SixPlusTwelve(Cage):
         Edge(3, _vertex_prototypes[7], _vertex_prototypes[3]),
         Edge(4, _vertex_prototypes[8], _vertex_prototypes[3]),
         Edge(5, _vertex_prototypes[8], _vertex_prototypes[2]),
-
         Edge(6, _vertex_prototypes[9], _vertex_prototypes[0]),
         Edge(7, _vertex_prototypes[9], _vertex_prototypes[2]),
         Edge(8, _vertex_prototypes[10], _vertex_prototypes[4]),
         Edge(9, _vertex_prototypes[10], _vertex_prototypes[0]),
         Edge(10, _vertex_prototypes[11], _vertex_prototypes[4]),
         Edge(11, _vertex_prototypes[11], _vertex_prototypes[1]),
-
         Edge(12, _vertex_prototypes[12], _vertex_prototypes[4]),
         Edge(13, _vertex_prototypes[12], _vertex_prototypes[2]),
         Edge(14, _vertex_prototypes[13], _vertex_prototypes[4]),
         Edge(15, _vertex_prototypes[13], _vertex_prototypes[3]),
         Edge(16, _vertex_prototypes[14], _vertex_prototypes[5]),
         Edge(17, _vertex_prototypes[14], _vertex_prototypes[0]),
-
         Edge(18, _vertex_prototypes[15], _vertex_prototypes[5]),
         Edge(19, _vertex_prototypes[15], _vertex_prototypes[1]),
         Edge(20, _vertex_prototypes[16], _vertex_prototypes[5]),

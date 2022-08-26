@@ -28,18 +28,16 @@ def _get_case_data(mongo_client):
 
     db = stk.ValueMongoDb(
         mongo_client=mongo_client,
-        collection='test_caching',
-        database='_stk_pytest_database',
+        collection="test_caching",
+        database="_stk_pytest_database",
     )
 
     fitness_calculator = stk.PropertyVector(
-        property_functions=(
-            _counter.get_count,
-        ),
+        property_functions=(_counter.get_count,),
         input_database=db,
         output_database=db,
     )
-    molecule = stk.BuildingBlock('BrCCBr')
+    molecule = stk.BuildingBlock("BrCCBr")
     fitness_value = fitness_calculator.get_fitness_value(molecule)
 
     return CaseData(
@@ -50,9 +48,7 @@ def _get_case_data(mongo_client):
 
 
 @pytest.fixture(
-    params=(
-        _get_case_data,
-    ),
+    params=(_get_case_data,),
 )
 def property_vector(request, mongo_client):
     return request.param(mongo_client)

@@ -64,6 +64,6 @@ class CaseData:
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self.molecule}, {self.smiles!r}, {self.name!r})'
+            f"{self.__class__.__name__}("
+            f"{self.molecule}, {self.smiles!r}, {self.name!r})"
         )

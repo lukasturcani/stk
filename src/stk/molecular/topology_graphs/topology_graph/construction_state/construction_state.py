@@ -304,10 +304,8 @@ class ConstructionState:
 
         """
 
-        self._graph_state = (
-            self._graph_state.with_lattice_constants(
-                lattice_constants=lattice_constants,
-            )
+        self._graph_state = self._graph_state.with_lattice_constants(
+            lattice_constants=lattice_constants,
         )
         return self
 

@@ -80,7 +80,7 @@ class SimilarBuildingBlock(MoleculeMutator):
         building_blocks,
         is_replaceable,
         key_maker=Inchi(),
-        name='SimilarBuildingBlock',
+        name="SimilarBuildingBlock",
         random_seed=None,
     ):
         """
@@ -130,10 +130,12 @@ class SimilarBuildingBlock(MoleculeMutator):
         similar_building_blocks = self._similar_building_blocks[key]
 
         # Choose the building block which undergoes mutation.
-        replaceable_building_blocks = tuple(filter(
-            self._is_replaceable,
-            record.get_molecule().get_building_blocks(),
-        ))
+        replaceable_building_blocks = tuple(
+            filter(
+                self._is_replaceable,
+                record.get_molecule().get_building_blocks(),
+            )
+        )
         replaced_building_block = self._generator.choice(
             a=replaceable_building_blocks,
         )
@@ -143,20 +145,28 @@ class SimilarBuildingBlock(MoleculeMutator):
         # for it.
         replaced_key = self._key_maker.get_key(replaced_building_block)
         if replaced_key not in similar_building_blocks:
-            similar_building_blocks[replaced_key] = iter(sorted(
-                self._building_blocks,
-                key=partial(dice_similarity, replaced_building_block),
-                reverse=True,
-            ))
+            similar_building_blocks[replaced_key] = iter(
+                sorted(
+                    self._building_blocks,
+                    key=partial(
+                        dice_similarity, replaced_building_block
+                    ),
+                    reverse=True,
+                )
+            )
 
         try:
             replacement = next(similar_building_blocks[replaced_key])
         except StopIteration:
-            similar_building_blocks[replaced_key] = iter(sorted(
-                self._building_blocks,
-                key=partial(dice_similarity, replaced_building_block),
-                reverse=True,
-            ))
+            similar_building_blocks[replaced_key] = iter(
+                sorted(
+                    self._building_blocks,
+                    key=partial(
+                        dice_similarity, replaced_building_block
+                    ),
+                    reverse=True,
+                )
+            )
             replacement = next(similar_building_blocks[replaced_key])
 
         # If the most similar molecule in `building_blocks` is itself,
@@ -167,22 +177,26 @@ class SimilarBuildingBlock(MoleculeMutator):
                     similar_building_blocks[replaced_key]
                 )
             except StopIteration:
-                similar_building_blocks[replaced_key] = iter(sorted(
-                    self._building_blocks,
-                    key=partial(
-                        dice_similarity,
-                        replaced_building_block,
-                    ),
-                    reverse=True,
-                ))
+                similar_building_blocks[replaced_key] = iter(
+                    sorted(
+                        self._building_blocks,
+                        key=partial(
+                            dice_similarity,
+                            replaced_building_block,
+                        ),
+                        reverse=True,
+                    )
+                )
                 replacement = next(
                     similar_building_blocks[replaced_key]
                 )
 
         # Build the new ConstructedMolecule.
-        graph = record.get_topology_graph().with_building_blocks({
-            replaced_building_block: replacement,
-        })
+        graph = record.get_topology_graph().with_building_blocks(
+            {
+                replaced_building_block: replacement,
+            }
+        )
         return MutationRecord(
             molecule_record=MoleculeRecord(graph),
             mutator_name=self._name,

@@ -25,64 +25,227 @@ from scipy.spatial.transform import Rotation
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
-    'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,
-    'Be': 2, 'Bi': 2, 'B': 2, 'Br': 1.85, 'Cd': 1.58,
-    'Cs': 2, 'Ca': 2, 'C': 1.7, 'Ce': 2, 'Cl': 1.75,
-    'Cr': 2, 'Co': 2, 'Cu': 1.4, 'Dy': 2, 'Er': 2,
-    'Eu': 2, 'F': 1.47, 'Gd': 2, 'Ga': 1.87, 'Ge': 2,
-    'Au': 1.66, 'Hf': 2, 'He': 1.4, 'Ho': 2, 'H': 1.09,
-    'In': 1.93, 'I': 1.98, 'Ir': 2, 'Fe': 2, 'Kr': 2.02,
-    'La': 2, 'Pb': 2.02, 'Li': 1.82, 'Lu': 2, 'Mg': 1.73,
-    'Mn': 2, 'Hg': 1.55, 'Mo': 2, 'Nd': 2, 'Ne': 1.54,
-    'Ni': 1.63, 'Nb': 2, 'N': 1.55, 'Os': 2, 'O': 1.52,
-    'Pd': 1.63, 'P': 1.8, 'Pt': 1.72, 'K': 2.75, 'Pr': 2,
-    'Pa': 2, 'Re': 2, 'Rh': 2, 'Rb': 2, 'Ru': 2, 'Sm': 2,
-    'Sc': 2, 'Se': 1.9, 'Si': 2.1, 'Ag': 1.72, 'Na': 2.27,
-    'Sr': 2, 'S': 1.8, 'Ta': 2, 'Te': 2.06, 'Tb': 2,
-    'Tl': 1.96, 'Th': 2, 'Tm': 2, 'Sn': 2.17, 'Ti': 2,
-    'W': 2, 'U': 1.86, 'V': 2, 'Xe': 2.16, 'Yb': 2,
-    'Y': 2, 'Zn': 1.29, 'Zr': 2, 'X': 1.0, 'D': 1.0
+    "Al": 2,
+    "Sb": 2,
+    "Ar": 1.88,
+    "As": 1.85,
+    "Ba": 2,
+    "Be": 2,
+    "Bi": 2,
+    "B": 2,
+    "Br": 1.85,
+    "Cd": 1.58,
+    "Cs": 2,
+    "Ca": 2,
+    "C": 1.7,
+    "Ce": 2,
+    "Cl": 1.75,
+    "Cr": 2,
+    "Co": 2,
+    "Cu": 1.4,
+    "Dy": 2,
+    "Er": 2,
+    "Eu": 2,
+    "F": 1.47,
+    "Gd": 2,
+    "Ga": 1.87,
+    "Ge": 2,
+    "Au": 1.66,
+    "Hf": 2,
+    "He": 1.4,
+    "Ho": 2,
+    "H": 1.09,
+    "In": 1.93,
+    "I": 1.98,
+    "Ir": 2,
+    "Fe": 2,
+    "Kr": 2.02,
+    "La": 2,
+    "Pb": 2.02,
+    "Li": 1.82,
+    "Lu": 2,
+    "Mg": 1.73,
+    "Mn": 2,
+    "Hg": 1.55,
+    "Mo": 2,
+    "Nd": 2,
+    "Ne": 1.54,
+    "Ni": 1.63,
+    "Nb": 2,
+    "N": 1.55,
+    "Os": 2,
+    "O": 1.52,
+    "Pd": 1.63,
+    "P": 1.8,
+    "Pt": 1.72,
+    "K": 2.75,
+    "Pr": 2,
+    "Pa": 2,
+    "Re": 2,
+    "Rh": 2,
+    "Rb": 2,
+    "Ru": 2,
+    "Sm": 2,
+    "Sc": 2,
+    "Se": 1.9,
+    "Si": 2.1,
+    "Ag": 1.72,
+    "Na": 2.27,
+    "Sr": 2,
+    "S": 1.8,
+    "Ta": 2,
+    "Te": 2.06,
+    "Tb": 2,
+    "Tl": 1.96,
+    "Th": 2,
+    "Tm": 2,
+    "Sn": 2.17,
+    "Ti": 2,
+    "W": 2,
+    "U": 1.86,
+    "V": 2,
+    "Xe": 2.16,
+    "Yb": 2,
+    "Y": 2,
+    "Zn": 1.29,
+    "Zr": 2,
+    "X": 1.0,
+    "D": 1.0,
 }
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {
-    '1': rdkit.rdchem.BondType.SINGLE,
-    'am': rdkit.rdchem.BondType.SINGLE,
-    '2': rdkit.rdchem.BondType.DOUBLE,
-    '3': rdkit.rdchem.BondType.TRIPLE,
-    'ar': rdkit.rdchem.BondType.AROMATIC
+    "1": rdkit.rdchem.BondType.SINGLE,
+    "am": rdkit.rdchem.BondType.SINGLE,
+    "2": rdkit.rdchem.BondType.DOUBLE,
+    "3": rdkit.rdchem.BondType.TRIPLE,
+    "ar": rdkit.rdchem.BondType.AROMATIC,
 }
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
-    1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C',
-    7: 'N', 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg',
-    13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl',
-    18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti',
-    23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co',
-    28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge',
-    33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
-    38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo',
-    43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag',
-    48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te',
-    53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La',
-    58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm',
-    63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
-    68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf',
-    73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir',
-    78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb',
-    83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr',
-    88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U',
-    93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
-    98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No',
-    103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh',
-    108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn',
-    113: 'Uut', 114: 'Fl', 115: 'Uup', 116: 'Lv',
-    117: 'Uus', 118: 'Uuo'
+    1: "H",
+    2: "He",
+    3: "Li",
+    4: "Be",
+    5: "B",
+    6: "C",
+    7: "N",
+    8: "O",
+    9: "F",
+    10: "Ne",
+    11: "Na",
+    12: "Mg",
+    13: "Al",
+    14: "Si",
+    15: "P",
+    16: "S",
+    17: "Cl",
+    18: "Ar",
+    19: "K",
+    20: "Ca",
+    21: "Sc",
+    22: "Ti",
+    23: "V",
+    24: "Cr",
+    25: "Mn",
+    26: "Fe",
+    27: "Co",
+    28: "Ni",
+    29: "Cu",
+    30: "Zn",
+    31: "Ga",
+    32: "Ge",
+    33: "As",
+    34: "Se",
+    35: "Br",
+    36: "Kr",
+    37: "Rb",
+    38: "Sr",
+    39: "Y",
+    40: "Zr",
+    41: "Nb",
+    42: "Mo",
+    43: "Tc",
+    44: "Ru",
+    45: "Rh",
+    46: "Pd",
+    47: "Ag",
+    48: "Cd",
+    49: "In",
+    50: "Sn",
+    51: "Sb",
+    52: "Te",
+    53: "I",
+    54: "Xe",
+    55: "Cs",
+    56: "Ba",
+    57: "La",
+    58: "Ce",
+    59: "Pr",
+    60: "Nd",
+    61: "Pm",
+    62: "Sm",
+    63: "Eu",
+    64: "Gd",
+    65: "Tb",
+    66: "Dy",
+    67: "Ho",
+    68: "Er",
+    69: "Tm",
+    70: "Yb",
+    71: "Lu",
+    72: "Hf",
+    73: "Ta",
+    74: "W",
+    75: "Re",
+    76: "Os",
+    77: "Ir",
+    78: "Pt",
+    79: "Au",
+    80: "Hg",
+    81: "Tl",
+    82: "Pb",
+    83: "Bi",
+    84: "Po",
+    85: "At",
+    86: "Rn",
+    87: "Fr",
+    88: "Ra",
+    89: "Ac",
+    90: "Th",
+    91: "Pa",
+    92: "U",
+    93: "Np",
+    94: "Pu",
+    95: "Am",
+    96: "Cm",
+    97: "Bk",
+    98: "Cf",
+    99: "Es",
+    100: "Fm",
+    101: "Md",
+    102: "No",
+    103: "Lr",
+    104: "Rf",
+    105: "Db",
+    106: "Sg",
+    107: "Bh",
+    108: "Hs",
+    109: "Mt",
+    110: "Ds",
+    111: "Rg",
+    112: "Cn",
+    113: "Uut",
+    114: "Fl",
+    115: "Uup",
+    116: "Lv",
+    117: "Uus",
+    118: "Uuo",
 }
 
 
-T = typing.TypeVar('T')
+T = typing.TypeVar("T")
 OneOrMany = typing.Union[T, typing.Iterable[T]]
 
 
@@ -164,18 +327,18 @@ def archive_output():
 
     """
 
-    if 'output' not in os.listdir():
+    if "output" not in os.listdir():
         return
 
     # Make the ``stk_ea_runs`` folder if it does not exist already.
-    if 'stk_ea_runs' not in os.listdir():
-        os.mkdir('stk_ea_runs')
+    if "stk_ea_runs" not in os.listdir():
+        os.mkdir("stk_ea_runs")
 
     # Find out with what number the ``output`` folder should be
     # labelled within ``stk_ea_runs``.
-    num = len(os.listdir('stk_ea_runs'))
-    new_dir = os.path.join('stk_ea_runs', str(num))
-    os.rename('output', new_dir)
+    num = len(os.listdir("stk_ea_runs"))
+    new_dir = os.path.join("stk_ea_runs", str(num))
+    os.rename("output", new_dir)
 
 
 def dedupe(iterable, key=None, seen=None):
@@ -279,7 +442,7 @@ def flatten(iterable, excluded_types=None):
         excluded_types = {str}
 
     for x in iterable:
-        if hasattr(x, '__iter__') and type(x) not in excluded_types:
+        if hasattr(x, "__iter__") and type(x) not in excluded_types:
             yield from flatten(x, excluded_types)
         else:
             yield x
@@ -373,39 +536,49 @@ def mol_from_mae_file(mae_path):
     mol = rdkit.EditableMol(rdkit.Mol())
     conf = rdkit.Conformer()
 
-    with open(mae_path, 'r') as mae:
-        content = re.split(r'[{}]', mae.read())
+    with open(mae_path, "r") as mae:
+        content = re.split(r"[{}]", mae.read())
 
-    prev_block = deque([''], maxlen=1)
+    prev_block = deque([""], maxlen=1)
     for block in content:
-        if 'm_atom[' in prev_block[0]:
+        if "m_atom[" in prev_block[0]:
             atom_block = block
-        if 'm_bond[' in prev_block[0]:
+        if "m_bond[" in prev_block[0]:
             bond_block = block
         prev_block.append(block)
 
-    labels, data_block, *_ = atom_block.split(':::')
-    labels = [label for label in labels.split('\n')
-              if not label.isspace() and label != '']
+    labels, data_block, *_ = atom_block.split(":::")
+    labels = [
+        label
+        for label in labels.split("\n")
+        if not label.isspace() and label != ""
+    ]
 
-    data_block = [a.split() for a in data_block.split('\n') if
-                  not a.isspace() and a != '']
+    data_block = [
+        a.split()
+        for a in data_block.split("\n")
+        if not a.isspace() and a != ""
+    ]
 
     for line in data_block:
         line = [word for word in line if word != '"']
         if len(labels) != len(line):
-            raise RuntimeError(('Number of labels does'
-                                ' not match number of columns'
-                                ' in .mae file.'))
+            raise RuntimeError(
+                (
+                    "Number of labels does"
+                    " not match number of columns"
+                    " in .mae file."
+                )
+            )
 
         for label, data in zip(labels, line):
-            if 'x_coord' in label:
+            if "x_coord" in label:
                 x = float(data)
-            if 'y_coord' in label:
+            if "y_coord" in label:
                 y = float(data)
-            if 'z_coord' in label:
+            if "z_coord" in label:
                 z = float(data)
-            if 'atomic_number' in label:
+            if "atomic_number" in label:
                 atom_num = int(data)
 
         atom_sym = periodic_table[atom_num]
@@ -413,24 +586,34 @@ def mol_from_mae_file(mae_path):
         atom_id = mol.AddAtom(rdkit.Atom(atom_sym))
         conf.SetAtomPosition(atom_id, atom_coord)
 
-    labels, data_block, *_ = bond_block.split(':::')
-    labels = [label for label in labels.split('\n')
-              if not label.isspace() and label != '']
-    data_block = [a.split() for a in data_block.split('\n')
-                  if not a.isspace() and a != '']
+    labels, data_block, *_ = bond_block.split(":::")
+    labels = [
+        label
+        for label in labels.split("\n")
+        if not label.isspace() and label != ""
+    ]
+    data_block = [
+        a.split()
+        for a in data_block.split("\n")
+        if not a.isspace() and a != ""
+    ]
 
     for line in data_block:
         if len(labels) != len(line):
-            raise RuntimeError(('Number of labels does'
-                                ' not match number of '
-                                'columns in .mae file.'))
+            raise RuntimeError(
+                (
+                    "Number of labels does"
+                    " not match number of "
+                    "columns in .mae file."
+                )
+            )
 
         for label, data in zip(labels, line):
-            if 'from' in label:
+            if "from" in label:
                 atom1 = int(data) - 1
-            if 'to' in label:
+            if "to" in label:
                 atom2 = int(data) - 1
-            if 'order' in label:
+            if "order" in label:
                 bond_order = str(int(data))
         mol.AddBond(atom1, atom2, bond_dict[bond_order])
 
@@ -486,7 +669,7 @@ def remake(mol):
         emol.AddBond(
             beginAtomIdx=bond.GetBeginAtomIdx(),
             endAtomIdx=bond.GetEndAtomIdx(),
-            order=bond.GetBondType()
+            order=bond.GetBondType(),
         )
 
     m = emol.GetMol()
@@ -500,17 +683,21 @@ def get_projection(start, target):
 
     """
 
-    return target * np.dot(
-        start,
-        target,
-    ) / np.dot(target, target)
+    return (
+        target
+        * np.dot(
+            start,
+            target,
+        )
+        / np.dot(target, target)
+    )
 
 
 def orthogonal_vector(vector):
-    ortho = np.array([0., 0., 0.])
+    ortho = np.array([0.0, 0.0, 0.0])
     for m, val in enumerate(vector):
         if not np.allclose(val, 0, atol=1e-8):
-            n = (m+1) % 3
+            n = (m + 1) % 3
             break
     ortho[n] = vector[m]
     ortho[m] = -vector[n]
@@ -555,20 +742,17 @@ def rotation_matrix(vector1, vector2):
     # Handle the case where the rotation is 180 degrees.
     if np.allclose(vector1, np.multiply(vector2, -1), atol=1e-8):
         return rotation_matrix_arbitrary_axis(
-            angle=np.pi,
-            axis=orthogonal_vector(vector1)
+            angle=np.pi, axis=orthogonal_vector(vector1)
         )
 
     v = np.cross(vector1, vector2)
-    vx = np.array([
-        [0, -v[2], v[1]],
-        [v[2], 0, -v[0]],
-        [-v[1], v[0], 0]
-    ])
+    vx = np.array(
+        [[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]]
+    )
     s = np.linalg.norm(v)
     c = np.dot(vector1, vector2)
     i = np.identity(3)
-    mult_factor = (1-c)/np.square(s)
+    mult_factor = (1 - c) / np.square(s)
 
     # Initialize as a scipy Rotation object, which normalizes the
     # matrix and allows for returns as quaternion or alternative
@@ -599,29 +783,27 @@ def rotation_matrix_arbitrary_axis(angle, axis):
 
     """
 
-    a = np.cos(angle/2)
-    b, c, d = axis * np.sin(angle/2)
+    a = np.cos(angle / 2)
+    b, c, d = axis * np.sin(angle / 2)
 
     e11 = np.square(a) + np.square(b) - np.square(c) - np.square(d)
-    e12 = 2*(b*c - a*d)
-    e13 = 2*(b*d + a*c)
+    e12 = 2 * (b * c - a * d)
+    e13 = 2 * (b * d + a * c)
 
-    e21 = 2*(b*c + a*d)
+    e21 = 2 * (b * c + a * d)
     e22 = np.square(a) + np.square(c) - np.square(b) - np.square(d)
-    e23 = 2*(c*d - a*b)
+    e23 = 2 * (c * d - a * b)
 
-    e31 = 2*(b*d - a*c)
-    e32 = 2*(c*d + a*b)
+    e31 = 2 * (b * d - a * c)
+    e32 = 2 * (c * d + a * b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
     # Initialize as a scipy Rotation object, which normalizes the
     # matrix and allows for returns as quaternion or alternative
     # type in the future.
-    return Rotation.from_matrix(np.array([
-        [e11, e12, e13],
-        [e21, e22, e23],
-        [e31, e32, e33]
-    ])).as_matrix()
+    return Rotation.from_matrix(
+        np.array([[e11, e12, e13], [e21, e22, e23], [e31, e32, e33]])
+    ).as_matrix()
 
 
 def dice_similarity(mol1, mol2, fp_radius=3):
@@ -652,14 +834,12 @@ def dice_similarity(mol1, mol2, fp_radius=3):
     fp1 = rdkit.GetMorganFingerprint(
         mol=rdkit_mol1,
         radius=fp_radius,
-
     )
     rdkit_mol2 = mol2.to_rdkit_mol()
     rdkit.SanitizeMol(rdkit_mol2)
     fp2 = rdkit.GetMorganFingerprint(
         mol=rdkit_mol2,
         radius=fp_radius,
-
     )
     return rdkit.DataStructs.DiceSimilarity(fp1, fp2)
 
@@ -683,10 +863,10 @@ def quaternion(u):
 
     a, b, c = u
     q = np.zeros(4, np.float64)
-    q[0] = np.sqrt(1. - a) * np.sin(2. * np.pi * b)
-    q[1] = np.sqrt(1. - a) * np.cos(2. * np.pi * b)
-    q[2] = np.sqrt(a) * np.sin(2. * np.pi * c)
-    q[3] = np.sqrt(a) * np.cos(2. * np.pi * c)
+    q[0] = np.sqrt(1.0 - a) * np.sin(2.0 * np.pi * b)
+    q[1] = np.sqrt(1.0 - a) * np.cos(2.0 * np.pi * b)
+    q[2] = np.sqrt(a) * np.sin(2.0 * np.pi * c)
+    q[3] = np.sqrt(a) * np.cos(2.0 * np.pi * c)
     return q
 
 
@@ -708,15 +888,15 @@ def translation_component(q):
 
     rot_epsilon = 1e-6
     q = np.copy(q)
-    if q[0] < 0.:
+    if q[0] < 0.0:
         q = -q
     if q[0] > 1.0:
         q /= np.sqrt(np.dot(q, q))
 
-    theta = 2. * np.arccos(q[0])
-    s = np.sqrt(1. - q[0] * q[0])
+    theta = 2.0 * np.arccos(q[0])
+    s = np.sqrt(1.0 - q[0] * q[0])
     if s < rot_epsilon:
-        p = 2. * q[1:4]
+        p = 2.0 * q[1:4]
     else:
         p = q[1:4] / s * theta
     return p
@@ -732,15 +912,15 @@ def tar_output():
 
     """
 
-    tname = os.path.join('output', 'output.tgz')
-    with tarfile.open(tname, 'w:gz') as tar:
-        tar.add('output')
+    tname = os.path.join("output", "output.tgz")
+    with tarfile.open(tname, "w:gz") as tar:
+        tar.add("output")
 
 
 def _printer(time_taken):
     m, s = divmod(time_taken, 60)
     h, m = divmod(m, 60)
-    print(f'\nTime taken was {int(h)} : {int(m)} : {int(s)}.\n\n')
+    print(f"\nTime taken was {int(h)} : {int(m)} : {int(s)}.\n\n")
 
 
 @contextmanager
@@ -822,16 +1002,16 @@ def vector_angle(vector1, vector2):
     """
 
     if np.all(np.equal(vector1, vector2)):
-        return 0.
+        return 0.0
 
     numerator = np.dot(vector1, vector2)
     denominator = np.linalg.norm(vector1) * np.linalg.norm(vector2)
     # This if statement prevents returns of NaN due to floating point
     # inaccuracy.
-    term = numerator/denominator
-    if term >= 1.:
+    term = numerator / denominator
+    if term >= 1.0:
         return 0.0
-    if term <= -1.:
+    if term <= -1.0:
         return np.pi
     return np.arccos(term)
 
@@ -840,7 +1020,7 @@ def get_acute_vector(reference, vector):
     if (
         # vector_angle is NaN if reference is [0, 0, 0].
         not np.allclose(reference, [0, 0, 0], atol=1e-5)
-        and vector_angle(vector, reference) > np.pi/2
+        and vector_angle(vector, reference) > np.pi / 2
     ):
         return vector * -1
     return vector

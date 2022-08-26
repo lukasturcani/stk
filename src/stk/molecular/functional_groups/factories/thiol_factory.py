@@ -100,7 +100,7 @@ class ThiolFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(2, ), placers=None):
+    def __init__(self, bonders=(1,), deleters=(2,), placers=None):
         """
         Initialize a :class:`.ThiolFactory` instance.
 
@@ -125,7 +125,7 @@ class ThiolFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[*][S][H]', molecule):
+        for atom_ids in _get_atom_ids("[*][S][H]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Thiol(
                 sulfur=atoms[1],

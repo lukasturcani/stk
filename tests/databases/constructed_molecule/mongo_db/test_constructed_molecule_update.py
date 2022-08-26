@@ -14,7 +14,7 @@ from .utilities import get_database_state
 def to_hashable_matrix(json):
     json = dict(json)
     return {
-        'm': tuple(tuple(row) for row in json.pop('m')),
+        "m": tuple(tuple(row) for row in json.pop("m")),
         **json,
     }
 
@@ -22,10 +22,10 @@ def to_hashable_matrix(json):
 def to_hashable_constructed_molecule(json):
     json = dict(json)
     return {
-        'BB': tuple(map(HashableDict, json.pop('BB'))),
-        'aI': tuple(tuple(v) for v in json.pop('aI')),
-        'bI': tuple(tuple(v) for v in json.pop('bI')),
-        'nBB': tuple(json.pop('nBB')),
+        "BB": tuple(map(HashableDict, json.pop("BB"))),
+        "aI": tuple(tuple(v) for v in json.pop("aI")),
+        "bI": tuple(tuple(v) for v in json.pop("bI")),
+        "nBB": tuple(json.pop("nBB")),
         **json,
     }
 
@@ -36,7 +36,7 @@ def test_update_1(mongo_client):
 
     """
 
-    database_name = '_test_update_1'
+    database_name = "_test_update_1"
     mongo_client.drop_database(database_name)
 
     database = stk.ConstructedMoleculeMongoDb(
@@ -48,7 +48,7 @@ def test_update_1(mongo_client):
     jsonizer = stk.ConstructedMoleculeJsonizer()
 
     molecule = stk.BuildingBlock(
-        smiles='BrCCBr',
+        smiles="BrCCBr",
         functional_groups=[stk.BromoFactory()],
     ).with_canonical_atom_ordering()
 
@@ -57,7 +57,7 @@ def test_update_1(mongo_client):
             # Use it as a building block twice, to make sure it is
             # not repeatedly added to the molecules database.
             building_blocks=(molecule, molecule),
-            repeating_unit='AB',
+            repeating_unit="AB",
             num_repeating_units=2,
         ),
     ).with_canonical_atom_ordering()
@@ -66,21 +66,25 @@ def test_update_1(mongo_client):
     database.put(polymer)
     assert_database_state(
         state1=get_database_state(database),
-        state2=DatabaseState({
-            DatabaseEntry(**json['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json['matrix'])): 1,
-            DatabaseEntry(**json['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json["molecule"]): 1,
+                DatabaseEntry(**to_hashable_matrix(json["matrix"])): 1,
+                DatabaseEntry(
+                    **json["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )
 
     polymer2 = polymer.with_position_matrix(
@@ -91,21 +95,27 @@ def test_update_1(mongo_client):
     database.put(polymer2)
     assert_database_state(
         state1=get_database_state(database),
-        state2=DatabaseState({
-            DatabaseEntry(**json['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json2['matrix'])): 1,
-            DatabaseEntry(**json['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json2["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )
 
 
@@ -119,13 +129,11 @@ def test_update_2(mongo_client):
 
     """
 
-    database_name = '_test_update_2'
+    database_name = "_test_update_2"
     mongo_client.drop_database(database_name)
 
     jsonizer1 = stk.ConstructedMoleculeJsonizer(
-        key_makers=(
-            stk.InchiKey(),
-        ),
+        key_makers=(stk.InchiKey(),),
     )
     database1 = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
@@ -136,9 +144,7 @@ def test_update_2(mongo_client):
     )
 
     jsonizer2 = stk.ConstructedMoleculeJsonizer(
-        key_makers=(
-            stk.Smiles(),
-        ),
+        key_makers=(stk.Smiles(),),
     )
     database2 = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
@@ -163,7 +169,7 @@ def test_update_2(mongo_client):
     )
 
     molecule = stk.BuildingBlock(
-        smiles='BrCCCBr',
+        smiles="BrCCCBr",
         functional_groups=[stk.BromoFactory()],
     ).with_canonical_atom_ordering()
 
@@ -172,7 +178,7 @@ def test_update_2(mongo_client):
             # Use it as a building block twice, to make sure it is
             # not repeatedly added to the molecules database.
             building_blocks=(molecule, molecule),
-            repeating_unit='AB',
+            repeating_unit="AB",
             num_repeating_units=2,
         ),
     ).with_canonical_atom_ordering()
@@ -181,21 +187,27 @@ def test_update_2(mongo_client):
     database1.put(polymer1)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(**json1['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json1['matrix'])): 1,
-            DatabaseEntry(**json1['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json1['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json1['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json1["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json1["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json1["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json1["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json1["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )
 
     # Should add another entry, as a different key maker is used.
@@ -207,34 +219,44 @@ def test_update_2(mongo_client):
     database2.put(polymer2)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(**json1['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json1['matrix'])): 1,
-            DatabaseEntry(**json1['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json1['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json1['constructedMolecule'],
-                )
-            ): 1,
-            DatabaseEntry(**json2['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json2['matrix'])): 1,
-            DatabaseEntry(**json2['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json2['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json2['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json1["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json1["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json1["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json1["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json1["constructedMolecule"],
+                    )
+                ): 1,
+                DatabaseEntry(**json2["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json2["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json2["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json2["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json2["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )
 
     # Should update both entries.
@@ -246,34 +268,44 @@ def test_update_2(mongo_client):
     database3.put(polymer3)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(**json3['molecule']): 2,
-            DatabaseEntry(**to_hashable_matrix(json3['matrix'])): 2,
-            DatabaseEntry(**json3['buildingBlocks'][0]['molecule']): 2,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json3['buildingBlocks'][0]['matrix'],
-                )
-            ): 2,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json3['constructedMolecule'],
-                )
-            ): 2,
-            DatabaseEntry(**json3['molecule']): 2,
-            DatabaseEntry(**to_hashable_matrix(json3['matrix'])): 2,
-            DatabaseEntry(**json3['buildingBlocks'][0]['molecule']): 2,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json3['buildingBlocks'][0]['matrix'],
-                )
-            ): 2,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json3['constructedMolecule'],
-                )
-            ): 2,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json3["molecule"]): 2,
+                DatabaseEntry(
+                    **to_hashable_matrix(json3["matrix"])
+                ): 2,
+                DatabaseEntry(
+                    **json3["buildingBlocks"][0]["molecule"]
+                ): 2,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json3["buildingBlocks"][0]["matrix"],
+                    )
+                ): 2,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json3["constructedMolecule"],
+                    )
+                ): 2,
+                DatabaseEntry(**json3["molecule"]): 2,
+                DatabaseEntry(
+                    **to_hashable_matrix(json3["matrix"])
+                ): 2,
+                DatabaseEntry(
+                    **json3["buildingBlocks"][0]["molecule"]
+                ): 2,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json3["buildingBlocks"][0]["matrix"],
+                    )
+                ): 2,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json3["constructedMolecule"],
+                    )
+                ): 2,
+            }
+        ),
     )
 
 
@@ -287,7 +319,7 @@ def test_update_3(mongo_client):
 
     """
 
-    database_name = '_test_update_3'
+    database_name = "_test_update_3"
     mongo_client.drop_database(database_name)
 
     jsonizer1 = stk.ConstructedMoleculeJsonizer(
@@ -305,9 +337,7 @@ def test_update_3(mongo_client):
     )
 
     jsonizer2 = stk.ConstructedMoleculeJsonizer(
-        key_makers=(
-            stk.InchiKey(),
-        ),
+        key_makers=(stk.InchiKey(),),
     )
     database2 = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
@@ -318,9 +348,7 @@ def test_update_3(mongo_client):
     )
 
     jsonizer3 = stk.ConstructedMoleculeJsonizer(
-        key_makers=(
-            stk.Smiles(),
-        ),
+        key_makers=(stk.Smiles(),),
     )
     database3 = stk.ConstructedMoleculeMongoDb(
         mongo_client=mongo_client,
@@ -331,7 +359,7 @@ def test_update_3(mongo_client):
     )
 
     molecule = stk.BuildingBlock(
-        smiles='BrCCCBr',
+        smiles="BrCCCBr",
         functional_groups=[stk.BromoFactory()],
     ).with_canonical_atom_ordering()
 
@@ -340,7 +368,7 @@ def test_update_3(mongo_client):
             # Use it as a building block twice, to make sure it is
             # not repeatedly added to the molecules database.
             building_blocks=(molecule, molecule),
-            repeating_unit='AB',
+            repeating_unit="AB",
             num_repeating_units=2,
         ),
     ).with_canonical_atom_ordering()
@@ -349,21 +377,27 @@ def test_update_3(mongo_client):
     database1.put(polymer1)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(**json1['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json1['matrix'])): 1,
-            DatabaseEntry(**json1['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json1['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json1['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json1["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json1["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json1["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json1["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json1["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )
 
     # Should update the entry.
@@ -371,27 +405,33 @@ def test_update_3(mongo_client):
         position_matrix=np.zeros((polymer1.get_num_atoms(), 3)),
     )
     json2 = jsonizer2.to_json(polymer2)
-    json2['matrix'] = dict(json1['matrix'])
-    json2['matrix']['m'] = jsonizer2.to_json(polymer2)['matrix']['m']
+    json2["matrix"] = dict(json1["matrix"])
+    json2["matrix"]["m"] = jsonizer2.to_json(polymer2)["matrix"]["m"]
 
     database2.put(polymer2)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(**json1['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json2['matrix'])): 1,
-            DatabaseEntry(**json1['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json1['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json1['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json1["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json2["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json1["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json1["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json1["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )
 
     # Should also update the entry.
@@ -399,25 +439,31 @@ def test_update_3(mongo_client):
         position_matrix=np.zeros((polymer1.get_num_atoms(), 3)),
     )
     json3 = jsonizer3.to_json(polymer3)
-    json3['matrix'] = dict(json1['matrix'])
-    json3['matrix']['m'] = jsonizer3.to_json(polymer3)['matrix']['m']
+    json3["matrix"] = dict(json1["matrix"])
+    json3["matrix"]["m"] = jsonizer3.to_json(polymer3)["matrix"]["m"]
 
     database3.put(polymer3)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(**json1['molecule']): 1,
-            DatabaseEntry(**to_hashable_matrix(json3['matrix'])): 1,
-            DatabaseEntry(**json1['buildingBlocks'][0]['molecule']): 1,
-            DatabaseEntry(
-                **to_hashable_matrix(
-                    json=json1['buildingBlocks'][0]['matrix'],
-                )
-            ): 1,
-            DatabaseEntry(
-                **to_hashable_constructed_molecule(
-                    json=json1['constructedMolecule'],
-                )
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(**json1["molecule"]): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(json3["matrix"])
+                ): 1,
+                DatabaseEntry(
+                    **json1["buildingBlocks"][0]["molecule"]
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_matrix(
+                        json=json1["buildingBlocks"][0]["matrix"],
+                    )
+                ): 1,
+                DatabaseEntry(
+                    **to_hashable_constructed_molecule(
+                        json=json1["constructedMolecule"],
+                    )
+                ): 1,
+            }
+        ),
     )

@@ -11,16 +11,18 @@ def normalize_ids(molecule, ids):
     if ids is None:
         return range(molecule.get_num_atoms())
     elif isinstance(ids, int):
-        return (ids, )
+        return (ids,)
     else:
         return ids
 
 
 def has_same_structure(molecule1, molecule2):
-    assert np.all(np.equal(
-        molecule1.get_position_matrix(),
-        molecule2.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            molecule1.get_position_matrix(),
+            molecule2.get_position_matrix(),
+        )
+    )
 
 
 def get_displacement_vector(molecule, start_atom, end_atom):
@@ -29,8 +31,8 @@ def get_displacement_vector(molecule, start_atom, end_atom):
 
     """
 
-    position1, position2 = (
-        molecule.get_atomic_positions((start_atom, end_atom))
+    position1, position2 = molecule.get_atomic_positions(
+        (start_atom, end_atom)
     )
     return position2 - position1
 

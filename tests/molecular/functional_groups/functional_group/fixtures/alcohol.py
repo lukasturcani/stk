@@ -12,8 +12,8 @@ def alcohol(get_atom_ids):
 
 
 def _alcohol(oxygen, hydrogen, atom):
-    bonders = (oxygen, )
-    deleters = (hydrogen, )
+    bonders = (oxygen,)
+    deleters = (hydrogen,)
     return GenericCaseData(
         functional_group=stk.Alcohol(
             oxygen=oxygen,

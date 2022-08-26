@@ -170,8 +170,8 @@ class Thioacid(GenericFunctionalGroup):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self._carbon}, {self._oxygen}, {self._sulfur}, '
-            f'{self._hydrogen}, {self._atom}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._carbon}, {self._oxygen}, {self._sulfur}, "
+            f"{self._hydrogen}, {self._atom}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

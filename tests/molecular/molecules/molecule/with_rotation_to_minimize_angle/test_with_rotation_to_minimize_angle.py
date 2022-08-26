@@ -51,7 +51,7 @@ def _test_with_rotation_to_minimize_angle(molecule):
         start=start,
         target=target,
         axis=stk.normalize_vector(np.cross(start, target)),
-        origin=next(molecule.get_atomic_positions((0, ))),
+        origin=next(molecule.get_atomic_positions((0,))),
     )
     is_clone(new, molecule)
 

@@ -50,7 +50,9 @@ def _test_with_canonical_atom_ordering(molecule, result):
     old_position_matrix = molecule.get_position_matrix()
     new_position_matrix = ordered.get_position_matrix()
     for old_id, new_id in enumerate(order):
-        assert np.all(np.equal(
-            old_position_matrix[old_id],
-            new_position_matrix[new_id],
-        ))
+        assert np.all(
+            np.equal(
+                old_position_matrix[old_id],
+                new_position_matrix[new_id],
+            )
+        )

@@ -7,9 +7,9 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('linear'),
-        lazy_fixture('nonlinear'),
-        lazy_fixture('unaligning'),
+        lazy_fixture("linear"),
+        lazy_fixture("nonlinear"),
+        lazy_fixture("unaligning"),
     ),
 )
 def case_data(request):

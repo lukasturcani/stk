@@ -102,7 +102,7 @@ class BoronicAcidFactory(FunctionalGroupFactory):
 
     def __init__(
         self,
-        bonders=(1, ),
+        bonders=(1,),
         deleters=(2, 3, 4, 5),
         placers=None,
     ):
@@ -130,7 +130,7 @@ class BoronicAcidFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        ids = _get_atom_ids('[*][B]([O][H])[O][H]', molecule)
+        ids = _get_atom_ids("[*][B]([O][H])[O][H]", molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield BoronicAcid(

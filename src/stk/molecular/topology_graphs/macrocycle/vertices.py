@@ -77,12 +77,10 @@ class CycleVertex(Vertex):
         edges: tuple[Edge, ...],
     ) -> np.ndarray:
 
-        assert (
-            building_block.get_num_functional_groups() == 2
-        ), (
-            f'{building_block} needs to have exactly 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 2, (
+            f"{building_block} needs to have exactly 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         building_block = building_block.with_centroid(
             position=self._position,
@@ -95,15 +93,19 @@ class CycleVertex(Vertex):
         fg1_position = building_block.get_centroid(
             atom_ids=fg1.get_placer_ids(),
         )
-        return building_block.with_rotation_between_vectors(
-            start=fg1_position - fg0_position,
-            target=np.array([-1 if self._flip else 1, 0, 0]),
-            origin=self._position,
-        ).with_rotation_about_axis(
-            angle=self._angle-(np.pi/2),
-            axis=np.array([0, 0, 1]),
-            origin=self._position,
-        ).get_position_matrix()
+        return (
+            building_block.with_rotation_between_vectors(
+                start=fg1_position - fg0_position,
+                target=np.array([-1 if self._flip else 1, 0, 0]),
+                origin=self._position,
+            )
+            .with_rotation_about_axis(
+                angle=self._angle - (np.pi / 2),
+                axis=np.array([0, 0, 1]),
+                origin=self._position,
+            )
+            .get_position_matrix()
+        )
 
     def map_functional_groups_to_edges(
         self,
@@ -132,8 +134,8 @@ class CycleVertex(Vertex):
 
     def __str__(self) -> str:
         return (
-            f'Vertex(id={self._id}, '
-            f'position={tuple(self._position.tolist())}, '
-            f'flip={self._flip}, '
-            f'angle={self._angle})'
+            f"Vertex(id={self._id}, "
+            f"position={tuple(self._position.tolist())}, "
+            f"flip={self._flip}, "
+            f"angle={self._angle})"
         )

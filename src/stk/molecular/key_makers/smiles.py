@@ -49,7 +49,7 @@ class Smiles(MoleculeKeyMaker):
         pass
 
     def get_key_name(self) -> str:
-        return 'SMILES'
+        return "SMILES"
 
     def get_key(self, molecule: Molecule) -> str:
         return get_smiles(molecule)
@@ -58,4 +58,4 @@ class Smiles(MoleculeKeyMaker):
         return repr(self)
 
     def __repr__(self) -> str:
-        return 'Smiles()'
+        return "Smiles()"

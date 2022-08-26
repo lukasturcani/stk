@@ -32,7 +32,7 @@ from ...bonds import Bond
 from ..utilities import get_bond_atom_ids, sort_bond_atoms_by_id
 from .utilities import updaters, writers
 
-_T = typing.TypeVar('_T', bound='Molecule')
+_T = typing.TypeVar("_T", bound="Molecule")
 
 
 class Molecule:
@@ -319,8 +319,8 @@ class Molecule:
             return self
         if np.allclose(target, [0, 0, 0], atol=1e-15):
             raise ValueError(
-                'target has a magnitude of 0. It is therefore not '
-                'possible to calculate an angle.'
+                "target has a magnitude of 0. It is therefore not "
+                "possible to calculate an angle."
             )
 
         self._with_displacement(-origin)
@@ -329,14 +329,14 @@ class Molecule:
         # the axis. This puts them both on the same plane.
         # 2. Calculate the angle between them.
         # 3. Apply the rotation.
-        tstart = start - np.dot(start, axis)*axis
+        tstart = start - np.dot(start, axis) * axis
 
         # If `tstart` is 0, it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], 1e-8):
             self._with_displacement(origin)
             return self
 
-        tend = target - np.dot(target, axis)*axis
+        tend = target - np.dot(target, axis) * axis
         # If `tend` is 0, it is parallel to the rotation axis, stop.
         if np.allclose(tend, [0, 0, 0], 1e-8):
             self._with_displacement(origin)
@@ -346,7 +346,7 @@ class Molecule:
 
         projection = tstart @ np.cross(axis, tend)
         if projection > 0:
-            angle = 2*np.pi - angle
+            angle = 2 * np.pi - angle
 
         rotation_matrix = rotation_matrix_arbitrary_axis(angle, axis)
         self._position_matrix = rotation_matrix @ self._position_matrix
@@ -450,7 +450,7 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
@@ -481,7 +481,7 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
 
         for atom_id in atom_ids:
             yield self._atoms[atom_id]
@@ -552,16 +552,16 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
-            raise ValueError('atom_ids was of length 0.')
+            raise ValueError("atom_ids was of length 0.")
 
         return np.divide(
             self._position_matrix[:, atom_ids].sum(axis=1),
-            len(atom_ids)
+            len(atom_ids),
         )
 
     def get_direction(
@@ -593,12 +593,12 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
-            raise ValueError('atom_ids was of length 0.')
+            raise ValueError("atom_ids was of length 0.")
 
         pos = self._position_matrix[:, atom_ids].T
         return np.around(
@@ -638,12 +638,12 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
-            raise ValueError('atom_ids was of length 0.')
+            raise ValueError("atom_ids was of length 0.")
 
         coords = self._position_matrix[:, atom_ids]
         return float(euclidean(coords.min(axis=1), coords.max(axis=1)))
@@ -677,12 +677,12 @@ class Molecule:
         if atom_ids is None:
             atom_ids = range(len(self._atoms))
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
         elif not isinstance(atom_ids, (list, tuple)):
             atom_ids = list(atom_ids)
 
         if len(atom_ids) == 0:
-            raise ValueError('atom_ids was of length 0.')
+            raise ValueError("atom_ids was of length 0.")
 
         pos = self._position_matrix[:, atom_ids].T
         centroid = self.get_centroid(atom_ids)
@@ -708,7 +708,7 @@ class Molecule:
     ) -> _T:
 
         centroid = self.get_centroid(atom_ids=atom_ids)
-        self._with_displacement(position-centroid)
+        self._with_displacement(position - centroid)
         return self
 
     def with_centroid(
@@ -792,7 +792,8 @@ class Molecule:
                 beginAtomIdx=bond.get_atom1().get_id(),
                 endAtomIdx=bond.get_atom2().get_id(),
                 order=(
-                    rdkit.BondType.DATIVE if bond.get_order() == 9
+                    rdkit.BondType.DATIVE
+                    if bond.get_order() == 9
                     else rdkit.BondType(bond.get_order())
                 ),
             )
@@ -841,12 +842,12 @@ class Molecule:
             _, extension = os.path.splitext(path)
 
         return {
-            '.mol': updaters._with_structure_from_mol,
-            '.sdf': updaters._with_structure_from_mol,
-            '.mae': updaters._with_structure_from_mae,
-            '.xyz': updaters._with_structure_from_xyz,
-            '.coord': updaters._with_structure_from_turbomole,
-            '.pdb': updaters._with_structure_from_pdb,
+            ".mol": updaters._with_structure_from_mol,
+            ".sdf": updaters._with_structure_from_mol,
+            ".mae": updaters._with_structure_from_mae,
+            ".xyz": updaters._with_structure_from_xyz,
+            ".coord": updaters._with_structure_from_turbomole,
+            ".pdb": updaters._with_structure_from_pdb,
         }[extension](self.clone(), path)
 
     def with_canonical_atom_ordering(self) -> Molecule:
@@ -874,24 +875,29 @@ class Molecule:
                 self._atoms,
             )
         }
-        self._atoms = tuple(sorted(
-            atom_map.values(),
-            key=lambda atom: atom.get_id()
-        ))
-        self._bonds = tuple(sorted(
-            (
-                sort_bond_atoms_by_id(bond.with_atoms(atom_map))
-                for bond in self._bonds
-            ),
-            key=get_bond_atom_ids,
-        ))
+        self._atoms = tuple(
+            sorted(atom_map.values(), key=lambda atom: atom.get_id())
+        )
+        self._bonds = tuple(
+            sorted(
+                (
+                    sort_bond_atoms_by_id(bond.with_atoms(atom_map))
+                    for bond in self._bonds
+                ),
+                key=get_bond_atom_ids,
+            )
+        )
         old_ids = {
             atom.get_id(): old_id for old_id, atom in atom_map.items()
         }
-        self._position_matrix = np.array(np.array([
-            self._position_matrix.T[old_ids[new_id]]
-            for new_id in range(len(self._atoms))
-        ]).T)
+        self._position_matrix = np.array(
+            np.array(
+                [
+                    self._position_matrix.T[old_ids[new_id]]
+                    for new_id in range(len(self._atoms))
+                ]
+            ).T
+        )
         return self
 
     def get_canonical_atom_ids(self) -> dict[int, int]:
@@ -947,10 +953,10 @@ class Molecule:
 
         _, extension = os.path.splitext(path)
         {
-            '.mol': writers._write_mdl_mol_file,
-            '.sdf': writers._write_mdl_mol_file,
-            '.xyz': writers._write_xyz_file,
-            '.pdb': writers._write_pdb_file,
+            ".mol": writers._write_mdl_mol_file,
+            ".sdf": writers._write_mdl_mol_file,
+            ".xyz": writers._write_xyz_file,
+            ".pdb": writers._write_pdb_file,
         }[extension](self, path, atom_ids)
         return self
 
@@ -958,4 +964,4 @@ class Molecule:
         return repr(self)
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__} at {id(self)}>'
+        return f"<{self.__class__.__name__} at {id(self)}>"

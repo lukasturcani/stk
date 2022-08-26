@@ -44,7 +44,6 @@ def _test_get_bond_infos(constructed_molecule, num_new_bonds):
         constructed_molecule.get_bond_infos(),
     )
     assert sum(1 for _ in new_bonds) == num_new_bonds
-    assert (
-        constructed_molecule.get_num_bonds()
-        == sum(1 for _ in constructed_molecule.get_bond_infos())
+    assert constructed_molecule.get_num_bonds() == sum(
+        1 for _ in constructed_molecule.get_bond_infos()
     )

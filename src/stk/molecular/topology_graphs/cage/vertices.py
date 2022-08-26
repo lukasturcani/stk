@@ -149,20 +149,18 @@ class _CageVertex(Vertex):
 
     def __str__(self):
         return (
-            f'Vertex(id={self._id}, '
-            f'position={self._position.tolist()}, '
-            f'aligner_edge={self._aligner_edge})'
+            f"Vertex(id={self._id}, "
+            f"position={self._position.tolist()}, "
+            f"aligner_edge={self._aligner_edge})"
         )
 
 
 class LinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
-        assert (
-            building_block.get_num_functional_groups() == 2
-        ), (
-            f'{building_block} needs to have exactly 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 2, (
+            f"{building_block} needs to have exactly 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         building_block = building_block.with_centroid(
             position=self._position,
@@ -174,9 +172,9 @@ class LinearVertex(_CageVertex):
             ).get_placer_ids(),
         )
         edge_position = edges[self._aligner_edge].get_position()
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         building_block = building_block.with_rotation_between_vectors(
             start=fg_centroid - self._position,
             target=edge_position - edge_centroid,
@@ -195,7 +193,7 @@ class LinearVertex(_CageVertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
 
         def fg_distance(edge):
@@ -209,26 +207,24 @@ class LinearVertex(_CageVertex):
 
 class NonLinearVertex(_CageVertex):
     def place_building_block(self, building_block, edges):
-        assert (
-            building_block.get_num_functional_groups() > 2
-        ), (
-            f'{building_block} needs to have more than 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() > 2, (
+            f"{building_block} needs to have more than 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         edge_normal = get_acute_vector(
             reference=edge_centroid,
             vector=get_plane_normal(
-                points=np.array([
-                    edge.get_position() for edge in edges
-                ]),
+                points=np.array(
+                    [edge.get_position() for edge in edges]
+                ),
             ),
         )
         core_centroid = building_block.get_centroid(
@@ -307,24 +303,20 @@ class UnaligningVertex(_CageVertex):
     def init_at_center(cls, id, vertices):
         vertex = cls.__new__(cls)
         vertex._id = id
-        vertex._position = (
-            sum(vertex.get_position() for vertex in vertices)
-            / len(vertices)
-        )
+        vertex._position = sum(
+            vertex.get_position() for vertex in vertices
+        ) / len(vertices)
         vertex._use_neighbor_placement = True
         vertex._aligner_edge = 0
         return vertex
 
 
 class AngledVertex(_CageVertex):
-
     def place_building_block(self, building_block, edges):
-        assert (
-            building_block.get_num_functional_groups() == 2
-        ), (
-            f'{building_block} needs to have exactly 2 functional '
-            'groups but has '
-            f'{building_block.get_num_functional_groups()}.'
+        assert building_block.get_num_functional_groups() == 2, (
+            f"{building_block} needs to have exactly 2 functional "
+            "groups but has "
+            f"{building_block.get_num_functional_groups()}."
         )
         building_block = building_block.with_centroid(
             position=self._position,
@@ -337,9 +329,9 @@ class AngledVertex(_CageVertex):
             ).get_placer_ids(),
         )
         edge_position = edges[self._aligner_edge].get_position()
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
         building_block = building_block.with_rotation_between_vectors(
             start=fg_centroid - self._position,
             target=edge_position - edge_centroid,
@@ -353,9 +345,9 @@ class AngledVertex(_CageVertex):
             atom_ids=building_block.get_core_atom_ids(),
         )
         core_to_placer = placer_centroid - core_centroid
-        edge_centroid = (
-            sum(edge.get_position() for edge in edges) / len(edges)
-        )
+        edge_centroid = sum(
+            edge.get_position() for edge in edges
+        ) / len(edges)
 
         return building_block.with_rotation_between_vectors(
             start=core_to_placer,
@@ -364,7 +356,7 @@ class AngledVertex(_CageVertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-        fg, = building_block.get_functional_groups(0)
+        (fg,) = building_block.get_functional_groups(0)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
 
         def fg_distance(edge):

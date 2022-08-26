@@ -24,7 +24,7 @@ def test_with_displacement(molecule, displacement):
     new = molecule.with_displacement(displacement)
     is_clone(new, molecule)
     assert np.allclose(
-        a=molecule.get_position_matrix()+displacement,
+        a=molecule.get_position_matrix() + displacement,
         b=new.get_position_matrix(),
         atol=1e-32,
     )

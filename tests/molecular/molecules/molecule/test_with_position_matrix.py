@@ -27,10 +27,12 @@ def test_with_position_matrix(molecule, get_position_matrix):
     # immutable.
     position_matrix = molecule.get_position_matrix()
     _test_with_position_matrix(molecule, get_position_matrix)
-    assert np.all(np.equal(
-        position_matrix,
-        molecule.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            position_matrix,
+            molecule.get_position_matrix(),
+        )
+    )
 
 
 def _test_with_position_matrix(molecule, get_position_matrix):
@@ -55,7 +57,9 @@ def _test_with_position_matrix(molecule, get_position_matrix):
     position_matrix = get_position_matrix(molecule)
     new = molecule.with_position_matrix(position_matrix)
     is_clone(new, molecule)
-    assert np.all(np.equal(
-        position_matrix,
-        new.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            position_matrix,
+            new.get_position_matrix(),
+        )
+    )

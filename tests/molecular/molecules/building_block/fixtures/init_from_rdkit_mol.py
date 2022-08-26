@@ -7,13 +7,13 @@ from ..case_data import CaseData
 
 
 def _get_rdkit_molecule() -> rdkit.Mol:
-    molecule = rdkit.MolFromSmiles('Br[C+2][C+2]Br')
+    molecule = rdkit.MolFromSmiles("Br[C+2][C+2]Br")
     rdkit.EmbedMolecule(molecule, rdkit.ETKDGv2())
     return molecule
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: CaseData(
             building_block=stk.BuildingBlock.init_from_rdkit_mol(
@@ -32,14 +32,14 @@ def _get_rdkit_molecule() -> rdkit.Mol:
                 stk.Bromo(
                     bromine=stk.Br(0),
                     atom=stk.C(1, 2),
-                    bonders=(stk.C(1, 2), ),
-                    deleters=(stk.Br(0), ),
+                    bonders=(stk.C(1, 2),),
+                    deleters=(stk.Br(0),),
                 ),
                 stk.Bromo(
                     bromine=stk.Br(3),
                     atom=stk.C(2, 2),
-                    bonders=(stk.C(2, 2), ),
-                    deleters=(stk.Br(3), ),
+                    bonders=(stk.C(2, 2),),
+                    deleters=(stk.Br(3),),
                 ),
             ),
             core_atom_ids=(1, 2),
@@ -64,14 +64,14 @@ def _get_rdkit_molecule() -> rdkit.Mol:
                 stk.Bromo(
                     bromine=stk.Br(0),
                     atom=stk.C(1, 2),
-                    bonders=(stk.C(1, 2), ),
-                    deleters=(stk.Br(0), ),
+                    bonders=(stk.C(1, 2),),
+                    deleters=(stk.Br(0),),
                 ),
                 stk.Bromo(
                     bromine=stk.Br(3),
                     atom=stk.C(2, 2),
-                    bonders=(stk.C(2, 2), ),
-                    deleters=(stk.Br(3), ),
+                    bonders=(stk.C(2, 2),),
+                    deleters=(stk.Br(3),),
                 ),
             ),
             core_atom_ids=(1, 2),

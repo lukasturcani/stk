@@ -13,7 +13,7 @@ import numpy as np
 from ...molecules import BuildingBlock
 from .edge import Edge
 
-_VertexT = typing.TypeVar('_VertexT', bound='Vertex')
+_VertexT = typing.TypeVar("_VertexT", bound="Vertex")
 
 
 class Vertex:
@@ -231,7 +231,7 @@ class Vertex:
 
     def __str__(self) -> str:
         position = self._position.tolist()
-        return f'Vertex(id={self._id}, position={position})'
+        return f"Vertex(id={self._id}, position={position})"
 
     def __repr__(self) -> str:
         return str(self)

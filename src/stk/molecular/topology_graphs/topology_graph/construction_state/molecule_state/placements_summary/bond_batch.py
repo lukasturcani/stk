@@ -18,7 +18,7 @@ class _BondBatch:
 
     """
 
-    __slots__ = ['_bonds', '_bond_infos']
+    __slots__ = ["_bonds", "_bond_infos"]
 
     _bonds: list[Bond]
     _bond_infos: list[BondInfo]

@@ -80,7 +80,7 @@ def linear_aligner_edge(request):
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='BrCCNCBr',
+            smiles="BrCCNCBr",
             functional_groups=[stk.BromoFactory()],
         ),
     ),
@@ -90,9 +90,7 @@ def building_block_2(request) -> stk.BuildingBlock:
 
 
 @pytest.fixture(
-    params=(
-        [1, 2, -20],
-    ),
+    params=([1, 2, -20],),
 )
 def position(request):
     """

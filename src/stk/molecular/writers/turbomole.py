@@ -74,7 +74,7 @@ class TurbomoleWriter:
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
-            atom_ids = (atom_ids, )
+            atom_ids = (atom_ids,)
 
         content = []
         if periodic_info is not None:
@@ -86,24 +86,24 @@ class TurbomoleWriter:
             beta = periodic_info.get_beta()
             gamma = periodic_info.get_gamma()
             content.append(
-                '$periodic 3\n'
-                '$cell angs\n'
-                f' {a:>8.3f} {b:>8.3f} {c:>8.3f} '
-                f'{alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f}\n'
+                "$periodic 3\n"
+                "$cell angs\n"
+                f" {a:>8.3f} {b:>8.3f} {c:>8.3f} "
+                f"{alpha:>6.2f} {beta:>6.2f} {gamma:>6.2f}\n"
             )
 
         coords = molecule.get_position_matrix()
-        content.append('$coord angs\n')
+        content.append("$coord angs\n")
         for atom_id in atom_ids:
-            atom, = molecule.get_atoms(atom_ids=atom_id)
+            (atom,) = molecule.get_atoms(atom_ids=atom_id)
             element = atom.__class__.__name__
             x, y, z = (i for i in coords[atom_id])
             content.append(
-                f' {round(x, 4)} {round(y, 4)} {round(z, 4)} '
-                f'{element}\n'
+                f" {round(x, 4)} {round(y, 4)} {round(z, 4)} "
+                f"{element}\n"
             )
 
-        content.append('$end\n')
+        content.append("$end\n")
 
         return content
 
@@ -141,7 +141,7 @@ class TurbomoleWriter:
             periodic_info=periodic_info,
         )
 
-        return ''.join(content)
+        return "".join(content)
 
     def write(
         self,
@@ -181,5 +181,5 @@ class TurbomoleWriter:
             periodic_info=periodic_info,
         )
 
-        with open(path, 'w') as f:
-            f.write(''.join(content))
+        with open(path, "w") as f:
+            f.write("".join(content))

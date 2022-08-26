@@ -38,10 +38,12 @@ def test_with_structure_from_file(
         get_position_matrix=get_position_matrix,
         path=path,
     )
-    assert np.all(np.equal(
-        position_matrix,
-        molecule.get_position_matrix(),
-    ))
+    assert np.all(
+        np.equal(
+            position_matrix,
+            molecule.get_position_matrix(),
+        )
+    )
 
 
 def _test_with_structure_from_file(

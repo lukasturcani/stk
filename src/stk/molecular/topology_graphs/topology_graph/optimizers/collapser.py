@@ -90,7 +90,8 @@ class Collapser(Optimizer):
                 mch.Atom(
                     id=atom.get_id(),
                     element_string=atom.__class__.__name__,
-                ) for atom in state.get_atoms()
+                )
+                for atom in state.get_atoms()
             ),
             bonds=get_mch_bonds(state),
             position_matrix=state.get_position_matrix(),

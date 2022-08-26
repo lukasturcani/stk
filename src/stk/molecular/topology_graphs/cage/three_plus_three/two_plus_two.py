@@ -103,21 +103,19 @@ class TwoPlusTwo(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        NonLinearVertex(0, [_x, 0, -_x/np.sqrt(2)], False),
-        NonLinearVertex(1, [-_x, 0, -_x/np.sqrt(2)], False),
-        NonLinearVertex(2, [0, _x, _x/np.sqrt(2)], False),
-        NonLinearVertex(3, [0, -_x, _x/np.sqrt(2)], False)
+        NonLinearVertex(0, [_x, 0, -_x / np.sqrt(2)], False),
+        NonLinearVertex(1, [-_x, 0, -_x / np.sqrt(2)], False),
+        NonLinearVertex(2, [0, _x, _x / np.sqrt(2)], False),
+        NonLinearVertex(3, [0, -_x, _x / np.sqrt(2)], False),
     )
 
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[0], _vertex_prototypes[1]),
         Edge(1, _vertex_prototypes[0], _vertex_prototypes[2]),
         Edge(2, _vertex_prototypes[0], _vertex_prototypes[3]),
-
         Edge(3, _vertex_prototypes[1], _vertex_prototypes[2]),
         Edge(4, _vertex_prototypes[1], _vertex_prototypes[3]),
-
-        Edge(5, _vertex_prototypes[2], _vertex_prototypes[3])
+        Edge(5, _vertex_prototypes[2], _vertex_prototypes[3]),
     )
 
     _num_windows = 4

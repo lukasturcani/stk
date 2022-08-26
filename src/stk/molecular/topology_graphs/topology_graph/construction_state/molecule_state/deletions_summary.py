@@ -17,19 +17,18 @@ class _DeletionsSummary:
     """
 
     __slots__ = [
-        '_atoms',
-        '_atom_infos',
-        '_bonds',
-        '_bond_infos',
-        '_position_matrix',
-        '_deleted_atom_ids',
-        '_deleted_bond_ids',
-
-        '_valid_atoms',
-        '_valid_atom_infos',
-        '_valid_bonds',
-        '_valid_bond_infos',
-        '_valid_positions',
+        "_atoms",
+        "_atom_infos",
+        "_bonds",
+        "_bond_infos",
+        "_position_matrix",
+        "_deleted_atom_ids",
+        "_deleted_bond_ids",
+        "_valid_atoms",
+        "_valid_atom_infos",
+        "_valid_bonds",
+        "_valid_bond_infos",
+        "_valid_positions",
     ]
 
     def __init__(

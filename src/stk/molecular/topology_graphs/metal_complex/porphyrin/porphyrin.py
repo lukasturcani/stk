@@ -86,8 +86,8 @@ class Porphyrin(MetalComplex):
 
     """
 
-    _metal_vertex_prototypes = (MetalVertex(0, (0, 0, 0)), )
-    _ligand_vertex_prototypes = (UnaligningVertex(1, (0, 0, 0)), )
+    _metal_vertex_prototypes = (MetalVertex(0, (0, 0, 0)),)
+    _ligand_vertex_prototypes = (UnaligningVertex(1, (0, 0, 0)),)
 
     _edge_prototypes = (
         Edge(

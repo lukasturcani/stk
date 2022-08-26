@@ -6,9 +6,7 @@ from .nrotaxane import *  # noqa
 
 
 @pytest.fixture(
-    params=(
-        lazy_fixture('rotaxane_nrotaxane'),
-    ),
+    params=(lazy_fixture("rotaxane_nrotaxane"),),
 )
 def rotaxane(request):
     return request.param

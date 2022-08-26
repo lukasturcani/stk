@@ -114,49 +114,35 @@ class FourPlusEight(Cage):
     _vertex_prototypes = (
         NonLinearVertex(0, [-1, -1, 0], False),
         NonLinearVertex(1, [-1, 1, 0], False),
-
         NonLinearVertex(2, [1, -1, 0], False),
         NonLinearVertex(3, [1, 1, 0], False),
-
         LinearVertex(4, [-2, 0, 1], False),
         LinearVertex(5, [-2, 0, -1], False),
-
         LinearVertex(6, [0, 2, 1], False),
         LinearVertex(7, [0, 2, -1], False),
-
         LinearVertex(8, [0, -2, 1], False),
         LinearVertex(9, [0, -2, -1], False),
-
         LinearVertex(10, [2, 0, 1], False),
         LinearVertex(11, [2, 0, -1], False),
-
     )
 
     _edge_prototypes = (
         Edge(0, _vertex_prototypes[4], _vertex_prototypes[0]),
         Edge(1, _vertex_prototypes[4], _vertex_prototypes[1]),
-
         Edge(2, _vertex_prototypes[5], _vertex_prototypes[0]),
         Edge(3, _vertex_prototypes[5], _vertex_prototypes[1]),
-
         Edge(4, _vertex_prototypes[6], _vertex_prototypes[1]),
         Edge(5, _vertex_prototypes[6], _vertex_prototypes[3]),
-
         Edge(6, _vertex_prototypes[7], _vertex_prototypes[1]),
         Edge(7, _vertex_prototypes[7], _vertex_prototypes[3]),
-
         Edge(8, _vertex_prototypes[8], _vertex_prototypes[0]),
         Edge(9, _vertex_prototypes[8], _vertex_prototypes[2]),
-
         Edge(10, _vertex_prototypes[9], _vertex_prototypes[0]),
         Edge(11, _vertex_prototypes[9], _vertex_prototypes[2]),
-
         Edge(12, _vertex_prototypes[10], _vertex_prototypes[2]),
         Edge(13, _vertex_prototypes[10], _vertex_prototypes[3]),
-
         Edge(14, _vertex_prototypes[11], _vertex_prototypes[2]),
         Edge(15, _vertex_prototypes[11], _vertex_prototypes[3]),
-
     )
 
     _num_windows = 6

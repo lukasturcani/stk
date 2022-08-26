@@ -18,7 +18,7 @@ def carboxylic_acid(get_atom_ids):
 
 
 def _carboxylic_acid(carbon, oxygen1, oxygen2, hydrogen, atom):
-    bonders = (carbon, )
+    bonders = (carbon,)
     deleters = (oxygen2, hydrogen)
     return GenericCaseData(
         functional_group=stk.CarboxylicAcid(

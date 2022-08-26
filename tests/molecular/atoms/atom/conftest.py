@@ -9,7 +9,8 @@ from .utilities import atomic_numbers
 
 @pytest.fixture(
     params=[
-        cls for cls in stk.__dict__.values()
+        cls
+        for cls in stk.__dict__.values()
         if isinstance(cls, type)
         and issubclass(cls, stk.AtomImpl)
         and cls is not stk.AtomImpl
@@ -73,8 +74,8 @@ def case_data_2(cls, id, charge):
 
 @pytest.fixture(
     params=(
-        lazy_fixture('case_data_1'),
-        lazy_fixture('case_data_2'),
+        lazy_fixture("case_data_1"),
+        lazy_fixture("case_data_2"),
     )
 )
 def case_data(request):

@@ -7,7 +7,7 @@ from ...building_blocks import get_mo_1, get_pd_atom
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
@@ -17,13 +17,13 @@ from ...building_blocks import get_mo_1, get_pd_atom
                 )
             ),
             smiles=(
-                '[H]C1=C([H])N(->[Pd+2](<-N2=C([H])C3=C(C([H])=C2[H])'
-                'C([H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])['
-                'H])(<-N2=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])(['
-                'H])C([H])([H])C([H])([H])C3([H])[H])<-N2=C([H])C3=C('
-                'C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H])'
-                '([H])C3([H])[H])=C([H])C2=C1C([H])([H])C([H])([H])C(['
-                'H])([H])C([H])([H])C2([H])[H]'
+                "[H]C1=C([H])N(->[Pd+2](<-N2=C([H])C3=C(C([H])=C2[H])"
+                "C([H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])["
+                "H])(<-N2=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])(["
+                "H])C([H])([H])C([H])([H])C3([H])[H])<-N2=C([H])C3=C("
+                "C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H])"
+                "([H])C3([H])[H])=C([H])C2=C1C([H])([H])C([H])([H])C(["
+                "H])([H])C([H])([H])C2([H])[H]"
             ),
             name=name,
         ),
@@ -35,13 +35,13 @@ from ...building_blocks import get_mo_1, get_pd_atom
                 )
             ),
             smiles=(
-                '[H]C1=C([H])N(->[Pd+2](<-N2=C([H])C3=C(C([H])=C2[H])'
-                'C([H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])['
-                'H])(<-N2=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])(['
-                'H])C([H])([H])C([H])([H])C3([H])[H])<-N2=C([H])C3=C('
-                'C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H])'
-                '([H])C3([H])[H])=C([H])C2=C1C([H])([H])C([H])([H])C(['
-                'H])([H])C([H])([H])C2([H])[H]'
+                "[H]C1=C([H])N(->[Pd+2](<-N2=C([H])C3=C(C([H])=C2[H])"
+                "C([H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])["
+                "H])(<-N2=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])(["
+                "H])C([H])([H])C([H])([H])C3([H])[H])<-N2=C([H])C3=C("
+                "C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H])"
+                "([H])C3([H])[H])=C([H])C2=C1C([H])([H])C([H])([H])C(["
+                "H])([H])C([H])([H])C2([H])[H]"
             ),
             name=name,
         ),
@@ -49,5 +49,5 @@ from ...building_blocks import get_mo_1, get_pd_atom
 )
 def metal_complex_square_planar(request) -> CaseData:
     return request.param(
-        f'{request.fixturename}{request.param_index}',
+        f"{request.fixturename}{request.param_index}",
     )

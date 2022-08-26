@@ -59,7 +59,8 @@ def get_rdkit_mol(molecule):
             beginAtomIdx=bond.get_atom1().get_id(),
             endAtomIdx=bond.get_atom2().get_id(),
             order=(
-                rdkit.BondType.DATIVE if bond.get_order() == 9
+                rdkit.BondType.DATIVE
+                if bond.get_order() == 9
                 else rdkit.BondType(bond.get_order())
             ),
         )

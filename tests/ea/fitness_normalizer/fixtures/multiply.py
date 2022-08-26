@@ -8,16 +8,16 @@ from ..case_data import CaseData
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
         building_blocks=(
-            stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
         ),
-        repeating_unit='A',
+        repeating_unit="A",
         num_repeating_units=2,
     )
     return CaseData(
         fitness_normalizer=stk.Multiply(
             coefficient=(1, 2, 3),
-            filter=lambda population, record:
-                record.get_fitness_value() is not None,
+            filter=lambda population, record: record.get_fitness_value()
+            is not None,
         ),
         population=(
             stk.MoleculeRecord(
@@ -47,10 +47,8 @@ def _get_case_data_1() -> CaseData:
 
 
 @pytest.fixture(
-    scope='session',
-    params=(
-        _get_case_data_1,
-    ),
+    scope="session",
+    params=(_get_case_data_1,),
 )
 def multiply(request) -> CaseData:
     return request.param()

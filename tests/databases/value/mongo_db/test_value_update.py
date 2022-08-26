@@ -14,8 +14,8 @@ def test_update_1(mongo_client):
 
     """
 
-    collection = '_test_update_1'
-    database_name = '_test_update_1'
+    collection = "_test_update_1"
+    database_name = "_test_update_1"
     mongo_client.drop_database(database_name)
 
     database = stk.ValueMongoDb(
@@ -26,28 +26,32 @@ def test_update_1(mongo_client):
         get_lru_cache_size=0,
     )
 
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
 
     database.put(molecule, 12)
     assert_database_state(
         state1=get_database_state(database),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                v=12,
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    v=12,
+                ): 1,
+            }
+        ),
     )
 
     database.put(molecule, 43)
     assert_database_state(
         state1=get_database_state(database),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                v=43,
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    v=43,
+                ): 1,
+            }
+        ),
     )
 
 
@@ -61,8 +65,8 @@ def test_update_2(mongo_client):
 
     """
 
-    collection = '_test_update_2'
-    database_name = '_test_update_2'
+    collection = "_test_update_2"
+    database_name = "_test_update_2"
     mongo_client.drop_database(database_name)
 
     database1 = stk.ValueMongoDb(
@@ -71,9 +75,7 @@ def test_update_2(mongo_client):
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
-        key_makers=(
-            stk.InchiKey(),
-        ),
+        key_makers=(stk.InchiKey(),),
     )
     database2 = stk.ValueMongoDb(
         mongo_client=mongo_client,
@@ -81,9 +83,7 @@ def test_update_2(mongo_client):
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
-        key_makers=(
-            stk.Smiles(),
-        ),
+        key_makers=(stk.Smiles(),),
     )
     database3 = stk.ValueMongoDb(
         mongo_client=mongo_client,
@@ -97,46 +97,52 @@ def test_update_2(mongo_client):
         ),
     )
 
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
 
     database1.put(molecule, 12)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                v=12,
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    v=12,
+                ): 1,
+            }
+        ),
     )
 
     # Should add another entry, as a different key maker is used.
     database2.put(molecule, 32)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                v=12,
-            ): 1,
-            DatabaseEntry(
-                SMILES=stk.Smiles().get_key(molecule),
-                v=32,
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    v=12,
+                ): 1,
+                DatabaseEntry(
+                    SMILES=stk.Smiles().get_key(molecule),
+                    v=32,
+                ): 1,
+            }
+        ),
     )
 
     # Should update both entries as both key makers are used.
     database3.put(molecule, 56)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                SMILES=stk.Smiles().get_key(molecule),
-                v=56,
-            ): 2,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    SMILES=stk.Smiles().get_key(molecule),
+                    v=56,
+                ): 2,
+            }
+        ),
     )
 
 
@@ -150,8 +156,8 @@ def test_update_3(mongo_client):
 
     """
 
-    collection = '_test_update_3'
-    database_name = '_test_update_3'
+    collection = "_test_update_3"
+    database_name = "_test_update_3"
     mongo_client.drop_database(database_name)
 
     database1 = stk.ValueMongoDb(
@@ -171,9 +177,7 @@ def test_update_3(mongo_client):
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
-        key_makers=(
-            stk.InchiKey(),
-        ),
+        key_makers=(stk.InchiKey(),),
     )
     database3 = stk.ValueMongoDb(
         mongo_client=mongo_client,
@@ -181,47 +185,51 @@ def test_update_3(mongo_client):
         database=database_name,
         put_lru_cache_size=0,
         get_lru_cache_size=0,
-        key_makers=(
-            stk.Smiles(),
-        ),
+        key_makers=(stk.Smiles(),),
     )
 
-    molecule = stk.BuildingBlock('CCC')
+    molecule = stk.BuildingBlock("CCC")
 
     database1.put(molecule, 12)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                SMILES=stk.Smiles().get_key(molecule),
-                v=12,
-            ): 1
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    SMILES=stk.Smiles().get_key(molecule),
+                    v=12,
+                ): 1
+            }
+        ),
     )
 
     # Should update the entry.
     database2.put(molecule, 32)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                SMILES=stk.Smiles().get_key(molecule),
-                v=32,
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    SMILES=stk.Smiles().get_key(molecule),
+                    v=32,
+                ): 1,
+            }
+        ),
     )
 
     # Should also update the entry.
     database3.put(molecule, 62)
     assert_database_state(
         state1=get_database_state(database1),
-        state2=DatabaseState({
-            DatabaseEntry(
-                InChIKey=stk.InchiKey().get_key(molecule),
-                SMILES=stk.Smiles().get_key(molecule),
-                v=62,
-            ): 1,
-        }),
+        state2=DatabaseState(
+            {
+                DatabaseEntry(
+                    InChIKey=stk.InchiKey().get_key(molecule),
+                    SMILES=stk.Smiles().get_key(molecule),
+                    v=62,
+                ): 1,
+            }
+        ),
     )

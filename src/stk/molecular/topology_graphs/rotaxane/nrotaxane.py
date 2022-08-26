@@ -439,18 +439,18 @@ class NRotaxane(TopologyGraph):
 
         if orientations is None:
             orientations = tuple(
-                0. for i in range(len(repeating_unit))
+                0.0 for i in range(len(repeating_unit))
             )
 
         if len(orientations) == len(repeating_unit):
-            orientations = orientations*num_repeating_units
+            orientations = orientations * num_repeating_units
 
-        chain_length = len(repeating_unit)*num_repeating_units
+        chain_length = len(repeating_unit) * num_repeating_units
         if len(orientations) != chain_length:
             raise ValueError(
-                'The length of orientations must match either '
-                'the length of repeating_unit or the '
-                'total number of vertices.'
+                "The length of orientations must match either "
+                "the length of repeating_unit or the "
+                "total number of vertices."
             )
 
         generator = np.random.RandomState(random_seed)
@@ -461,17 +461,17 @@ class NRotaxane(TopologyGraph):
         self._num_repeating_units = num_repeating_units
 
         vertices = [AxleVertex(0, [0, 0, 0])]
-        distance = 1 / (chain_length+1)
+        distance = 1 / (chain_length + 1)
         choices = [True, False]
         for vertex_id, flip_chance in enumerate(orientations, 1):
             vertices.append(
                 CycleVertex(
                     id=vertex_id,
-                    position=[vertex_id*distance-0.5, 0, 0],
+                    position=[vertex_id * distance - 0.5, 0, 0],
                     flip=generator.choice(
                         choices,
-                        p=[flip_chance, 1-flip_chance],
-                    )
+                        p=[flip_chance, 1 - flip_chance],
+                    ),
                 )
             )
 
@@ -505,17 +505,17 @@ class NRotaxane(TopologyGraph):
     def _normalize_repeating_unit(repeating_unit):
         if isinstance(repeating_unit, tuple):
             return repeating_unit
-        base = ord('A')
-        return tuple(ord(letter)-base for letter in repeating_unit)
+        base = ord("A")
+        return tuple(ord(letter) - base for letter in repeating_unit)
 
     def _get_building_block_vertices(self, axle, cycles, vertices):
-        threads = self._repeating_unit*self._num_repeating_units
+        threads = self._repeating_unit * self._num_repeating_units
         building_block_vertices = {}
         building_block_vertices[axle] = vertices[0:1]
         for cycle_index, vertex in zip(threads, vertices[1:]):
             bb = cycles[cycle_index]
-            building_block_vertices[bb] = (
-                building_block_vertices.get(bb, [])
+            building_block_vertices[bb] = building_block_vertices.get(
+                bb, []
             )
             building_block_vertices[bb].append(vertex)
         return building_block_vertices
@@ -525,13 +525,13 @@ class NRotaxane(TopologyGraph):
 
     def _get_scale(self, building_block_vertices):
         axle = next(iter(building_block_vertices))
-        return 0.8*axle.get_maximum_diameter()
+        return 0.8 * axle.get_maximum_diameter()
 
     def __repr__(self):
         return (
-            f'rotaxane.NRotaxane('
-            f'{self._repeating_unit!r}, '
-            f'{self._num_repeating_units}, '
-            f'{self._orientations!r}'
-            f')'
+            f"rotaxane.NRotaxane("
+            f"{self._repeating_unit!r}, "
+            f"{self._num_repeating_units}, "
+            f"{self._orientations!r}"
+            f")"
         )

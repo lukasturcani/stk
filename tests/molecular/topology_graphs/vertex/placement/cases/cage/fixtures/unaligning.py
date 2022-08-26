@@ -15,8 +15,8 @@ from ....case_data import CaseData
             ),
             edges=(),
             building_block=stk.BuildingBlock(
-                smiles='[Fe]',
-                position_matrix=([0, 0, 0], ),
+                smiles="[Fe]",
+                position_matrix=([0, 0, 0],),
             ),
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},

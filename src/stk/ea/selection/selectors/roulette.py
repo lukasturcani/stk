@@ -109,7 +109,7 @@ class Roulette(Selector):
         duplicate_batches=True,
         key_maker=Inchi(),
         fitness_modifier=None,
-        random_seed=None
+        random_seed=None,
     ):
         """
         Initialize a :class:`Roulette` instance.
@@ -148,7 +148,7 @@ class Roulette(Selector):
         """
 
         if num_batches is None:
-            num_batches = float('inf')
+            num_batches = float("inf")
 
         if fitness_modifier is None:
             fitness_modifier = self._get_fitness_values

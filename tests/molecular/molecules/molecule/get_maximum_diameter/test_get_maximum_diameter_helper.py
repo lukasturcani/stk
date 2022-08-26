@@ -5,39 +5,47 @@ from .utilities import get_maximum_diameter
 
 
 @pytest.mark.parametrize(
-    argnames=('position_matrix', 'atom_ids', 'maximum_diameter'),
+    argnames=("position_matrix", "atom_ids", "maximum_diameter"),
     argvalues=(
         (
-            np.array([
-                [1., 2., 3.],
-                [1., 2., 4.],
-            ]),
-            (0, ),
+            np.array(
+                [
+                    [1.0, 2.0, 3.0],
+                    [1.0, 2.0, 4.0],
+                ]
+            ),
+            (0,),
             0,
         ),
         (
-            np.array([
-                [1., 0., 0.],
-                [-1., 0., 0.],
-                [9., 0., 0.],
-            ]),
+            np.array(
+                [
+                    [1.0, 0.0, 0.0],
+                    [-1.0, 0.0, 0.0],
+                    [9.0, 0.0, 0.0],
+                ]
+            ),
             (0, 1, 2),
             10,
         ),
         (
-            np.array([
-                [1., 0., 0.],
-                [-1., 0., 0.],
-                [9., 0., 0.],
-            ]),
+            np.array(
+                [
+                    [1.0, 0.0, 0.0],
+                    [-1.0, 0.0, 0.0],
+                    [9.0, 0.0, 0.0],
+                ]
+            ),
             (0, 2),
             8,
         ),
         (
-            np.array([
-                [0., 0., 0.],
-                [3., 4., 0.],
-            ]),
+            np.array(
+                [
+                    [0.0, 0.0, 0.0],
+                    [3.0, 4.0, 0.0],
+                ]
+            ),
             (0, 1),
             5,
         ),

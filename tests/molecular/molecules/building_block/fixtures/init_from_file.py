@@ -7,8 +7,8 @@ from ..case_data import CaseData
 
 @pytest.fixture(
     params=[
-        'building_block.mol',
-        'building_block.pdb',
+        "building_block.mol",
+        "building_block.pdb",
     ],
 )
 def path(tmpdir, request):
@@ -96,10 +96,10 @@ class InitFromFileData:
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: InitFromFileData(
-            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
             init_functional_groups=(),
             init_placer_ids=None,
             case_data_functional_groups=(),
@@ -107,28 +107,28 @@ class InitFromFileData:
             case_data_placer_ids=(0, 1, 2, 3),
         ),
         lambda: InitFromFileData(
-            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
             init_functional_groups=[stk.BromoFactory()],
             init_placer_ids=None,
             case_data_functional_groups=(
                 stk.Bromo(
                     bromine=stk.Br(0),
                     atom=stk.C(1, 2),
-                    bonders=(stk.C(1, 2), ),
-                    deleters=(stk.Br(0), ),
+                    bonders=(stk.C(1, 2),),
+                    deleters=(stk.Br(0),),
                 ),
                 stk.Bromo(
                     bromine=stk.Br(3),
                     atom=stk.C(2, 2),
-                    bonders=(stk.C(2, 2), ),
-                    deleters=(stk.Br(3), ),
+                    bonders=(stk.C(2, 2),),
+                    deleters=(stk.Br(3),),
                 ),
             ),
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(1, 2),
         ),
         lambda: InitFromFileData(
-            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
             init_functional_groups=(),
             init_placer_ids=(1, 2),
             case_data_functional_groups=(),
@@ -136,28 +136,28 @@ class InitFromFileData:
             case_data_placer_ids=(1, 2),
         ),
         lambda: InitFromFileData(
-            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
             init_functional_groups=[stk.BromoFactory()],
             init_placer_ids=(0, 3),
             case_data_functional_groups=(
                 stk.Bromo(
                     bromine=stk.Br(0),
                     atom=stk.C(1, 2),
-                    bonders=(stk.C(1, 2), ),
-                    deleters=(stk.Br(0), ),
+                    bonders=(stk.C(1, 2),),
+                    deleters=(stk.Br(0),),
                 ),
                 stk.Bromo(
                     bromine=stk.Br(3),
                     atom=stk.C(2, 2),
-                    bonders=(stk.C(2, 2), ),
-                    deleters=(stk.Br(3), ),
+                    bonders=(stk.C(2, 2),),
+                    deleters=(stk.Br(3),),
                 ),
             ),
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(0, 3),
         ),
         lambda: InitFromFileData(
-            building_block=stk.BuildingBlock('Br[C+2][C+2]Br'),
+            building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
             init_functional_groups=[stk.IodoFactory()],
             init_placer_ids=None,
             case_data_functional_groups=(),

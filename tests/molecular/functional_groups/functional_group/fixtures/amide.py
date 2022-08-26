@@ -19,7 +19,7 @@ def amide(get_atom_ids):
 
 
 def _amide(carbon, oxygen, nitrogen, hydrogen1, hydrogen2, atom):
-    bonders = (carbon, )
+    bonders = (carbon,)
     deleters = (nitrogen, hydrogen1, hydrogen2)
     return GenericCaseData(
         functional_group=stk.Amide(

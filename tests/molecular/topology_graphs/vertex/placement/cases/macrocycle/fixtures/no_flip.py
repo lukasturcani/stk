@@ -33,7 +33,7 @@ def no_flip(position, building_block_2, angle):
         id=0,
         position=position,
         flip=False,
-        angle=angle+np.pi/2,
+        angle=angle + np.pi / 2,
     )
     return CaseData(
         vertex=vertex,

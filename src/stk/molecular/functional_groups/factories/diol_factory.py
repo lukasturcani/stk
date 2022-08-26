@@ -126,7 +126,7 @@ class DiolFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        ids = _get_atom_ids('[H][O][#6]~[#6][O][H]', molecule)
+        ids = _get_atom_ids("[H][O][#6]~[#6][O][H]", molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Diol(

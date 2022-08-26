@@ -101,7 +101,7 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
 
     """
 
-    def __init__(self, bonders=(1, ), deleters=(3, 4), placers=None):
+    def __init__(self, bonders=(1,), deleters=(3, 4), placers=None):
         """
         Initialize a :class:`.CarboxylicAcidFactory` instance.
 
@@ -126,7 +126,7 @@ class CarboxylicAcidFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids('[*][C](=[O])[O][H]', molecule):
+        for atom_ids in _get_atom_ids("[*][C](=[O])[O][H]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield CarboxylicAcid(
                 carbon=atoms[1],

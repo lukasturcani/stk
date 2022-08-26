@@ -12,7 +12,7 @@ def primary_amino(get_atom_ids):
 
 
 def _primary_amino(nitrogen, hydrogen1, hydrogen2, atom):
-    bonders = (nitrogen, )
+    bonders = (nitrogen,)
     deleters = (hydrogen1, hydrogen2)
     return GenericCaseData(
         functional_group=stk.PrimaryAmino(

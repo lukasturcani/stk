@@ -161,19 +161,19 @@ class CofData:
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: CofData(
             topology_graph=stk.cof.Honeycomb,
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        "Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1"
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -188,12 +188,12 @@ class CofData:
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        "Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1"
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -208,12 +208,12 @@ class CofData:
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        "Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1"
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -228,12 +228,12 @@ class CofData:
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        "Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1"
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -248,7 +248,7 @@ class CofData:
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1'
+                        "Br[C+]1[C+2][C+](Br)[C+](F)[C+](Br)[C+2]1"
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
@@ -264,7 +264,7 @@ class CofData:
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)C1Br'
+                        "Br[C+]1[C+](F)[C+](I)[C+](I)[C+](Br)C1Br"
                     ),
                     functional_groups=[
                         stk.BromoFactory(),
@@ -273,7 +273,7 @@ class CofData:
                     ],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -288,13 +288,13 @@ class CofData:
             building_blocks=(
                 stk.BuildingBlock(
                     smiles=(
-                        'Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)'
-                        '[C+2]1'
+                        "Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)"
+                        "[C+2]1"
                     ),
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),
@@ -308,11 +308,11 @@ class CofData:
             topology_graph=stk.cof.Square,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles='BrC1=C(Br)C(F)(Br)[C+]1Br',
+                    smiles="BrC1=C(Br)C(F)(Br)[C+]1Br",
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(
-                    smiles='Br[C+]=NC#CBr',
+                    smiles="Br[C+]=NC#CBr",
                     functional_groups=[stk.BromoFactory()],
                 ),
             ),

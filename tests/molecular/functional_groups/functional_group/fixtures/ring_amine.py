@@ -47,6 +47,6 @@ def _ring_amine(
             hydrogen3,
             carbon3,
         ),
-        placers=(nitrogen, ),
-        core_atoms=(nitrogen, ),
+        placers=(nitrogen,),
+        core_atoms=(nitrogen,),
     )

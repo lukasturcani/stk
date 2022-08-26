@@ -12,8 +12,8 @@ def iodo(get_atom_ids):
 
 
 def _iodo(iodine, atom):
-    bonders = (atom, )
-    deleters = (iodine, )
+    bonders = (atom,)
+    deleters = (iodine,)
     return GenericCaseData(
         functional_group=stk.Iodo(
             iodine=iodine,

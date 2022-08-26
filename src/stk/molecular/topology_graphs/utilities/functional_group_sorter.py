@@ -18,11 +18,11 @@ class _FunctionalGroupSorter(_Sorter):
     """
 
     __slots__ = [
-        '_items',
-        '_reference',
-        '_axis',
-        '_placer_centroid',
-        '_building_block',
+        "_items",
+        "_reference",
+        "_axis",
+        "_placer_centroid",
+        "_building_block",
     ]
 
     def __init__(self, building_block):
@@ -43,10 +43,10 @@ class _FunctionalGroupSorter(_Sorter):
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
-        self._placer_centroid = placer_centroid = (
-            building_block.get_centroid(
-                atom_ids=building_block.get_placer_ids(),
-            )
+        self._placer_centroid = (
+            placer_centroid
+        ) = building_block.get_centroid(
+            atom_ids=building_block.get_placer_ids(),
         )
         fg0_direction = fg0_position - placer_centroid
         core_centroid = building_block.get_centroid(
@@ -68,6 +68,6 @@ class _FunctionalGroupSorter(_Sorter):
 
     def _get_vector(self, item):
         building_block = self._building_block
-        fg, = building_block.get_functional_groups(item)
+        (fg,) = building_block.get_functional_groups(item)
         fg_position = building_block.get_centroid(fg.get_placer_ids())
         return fg_position - self._placer_centroid

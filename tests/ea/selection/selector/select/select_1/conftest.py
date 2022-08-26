@@ -7,13 +7,13 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('above_average'),
-        lazy_fixture('best'),
-        lazy_fixture('filter_batches'),
-        lazy_fixture('filter_molecules'),
-        lazy_fixture('remove_batches'),
-        lazy_fixture('remove_molecules'),
-        lazy_fixture('worst'),
+        lazy_fixture("above_average"),
+        lazy_fixture("best"),
+        lazy_fixture("filter_batches"),
+        lazy_fixture("filter_molecules"),
+        lazy_fixture("remove_batches"),
+        lazy_fixture("remove_molecules"),
+        lazy_fixture("worst"),
     ),
 )
 def case_data(request):

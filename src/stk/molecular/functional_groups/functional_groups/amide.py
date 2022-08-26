@@ -205,8 +205,8 @@ class Amide(GenericFunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._carbon}, {self._oxygen}, {self._nitrogen}, '
-            f'{self._hydrogen1}, {self._hydrogen2}, {self._atom}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._carbon}, {self._oxygen}, {self._nitrogen}, "
+            f"{self._hydrogen1}, {self._hydrogen2}, {self._atom}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

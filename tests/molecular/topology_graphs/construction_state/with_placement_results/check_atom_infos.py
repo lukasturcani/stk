@@ -5,17 +5,17 @@ def check_atom_infos(old_state, new_state, building_blocks):
     old_infos = tuple(old_state.get_atom_infos())
     new_infos = tuple(new_state.get_atom_infos())
     num_added = len(new_infos) - len(old_infos)
-    assert (
-        num_added == sum(bb.get_num_atoms() for bb in building_blocks)
+    assert num_added == sum(
+        bb.get_num_atoms() for bb in building_blocks
     )
 
     for info1, info2 in zip(
         # Take just the newly added infos.
-        new_infos[len(old_infos):],
+        new_infos[len(old_infos) :],
         get_infos(
             building_blocks=building_blocks,
             building_block_index=max(
-                (info.building_block_index+1 for info in old_infos),
+                (info.building_block_index + 1 for info in old_infos),
                 default=0,
             ),
             atom_id=len(old_infos),

@@ -18,7 +18,7 @@ class _AtomBatch:
 
     """
 
-    __slots__ = ['_atoms', '_atom_infos', '_id_map']
+    __slots__ = ["_atoms", "_atom_infos", "_id_map"]
 
     _atoms: tuple[Atom, ...]
     _atom_infos: tuple[AtomInfo, ...]

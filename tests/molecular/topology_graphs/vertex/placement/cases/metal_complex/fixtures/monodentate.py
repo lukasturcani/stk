@@ -72,11 +72,11 @@ def get_edge(vertex):
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles='c1cc2c(cn1)CCCCC2',
+            smiles="c1cc2c(cn1)CCCCC2",
             functional_groups=[
                 stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
+                    smarts="[#6]~[#7X2]~[#6]",
+                    bonders=(1,),
                     deleters=(),
                 ),
             ],

@@ -12,8 +12,8 @@ def aldehyde(get_atom_ids):
 
 
 def _aldehyde(carbon, oxygen, hydrogen, atom):
-    bonders = (carbon, )
-    deleters = (oxygen, )
+    bonders = (carbon,)
+    deleters = (oxygen,)
     return GenericCaseData(
         functional_group=stk.Aldehyde(
             carbon=carbon,

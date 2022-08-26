@@ -10,21 +10,21 @@ def get_eight_plus_twelve(graph):
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         lambda: CaseData(
             mutator=stk.RandomTopologyGraph(
-                replacement_funcs=(get_eight_plus_twelve, ),
+                replacement_funcs=(get_eight_plus_twelve,),
             ),
             record=stk.MoleculeRecord(
                 topology_graph=stk.cage.FourPlusSix(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrCCBr',
+                            smiles="BrCCBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                         stk.BuildingBlock(
-                            smiles='BrCC(CBr)CBr',
+                            smiles="BrCC(CBr)CBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
@@ -35,17 +35,17 @@ def get_eight_plus_twelve(graph):
                     topology_graph=stk.cage.EightPlusTwelve(
                         building_blocks=(
                             stk.BuildingBlock(
-                                smiles='BrCCBr',
+                                smiles="BrCCBr",
                                 functional_groups=[stk.BromoFactory()],
                             ),
                             stk.BuildingBlock(
-                                smiles='BrCC(CBr)CBr',
+                                smiles="BrCC(CBr)CBr",
                                 functional_groups=[stk.BromoFactory()],
                             ),
                         ),
                     ),
                 ),
-                mutator_name='RandomTopologyGraph',
+                mutator_name="RandomTopologyGraph",
             ),
         ),
     ),

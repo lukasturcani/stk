@@ -189,7 +189,7 @@ class GeneticRecombination(MoleculeCrosser):
     def __init__(
         self,
         get_gene,
-        name='GeneticRecombination',
+        name="GeneticRecombination",
     ):
         """
         Initialize a :class:`GeneticRecombination` instance.
@@ -221,15 +221,15 @@ class GeneticRecombination(MoleculeCrosser):
             def get_replacement(building_block):
                 gene = self._get_gene(building_block)
                 return next(
-                    allele for allele in alleles
+                    allele
+                    for allele in alleles
                     if self._get_gene(allele) == gene
                 )
 
             topology_graph = topology_graph.with_building_blocks(
                 building_block_map={
                     building_block: get_replacement(building_block)
-                    for building_block
-                    in topology_graph.get_building_blocks()
+                    for building_block in topology_graph.get_building_blocks()
                 },
             )
             yield CrossoverRecord(

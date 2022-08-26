@@ -12,8 +12,8 @@ def secondary_amino(get_atom_ids):
 
 
 def _secondary_amino(nitrogen, hydrogen, atom1, atom2):
-    bonders = (nitrogen, )
-    deleters = (hydrogen, )
+    bonders = (nitrogen,)
+    deleters = (hydrogen,)
     return GenericCaseData(
         functional_group=stk.SecondaryAmino(
             nitrogen=nitrogen,

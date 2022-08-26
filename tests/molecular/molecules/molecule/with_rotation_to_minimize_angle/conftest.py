@@ -4,23 +4,23 @@ import stk
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
-        lambda: stk.BuildingBlock('NCCN'),
+        lambda: stk.BuildingBlock("NCCN"),
         lambda: stk.BuildingBlock(
-            smiles='Brc1ccc(Br)cc1Br',
+            smiles="Brc1ccc(Br)cc1Br",
             functional_groups=[stk.BromoFactory()],
         ),
         lambda: stk.ConstructedMolecule(
             topology_graph=stk.polymer.Linear(
                 building_blocks=(
-                    stk.BuildingBlock('BrCCBr', [stk.BromoFactory()]),
+                    stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
                     stk.BuildingBlock(
-                        smiles='BrCNCCBr',
+                        smiles="BrCNCCBr",
                         functional_groups=[stk.BromoFactory()],
                     ),
                 ),
-                repeating_unit='AB',
+                repeating_unit="AB",
                 num_repeating_units=2,
             ),
         ),

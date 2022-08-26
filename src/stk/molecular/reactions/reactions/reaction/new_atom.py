@@ -39,7 +39,7 @@ class NewAtom:
 
     """
 
-    __slots__ = ['_atom', '_position']
+    __slots__ = ["_atom", "_position"]
 
     def __init__(self, atom, position):
         """

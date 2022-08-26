@@ -225,18 +225,16 @@ class M6L2L3Prism(Cage):
     """
 
     _non_linears = (
-        NonLinearVertex(0, [-1, -1/np.sqrt(3), 1]),
-        NonLinearVertex(1, [1, -1/np.sqrt(3), 1]),
-        NonLinearVertex(2, [0, 2/np.sqrt(3), 1]),
-
-        NonLinearVertex(3, [-1, -1/np.sqrt(3), -1]),
-        NonLinearVertex(4, [1, -1/np.sqrt(3), -1]),
-        NonLinearVertex(5, [0, 2/np.sqrt(3), -1]),
+        NonLinearVertex(0, [-1, -1 / np.sqrt(3), 1]),
+        NonLinearVertex(1, [1, -1 / np.sqrt(3), 1]),
+        NonLinearVertex(2, [0, 2 / np.sqrt(3), 1]),
+        NonLinearVertex(3, [-1, -1 / np.sqrt(3), -1]),
+        NonLinearVertex(4, [1, -1 / np.sqrt(3), -1]),
+        NonLinearVertex(5, [0, 2 / np.sqrt(3), -1]),
     )
 
     _vertex_prototypes = (
         *_non_linears,
-
         NonLinearVertex.init_at_center(
             id=6,
             vertices=(
@@ -253,7 +251,6 @@ class M6L2L3Prism(Cage):
                 _non_linears[5],
             ),
         ),
-
         NonLinearVertex.init_at_center(
             id=8,
             vertices=(

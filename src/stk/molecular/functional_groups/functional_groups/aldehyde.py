@@ -159,8 +159,8 @@ class Aldehyde(GenericFunctionalGroup):
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._carbon}, {self._oxygen}, {self._hydrogen}, '
-            f'{self._atom}, bonders={self._bonders}, '
-            f'deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._carbon}, {self._oxygen}, {self._hydrogen}, "
+            f"{self._atom}, bonders={self._bonders}, "
+            f"deleters={self._deleters})"
         )

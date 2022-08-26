@@ -29,8 +29,8 @@ from .implementations import (
 )
 
 _TopologyGraphT = typing.TypeVar(
-    '_TopologyGraphT',
-    bound='TopologyGraph',
+    "_TopologyGraphT",
+    bound="TopologyGraph",
 )
 
 
@@ -163,7 +163,8 @@ class TopologyGraph:
     def __init__(
         self,
         building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex],
+            BuildingBlock,
+            abc.Sequence[Vertex],
         ],
         edges: tuple[Edge, ...],
         reaction_factory: ReactionFactory,
@@ -171,7 +172,8 @@ class TopologyGraph:
             # TODO: Use typing.Callable here for now so that Sphinx
             # generates hyperlinks in the compiled docs. This should
             # eventually be replaced by abc.Callable.
-            typing.Callable[[Vertex], bool], ...
+            typing.Callable[[Vertex], bool],
+            ...,
         ],
         num_processes: int,
         optimizer: Optimizer,
@@ -239,8 +241,7 @@ class TopologyGraph:
 
         self._building_block_vertices = {
             building_block: tuple(map(apply_scale, vertices))
-            for building_block, vertices
-            in building_block_vertices.items()
+            for building_block, vertices in building_block_vertices.items()
         }
         self._edges = tuple(map(apply_scale, edges))
         self._reaction_factory = reaction_factory
@@ -257,7 +258,7 @@ class TopologyGraph:
 
         if edge_groups is None:
             edge_groups = tuple(
-                EdgeGroup((edge, )) for edge in self._edges
+                EdgeGroup((edge,)) for edge in self._edges
             )
         self._edge_groups = edge_groups
 
@@ -276,16 +277,16 @@ class TopologyGraph:
         # the scale is recalculated with the new building blocks, it
         # has the same starting geometry.
         def undo_scale(vertex):
-            return vertex.with_scale(1/self._scale)
+            return vertex.with_scale(1 / self._scale)
 
         building_block_vertices: dict[
             BuildingBlock, abc.Sequence[Vertex]
         ]
         building_block_vertices = {
-            building_block_map.get(building_block, building_block):
-                tuple(map(undo_scale, vertices))
-            for building_block, vertices
-            in self._building_block_vertices.items()
+            building_block_map.get(
+                building_block, building_block
+            ): tuple(map(undo_scale, vertices))
+            for building_block, vertices in self._building_block_vertices.items()
         }
         scale = self._get_scale(building_block_vertices)
 
@@ -294,13 +295,12 @@ class TopologyGraph:
 
         self._building_block_vertices = {
             building_block: tuple(map(scale_vertex, vertices))
-            for building_block, vertices
-            in building_block_vertices.items()
+            for building_block, vertices in building_block_vertices.items()
         }
 
         def scale_edge(edge):
             # Remove the old scale and apply the new one.
-            return edge.with_scale(scale/self._scale)
+            return edge.with_scale(scale / self._scale)
 
         self._edges = edges = tuple(map(scale_edge, self._edges))
 
@@ -380,14 +380,15 @@ class TopologyGraph:
 
         vertex_building_blocks = {}
         num_vertices = 0
-        for building_block, vertices in (
-            self._building_block_vertices.items()
-        ):
+        for (
+            building_block,
+            vertices,
+        ) in self._building_block_vertices.items():
             for vertex in vertices:
                 num_vertices += 1
-                vertex_building_blocks[vertex.get_id()] = (
-                    building_block
-                )
+                vertex_building_blocks[
+                    vertex.get_id()
+                ] = building_block
 
         yielded = set()
         for vertex_id in range(num_vertices):
@@ -478,7 +479,7 @@ class TopologyGraph:
             building_block_vertices=self._building_block_vertices,
             edges=self._edges,
             lattice_constants=tuple(
-                np.array(constant, dtype=np.float64)*self._scale
+                np.array(constant, dtype=np.float64) * self._scale
                 for constant in self._get_lattice_constants()
             ),
         )
@@ -486,7 +487,8 @@ class TopologyGraph:
     def _get_scale(
         self,
         building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex],
+            BuildingBlock,
+            abc.Sequence[Vertex],
         ],
     ) -> float:
         """
@@ -576,7 +578,7 @@ class TopologyGraph:
         """
 
         stages: tuple[list[int], ...] = tuple(
-            [] for i in range(len(construction_stages)+1)
+            [] for i in range(len(construction_stages) + 1)
         )
         vertices = flatten(self._building_block_vertices.values())
         for vertex in vertices:

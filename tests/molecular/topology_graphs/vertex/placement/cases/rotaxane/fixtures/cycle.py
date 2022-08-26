@@ -11,9 +11,9 @@ def _get_macrocycle() -> stk.BuildingBlock:
     macrocycle = stk.ConstructedMolecule(
         topology_graph=stk.macrocycle.Macrocycle(
             building_blocks=(
-                stk.BuildingBlock('BrCCCBr', [stk.BromoFactory()]),
+                stk.BuildingBlock("BrCCCBr", [stk.BromoFactory()]),
             ),
-            repeating_unit='A',
+            repeating_unit="A",
             num_repeating_units=5,
         ),
     )
@@ -22,20 +22,21 @@ def _get_macrocycle() -> stk.BuildingBlock:
 
 def _get_case_data_1() -> CaseData:
     macrocycle = _get_macrocycle()
-    macrocycle_ids = tuple(max(
-        rdkit.GetSymmSSSR(macrocycle.to_rdkit_mol()),
-        # mypy throws an incorrect type error here, I believe it has
-        # issues with generic functions sometimes.
-        key=len,  # type: ignore
-    ))
+    macrocycle_ids = tuple(
+        max(
+            rdkit.GetSymmSSSR(macrocycle.to_rdkit_mol()),
+            # mypy throws an incorrect type error here, I believe it has
+            # issues with generic functions sometimes.
+            key=len,  # type: ignore
+        )
+    )
     return CaseData(
         vertex=stk.rotaxane.CycleVertex(0, (1, 2, 3), False),
         edges=(),
         building_block=_get_macrocycle(),
         position=np.array([1, 2, 3], dtype=np.float64),
         alignment_tests={
-            get_plane_normal:
-                np.array([1, 0, 0], dtype=np.float64),
+            get_plane_normal: np.array([1, 0, 0], dtype=np.float64),
         },
         functional_group_edges={},
         position_ids=macrocycle_ids,
@@ -44,20 +45,21 @@ def _get_case_data_1() -> CaseData:
 
 def _get_case_data_2() -> CaseData:
     macrocycle = _get_macrocycle()
-    macrocycle_ids = tuple(max(
-        rdkit.GetSymmSSSR(macrocycle.to_rdkit_mol()),
-        # mypy throws an incorrect type error here, I believe it has
-        # issues with generic functions sometimes.
-        key=len,  # type: ignore
-    ))
+    macrocycle_ids = tuple(
+        max(
+            rdkit.GetSymmSSSR(macrocycle.to_rdkit_mol()),
+            # mypy throws an incorrect type error here, I believe it has
+            # issues with generic functions sometimes.
+            key=len,  # type: ignore
+        )
+    )
     return CaseData(
         vertex=stk.rotaxane.CycleVertex(0, (1, 2, 3), True),
         edges=(),
         building_block=_get_macrocycle(),
         position=np.array([1, 2, 3], dtype=np.float64),
         alignment_tests={
-            get_plane_normal:
-                np.array([-1, 0, 0], dtype=np.float64),
+            get_plane_normal: np.array([-1, 0, 0], dtype=np.float64),
         },
         functional_group_edges={},
         position_ids=macrocycle_ids,
@@ -70,7 +72,7 @@ def get_plane_normal(building_block):
         key=len,
     )
     centroid = building_block.get_centroid()
-    atom1_position, = building_block.get_atomic_positions(0)
+    (atom1_position,) = building_block.get_atomic_positions(0)
     normal = -stk.get_acute_vector(
         reference=atom1_position - centroid,
         vector=building_block.get_plane_normal(macrocycle),
@@ -84,7 +86,7 @@ def get_plane_normal(building_block):
 
 
 @pytest.fixture(
-    scope='session',
+    scope="session",
     params=(
         _get_case_data_1,
         _get_case_data_2,

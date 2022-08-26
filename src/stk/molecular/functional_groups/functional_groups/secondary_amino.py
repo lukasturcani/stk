@@ -147,8 +147,8 @@ class SecondaryAmino(GenericFunctionalGroup):
 
     def __repr__(self):
         return (
-            f'{self.__class__.__name__}('
-            f'{self._nitrogen}, {self._hydrogen}, {self._atom1}, '
-            f'{self._atom2}, '
-            f'bonders={self._bonders}, deleters={self._deleters})'
+            f"{self.__class__.__name__}("
+            f"{self._nitrogen}, {self._hydrogen}, {self._atom1}, "
+            f"{self._atom2}, "
+            f"bonders={self._bonders}, deleters={self._deleters})"
         )

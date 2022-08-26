@@ -42,7 +42,7 @@ class CaseDataData:
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
-                    database='_stk_test_database_for_testing',
+                    database="_stk_test_database_for_testing",
                     put_lru_cache_size=0,
                     get_lru_cache_size=0,
                 )
@@ -51,26 +51,25 @@ class CaseDataData:
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrCCBr',
+                            smiles="BrCCBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='A',
+                    repeating_unit="A",
                     num_repeating_units=2,
                 ),
             ),
             key={
-                'InChIKey':
-                    rdkit.MolToInchiKey(rdkit.MolFromSmiles(
-                        SMILES='BrCCCCBr'
-                    )),
+                "InChIKey": rdkit.MolToInchiKey(
+                    rdkit.MolFromSmiles(SMILES="BrCCCCBr")
+                ),
             },
         ),
         lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
-                    database='_stk_test_database_for_testing',
+                    database="_stk_test_database_for_testing",
                     put_lru_cache_size=128,
                     get_lru_cache_size=128,
                 )
@@ -79,30 +78,29 @@ class CaseDataData:
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='BrCCBr',
+                            smiles="BrCCBr",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='A',
+                    repeating_unit="A",
                     num_repeating_units=2,
                 ),
             ),
             key={
-                'InChIKey':
-                    rdkit.MolToInchiKey(rdkit.MolFromSmiles(
-                        SMILES='BrCCCCBr'
-                    )),
+                "InChIKey": rdkit.MolToInchiKey(
+                    rdkit.MolFromSmiles(SMILES="BrCCCCBr")
+                ),
             },
         ),
         lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
-                    database='_stk_test_database_for_testing',
+                    database="_stk_test_database_for_testing",
                     jsonizer=stk.ConstructedMoleculeJsonizer(
                         key_makers=(
                             stk.MoleculeKeyMaker(
-                                key_name='SMILES',
+                                key_name="SMILES",
                                 get_key=lambda molecule: (
                                     rdkit.MolToSmiles(
                                         mol=molecule.to_rdkit_mol(),
@@ -119,25 +117,25 @@ class CaseDataData:
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='Br[C+2][C+2]Br',
+                            smiles="Br[C+2][C+2]Br",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='A',
+                    repeating_unit="A",
                     num_repeating_units=2,
                 ),
             ),
-            key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
+            key={"SMILES": "Br[C+2][C+2][C+2][C+2]Br"},
         ),
         lambda: CaseDataData(
             get_database=lambda mongo_client: (
                 stk.ConstructedMoleculeMongoDb(
                     mongo_client=mongo_client,
-                    database='_stk_test_database_for_testing',
+                    database="_stk_test_database_for_testing",
                     jsonizer=stk.ConstructedMoleculeJsonizer(
                         key_makers=(
                             stk.MoleculeKeyMaker(
-                                key_name='SMILES',
+                                key_name="SMILES",
                                 get_key=lambda molecule: (
                                     rdkit.MolToSmiles(
                                         mol=molecule.to_rdkit_mol(),
@@ -154,15 +152,15 @@ class CaseDataData:
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(
                         stk.BuildingBlock(
-                            smiles='Br[C+2][C+2]Br',
+                            smiles="Br[C+2][C+2]Br",
                             functional_groups=[stk.BromoFactory()],
                         ),
                     ),
-                    repeating_unit='A',
+                    repeating_unit="A",
                     num_repeating_units=2,
                 ),
             ),
-            key={'SMILES': 'Br[C+2][C+2][C+2][C+2]Br'},
+            key={"SMILES": "Br[C+2][C+2][C+2][C+2]Br"},
         ),
     ),
 )

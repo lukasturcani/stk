@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-plt.switch_backend('agg')
+plt.switch_backend("agg")
 
 
 class ProgressPlotter:
@@ -333,15 +333,15 @@ class ProgressPlotter:
             data.append(
                 pd.DataFrame(
                     data={
-                        'Generation': [id_, id_, id_],
+                        "Generation": [id_, id_, id_],
                         self._y_label: [
                             max(properties),
                             np.mean(properties),
                             min(properties),
                         ],
-                        'Type': ['Max', 'Mean', 'Min'],
+                        "Type": ["Max", "Mean", "Min"],
                     },
-                    index=['Generation', 'Generation', 'Generation'],
+                    index=["Generation", "Generation", "Generation"],
                 ),
             )
         return pd.concat(data, ignore_index=True)
@@ -378,21 +378,21 @@ class ProgressPlotter:
 
         """
 
-        sns.set(style='darkgrid')
+        sns.set(style="darkgrid")
         fig = plt.figure(figsize=[8, 4.5])
-        palette = sns.color_palette('deep')
+        palette = sns.color_palette("deep")
 
         # It's possible that all values were filtered out, and trying
         # to plot an empty dataframe would raise an exception.
         if len(self._plot_data) != 0:
             sns.scatterplot(
-                x='Generation',
+                x="Generation",
                 y=self._y_label,
-                hue='Type',
+                hue="Type",
                 palette={
-                    'Max': palette[3],
-                    'Min': palette[0],
-                    'Mean': palette[2]
+                    "Max": palette[3],
+                    "Min": palette[0],
+                    "Mean": palette[2],
                 },
                 data=self._plot_data,
             )
@@ -401,8 +401,8 @@ class ProgressPlotter:
         # due to being filtered out.
         plt.xlim(0, self._num_generations)
 
-        plt.legend(bbox_to_anchor=(1.15, 1), prop={'size': 9})
+        plt.legend(bbox_to_anchor=(1.15, 1), prop={"size": 9})
         plt.tight_layout()
         fig.savefig(path, dpi=dpi)
-        plt.close('all')
+        plt.close("all")
         return self

@@ -7,8 +7,8 @@ from .fixtures import *  # noqa
 
 @pytest.fixture(
     params=(
-        lazy_fixture('genetic_recombination'),
-        lazy_fixture('random_crosser'),
+        lazy_fixture("genetic_recombination"),
+        lazy_fixture("random_crosser"),
     ),
 )
 def case_data(request):

@@ -44,4 +44,4 @@ class EdgeGroup:
         return repr(self)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(edge_ids={self._edge_ids})'
+        return f"{self.__class__.__name__}(edge_ids={self._edge_ids})"

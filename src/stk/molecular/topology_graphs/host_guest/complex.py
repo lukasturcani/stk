@@ -30,9 +30,9 @@ class Guest:
     def __init__(
         self,
         building_block: BuildingBlock,
-        start_vector: tuple[float, float, float] = (1., 0., 0.),
-        end_vector: tuple[float, float, float] = (1., 0., 0.),
-        displacement: tuple[float, float, float] = (1., 0., 0.),
+        start_vector: tuple[float, float, float] = (1.0, 0.0, 0.0),
+        end_vector: tuple[float, float, float] = (1.0, 0.0, 0.0),
+        displacement: tuple[float, float, float] = (1.0, 0.0, 0.0),
     ) -> None:
         """
         Initialize a :class:`.Guest` instance.
@@ -103,11 +103,11 @@ class Guest:
 
     def __repr__(self) -> str:
         return (
-            f'{self.__class__.__name__}('
-            f'{self._building_block!r}, '
-            f'start_vector={self._start_vector!r}, '
-            f'end_vector={self._end_vector!r}, '
-            f'displacement={self._displacement!r})'
+            f"{self.__class__.__name__}("
+            f"{self._building_block!r}, "
+            f"start_vector={self._start_vector!r}, "
+            f"end_vector={self._end_vector!r}, "
+            f"displacement={self._displacement!r})"
         )
 
 
@@ -491,21 +491,23 @@ class Complex(TopologyGraph):
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
 
         if isinstance(guests, Guest):
-            guests = (guests, )
+            guests = (guests,)
 
         building_block_vertices: dict[
             BuildingBlock, abc.Sequence[Vertex]
         ]
         building_block_vertices = {
-            host: (HostVertex(0, (0., 0., 0.)), )
+            host: (HostVertex(0, (0.0, 0.0, 0.0)),)
         }
         guest_vertices = {
-            guest.get_building_block(): (GuestVertex(
-                id=i+1,
-                position=guest.get_displacement(),
-                start=guest.get_start_vector(),
-                target=guest.get_end_vector(),
-            ), )
+            guest.get_building_block(): (
+                GuestVertex(
+                    id=i + 1,
+                    position=guest.get_displacement(),
+                    start=guest.get_start_vector(),
+                    target=guest.get_end_vector(),
+                ),
+            )
             for i, guest in enumerate(guests)
         }
         building_block_vertices.update(guest_vertices)
@@ -527,7 +529,7 @@ class Complex(TopologyGraph):
             BuildingBlock, abc.Sequence[Vertex]
         ],
     ) -> float:
-        return 1.
+        return 1.0
 
     def __repr__(self) -> str:
-        return 'host_guest.Complex()'
+        return "host_guest.Complex()"

@@ -91,7 +91,8 @@ class PeriodicCollapser(Optimizer):
                 mch.Atom(
                     id=atom.get_id(),
                     element_string=atom.__class__.__name__,
-                ) for atom in state.get_atoms()
+                )
+                for atom in state.get_atoms()
             ),
             bonds=get_mch_bonds(state),
             position_matrix=state.get_position_matrix(),
@@ -106,17 +107,17 @@ class PeriodicCollapser(Optimizer):
         old_pos_mat = state.get_position_matrix()
         new_pos_mat = mch_mol.get_position_matrix()
         old_extents = (
-            abs(max(old_pos_mat[:, i])-min(old_pos_mat[:, i]))
+            abs(max(old_pos_mat[:, i]) - min(old_pos_mat[:, i]))
             for i in range(3)
         )
         new_extents = (
-            abs(max(new_pos_mat[:, i])-min(new_pos_mat[:, i]))
+            abs(max(new_pos_mat[:, i]) - min(new_pos_mat[:, i]))
             for i in range(3)
         )
-        ratios = (n/o for n, o in zip(new_extents, old_extents))
+        ratios = (n / o for n, o in zip(new_extents, old_extents))
         old_lattice = state.get_lattice_constants()
         new_lattice = tuple(
-            old_lattice[i]*ratio for i, ratio in enumerate(ratios)
+            old_lattice[i] * ratio for i, ratio in enumerate(ratios)
         )
         state = state.with_lattice_constants(new_lattice)
         return state.with_position_matrix(
