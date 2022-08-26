@@ -24,7 +24,23 @@ dependencies = [
 requires-python = ">=3.9"
 dynamic = ["version"]
 
-
+[project.optional-dependencies]
+dev = [
+  "black",
+  "flake8",
+  "isort",
+  "moldoc",
+  "numpydoc",
+  "mypy",
+  "pytest",
+  "pytest-benchmark",
+  "pytest-datadir",
+  "pytest-lazy-fixture",
+  "sphinx",
+  "sphinx-autodoc-typehints",
+  "sphinx-rtd-theme",
+  "twine",
+]
 
 [project.urls]
 github = "https://github.com/lukasturcani/stk"
