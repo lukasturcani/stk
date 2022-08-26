@@ -56,7 +56,7 @@ python_files = [
 ]
 python_functions = [
   "test_*",
-  "benchmark_*"
+  "benchmark_*",
 ]
 
 [tool.mypy]
