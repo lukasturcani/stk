@@ -75,6 +75,11 @@ __ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembl
 using stk
 ---------
 
+* `Conformer-RL: A deep reinforcement learning library for conformer
+  generation`__
+
+__ https://onlinelibrary.wiley.com/doi/full/10.1002/jcc.26984
+
 * `High-throughput Computational Evaluation of Low Symmetry Pd2L4
   Cages to Aid in System Design`__
 
