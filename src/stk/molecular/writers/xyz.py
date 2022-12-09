@@ -7,6 +7,7 @@ XYZ Writer
 from __future__ import annotations
 
 import typing
+import pathlib
 
 from ...utilities import OneOrMany
 from ..molecules import Molecule
@@ -96,7 +97,7 @@ class XyzWriter:
     def write(
         self,
         molecule: Molecule,
-        path: str,
+        path: pathlib.Path | str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> None:
         """

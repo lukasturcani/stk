@@ -7,6 +7,7 @@ PDB Writer
 from __future__ import annotations
 
 import typing
+import pathlib
 
 from ...utilities import OneOrMany
 from ..molecules import Molecule
@@ -177,7 +178,7 @@ class PdbWriter:
     def write(
         self,
         molecule: Molecule,
-        path: str,
+        path: pathlib.Path | str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
         periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> None:
