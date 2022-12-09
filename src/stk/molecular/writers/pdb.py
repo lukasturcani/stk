@@ -6,8 +6,8 @@ PDB Writer
 
 from __future__ import annotations
 
-import typing
 import pathlib
+import typing
 
 from ...utilities import OneOrMany
 from ..molecules import Molecule
