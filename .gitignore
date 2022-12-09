@@ -6,6 +6,7 @@ src/stk/_version.py
 **/__pycache__/
 
 **/.cache
+**/.mypy_cache
 *.ipynb_checkpoints
 **/.vscode
 
