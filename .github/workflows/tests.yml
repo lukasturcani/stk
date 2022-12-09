@@ -94,19 +94,6 @@ jobs:
               run: conda run -n stk
                 pytest --mongodb_uri='mongodb://MongoDB:27017/'
 
-            - name: Dump the database
-              if: ${{ always() }}
-              run: mongodump
-                --forceTableScan
-                -o database-dump/database-dump
-                --uri='mongodb://MongoDB:27017/'
-
-            - name: Upload the database dump
-              if: ${{ always() }}
-              uses: actions/upload-artifact@v2
-              with:
-                name: database-dump
-                path: database-dump
 
     doctest:
         runs-on: ubuntu-20.04
