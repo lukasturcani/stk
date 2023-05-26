@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "stk"
 maintainers = [
-  { name = "Lukas Turcani", email = "lukasturcani@mailbox.org" },
+  { name = "Lukas Turcani", email = "lukasturcani93@gmail.com" },
   { name = "Andrew Tarzia", email = "andrew.tarzia@gmail.com" },
 ]
 dependencies = [
@@ -19,16 +19,15 @@ dependencies = [
   "MCHammer",
   "SpinDry",
   "vabene",
-  "rdkit-pypi",
+  "rdkit",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
   "black",
-  "flake8",
-  "isort",
+  "ruff",
   "moldoc",
   "numpydoc",
   "mypy",
@@ -36,6 +35,7 @@ dev = [
   "pytest-benchmark",
   "pytest-datadir",
   "pytest-lazy-fixture",
+  "pytest-cov",
   "sphinx",
   "sphinx-autodoc-typehints",
   "sphinx-rtd-theme",
@@ -55,11 +55,11 @@ stk = [
 write_to = "src/stk/_version.py"
 
 [tool.black]
-line-length = 71
+line-length = 79
 
-[tool.isort]
-line_length = 71
-profile = "black"
+[tool.ruff]
+line-length = 79
+extend-select = ["I"]
 
 [tool.pytest.ini_options]
 testpaths = [

@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import pytest
-
 import stk
 
 
 def build_kagome(
     lattice_size: tuple[int, int, int],
 ) -> stk.ConstructedMolecule:
-
     bb1 = stk.BuildingBlock("BrCCBr", [stk.BromoFactory()])
     bb2 = stk.BuildingBlock(
         smiles="BrC1C(Br)CC(Br)C(Br)C1",

@@ -46,9 +46,7 @@ def _test_mutate(mutator, record, mutation_record):
     """
 
     result = mutator.mutate(record)
-    assert (
-        result.get_mutator_name() == mutation_record.get_mutator_name()
-    )
+    assert result.get_mutator_name() == mutation_record.get_mutator_name()
     is_equivalent(
         result.get_molecule_record().get_molecule(),
         mutation_record.get_molecule_record().get_molecule(),

@@ -106,9 +106,7 @@ class MoleculeRecord:
         clone._molecule = self._molecule
         clone._topology_graph = self._topology_graph
         clone._fitness_value = self._fitness_value
-        clone._normalized_fitness_value = (
-            self._normalized_fitness_value
-        )
+        clone._normalized_fitness_value = self._normalized_fitness_value
         return clone
 
     def with_fitness_value(self, fitness_value, normalized=True):

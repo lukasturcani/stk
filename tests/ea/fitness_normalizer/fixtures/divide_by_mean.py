@@ -1,16 +1,12 @@
 import pytest
-
 import stk
 
 from ..case_data import CaseData
 
 
 def _get_case_data_1() -> CaseData:
-
     topology_graph = stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=2,
     )
@@ -42,11 +38,8 @@ def _get_case_data_1() -> CaseData:
 
 
 def _get_case_data_2() -> CaseData:
-
     topology_graph = stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=2,
     )

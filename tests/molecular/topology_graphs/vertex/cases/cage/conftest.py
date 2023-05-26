@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from pytest_lazyfixture import lazy_fixture
-
 import stk
+from pytest_lazyfixture import lazy_fixture
 
 from ...case_data import CaseData
 
@@ -41,9 +40,7 @@ def cage2(init_at_center, vertices_):
             vertices=vertices_,
         ),
         id=0,
-        position=(
-            sum(v.get_position() for v in vertices_) / len(vertices_)
-        ),
+        position=(sum(v.get_position() for v in vertices_) / len(vertices_)),
         cell=np.array([0, 0, 0]),
     )
 

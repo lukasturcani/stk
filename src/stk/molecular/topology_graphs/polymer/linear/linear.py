@@ -486,9 +486,7 @@ class Linear(TopologyGraph):
         """
 
         if orientations is None:
-            orientations = tuple(
-                0.0 for i in range(len(repeating_unit))
-            )
+            orientations = tuple(0.0 for i in range(len(repeating_unit)))
 
         if len(orientations) == len(repeating_unit):
             orientations = orientations * num_repeating_units
@@ -587,9 +585,7 @@ class Linear(TopologyGraph):
             vertices.append(
                 LinearVertex(i, np.array([i, 0, 0]), flip),
             )
-            edges.append(
-                Edge(len(edges), vertices[i - 1], vertices[i])
-            )
+            edges.append(Edge(len(edges), vertices[i - 1], vertices[i]))
 
         vertices.append(
             TailVertex(
@@ -620,7 +616,6 @@ class Linear(TopologyGraph):
     def _normalize_repeating_unit(
         repeating_unit: typing.Union[str, tuple[int, ...]],
     ) -> tuple[int, ...]:
-
         if isinstance(repeating_unit, tuple):
             return repeating_unit
 
@@ -632,18 +627,13 @@ class Linear(TopologyGraph):
         building_blocks: tuple[BuildingBlock, ...],
         vertices: tuple[LinearVertex, ...],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
-
         polymer = self._repeating_unit * self._num_repeating_units
 
-        building_block_vertices: dict[
-            BuildingBlock, list[LinearVertex]
-        ] = {}
+        building_block_vertices: dict[BuildingBlock, list[LinearVertex]] = {}
 
         for bb_index, vertex in zip(polymer, vertices):
             bb = building_blocks[bb_index]
-            building_block_vertices[bb] = building_block_vertices.get(
-                bb, []
-            )
+            building_block_vertices[bb] = building_block_vertices.get(bb, [])
             building_block_vertices[bb].append(vertex)
 
         return self._with_unaligning_vertices(
@@ -652,11 +642,8 @@ class Linear(TopologyGraph):
 
     @staticmethod
     def _with_unaligning_vertices(
-        building_block_vertices: dict[
-            BuildingBlock, list[LinearVertex]
-        ],
+        building_block_vertices: dict[BuildingBlock, list[LinearVertex]],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
-
         clone: dict[BuildingBlock, abc.Sequence[Vertex]]
         clone = {}
         terminal_ids = {
@@ -698,13 +685,9 @@ class Linear(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
-        return max(
-            bb.get_maximum_diameter() for bb in building_block_vertices
-        )
+        return max(bb.get_maximum_diameter() for bb in building_block_vertices)
 
     def with_building_blocks(
         self,

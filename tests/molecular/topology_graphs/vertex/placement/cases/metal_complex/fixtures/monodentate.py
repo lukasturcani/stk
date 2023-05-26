@@ -1,16 +1,14 @@
 from functools import partial
 
 import pytest
-from scipy.spatial.distance import euclidean
-
 import stk
+from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
 
 @pytest.fixture
 def monodentate(position, building_block_1):
-
     point1, point2 = points = (
         position + [-10, 0, 0],
         position + [10, 0, 0],
@@ -58,7 +56,6 @@ def get_fg_position(id, building_block):
 
 
 def get_core_position(building_block):
-
     return building_block.get_centroid(
         atom_ids=building_block.get_core_atom_ids(),
     )

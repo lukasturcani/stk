@@ -1,7 +1,6 @@
 import itertools as it
 
 import numpy as np
-
 import stk
 
 
@@ -34,15 +33,12 @@ def is_clone(construction_state, clone):
     for bond_info1, bond_info2 in bond_infos:
         assert bond_info1 is bond_info2
 
-    assert (
-        construction_state.get_num_vertices()
-        == clone.get_num_vertices()
-    )
+    assert construction_state.get_num_vertices() == clone.get_num_vertices()
 
     for vertex_id in range(clone.get_num_vertices()):
-        assert construction_state.get_vertex(
+        assert construction_state.get_vertex(vertex_id) is clone.get_vertex(
             vertex_id
-        ) is clone.get_vertex(vertex_id)
+        )
 
     assert np.all(
         np.equal(
@@ -53,9 +49,7 @@ def is_clone(construction_state, clone):
 
     assert construction_state.get_num_edges() == clone.get_num_edges()
     for edge_id in range(clone.get_num_edges()):
-        assert construction_state.get_edge(edge_id) is clone.get_edge(
-            edge_id
-        )
+        assert construction_state.get_edge(edge_id) is clone.get_edge(edge_id)
 
     edge_group = stk.EdgeGroup(
         edges=map(clone.get_edge, range(clone.get_num_edges())),

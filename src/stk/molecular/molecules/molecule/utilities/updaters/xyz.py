@@ -55,9 +55,7 @@ def _with_structure_from_xyz(self, path):
             element = periodic_table[int(element)]
 
         if element != self._atoms[i].__class__.__name__:
-            raise RuntimeError(
-                f"Atom {i} element does not match file."
-            )
+            raise RuntimeError(f"Atom {i} element does not match file.")
 
         new_coords.append([float(i) for i in coords])
 

@@ -45,7 +45,6 @@ class SingleAtom(GenericFunctionalGroup):
         return self._atom
 
     def with_atoms(self, atom_map):
-
         clone = super().with_atoms(atom_map)
         clone._atom = atom_map.get(
             self._atom.get_id(),

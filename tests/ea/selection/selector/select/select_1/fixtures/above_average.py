@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
-
 import stk
+from pytest_lazyfixture import lazy_fixture
 
 from ..case_data import CaseData
 from .utilities import get_rank_fitness
@@ -11,9 +10,7 @@ from .utilities import get_rank_fitness
 
 def get_topology_graph(num_repeating_units):
     return stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )

@@ -235,7 +235,6 @@ lattice.html
         return self._gamma
 
     def __str__(self) -> str:
-
         return (
             f"{self.__class__.__name__}(a={self._a}, b={self._b}, "
             f"c={self._c}, alpha={self._alpha}, beta={self._beta}, "

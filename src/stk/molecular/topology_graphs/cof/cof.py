@@ -419,9 +419,7 @@ class Cof(TopologyGraph):
         """
 
         self._vertex_alignments = (
-            dict(vertex_alignments)
-            if vertex_alignments is not None
-            else {}
+            dict(vertex_alignments) if vertex_alignments is not None else {}
         )
         self._lattice_size = lattice_size
         self._periodic = periodic
@@ -455,12 +453,10 @@ class Cof(TopologyGraph):
                 for building_block, ids in building_blocks.items()
             }
         else:
-            building_block_vertices = (
-                self._get_building_block_vertices(
-                    building_blocks=building_blocks,
-                    vertices=vertices,
-                    edges=edges,
-                )
+            building_block_vertices = self._get_building_block_vertices(
+                building_blocks=building_blocks,
+                vertices=vertices,
+                edges=edges,
             )
 
         building_block_vertices = self._with_unaligning_vertices(
@@ -526,8 +522,7 @@ class Cof(TopologyGraph):
 
         if unassigned_ids:
             raise UnoccupiedVertexError(
-                "The following vertices are unoccupied "
-                f"{unassigned_ids}."
+                "The following vertices are unoccupied " f"{unassigned_ids}."
             )
 
     def clone(self):
@@ -563,9 +558,7 @@ class Cof(TopologyGraph):
             return None
 
         return tuple(
-            EdgeGroup((edge,))
-            for edge in edges
-            if not edge.is_periodic()
+            EdgeGroup((edge,)) for edge in edges if not edge.is_periodic()
         )
 
     def _get_vertices(self, lattice):
@@ -587,9 +580,7 @@ class Cof(TopologyGraph):
         """
 
         xdim, ydim, zdim = self._lattice_size
-        num_vertices = (
-            xdim * ydim * zdim * len(self._vertex_prototypes)
-        )
+        num_vertices = xdim * ydim * zdim * len(self._vertex_prototypes)
         vertices = [None for i in range(num_vertices)]
         for x, y, z in it.product(
             range(xdim),
@@ -640,8 +631,7 @@ class Cof(TopologyGraph):
         for id_, (cell, vertex) in enumerate(vertices):
             x, y, z = cell
             shift = sum(
-                axis * dim
-                for axis, dim in zip(cell, self._lattice_constants)
+                axis * dim for axis, dim in zip(cell, self._lattice_constants)
             )
             lattice[x][y][z][vertex.get_id()] = vertex.__class__(
                 id=id_,
@@ -768,9 +758,7 @@ class Cof(TopologyGraph):
             building_blocks_by_degree[num_fgs] = building_block
 
         vertex_degrees = Counter(
-            vertex_id
-            for edge in edges
-            for vertex_id in edge.get_vertex_ids()
+            vertex_id for edge in edges for vertex_id in edge.get_vertex_ids()
         )
 
         building_block_vertices = {}

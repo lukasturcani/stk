@@ -147,9 +147,7 @@ class Molecule:
 
         """
 
-        self._position_matrix = (
-            self._position_matrix.T + displacement
-        ).T
+        self._position_matrix = (self._position_matrix.T + displacement).T
         return self
 
     def with_displacement(
@@ -312,7 +310,6 @@ class Molecule:
         axis: np.ndarray,
         origin: np.ndarray,
     ) -> _T:
-
         # If the vector being rotated is not finite, exit. This is
         # probably due to a planar molecule.
         if not all(np.isfinite(x) for x in start):
@@ -706,7 +703,6 @@ class Molecule:
         position: np.ndarray,
         atom_ids: typing.Optional[OneOrMany[int]],
     ) -> _T:
-
         centroid = self.get_centroid(atom_ids=atom_ids)
         self._with_displacement(position - centroid)
         return self
@@ -887,9 +883,7 @@ class Molecule:
                 key=get_bond_atom_ids,
             )
         )
-        old_ids = {
-            atom.get_id(): old_id for old_id, atom in atom_map.items()
-        }
+        old_ids = {atom.get_id(): old_id for old_id, atom in atom_map.items()}
         self._position_matrix = np.array(
             np.array(
                 [

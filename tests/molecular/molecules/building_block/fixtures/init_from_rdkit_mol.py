@@ -1,6 +1,5 @@
 import pytest
 import rdkit.Chem.AllChem as rdkit
-
 import stk
 
 from ..case_data import CaseData

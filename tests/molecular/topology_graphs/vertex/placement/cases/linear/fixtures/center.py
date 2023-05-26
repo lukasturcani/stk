@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ....case_data import CaseData
@@ -8,7 +7,6 @@ from .utilities import get_closest_point, get_edges, get_fg_position
 
 @pytest.fixture
 def center(position, flip, building_block_2):
-
     point1, point2 = points = (
         position + [-10, 0, 0],
         position + [10, 0, 0],

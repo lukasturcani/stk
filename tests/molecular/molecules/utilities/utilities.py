@@ -1,5 +1,4 @@
 import numpy as np
-
 import stk
 
 from .building_block import is_clone_building_block

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pymongo
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -27,7 +26,6 @@ def get_database(
     key_makers: tuple[stk.MoleculeKeyMaker, ...],
     indices: tuple[str, ...],
 ) -> stk.MoleculeMongoDb:
-
     return stk.MoleculeMongoDb(
         mongo_client=mongo_client,
         database=database_name,
@@ -43,7 +41,6 @@ def molecule_mongo_db(
     mongo_client: pymongo.MongoClient,
     molecules: tuple[stk.BuildingBlock, ...],
 ) -> CaseData:
-
     inchi = stk.Inchi()
     smiles = stk.Smiles()
     database_name = "_test_get_all_molecules"

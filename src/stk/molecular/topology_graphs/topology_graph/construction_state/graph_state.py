@@ -162,9 +162,7 @@ class _GraphState:
         """
 
         clone = self.__class__.__new__(self.__class__)
-        clone._vertex_building_blocks = dict(
-            self._vertex_building_blocks
-        )
+        clone._vertex_building_blocks = dict(self._vertex_building_blocks)
         clone._vertices = dict(self._vertices)
         clone._vertex_edges = dict(self._vertex_edges)
         clone._edges = self._edges
@@ -303,9 +301,7 @@ class _GraphState:
 
         """
 
-        self._vertices = {
-            vertex.get_id(): vertex for vertex in vertices
-        }
+        self._vertices = {vertex.get_id(): vertex for vertex in vertices}
         return self
 
     def with_vertices(self, vertices):

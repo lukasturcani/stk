@@ -1,7 +1,6 @@
 from typing import Callable
 
 import pytest
-
 import stk
 
 

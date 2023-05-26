@@ -76,7 +76,6 @@ class CycleVertex(Vertex):
         building_block: BuildingBlock,
         edges: tuple[Edge, ...],
     ) -> np.ndarray:
-
         assert building_block.get_num_functional_groups() == 2, (
             f"{building_block} needs to have exactly 2 functional "
             "groups but has "
@@ -112,7 +111,6 @@ class CycleVertex(Vertex):
         building_block: BuildingBlock,
         edges: tuple[Edge, ...],
     ) -> dict[int, int]:
-
         fg0_position = building_block.get_centroid(
             atom_ids=next(
                 building_block.get_functional_groups()
@@ -125,11 +123,7 @@ class CycleVertex(Vertex):
         edge0 = min(edges, key=fg0_distance)
         return {
             0: edge0.get_id(),
-            1: (
-                edges[1].get_id()
-                if edge0 is edges[0]
-                else edges[0].get_id()
-            ),
+            1: (edges[1].get_id() if edge0 is edges[0] else edges[0].get_id()),
         }
 
     def __str__(self) -> str:

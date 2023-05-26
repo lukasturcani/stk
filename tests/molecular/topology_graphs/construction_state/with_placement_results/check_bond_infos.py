@@ -5,9 +5,7 @@ def check_bond_infos(old_state, new_state, building_blocks):
     old_infos = tuple(old_state.get_bond_infos())
     new_infos = tuple(new_state.get_bond_infos())
     num_added = len(new_infos) - len(old_infos)
-    assert num_added == sum(
-        bb.get_num_bonds() for bb in building_blocks
-    )
+    assert num_added == sum(bb.get_num_bonds() for bb in building_blocks)
 
     for info1, info2 in zip(
         # Take just the newly added infos.
@@ -21,10 +19,7 @@ def check_bond_infos(old_state, new_state, building_blocks):
 
 def get_infos(old_state, new_state, building_blocks):
     start_building_block_index = max(
-        (
-            info.building_block_index + 1
-            for info in old_state.get_bond_infos()
-        ),
+        (info.building_block_index + 1 for info in old_state.get_bond_infos()),
         default=0,
     )
     start_atom_index = sum(1 for _ in old_state.get_atoms())

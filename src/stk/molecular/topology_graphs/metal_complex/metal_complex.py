@@ -523,15 +523,9 @@ class MetalComplex(TopologyGraph):
 
     _edge_prototypes: typing.ClassVar[tuple[Edge, ...]]
     _metal_vertex_prototypes: typing.ClassVar[tuple[MetalVertex, ...]]
-    _ligand_vertex_prototypes: typing.ClassVar[
-        tuple[_LigandVertex, ...],
-    ]
-    _metal_vertices_of_degree: typing.ClassVar[
-        abc.Mapping[int, set[int]],
-    ]
-    _ligand_vertices_of_degree: typing.ClassVar[
-        abc.Mapping[int, set[int]],
-    ]
+    _ligand_vertex_prototypes: typing.ClassVar[tuple[_LigandVertex, ...],]
+    _metal_vertices_of_degree: typing.ClassVar[abc.Mapping[int, set[int]],]
+    _ligand_vertices_of_degree: typing.ClassVar[abc.Mapping[int, set[int]],]
     _vertex_degrees: typing.ClassVar[abc.Mapping[int, int]]
 
     def __init_subclass__(cls, **kwargs: typing.Any) -> None:
@@ -649,8 +643,7 @@ class MetalComplex(TopologyGraph):
             reaction_factory = DativeReactionFactory(
                 GenericReactionFactory(
                     bond_orders={
-                        frozenset(pair): 9
-                        for pair in functional_group_pairs
+                        frozenset(pair): 9 for pair in functional_group_pairs
                     }
                 )
             )
@@ -699,8 +692,7 @@ class MetalComplex(TopologyGraph):
                 metal.get_num_functional_groups() for metal in metals
             )
             assert all(
-                count == 1
-                for count in functional_group_counter.values()
+                count == 1 for count in functional_group_counter.values()
             ), (
                 "Cannot use a tuple when multiple metals "
                 "have the same number of functional groups. "
@@ -718,9 +710,7 @@ class MetalComplex(TopologyGraph):
             }
         else:
             ids = range(len(self._metal_vertex_prototypes))
-            metals_dict = {
-                metals: tuple(self._get_metal_vertices(ids))
-            }
+            metals_dict = {metals: tuple(self._get_metal_vertices(ids))}
 
         return metals_dict
 
@@ -761,12 +751,10 @@ class MetalComplex(TopologyGraph):
             }
         elif isinstance(ligands, tuple):
             functional_group_counter = Counter(
-                ligand.get_num_functional_groups()
-                for ligand in ligands
+                ligand.get_num_functional_groups() for ligand in ligands
             )
             assert all(
-                count == 1
-                for count in functional_group_counter.values()
+                count == 1 for count in functional_group_counter.values()
             ), (
                 "Cannot use a tuple when multiple ligands "
                 "have the same number of functional groups. "
@@ -785,9 +773,7 @@ class MetalComplex(TopologyGraph):
 
         else:
             ids = range(len(self._ligand_vertex_prototypes))
-            ligands_dict = {
-                ligands: tuple(self._get_ligand_vertices(ids))
-            }
+            ligands_dict = {ligands: tuple(self._get_ligand_vertices(ids))}
 
         return ligands_dict
 
@@ -841,9 +827,7 @@ class MetalComplex(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
         return 1
 

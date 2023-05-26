@@ -1,6 +1,0 @@
-[flake8]
-ignore = E501,W503,E203
-count = True
-show-source = True
-statistics = True
-exclude = .venv

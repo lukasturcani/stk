@@ -348,7 +348,6 @@ class ConstructedMolecule(Molecule):
         old_atom_infos = self._atom_infos
 
         def get_atom_info(atom: Atom) -> AtomInfo:
-
             old_atom_info = old_atom_infos[id_map[atom.get_id()]]
             old_building_block = old_atom_info.get_building_block()
 
@@ -371,9 +370,7 @@ class ConstructedMolecule(Molecule):
                 old_building_block
             ][old_building_block_atom.get_id()]
 
-            canonical_building_block = building_blocks[
-                old_building_block
-            ]
+            canonical_building_block = building_blocks[old_building_block]
 
             (
                 canonical_building_block_atom,
@@ -385,9 +382,7 @@ class ConstructedMolecule(Molecule):
                 atom=atom,
                 building_block_atom=canonical_building_block_atom,
                 building_block=canonical_building_block,
-                building_block_id=(
-                    old_atom_info.get_building_block_id()
-                ),
+                building_block_id=(old_atom_info.get_building_block_id()),
             )
 
         def get_bond_info(info: BondInfo) -> BondInfo:
@@ -418,21 +413,18 @@ class ConstructedMolecule(Molecule):
         position: np.ndarray,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> ConstructedMolecule:
-
         return self.clone()._with_centroid(position, atom_ids)
 
     def with_displacement(
         self,
         displacement: np.ndarray,
     ) -> ConstructedMolecule:
-
         return self.clone()._with_displacement(displacement)
 
     def with_position_matrix(
         self,
         position_matrix: np.ndarray,
     ) -> ConstructedMolecule:
-
         return self.clone()._with_position_matrix(position_matrix)
 
     def with_rotation_about_axis(
@@ -441,7 +433,6 @@ class ConstructedMolecule(Molecule):
         axis: np.ndarray,
         origin: np.ndarray,
     ) -> ConstructedMolecule:
-
         return self.clone()._with_rotation_about_axis(
             angle=angle,
             axis=axis,
@@ -454,7 +445,6 @@ class ConstructedMolecule(Molecule):
         target: np.ndarray,
         origin: np.ndarray,
     ) -> ConstructedMolecule:
-
         return self.clone()._with_rotation_between_vectors(
             start=start,
             target=target,
@@ -468,7 +458,6 @@ class ConstructedMolecule(Molecule):
         axis: np.ndarray,
         origin: np.ndarray,
     ) -> ConstructedMolecule:
-
         return self.clone()._with_rotation_to_minimize_angle(
             start=start,
             target=target,
@@ -481,7 +470,6 @@ class ConstructedMolecule(Molecule):
         path: str,
         extension: typing.Optional[str] = None,
     ) -> ConstructedMolecule:
-
         return typing.cast(
             ConstructedMolecule,
             super().with_structure_from_file(path, extension),
@@ -492,7 +480,6 @@ class ConstructedMolecule(Molecule):
         path: str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> ConstructedMolecule:
-
         return typing.cast(
             ConstructedMolecule,
             super().write(path, atom_ids),

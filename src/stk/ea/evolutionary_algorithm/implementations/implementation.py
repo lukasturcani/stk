@@ -55,9 +55,7 @@ class Implementation:
 
         population = self._initial_population
 
-        self._logger.info(
-            "Calculating fitness values of initial population."
-        )
+        self._logger.info("Calculating fitness values of initial population.")
         population = tuple(self._with_fitness_values(map_, population))
         population = tuple(
             self._fitness_normalizer.normalize(
@@ -75,9 +73,7 @@ class Implementation:
             self._logger.info(f"Population size is {len(population)}.")
 
             self._logger.info("Doing crossovers.")
-            crossover_records = tuple(
-                self._get_crossover_records(population)
-            )
+            crossover_records = tuple(self._get_crossover_records(population))
 
             self._logger.info("Doing mutations.")
             mutation_records = tuple(
@@ -92,12 +88,10 @@ class Implementation:
             self._logger.info("Calculating fitness values.")
 
             offspring = (
-                record.get_molecule_record()
-                for record in crossover_records
+                record.get_molecule_record() for record in crossover_records
             )
             mutants = (
-                record.get_molecule_record()
-                for record in mutation_records
+                record.get_molecule_record() for record in mutation_records
             )
 
             population = tuple(
@@ -105,17 +99,13 @@ class Implementation:
                     map_=map_,
                     population=tuple(
                         dedupe(
-                            iterable=it.chain(
-                                population, offspring, mutants
-                            ),
+                            iterable=it.chain(population, offspring, mutants),
                             key=get_key,
                         )
                     ),
                 )
             )
-            population = tuple(
-                self._fitness_normalizer.normalize(population)
-            )
+            population = tuple(self._fitness_normalizer.normalize(population))
 
             population = tuple(
                 molecule_record

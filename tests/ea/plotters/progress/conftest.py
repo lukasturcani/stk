@@ -1,6 +1,5 @@
 import pandas as pd
 import pytest
-
 import stk
 
 from .case_data import CaseData
@@ -8,9 +7,7 @@ from .case_data import CaseData
 
 def _get_topology_graph() -> stk.polymer.Linear:
     return stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=2,
     )
@@ -69,8 +66,7 @@ def get_generation(*fitness_values):
                 ),
                 get_property=lambda record: record.get_fitness_value(),
                 y_label="Fitness Value",
-                filter=lambda record: record.get_fitness_value()
-                is not None,
+                filter=lambda record: record.get_fitness_value() is not None,
             ),
             plot_data=pd.DataFrame(
                 {

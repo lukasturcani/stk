@@ -438,9 +438,7 @@ class NRotaxane(TopologyGraph):
         """
 
         if orientations is None:
-            orientations = tuple(
-                0.0 for i in range(len(repeating_unit))
-            )
+            orientations = tuple(0.0 for i in range(len(repeating_unit)))
 
         if len(orientations) == len(repeating_unit):
             orientations = orientations * num_repeating_units
@@ -514,9 +512,7 @@ class NRotaxane(TopologyGraph):
         building_block_vertices[axle] = vertices[0:1]
         for cycle_index, vertex in zip(threads, vertices[1:]):
             bb = cycles[cycle_index]
-            building_block_vertices[bb] = building_block_vertices.get(
-                bb, []
-            )
+            building_block_vertices[bb] = building_block_vertices.get(bb, [])
             building_block_vertices[bb].append(vertex)
         return building_block_vertices
 

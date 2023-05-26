@@ -1,7 +1,8 @@
-dist
-build
+/dist
+/build
 src/stk.egg-info
 src/stk/_version.py
+/.coverage
 
 **/__pycache__/
 

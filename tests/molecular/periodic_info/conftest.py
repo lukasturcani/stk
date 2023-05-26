@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-
 import stk
 
 from .case_data import CaseData
@@ -27,5 +26,4 @@ from .case_data import CaseData
     ),
 )
 def periodic_case(request) -> CaseData:
-
     return request.param()

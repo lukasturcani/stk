@@ -257,9 +257,7 @@ class TopologyGraph:
             )
 
         if edge_groups is None:
-            edge_groups = tuple(
-                EdgeGroup((edge,)) for edge in self._edges
-            )
+            edge_groups = tuple(EdgeGroup((edge,)) for edge in self._edges)
         self._edge_groups = edge_groups
 
         self._optimizer = optimizer
@@ -279,14 +277,10 @@ class TopologyGraph:
         def undo_scale(vertex):
             return vertex.with_scale(1 / self._scale)
 
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ]
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]]
         building_block_vertices = {
-            building_block_map.get(
-                building_block, building_block
-            ): tuple(map(undo_scale, vertices))
-            for building_block, vertices in self._building_block_vertices.items()
+            building_block_map.get(bb, bb): tuple(map(undo_scale, vertices))
+            for bb, vertices in self._building_block_vertices.items()
         }
         scale = self._get_scale(building_block_vertices)
 
@@ -352,9 +346,7 @@ class TopologyGraph:
     def _clone(self: _TopologyGraphT) -> _TopologyGraphT:
         clone = self.__class__.__new__(self.__class__)
         clone._scale = self._scale
-        clone._building_block_vertices = dict(
-            self._building_block_vertices
-        )
+        clone._building_block_vertices = dict(self._building_block_vertices)
         clone._edges = self._edges
         clone._reaction_factory = self._reaction_factory
         clone._implementation = self._implementation
@@ -386,9 +378,7 @@ class TopologyGraph:
         ) in self._building_block_vertices.items():
             for vertex in vertices:
                 num_vertices += 1
-                vertex_building_blocks[
-                    vertex.get_id()
-                ] = building_block
+                vertex_building_blocks[vertex.get_id()] = building_block
 
         yielded = set()
         for vertex_id in range(num_vertices):
@@ -417,9 +407,7 @@ class TopologyGraph:
 
         """
 
-        return len(
-            self._building_block_vertices.get(building_block, [])
-        )
+        return len(self._building_block_vertices.get(building_block, []))
 
     def _get_lattice_constants(self) -> typing.Iterator[np.ndarray]:
         """

@@ -19,9 +19,7 @@ class MockConstructionState(stk.ConstructionState):
     ):
         self._molecule_state = _MoleculeState()
         self._molecule_state._position_matrix = position_matrix
-        self._molecule_state._edge_functional_groups = (
-            edge_functional_groups
-        )
+        self._molecule_state._edge_functional_groups = edge_functional_groups
         self._graph_state = MockGraphState(edges)
 
 

@@ -95,7 +95,6 @@ class Bromo(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Bromo:
-
         super()._with_ids(id_map)
         if (bromine_id := self._bromine.get_id()) in id_map:
             self._bromine = self._bromine.with_id(id_map[bromine_id])

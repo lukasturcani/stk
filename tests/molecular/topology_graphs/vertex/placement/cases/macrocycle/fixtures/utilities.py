@@ -1,9 +1,8 @@
 from functools import partial
 
 import numpy as np
-from scipy.spatial.distance import euclidean
-
 import stk
+from scipy.spatial.distance import euclidean
 
 
 def get_fg_position(id, building_block):

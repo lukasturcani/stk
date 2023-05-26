@@ -3,7 +3,6 @@ from functools import partial
 
 import numpy as np
 import pytest
-
 import stk
 
 from ..utilities import is_clone
@@ -74,8 +73,6 @@ def get_placement_result(construction_state, building_block):
         ),
         functional_group_edges={
             fg_id: next(edges)
-            for fg_id in range(
-                building_block.get_num_functional_groups()
-            )
+            for fg_id in range(building_block.get_num_functional_groups())
         },
     )

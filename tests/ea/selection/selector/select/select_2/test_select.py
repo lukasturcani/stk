@@ -66,6 +66,4 @@ def _test_select(selector, population, selected):
 
 def get_inchis(batch):
     inchi = stk.Inchi()
-    return tuple(
-        inchi.get_key(record.get_molecule()) for record in batch
-    )
+    return tuple(inchi.get_key(record.get_molecule()) for record in batch)

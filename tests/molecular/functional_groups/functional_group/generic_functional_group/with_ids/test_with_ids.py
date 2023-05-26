@@ -88,7 +88,6 @@ def is_modified_id_sequence(
     modified_ids: Iterable[int],
     id_map: dict[int, int],
 ) -> None:
-
     for original_id, modified_id in it.zip_longest(
         original_ids,
         modified_ids,

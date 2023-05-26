@@ -29,7 +29,6 @@ class Parallel(Implementation):
         logger,
         num_processes,
     ):
-
         super().__init__(
             initial_population=initial_population,
             fitness_calculator=fitness_calculator,

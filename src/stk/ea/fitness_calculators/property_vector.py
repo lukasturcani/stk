@@ -259,7 +259,6 @@ class PropertyVector(FitnessCalculator):
         input_database=None,
         output_database=None,
     ):
-
         """
         Initialize a :class:`.PropertyVector` instance.
 

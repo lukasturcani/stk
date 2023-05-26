@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from .case_data import CaseData
@@ -145,5 +144,4 @@ def _get_cof_case() -> CaseData:
     ),
 )
 def case_data(request) -> CaseData:
-
     return request.param()

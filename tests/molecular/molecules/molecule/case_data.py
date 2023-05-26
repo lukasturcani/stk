@@ -1,5 +1,4 @@
 import numpy as np
-
 import stk
 
 
@@ -31,7 +30,6 @@ class CaseData:
         smiles: str,
         name: str,
     ) -> None:
-
         self.molecule = molecule
         self.smiles = smiles
         self.name = name

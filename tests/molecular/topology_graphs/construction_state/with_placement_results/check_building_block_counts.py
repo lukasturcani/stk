@@ -7,9 +7,7 @@ def check_building_block_counts(old_state, new_state, building_blocks):
     new_count = new_state.get_building_block_counts()
 
     for building_block in old_count:
-        expected_count = (
-            old_count[building_block] - new_count[building_block]
-        )
+        expected_count = old_count[building_block] - new_count[building_block]
         assert counts.get(building_block, 0) == expected_count
 
     new_only = new_count.keys() - old_count.keys()

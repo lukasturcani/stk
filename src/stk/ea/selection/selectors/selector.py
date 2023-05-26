@@ -235,6 +235,4 @@ class Selector:
         raise NotImplementedError()
 
     def _get_fitness_values(self, population):
-        return {
-            record: record.get_fitness_value() for record in population
-        }
+        return {record: record.get_fitness_value() for record in population}

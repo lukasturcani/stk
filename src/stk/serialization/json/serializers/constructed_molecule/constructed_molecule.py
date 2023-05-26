@@ -138,9 +138,7 @@ class ConstructedMoleculeJsonizer:
 
         def get_keys(building_block):
             return {
-                key_maker.get_key_name(): key_maker.get_key(
-                    building_block
-                )
+                key_maker.get_key_name(): key_maker.get_key(building_block)
                 for key_maker in self._key_makers
                 if isinstance(key_maker, MoleculeKeyMaker)
             }

@@ -31,7 +31,6 @@ class AtomImpl(Atom):
         id: int,
         charge: int = 0,
     ) -> None:
-
         self._id = id
         self._charge = charge
 
@@ -60,9 +59,7 @@ class AtomImpl(Atom):
         return type(self)(self._id, self._charge)
 
     def __repr__(self) -> str:
-        charge = (
-            f", charge={self._charge}" if self._charge != 0 else ""
-        )
+        charge = f", charge={self._charge}" if self._charge != 0 else ""
         return f"{self.__class__.__name__}({self._id}{charge})"
 
     def __str__(self) -> str:

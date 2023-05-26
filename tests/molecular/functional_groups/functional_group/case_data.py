@@ -98,8 +98,6 @@ class GenericCaseData(CaseData):
             atoms=atoms,
             placers=bonders,
             core_atoms=tuple(
-                atom
-                for atom in atoms
-                if atom.get_id() not in deleter_ids
+                atom for atom in atoms if atom.get_id() not in deleter_ids
             ),
         )

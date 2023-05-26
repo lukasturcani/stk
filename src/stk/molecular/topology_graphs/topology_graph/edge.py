@@ -241,6 +241,4 @@ class Edge:
         return str(self)
 
     def __str__(self):
-        return (
-            f"Edge({self._id}, {self._vertex1_id}, {self._vertex2_id})"
-        )
+        return f"Edge({self._id}, {self._vertex1_id}, {self._vertex2_id})"

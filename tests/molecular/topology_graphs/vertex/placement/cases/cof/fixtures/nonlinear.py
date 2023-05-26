@@ -2,10 +2,9 @@ from functools import partial
 
 import numpy as np
 import pytest
+import stk
 from pytest_lazyfixture import lazy_fixture
 from scipy.spatial.distance import euclidean
-
-import stk
 from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
 
 from ....case_data import CaseData
@@ -170,13 +169,9 @@ def get_points(center, num_points):
 
     # Take slice to account for case where rounding errors cause
     # extra theta.
-    thetas = np.arange(0, 2 * np.pi, 2 * np.pi / num_points)[
-        :num_points
-    ]
+    thetas = np.arange(0, 2 * np.pi, 2 * np.pi / num_points)[:num_points]
     for theta in thetas:
-        yield center + 10 * np.array(
-            [np.sin(theta), np.cos(theta), 0.0]
-        )
+        yield center + 10 * np.array([np.sin(theta), np.cos(theta), 0.0])
 
 
 def get_fg_point(points, fg_id, building_block):

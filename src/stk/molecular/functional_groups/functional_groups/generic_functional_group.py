@@ -61,9 +61,7 @@ class GenericFunctionalGroup(FunctionalGroup):
             atoms=atoms,
             placers=bonders if placers is None else placers,
             core_atoms=tuple(
-                atom
-                for atom in atoms
-                if atom.get_id() not in deleter_set
+                atom for atom in atoms if atom.get_id() not in deleter_set
             ),
         )
         self._bonders = bonders
@@ -82,20 +80,13 @@ class GenericFunctionalGroup(FunctionalGroup):
         self,
         atom_map: dict[int, Atom],
     ) -> GenericFunctionalGroup:
-
         return GenericFunctionalGroup(
-            atoms=tuple(
-                atom_map.get(a.get_id(), a) for a in self._atoms
-            ),
-            bonders=tuple(
-                atom_map.get(a.get_id(), a) for a in self._bonders
-            ),
+            atoms=tuple(atom_map.get(a.get_id(), a) for a in self._atoms),
+            bonders=tuple(atom_map.get(a.get_id(), a) for a in self._bonders),
             deleters=tuple(
                 atom_map.get(a.get_id(), a) for a in self._deleters
             ),
-            placers=tuple(
-                atom_map.get(a.get_id(), a) for a in self._placers
-            ),
+            placers=tuple(atom_map.get(a.get_id(), a) for a in self._placers),
         )
 
     def _with_ids(self: _T, id_map: dict[int, int]) -> _T:
@@ -124,7 +115,6 @@ class GenericFunctionalGroup(FunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> GenericFunctionalGroup:
-
         return self.clone()._with_ids(id_map)
 
     def get_bonders(self) -> typing.Iterator[Atom]:

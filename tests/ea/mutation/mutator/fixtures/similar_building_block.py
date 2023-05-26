@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -11,7 +10,6 @@ def has_bromo(building_block):
 
 
 def _get_case_data_1() -> CaseData:
-
     bb1 = stk.BuildingBlock("BrCCBr", [stk.BromoFactory()])
     graph1 = stk.polymer.Linear((bb1,), "A", 2)
 

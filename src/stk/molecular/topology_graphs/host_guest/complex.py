@@ -489,16 +489,11 @@ class Complex(TopologyGraph):
         host: BuildingBlock,
         guests: typing.Union[Guest, typing.Iterable[Guest]],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
-
         if isinstance(guests, Guest):
             guests = (guests,)
 
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ]
-        building_block_vertices = {
-            host: (HostVertex(0, (0.0, 0.0, 0.0)),)
-        }
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]]
+        building_block_vertices = {host: (HostVertex(0, (0.0, 0.0, 0.0)),)}
         guest_vertices = {
             guest.get_building_block(): (
                 GuestVertex(
@@ -525,9 +520,7 @@ class Complex(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
         return 1.0
 

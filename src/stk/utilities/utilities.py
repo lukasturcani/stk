@@ -746,9 +746,7 @@ def rotation_matrix(vector1, vector2):
         )
 
     v = np.cross(vector1, vector2)
-    vx = np.array(
-        [[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]]
-    )
+    vx = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
     s = np.linalg.norm(v)
     c = np.dot(vector1, vector2)
     i = np.identity(3)

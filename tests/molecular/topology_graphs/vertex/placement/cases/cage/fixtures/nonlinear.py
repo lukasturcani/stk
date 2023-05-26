@@ -2,10 +2,9 @@ from functools import partial
 
 import numpy as np
 import pytest
+import stk
 from pytest_lazyfixture import lazy_fixture
 from scipy.spatial.distance import euclidean
-
-import stk
 
 from ....case_data import CaseData
 
@@ -127,9 +126,7 @@ def _nonlinear(position, aligner_edge, building_block):
     alignment_tests = {
         partial(get_fg_point, points, 0): points[aligner_edge],
         get_normal: (
-            np.array([0, 0, 1])
-            if position[2] > 0
-            else np.array([0, 0, -1])
+            np.array([0, 0, 1]) if position[2] > 0 else np.array([0, 0, -1])
         ),
     }
 
@@ -183,9 +180,7 @@ def get_points(center, num_points):
         step=direction * 2 * np.pi / num_points,
     )[:num_points]
     for theta in thetas:
-        yield center + 10 * np.array(
-            [np.sin(theta), np.cos(theta), 0.0]
-        )
+        yield center + 10 * np.array([np.sin(theta), np.cos(theta), 0.0])
 
 
 def get_fg_point(points, fg_id, building_block):

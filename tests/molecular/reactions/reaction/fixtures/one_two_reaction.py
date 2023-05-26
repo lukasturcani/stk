@@ -1,7 +1,6 @@
 import itertools as it
 
 import pytest
-
 import stk
 
 from ..case_data import CaseData

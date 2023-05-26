@@ -141,9 +141,7 @@ class StochasticUniversalSampling(Selector):
         # previous rounds. This will repeat until the desired number
         # of batches has been yielded, or there are no more valid
         # batches.
-        while (
-            batches and yielded_batches.get_num() < self._num_batches
-        ):
+        while batches and yielded_batches.get_num() < self._num_batches:
             yield from self._select_with_stochastic_universal_sampling(
                 batches=batches,
                 yielded_batches=yielded_batches,
@@ -171,7 +169,6 @@ class StochasticUniversalSampling(Selector):
         batches,
         yielded_batches,
     ):
-
         total = sum(batch.get_fitness_value() for batch in batches)
         batch_positions = []
         batch_position = 0

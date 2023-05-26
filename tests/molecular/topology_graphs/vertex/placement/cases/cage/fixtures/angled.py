@@ -4,9 +4,8 @@ from functools import partial
 
 import numpy as np
 import pytest
-from scipy.spatial.distance import euclidean
-
 import stk
+from scipy.spatial.distance import euclidean
 
 from ....case_data import CaseData
 
@@ -17,7 +16,6 @@ def angled(
     angled_aligner_edge: int,
     building_block_2: stk.BuildingBlock,
 ) -> CaseData:
-
     point1, point2 = points = (
         position + [0, 10, 0],
         position + [10, 0, 0],
@@ -47,12 +45,8 @@ def angled(
         building_block=building_block_2,
         position=position,
         alignment_tests={
-            get_fg0_point: (
-                point1 if angled_aligner_edge == 0 else point2
-            ),
-            get_fg1_point: (
-                point2 if angled_aligner_edge == 0 else point1
-            ),
+            get_fg0_point: (point1 if angled_aligner_edge == 0 else point2),
+            get_fg1_point: (point2 if angled_aligner_edge == 0 else point1),
         },
         functional_group_edges=(
             {0: 0, 1: 1} if angled_aligner_edge == 0 else {0: 1, 1: 0}

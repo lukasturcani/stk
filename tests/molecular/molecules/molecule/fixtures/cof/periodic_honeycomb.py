@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ...case_data import CaseData
@@ -18,8 +17,7 @@ from ...case_data import CaseData
                         ),
                         stk.BuildingBlock(
                             smiles=(
-                                "Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)"
-                                "[C+2]1"
+                                "Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)" "[C+2]1"
                             ),
                             functional_groups=[stk.BromoFactory()],
                         ),
@@ -51,8 +49,7 @@ from ...case_data import CaseData
                         ),
                         stk.BuildingBlock(
                             smiles=(
-                                "Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)"
-                                "[C+2]1"
+                                "Br[C+]1C2[C+]=NC2(Br)[C+](F)[C+](Br)" "[C+2]1"
                             ),
                             functional_groups=[stk.BromoFactory()],
                         ),

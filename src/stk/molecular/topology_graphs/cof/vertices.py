@@ -160,9 +160,7 @@ class _CofVertex(Vertex):
         for vertex, cell_shift in zip(vertices, cell_shifts):
             shift = sum(
                 dim_shift * constant
-                for dim_shift, constant in zip(
-                    cell_shift, lattice_constants
-                )
+                for dim_shift, constant in zip(cell_shift, lattice_constants)
             )
             positions.append(vertex.get_position() + shift)
 
@@ -235,9 +233,7 @@ class LinearVertex(_CofVertex):
             return euclidean(edge.get_position(), fg_position)
 
         edges = sorted(edges, key=fg_distance)
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
 
 
 class NonLinearVertex(_CofVertex):
@@ -315,10 +311,7 @@ class UnaligningVertex(_CofVertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
 
     @classmethod
     def init_at_center(
@@ -328,7 +321,6 @@ class UnaligningVertex(_CofVertex):
         aligner_edge=0,
         cell=(0, 0, 0),
     ):
-
         vertex = cls.__new__(cls)
         vertex._id = id
         vertex._position = sum(
@@ -355,9 +347,7 @@ class UnaligningVertex(_CofVertex):
         for vertex, cell_shift in zip(vertices, cell_shifts):
             shift = sum(
                 dim_shift * constant
-                for dim_shift, constant in zip(
-                    cell_shift, lattice_constants
-                )
+                for dim_shift, constant in zip(cell_shift, lattice_constants)
             )
             positions.append(vertex.get_position() + shift)
 

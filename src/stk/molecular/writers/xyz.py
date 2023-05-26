@@ -48,7 +48,6 @@ class XyzWriter:
         molecule: Molecule,
         atom_ids: typing.Optional[OneOrMany[int]],
     ) -> list[str]:
-
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import stk
+
 from tests.utilities import is_equivalent_constructed_molecule
 
 from .case_data import CaseData
@@ -43,12 +44,8 @@ def _test_get_all(
     for i, retrieved in enumerate(database.get_all()):
         expected = expected_molecules[smiles.get_key(retrieved)]
         is_equivalent_constructed_molecule(
-            constructed_molecule1=(
-                expected.with_canonical_atom_ordering()
-            ),
-            constructed_molecule2=(
-                retrieved.with_canonical_atom_ordering()
-            ),
+            constructed_molecule1=(expected.with_canonical_atom_ordering()),
+            constructed_molecule2=(retrieved.with_canonical_atom_ordering()),
         )
 
     assert i + 1 == len(expected_molecules)

@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 import pytest
+import stk
 from pytest_lazyfixture import lazy_fixture
 from rdkit.Chem import AllChem as rdkit
-
-import stk
 
 from .case_data import CaseData
 
@@ -54,12 +53,10 @@ from .fixtures import *  # noqa
         ),
         lambda: stk.BuildingBlock("NCCN"),
         lambda: stk.BuildingBlock(
-            "C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc"
-            "(C#Cc4cccc5cnccc54)cc3c2c1"
+            "C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc" "(C#Cc4cccc5cnccc54)cc3c2c1"
         ),
         lambda: stk.BuildingBlock(
-            "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc"
-            "(C#Cc4cccc5ccncc45)cc3c2c1"
+            "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc" "(C#Cc4cccc5ccncc45)cc3c2c1"
         ),
         lambda: stk.BuildingBlock("N[C+][C+2]N"),
         lambda: stk.BuildingBlock("NCCN", [stk.PrimaryAminoFactory()]),
@@ -100,10 +97,7 @@ def get_random_position_matrix(molecule):
     params=(
         lambda molecule: np.zeros((molecule.get_num_atoms(), 3)),
         lambda molecule: np.array(
-            [
-                [i, -i, 10.12 * i]
-                for i in range(molecule.get_num_atoms())
-            ]
+            [[i, -i, 10.12 * i] for i in range(molecule.get_num_atoms())]
         ),
         lambda molecule: molecule.get_position_matrix(),
         get_random_position_matrix,
@@ -176,12 +170,8 @@ def get_origin(request):
         lambda molecule: 0,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: list(
-            range(0, min(1, molecule.get_num_atoms()))
-        ),
-        lambda molecule: tuple(
-            range(0, min(1, molecule.get_num_atoms()))
-        ),
+        lambda molecule: list(range(0, min(1, molecule.get_num_atoms()))),
+        lambda molecule: tuple(range(0, min(1, molecule.get_num_atoms()))),
         lambda molecule: (
             i for i in range(0, min(1, molecule.get_num_atoms()))
         ),
@@ -237,9 +227,7 @@ def _get_dative_molecule() -> rdkit.Mol:
         ),
         lambda name: CaseData(
             molecule=(
-                stk.BuildingBlock(
-                    "C(N)CN"
-                ).with_canonical_atom_ordering()
+                stk.BuildingBlock("C(N)CN").with_canonical_atom_ordering()
             ),
             smiles="[H]N([H])C([H])([H])C([H])([H])N([H])[H]",
             name=name,

@@ -1,7 +1,6 @@
 import itertools as it
 
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -53,7 +52,6 @@ def get_bond(
     bond_order,
     periodicity,
 ):
-
     (bonder1,) = functional_group1.get_bonders()
     (bonder2,) = functional_group2.get_bonders()
 

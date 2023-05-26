@@ -1,5 +1,4 @@
 import numpy as np
-
 import stk
 
 from ...utilities import (
@@ -70,9 +69,7 @@ def test_update_1(mongo_client):
             {
                 DatabaseEntry(**json["molecule"]): 1,
                 DatabaseEntry(**to_hashable_matrix(json["matrix"])): 1,
-                DatabaseEntry(
-                    **json["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**json["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json["buildingBlocks"][0]["matrix"],
@@ -98,12 +95,8 @@ def test_update_1(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json2["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json2["matrix"])): 1,
+                DatabaseEntry(**json["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json["buildingBlocks"][0]["matrix"],
@@ -190,12 +183,8 @@ def test_update_2(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json1["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json1["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json1["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json1["matrix"])): 1,
+                DatabaseEntry(**json1["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json1["buildingBlocks"][0]["matrix"],
@@ -222,12 +211,8 @@ def test_update_2(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json1["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json1["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json1["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json1["matrix"])): 1,
+                DatabaseEntry(**json1["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json1["buildingBlocks"][0]["matrix"],
@@ -239,12 +224,8 @@ def test_update_2(mongo_client):
                     )
                 ): 1,
                 DatabaseEntry(**json2["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json2["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json2["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json2["matrix"])): 1,
+                DatabaseEntry(**json2["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json2["buildingBlocks"][0]["matrix"],
@@ -271,12 +252,8 @@ def test_update_2(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json3["molecule"]): 2,
-                DatabaseEntry(
-                    **to_hashable_matrix(json3["matrix"])
-                ): 2,
-                DatabaseEntry(
-                    **json3["buildingBlocks"][0]["molecule"]
-                ): 2,
+                DatabaseEntry(**to_hashable_matrix(json3["matrix"])): 2,
+                DatabaseEntry(**json3["buildingBlocks"][0]["molecule"]): 2,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json3["buildingBlocks"][0]["matrix"],
@@ -288,12 +265,8 @@ def test_update_2(mongo_client):
                     )
                 ): 2,
                 DatabaseEntry(**json3["molecule"]): 2,
-                DatabaseEntry(
-                    **to_hashable_matrix(json3["matrix"])
-                ): 2,
-                DatabaseEntry(
-                    **json3["buildingBlocks"][0]["molecule"]
-                ): 2,
+                DatabaseEntry(**to_hashable_matrix(json3["matrix"])): 2,
+                DatabaseEntry(**json3["buildingBlocks"][0]["molecule"]): 2,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json3["buildingBlocks"][0]["matrix"],
@@ -380,12 +353,8 @@ def test_update_3(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json1["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json1["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json1["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json1["matrix"])): 1,
+                DatabaseEntry(**json1["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json1["buildingBlocks"][0]["matrix"],
@@ -414,12 +383,8 @@ def test_update_3(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json1["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json2["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json1["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json2["matrix"])): 1,
+                DatabaseEntry(**json1["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json1["buildingBlocks"][0]["matrix"],
@@ -448,12 +413,8 @@ def test_update_3(mongo_client):
         state2=DatabaseState(
             {
                 DatabaseEntry(**json1["molecule"]): 1,
-                DatabaseEntry(
-                    **to_hashable_matrix(json3["matrix"])
-                ): 1,
-                DatabaseEntry(
-                    **json1["buildingBlocks"][0]["molecule"]
-                ): 1,
+                DatabaseEntry(**to_hashable_matrix(json3["matrix"])): 1,
+                DatabaseEntry(**json1["buildingBlocks"][0]["molecule"]): 1,
                 DatabaseEntry(
                     **to_hashable_matrix(
                         json=json1["buildingBlocks"][0]["matrix"],

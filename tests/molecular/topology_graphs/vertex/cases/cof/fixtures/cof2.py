@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ....case_data import CaseData
@@ -10,9 +9,7 @@ def cof2(init_at_center, id, vertices_, aligner_edge, cell):
     return CaseData(
         vertex=init_at_center(id, vertices_, aligner_edge, cell),
         id=id,
-        position=(
-            sum(v.get_position() for v in vertices_) / len(vertices_)
-        ),
+        position=(sum(v.get_position() for v in vertices_) / len(vertices_)),
         cell=cell,
     )
 

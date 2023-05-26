@@ -1,7 +1,6 @@
 from typing import Callable
 
 import pytest
-
 import stk
 
 
@@ -24,7 +23,6 @@ def get_id_map_0(
 def get_id_map_1(
     functional_group: stk.FunctionalGroup,
 ) -> dict[int, int]:
-
     new_id = max(functional_group.get_atom_ids()) + 1
     num_atoms = sum(1 for _ in functional_group.get_atoms())
     ids = range(new_id, new_id + num_atoms)

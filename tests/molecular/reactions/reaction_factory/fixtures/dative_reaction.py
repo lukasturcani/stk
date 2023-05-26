@@ -1,7 +1,6 @@
 import itertools as it
 
 import pytest
-
 import stk
 from stk.molecular.reactions.reactions.reaction import ReactionResult
 
@@ -76,7 +75,6 @@ def get_new_bonds(
     order,
     periodicity,
 ):
-
     (bonder1,) = functional_group1.get_bonders()
     (bonder2,) = functional_group2.get_bonders()
 

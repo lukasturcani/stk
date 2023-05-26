@@ -1064,9 +1064,7 @@ class Cage(TopologyGraph):
             building_blocks=building_blocks,
         )
         self._vertex_alignments = (
-            dict(vertex_alignments)
-            if vertex_alignments is not None
-            else {}
+            dict(vertex_alignments) if vertex_alignments is not None else {}
         )
         building_block_vertices = self._with_unaligning_vertices(
             building_block_vertices=building_block_vertices,
@@ -1085,9 +1083,7 @@ class Cage(TopologyGraph):
             reaction_factory=reaction_factory,
             construction_stages=tuple(
                 partial(self._has_degree, degree)
-                for degree in sorted(
-                    self._vertices_of_degree, reverse=True
-                )
+                for degree in sorted(self._vertices_of_degree, reverse=True)
             ),
             num_processes=num_processes,
             optimizer=optimizer,
@@ -1102,7 +1098,6 @@ class Cage(TopologyGraph):
             dict[BuildingBlock, tuple[int, ...]],
         ],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
-
         # Use tuple here because it prints nicely.
         allowed_degrees = tuple(cls._vertices_of_degree.keys())
         if isinstance(building_blocks, dict):
@@ -1133,7 +1128,6 @@ class Cage(TopologyGraph):
             BuildingBlock, abc.Sequence[_CageVertex]
         ],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
-
         clone = dict(building_block_vertices)
         for building_block, vertices in clone.items():
             # Building blocks with 1 placer, cannot be aligned and
@@ -1143,9 +1137,7 @@ class Cage(TopologyGraph):
                     UnaligningVertex(
                         id=v.get_id(),
                         position=v.get_position(),
-                        use_neighbor_placement=(
-                            v.use_neighbor_placement()
-                        ),
+                        use_neighbor_placement=(v.use_neighbor_placement()),
                         aligner_edge=v.get_aligner_edge(),
                     )
                     for v in vertices
@@ -1178,7 +1170,6 @@ class Cage(TopologyGraph):
             BuildingBlock, abc.Sequence[_CageVertex]
         ],
     ) -> None:
-
         unassigned_ids = set(
             vertex.get_id() for vertex in cls._vertex_prototypes
         )
@@ -1199,8 +1190,7 @@ class Cage(TopologyGraph):
 
         if unassigned_ids:
             raise UnoccupiedVertexError(
-                "The following vertices are unoccupied "
-                f"{unassigned_ids}."
+                "The following vertices are unoccupied " f"{unassigned_ids}."
             )
 
     def clone(self) -> Cage:
@@ -1327,14 +1317,9 @@ class Cage(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
-
-        return max(
-            bb.get_maximum_diameter() for bb in building_block_vertices
-        )
+        return max(bb.get_maximum_diameter() for bb in building_block_vertices)
 
     def _get_construction_state(self) -> _CageConstructionState:
         return _CageConstructionState(

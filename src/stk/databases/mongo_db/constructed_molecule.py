@@ -425,9 +425,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         database = mongo_client[database]
         self._molecules = database[molecule_collection]
-        self._constructed_molecules = database[
-            constructed_molecule_collection
-        ]
+        self._constructed_molecules = database[constructed_molecule_collection]
         self._position_matrices = database[position_matrix_collection]
         self._building_block_position_matrices = database[
             building_block_position_matrix_collection
@@ -447,16 +445,13 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
                 not in self._constructed_molecules.index_information()
             ):
                 self._constructed_molecules.create_index(index)
-            if (
-                f"{index}_1"
-                not in self._position_matrices.index_information()
-            ):
+            if f"{index}_1" not in self._position_matrices.index_information():
                 self._position_matrices.create_index(index)
 
-            if (
-                f"{index}_1"
-                not in self._building_block_position_matrices.index_information()
-            ):
+            index_information = (
+                self._building_block_position_matrices.index_information()
+            )
+            if f"{index}_1" not in index_information:
                 self._building_block_position_matrices.create_index(
                     index,
                 )
@@ -466,14 +461,10 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         json = self._jsonizer.to_json(molecule)
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
-        json["matrix"]["m"] = tuple(
-            tuple(row) for row in json["matrix"]["m"]
-        )
+        json["matrix"]["m"] = tuple(tuple(row) for row in json["matrix"]["m"])
         json["matrix"] = HashableDict(json["matrix"])
         json["molecule"] = HashableDict(json["molecule"])
-        json["constructedMolecule"] = HashableDict(
-            json["constructedMolecule"]
-        )
+        json["constructedMolecule"] = HashableDict(json["constructedMolecule"])
         json["constructedMolecule"]["BB"] = tuple(
             map(
                 HashableDict,
@@ -611,9 +602,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
 
         database_building_block_keys = (
             molecule_entry["BB"]
-            for molecule_entry in self._constructed_molecules.find(
-                query
-            )
+            for molecule_entry in self._constructed_molecules.find(query)
         )
         for entry_building_block_keys in database_building_block_keys:
             for keys1, keys2 in zip(
@@ -647,17 +636,13 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         molecule_json = self._molecules.find_one(key)
         if molecule_json is None:
             raise KeyError(
-                "No molecule found in the database with a key of: "
-                f"{key}"
+                "No molecule found in the database with a key of: " f"{key}"
             )
 
-        constructed_molecule_json = (
-            self._constructed_molecules.find_one(key)
-        )
+        constructed_molecule_json = self._constructed_molecules.find_one(key)
         if constructed_molecule_json is None:
             raise KeyError(
-                "No molecule found in the database with a key of: "
-                f"{key}"
+                "No molecule found in the database with a key of: " f"{key}"
             )
 
         position_matrix = self._position_matrices.find_one(key)
@@ -684,9 +669,7 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
     def _get_building_block(self, key):
         return {
             "molecule": self._molecules.find_one(key),
-            "matrix": self._building_block_position_matrices.find_one(
-                key
-            ),
+            "matrix": self._building_block_position_matrices.find_one(key),
         }
 
     def get_all(self):

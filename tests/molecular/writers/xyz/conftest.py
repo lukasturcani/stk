@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from .case_data import CaseData
@@ -21,5 +20,4 @@ from .case_data import CaseData
     ),
 )
 def case_data(request) -> CaseData:
-
     return request.param()

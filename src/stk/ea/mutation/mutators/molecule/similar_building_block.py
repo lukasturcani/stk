@@ -148,9 +148,7 @@ class SimilarBuildingBlock(MoleculeMutator):
             similar_building_blocks[replaced_key] = iter(
                 sorted(
                     self._building_blocks,
-                    key=partial(
-                        dice_similarity, replaced_building_block
-                    ),
+                    key=partial(dice_similarity, replaced_building_block),
                     reverse=True,
                 )
             )
@@ -161,9 +159,7 @@ class SimilarBuildingBlock(MoleculeMutator):
             similar_building_blocks[replaced_key] = iter(
                 sorted(
                     self._building_blocks,
-                    key=partial(
-                        dice_similarity, replaced_building_block
-                    ),
+                    key=partial(dice_similarity, replaced_building_block),
                     reverse=True,
                 )
             )
@@ -173,9 +169,7 @@ class SimilarBuildingBlock(MoleculeMutator):
         # then take the next most similar one.
         if self._key_maker.get_key(replacement) == replaced_key:
             try:
-                replacement = next(
-                    similar_building_blocks[replaced_key]
-                )
+                replacement = next(similar_building_blocks[replaced_key])
             except StopIteration:
                 similar_building_blocks[replaced_key] = iter(
                     sorted(
@@ -187,9 +181,7 @@ class SimilarBuildingBlock(MoleculeMutator):
                         reverse=True,
                     )
                 )
-                replacement = next(
-                    similar_building_blocks[replaced_key]
-                )
+                replacement = next(similar_building_blocks[replaced_key])
 
         # Build the new ConstructedMolecule.
         graph = record.get_topology_graph().with_building_blocks(

@@ -26,7 +26,5 @@ def test_to_rdkit_mol(molecule):
     bonds = zip(molecule.get_bonds(), rdkit_molecule.GetBonds())
     for bond, rdkit_bond in bonds:
         assert bond.get_order() == rdkit_bond.GetBondTypeAsDouble()
-        assert (
-            bond.get_atom1().get_id() == rdkit_bond.GetBeginAtomIdx()
-        )
+        assert bond.get_atom1().get_id() == rdkit_bond.GetBeginAtomIdx()
         assert bond.get_atom2().get_id() == rdkit_bond.GetEndAtomIdx()

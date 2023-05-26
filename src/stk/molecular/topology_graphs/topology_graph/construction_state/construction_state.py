@@ -75,13 +75,11 @@ class ConstructionState:
 
         """
 
-        self._molecule_state = (
-            self._molecule_state.with_placement_results(
-                vertices=vertices,
-                edges=edges,
-                building_blocks=building_blocks,
-                results=results,
-            )
+        self._molecule_state = self._molecule_state.with_placement_results(
+            vertices=vertices,
+            edges=edges,
+            building_blocks=building_blocks,
+            results=results,
         )
         return self
 
@@ -268,11 +266,9 @@ class ConstructionState:
 
         """
 
-        self._molecule_state = (
-            self._molecule_state.with_reaction_results(
-                reactions=reactions,
-                results=results,
-            )
+        self._molecule_state = self._molecule_state.with_reaction_results(
+            reactions=reactions,
+            results=results,
         )
         return self
 
@@ -335,10 +331,8 @@ class ConstructionState:
 
         """
 
-        self._molecule_state = (
-            self._molecule_state.with_position_matrix(
-                position_matrix=position_matrix,
-            )
+        self._molecule_state = self._molecule_state.with_position_matrix(
+            position_matrix=position_matrix,
         )
         return self
 

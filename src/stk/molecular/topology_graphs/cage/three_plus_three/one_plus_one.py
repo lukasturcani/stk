@@ -40,9 +40,7 @@ class OnePlusOneVertex(NonLinearVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
@@ -66,13 +64,11 @@ class OnePlusOneVertex(NonLinearVertex):
         )
         start = fg_bonder_centroid - self._position
         edge_coord = edges[self._aligner_edge].get_position()
-        building_block = (
-            building_block.with_rotation_to_minimize_angle(
-                start=start,
-                target=edge_coord - edge_centroid,
-                axis=self._edge_normal,
-                origin=self._position,
-            )
+        building_block = building_block.with_rotation_to_minimize_angle(
+            start=start,
+            target=edge_coord - edge_centroid,
+            axis=self._edge_normal,
+            origin=self._position,
         )
         return building_block.get_position_matrix()
 

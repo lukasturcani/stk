@@ -1,5 +1,4 @@
 import numpy as np
-
 import stk
 
 from ...utilities import is_clone

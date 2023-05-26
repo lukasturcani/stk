@@ -165,7 +165,6 @@ class SelectionPlotter:
 
         @wraps(select)
         def inner(population, *args, **kwargs):
-
             counter = Counter({record: 0 for record in population})
             for selected in select(population, *args, **kwargs):
                 counter.update(selected)
@@ -215,9 +214,7 @@ class SelectionPlotter:
             ["Number of Times Selected", "order"],
             ascending=[False, False],
         )
-        norm = plt.Normalize(
-            df["heat_map"].min(), df["heat_map"].max()
-        )
+        norm = plt.Normalize(df["heat_map"].min(), df["heat_map"].max())
         sm = plt.cm.ScalarMappable(cmap="magma_r", norm=norm)
         sm.set_array([])
 

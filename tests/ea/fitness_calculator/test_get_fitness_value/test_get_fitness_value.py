@@ -46,6 +46,4 @@ def _test_get_fitness_value(
 
     """
 
-    assert (
-        fitness_calculator.get_fitness_value(molecule) == fitness_value
-    )
+    assert fitness_calculator.get_fitness_value(molecule) == fitness_value

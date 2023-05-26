@@ -2,9 +2,7 @@ def check_bonds(old_state, new_state, building_blocks):
     old_bonds = tuple(old_state.get_bonds())
     new_bonds = tuple(new_state.get_bonds())
     num_added = len(new_bonds) - len(old_bonds)
-    assert num_added == sum(
-        bb.get_num_bonds() for bb in building_blocks
-    )
+    assert num_added == sum(bb.get_num_bonds() for bb in building_blocks)
     for bond1, bond2 in zip(
         new_bonds[len(old_bonds) :],
         get_expected_bonds(old_state, building_blocks),
