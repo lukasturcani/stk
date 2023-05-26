@@ -11,19 +11,28 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker image build
-          -t ghcr.io/lukasturcani/stk-test-environment:latest
-          ./tests/docker
+        run: >
+          pip install pip-tools
+
+          pip-compile
+          -o docker_testing_environment/requirements.txt
+          --extra dev
+          pyproject.toml
+
+
+          docker buildx build
+          -t ghcr.io/lukasturcani/stk-testing-environment:latest
+          ./docker_testing_environment
 
       - name: Publish image
         run: docker push
