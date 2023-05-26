@@ -17,12 +17,14 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run ruff
-        run: conda run -n stk
+        run: |
+          ./deps/venv/bin/activate
           ruff .
 
   mypy:
@@ -34,12 +36,14 @@ jobs:
       - name: Git checkout
         uses: actions/chekcout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run mypy
-        run: conda run -n stk
+        run: |
+          ./deps/venv/bin/activate
           mypy src
 
   black:
@@ -51,12 +55,14 @@ jobs:
       - name: Git checkout
         uses: actions/chekcout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run black
-        run: conda run -n stk
+        run: |
+          ./deps/venv/bin/activate
           black --check .
 
   pytest-stable-linux:
@@ -72,12 +78,14 @@ jobs:
       - name: Git checkout
         uses: actions/chekcout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run pytest
-        run: conda run -n stk
+        run: |
+          ./deps/venv/bin/activate
           pytest --mongodb_uri='mongodb://MongoDB:27017/'
 
   doctest:
@@ -93,14 +101,15 @@ jobs:
       - name: Git checkout
         uses: actions/chekcout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run doctest
-        run: conda run -n stk
-          MONGODB_URI='mongodb://MongoDB:27017/'
-          make -C docs doctest
+        run: |
+          ./deps/venv/bin/activate
+          MONGODB_URI='mongodb://MongoDB:27017/' make -C docs doctest
 
   basic-ea:
     runs-on: ubuntu-22.04
@@ -115,8 +124,9 @@ jobs:
       - name: Git checkout
         uses: actions/chekcout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Install dependencies
@@ -124,9 +134,11 @@ jobs:
           --depth 1
 
       - name: Run the EA
-        run: conda run -n stk
+        run: >
+          ./deps/venv/bin/activate
+
           python basic_ea/basic_ea.py
-            --mongodb_uri mongodb://MongoDB:27017
+          --mongodb_uri mongodb://MongoDB:27017
 
       - name: Upload fitness plot
         uses: actions/upload-artifact@v2
@@ -153,8 +165,9 @@ jobs:
       - name: Git checkout
         uses: actions/chekcout@v3
 
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          ./deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Install dependencies
@@ -163,9 +176,11 @@ jobs:
           --depth 1
 
       - name: Run the EA
-        run: conda run -n stk
+        run: >
+          ./deps/venv/bin/activate
+
           python intermediate_ea/intermediate_ea.py
-            --mongodb_uri mongodb://MongoDB:27017
+          --mongodb_uri mongodb://MongoDB:27017
 
       - name: Upload fitness plot
         uses: actions/upload-artifact@v2
