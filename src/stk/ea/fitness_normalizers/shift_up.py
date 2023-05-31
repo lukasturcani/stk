@@ -190,9 +190,7 @@ class ShiftUp(FitnessNormalizer):
             population,
         )
         # Get all the fitness arrays in a matrix.
-        fmat = np.array(
-            [record.get_fitness_value() for record in filtered]
-        )
+        fmat = np.array([record.get_fitness_value() for record in filtered])
 
         # Get the minimum value of each element across the population.
         # keepdims ensures that np.min returns a 1-D array, because

@@ -1,9 +1,8 @@
 from functools import partial
 
 import pytest
-from scipy.spatial.distance import euclidean
-
 import stk
+from scipy.spatial.distance import euclidean
 from stk.molecular.topology_graphs.cof.edge import CofEdge as Edge
 
 from ....case_data import CaseData
@@ -11,7 +10,6 @@ from ....case_data import CaseData
 
 @pytest.fixture
 def linear(position, linear_aligner_edge, building_block_2):
-
     point1, point2 = points = (
         position + [-10, 0, 0],
         position + [10, 0, 0],
@@ -42,12 +40,8 @@ def linear(position, linear_aligner_edge, building_block_2):
         building_block=building_block_2,
         position=position,
         alignment_tests={
-            get_fg0_point: (
-                point1 if linear_aligner_edge == 0 else point2
-            ),
-            get_fg1_point: (
-                point2 if linear_aligner_edge == 0 else point1
-            ),
+            get_fg0_point: (point1 if linear_aligner_edge == 0 else point2),
+            get_fg1_point: (point2 if linear_aligner_edge == 0 else point1),
         },
         functional_group_edges=(
             {0: 0, 1: 1} if linear_aligner_edge == 0 else {0: 1, 1: 0}

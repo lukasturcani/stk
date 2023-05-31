@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ....case_data import CaseData
@@ -41,9 +40,7 @@ def _get_bi_1() -> stk.BuildingBlock:
                     ),
                 ),
             ),
-            smiles=(
-                "[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]<-N1([H])[H]"
-            ),
+            smiles=("[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]<-N1([H])[H]"),
             name=name,
         ),
         lambda name: CaseData(
@@ -65,9 +62,7 @@ def _get_bi_1() -> stk.BuildingBlock:
                     ),
                 ),
             ),
-            smiles=(
-                "[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]<-N1([H])[H]"
-            ),
+            smiles=("[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]<-N1([H])[H]"),
             name=name,
         ),
     ),

@@ -162,10 +162,7 @@ def _get_coord_section(path, num_atoms):
 
     for line_number, line in enumerate(content):
         if "$coord" in line:
-
-            lines = content[
-                line_number + 1 : line_number + 1 + num_atoms
-            ]
+            lines = content[line_number + 1 : line_number + 1 + num_atoms]
 
             if "angs" in line:
                 return _CoordSection(lines)

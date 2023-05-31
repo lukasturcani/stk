@@ -168,7 +168,6 @@ class Amide(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Amide:
-
         super()._with_ids(id_map)
 
         if (carbon_id := self._carbon.get_id()) in id_map:

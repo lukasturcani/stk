@@ -197,10 +197,8 @@ class M3L6(Cage):
         LinearVertex(
             id=5,
             position=[
-                _R
-                * np.cos((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
-                _R
-                * np.sin((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                _R * np.cos((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                _R * np.sin((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
                 0.5,
             ],
             use_neighbor_placement=False,
@@ -208,10 +206,8 @@ class M3L6(Cage):
         LinearVertex(
             id=6,
             position=[
-                _R
-                * np.cos((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
-                _R
-                * np.sin((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                _R * np.cos((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
+                _R * np.sin((_theta + 1 * np.pi / 3) + (4 * np.pi / 3)),
                 -0.5,
             ],
             use_neighbor_placement=False,
@@ -219,10 +215,8 @@ class M3L6(Cage):
         LinearVertex(
             id=7,
             position=[
-                _R
-                * np.cos((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
-                _R
-                * np.sin((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                _R * np.cos((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                _R * np.sin((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
                 0.5,
             ],
             use_neighbor_placement=False,
@@ -230,10 +224,8 @@ class M3L6(Cage):
         LinearVertex(
             id=8,
             position=[
-                _R
-                * np.cos((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
-                _R
-                * np.sin((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                _R * np.cos((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
+                _R * np.sin((_theta + 1 * np.pi / 3) + (2 * np.pi / 3)),
                 -0.5,
             ],
             use_neighbor_placement=False,

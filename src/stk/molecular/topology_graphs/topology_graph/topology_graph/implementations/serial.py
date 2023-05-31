@@ -36,12 +36,9 @@ class _Serial:
         self,
         state: ConstructionState,
     ) -> ConstructionState:
-
         for stage in self._stages:
             vertices = tuple(state.get_vertices(stage))
-            building_blocks = tuple(
-                map(state.get_building_block, stage)
-            )
+            building_blocks = tuple(map(state.get_building_block, stage))
             edges = tuple(map(state.get_edges, stage))
             placements = map(
                 _Placement,

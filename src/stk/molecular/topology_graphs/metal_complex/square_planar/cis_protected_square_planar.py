@@ -84,9 +84,7 @@ class CisProtectedSquarePlanar(MetalComplex):
     """
 
     _metal_vertex_prototypes = (MetalVertex(0, (0, 0, 0)),)
-    _ligand_vertex_prototypes = (
-        BiDentateLigandVertex(1, (2.5, 2.5, 0)),
-    )
+    _ligand_vertex_prototypes = (BiDentateLigandVertex(1, (2.5, 2.5, 0)),)
 
     _edge_prototypes = (
         Edge(

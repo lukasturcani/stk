@@ -3,7 +3,6 @@ from typing import Callable
 
 import pymongo
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -64,7 +63,6 @@ def mongo_db(
     request,
     mongo_client: pymongo.MongoClient,
 ) -> CaseData:
-
     data = request.param()
     return CaseData(
         database=data.get_database(mongo_client),

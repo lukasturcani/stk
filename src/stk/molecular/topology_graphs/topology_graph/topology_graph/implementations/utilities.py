@@ -93,11 +93,9 @@ class _Placement:
         building_block = self._building_block.with_position_matrix(
             position_matrix=position_matrix,
         )
-        functional_group_edges = (
-            self._vertex.map_functional_groups_to_edges(
-                building_block=building_block,
-                edges=self._edges,
-            )
+        functional_group_edges = self._vertex.map_functional_groups_to_edges(
+            building_block=building_block,
+            edges=self._edges,
         )
         return _PlacementResult(
             position_matrix=position_matrix,

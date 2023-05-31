@@ -20,9 +20,7 @@ def check_edge_functional_groups(
         expected_fgs = {get_fg_key(fg): fg for fg in expected[edge_id]}
         new_state_fgs = {
             get_fg_key(fg): fg
-            for fg in new_state.get_edge_group_functional_groups(
-                edge_group
-            )
+            for fg in new_state.get_edge_group_functional_groups(edge_group)
         }
         assert expected_fgs.keys() == new_state_fgs.keys()
         for fg_key in expected_fgs:

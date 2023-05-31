@@ -126,8 +126,7 @@ class Tournament(Selector):
         # The tournament can only take place if there is more than 1
         # batch.
         while (
-            len(batches) > 1
-            and yielded_batches.get_num() < self._num_batches
+            len(batches) > 1 and yielded_batches.get_num() < self._num_batches
         ):
             tournament_size = self._generator.randint(
                 low=2, high=len(batches) + 1
@@ -147,8 +146,5 @@ class Tournament(Selector):
                     yielded_batches.is_unyielded_batch,
                     batches,
                 )
-            if (
-                not self._duplicate_molecules
-                or not self._duplicate_batches
-            ):
+            if not self._duplicate_molecules or not self._duplicate_batches:
                 batches = tuple(batches)

@@ -164,13 +164,9 @@ class Roulette(Selector):
         )
 
     def _select_from_batches(self, batches, yielded_batches):
-        while (
-            batches and yielded_batches.get_num() < self._num_batches
-        ):
+        while batches and yielded_batches.get_num() < self._num_batches:
             total = sum(batch.get_fitness_value() for batch in batches)
-            weights = [
-                batch.get_fitness_value() / total for batch in batches
-            ]
+            weights = [batch.get_fitness_value() / total for batch in batches]
             yield self._generator.choice(batches, p=weights)
 
             if not self._duplicate_molecules:
@@ -183,8 +179,5 @@ class Roulette(Selector):
                     yielded_batches.is_unyielded_batch,
                     batches,
                 )
-            if (
-                not self._duplicate_molecules
-                or not self._duplicate_batches
-            ):
+            if not self._duplicate_molecules or not self._duplicate_batches:
                 batches = tuple(batches)

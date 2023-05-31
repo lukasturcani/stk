@@ -31,9 +31,7 @@ class ConstructionResult:
 
         """
 
-        self._position_matrix = (
-            construction_state.get_position_matrix()
-        )
+        self._position_matrix = construction_state.get_position_matrix()
         self._position_matrix.setflags(write=False)
         self._atoms = tuple(construction_state.get_atoms())
         self._bonds = tuple(construction_state.get_bonds())

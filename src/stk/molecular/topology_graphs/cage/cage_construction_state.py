@@ -70,10 +70,7 @@ class _CageConstructionState(ConstructionState):
 
         # No need to update vertex positions after the last stage.
         self._num_placement_stages_done += 1
-        if (
-            self._num_placement_stages_done
-            >= self._num_placement_stages
-        ):
+        if self._num_placement_stages_done >= self._num_placement_stages:
             return self
 
         self._update_neighbor_positions(
@@ -179,9 +176,9 @@ class _CageConstructionState(ConstructionState):
                 vertex_edges=vertex_edges,
             ):
                 fg_id = edge_functional_groups[edge_id]
-                (
-                    functional_group,
-                ) = building_block.get_functional_groups(fg_id)
+                (functional_group,) = building_block.get_functional_groups(
+                    fg_id
+                )
                 self._neighbor_positions[
                     neighbor_id
                 ] = self._neighbor_positions.get(neighbor_id, [])
@@ -237,9 +234,7 @@ class _CageConstructionState(ConstructionState):
 
         """
 
-        for vertex_id, vertex in enumerate(
-            self._graph_state.get_vertices()
-        ):
+        for vertex_id, vertex in enumerate(self._graph_state.get_vertices()):
             if (
                 len(self._neighbor_positions.get(vertex_id, []))
                 == self._vertex_degrees[vertex_id]
@@ -256,12 +251,9 @@ class _CageConstructionState(ConstructionState):
     def clone(self):
         clone = super().clone()
         clone._neighbor_positions = {
-            key: list(value)
-            for key, value in self._neighbor_positions.items()
+            key: list(value) for key, value in self._neighbor_positions.items()
         }
-        clone._num_placement_stages_done = (
-            self._num_placement_stages_done
-        )
+        clone._num_placement_stages_done = self._num_placement_stages_done
         clone._num_placement_stages = self._num_placement_stages
         clone._vertex_degrees = dict(self._vertex_degrees)
         return clone

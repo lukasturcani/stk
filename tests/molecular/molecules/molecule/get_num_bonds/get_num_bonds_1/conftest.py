@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from .case_data import CaseData
@@ -7,9 +6,7 @@ from .case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lambda: CaseData(
-            molecule=stk.BuildingBlock("NCCN"), num_bonds=11
-        ),
+        lambda: CaseData(molecule=stk.BuildingBlock("NCCN"), num_bonds=11),
     ),
 )
 def case_data(request) -> CaseData:

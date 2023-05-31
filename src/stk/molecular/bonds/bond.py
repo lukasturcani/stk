@@ -202,7 +202,6 @@ class Bond:
         return self.clone()._with_ids(id_map)
 
     def _with_ids(self, id_map: dict[int, int]) -> Bond:
-
         id1 = self._atom1.get_id()
         if id1 in id_map:
             self._atom1 = self._atom1.with_id(id_map[id1])
@@ -227,9 +226,7 @@ class Bond:
 
     def __repr__(self) -> str:
         periodicity = (
-            f", periodicity={self._periodicity}"
-            if self.is_periodic()
-            else ""
+            f", periodicity={self._periodicity}" if self.is_periodic() else ""
         )
 
         cls_name = self.__class__.__name__

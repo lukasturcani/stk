@@ -335,12 +335,8 @@ class FunctionalGroup:
 
         # The clone needs to be downcasted.
         return FunctionalGroup(
-            atoms=tuple(
-                atom_map.get(a.get_id(), a) for a in self._atoms
-            ),
-            placers=tuple(
-                atom_map.get(a.get_id(), a) for a in self._placers
-            ),
+            atoms=tuple(atom_map.get(a.get_id(), a) for a in self._atoms),
+            placers=tuple(atom_map.get(a.get_id(), a) for a in self._placers),
             core_atoms=tuple(
                 atom_map.get(a.get_id(), a) for a in self._core_atoms
             ),

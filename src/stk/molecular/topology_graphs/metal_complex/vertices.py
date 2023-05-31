@@ -24,10 +24,7 @@ class UnaligningVertex(Vertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
 
 
 class MetalVertex(UnaligningVertex):
@@ -62,9 +59,7 @@ class MonoDentateLigandVertex(Vertex):
         core_centroid = building_block.get_centroid(
             atom_ids=building_block.get_core_atom_ids(),
         )
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
         return building_block.with_rotation_between_vectors(
             start=fg_centroid - core_centroid,
             target=edge_centroid - self._position,
@@ -72,7 +67,6 @@ class MonoDentateLigandVertex(Vertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-
         return {0: edges[0].get_id()}
 
 
@@ -125,9 +119,7 @@ class BiDentateLigandVertex(Vertex):
             target=fg_vector,
         )
 
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
         building_block = building_block.with_rotation_between_vectors(
             start=core_to_placer - fg_vector_projection,
             target=edge_centroid - self._position,
@@ -147,6 +139,4 @@ class BiDentateLigandVertex(Vertex):
             return euclidean(edge.get_position(), fg_position)
 
         edges = sorted(edges, key=fg_distance)
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}

@@ -386,10 +386,7 @@ class MoleculeMongoDb(MoleculeDatabase):
             # Do not create the same index twice.
             if f"{index}_1" not in self._molecules.index_information():
                 self._molecules.create_index(index)
-            if (
-                f"{index}_1"
-                not in self._position_matrices.index_information()
-            ):
+            if f"{index}_1" not in self._position_matrices.index_information():
                 self._position_matrices.create_index(index)
 
     def put(self, molecule):
@@ -397,9 +394,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         json = self._jsonizer.to_json(molecule)
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
-        json["matrix"]["m"] = tuple(
-            tuple(row) for row in json["matrix"]["m"]
-        )
+        json["matrix"]["m"] = tuple(tuple(row) for row in json["matrix"]["m"])
         json["matrix"] = HashableDict(json["matrix"])
         json["molecule"] = HashableDict(json["molecule"])
         return self._put(HashableDict(json))
@@ -452,8 +447,7 @@ class MoleculeMongoDb(MoleculeDatabase):
         json = self._molecules.find_one(key)
         if json is None:
             raise KeyError(
-                "No molecule found in the database with a key of: "
-                f"{key}"
+                "No molecule found in the database with a key of: " f"{key}"
             )
         position_matrix = self._position_matrices.find_one(key)
         if position_matrix is None:

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -9,9 +8,7 @@ from ..case_data import CaseData
 
 def get_topology_graph(num_repeating_units):
     return stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )
@@ -108,9 +105,7 @@ def roulette_population_1() -> tuple[stk.MoleculeRecord, ...]:
             ),
         ),
         lambda population: CaseData(
-            selector=stk.Roulette(
-                batch_size=2, duplicate_batches=False
-            ),
+            selector=stk.Roulette(batch_size=2, duplicate_batches=False),
             population=population,
             selected=(
                 stk.Batch(

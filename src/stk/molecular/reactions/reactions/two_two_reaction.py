@@ -52,9 +52,7 @@ class TwoTwoReaction(Reaction):
 
         """
 
-        self._position_matrix = (
-            construction_state.get_position_matrix()
-        )
+        self._position_matrix = construction_state.get_position_matrix()
         self._functional_group1 = functional_group1
         self._functional_group2 = functional_group2
         self._bond_order = bond_order

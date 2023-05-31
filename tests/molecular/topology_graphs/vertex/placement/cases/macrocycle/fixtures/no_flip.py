@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-
 import stk
 
 from ....case_data import CaseData
@@ -14,7 +13,6 @@ from .utilities import (
 
 @pytest.fixture
 def no_flip(position, building_block_2, angle):
-
     point1, point2 = points = tuple(get_points(position, angle))
 
     def get_fg0_point(building_block):

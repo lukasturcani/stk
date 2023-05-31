@@ -73,8 +73,7 @@ class ConstructedMoleculeDejsonizer:
             for atom_id, atom_json in enumerate(json["molecule"]["a"])
         )
         bonds = tuple(
-            to_bond(atoms, bond_json)
-            for bond_json in json["molecule"]["b"]
+            to_bond(atoms, bond_json) for bond_json in json["molecule"]["b"]
         )
         return ConstructedMolecule.init(
             atoms=atoms,

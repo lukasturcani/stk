@@ -111,7 +111,6 @@ class Alcohol(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Alcohol:
-
         super()._with_ids(id_map)
 
         if (oxygen_id := self._oxygen.get_id()) in id_map:
@@ -131,7 +130,6 @@ class Alcohol(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Alcohol:
-
         return self.clone()._with_ids(id_map)
 
     def __repr__(self) -> str:

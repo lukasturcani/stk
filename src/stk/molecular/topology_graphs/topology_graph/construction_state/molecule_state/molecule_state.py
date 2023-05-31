@@ -59,9 +59,11 @@ class _MoleculeState:
         clone._bonds = list(self._bonds)
         clone._bond_infos = list(self._bond_infos)
         clone._num_placements = self._num_placements
+
+        edge_functional_groups = self._edge_functional_groups.items()
         clone._edge_functional_groups = {
             edge_id: list(functional_groups)
-            for edge_id, functional_groups in self._edge_functional_groups.items()
+            for edge_id, functional_groups in edge_functional_groups
         }
         return clone
 
@@ -101,9 +103,7 @@ class _MoleculeState:
             self._edge_functional_groups[
                 edge_id
             ] = self._edge_functional_groups.get(edge_id, [])
-            self._edge_functional_groups[edge_id].extend(
-                functional_groups
-            )
+            self._edge_functional_groups[edge_id].extend(functional_groups)
         return self
 
     def with_placement_results(

@@ -1,9 +1,8 @@
 import itertools as it
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
-
 import stk
+from pytest_lazyfixture import lazy_fixture
 
 # Fixtures need be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
@@ -39,9 +38,7 @@ def building_block(case_data):
 
 @pytest.fixture(
     params=(
-        lambda molecule: stk.BromoFactory().get_functional_groups(
-            molecule
-        ),
+        lambda molecule: stk.BromoFactory().get_functional_groups(molecule),
         lambda molecule: stk.PrimaryAminoFactory().get_functional_groups(
             molecule
         ),

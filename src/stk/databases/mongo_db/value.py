@@ -166,9 +166,7 @@ class ValueMongoDb(ValueDatabase):
     def put(self, molecule, value):
         json = {"v": value}
         for key_maker in self._key_makers:
-            json[key_maker.get_key_name()] = key_maker.get_key(
-                molecule
-            )
+            json[key_maker.get_key_name()] = key_maker.get_key(molecule)
         # lru_cache requires that the parameters to the cached function
         # are hashable objects.
         return self._put(HashableDict(json))
@@ -202,7 +200,6 @@ class ValueMongoDb(ValueDatabase):
         value = self._values.find_one(key)
         if value is None:
             raise KeyError(
-                "No molecule found in the database with a key of: "
-                f"{key}"
+                "No molecule found in the database with a key of: " f"{key}"
             )
         return value["v"]

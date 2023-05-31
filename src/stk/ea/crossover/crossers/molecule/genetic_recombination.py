@@ -210,9 +210,7 @@ class GeneticRecombination(MoleculeCrosser):
         self._name = name
 
     def cross(self, records):
-        topology_graphs = (
-            record.get_topology_graph() for record in records
-        )
+        topology_graphs = (record.get_topology_graph() for record in records)
         for topology_graph, alleles in it.product(
             topology_graphs,
             self._get_alleles(records),
@@ -246,9 +244,7 @@ class GeneticRecombination(MoleculeCrosser):
         """
 
         genes = defaultdict(list)
-        topology_graphs = (
-            record.get_topology_graph() for record in records
-        )
+        topology_graphs = (record.get_topology_graph() for record in records)
         for topology_graph in topology_graphs:
             for allele in topology_graph.get_building_blocks():
                 genes[self._get_gene(allele)].append(allele)

@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -7,23 +6,23 @@ from ..case_data import CaseData
 
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=2,
     )
+
+    def filter(population, record):
+        return record.get_fitness_value() is not None
+
     return CaseData(
         fitness_normalizer=stk.NormalizerSequence(
             fitness_normalizers=(
                 stk.Multiply(
                     coefficient=(1, 2, 4),
-                    filter=lambda population, record: record.get_fitness_value()
-                    is not None,
+                    filter=filter,
                 ),
                 stk.Sum(
-                    filter=lambda population, record: record.get_fitness_value()
-                    is not None,
+                    filter=filter,
                 ),
             ),
         ),

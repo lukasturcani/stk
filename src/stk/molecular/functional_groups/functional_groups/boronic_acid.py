@@ -168,7 +168,6 @@ class BoronicAcid(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> BoronicAcid:
-
         super()._with_ids(id_map)
 
         if (boron_id := self._boron.get_id()) in id_map:

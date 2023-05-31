@@ -1,5 +1,4 @@
 import numpy as np
-
 import stk
 
 
@@ -47,16 +46,12 @@ def test_get_caching(mongo_client):
     database.put(molecule)
     database.get(
         {
-            stk.InchiKey()
-            .get_key_name(): stk.InchiKey()
-            .get_key(molecule),
+            stk.InchiKey().get_key_name(): stk.InchiKey().get_key(molecule),
         }
     )
     database.get(
         {
-            stk.InchiKey()
-            .get_key_name(): stk.InchiKey()
-            .get_key(molecule),
+            stk.InchiKey().get_key_name(): stk.InchiKey().get_key(molecule),
         }
     )
 

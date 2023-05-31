@@ -392,9 +392,7 @@ class Macrocycle(TopologyGraph):
         """
 
         if orientations is None:
-            orientations = tuple(
-                0.0 for i in range(len(repeating_unit))
-            )
+            orientations = tuple(0.0 for i in range(len(repeating_unit)))
 
         if len(orientations) == len(repeating_unit):
             orientations = orientations * num_repeating_units
@@ -480,7 +478,6 @@ class Macrocycle(TopologyGraph):
     def _normalize_repeating_unit(
         repeating_unit: typing.Union[str, tuple[int, ...]],
     ) -> tuple[int, ...]:
-
         if isinstance(repeating_unit, tuple):
             return repeating_unit
         base = ord("A")
@@ -491,15 +488,12 @@ class Macrocycle(TopologyGraph):
         building_blocks: tuple[BuildingBlock, ...],
         vertices: abc.Sequence[CycleVertex],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
-
         polymer = self._repeating_unit * self._num_repeating_units
         building_block_vertices: dict[BuildingBlock, list[Vertex]]
         building_block_vertices = {}
         for bb_index, vertex in zip(polymer, vertices):
             bb = building_blocks[bb_index]
-            building_block_vertices[bb] = building_block_vertices.get(
-                bb, []
-            )
+            building_block_vertices[bb] = building_block_vertices.get(bb, [])
             building_block_vertices[bb].append(vertex)
         return typing.cast(
             dict[BuildingBlock, abc.Sequence[Vertex]],
@@ -508,19 +502,13 @@ class Macrocycle(TopologyGraph):
 
     def _get_scale(
         self,
-        building_block_vertices: dict[
-            BuildingBlock, abc.Sequence[Vertex]
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
-
         length = len(self._repeating_unit) * self._num_repeating_units
         return (
             length
             * 0.25
-            * max(
-                bb.get_maximum_diameter()
-                for bb in building_block_vertices
-            )
+            * max(bb.get_maximum_diameter() for bb in building_block_vertices)
         )
 
     def with_building_blocks(

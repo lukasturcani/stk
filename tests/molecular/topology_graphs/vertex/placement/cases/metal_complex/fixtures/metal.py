@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
-from rdkit.Chem import AllChem as rdkit
-
 import stk
+from rdkit.Chem import AllChem as rdkit
 
 from ....case_data import CaseData
 
@@ -18,9 +17,7 @@ single_atom.AddConformer(rdkit.Conformer(single_atom.GetNumAtoms()))
                 position=(1, 2, 3),
             ),
             edges=(),
-            building_block=stk.BuildingBlock.init_from_rdkit_mol(
-                single_atom
-            ),
+            building_block=stk.BuildingBlock.init_from_rdkit_mol(single_atom),
             position=np.array([1, 2, 3], dtype=np.float64),
             alignment_tests={},
             functional_group_edges={},

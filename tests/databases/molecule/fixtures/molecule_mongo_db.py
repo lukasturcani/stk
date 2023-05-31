@@ -4,7 +4,6 @@ from typing import Callable
 import pymongo
 import pytest
 import rdkit.Chem.AllChem as rdkit
-
 import stk
 
 from ..case_data import CaseData
@@ -47,9 +46,7 @@ class CaseDataData:
             ),
             molecule=stk.BuildingBlock("BrCCBr"),
             key={
-                "InChIKey": rdkit.MolToInchiKey(
-                    rdkit.MolFromSmiles("BrCCBr")
-                )
+                "InChIKey": rdkit.MolToInchiKey(rdkit.MolFromSmiles("BrCCBr"))
             },
         ),
         lambda: CaseDataData(

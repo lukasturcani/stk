@@ -41,12 +41,8 @@ class BuildingBlock(Molecule):
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
     _init_funcs = {
-        ".mol": partial(
-            rdkit.MolFromMolFile, sanitize=False, removeHs=False
-        ),
-        ".sdf": partial(
-            rdkit.MolFromMolFile, sanitize=False, removeHs=False
-        ),
+        ".mol": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
+        ".sdf": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
         ".pdb": partial(
             rdkit.MolFromPDBFile,
             sanitize=False,
@@ -131,8 +127,7 @@ class BuildingBlock(Molecule):
             params.randomSeed = random_seed
             if rdkit.EmbedMolecule(molecule, params) == -1:
                 raise RuntimeError(
-                    f"Embedding with seed value of {random_seed} "
-                    "failed."
+                    f"Embedding with seed value of {random_seed} " "failed."
                 )
             rdkit.Kekulize(molecule)
         else:
@@ -310,8 +305,7 @@ class BuildingBlock(Molecule):
             params.randomSeed = random_seed
             if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
                 raise RuntimeError(
-                    f"Embedding with seed value of {random_seed} "
-                    "failed."
+                    f"Embedding with seed value of {random_seed} " "failed."
                 )
         else:
             # Make sure the position matrix always holds floats.
@@ -400,11 +394,9 @@ class BuildingBlock(Molecule):
             functional_groups=functional_groups,
         )
         building_block._with_functional_groups(functional_groups)
-        building_block._placer_ids = (
-            building_block._normalize_placer_ids(
-                placer_ids=placer_ids,
-                functional_groups=building_block._functional_groups,
-            )
+        building_block._placer_ids = building_block._normalize_placer_ids(
+            placer_ids=placer_ids,
+            functional_groups=building_block._functional_groups,
         )
         building_block._core_ids = frozenset(
             building_block._get_core_ids(
@@ -488,9 +480,7 @@ class BuildingBlock(Molecule):
             )
 
         if extension not in cls._init_funcs:
-            raise ValueError(
-                f'Unable to initialize from "{extension}" files.'
-            )
+            raise ValueError(f'Unable to initialize from "{extension}" files.')
         # This remake needs to be here because molecules loaded
         # with rdkit often have issues, because rdkit tries to do
         # bits of structural analysis like stereocenters. Remake
@@ -811,9 +801,7 @@ class BuildingBlock(Molecule):
     def _with_canonical_atom_ordering(self) -> BuildingBlock:
         ordering = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
         super()._with_canonical_atom_ordering()
-        id_map = {
-            old_id: new_id for old_id, new_id in enumerate(ordering)
-        }
+        id_map = {old_id: new_id for old_id, new_id in enumerate(ordering)}
         self._functional_groups = tuple(
             functional_group.with_ids(id_map)
             for functional_group in self._functional_groups
@@ -934,21 +922,18 @@ class BuildingBlock(Molecule):
         position: np.ndarray,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> BuildingBlock:
-
         return self.clone()._with_centroid(position, atom_ids)
 
     def with_displacement(
         self,
         displacement: np.ndarray,
     ) -> BuildingBlock:
-
         return self.clone()._with_displacement(displacement)
 
     def with_position_matrix(
         self,
         position_matrix: np.ndarray,
     ) -> BuildingBlock:
-
         return self.clone()._with_position_matrix(position_matrix)
 
     def with_rotation_about_axis(
@@ -957,7 +942,6 @@ class BuildingBlock(Molecule):
         axis: np.ndarray,
         origin: np.ndarray,
     ) -> BuildingBlock:
-
         return self.clone()._with_rotation_about_axis(
             angle=angle,
             axis=axis,
@@ -970,7 +954,6 @@ class BuildingBlock(Molecule):
         target: np.ndarray,
         origin: np.ndarray,
     ) -> BuildingBlock:
-
         return self.clone()._with_rotation_between_vectors(
             start=start,
             target=target,
@@ -984,7 +967,6 @@ class BuildingBlock(Molecule):
         axis: np.ndarray,
         origin: np.ndarray,
     ) -> BuildingBlock:
-
         return self.clone()._with_rotation_to_minimize_angle(
             start=start,
             target=target,
@@ -997,7 +979,6 @@ class BuildingBlock(Molecule):
         path: str,
         extension: typing.Optional[str] = None,
     ) -> BuildingBlock:
-
         return typing.cast(
             BuildingBlock,
             super().with_structure_from_file(
@@ -1011,10 +992,7 @@ class BuildingBlock(Molecule):
         path: str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
     ) -> BuildingBlock:
-
-        return typing.cast(
-            BuildingBlock, super().write(path, atom_ids)
-        )
+        return typing.cast(BuildingBlock, super().write(path, atom_ids))
 
     def __str__(self) -> str:
         if self._functional_groups:

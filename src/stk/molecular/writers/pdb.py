@@ -71,7 +71,6 @@ class PdbWriter:
         atom_ids: typing.Optional[OneOrMany[int]],
         periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> list[str]:
-
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):

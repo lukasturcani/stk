@@ -43,9 +43,7 @@ class _FunctionalGroupSorter(_Sorter):
                 building_block.get_functional_groups()
             ).get_placer_ids(),
         )
-        self._placer_centroid = (
-            placer_centroid
-        ) = building_block.get_centroid(
+        self._placer_centroid = placer_centroid = building_block.get_centroid(
             atom_ids=building_block.get_placer_ids(),
         )
         fg0_direction = fg0_position - placer_centroid

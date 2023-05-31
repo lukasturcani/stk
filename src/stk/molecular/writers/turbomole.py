@@ -70,7 +70,6 @@ class TurbomoleWriter:
         atom_ids: typing.Optional[OneOrMany[int]],
         periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> list[str]:
-
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
         elif isinstance(atom_ids, int):
@@ -99,8 +98,7 @@ class TurbomoleWriter:
             element = atom.__class__.__name__
             x, y, z = (i for i in coords[atom_id])
             content.append(
-                f" {round(x, 4)} {round(y, 4)} {round(z, 4)} "
-                f"{element}\n"
+                f" {round(x, 4)} {round(y, 4)} {round(z, 4)} " f"{element}\n"
             )
 
         content.append("$end\n")

@@ -71,9 +71,7 @@ def _write_pdb_file(self, path, atom_ids):
         a1 = bond.get_atom1().get_id()
         a2 = bond.get_atom2().get_id()
         if a1 in atoms and a2 in atoms:
-            lines.append(
-                f"{conect:<6}{a1+1:>5}{a2+1:>5}               \n"
-            )
+            lines.append(f"{conect:<6}{a1+1:>5}{a2+1:>5}               \n")
 
     lines.append("END\n")
     with open(path, "w") as f:

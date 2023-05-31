@@ -1,6 +1,6 @@
 import numpy as np
-
 import stk
+
 from tests.utilities import (
     is_equivalent_constructed_molecule,
     is_equivalent_molecule,

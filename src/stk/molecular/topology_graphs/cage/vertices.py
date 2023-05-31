@@ -172,9 +172,7 @@ class LinearVertex(_CageVertex):
             ).get_placer_ids(),
         )
         edge_position = edges[self._aligner_edge].get_position()
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
         building_block = building_block.with_rotation_between_vectors(
             start=fg_centroid - self._position,
             target=edge_position - edge_centroid,
@@ -200,9 +198,7 @@ class LinearVertex(_CageVertex):
             return euclidean(edge.get_position(), fg_position)
 
         edges = sorted(edges, key=fg_distance)
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
 
 
 class NonLinearVertex(_CageVertex):
@@ -216,15 +212,11 @@ class NonLinearVertex(_CageVertex):
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         )
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
         edge_normal = get_acute_vector(
             reference=edge_centroid,
             vector=get_plane_normal(
-                points=np.array(
-                    [edge.get_position() for edge in edges]
-                ),
+                points=np.array([edge.get_position() for edge in edges]),
             ),
         )
         core_centroid = building_block.get_centroid(
@@ -294,10 +286,7 @@ class UnaligningVertex(_CageVertex):
         ).get_position_matrix()
 
     def map_functional_groups_to_edges(self, building_block, edges):
-
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
 
     @classmethod
     def init_at_center(cls, id, vertices):
@@ -329,9 +318,7 @@ class AngledVertex(_CageVertex):
             ).get_placer_ids(),
         )
         edge_position = edges[self._aligner_edge].get_position()
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
         building_block = building_block.with_rotation_between_vectors(
             start=fg_centroid - self._position,
             target=edge_position - edge_centroid,
@@ -345,9 +332,7 @@ class AngledVertex(_CageVertex):
             atom_ids=building_block.get_core_atom_ids(),
         )
         core_to_placer = placer_centroid - core_centroid
-        edge_centroid = sum(
-            edge.get_position() for edge in edges
-        ) / len(edges)
+        edge_centroid = sum(edge.get_position() for edge in edges) / len(edges)
 
         return building_block.with_rotation_between_vectors(
             start=core_to_placer,
@@ -363,6 +348,4 @@ class AngledVertex(_CageVertex):
             return euclidean(edge.get_position(), fg_position)
 
         edges = sorted(edges, key=fg_distance)
-        return {
-            fg_id: edge.get_id() for fg_id, edge in enumerate(edges)
-        }
+        return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}

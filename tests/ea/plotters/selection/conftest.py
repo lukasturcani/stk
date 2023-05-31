@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from .case_data import CaseData
@@ -7,9 +6,7 @@ from .case_data import CaseData
 
 def get_topology_graph(num_repeating_units):
     return stk.polymer.Linear(
-        building_blocks=(
-            stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),
-        ),
+        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
         repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )

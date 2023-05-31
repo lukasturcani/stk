@@ -46,6 +46,4 @@ def _test_caching(
 
     """
 
-    assert (
-        fitness_calculator.get_fitness_value(molecule) is fitness_value
-    )
+    assert fitness_calculator.get_fitness_value(molecule) is fitness_value

@@ -1,7 +1,6 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
-
 import stk
+from pytest_lazyfixture import lazy_fixture
 
 from ...case_data import CaseData
 
@@ -47,8 +46,7 @@ from ...case_data import CaseData
                 ),
             ),
             smiles=(
-                "N1=NN2N1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N"
-                "=NN21"
+                "N1=NN2N1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N" "=NN21"
             ),
             name=name,
         ),

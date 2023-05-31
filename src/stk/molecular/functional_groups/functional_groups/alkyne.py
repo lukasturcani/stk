@@ -132,7 +132,6 @@ class Alkyne(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Alkyne:
-
         super()._with_ids(id_map)
         if (carbon1_id := self._carbon1.get_id()) in id_map:
             self._carbon1 = self._carbon1.with_id(id_map[carbon1_id])
@@ -152,7 +151,6 @@ class Alkyne(GenericFunctionalGroup):
         self,
         id_map: dict[int, int],
     ) -> Alkyne:
-
         return self.clone()._with_ids(id_map)
 
     def __repr__(self) -> str:

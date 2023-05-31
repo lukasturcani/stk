@@ -1,5 +1,4 @@
 import pytest
-
 import stk
 
 from ..case_data import CaseData
@@ -20,9 +19,7 @@ graph2 = stk.cage.EightPlusTwelve((bb3, bb4))
             crosser=stk.RandomCrosser(
                 crossers=(
                     stk.GeneticRecombination(
-                        get_gene=(
-                            stk.BuildingBlock.get_num_functional_groups
-                        ),
+                        get_gene=(stk.BuildingBlock.get_num_functional_groups),
                     ),
                 ),
             ),
