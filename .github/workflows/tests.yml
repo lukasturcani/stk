@@ -19,12 +19,12 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run ruff
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           ruff .
 
   mypy:
@@ -38,12 +38,12 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run mypy
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           mypy src
 
   black:
@@ -57,12 +57,12 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run black
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           black --check .
 
   pytest-stable-linux:
@@ -80,12 +80,12 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run pytest
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pytest --mongodb_uri='mongodb://MongoDB:27017/'
 
   doctest:
@@ -103,12 +103,12 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Run doctest
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           MONGODB_URI='mongodb://MongoDB:27017/' make -C docs doctest
 
   basic-ea:
@@ -126,7 +126,7 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Install dependencies
@@ -135,7 +135,7 @@ jobs:
 
       - name: Run the EA
         run: >
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
 
           python basic_ea/basic_ea.py
           --mongodb_uri mongodb://MongoDB:27017
@@ -167,7 +167,7 @@ jobs:
 
       - name: Install stk
         run: |
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
 
       - name: Install dependencies
@@ -177,7 +177,7 @@ jobs:
 
       - name: Run the EA
         run: >
-          ./deps/venv/bin/activate
+          . /deps/venv/bin/activate
 
           python intermediate_ea/intermediate_ea.py
           --mongodb_uri mongodb://MongoDB:27017
