@@ -4,8 +4,7 @@ RUN \
   apt-get update \
   && apt-get install -y \
   git \
-  make \
-  mongo-tools
+  make
 
 
 # requirements.txt is generated with pip-comile. See the justfile.
