@@ -43,10 +43,10 @@ fix:
 # Build the docker testing environment.
 build-testing-environment:
   pip-compile -o docker_testing_environment/requirements.txt --extra dev pyproject.toml
-  docker buildx build -t stk-testing-environment:latest ./docker_testing_environment
+  docker buildx build -t stk-test-environment:latest ./docker_testing_environment
 
 # Enter the docker testing environment.
 enter-docker:
   docker run -it --rm \
     --mount type=bind,source="$(pwd)",target=/code \
-    stk-testing-environment:latest /bin/sh
+    stk-test-environment:latest /bin/sh

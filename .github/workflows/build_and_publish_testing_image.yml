@@ -31,7 +31,7 @@ jobs:
 
 
           docker buildx build
-          -t ghcr.io/lukasturcani/stk-testing-environment:latest
+          -t ghcr.io/lukasturcani/stk-test-environment:latest
           ./docker_testing_environment
 
       - name: Publish image
