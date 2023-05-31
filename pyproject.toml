@@ -31,6 +31,7 @@ dev = [
   "moldoc",
   "numpydoc",
   "mypy",
+  "pip-tools",
   "pytest",
   "pytest-benchmark",
   "pytest-datadir",
