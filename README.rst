@@ -4,7 +4,7 @@
 :documentation: https://stk.readthedocs.io
 :discord: https://discord.gg/zbCUzuxe2B
 
-.. figure:: docs/source/figures/stk.png
+.. figure:: docs/source/_static/stk.png
 
 .. image:: https://github.com/lukasturcani/stk/workflows/tests/badge.svg?branch=master
     :target: https://github.com/lukasturcani/stk/actions?query=branch%3Amaster
