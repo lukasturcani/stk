@@ -4,7 +4,7 @@ Molecule Record
 
 """
 
-from stk.molecular import ConstructedMolecule
+from stk._internal.constructed_molecule import ConstructedMolecule
 
 
 class MoleculeRecord:

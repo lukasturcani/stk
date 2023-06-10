@@ -4,9 +4,12 @@ Ring Amine Factory
 
 """
 
-from ..functional_groups import RingAmine
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+
+from stk._internal.functional_group_factories.functional_group_factory import (
+    FunctionalGroupFactory,
+)
+from stk._internal.functional_group_factories.utilities import get_atom_ids
+from stk._internal.functional_groups.ring_amine import RingAmine
 
 
 class RingAmineFactory(FunctionalGroupFactory):
@@ -29,7 +32,7 @@ class RingAmineFactory(FunctionalGroupFactory):
         return super().__init__()
 
     def get_functional_groups(self, molecule):
-        ids = _get_atom_ids(
+        ids = get_atom_ids(
             query="[N]([H])([H])[#6]~[#6]([H])~[#6R1]",
             molecule=molecule,
         )

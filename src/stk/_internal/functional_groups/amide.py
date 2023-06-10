@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from ...atoms import Atom, C, H, N, O
+from stk._internal.atom import Atom
+from stk._internal.elements import C, H, N, O
+
 from .generic_functional_group import GenericFunctionalGroup
 
 

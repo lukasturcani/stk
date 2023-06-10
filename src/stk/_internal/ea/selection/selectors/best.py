@@ -6,7 +6,7 @@ Best
 
 import itertools as it
 
-from stk.molecular import Inchi
+from stk._internal.key_makers.inchi import Inchi
 
 from .selector import Selector
 

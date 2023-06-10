@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import typing
 
-from ...atoms import Atom
-from .functional_group import FunctionalGroup
+from stk._internal.atom import Atom
+from stk._internal.functional_groups.functional_group import FunctionalGroup
 
 _T = typing.TypeVar("_T", bound="GenericFunctionalGroup")
 

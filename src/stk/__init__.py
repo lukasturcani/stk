@@ -1,3 +1,4 @@
+from stk._internal.building_block import BuildingBlock
 from stk._internal.functional_group_factories.alcohol_factory import (
     AlcoholFactory,
 )
@@ -42,7 +43,6 @@ from stk._internal.functional_groups.secondary_amino import SecondaryAmino
 from stk._internal.functional_groups.single_atom import SingleAtom
 from stk._internal.functional_groups.thioacid import Thioacid
 from stk._internal.functional_groups.thiol import Thiol
-from stk._internal.molecular.molecules.building_block import BuildingBlock
 from stk._version import __version__
 
 __all__ = [

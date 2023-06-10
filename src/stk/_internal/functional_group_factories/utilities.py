@@ -7,7 +7,7 @@ Functional Group Factory Utilities
 import rdkit.Chem.AllChem as rdkit
 
 
-def _get_atom_ids(query, molecule):
+def get_atom_ids(query, molecule):
     """
     Yield the ids of atoms in `molecule` which match `query`.
 

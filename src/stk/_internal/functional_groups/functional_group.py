@@ -63,7 +63,7 @@ from __future__ import annotations
 
 import typing
 
-from ...atoms import Atom
+from stk._internal.atom import Atom
 
 _T = typing.TypeVar("_T", bound="FunctionalGroup")
 

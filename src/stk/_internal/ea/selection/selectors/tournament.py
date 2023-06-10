@@ -6,7 +6,7 @@ Tournament
 
 import numpy as np
 
-from stk.molecular import Inchi
+from stk._internal.key_makers.inchi import Inchi
 
 from .selector import Selector
 

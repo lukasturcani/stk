@@ -4,9 +4,11 @@ Boronic Acid Factory
 
 """
 
-from ..functional_groups import BoronicAcid
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from stk._internal.functional_group_factories.functional_group_factory import (
+    FunctionalGroupFactory,
+)
+from stk._internal.functional_group_factories.utilities import get_atom_ids
+from stk._internal.functional_groups.boronic_acid import BoronicAcid
 
 
 class BoronicAcidFactory(FunctionalGroupFactory):
@@ -130,7 +132,7 @@ class BoronicAcidFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        ids = _get_atom_ids("[*][B]([O][H])[O][H]", molecule)
+        ids = get_atom_ids("[*][B]([O][H])[O][H]", molecule)
         for atom_ids in ids:
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield BoronicAcid(

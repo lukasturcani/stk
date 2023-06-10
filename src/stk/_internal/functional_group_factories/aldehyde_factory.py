@@ -4,9 +4,11 @@ Aldehyde Factory
 
 """
 
-from ..functional_groups import Aldehyde
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+from stk._internal.functional_group_factories.functional_group_factory import (
+    FunctionalGroupFactory,
+)
+from stk._internal.functional_group_factories.utilities import get_atom_ids
+from stk._internal.functional_groups.aldehyde import Aldehyde
 
 
 class AldehydeFactory(FunctionalGroupFactory):
@@ -123,7 +125,7 @@ class AldehydeFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids("[*][C](=[O])[H]", molecule):
+        for atom_ids in get_atom_ids("[*][C](=[O])[H]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield Aldehyde(
                 carbon=atoms[1],

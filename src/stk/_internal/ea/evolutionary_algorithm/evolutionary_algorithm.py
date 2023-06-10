@@ -6,7 +6,7 @@ Evolutionary Algorithm
 
 import logging
 
-from stk.molecular import Inchi
+from stk._internal.key_makers.inchi import Inchi
 
 from ..fitness_normalizers import NullFitnessNormalizer
 from .implementations import Parallel, Serial

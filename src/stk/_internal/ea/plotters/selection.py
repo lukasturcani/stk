@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from stk.molecular import InchiKey
+from stk._internal.key_makers.inchi_key import InchiKey
 
 plt.switch_backend("agg")
 

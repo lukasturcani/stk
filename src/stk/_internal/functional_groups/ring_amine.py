@@ -4,7 +4,7 @@ Ring Amine
 
 """
 
-from . import FunctionalGroup
+from .functional_group import FunctionalGroup
 
 
 class RingAmine(FunctionalGroup):

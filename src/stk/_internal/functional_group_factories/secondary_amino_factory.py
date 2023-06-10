@@ -4,9 +4,12 @@ Secondary Amino Factory
 
 """
 
-from ..functional_groups import SecondaryAmino
-from .functional_group_factory import FunctionalGroupFactory
-from .utilities import _get_atom_ids
+
+from stk._internal.functional_group_factories.functional_group_factory import (
+    FunctionalGroupFactory,
+)
+from stk._internal.functional_group_factories.utilities import get_atom_ids
+from stk._internal.functional_groups.secondary_amino import SecondaryAmino
 
 
 class SecondaryAminoFactory(FunctionalGroupFactory):
@@ -122,7 +125,7 @@ class SecondaryAminoFactory(FunctionalGroupFactory):
         self._placers = bonders if placers is None else placers
 
     def get_functional_groups(self, molecule):
-        for atom_ids in _get_atom_ids("[H][N]([#6])[#6]", molecule):
+        for atom_ids in get_atom_ids("[H][N]([#6])[#6]", molecule):
             atoms = tuple(molecule.get_atoms(atom_ids))
             yield SecondaryAmino(
                 nitrogen=atoms[1],
