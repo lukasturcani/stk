@@ -4,7 +4,8 @@ M4L8
 
 """
 
-from ...topology_graph import Edge
+from stk._internal.topology_graphs.edge import Edge
+
 from ..cage import Cage
 from ..vertices import LinearVertex, NonLinearVertex
 

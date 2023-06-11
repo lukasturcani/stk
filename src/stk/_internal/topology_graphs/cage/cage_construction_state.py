@@ -4,7 +4,7 @@ Cage Construction State
 
 """
 
-from ..topology_graph import ConstructionState
+from stk._internal.topology_graphs.construction_state import ConstructionState
 
 
 class _CageConstructionState(ConstructionState):

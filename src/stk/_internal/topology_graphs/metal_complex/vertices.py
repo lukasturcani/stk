@@ -6,9 +6,8 @@ Metal Complex Vertices
 
 from scipy.spatial.distance import euclidean
 
-from stk.utilities import get_projection
-
-from ..topology_graph import Vertex
+from stk._internal.topology_graphs.vertex import Vertex
+from stk._internal.utilities.utilities import get_projection
 
 
 class UnaligningVertex(Vertex):

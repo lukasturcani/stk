@@ -4,7 +4,7 @@ Dative Reaction Factory
 
 """
 
-from ..reactions import DativeReaction
+from ..reactions.dative_reaction.dative_reaction import DativeReaction
 from .reaction_factory import ReactionFactory
 
 

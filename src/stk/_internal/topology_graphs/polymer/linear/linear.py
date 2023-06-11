@@ -13,20 +13,20 @@ from dataclasses import dataclass
 import numpy as np
 
 from stk._internal.building_block import BuildingBlock
-from stk._internal.reactions.factories.generic_reaction_factory import (
+from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.generic_reaction_factory import (
     GenericReactionFactory,
 )
-from stk._internal.reactions.factories.reaction_factory import (
+from stk._internal.reaction_factories.reaction_factory import (
     ReactionFactory,
 )
-
-from ...topology_graph import (
-    Edge,
-    NullOptimizer,
+from stk._internal.topology_graphs.edge import Edge
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
-    Vertex,
 )
-from ...topology_graph.optimizers import Optimizer
+from stk._internal.topology_graphs.vertex import Vertex
+
 from .vertices import (
     HeadVertex,
     LinearVertex,

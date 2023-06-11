@@ -4,7 +4,8 @@ M8L6 Cube
 
 """
 
-from ...topology_graph import Edge
+from stk._internal.topology_graphs.edge import Edge
+
 from ..cage import Cage
 from ..vertices import NonLinearVertex
 

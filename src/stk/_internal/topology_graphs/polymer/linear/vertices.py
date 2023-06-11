@@ -6,7 +6,7 @@ Linear Polymer Vertices
 
 import logging
 
-from ...topology_graph import Vertex
+from stk._internal.topology_graphs.vertex import Vertex
 
 logger = logging.getLogger(__name__)
 

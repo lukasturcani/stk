@@ -9,9 +9,9 @@ from stk._internal.functional_groups.alkene import Alkene
 from stk._internal.functional_groups.alkyne import Alkyne
 from stk._internal.functional_groups.amide import Amide
 from stk._internal.functional_groups.primary_amino import PrimaryAmino
-from stk._internal.reactions.reactions.one_one_reaction import OneOneReaction
-from stk._internal.reactions.reactions.one_two_reaction import OneTwoReaction
-from stk._internal.reactions.reactions.two_two_reaction import TwoTwoReaction
+from stk._internal.reactions.one_one_reaction import OneOneReaction
+from stk._internal.reactions.one_two_reaction import OneTwoReaction
+from stk._internal.reactions.two_two_reaction import TwoTwoReaction
 
 from .reaction_factory import ReactionFactory
 

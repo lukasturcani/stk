@@ -4,7 +4,8 @@ Square Planar
 
 """
 
-from ...topology_graph import Edge
+from stk._internal.topology_graphs.edge import Edge
+
 from ..metal_complex import MetalComplex
 from ..vertices import MetalVertex, MonoDentateLigandVertex
 

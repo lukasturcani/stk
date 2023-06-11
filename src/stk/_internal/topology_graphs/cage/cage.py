@@ -118,12 +118,19 @@ import typing
 from collections import Counter, abc, defaultdict
 from functools import partial
 
-from ...molecules import BuildingBlock
-from ...reactions import GenericReactionFactory, ReactionFactory
-from ..topology_graph import NullOptimizer, TopologyGraph
-from ..topology_graph.edge import Edge
-from ..topology_graph.optimizers import Optimizer
-from ..topology_graph.vertex import Vertex
+from stk._internal.building_block import BuildingBlock
+from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
+from stk._internal.reaction_factories.reaction_factory import ReactionFactory
+from stk._internal.topology_graphs.edge import Edge
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
+from stk._internal.topology_graphs.vertex import Vertex
+
 from .cage_construction_state import _CageConstructionState
 from .vertices import UnaligningVertex, _CageVertex
 

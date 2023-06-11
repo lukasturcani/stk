@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import pathos
 
-from ...construction_state import ConstructionState
+from stk._internal.topology_graphs.construction_state import ConstructionState
+
 from .utilities import _Placement
 
 

@@ -6,7 +6,7 @@ Functional Group Sorter
 
 import numpy as np
 
-from stk.utilities import get_acute_vector
+from stk._internal.utilities.utilities import get_acute_vector
 
 from .sorter import _Sorter
 

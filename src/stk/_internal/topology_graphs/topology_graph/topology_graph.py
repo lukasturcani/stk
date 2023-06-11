@@ -13,20 +13,25 @@ from functools import partial
 import numpy as np
 
 from stk._internal.building_block import BuildingBlock
-from stk._internal.reactions.factories.reaction_factory import ReactionFactory
-from stk._internal.utilities.utilities import flatten
-
-from ..construction_result import ConstructionResult
-from ..construction_state import ConstructionState
-from ..edge import Edge
-from ..edge_group import EdgeGroup
-from ..optimizers import Optimizer
-from ..vertex import Vertex
-from .implementations import (
+from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.reaction_factory import ReactionFactory
+from stk._internal.topology_graphs.construction_result import (
+    ConstructionResult,
+)
+from stk._internal.topology_graphs.construction_state import ConstructionState
+from stk._internal.topology_graphs.edge import Edge
+from stk._internal.topology_graphs.edge_group import EdgeGroup
+from stk._internal.topology_graphs.topology_graph.parallel import (
     _Parallel,
+)
+from stk._internal.topology_graphs.topology_graph.serial import (
     _Serial,
+)
+from stk._internal.topology_graphs.topology_graph.utilities import (
     _TopologyGraphImplementation,
 )
+from stk._internal.topology_graphs.vertex import Vertex
+from stk._internal.utilities.utilities import flatten
 
 _TopologyGraphT = typing.TypeVar(
     "_TopologyGraphT",

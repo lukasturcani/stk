@@ -17,9 +17,11 @@ from stk._internal.atom_info import AtomInfo
 from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
 from stk._internal.molecule import Molecule
-from stk._internal.topology_graphs.topology_graph import TopologyGraph
-from stk._internal.topology_graphs.topology_graph.construction_result import (
+from stk._internal.topology_graphs.construction_result import (
     ConstructionResult,
+)
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
 )
 from stk._internal.utilities.molecule import (
     get_bond_info_atom_ids,

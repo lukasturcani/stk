@@ -6,7 +6,7 @@ Sorter
 
 import numpy as np
 
-from stk.utilities import vector_angle
+from stk._internal.utilities.utilities import vector_angle
 
 
 class _Sorter:

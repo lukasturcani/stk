@@ -4,7 +4,8 @@ Periodic Construction Result
 
 """
 
-from ....periodic_info import PeriodicInfo
+from stk._internal.periodic_info import PeriodicInfo
+
 from .construction_result import ConstructionResult
 
 

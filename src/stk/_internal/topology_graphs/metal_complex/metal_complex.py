@@ -43,20 +43,25 @@ import typing
 from collections import Counter, abc, defaultdict
 from itertools import product
 
-from ....utilities import OneOrMany
-from ...molecules import BuildingBlock
-from ...reactions import (
+from stk._internal.building_block import BuildingBlock
+from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.dative_reaction_factory import (
     DativeReactionFactory,
+)
+from stk._internal.reaction_factories.generic_reaction_factory import (
     GenericReactionFactory,
+)
+from stk._internal.reaction_factories.reaction_factory import (
     ReactionFactory,
 )
-from ..topology_graph import (
-    Edge,
-    NullOptimizer,
-    Optimizer,
+from stk._internal.topology_graphs.edge import Edge
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
-    Vertex,
 )
+from stk._internal.topology_graphs.vertex import Vertex
+from stk._internal.utilities.utilities import OneOrMany
+
 from .vertices import (
     BiDentateLigandVertex,
     MetalVertex,

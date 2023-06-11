@@ -10,7 +10,7 @@ import typing
 
 import numpy as np
 
-from ...construction_state import ConstructionState
+from stk._internal.topology_graphs.construction_state import ConstructionState
 
 
 class _TopologyGraphImplementation(typing.Protocol):
