@@ -6,8 +6,9 @@ One-Two Reaction
 
 import itertools as it
 
-from ...bonds import Bond
-from .reaction import Reaction
+from stk._internal.bond import Bond
+
+from .reaction.reaction import Reaction
 
 
 class OneTwoReaction(Reaction):

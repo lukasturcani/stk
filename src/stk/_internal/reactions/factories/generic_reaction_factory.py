@@ -4,14 +4,15 @@ Generic Reaction Factory
 
 """
 
-from ...functional_groups import (
-    Aldehyde,
-    Alkene,
-    Alkyne,
-    Amide,
-    PrimaryAmino,
-)
-from ..reactions import OneOneReaction, OneTwoReaction, TwoTwoReaction
+from stk._internal.functional_groups.aldehyde import Aldehyde
+from stk._internal.functional_groups.alkene import Alkene
+from stk._internal.functional_groups.alkyne import Alkyne
+from stk._internal.functional_groups.amide import Amide
+from stk._internal.functional_groups.primary_amino import PrimaryAmino
+from stk._internal.reactions.reactions.one_one_reaction import OneOneReaction
+from stk._internal.reactions.reactions.one_two_reaction import OneTwoReaction
+from stk._internal.reactions.reactions.two_two_reaction import TwoTwoReaction
+
 from .reaction_factory import ReactionFactory
 
 # Impose the same interface on all reaction initializers.

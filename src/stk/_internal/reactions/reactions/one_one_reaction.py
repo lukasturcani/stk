@@ -4,8 +4,9 @@ One-One Reaction
 
 """
 
-from ...bonds import Bond
-from .reaction import Reaction
+from stk._internal.bond import Bond
+
+from .reaction.reaction import Reaction
 
 
 class OneOneReaction(Reaction):
