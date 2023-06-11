@@ -8,8 +8,9 @@ import logging
 
 from stk._internal.key_makers.inchi import Inchi
 
-from ..fitness_normalizers import NullFitnessNormalizer
-from .implementations import Parallel, Serial
+from ..fitness_normalizers.null import NullFitnessNormalizer
+from .implementations.parallel import Parallel
+from .implementations.serial import Serial
 
 logger = logging.getLogger(__name__)
 

@@ -42,23 +42,14 @@
 
 .. toctree::
    :hidden:
-   :caption: Molecular Databases
-   :maxdepth: 2
-
-    Molecule <stk.databases.molecule>
-    Constructed Molecule <stk.databases.constructed_molecule>
-    Value <stk.databases.value>
-
-.. toctree::
-   :hidden:
    :caption: Evolutionary Algorithm
    :maxdepth: 2
 
-   Overview <stk.ea.evolutionary_algorithm.evolutionary_algorithm>
+   Overview <_autosummary/stk.EvolutionaryAlgorithm>
    Basic Example <basic_ea_example>
    Intermediate Example <intermediate_ea_example>
-   Fitness Calculators <stk.ea.fitness_calculators.fitness_calculator>
-   Fitness Normalizers <stk.ea.fitness_normalizers.fitness_normalizer>
+   Fitness Calculators <_autosummary/stk.FitnessCalculator>
+   Fitness Normalizers <_autosummary/stk.FitnessNormalizer>
    Selection <stk.ea.selection.selectors.selector>
    Mutation <mutation>
    Crossover <crossover>

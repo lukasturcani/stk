@@ -1,6 +1,18 @@
 from stk import cage, cof, host_guest, metal_complex, polymer
 from stk._internal.building_block import BuildingBlock
 from stk._internal.constructed_molecule import ConstructedMolecule
+from stk._internal.ea.crossover.molecule_crosser import MoleculeCrosser
+from stk._internal.ea.crossover.random import RandomCrosser
+from stk._internal.ea.evolutionary_algorithm.evolutionary_algorithm import (
+    EvolutionaryAlgorithm,
+)
+from stk._internal.ea.fitness_calculators.fitness_calculator import (
+    FitnessCalculator,
+)
+from stk._internal.ea.fitness_normalizers.fitness_normalizer import (
+    FitnessNormalizer,
+)
+from stk._internal.ea.mutation.random import RandomMutator
 from stk._internal.elements import (
     Ac,
     Ag,
@@ -203,16 +215,28 @@ from stk._internal.functional_groups.thioacid import Thioacid
 from stk._internal.functional_groups.thiol import Thiol
 from stk._internal.optimizers.collapser import Collapser
 from stk._internal.optimizers.mchammer import MCHammer
+from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.reaction_factories.reaction_factory import ReactionFactory
 from stk._internal.reactions.reaction.reaction import Reaction
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
 from stk._version import __version__
 
 __all__ = [
+    "EvolutionaryAlgorithm",
+    "RandomMutator",
     "cof",
     "host_guest",
     "metal_complex",
     "BuildingBlock",
     "ConstructedMolecule",
+    "TopologyGraph",
+    "MoleculeCrosser",
+    "Optimizer",
+    "RandomCrosser",
+    "FitnessCalculator",
+    "FitnessNormalizer",
     "AlcoholFactory",
     "AldehydeFactory",
     "AmideFactory",
