@@ -1,4 +1,6 @@
+from stk import polymer
 from stk._internal.building_block import BuildingBlock
+from stk._internal.constructed_molecule import ConstructedMolecule
 from stk._internal.functional_group_factories.alcohol_factory import (
     AlcoholFactory,
 )
@@ -19,6 +21,39 @@ from stk._internal.functional_group_factories.carboxylic_acid_factory import (
 )
 from stk._internal.functional_group_factories.dibromo_factory import (
     DibromoFactory,
+)
+from stk._internal.functional_group_factories.difluoro_factory import (
+    DifluoroFactory,
+)
+from stk._internal.functional_group_factories.diol_factory import (
+    DiolFactory,
+)
+from stk._internal.functional_group_factories.iodo_factory import (
+    IodoFactory,
+)
+from stk._internal.functional_group_factories.primary_amino_factory import (
+    PrimaryAminoFactory,
+)
+from stk._internal.functional_group_factories.ring_amine_factory import (
+    RingAmineFactory,
+)
+from stk._internal.functional_group_factories.secondary_amino_factory import (
+    SecondaryAminoFactory,
+)
+from stk._internal.functional_group_factories.smarts import (
+    SmartsFunctionalGroupFactory,
+)
+from stk._internal.functional_group_factories.terminal_alkene_factory import (
+    TerminalAlkeneFactory,
+)
+from stk._internal.functional_group_factories.terminal_alkyne_factory import (
+    TerminalAlkyneFactory,
+)
+from stk._internal.functional_group_factories.thioacid_factory import (
+    ThioacidFactory,
+)
+from stk._internal.functional_group_factories.thiol_factory import (
+    ThiolFactory,
 )
 from stk._internal.functional_groups.alcohol import Alcohol
 from stk._internal.functional_groups.aldehyde import Aldehyde
@@ -46,6 +81,8 @@ from stk._internal.functional_groups.thiol import Thiol
 from stk._version import __version__
 
 __all__ = [
+    "BuildingBlock",
+    "ConstructedMolecule",
     "AlcoholFactory",
     "AldehydeFactory",
     "AmideFactory",
@@ -53,6 +90,17 @@ __all__ = [
     "BromoFactory",
     "CarboxylicAcidFactory",
     "DibromoFactory",
+    "DifluoroFactory",
+    "DiolFactory",
+    "IodoFactory",
+    "PrimaryAminoFactory",
+    "RingAmineFactory",
+    "SecondaryAminoFactory",
+    "SmartsFunctionalGroupFactory",
+    "TerminalAlkeneFactory",
+    "TerminalAlkyneFactory",
+    "ThioacidFactory",
+    "ThiolFactory",
     "Alcohol",
     "Aldehyde",
     "Alkene",
@@ -74,6 +122,6 @@ __all__ = [
     "SingleAtom",
     "Thioacid",
     "Thiol",
-    "BuildingBlock",
+    "polymer",
     "__version__",
 ]

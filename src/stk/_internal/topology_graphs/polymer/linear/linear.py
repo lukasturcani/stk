@@ -12,8 +12,14 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from ....molecules import BuildingBlock
-from ....reactions import GenericReactionFactory, ReactionFactory
+from stk._internal.building_block import BuildingBlock
+from stk._internal.reactions.factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
+from stk._internal.reactions.factories.reaction_factory import (
+    ReactionFactory,
+)
+
 from ...topology_graph import (
     Edge,
     NullOptimizer,
