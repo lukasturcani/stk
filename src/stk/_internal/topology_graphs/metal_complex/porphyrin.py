@@ -6,8 +6,8 @@ Porphyrin
 
 from stk._internal.topology_graphs.edge import Edge
 
-from ..metal_complex import MetalComplex
-from ..vertices import MetalVertex, UnaligningVertex
+from .metal_complex import MetalComplex
+from .vertices import MetalVertex, UnaligningVertex
 
 
 class Porphyrin(MetalComplex):

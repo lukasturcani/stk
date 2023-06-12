@@ -6,8 +6,8 @@ Cis Protected Square Planar
 
 from stk._internal.topology_graphs.edge import Edge
 
-from ..metal_complex import MetalComplex
-from ..vertices import BiDentateLigandVertex, MetalVertex
+from .metal_complex import MetalComplex
+from .vertices import BiDentateLigandVertex, MetalVertex
 
 
 class CisProtectedSquarePlanar(MetalComplex):

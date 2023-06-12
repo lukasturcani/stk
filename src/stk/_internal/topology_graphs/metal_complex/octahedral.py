@@ -6,8 +6,8 @@ Octahedral
 
 from stk._internal.topology_graphs.edge import Edge
 
-from ..metal_complex import MetalComplex
-from ..vertices import MetalVertex, MonoDentateLigandVertex
+from .metal_complex import MetalComplex
+from .vertices import MetalVertex, MonoDentateLigandVertex
 
 
 class Octahedral(MetalComplex):

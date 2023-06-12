@@ -1,4 +1,4 @@
-from stk._internal.topology_graphs.metal_complex.octahedral.octahedral_delta import (
+from stk._internal.topology_graphs.metal_complex.octahedral_delta import (
     OctahedralDelta,
 )
 from stk._internal.topology_graphs.metal_complex.porphyrin import Porphyrin
