@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import typing
 
-from ...utilities import OneOrMany
-from ..molecules import Molecule
-from ..periodic_info import PeriodicInfo
+from stk._internal.molecule import Molecule
+from stk._internal.periodic_info import PeriodicInfo
+from stk._internal.utilities.utilities import OneOrMany
 
 
 class TurbomoleWriter:
