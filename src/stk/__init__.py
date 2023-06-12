@@ -220,6 +220,12 @@ from stk._internal.functional_groups.thiol import Thiol
 from stk._internal.optimizers.collapser import Collapser
 from stk._internal.optimizers.mchammer import MCHammer
 from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.dative_reaction_factory import (
+    DativeReactionFactory,
+)
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
 from stk._internal.reaction_factories.reaction_factory import ReactionFactory
 from stk._internal.reactions.reaction.reaction import Reaction
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
@@ -299,6 +305,8 @@ __all__ = [
     "PdbWriter",
     "MolWriter",
     "TurbomoleWriter",
+    "DativeReactionFactory",
+    "GenericReactionFactory",
     "__version__",
     "Ac",
     "Ag",

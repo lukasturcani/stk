@@ -1,3 +1,4 @@
+from stk._internal.topology_graphs.cage.cage import Cage
 from stk._internal.topology_graphs.cage.eight_plus_twelve import (
     EightPlusTwelve,
 )
@@ -25,6 +26,7 @@ from stk._internal.topology_graphs.cage.twenty_plus_thirty import (
 from stk._internal.topology_graphs.cage.two_plus_three import TwoPlusThree
 
 __all__ = [
+    "Cage",
     "M2L4Lantern",
     "M3L3Triangle",
     "M4L4Square",
