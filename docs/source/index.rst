@@ -50,7 +50,7 @@
    Intermediate Example <intermediate_ea_example>
    Fitness Calculators <_autosummary/stk.FitnessCalculator>
    Fitness Normalizers <_autosummary/stk.FitnessNormalizer>
-   Selection <stk.ea.selection.selectors.selector>
+   Selection <_autosummary/stk.Selector>
    Mutation <mutation>
    Crossover <crossover>
    Plotting <plotters>

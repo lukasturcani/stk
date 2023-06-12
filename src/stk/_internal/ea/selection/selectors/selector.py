@@ -24,7 +24,7 @@ import itertools as it
 import logging
 
 from ..batch import Batch
-from .utilities import YieldedBatches
+from .utilities.yielded_batches import YieldedBatches
 
 logger = logging.getLogger(__name__)
 

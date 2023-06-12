@@ -11,6 +11,3 @@ inheritance hierarchy. Each plotter has its own distinct API, according
 to its needs.
 
 """
-
-from .progress import *  # noqa
-from .selection import *  # noqa

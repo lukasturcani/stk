@@ -12,7 +12,11 @@ from stk._internal.ea.fitness_calculators.fitness_calculator import (
 from stk._internal.ea.fitness_normalizers.fitness_normalizer import (
     FitnessNormalizer,
 )
+from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.mutation.random import RandomMutator
+from stk._internal.ea.plotters.progress import ProgressPlotter
+from stk._internal.ea.plotters.selection import SelectionPlotter
+from stk._internal.ea.selection.selectors.selector import Selector
 from stk._internal.elements import (
     Ac,
     Ag,
@@ -225,6 +229,7 @@ from stk._version import __version__
 
 __all__ = [
     "EvolutionaryAlgorithm",
+    "MoleculeMutator",
     "RandomMutator",
     "cof",
     "host_guest",
@@ -283,6 +288,9 @@ __all__ = [
     "MCHammer",
     "ReactionFactory",
     "Reaction",
+    "Selector",
+    "ProgressPlotter",
+    "SelectionPlotter",
     "__version__",
     "Ac",
     "Ag",
