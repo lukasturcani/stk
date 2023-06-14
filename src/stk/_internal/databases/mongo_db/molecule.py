@@ -7,8 +7,11 @@ Molecule MongoDB
 import itertools
 from functools import lru_cache
 
-from stk.serialization import MoleculeDejsonizer, MoleculeJsonizer
-from stk.utilities import dedupe
+from stk._internal.json_serde.molecule import (
+    MoleculeDejsonizer,
+    MoleculeJsonizer,
+)
+from stk._internal.utilities.utilities import dedupe
 
 from ..molecule import MoleculeDatabase
 from .utilities import HashableDict, get_any_value

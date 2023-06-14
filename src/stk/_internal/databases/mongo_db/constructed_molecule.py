@@ -7,11 +7,11 @@ Constructed Molecule MongoDB
 import itertools
 from functools import lru_cache
 
-from stk._internal.serialization import (
+from stk._internal.json_serde.constructed_molecule import (
     ConstructedMoleculeDejsonizer,
     ConstructedMoleculeJsonizer,
 )
-from stk._internal.utilities import dedupe
+from stk._internal.utilities.utilities import dedupe
 
 from ..constructed_molecule import ConstructedMoleculeDatabase
 from .utilities import HashableDict, get_any_value

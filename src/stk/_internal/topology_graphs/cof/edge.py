@@ -4,7 +4,7 @@ COF Edge
 
 """
 
-from ..topology_graph import Edge
+from stk._internal.topology_graphs.edge import Edge
 
 
 class CofEdge(Edge):

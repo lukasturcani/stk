@@ -6,7 +6,8 @@ SMILES
 
 from __future__ import annotations
 
-from ..molecules import Molecule
+from stk._internal.molecule import Molecule
+
 from .molecule import MoleculeKeyMaker
 from .utilities import get_smiles
 

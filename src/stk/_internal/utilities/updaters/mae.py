@@ -5,7 +5,7 @@ MAE Updating Utilities
 """
 
 
-from stk._internal.utilities import mol_from_mae_file
+from stk._internal.utilities.utilities import mol_from_mae_file
 
 
 def _with_structure_from_mae(self, path):

@@ -6,7 +6,7 @@ PDB Updating Utilities
 
 import rdkit.Chem.AllChem as rdkit
 
-from stk._internal.utilities import remake
+from stk._internal.utilities.utilities import remake
 
 
 def _with_structure_from_pdb(self, path):

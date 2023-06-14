@@ -4,8 +4,8 @@ Construction State
 
 """
 
-from .graph_state import _GraphState
-from .molecule_state import _MoleculeState
+from .graph_state import GraphState
+from .molecule_state import MoleculeState
 
 
 class ConstructionState:
@@ -40,12 +40,12 @@ class ConstructionState:
 
         """
 
-        self._graph_state = _GraphState(
+        self._graph_state = GraphState(
             building_block_vertices=building_block_vertices,
             edges=edges,
             lattice_constants=lattice_constants,
         )
-        self._molecule_state = _MoleculeState()
+        self._molecule_state = MoleculeState()
 
     def clone(self):
         """

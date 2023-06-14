@@ -4,23 +4,25 @@ Placements Summary
 
 """
 
-from __future__ import annotations
-
 from collections import defaultdict
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 import numpy as np
 
-import stk
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
 from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
-from stk._internal.building_block import BuildingBlock
 from stk._internal.functional_groups.functional_group import FunctionalGroup
+from stk._internal.topology_graphs.topology_graph.utilities import (
+    _PlacementResult,
+)
 
 from .atom_batch import _AtomBatch
 from .bond_batch import _BondBatch
+
+if TYPE_CHECKING:
+    from stk._internal.building_block import BuildingBlock
 
 
 class _PlacementsSummary:
@@ -48,10 +50,8 @@ class _PlacementsSummary:
 
     def __init__(
         self,
-        building_blocks: Iterable[BuildingBlock],
-        placement_results: Iterable[
-            stk.molecular.topology_graphs.topology_graph.topology_graph.implementations._PlacementResult
-        ],
+        building_blocks: Iterable["BuildingBlock"],
+        placement_results: Iterable[_PlacementResult],
         num_atoms: int,
         num_previous_placements: int,
     ) -> None:
@@ -95,11 +95,9 @@ class _PlacementsSummary:
 
     def _with_placement_result(
         self,
-        building_block: BuildingBlock,
+        building_block: "BuildingBlock",
         building_block_id: int,
-        result: (
-            stk.molecular.topology_graphs.topology_graph.topology_graph.implementations._PlacementResult
-        ),
+        result: _PlacementResult,
     ) -> None:
         """
         Add the placement result to the summary.
@@ -180,7 +178,7 @@ class _PlacementsSummary:
 
     def _with_functional_group_edges(
         self,
-        building_block: BuildingBlock,
+        building_block: "BuildingBlock",
         functional_group_edges: dict[int, int],
         id_map: dict[int, int],
     ):

@@ -6,7 +6,10 @@ Spinner
 
 import spindry as spd
 
-from ..construction_state import ConstructionState
+from stk._internal.construction_state.construction_state import (
+    ConstructionState,
+)
+
 from .optimizer import Optimizer
 
 

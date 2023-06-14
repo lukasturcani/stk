@@ -6,7 +6,8 @@ Linkerless Honeycomb
 
 import numpy as np
 
-from ..topology_graph import Edge
+from stk._internal.topology_graphs.edge import Edge
+
 from .cof import Cof
 from .vertices import NonLinearVertex
 

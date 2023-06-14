@@ -11,8 +11,8 @@ from .utilities import atomic_numbers
         cls
         for cls in stk.__dict__.values()
         if isinstance(cls, type)
-        and issubclass(cls, stk.AtomImpl)
-        and cls is not stk.AtomImpl
+        and issubclass(cls, stk.Atom)
+        and cls is not stk.Atom
     ],
 )
 def cls(request):

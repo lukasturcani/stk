@@ -7,8 +7,12 @@ Periodic Square
 
 import numpy as np
 
-from ...reactions import GenericReactionFactory
-from ..topology_graph import Edge, NullOptimizer
+from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
+from stk._internal.topology_graphs.edge import Edge
+
 from .cof import Cof
 from .vertices import LinearVertex, NonLinearVertex
 

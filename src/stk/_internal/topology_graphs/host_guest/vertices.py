@@ -7,7 +7,7 @@ Host Guest Complex Vertices
 
 import numpy as np
 
-from ..topology_graph import Vertex
+from stk._internal.topology_graphs.vertex import Vertex
 
 
 class HostVertex(Vertex):

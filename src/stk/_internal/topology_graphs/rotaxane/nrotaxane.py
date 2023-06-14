@@ -6,7 +6,11 @@
 
 import numpy as np
 
-from ..topology_graph import NullOptimizer, TopologyGraph
+from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
+
 from .vertices import AxleVertex, CycleVertex
 
 

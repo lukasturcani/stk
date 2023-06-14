@@ -6,7 +6,7 @@ Rotaxane Vertices
 
 import rdkit.Chem.AllChem as rdkit
 
-from ..topology_graph import Vertex
+from stk._internal.topology_graphs.vertex import Vertex
 
 
 class AxleVertex(Vertex):

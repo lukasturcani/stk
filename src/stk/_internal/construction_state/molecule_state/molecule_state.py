@@ -11,7 +11,7 @@ from .placements_summary import _PlacementsSummary
 from .reactions_summary import _ReactionsSummary
 
 
-class _MoleculeState:
+class MoleculeState:
     """
     Represents the state of a molecule under construction.
 

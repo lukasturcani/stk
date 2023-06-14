@@ -1,6 +1,27 @@
 from stk import cage, cof, host_guest, metal_complex, polymer
+from stk._internal.atom import Atom
+from stk._internal.atom_info import AtomInfo
+from stk._internal.bond import Bond
+from stk._internal.bond_info import BondInfo
 from stk._internal.building_block import BuildingBlock
 from stk._internal.constructed_molecule import ConstructedMolecule
+from stk._internal.construction_state.construction_state import (
+    ConstructionState,
+)
+from stk._internal.construction_state.graph_state import GraphState
+from stk._internal.construction_state.molecule_state.molecule_state import (
+    MoleculeState,
+)
+from stk._internal.databases.constructed_molecule import (
+    ConstructedMoleculeDatabase,
+)
+from stk._internal.databases.molecule import MoleculeDatabase
+from stk._internal.databases.mongo_db.constructed_molecule import (
+    ConstructedMoleculeMongoDb,
+)
+from stk._internal.databases.mongo_db.molecule import MoleculeMongoDb
+from stk._internal.databases.mongo_db.value import ValueMongoDb
+from stk._internal.databases.value import ValueDatabase
 from stk._internal.ea.crossover.molecule_crosser import MoleculeCrosser
 from stk._internal.ea.crossover.random import RandomCrosser
 from stk._internal.ea.evolutionary_algorithm.evolutionary_algorithm import (
@@ -217,6 +238,11 @@ from stk._internal.functional_groups.secondary_amino import SecondaryAmino
 from stk._internal.functional_groups.single_atom import SingleAtom
 from stk._internal.functional_groups.thioacid import Thioacid
 from stk._internal.functional_groups.thiol import Thiol
+from stk._internal.key_makers.inchi import Inchi
+from stk._internal.key_makers.inchi_key import InchiKey
+from stk._internal.key_makers.molecule import MoleculeKeyMaker
+from stk._internal.key_makers.smiles import Smiles
+from stk._internal.molecule import Molecule
 from stk._internal.optimizers.collapser import Collapser
 from stk._internal.optimizers.mchammer import MCHammer
 from stk._internal.optimizers.optimizer import Optimizer
@@ -228,9 +254,12 @@ from stk._internal.reaction_factories.generic_reaction_factory import (
 )
 from stk._internal.reaction_factories.reaction_factory import ReactionFactory
 from stk._internal.reactions.reaction.reaction import Reaction
+from stk._internal.reactions.reaction.reaction_result import ReactionResult
+from stk._internal.topology_graphs.edge import Edge
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
+from stk._internal.topology_graphs.vertex import Vertex
 from stk._internal.writers.mdl_mol import MolWriter
 from stk._internal.writers.pdb import PdbWriter
 from stk._internal.writers.turbomole import TurbomoleWriter
@@ -238,9 +267,16 @@ from stk._internal.writers.xyz import XyzWriter
 from stk._version import __version__
 
 __all__ = [
+    "Atom",
+    "AtomInfo",
+    "Bond",
+    "BondInfo",
     "EvolutionaryAlgorithm",
     "MoleculeMutator",
     "RandomMutator",
+    "MoleculeState",
+    "Edge",
+    "Vertex",
     "cof",
     "host_guest",
     "metal_complex",
@@ -307,6 +343,20 @@ __all__ = [
     "TurbomoleWriter",
     "DativeReactionFactory",
     "GenericReactionFactory",
+    "ValueDatabase",
+    "ConstructedMoleculeMongoDb",
+    "ConstructedMoleculeDatabase",
+    "MoleculeMongoDb",
+    "ValueMongoDb",
+    "MoleculeDatabase",
+    "Inchi",
+    "InchiKey",
+    "Smiles",
+    "MoleculeKeyMaker",
+    "Molecule",
+    "ConstructionState",
+    "ReactionResult",
+    "GraphState",
     "__version__",
     "Ac",
     "Ag",

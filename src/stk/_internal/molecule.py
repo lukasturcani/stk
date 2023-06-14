@@ -22,17 +22,20 @@ from scipy.spatial.distance import euclidean
 
 from stk._internal.atom import Atom
 from stk._internal.bond import Bond
-from stk._internal.utilities import updaters, writers
 from stk._internal.utilities.molecule import (
     get_bond_atom_ids,
     sort_bond_atoms_by_id,
 )
+from stk._internal.utilities.updaters import mae, mdl_mol, pdb, turbomole, xyz
 from stk._internal.utilities.utilities import (
     OneOrMany,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
     vector_angle,
 )
+from stk._internal.utilities.writers.mdl_mol import _write_mdl_mol_file
+from stk._internal.utilities.writers.pdb import _write_pdb_file
+from stk._internal.utilities.writers.xyz import _write_xyz_file
 
 _T = typing.TypeVar("_T", bound="Molecule")
 
@@ -840,12 +843,12 @@ class Molecule:
             _, extension = os.path.splitext(path)
 
         return {
-            ".mol": updaters._with_structure_from_mol,
-            ".sdf": updaters._with_structure_from_mol,
-            ".mae": updaters._with_structure_from_mae,
-            ".xyz": updaters._with_structure_from_xyz,
-            ".coord": updaters._with_structure_from_turbomole,
-            ".pdb": updaters._with_structure_from_pdb,
+            ".mol": mdl_mol._with_structure_from_mol,
+            ".sdf": mdl_mol._with_structure_from_mol,
+            ".mae": mae._with_structure_from_mae,
+            ".xyz": xyz._with_structure_from_xyz,
+            ".coord": turbomole._with_structure_from_turbomole,
+            ".pdb": pdb._with_structure_from_pdb,
         }[extension](self.clone(), path)
 
     def with_canonical_atom_ordering(self) -> Molecule:
@@ -949,10 +952,10 @@ class Molecule:
 
         _, extension = os.path.splitext(path)
         {
-            ".mol": writers._write_mdl_mol_file,
-            ".sdf": writers._write_mdl_mol_file,
-            ".xyz": writers._write_xyz_file,
-            ".pdb": writers._write_pdb_file,
+            ".mol": _write_mdl_mol_file,
+            ".sdf": _write_mdl_mol_file,
+            ".xyz": _write_xyz_file,
+            ".pdb": _write_pdb_file,
         }[extension](self, path, atom_ids)
         return self
 

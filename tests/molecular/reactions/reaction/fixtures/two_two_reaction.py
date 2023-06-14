@@ -3,9 +3,6 @@ import itertools as it
 import numpy as np
 import pytest
 import stk
-from stk.molecular.topology_graphs.topology_graph import (
-    ConstructionState,
-)
 
 from ..case_data import CaseData
 
@@ -85,7 +82,7 @@ def get_bonds(
     )
 
 
-class MockConstructionState(ConstructionState):
+class MockConstructionState(stk.ConstructionState):
     def __init__(self, position_matrix):
         self.position_matrix = position_matrix
 

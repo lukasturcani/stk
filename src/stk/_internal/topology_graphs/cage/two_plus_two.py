@@ -6,9 +6,10 @@ Two Plus Two
 
 import numpy as np
 
-from ...topology_graph import Edge
-from ..cage import Cage
-from ..vertices import NonLinearVertex
+from stk._internal.topology_graphs.cage.cage import Cage
+from stk._internal.topology_graphs.edge import Edge
+
+from .vertices import NonLinearVertex
 
 
 class TwoPlusTwo(Cage):

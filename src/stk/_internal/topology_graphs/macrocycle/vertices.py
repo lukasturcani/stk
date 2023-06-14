@@ -11,8 +11,9 @@ import typing
 import numpy as np
 from scipy.spatial.distance import euclidean
 
-from ...molecules import BuildingBlock
-from ..topology_graph import Edge, Vertex
+from stk._internal.building_block import BuildingBlock
+from stk._internal.topology_graphs.edge import Edge
+from stk._internal.topology_graphs.vertex import Vertex
 
 
 class CycleVertex(Vertex):

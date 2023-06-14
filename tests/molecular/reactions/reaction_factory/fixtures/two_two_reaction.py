@@ -3,7 +3,6 @@ import itertools as it
 import numpy as np
 import pytest
 import stk
-from stk.molecular.reactions.reactions.reaction import ReactionResult
 
 from ..case_data import CaseData
 from .utilities import MockConstructionState, MockEdge
@@ -56,7 +55,7 @@ def two_two_reaction(
         edge_group=stk.EdgeGroup(
             edges=(edge,),
         ),
-        reaction_result=ReactionResult(
+        reaction_result=stk.ReactionResult(
             new_atoms=(),
             new_bonds=get_new_bonds(
                 functional_group1=functional_group2,

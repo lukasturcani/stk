@@ -4,11 +4,11 @@ Atom Info
 
 """
 
-from __future__ import annotations
 
 import typing
 
-import stk
+from stk._internal.atom import Atom
+from stk._internal.molecule import Molecule
 
 
 class AtomInfo:
@@ -19,9 +19,9 @@ class AtomInfo:
 
     def __init__(
         self,
-        atom: stk.Atom,
-        building_block_atom: typing.Optional[stk.Atom],
-        building_block: typing.Optional[stk.Molecule],
+        atom: Atom,
+        building_block_atom: typing.Optional[Atom],
+        building_block: typing.Optional[Molecule],
         building_block_id: typing.Optional[int],
     ) -> None:
         """
@@ -61,7 +61,7 @@ class AtomInfo:
         self._building_block = building_block
         self._building_block_id = building_block_id
 
-    def get_atom(self) -> stk.Atom:
+    def get_atom(self) -> Atom:
         """
         Get the atom about which information is held.
 
@@ -73,7 +73,7 @@ class AtomInfo:
 
         return self._atom
 
-    def get_building_block_atom(self) -> typing.Optional[stk.Atom]:
+    def get_building_block_atom(self) -> typing.Optional[Atom]:
         """
         Get the original atom held by the building block.
 
@@ -87,7 +87,7 @@ class AtomInfo:
 
         return self._building_block_atom
 
-    def get_building_block(self) -> typing.Optional[stk.Molecule]:
+    def get_building_block(self) -> typing.Optional[Molecule]:
         """
         Get the building block from which the atom originates.
 

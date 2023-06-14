@@ -6,7 +6,7 @@ XYZ Updating Utilities
 
 import numpy as np
 
-from stk._internal.utilities import periodic_table
+from stk._internal.utilities.utilities import periodic_table
 
 
 def _with_structure_from_xyz(self, path):

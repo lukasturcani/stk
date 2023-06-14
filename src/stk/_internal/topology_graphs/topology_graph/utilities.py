@@ -4,19 +4,21 @@ Topology Graph Implementation Utilities
 
 """
 
-from __future__ import annotations
 
 import typing
 
 import numpy as np
 
-from stk._internal.topology_graphs.construction_state import ConstructionState
+if typing.TYPE_CHECKING:
+    from stk._internal.construction_state.construction_state import (
+        ConstructionState,
+    )
 
 
 class _TopologyGraphImplementation(typing.Protocol):
     def _place_building_blocks(
-        self, state: ConstructionState
-    ) -> ConstructionState:
+        self, state: "ConstructionState"
+    ) -> "ConstructionState":
         pass
 
     def get_num_stages(self) -> int:

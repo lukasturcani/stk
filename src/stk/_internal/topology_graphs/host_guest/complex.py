@@ -9,15 +9,26 @@ from __future__ import annotations
 import typing
 from collections import abc
 
-from ...molecules import BuildingBlock
-from ...reactions import GenericReactionFactory
-from ..topology_graph import (
+from stk._internal.building_block import BuildingBlock
+from stk._internal.construction_state import (
     ConstructionState,
+)
+from stk._internal.optimizers.null import (
     NullOptimizer,
+)
+from stk._internal.optimizers.optimizer import (
     Optimizer,
+)
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
+)
+from stk._internal.topology_graphs.vertex import (
     Vertex,
 )
+
 from .vertices import GuestVertex, HostVertex
 
 

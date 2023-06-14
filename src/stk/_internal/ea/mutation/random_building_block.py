@@ -6,9 +6,9 @@ Random Building Block
 
 import numpy as np
 
-from ....molecule_records import MoleculeRecord
-from ...records import MutationRecord
-from .mutator import MoleculeMutator
+from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.mutation.mutator import MoleculeMutator
+from stk._internal.ea.mutation.record import MutationRecord
 
 
 class RandomBuildingBlock(MoleculeMutator):

@@ -33,13 +33,22 @@ from operator import getitem
 
 import numpy as np
 
-from ...reactions import GenericReactionFactory
-from ..topology_graph import (
-    EdgeGroup,
-    NullOptimizer,
+from stk._internal.construction_result.periodic import (
     PeriodicConstructionResult,
+)
+from stk._internal.optimizers.null import (
+    NullOptimizer,
+)
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
+from stk._internal.topology_graphs.edge_group import (
+    EdgeGroup,
+)
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
+
 from .edge import CofEdge
 from .vertices import UnaligningVertex
 

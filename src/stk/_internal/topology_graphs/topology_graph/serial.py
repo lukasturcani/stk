@@ -6,7 +6,9 @@ Serial Topology Graph
 
 from __future__ import annotations
 
-from stk._internal.topology_graphs.construction_state import ConstructionState
+from stk._internal.construction_state.construction_state import (
+    ConstructionState,
+)
 
 from .utilities import _Placement
 

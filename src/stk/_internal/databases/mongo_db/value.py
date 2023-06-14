@@ -6,7 +6,7 @@ Value MongoDB
 
 from functools import lru_cache
 
-from stk.molecular import InchiKey
+from stk._internal.key_makers.inchi_key import InchiKey
 
 from ..value import ValueDatabase
 from .utilities import HashableDict

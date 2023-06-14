@@ -9,7 +9,7 @@ from collections import defaultdict
 import numpy as np
 
 
-class _GraphState:
+class GraphState:
     """
     The topology graph of a molecule under construction.
 

@@ -6,9 +6,11 @@ Ring Amine Reaction
 
 import numpy as np
 
-from ... import atoms
-from ...bonds import Bond
-from .reaction import NewAtom, Reaction
+from stk._internal.bond import Bond
+from stk._internal.elements import C, H
+
+from .reaction.new_atom import NewAtom
+from .reaction.reaction import Reaction
 
 
 class RingAmineReaction(Reaction):
@@ -46,39 +48,39 @@ class RingAmineReaction(Reaction):
         c1_coord = self._get_position(self._ring_amine1.get_carbon1())
         c2_coord = self._get_position(self._ring_amine2.get_carbon1())
 
-        n_joiner = atoms.C(-1)
+        n_joiner = C(-1)
         n_joiner_coord = (n1_coord + n2_coord) / 2
         yield NewAtom(n_joiner, n_joiner_coord)
 
-        nh1 = atoms.H(-2)
+        nh1 = H(-2)
         nh1_coord = n_joiner_coord + [0, 0, 1]
         yield NewAtom(nh1, nh1_coord)
 
-        nh2 = atoms.H(-3)
+        nh2 = H(-3)
         nh2_coord = n_joiner_coord + [0, 0, -1]
         yield NewAtom(nh2, nh2_coord)
 
-        nc_joiner1 = atoms.C(-4)
+        nc_joiner1 = C(-4)
         nc_joiner1_coord = (c1_coord + n2_coord) / 2
         yield NewAtom(nc_joiner1, nc_joiner1_coord)
 
-        nc1h1 = atoms.H(-5)
+        nc1h1 = H(-5)
         nc1h1_coord = nc_joiner1_coord + [0, 0, 1]
         yield NewAtom(nc1h1, nc1h1_coord)
 
-        nc1h2 = atoms.H(-6)
+        nc1h2 = H(-6)
         nc1h2_coord = nc_joiner1_coord + [0, 0, -1]
         yield NewAtom(nc1h2, nc1h2_coord)
 
-        nc_joiner2 = atoms.C(-7)
+        nc_joiner2 = C(-7)
         nc_joiner2_coord = (c2_coord + n1_coord) / 2
         yield NewAtom(nc_joiner2, nc_joiner2_coord)
 
-        nc2h1 = atoms.H(-8)
+        nc2h1 = H(-8)
         nc2h1_coord = nc_joiner2_coord + [0, 0, 1]
         yield NewAtom(nc2h1, nc2h1_coord)
 
-        nc2h2 = atoms.H(-9)
+        nc2h2 = H(-9)
         nc2h2_coord = nc_joiner2_coord + [0, 0, -1]
         yield NewAtom(nc2h2, nc2h2_coord)
 
@@ -87,15 +89,15 @@ class RingAmineReaction(Reaction):
         n2 = self._ring_amine2.get_nitrogen()
         c1 = self._ring_amine1.get_carbon2()
         c2 = self._ring_amine2.get_carbon2()
-        n_joiner = atoms.C(-1)
-        nh1 = atoms.H(-2)
-        nh2 = atoms.H(-3)
-        nc_joiner1 = atoms.C(-4)
-        nc1h1 = atoms.H(-5)
-        nc1h2 = atoms.H(-6)
-        nc_joiner2 = atoms.C(-7)
-        nc2h1 = atoms.C(-8)
-        nc2h2 = atoms.C(-9)
+        n_joiner = C(-1)
+        nh1 = H(-2)
+        nh2 = H(-3)
+        nc_joiner1 = C(-4)
+        nc1h1 = H(-5)
+        nc1h2 = H(-6)
+        nc_joiner2 = C(-7)
+        nc2h1 = C(-8)
+        nc2h2 = C(-9)
 
         yield Bond(n1, n_joiner, 1),
         yield Bond(n_joiner, n2, 1, self._periodicity),

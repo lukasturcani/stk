@@ -8,11 +8,11 @@ from functools import partial
 
 import numpy as np
 
+from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.utilities.utilities import dice_similarity
 
-from ....molecule_records import MoleculeRecord
-from ...records import MutationRecord
 from .mutator import MoleculeMutator
 
 

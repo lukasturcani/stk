@@ -24,6 +24,12 @@ from stk._internal.topology_graphs.cage.twenty_plus_thirty import (
     TwentyPlusThirty,
 )
 from stk._internal.topology_graphs.cage.two_plus_three import TwoPlusThree
+from stk._internal.topology_graphs.cage.vertices import (
+    AngledVertex,
+    LinearVertex,
+    NonLinearVertex,
+    UnaligningVertex,
+)
 
 __all__ = [
     "Cage",
@@ -46,4 +52,8 @@ __all__ = [
     "FourPlusSix2",
     "EightPlusTwelve",
     "TwentyPlusThirty",
+    "LinearVertex",
+    "NonLinearVertex",
+    "UnaligningVertex",
+    "AngledVertex",
 ]

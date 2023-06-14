@@ -4,9 +4,12 @@ Two Plus Four
 
 """
 
-from ...topology_graph import Edge
-from ..cage import Cage
-from ..vertices import LinearVertex, NonLinearVertex
+from stk._internal.topology_graphs.cage.cage import Cage
+from stk._internal.topology_graphs.cage.vertices import (
+    LinearVertex,
+    NonLinearVertex,
+)
+from stk._internal.topology_graphs.edge import Edge
 
 
 class TwoPlusFour(Cage):

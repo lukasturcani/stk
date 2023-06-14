@@ -16,10 +16,10 @@ from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
 from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
-from stk._internal.molecule import Molecule
-from stk._internal.topology_graphs.construction_result import (
+from stk._internal.construction_result.construction_result import (
     ConstructionResult,
 )
+from stk._internal.molecule import Molecule
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
