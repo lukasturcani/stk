@@ -24,7 +24,7 @@ def center(position, flip, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = stk.polymer.linear.LinearVertex(0, position, flip)
+    vertex = stk.polymer.LinearVertex(0, position, flip)
     return CaseData(
         vertex=vertex,
         edges=tuple(get_edges(vertex)),

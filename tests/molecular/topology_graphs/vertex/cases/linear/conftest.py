@@ -21,7 +21,7 @@ def case_data(request):
 @pytest.fixture
 def center(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.linear.LinearVertex(id, position, flip),
+        vertex=stk.polymer.LinearVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -31,7 +31,7 @@ def center(id, position, flip):
 @pytest.fixture
 def head(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.linear.HeadVertex(id, position, flip),
+        vertex=stk.polymer.HeadVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -41,7 +41,7 @@ def head(id, position, flip):
 @pytest.fixture
 def tail(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.linear.TailVertex(id, position, flip),
+        vertex=stk.polymer.TailVertex(id, position, flip),
         id=id,
         position=position,
         cell=np.array([0, 0, 0]),
@@ -51,7 +51,7 @@ def tail(id, position, flip):
 @pytest.fixture
 def unaligning(id, position, flip):
     return CaseData(
-        vertex=stk.polymer.linear.UnaligningVertex(
+        vertex=stk.polymer.UnaligningVertex(
             id=id,
             position=position,
             flip=flip,
