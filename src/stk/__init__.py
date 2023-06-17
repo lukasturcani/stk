@@ -331,6 +331,12 @@ from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
 from stk._internal.topology_graphs.vertex import Vertex
+from stk._internal.utilities.utilities import (
+    get_acute_vector,
+    normalize_vector,
+    rotation_matrix_arbitrary_axis,
+    vector_angle,
+)
 from stk._internal.writers.mdl_mol import MolWriter
 from stk._internal.writers.pdb import PdbWriter
 from stk._internal.writers.turbomole import TurbomoleWriter
@@ -352,6 +358,10 @@ __all__ = [
     "cof",
     "host_guest",
     "metal_complex",
+    "get_acute_vector",
+    "normalize_vector",
+    "rotation_matrix_arbitrary_axis",
+    "vector_angle",
     "CrossoverRecord",
     "ReplaceFitness",
     "RemoveMolecules",
