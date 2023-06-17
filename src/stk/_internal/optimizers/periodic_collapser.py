@@ -12,7 +12,7 @@ from .utilities import get_long_bond_ids, get_mch_bonds, get_subunits
 
 class PeriodicCollapser(Optimizer):
     """
-    Performs rigid-body collapse of molecules [1]_.
+    Performs rigid-body collapse of molecules.
 
     This :class:`.Optimizer` will also update the `.PeriodicInfo`.
 
@@ -41,7 +41,7 @@ class PeriodicCollapser(Optimizer):
     Optimisation with :mod:`stk` simply collects the final position
     matrix and periodic info. The optimisation's trajectory can be
     output using the :mod:`MCHammer` implementation if required by the
-    user [1]_.
+    user [#mchammer]_.
 
     The open-source optimization code :mod:`MCHammer` specializes in
     the `collapsing` of molecules with long bonds like those
@@ -50,7 +50,7 @@ class PeriodicCollapser(Optimizer):
 
     References
     ----------
-    .. [1] https://github.com/andrewtarzia/MCHammer
+    .. [#mchammer] https://github.com/andrewtarzia/MCHammer
 
     """
 

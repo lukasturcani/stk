@@ -15,9 +15,10 @@ from .optimizer import Optimizer
 
 class Spinner(Optimizer):
     """
-    Performs Monte Carlo optimisation of host-guest complexes [1]_.
+    Performs Monte Carlo optimisation of host-guest complexes.
 
     Examples:
+
         *Structure Optimization*
 
         Using :class:`.Spinner` will lead to
@@ -60,12 +61,13 @@ class Spinner(Optimizer):
 
         Optimisation with :mod:`stk` simply collects the final position
         matrix. The optimisation's trajectory can be output using the
-        :mod:`SpinDry` implementation if required by the user [1]_.
-        This code is entirely nonphysical and is, therefore, completely
-        general to any chemistry.
+        :mod:`SpinDry` implementation if required by the user
+        [#spindry]_. This code is entirely nonphysical and is,
+        therefore, completely general to any chemistry.
 
     References:
-        .. [1] https://github.com/andrewtarzia/SpinDry
+
+        .. [#spindry] https://github.com/andrewtarzia/SpinDry
 
     """
 

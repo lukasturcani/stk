@@ -144,11 +144,11 @@ class AboveAverage(Selector):
             the same key, they are considered duplicates.
 
         fitness_modifier : :class:`callable`, optional
-            Takes the `population` on which :meth:`.select` is called
-            and returns a :class:`dict`, which maps records in the
-            `population` to the fitness values the :class:`.Selector`
-            should use. If ``None``, the regular fitness values of the
-            records are used.
+            Takes the `population` on which :meth:`~Selector.select`
+            is called and returns a :class:`dict`, which maps records
+            in the `population` to the fitness values the
+            :class:`.Selector` should use. If ``None``, the regular
+            fitness values of the records are used.
 
         """
 
