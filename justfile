@@ -25,7 +25,7 @@ check:
   ( set -x; black --check . )
 
   echo
-  ( set -x; mypy srcbuilding_block )
+  ( set -x; mypy src )
 
   echo
   ( set -x; pytest --cov=src --cov-report term-missing )

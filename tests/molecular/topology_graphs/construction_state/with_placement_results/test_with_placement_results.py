@@ -18,10 +18,6 @@ from .check_position_matrix import check_position_matrix
 from .check_vertex_edges import check_vertex_edges
 from .check_vertices import check_vertices
 
-PlacementResult = (
-    stk.topology_graphs.implementations.utilities._PlacementResult
-)
-
 
 @pytest.mark.skip
 def test_with_placement_results(construction_state):
@@ -66,7 +62,7 @@ def test_with_placement_results(construction_state):
 
 def get_placement_result(construction_state, building_block):
     edges = it.cycle(range(construction_state.get_num_edges()))
-    return PlacementResult(
+    return stk.PlacementResult(
         position_matrix=np.array(
             [[i, i, i] for i in range(building_block.get_num_atoms())],
             dtype=np.float64,

@@ -1,0 +1,7 @@
+"""
+Polymer
+=======
+
+#. :class:`.Linear`
+
+"""

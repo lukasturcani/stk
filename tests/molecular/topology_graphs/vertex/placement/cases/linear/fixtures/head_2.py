@@ -24,7 +24,7 @@ def head_2(position, building_block_2):
             point=get_fg_position(1, building_block),
         )
 
-    vertex = stk.polymer.linear.HeadVertex(0, position, False)
+    vertex = stk.polymer.HeadVertex(0, position, False)
     return CaseData(
         vertex=vertex,
         edges=(tuple(get_edges(vertex))[1],),

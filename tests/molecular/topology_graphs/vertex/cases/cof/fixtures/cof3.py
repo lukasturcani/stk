@@ -4,9 +4,6 @@ import stk
 
 from ....case_data import CaseData
 
-vertices1 = stk.cof.honeycomb
-vertices2 = stk.cof.vertices
-
 
 @pytest.fixture
 def cof3(init_at_shifted_center, id, aligner_edge, cell, shift_params):
@@ -27,9 +24,9 @@ def cof3(init_at_shifted_center, id, aligner_edge, cell, shift_params):
 
 @pytest.fixture(
     params=(
-        vertices1.LinearVertex.init_at_shifted_center,
-        vertices1.NonLinearVertex.init_at_shifted_center,
-        vertices2.UnaligningVertex.init_at_shifted_center,
+        stk.cof.LinearVertex.init_at_shifted_center,
+        stk.cof.NonLinearVertex.init_at_shifted_center,
+        stk.cof.UnaligningVertex.init_at_shifted_center,
     ),
 )
 def init_at_shifted_center(request):

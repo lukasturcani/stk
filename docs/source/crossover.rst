@@ -5,5 +5,5 @@ Crossover
 .. toctree::
     :maxdepth: 2
 
-    Molecule <stk.ea.crossover.crossers.molecule.crosser>
+    Molecule <_autosummary/stk.MoleculeCrosser>
     Compound <compound_crossers>

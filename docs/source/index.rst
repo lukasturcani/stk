@@ -17,13 +17,12 @@
    :caption: Molecules
    :maxdepth: 2
 
-   Building Block <stk.molecular.molecules.building_block>
-   Constructed Molecule <stk.molecular.molecules.constructed_molecule>
-   Functional Groups <stk.molecular.functional_groups.functional_groups.functional_group>
-   Functional Group Factories <stk.molecular.functional_groups.factories.functional_group_factory>
-   Key Makers <stk.molecular.key_makers.molecule>
-   Reactions <stk.molecular.reactions.reactions.reaction.reaction>
-   Reaction Factories <stk.molecular.reactions.factories.reaction_factory>
+   Building Block <_autosummary/stk.BuildingBlock>
+   Constructed Molecule <_autosummary/stk.ConstructedMolecule>
+   Functional Groups <_autosummary/stk.FunctionalGroup>
+   Functional Group Factories <_autosummary/stk.FunctionalGroupFactory>
+   Reactions <_autosummary/stk.Reaction>
+   Reaction Factories <_autosummary/stk.ReactionFactory>
    Writers <writers>
 
 .. toctree::
@@ -32,35 +31,26 @@
    :maxdepth: 2
 
    Polymers <polymer>
-   Organic & Metal-Organic Cages <stk.molecular.topology_graphs.cage.cage>
-   Covalent Organic Frameworks <stk.molecular.topology_graphs.cof.cof>
-   Metal Complexes <stk.molecular.topology_graphs.metal_complex.metal_complex>
-   Host Guest Complex <stk.molecular.topology_graphs.host_guest.complex>
-   Macrocycle <stk.molecular.topology_graphs.macrocycle.macrocycle>
-   [n]Rotaxane <stk.molecular.topology_graphs.rotaxane.nrotaxane>
-   Adding Topology Graphs <stk.molecular.topology_graphs.topology_graph.topology_graph.topology_graph>
-   Optimizers <stk.molecular.topology_graphs.topology_graph.optimizers.optimizer>
-
-.. toctree::
-   :hidden:
-   :caption: Molecular Databases
-   :maxdepth: 2
-
-    Molecule <stk.databases.molecule>
-    Constructed Molecule <stk.databases.constructed_molecule>
-    Value <stk.databases.value>
+   Organic & Metal-Organic Cages <_autosummary/stk.cage>
+   Covalent Organic Frameworks <_autosummary/stk.cof>
+   Metal Complexes <_autosummary/stk.metal_complex>
+   Host Guest Complex <_autosummary/stk.host_guest>
+   Macrocycle <_autosummary/stk.macrocycle>
+   [n]Rotaxane <_autosummary/stk.rotaxane>
+   Adding Topology Graphs <_autosummary/stk.TopologyGraph>
+   Optimizers <_autosummary/stk.Optimizer>
 
 .. toctree::
    :hidden:
    :caption: Evolutionary Algorithm
    :maxdepth: 2
 
-   Overview <stk.ea.evolutionary_algorithm.evolutionary_algorithm>
+   Overview <_autosummary/stk.EvolutionaryAlgorithm>
    Basic Example <basic_ea_example>
    Intermediate Example <intermediate_ea_example>
-   Fitness Calculators <stk.ea.fitness_calculators.fitness_calculator>
-   Fitness Normalizers <stk.ea.fitness_normalizers.fitness_normalizer>
-   Selection <stk.ea.selection.selectors.selector>
+   Fitness Calculators <_autosummary/stk.FitnessCalculator>
+   Fitness Normalizers <_autosummary/stk.FitnessNormalizer>
+   Selection <_autosummary/stk.Selector>
    Mutation <mutation>
    Crossover <crossover>
    Plotting <plotters>
@@ -85,7 +75,7 @@ Installation
 
 To get :mod:`.stk`, you can install it with pip::
 
-    $ pip install stk
+  $ pip install stk
 
 Overview
 --------
@@ -161,7 +151,7 @@ Features of `stk-vis`_ include
 
 You read more about `stk-vis`_ here:
 
-    https://github.com/lukasturcani/stk-vis
+  https://github.com/lukasturcani/stk-vis
 
 .. _`stk-vis`: https://github.com/lukasturcani/stk-vis
 

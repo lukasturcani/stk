@@ -4,6 +4,7 @@ src/stk.egg-info
 src/stk/_version.py
 /.coverage
 docker_testing_environment/requirements.txt
+docs/source/_autosummary
 
 **/__pycache__/
 

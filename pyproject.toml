@@ -38,8 +38,8 @@ dev = [
   "pytest-lazy-fixture",
   "pytest-cov",
   "sphinx",
-  "sphinx-autodoc-typehints",
-  "sphinx-rtd-theme",
+  "sphinx-copybutton",
+  "furo",
   "twine",
 ]
 

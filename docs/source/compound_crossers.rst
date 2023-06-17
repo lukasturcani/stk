@@ -4,4 +4,4 @@ Compound Crossers
 .. toctree::
    :maxdepth: 2
 
-    Random Crosser <stk.ea.crossover.crossers.compound.random>
+    Random Crosser <_autosummary/stk.RandomCrosser>
