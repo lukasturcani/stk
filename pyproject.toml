@@ -29,7 +29,6 @@ dev = [
   "black",
   "ruff",
   "moldoc",
-  "numpydoc",
   "mypy",
   "pip-tools",
   "pytest",
@@ -79,7 +78,7 @@ python_functions = [
 
 [tool.mypy]
 show_error_codes = true
-no_implicit_optional = true
+implicit_optional = false
 warn_no_return = true
 strict_optional = true
 
