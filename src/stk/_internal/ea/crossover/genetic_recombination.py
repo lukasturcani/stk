@@ -1,18 +1,14 @@
-"""
-Genetic Recombination
-=====================
-
-"""
-
-import itertools as it
+import itertools
+import typing
 from collections import defaultdict
+from collections.abc import Iterable, Iterator, Sequence
 
-from stk._internal.ea.crossover.molecule_crosser import MoleculeCrosser
+from stk._internal.building_block import BuildingBlock
 from stk._internal.ea.crossover.record import CrossoverRecord
 from stk._internal.ea.molecule_records.molecule import MoleculeRecord
 
 
-class GeneticRecombination(MoleculeCrosser):
+class GeneticRecombination:
     """
     Recombine building blocks using biological systems as a model.
 
@@ -108,115 +104,115 @@ class GeneticRecombination(MoleculeCrosser):
     For obvious reasons, this approach works with any number of
     parents.
 
-    Examples
-    --------
-    *Crossing Constructed Molecules*
+    Examples:
+        *Crossing Constructed Molecules*
 
-    Note that any number of parents can be used for the crossover
+        Note that any number of parents can be used for the crossover
 
-    .. testcode:: crossing-constructed-molecules
+        .. testcode:: crossing-constructed-molecules
 
-        import stk
+            import stk
 
-        # Create the molecule records which will be crossed.
+            # Create the molecule records which will be crossed.
 
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
-        graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
-        polymer1  = stk.ConstructedMolecule(graph1)
-        record1 = stk.MoleculeRecord(graph1)
+            bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+            bb2 = stk.BuildingBlock('O=CCCCC=O', [stk.AldehydeFactory()])
+            graph1 = stk.polymer.Linear((bb1, bb2), 'AB', 2)
+            polymer1  = stk.ConstructedMolecule(graph1)
+            record1 = stk.MoleculeRecord(graph1)
 
-        bb3 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
-        bb4 = stk.BuildingBlock(
-            smiles='O=C[Si]CCC=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        graph2 = stk.polymer.Linear((bb3, bb4), 'AB', 2)
-        polymer2  = stk.ConstructedMolecule(graph2)
-        record2 = stk.MoleculeRecord(graph2)
+            bb3 = stk.BuildingBlock('NCCCN', [stk.PrimaryAminoFactory()])
+            bb4 = stk.BuildingBlock(
+                smiles='O=C[Si]CCC=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+            graph2 = stk.polymer.Linear((bb3, bb4), 'AB', 2)
+            polymer2  = stk.ConstructedMolecule(graph2)
+            record2 = stk.MoleculeRecord(graph2)
 
-        # Create the crosser.
+            # Create the crosser.
 
-        def get_functional_group_type(building_block):
-            fg, = building_block.get_functional_groups(0)
-            return type(fg)
+            def get_functional_group_type(building_block):
+                fg, = building_block.get_functional_groups(0)
+                return type(fg)
 
-        recombination = stk.GeneticRecombination(
-            get_gene=get_functional_group_type,
-        )
+            recombination = stk.GeneticRecombination(
+                get_gene=get_functional_group_type,
+            )
 
-        # Get the offspring molecules.
+            # Get the offspring molecules.
 
-        cohort1 = tuple(recombination.cross(
-            records=(record1, record2),
-        ))
+            cohort1 = tuple(recombination.cross(
+                records=(record1, record2),
+            ))
 
-    .. testcode:: crossing-constructed-molecules
-        :hide:
+        .. testcode:: crossing-constructed-molecules
+            :hide:
 
-        _expected_cohort = (
-            polymer1,
-            polymer2,
-            stk.ConstructedMolecule(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb4),
-                    repeating_unit='AB',
-                    num_repeating_units=2,
+            _expected_cohort = (
+                polymer1,
+                polymer2,
+                stk.ConstructedMolecule(
+                    topology_graph=stk.polymer.Linear(
+                        building_blocks=(bb1, bb4),
+                        repeating_unit='AB',
+                        num_repeating_units=2,
+                    ),
                 ),
-            ),
-            stk.ConstructedMolecule(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb2, bb3),
-                    repeating_unit='AB',
-                    num_repeating_units=2,
+                stk.ConstructedMolecule(
+                    topology_graph=stk.polymer.Linear(
+                        building_blocks=(bb2, bb3),
+                        repeating_unit='AB',
+                        num_repeating_units=2,
+                    ),
                 ),
-            ),
-        )
+            )
 
-        def _get_smiles(item):
-            if isinstance(item, stk.ConstructedMolecule):
-               return stk.Smiles().get_key(item)
-            return stk.Smiles().get_key(
-                molecule=item.get_molecule_record().get_molecule(),
-             )
+            def _get_smiles(item):
+                if isinstance(item, stk.ConstructedMolecule):
+                   return stk.Smiles().get_key(item)
+                return stk.Smiles().get_key(
+                    molecule=item.get_molecule_record().get_molecule(),
+                 )
 
-        _expected_smiles = set(map(_get_smiles, _expected_cohort))
-        _cohort_smiles = set(map(_get_smiles, cohort1))
-        assert _expected_smiles == _cohort_smiles
+            _expected_smiles = set(map(_get_smiles, _expected_cohort))
+            _cohort_smiles = set(map(_get_smiles, cohort1))
+            assert _expected_smiles == _cohort_smiles
 
     """
 
     def __init__(
         self,
-        get_gene,
-        name="GeneticRecombination",
-    ):
+        get_gene: typing.Callable[[BuildingBlock], typing.Any],
+        name: str = "GeneticRecombination",
+    ) -> None:
         """
-        Initialize a :class:`GeneticRecombination` instance.
+        Parameters:
+            get_gene:
+                A function, which takes a :class:`.BuildingBlock`
+                and returns its gene. To produce an offspring, one
+                of the building blocks from each gene is picked.
 
-        Parameters
-        ----------
-        get_gene : :class:`callable`
-            A :class:`callable`, which takes a :class:`.BuildingBlock`
-            object and returns its gene. To produce an offspring, one
-            of the building blocks from each gene is picked.
-
-        name : :class:`str`, optional
-            A name to identify the crosser instance.
-
+            name:
+                A name to identify the crosser instance.
         """
 
         self._get_gene = get_gene
         self._name = name
 
-    def cross(self, records):
+    def cross(
+        self,
+        records: Sequence[MoleculeRecord],
+    ) -> Iterator[CrossoverRecord[MoleculeRecord]]:
         topology_graphs = (record.get_topology_graph() for record in records)
-        for topology_graph, alleles in it.product(
+        for topology_graph, alleles in itertools.product(
             topology_graphs,
             self._get_alleles(records),
         ):
 
-            def get_replacement(building_block):
+            def get_replacement(
+                building_block: BuildingBlock,
+            ) -> BuildingBlock:
                 gene = self._get_gene(building_block)
                 return next(
                     allele
@@ -237,7 +233,10 @@ class GeneticRecombination(MoleculeCrosser):
                 crosser_name=self._name,
             )
 
-    def _get_alleles(self, records):
+    def _get_alleles(
+        self,
+        records: Sequence[MoleculeRecord],
+    ) -> Iterable[tuple[BuildingBlock, ...]]:
         """
         Yield every possible combination of alleles.
 
@@ -248,4 +247,4 @@ class GeneticRecombination(MoleculeCrosser):
         for topology_graph in topology_graphs:
             for allele in topology_graph.get_building_blocks():
                 genes[self._get_gene(allele)].append(allele)
-        return it.product(*genes.values())
+        return itertools.product(*genes.values())
