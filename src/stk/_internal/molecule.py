@@ -416,8 +416,7 @@ class Molecule:
 
             atom_ids (int | list[int] | None):
                 The ids of the atoms whose positions are desired.
-                If ``None``, then the positions of all atoms will be
-                yielded.
+                If ``None``, all atoms are used.
 
         Yields:
 
@@ -447,7 +446,7 @@ class Molecule:
 
             atom_ids (int | list[int] | None):
                 The ids of atoms to yield. If ``None``, all
-                atoms are yielded.
+                atoms are used.
 
         Yields:
 
