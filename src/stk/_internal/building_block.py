@@ -16,7 +16,7 @@ from stk._internal.functional_group_factories.functional_group_factory import (
 )
 from stk._internal.functional_groups.functional_group import FunctionalGroup
 from stk._internal.molecule import Molecule
-from stk._internal.utilities.utilities import OneOrMany, flatten, remake
+from stk._internal.utilities.utilities import flatten, remake
 
 logger = logging.getLogger(__name__)
 
@@ -860,7 +860,8 @@ class BuildingBlock(Molecule):
 
         See Also:
 
-            :meth:`.FunctionalGroup.get_placer_ids`
+            * :meth:`.FunctionalGroup.get_placer_ids`: For getting
+              the placer ids of functional groups.
 
         Yields:
 
@@ -880,7 +881,8 @@ class BuildingBlock(Molecule):
 
         See Also:
 
-            :meth:`.FunctionalGroup.get_core_atom_ids`
+            * :meth:`.FunctionalGroup.get_core_atom_ids`: For getting
+              the core atom ids of functional groups.
 
         Yields:
 
