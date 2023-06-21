@@ -39,7 +39,7 @@ dev = [
   "pytest-cov",
   "sphinx",
   "sphinx-copybutton",
-  "furo",
+  "sphinx-rtd-theme",
   "twine",
 ]
 
