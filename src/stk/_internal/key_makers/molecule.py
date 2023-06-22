@@ -13,7 +13,7 @@ Molecule Key Maker
 
 from __future__ import annotations
 
-import typing
+from collections.abc import Callable
 
 from stk._internal.molecule import Molecule
 
@@ -76,7 +76,7 @@ class MoleculeKeyMaker:
     def __init__(
         self,
         key_name: str,
-        get_key: typing.Callable[[Molecule], object],
+        get_key: Callable[[Molecule], object],
     ) -> None:
         """
         Initialize a :class:`.MoleculeKeyMaker` instance.

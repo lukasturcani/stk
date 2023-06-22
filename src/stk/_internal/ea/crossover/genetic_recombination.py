@@ -1,7 +1,7 @@
 import itertools
 import typing
 from collections import defaultdict
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 
 from stk._internal.building_block import BuildingBlock
 from stk._internal.ea.crossover.record import CrossoverRecord
@@ -183,7 +183,7 @@ class GeneticRecombination:
 
     def __init__(
         self,
-        get_gene: typing.Callable[[BuildingBlock], typing.Any],
+        get_gene: Callable[[BuildingBlock], typing.Any],
         name: str = "GeneticRecombination",
     ) -> None:
         """

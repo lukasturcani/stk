@@ -1,90 +1,99 @@
-"""
-Random Topology Graph
-=====================
-
-"""
+from collections.abc import Callable, Iterable
 
 import numpy as np
 
 from stk._internal.ea.molecule_records.molecule import MoleculeRecord
-from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.mutation.record import MutationRecord
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
 
 
-class RandomTopologyGraph(MoleculeMutator):
+class RandomTopologyGraph:
     """
     Changes topology graphs at random.
 
-    Examples
-    --------
-    *Constructed Molecule Mutation*
+    Examples:
+        *Constructed Molecule Mutation*
 
-    .. testcode:: constructed-molecule-mutation
+        .. testcode:: constructed-molecule-mutation
 
-        import stk
+            import stk
 
-        # Create a molecule which is to be mutated.
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock(
-            smiles='O=CCC(C=O)CC=O',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        cage = stk.MoleculeRecord(
-            topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
-        )
+            # Create a molecule which is to be mutated.
+            bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+            bb2 = stk.BuildingBlock(
+                smiles='O=CCC(C=O)CC=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+            cage = stk.MoleculeRecord(
+                topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
+            )
 
-        # Create functions which replace the topology graph.
-        replacement_funcs = (
-            lambda graph:
-                stk.cage.TwoPlusThree(graph.get_building_blocks()),
-            lambda graph:
-                stk.cage.EightPlusTwelve(graph.get_building_blocks()),
-            lambda graph:
-                stk.cage.TwentyPlusThirty(graph.get_building_blocks()),
-        )
+            # Create functions which replace the topology graph.
+            replacement_funcs = (
+                lambda graph:
+                    stk.cage.TwoPlusThree(graph.get_building_blocks()),
+                lambda graph:
+                    stk.cage.EightPlusTwelve(graph.get_building_blocks()),
+                lambda graph:
+                    stk.cage.TwentyPlusThirty(graph.get_building_blocks()),
+            )
 
-        # Create the mutator.
-        random_topology = stk.RandomTopologyGraph(replacement_funcs)
+            # Create the mutator.
+            random_topology = stk.RandomTopologyGraph(replacement_funcs)
 
-        # Mutate a molecule.
-        mutation_record1 = random_topology.mutate(cage)
+            # Mutate a molecule.
+            mutation_record1 = random_topology.mutate(cage)
 
-        # Mutate the molecule a second time.
-        mutation_record2 = random_topology.mutate(cage)
+            # Mutate the molecule a second time.
+            mutation_record2 = random_topology.mutate(cage)
 
     """
 
     def __init__(
         self,
-        replacement_funcs,
-        name="RandomTopologyGraph",
-        random_seed=None,
-    ):
+        replacement_funcs: Iterable[Callable[[TopologyGraph], TopologyGraph]],
+        name: str = "RandomTopologyGraph",
+        random_seed: int | np.random.Generator | None = None,
+    ) -> None:
         """
-        Initialize a :class:`.RandomTopology` instance.
+        Parameters:
+            replacement_funcs \
+(list[collections.abc.Callable[[TopologyGraph], TopologyGraph]]):
+                Functions which take a topology graph and return
+                its replacement. One is selected at random each
+                time :meth:`.mutate` is called.
 
-        Parameters
-        ----------
-        replacement_funcs : :class:`tuple` of :class:`callable`
-            Each :class:`callable` takes a single parameter, a
-            :class:`.TopologyGraph`, and returns the
-            :class:`.TopologyGraph` which should replace it.
+            name:
+                A name to help identify the mutator instance.
 
-        name : :class:`str`, optional
-            A name to help identify the mutator instance.
-
-        random_seed : :class:`bool`, optional
-            The random seed to use.
+            random_seed:
+                The random seed to use.
 
         """
 
-        self._replacement_funcs = replacement_funcs
+        if random_seed is None or isinstance(random_seed, int):
+            random_seed = np.random.default_rng(random_seed)
+
+        self._replacement_funcs = tuple(replacement_funcs)
         self._name = name
-        self._generator = np.random.RandomState(random_seed)
+        self._generator = random_seed
 
-    def mutate(self, record):
+    def mutate(self, record: MoleculeRecord) -> MutationRecord[MoleculeRecord]:
+        """
+        Return a mutant of `record`.
+
+        Parameters:
+            record:
+                The molecule to be mutated.
+
+        Returns:
+            A record of the mutation or ``None``
+            if `record` cannot be mutated.
+        """
         replacement_func = self._generator.choice(
-            a=self._replacement_funcs,
+            a=self._replacement_funcs,  # type: ignore
         )
         replacement = replacement_func(record.get_topology_graph())
         return MutationRecord(

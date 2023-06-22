@@ -1,9 +1,3 @@
-"""
-Roulette
-========
-
-"""
-
 import numpy as np
 
 from stk._internal.key_makers.inchi import Inchi
@@ -26,78 +20,78 @@ class Roulette(Selector):
     fitness is the sum of all fitness values of molecules in the
     batch [#]_.
 
-    References
-    ----------
-    .. [#] http://tinyurl.com/csc3djm
+    References:
 
-    Examples
-    --------
-    *Yielding Single Molecule Batches*
+        .. [#] http://tinyurl.com/csc3djm
 
-    Yielding molecules one at a time. For example, if molecules need
-    to be selected for mutation or the next generation
+    Examples:
 
-    .. testcode:: yielding-single-molecule-batches
+        *Yielding Single Molecule Batches*
 
-        import stk
+        Yielding molecules one at a time. For example, if molecules need
+        to be selected for mutation or the next generation
 
-        # Make the selector.
-        roulette = stk.Roulette(num_batches=5)
+        .. testcode:: yielding-single-molecule-batches
 
-        population = tuple(
-            stk.MoleculeRecord(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
+            import stk
+
+            # Make the selector.
+            roulette = stk.Roulette(num_batches=5)
+
+            population = tuple(
+                stk.MoleculeRecord(
+                    topology_graph=stk.polymer.Linear(
+                        building_blocks=(
+                            stk.BuildingBlock(
+                                smiles='BrCCBr',
+                                functional_groups=[stk.BromoFactory()],
+                            ),
                         ),
+                        repeating_unit='A',
+                        num_repeating_units=2,
                     ),
-                    repeating_unit='A',
-                    num_repeating_units=2,
-                ),
-            ).with_fitness_value(i)
-            for i in range(100)
-        )
+                ).with_fitness_value(i)
+                for i in range(100)
+            )
 
-        # Select the molecules.
-        for selected, in roulette.select(population):
-            # Do stuff with each selected molecule.
-            pass
+            # Select the molecules.
+            for selected, in roulette.select(population):
+                # Do stuff with each selected molecule.
+                pass
 
 
-    *Yielding Batches Holding Multiple Molecules*
+        *Yielding Batches Holding Multiple Molecules*
 
-    Yielding multiple molecules at once. For example, if molecules need
-    to be selected for crossover
+        Yielding multiple molecules at once. For example, if molecules need
+        to be selected for crossover
 
-    .. testcode:: yielding-batches-holding-multiple-molecules
+        .. testcode:: yielding-batches-holding-multiple-molecules
 
-        import stk
+            import stk
 
-        # Make the selector.
-        roulette = stk.Roulette(num_batches=5, batch_size=2)
+            # Make the selector.
+            roulette = stk.Roulette(num_batches=5, batch_size=2)
 
-        population = tuple(
-            stk.MoleculeRecord(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
+            population = tuple(
+                stk.MoleculeRecord(
+                    topology_graph=stk.polymer.Linear(
+                        building_blocks=(
+                            stk.BuildingBlock(
+                                smiles='BrCCBr',
+                                functional_groups=[stk.BromoFactory()],
+                            ),
                         ),
+                        repeating_unit='A',
+                        num_repeating_units=2,
                     ),
-                    repeating_unit='A',
-                    num_repeating_units=2,
-                ),
-            ).with_fitness_value(i)
-            for i in range(100)
-        )
+                ).with_fitness_value(i)
+                for i in range(100)
+            )
 
-        # Select the molecules.
-        for selected1, selected2 in roulette.select(population):
-            # Do stuff to the molecules.
-            pass
+            # Select the molecules.
+            for selected1, selected2 in roulette.select(population):
+                # Do stuff to the molecules.
+                pass
 
     """
 
@@ -110,40 +104,37 @@ class Roulette(Selector):
         key_maker=Inchi(),
         fitness_modifier=None,
         random_seed=None,
-    ):
+    ) -> None:
         """
-        Initialize a :class:`Roulette` instance.
+        Parameters:
+            num_batches : :class:`int`, optional
+                The number of batches to yield. If ``None`` then yielding
+                will continue forever or until the generator is exhausted,
+                whichever comes first.
 
-        Parameters
-        ----------
-        num_batches : :class:`int`, optional
-            The number of batches to yield. If ``None`` then yielding
-            will continue forever or until the generator is exhausted,
-            whichever comes first.
+            batch_size : :class:`int`, optional
+                The number of molecules yielded at once.
 
-        batch_size : :class:`int`, optional
-            The number of molecules yielded at once.
+            duplicate_molecules : :class:`bool`, optional
+                If ``True`` the same molecule can be yielded in more than
+                one batch.
 
-        duplicate_molecules : :class:`bool`, optional
-            If ``True`` the same molecule can be yielded in more than
-            one batch.
+            duplicate_batches : :class:`bool`, optional
+                If ``True`` the same batch can be yielded more than once.
 
-        duplicate_batches : :class:`bool`, optional
-            If ``True`` the same batch can be yielded more than once.
+            key_maker : :class:`.MoleculeKeyMaker`, optional
+                Used to get the keys of molecules. If two molecules have
+                the same key, they are considered duplicates.
 
-        key_maker : :class:`.MoleculeKeyMaker`, optional
-            Used to get the keys of molecules. If two molecules have
-            the same key, they are considered duplicates.
+            fitness_modifier : :class:`callable`, optional
+                Takes the `population` on which :meth:`~.Selector.select`
+                is called and returns a :class:`dict`, which maps records
+                in the `population` to the fitness values the
+                :class:`.Selector` should use. If ``None``, the regular
+                fitness values of the records are used.
 
-        fitness_modifier : :class:`callable`, optional
-            Takes the `population` on which :meth:`~.Selector.select`
-            is called and returns a :class:`dict`, which maps records
-            in the `population` to the fitness values the
-            :class:`.Selector` should use. If ``None``, the regular
-            fitness values of the records are used.
-
-        random_seed : :class:`int`, optional
-            The random seed to use.
+            random_seed : :class:`int`, optional
+                The random seed to use.
 
         """
 

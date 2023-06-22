@@ -1,5 +1,4 @@
-import typing
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 
 import numpy as np
 
@@ -68,7 +67,7 @@ class RandomBuildingBlock:
     def __init__(
         self,
         building_blocks: Iterable[BuildingBlock],
-        is_replaceable: typing.Callable[[BuildingBlock], bool],
+        is_replaceable: Callable[[BuildingBlock], bool],
         name: str = "RandomBuildingBlock",
         random_seed: int | np.random.Generator | None = None,
     ) -> None:
