@@ -1,13 +1,10 @@
-"""
-Batch
-=====
-
-"""
-
+import typing
 from collections import Counter
 
+T = typing.TypeVar("T")
 
-class Batch:
+
+class Batch(typing.Generic[T]):
     """
     Represents a batch of molecule records.
 
@@ -15,195 +12,192 @@ class Batch:
     fitness values. Batches can also be iterated through, this
     iterates through all the records in the batch.
 
-    Examples
-    --------
-    *Sorting Batches by Fitness Value*
+    Examples:
+        *Sorting Batches by Fitness Value*
 
-    Sorting batches causes them to be sorted by fitness value.
+        Sorting batches causes them to be sorted by fitness value.
 
-    .. testcode:: sorting-batches-by-fitness-value
+        .. testcode:: sorting-batches-by-fitness-value
 
-        import stk
+            import stk
 
-        record1 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
+            record1 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
                 ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
-        record2 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
+            )
+            record2 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
                 ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
-        record3 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
+            )
+            record3 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
                     ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
                 ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
+            )
 
-        batches = (
-            stk.Batch(
+            batches = (
+                stk.Batch(
+                    records=(record1, ),
+                    fitness_values={record1: 1},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(record2, ),
+                    fitness_values={record2: 2},
+                    key_maker=stk.Inchi(),
+                ),
+                stk.Batch(
+                    records=(record3, ),
+                    fitness_values={record3: 3},
+                    key_maker=stk.Inchi(),
+                ),
+            )
+            sorted_batches = sorted(batches)
+
+        .. testcode:: sorting-batches-by-fitness-value
+            :hide:
+
+            assert (
+                sorted_batches[0] < sorted_batches[1] < sorted_batches[2]
+            )
+
+        *Comparing Batches by Fitness Value*
+
+        Comparison is also based on fitness value
+
+        .. testcode:: comparing-batches-by-fitness-value
+
+            import stk
+
+            record1 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            )
+            batch1 = stk.Batch(
                 records=(record1, ),
                 fitness_values={record1: 1},
                 key_maker=stk.Inchi(),
-            ),
-            stk.Batch(
+            )
+
+            record2 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            )
+            batch2 = stk.Batch(
                 records=(record2, ),
                 fitness_values={record2: 2},
                 key_maker=stk.Inchi(),
-            ),
-            stk.Batch(
-                records=(record3, ),
-                fitness_values={record3: 3},
+            )
+
+            if batch1 < batch2:
+                print('batch1 has a smaller fitness value than batch2.')
+
+        .. testoutput:: comparing-batches-by-fitness-value
+            :hide:
+
+            batch1 has a smaller fitness value than batch2.
+
+        *Iterating Through Molecule Records in a Batch*
+
+        Batches can be iterated through to get the molecule records in the
+        batch
+
+        .. testcode:: iterating-through-molecule-records-in-a-batch
+
+            import stk
+
+            record1 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            )
+            record2 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            )
+            batch = stk.Batch(
+                records=(record1, record2),
+                fitness_values={record1: 1, record2: 2},
                 key_maker=stk.Inchi(),
-            ),
-        )
-        sorted_batches = sorted(batches)
-
-    .. testcode:: sorting-batches-by-fitness-value
-        :hide:
-
-        assert (
-            sorted_batches[0] < sorted_batches[1] < sorted_batches[2]
-        )
-
-    *Comparing Batches by Fitness Value*
-
-    Comparison is also based on fitness value
-
-    .. testcode:: comparing-batches-by-fitness-value
-
-        import stk
-
-        record1 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
-        batch1 = stk.Batch(
-            records=(record1, ),
-            fitness_values={record1: 1},
-            key_maker=stk.Inchi(),
-        )
-
-        record2 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
-        batch2 = stk.Batch(
-            records=(record2, ),
-            fitness_values={record2: 2},
-            key_maker=stk.Inchi(),
-        )
-
-        if batch1 < batch2:
-            print('batch1 has a smaller fitness value than batch2.')
-
-    .. testoutput:: comparing-batches-by-fitness-value
-        :hide:
-
-        batch1 has a smaller fitness value than batch2.
-
-    *Iterating Through Molecule Records in a Batch*
-
-    Batches can be iterated through to get the molecule records in the
-    batch
-
-    .. testcode:: iterating-through-molecule-records-in-a-batch
-
-        import stk
-
-        record1 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
-        record2 = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                ),
-                repeating_unit='A',
-                num_repeating_units=2,
-            ),
-        )
-        batch = stk.Batch(
-            records=(record1, record2),
-            fitness_values={record1: 1, record2: 2},
-            key_maker=stk.Inchi(),
-        )
-        for record in batch:
-            # Do stuff with record.
-            pass
+            )
+            for record in batch:
+                # Do stuff with record.
+                pass
 
     """
 
     __slots__ = ("_records", "_fitness_value", "_identity_key")
 
-    def __init__(self, records, fitness_values, key_maker):
+    def __init__(self, records, fitness_values, key_maker) -> None:
         """
-        Initialize a :class:`.Batch`.
+        Parameters:
 
-        Parameters
-        ----------
-        records : :class:`tuple` of :class:`.MoleculeRecord`
-            The molecule records which are part of the batch.
+            records : :class:`tuple` of :class:`.MoleculeRecord`
+                The molecule records which are part of the batch.
 
-        fitness_values : :class:`dict`
-            Maps each :class:`.MoleculeRecord` in `records` to the
-            fitness value which should be used for it.
+            fitness_values : :class:`dict`
+                Maps each :class:`.MoleculeRecord` in `records` to the
+                fitness value which should be used for it.
 
-        key_maker : :class:`.MoleculeKeyMaker`
-            Used to make keys for molecules, which are used to
-            determine the identity key of the batch. If two
-            batches have the same molecule keys, the same number of
-            times, they will have the same identity key.
+            key_maker : :class:`.MoleculeKeyMaker`
+                Used to make keys for molecules, which are used to
+                determine the identity key of the batch. If two
+                batches have the same molecule keys, the same number of
+                times, they will have the same identity key.
 
         """
 

@@ -1,10 +1,3 @@
-"""
-Yielded Batches
-===============
-
-"""
-
-
 class YieldedBatches:
     """
     Keeps track of batches yielded by :meth:`.Selector.select`.
