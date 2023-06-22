@@ -1,16 +1,3 @@
-"""
-Molecule Key Maker
-==================
-
-.. toctree::
-    :maxdepth: 2
-
-    InChI <stk.molecular.key_makers.inchi>
-    InChIKey <stk.molecular.key_makers.inchi_key>
-    SMILES <stk.molecular.key_makers.smiles>
-
-"""
-
 from __future__ import annotations
 
 from collections.abc import Callable

@@ -324,6 +324,7 @@ from stk._internal.reactions.one_one_reaction import OneOneReaction
 from stk._internal.reactions.one_two_reaction import OneTwoReaction
 from stk._internal.reactions.reaction.reaction import Reaction
 from stk._internal.reactions.reaction.reaction_result import ReactionResult
+from stk._internal.reactions.ring_amine_reaction import RingAmineReaction
 from stk._internal.reactions.two_two_reaction import TwoTwoReaction
 from stk._internal.topology_graphs.edge import Edge
 from stk._internal.topology_graphs.edge_group import EdgeGroup
@@ -443,6 +444,7 @@ __all__ = [
     "Iodo",
     "PrimaryAmino",
     "RingAmine",
+    "RingAmineReaction",
     "SecondaryAmino",
     "SingleAtom",
     "Thioacid",

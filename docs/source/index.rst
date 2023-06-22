@@ -19,10 +19,11 @@
 
    Building Block <_autosummary/stk.BuildingBlock>
    Constructed Molecule <_autosummary/stk.ConstructedMolecule>
-   Functional Groups <_autosummary/stk.FunctionalGroup>
-   Functional Group Factories <_autosummary/stk.FunctionalGroupFactory>
-   Reactions <_autosummary/stk.Reaction>
-   Reaction Factories <_autosummary/stk.ReactionFactory>
+   Functional Groups <functional_groups>
+   Functional Group Factories <functional_group_factories>
+   Key Makers <key_makers>
+   Reactions <reactions>
+   Reaction Factories <reaction_factories>
    Writers <writers>
 
 .. toctree::

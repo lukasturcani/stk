@@ -1,20 +1,3 @@
-"""
-Reaction Factory
-================
-
-.. toctree::
-    :maxdepth: 2
-
-    Generic Reaction Factory <\
-stk.molecular.reactions.factories.generic_reaction_factory\
->
-    Dative Reaction Factory <\
-stk.molecular.reactions.factories.dative_reaction_factory\
->
-
-"""
-
-
 class ReactionFactory:
     """
     An abstract base class for reaction factories.
