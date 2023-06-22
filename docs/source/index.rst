@@ -32,14 +32,14 @@
    :maxdepth: 2
 
    Polymers <polymer>
-   Organic & Metal-Organic Cages <_autosummary/stk.cage>
-   Covalent Organic Frameworks <_autosummary/stk.cof>
-   Metal Complexes <_autosummary/stk.metal_complex>
-   Host Guest Complex <_autosummary/stk.host_guest>
-   Macrocycle <_autosummary/stk.macrocycle>
-   [n]Rotaxane <_autosummary/stk.rotaxane>
+   Organic & Metal-Organic Cages <cage>
+   Covalent Organic Frameworks <cof>
+   Metal Complexes <metal_complex>
+   Host Guest Complex <_autosummary/stk.host_guest.Complex>
+   Macrocycle <_autosummary/stk.macrocycle.Macrocycle>
+   [n]Rotaxane <_autosummary/stk.rotaxane.NRotaxane>
    Adding Topology Graphs <_autosummary/stk.TopologyGraph>
-   Optimizers <_autosummary/stk.Optimizer>
+   Optimizers <optimizers>
 
 .. toctree::
    :hidden:

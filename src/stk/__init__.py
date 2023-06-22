@@ -306,6 +306,7 @@ from stk._internal.key_makers.smiles import Smiles
 from stk._internal.molecule import Molecule
 from stk._internal.optimizers.collapser import Collapser
 from stk._internal.optimizers.mchammer import MCHammer
+from stk._internal.optimizers.null import NullOptimizer
 from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.optimizers.periodic_collapser import PeriodicCollapser
 from stk._internal.optimizers.spinner import Spinner
@@ -386,6 +387,7 @@ __all__ = [
     "Batch",
     "Add",
     "NullFitnessNormalizer",
+    "NullOptimizer",
     "Power",
     "DivideByMean",
     "Sum",

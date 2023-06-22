@@ -1,31 +1,3 @@
-"""
-Covalent Organic Framework
-==========================
-
-.. toctree::
-    :maxdepth: 2
-
-    Hexagonal <stk.molecular.topology_graphs.cof.hexagonal>
-    Honeycomb <stk.molecular.topology_graphs.cof.honeycomb>
-    Kagome <stk.molecular.topology_graphs.cof.kagome>
-    Linkerless Honeycomb <\
-stk.molecular.topology_graphs.cof.linkerless_honeycomb\
->
-    Square <stk.molecular.topology_graphs.cof.square>
-    Periodic Hexagonal <\
-stk.molecular.topology_graphs.cof.periodic_hexagonal\
->
-    Periodic Honeycomb <\
-stk.molecular.topology_graphs.cof.periodic_honeycomb\
->
-    Periodic Kagome <stk.molecular.topology_graphs.cof.periodic_kagome>
-    Periodic Linkerless Honeycomb <\
-stk.molecular.topology_graphs.cof.periodic_linkerless_honeycomb\
->
-    Periodic Square <stk.molecular.topology_graphs.cof.periodic_square>
-
-"""
-
 import itertools as it
 from collections import Counter
 from functools import partial
