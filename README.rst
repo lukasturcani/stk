@@ -66,6 +66,10 @@ about stk
 
 __ https://aip.scitation.org/doi/10.1063/5.0049708
 
+* Describing metal-organic cage usage: `Unlocking the computational design of metal–organic cages`__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2022/CC/D2CC00532H
+
 * (Out of date) `stk: A Python Toolkit for Supramolecular Assembly`__
   | chemrxiv__
 
@@ -74,6 +78,18 @@ __ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembl
 
 using stk
 ---------
+
+* `The effect of disorder in multi-component covalent organic frameworks`__
+
+__ https://pubs.rsc.org/en/content/articlehtml/2023/cc/d3cc01111a
+
+* `Tetramine Aspect Ratio and Flexibility Determine Framework Symmetry for Zn8L6 Self-Assembled Structures`__
+
+__ https://onlinelibrary.wiley.com/doi/10.1002/anie.202217987
+
+* `Orientational self-sorting in cuboctahedral Pd cages`__
+
+__ https://pubs.rsc.org/en/content/articlehtml/2022/sc/d2sc03856k
 
 * `Conformer-RL: A deep reinforcement learning library for conformer
   generation`__
