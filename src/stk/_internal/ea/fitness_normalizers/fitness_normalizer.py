@@ -1,23 +1,3 @@
-"""
-Fitness Normalizer
-==================
-
-.. toctree::
-    :maxdepth: 2
-
-    Add <stk.ea.fitness_normalizers.add>
-    Divide By Mean <stk.ea.fitness_normalizers.divide_by_mean>
-    Multiply <stk.ea.fitness_normalizers.multiply>
-    Normalizer Sequence <stk.ea.fitness_normalizers.sequence>
-    Null Fitness Normalizer <stk.ea.fitness_normalizers.null>
-    Power <stk.ea.fitness_normalizers.power>
-    Replace Fitness <stk.ea.fitness_normalizers.replace_fitness>
-    Shift Up <stk.ea.fitness_normalizers.shift_up>
-    Sum <stk.ea.fitness_normalizers.sum>
-
-"""
-
-
 class FitnessNormalizer:
     """
     Abstract base class for fitness normalizers.

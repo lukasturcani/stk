@@ -58,9 +58,9 @@
    Overview <_autosummary/stk.EvolutionaryAlgorithm>
    Basic Example <basic_ea_example>
    Intermediate Example <intermediate_ea_example>
-   Fitness Calculators <_autosummary/stk.FitnessCalculator>
-   Fitness Normalizers <_autosummary/stk.FitnessNormalizer>
-   Selection <_autosummary/stk.Selector>
+   Fitness Calculators <fitness_calculators>
+   Fitness Normalizers <fitness_normalizers>
+   Selection <selection>
    Mutation <mutation>
    Crossover <crossover>
    Plotting <plotters>

@@ -2,7 +2,7 @@ Mutation
 ========
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     Molecule <_autosummary/stk.MoleculeMutator>
-    Compound <compound_mutators>
+    Random Mutator <_autosummary/stk.RandomMutator>
