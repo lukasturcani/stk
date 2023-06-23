@@ -1,15 +1,3 @@
-"""
-Molecule Database
-=================
-
-.. toctree::
-    :maxdepth: 2
-
-    Molecule MongoDB <stk.databases.mongo_db.molecule>
-
-"""
-
-
 class MoleculeDatabase:
     """
     An abstract base class for storing and retrieving molecules.

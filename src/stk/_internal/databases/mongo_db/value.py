@@ -1,9 +1,3 @@
-"""
-Value MongoDB
-=============
-
-"""
-
 from functools import lru_cache
 
 from stk._internal.key_makers.inchi_key import InchiKey

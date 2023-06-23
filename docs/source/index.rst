@@ -43,6 +43,15 @@
 
 .. toctree::
    :hidden:
+   :caption: Molecular Databases
+   :maxdepth: 2
+
+    Molecule <molecule_databases>
+    Constructed Molecule <constructed_molecule_databases>
+    Value <value_databases>
+
+.. toctree::
+   :hidden:
    :caption: Evolutionary Algorithm
    :maxdepth: 2
 
