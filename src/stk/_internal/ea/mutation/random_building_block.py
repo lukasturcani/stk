@@ -112,11 +112,18 @@ class RandomBuildingBlock:
         replaceable_building_blocks = tuple(
             filter(
                 self._is_replaceable,
-                record.get_molecule().get_building_blocks(),
+                (
+                    bb
+                    for bb in record.get_molecule().get_building_blocks()
+                    # TODO: this is actually a type error -- maybe
+                    # get_building_blocks needs to return BuildingBlock
+                    # instances?
+                    if isinstance(bb, BuildingBlock)
+                ),
             )
         )
         replaced_building_block = self._generator.choice(
-            a=replaceable_building_blocks,
+            a=replaceable_building_blocks,  # type: ignore
         )
         # Choose a replacement building block.
         replacement = self._generator.choice(

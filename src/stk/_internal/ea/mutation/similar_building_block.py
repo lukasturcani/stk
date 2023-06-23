@@ -9,6 +9,7 @@ from stk._internal.ea.molecule_records.molecule import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
+from stk._internal.molecule import Molecule
 from stk._internal.utilities.utilities import dice_similarity
 
 
@@ -139,11 +140,18 @@ class SimilarBuildingBlock:
         replaceable_building_blocks = tuple(
             filter(
                 self._is_replaceable,
-                record.get_molecule().get_building_blocks(),
+                (
+                    bb
+                    for bb in record.get_molecule().get_building_blocks()
+                    # TODO: this is actually a type error -- maybe
+                    # get_building_blocks needs to return BuildingBlock
+                    # instances?
+                    if isinstance(bb, BuildingBlock)
+                ),
             )
         )
         replaced_building_block = self._generator.choice(
-            a=replaceable_building_blocks,
+            a=replaceable_building_blocks,  # type: ignore
         )
 
         # If the building block has not been chosen before, create an

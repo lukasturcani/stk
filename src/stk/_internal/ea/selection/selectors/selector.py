@@ -1,7 +1,7 @@
 import itertools
 import logging
 import typing
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator, Sequence
 
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
@@ -67,7 +67,8 @@ class Selector(typing.Generic[T]):
     def __init__(
         self,
         key_maker: MoleculeKeyMaker,
-        fitness_modifier,
+        fitness_modifier: Callable[[Sequence[T]], dict[T, float]],
+        batch_size: int,
     ) -> None:
         """
         Parameters:
@@ -77,15 +78,18 @@ class Selector(typing.Generic[T]):
                 determine if two molecule records are duplicates of each
                 other.
 
-            fitness_modifier : :class:`callable`, optional
+            fitness_modifier:
                 Takes the `population` on which :meth:`.select` is called
                 and returns a :class:`dict`, which maps records in the
                 `population` to the fitness values the :class:`.Selector`
-                should use. If ``None``, the regular fitness values of the
-                records are used.
+                should use.
+
+            batch_size:
+                The number of molecules yielded at once.
         """
         self._key_maker = key_maker
         self._fitness_modifier = fitness_modifier
+        self._batch_size = batch_size
 
     def select(
         self,

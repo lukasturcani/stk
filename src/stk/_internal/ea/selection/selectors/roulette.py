@@ -108,7 +108,7 @@ class Roulette(Selector[T]):
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
         key_maker: MoleculeKeyMaker = Inchi(),
-        fitness_modifier: Callable[[Sequence[T]], dict[T, typing.Any]]
+        fitness_modifier: Callable[[Sequence[T]], dict[T, float]]
         | None = None,
         random_seed: int | np.random.Generator | None = None,
     ) -> None:
@@ -144,22 +144,20 @@ class Roulette(Selector[T]):
                 The random seed to use.
 
         """
-        super().__init__(key_maker, fitness_modifier)
+        if fitness_modifier is None:
+            fitness_modifier = self._get_fitness_values
+
+        super().__init__(key_maker, fitness_modifier, batch_size)
 
         if random_seed is None or isinstance(random_seed, int):
             random_seed = np.random.default_rng(random_seed)
 
-        if num_batches is None:
-            num_batches = float("inf")
-
-        if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
+        num_batches_ = float("inf") if num_batches is None else num_batches
 
         self._generator = random_seed
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
-        self._num_batches = num_batches
-        self._batch_size = batch_size
+        self._num_batches = num_batches_
 
     def _select_from_batches(self, batches, yielded_batches):
         while batches and yielded_batches.get_num() < self._num_batches:
