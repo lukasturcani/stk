@@ -9,7 +9,6 @@ from stk._internal.ea.molecule_records.molecule import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
-from stk._internal.molecule import Molecule
 from stk._internal.utilities.utilities import dice_similarity
 
 
