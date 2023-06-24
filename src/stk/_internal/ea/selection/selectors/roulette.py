@@ -142,7 +142,6 @@ class Roulette(Selector[T]):
 
             random_seed:
                 The random seed to use.
-
         """
         if fitness_modifier is None:
             fitness_modifier = self._get_fitness_values
@@ -152,12 +151,12 @@ class Roulette(Selector[T]):
         if random_seed is None or isinstance(random_seed, int):
             random_seed = np.random.default_rng(random_seed)
 
-        num_batches_ = float("inf") if num_batches is None else num_batches
-
         self._generator = random_seed
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
-        self._num_batches = num_batches_
+        self._num_batches = (
+            float("inf") if num_batches is None else num_batches
+        )
 
     def _select_from_batches(self, batches, yielded_batches):
         while batches and yielded_batches.get_num() < self._num_batches:
