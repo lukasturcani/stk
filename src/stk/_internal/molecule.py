@@ -188,23 +188,17 @@ class Molecule:
         `origin`.
 
         Parameters:
-
             angle:
                 The size of the rotation in radians.
-
             axis:
                 The axis about which the rotation happens. Must have
                 unit magnitude.
-
             origin:
                 The origin about which the rotation happens.
-
         Returns:
-
             Molecule: A rotated clone.
 
         """
-
         return self.clone()._with_rotation_about_axis(
             angle=angle,
             axis=axis,
@@ -384,7 +378,15 @@ class Molecule:
             origin=origin,
         )
 
-    def _clone(self) -> typing.Self:
+    def clone(self) -> typing.Self:
+        """
+        Return a clone.
+
+        Returns:
+            Molecule: The clone.
+
+        """
+
         clone = self.__class__.__new__(self.__class__)
         Molecule.__init__(
             self=clone,
@@ -393,17 +395,6 @@ class Molecule:
             position_matrix=self._position_matrix.T,
         )
         return clone
-
-    def clone(self) -> typing.Self:
-        """
-        Return a clone.
-
-        Returns:
-            The clone.
-
-        """
-
-        return self._clone()
 
     def get_atomic_positions(
         self,
@@ -817,11 +808,8 @@ class Molecule:
         Return a clone, with canonically ordered atoms.
 
         Returns:
-
-            The clone.
-
+            Molecule: The clone.
         """
-
         return self.clone()._with_canonical_atom_ordering()
 
     def _with_canonical_atom_ordering(self) -> typing.Self:
