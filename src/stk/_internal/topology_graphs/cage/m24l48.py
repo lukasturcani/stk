@@ -18,33 +18,32 @@ class M24L48(Cage):
 
         import moldoc.molecule as molecule
         import stk
-
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
-            functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(4)
-            ),
-            position_matrix=[[0, 0, 0]],
+        
+        four_c_bb = stk.BuildingBlock(
+            smiles="[Br][C]([Br])([Br])[Br]",
+            position_matrix=[
+                [-2, 0, -1],
+                [0, 0, 1],
+                [0, -2, -1],
+                [2, 0, 1],
+                [0, 2, 1],
+            ],
+            functional_groups=(stk.BromoFactory(placers=(0, 1)),),
         )
 
-        bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
-            ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
+        two_c_bb = stk.BuildingBlock(
+            smiles="[Br][N][Br]",
+            position_matrix=[
+                [-2, 0, -1],
+                [0, 0, 1],
+                [0, -2, -1],
             ],
+            functional_groups=(stk.BromoFactory(placers=(0, 1)),),
         )
 
         cage = stk.ConstructedMolecule(
             topology_graph=stk.cage.M24L48(
-                building_blocks=(bb1, bb2),
+                building_blocks=(four_c_bb, two_c_bb),
             ),
         )
 
@@ -71,11 +70,13 @@ class M24L48(Cage):
             ),
         )
 
-    Metal building blocks with four functional groups are
+    Metal building blocks (COLOUR1) with four functional groups are
     required for this topology.
 
-    Ligand building blocks with two functional groups are required for
+    Ligand building blocks (COLOUR2) with two functional groups are required for
     this topology.
+
+    :class:`.MCHammer` optimization is recommended for construction.
 
     When using a :class:`dict` for the `building_blocks` parameter,
     as in :ref:`cage-topology-graph-examples`:
@@ -83,8 +84,8 @@ class M24L48(Cage):
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
-        | 4-functional groups: 0 to 23
-        | 2-functional groups: 24 to 71
+        | 4-functional groups (U+25FC, COLOUR1): 0 to 23
+        | 2-functional groups (U+25FC, COLOUR2): 24 to 71
 
     See :class:`.Cage` for more details and examples.
 

@@ -16,23 +16,36 @@ class FourPlusSix(Cage):
     """
     Represents a cage topology graph.
 
-    Unoptimized construction
+    Vertex connectivities:
 
     .. moldoc::
 
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='NC1CCCCC1N',
-            functional_groups=[stk.PrimaryAminoFactory()],
+        three_c_bb = stk.BuildingBlock(
+            smiles="[Br][C]([Br])[Br]",
+            position_matrix=[
+                [-2, 0, -1],
+                [0, 0, 1],
+                [0, -2, -1],
+                [2, 0, 1],
+            ],
+            functional_groups=(stk.BromoFactory(placers=(0, 1)),),
         )
-        bb2 = stk.BuildingBlock(
-            smiles='O=Cc1cc(C=O)cc(C=O)c1',
-            functional_groups=[stk.AldehydeFactory()],
+
+        two_c_bb = stk.BuildingBlock(
+            smiles="[Br][N][Br]",
+            position_matrix=[
+                [-2, 0, -1],
+                [0, 0, 1],
+                [0, -2, -1],
+            ],
+            functional_groups=(stk.BromoFactory(placers=(0, 1)),),
         )
+
         cage = stk.ConstructedMolecule(
-            topology_graph=stk.cage.FourPlusSix((bb1, bb2)),
+            topology_graph=stk.cage.FourPlusSix((three_c_bb, two_c_bb)),
         )
 
         moldoc_display_molecule = molecule.Molecule(
@@ -54,52 +67,13 @@ class FourPlusSix(Cage):
             ),
         )
 
-    :class:`.MCHammer` optimized construction
-
-    .. moldoc::
-
-        import moldoc.molecule as molecule
-        import stk
-
-        bb1 = stk.BuildingBlock(
-            smiles='NC1CCCCC1N',
-            functional_groups=[stk.PrimaryAminoFactory()],
-        )
-        bb2 = stk.BuildingBlock(
-            smiles='O=Cc1cc(C=O)cc(C=O)c1',
-            functional_groups=[stk.AldehydeFactory()],
-        )
-        cage = stk.ConstructedMolecule(
-            topology_graph=stk.cage.FourPlusSix(
-                building_blocks=(bb1, bb2),
-                optimizer=stk.MCHammer(),
-            ),
-        )
-
-        moldoc_display_molecule = molecule.Molecule(
-            atoms=(
-                molecule.Atom(
-                    atomic_number=atom.get_atomic_number(),
-                    position=position,
-                ) for atom, position in zip(
-                    cage.get_atoms(),
-                    cage.get_position_matrix(),
-                )
-            ),
-            bonds=(
-                molecule.Bond(
-                    atom1_id=bond.get_atom1().get_id(),
-                    atom2_id=bond.get_atom2().get_id(),
-                    order=bond.get_order(),
-                ) for bond in cage.get_bonds()
-            ),
-        )
-
-    Nonlinear building blocks with three functional groups are
+    Nonlinear building blocks (COLOUR1) with three functional groups are
     required for this topology.
 
-    Linear building blocks with two functional groups are required for
+    Linear building blocks (COLOUR2) with two functional groups are required for
     this topology.
+    
+    :class:`.MCHammer` optimization is recommended for construction.
 
     When using a :class:`dict` for the `building_blocks` parameter,
     as in :ref:`cage-topology-graph-examples`:
@@ -107,8 +81,8 @@ class FourPlusSix(Cage):
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
-        | 3-functional groups: 0 to 3
-        | 2-functional groups: 4 to 9
+        | 3-functional groups (COLOUR1): 0 to 3
+        | 2-functional groups (COLOUR2): 4 to 9
 
     See :class:`.Cage` for more details and examples.
 
