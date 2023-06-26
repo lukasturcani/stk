@@ -84,8 +84,8 @@ class M24L48(Cage):
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
-        | 4-functional groups (U+25FC, COLOUR1): 0 to 23
-        | 2-functional groups (U+25FC, COLOUR2): 24 to 71
+        | 4-functional groups (u'\u25FC', COLOUR1): 0 to 23
+        | 2-functional groups (u'\u25FC', COLOUR2): 24 to 71
 
     See :class:`.Cage` for more details and examples.
 
