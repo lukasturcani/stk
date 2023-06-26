@@ -1,9 +1,3 @@
-"""
-Linear
-======
-
-"""
-
 from __future__ import annotations
 
 import typing
@@ -44,6 +38,7 @@ class Linear(TopologyGraph):
     positions.
 
     Examples:
+
         *Construction*
 
         Linear polymers require building blocks with two functional
@@ -417,8 +412,8 @@ class Linear(TopologyGraph):
         building_blocks: tuple[BuildingBlock, ...],
         repeating_unit: typing.Union[str, tuple[int, ...]],
         num_repeating_units: int,
-        orientations: typing.Optional[tuple[float, ...]] = None,
-        random_seed: typing.Optional[int] = None,
+        orientations: tuple[float, ...] | None = None,
+        random_seed: int | np.random.Generator | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -492,7 +487,7 @@ class Linear(TopologyGraph):
         """
 
         if orientations is None:
-            orientations = tuple(0.0 for i in range(len(repeating_unit)))
+            orientations = tuple(0.0 for _ in range(len(repeating_unit)))
 
         if len(orientations) == len(repeating_unit):
             orientations = orientations * num_repeating_units
@@ -544,9 +539,9 @@ class Linear(TopologyGraph):
     @staticmethod
     def _get_vertices_and_edges(
         head_orientation: float,
-        body_orientations: typing.Iterable[float],
+        body_orientations: abc.Iterable[float],
         tail_orientation: float,
-        random_seed: typing.Optional[int],
+        random_seed: int | None,
     ) -> _VerticesAndEdges:
         """
         Get the vertices and edges of the topology graph.
@@ -572,14 +567,15 @@ class Linear(TopologyGraph):
 
         """
 
-        generator = np.random.RandomState(random_seed)
+        if random_seed is None or isinstance(random_seed, int):
+            random_seed = np.random.default_rng(random_seed)
 
         choices = [True, False]
         vertices: list[LinearVertex] = [
             HeadVertex(
                 id=0,
                 position=np.array([0, 0, 0]),
-                flip=generator.choice(
+                flip=random_seed.choice(
                     a=choices,
                     p=[head_orientation, 1 - head_orientation],
                 ),
@@ -587,7 +583,7 @@ class Linear(TopologyGraph):
         ]
         edges: list[Edge] = []
         for i, p in enumerate(body_orientations, 1):
-            flip = generator.choice(choices, p=[p, 1 - p])
+            flip = random_seed.choice(choices, p=[p, 1 - p])
             vertices.append(
                 LinearVertex(i, np.array([i, 0, 0]), flip),
             )
@@ -597,7 +593,7 @@ class Linear(TopologyGraph):
             TailVertex(
                 id=len(vertices),
                 position=np.array([len(vertices), 0, 0]),
-                flip=generator.choice(
+                flip=random_seed.choice(
                     a=choices,
                     p=[tail_orientation, 1 - tail_orientation],
                 ),

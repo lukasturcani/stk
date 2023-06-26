@@ -1,3 +1,8 @@
+from stk._internal.construction_state.construction_state import (
+    ConstructionState,
+)
+
+
 class Optimizer:
     """
     An abstract base class for optimizers.
@@ -7,18 +12,15 @@ class Optimizer:
 
     """
 
-    def optimize(self, state):
+    def optimize(self, state: ConstructionState) -> ConstructionState:
         """
         Optimize the structure of a molecule under construction.
 
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The molecule being constructed.
+        Parameters:
+            state:
+                The molecule being constructed.
 
-        Returns
-        -------
-        :class:`.ConstructionState`
+        Returns:
             The optimized construction state.
 
         """

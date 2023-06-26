@@ -1,9 +1,3 @@
-"""
-Spinner
-=======
-
-"""
-
 import spindry as spd
 
 from stk._internal.construction_state.construction_state import (
