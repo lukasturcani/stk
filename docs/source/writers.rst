@@ -3,7 +3,7 @@ Molecular Writers
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     MDL Mol <_autosummary/stk.MolWriter>
     PDB <_autosummary/stk.PdbWriter>

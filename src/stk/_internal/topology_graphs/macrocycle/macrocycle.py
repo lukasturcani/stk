@@ -1,9 +1,3 @@
-"""
-Macrocycle
-==========
-
-"""
-
 from __future__ import annotations
 
 import typing
@@ -338,8 +332,8 @@ class Macrocycle(TopologyGraph):
         building_blocks: tuple[BuildingBlock, ...],
         repeating_unit: typing.Union[str, tuple[int, ...]],
         num_repeating_units: int,
-        orientations: typing.Optional[tuple[float, ...]] = None,
-        random_seed: typing.Optional[int] = None,
+        orientations: tuple[float, ...] | None = None,
+        random_seed: int | np.random.Generator | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -424,7 +418,8 @@ class Macrocycle(TopologyGraph):
                 "total number of vertices."
             )
 
-        generator = np.random.RandomState(random_seed)
+        if random_seed is None or isinstance(random_seed, int):
+            random_seed = np.random.default_rng(random_seed)
 
         # Keep these for __repr__.
         self._repeating_unit = self._normalize_repeating_unit(
@@ -443,7 +438,7 @@ class Macrocycle(TopologyGraph):
                 CycleVertex(
                     id=vertex_id,
                     position=(np.cos(theta), np.sin(theta), 0),
-                    flip=generator.choice(
+                    flip=random_seed.choice(
                         choices,
                         p=[flip_chance, 1 - flip_chance],
                     ),

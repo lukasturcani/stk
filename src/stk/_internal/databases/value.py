@@ -1,15 +1,3 @@
-"""
-Value Database
-==============
-
-.. toctree::
-    :maxdepth: 2
-
-    Value MongoDB <stk.databases.mongo_db.value>
-
-"""
-
-
 class ValueDatabase:
     """
     Abstract base class for storing of molecular property values.

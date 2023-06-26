@@ -1,16 +1,8 @@
-"""
-Building Block
-==============
-
-"""
-
-from __future__ import annotations
-
 import logging
 import os
 import typing
 import warnings
-from collections.abc import Collection
+from collections.abc import Collection, Iterable, Iterator
 from functools import partial
 
 import numpy as np
@@ -24,7 +16,7 @@ from stk._internal.functional_group_factories.functional_group_factory import (
 )
 from stk._internal.functional_groups.functional_group import FunctionalGroup
 from stk._internal.molecule import Molecule
-from stk._internal.utilities.utilities import OneOrMany, flatten, remake
+from stk._internal.utilities.utilities import flatten, remake
 
 logger = logging.getLogger(__name__)
 
@@ -60,37 +52,28 @@ class BuildingBlock(Molecule):
     def __init__(
         self,
         smiles: str,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
+        functional_groups: Iterable[
+            FunctionalGroup | FunctionalGroupFactory
         ] = (),
-        placer_ids: typing.Optional[tuple[int, ...]] = None,
-        position_matrix: typing.Optional[np.ndarray] = None,
+        placer_ids: Iterable[int] | None = None,
+        position_matrix: np.ndarray | None = None,
     ) -> None:
         """
-        Initialize a :class:`.BuildingBlock`.
-
-        Notes:
-
-            The molecule is given 3D coordinates with
-            :func:`rdkit.ETKDGv2`.
-
         Parameters:
 
             smiles:
                 A SMILES string of the molecule.
 
-            functional_groups:
-                An :class:`iterable` of :class:`.FunctionalGroup` or
-                :class:`.FunctionalGroupFactory` or both.
-                :class:`.FunctionalGroup` instances are added to the
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
-                instances are used to create :class:`.FunctionalGroup`
-                instances the building block should hold.
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
                 :class:`.FunctionalGroup` instances are used to
                 identify which atoms are modified during
                 :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -154,11 +137,11 @@ class BuildingBlock(Molecule):
     def init_from_molecule(
         cls,
         molecule: Molecule,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
+        functional_groups: Iterable[
+            FunctionalGroup | FunctionalGroupFactory
         ] = (),
-        placer_ids: typing.Optional[tuple[int, ...]] = None,
-    ) -> BuildingBlock:
+        placer_ids: Iterable[int] | None = None,
+    ) -> typing.Self:
         """
         Initialize from a :class:`.Molecule`.
 
@@ -167,18 +150,16 @@ class BuildingBlock(Molecule):
             molecule:
                 The molecule to initialize from.
 
-            functional_groups:
-                An :class:`iterable` of :class:`.FunctionalGroup` or
-                :class:`.FunctionalGroupFactory` or both.
-                :class:`.FunctionalGroup` instances are added to the
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
-                instances are used to create :class:`.FunctionalGroup`
-                instances the building block should hold.
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
                 :class:`.FunctionalGroup` instances are used to
                 identify which atoms are modified during
                 :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -200,9 +181,8 @@ class BuildingBlock(Molecule):
                    *placer* ids.
 
         Returns:
-
-             The building block. It will have the same atoms, bonds and
-             atomic positions as `molecule`.
+            BuildingBlock: The building block. It will have the same
+            atoms, bonds and atomic positions as `molecule`.
 
         """
 
@@ -218,12 +198,12 @@ class BuildingBlock(Molecule):
     def init_from_vabene_molecule(
         cls,
         molecule: vabene.Molecule,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
+        functional_groups: Iterable[
+            FunctionalGroup | FunctionalGroupFactory
         ] = (),
-        placer_ids: typing.Optional[tuple[int, ...]] = None,
-        position_matrix: typing.Optional[np.ndarray] = None,
-    ) -> BuildingBlock:
+        placer_ids: Iterable[int] | None = None,
+        position_matrix: np.ndarray | None = None,
+    ) -> typing.Self:
         """
         Initialize from a :mod:`vabene.Molecule`.
 
@@ -237,18 +217,16 @@ class BuildingBlock(Molecule):
             molecule:
                 The :class:`vabene.Molecule` from which to initialize.
 
-            functional_groups:
-                An :class:`iterable` of :class:`.FunctionalGroup` or
-                :class:`.FunctionalGroupFactory` or both.
-                :class:`.FunctionalGroup` instances are added to the
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
-                instances are used to create :class:`.FunctionalGroup`
-                instances the building block should hold.
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
                 :class:`.FunctionalGroup` instances are used to
                 identify which atoms are modified during
                 :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -276,7 +254,7 @@ class BuildingBlock(Molecule):
 
         Returns:
 
-             The building block.
+            BuildingBlock: The building block.
 
         Raises:
 
@@ -331,35 +309,38 @@ class BuildingBlock(Molecule):
     @classmethod
     def init(
         cls,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: Iterable[Atom],
+        bonds: Iterable[Bond],
         position_matrix: np.ndarray,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
+        functional_groups: Iterable[
+            FunctionalGroup | FunctionalGroupFactory
         ] = (),
-        placer_ids: typing.Optional[tuple[int, ...]] = None,
-    ) -> BuildingBlock:
+        placer_ids: Iterable[int] | None = None,
+    ) -> typing.Self:
         """
         Initialize a :class:`.BuildingBlock` from its components.
 
         Parameters:
 
-            atoms:
+            atoms (list[Atom]):
                 The atoms of the building block.
 
-            bonds:
+            bonds (list[Bond]):
                 The bonds of the building block.
 
             position_matrix:
                 An ``(n, 3)`` position matrix of the building block.
 
-            functional_groups:
-                An :class:`iterable` holding the
-                :class:`.FunctionalGroup` instances the building block
-                should have, and / or :class:`.FunctionalGroupFactory`
-                instances used for creating them.
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
+                building block and :class:`.FunctionalGroupFactory`
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
+                :class:`.FunctionalGroup` instances are used to
+                identify which atoms are modified during
+                :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -382,7 +363,7 @@ class BuildingBlock(Molecule):
 
         Returns:
 
-            The building block.
+            BuildingBlock: The building block.
 
         """
 
@@ -412,11 +393,11 @@ class BuildingBlock(Molecule):
     def init_from_file(
         cls,
         path: str,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
+        functional_groups: Iterable[
+            FunctionalGroup | FunctionalGroupFactory
         ] = (),
-        placer_ids: typing.Optional[tuple[int, ...]] = None,
-    ):
+        placer_ids: Iterable[int] | None = None,
+    ) -> typing.Self:
         """
         Initialize from a file.
 
@@ -428,18 +409,16 @@ class BuildingBlock(Molecule):
 
                     #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
 
-            functional_groups:
-                An :class:`iterable` of :class:`.FunctionalGroup` or
-                :class:`.FunctionalGroupFactory` or both.
-                :class:`.FunctionalGroup` instances are added to the
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
-                instances are used to create :class:`.FunctionalGroup`
-                instances the building block should hold.
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
                 :class:`.FunctionalGroup` instances are used to
                 identify which atoms are modified during
                 :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -462,7 +441,7 @@ class BuildingBlock(Molecule):
 
         Returns:
 
-            The building block.
+            BuildingBlock: The building block.
 
         Raises:
 
@@ -500,11 +479,11 @@ class BuildingBlock(Molecule):
     def init_from_rdkit_mol(
         cls,
         molecule: rdkit.Mol,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
+        functional_groups: Iterable[
+            FunctionalGroup | FunctionalGroupFactory
         ] = (),
-        placer_ids: typing.Optional[tuple[int, ...]] = None,
-    ) -> BuildingBlock:
+        placer_ids: Iterable[int] | None = None,
+    ) -> typing.Self:
         """
         Initialize from an :mod:`rdkit` molecule.
 
@@ -520,18 +499,16 @@ class BuildingBlock(Molecule):
             molecule:
                 The molecule.
 
-            functional_groups:
-                An :class:`iterable` of :class:`.FunctionalGroup` or
-                :class:`.FunctionalGroupFactory` or both.
-                :class:`.FunctionalGroup` instances are added to the
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
-                instances are used to create :class:`.FunctionalGroup`
-                instances the building block should hold.
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
                 :class:`.FunctionalGroup` instances are used to
                 identify which atoms are modified during
                 :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -554,7 +531,7 @@ class BuildingBlock(Molecule):
 
         Returns:
 
-            The molecule.
+            BuildingBlock: The building block.
 
         """
 
@@ -569,10 +546,8 @@ class BuildingBlock(Molecule):
     def _init_from_rdkit_mol(
         self,
         molecule: rdkit.Mol,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
-        ],
-        placer_ids: typing.Optional[tuple[int, ...]],
+        functional_groups: Iterable[FunctionalGroup | FunctionalGroupFactory],
+        placer_ids: Iterable[int] | None,
     ) -> None:
         """
         Initialize from an :mod:`rdkit` molecule.
@@ -582,18 +557,16 @@ class BuildingBlock(Molecule):
             molecule:
                 The molecule.
 
-            functional_groups:
-                An :class:`iterable` of :class:`.FunctionalGroup` or
-                :class:`.FunctionalGroupFactory` or both.
-                :class:`.FunctionalGroup` instances are added to the
+            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
-                instances are used to create :class:`.FunctionalGroup`
-                instances the building block should hold.
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
                 :class:`.FunctionalGroup` instances are used to
                 identify which atoms are modified during
                 :class:`.ConstructedMolecule` construction.
 
-            placer_ids:
+            placer_ids (list[int]):
                 The ids of *placer* atoms. These are the atoms which
                 should be used for calculating the position of the
                 building block. Depending on the values passed to
@@ -652,7 +625,7 @@ class BuildingBlock(Molecule):
 
     def _normalize_placer_ids(
         self,
-        placer_ids: typing.Optional[tuple[int, ...]],
+        placer_ids: Iterable[int] | None,
         functional_groups: Collection[FunctionalGroup],
     ) -> frozenset[int]:
         """
@@ -699,8 +672,8 @@ class BuildingBlock(Molecule):
 
     def _get_core_ids(
         self,
-        functional_groups: typing.Iterable[FunctionalGroup],
-    ) -> typing.Iterator[int]:
+        functional_groups: Iterable[FunctionalGroup],
+    ) -> Iterator[int]:
         """
         Get the final *core* ids.
 
@@ -734,10 +707,8 @@ class BuildingBlock(Molecule):
 
     def _extract_functional_groups(
         self,
-        functional_groups: typing.Iterable[
-            typing.Union[FunctionalGroup, FunctionalGroupFactory]
-        ],
-    ) -> typing.Iterator[FunctionalGroup]:
+        functional_groups: Iterable[FunctionalGroup | FunctionalGroupFactory],
+    ) -> Iterator[FunctionalGroup]:
         """
         Yield functional groups.
 
@@ -770,8 +741,8 @@ class BuildingBlock(Molecule):
 
     def _with_functional_groups(
         self,
-        functional_groups: typing.Iterable[FunctionalGroup],
-    ) -> BuildingBlock:
+        functional_groups: Iterable[FunctionalGroup],
+    ) -> typing.Self:
         """
         Modify the molecule.
 
@@ -782,26 +753,25 @@ class BuildingBlock(Molecule):
 
     def with_functional_groups(
         self,
-        functional_groups: typing.Iterable[FunctionalGroup],
-    ) -> BuildingBlock:
+        functional_groups: Iterable[FunctionalGroup],
+    ) -> typing.Self:
         """
         Return a clone with specific functional groups.
 
         Parameters:
 
-            functional_groups:
-                :class:`.FunctionalGroup` instances which the clone
-                should have.
+            functional_groups (list[FunctionalGroup]):
+                Functional groups the clone should have.
 
         Returns:
 
-            The clone.
+            BuildingBlock: The clone.
 
         """
 
         return self.clone()._with_functional_groups(functional_groups)
 
-    def _with_canonical_atom_ordering(self) -> BuildingBlock:
+    def _with_canonical_atom_ordering(self) -> typing.Self:
         ordering = rdkit.CanonicalRankAtoms(self.to_rdkit_mol())
         super()._with_canonical_atom_ordering()
         id_map = {old_id: new_id for old_id, new_id in enumerate(ordering)}
@@ -831,18 +801,16 @@ class BuildingBlock(Molecule):
 
     def get_functional_groups(
         self,
-        fg_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> typing.Iterator[FunctionalGroup]:
+        fg_ids: int | Iterable[int] | None = None,
+    ) -> Iterator[FunctionalGroup]:
         """
         Yield the functional groups, ordered by id.
 
         Parameters:
 
-            fg_ids:
+            fg_ids (int | list[int] | None):
                 The ids of functional groups yielded. If ``None``, then
-                all functional groups are yielded. Can be a single
-                :class:`int`, if a single functional group is
-                desired.
+                all functional groups are yielded.
 
         Yields:
 
@@ -858,7 +826,13 @@ class BuildingBlock(Molecule):
         for fg_id in fg_ids:
             yield self._functional_groups[fg_id]
 
-    def clone(self) -> BuildingBlock:
+    def clone(self) -> typing.Self:
+        """
+        Return a clone.
+
+        Returns:
+            BuildingBlock: The clone.
+        """
         clone = self._clone()
         clone._functional_groups = self._functional_groups
         clone._placer_ids = self._placer_ids
@@ -877,7 +851,7 @@ class BuildingBlock(Molecule):
 
         return len(self._placer_ids)
 
-    def get_placer_ids(self) -> typing.Iterator[int]:
+    def get_placer_ids(self) -> Iterator[int]:
         """
         Yield the ids of *placer* atoms.
 
@@ -886,7 +860,8 @@ class BuildingBlock(Molecule):
 
         See Also:
 
-            :meth:`.FunctionalGroup.get_placer_ids`
+            * :meth:`.FunctionalGroup.get_placer_ids`: For getting
+              the placer ids of functional groups.
 
         Yields:
 
@@ -896,7 +871,7 @@ class BuildingBlock(Molecule):
 
         yield from self._placer_ids
 
-    def get_core_atom_ids(self) -> typing.Iterator[int]:
+    def get_core_atom_ids(self) -> Iterator[int]:
         """
         Yield ids of atoms which form the core of the building block.
 
@@ -906,7 +881,8 @@ class BuildingBlock(Molecule):
 
         See Also:
 
-            :meth:`.FunctionalGroup.get_core_atom_ids`
+            * :meth:`.FunctionalGroup.get_core_atom_ids`: For getting
+              the core atom ids of functional groups.
 
         Yields:
 
@@ -917,51 +893,147 @@ class BuildingBlock(Molecule):
 
         yield from self._core_ids
 
-    def with_canonical_atom_ordering(self) -> BuildingBlock:
-        return self.clone()._with_canonical_atom_ordering()
+    def with_canonical_atom_ordering(self) -> typing.Self:
+        """
+        Return a clone, with canonically ordered atoms.
+
+        Returns:
+            BuildingBlock: The clone.
+        """
+        return super().with_canonical_atom_ordering()
 
     def with_centroid(
         self,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> BuildingBlock:
-        return self.clone()._with_centroid(position, atom_ids)
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> typing.Self:
+        """
+        Return a clone with its centroid at `position`.
 
-    def with_displacement(
-        self,
-        displacement: np.ndarray,
-    ) -> BuildingBlock:
-        return self.clone()._with_displacement(displacement)
+        Parameters:
 
-    def with_position_matrix(
-        self,
-        position_matrix: np.ndarray,
-    ) -> BuildingBlock:
-        return self.clone()._with_position_matrix(position_matrix)
+            position:
+                This array holds the position on which the centroid of
+                the clone is going to be placed.
+
+            atom_ids (int | list[int] | None):
+                The ids of atoms which should have their centroid set
+                to `position`. If ``None``, all atoms are used.
+
+        Returns:
+
+            BuildingBlock: A clone with its centroid at `position`.
+        """
+        return super().with_centroid(position, atom_ids)
+
+    def with_displacement(self, displacement: np.ndarray) -> typing.Self:
+        """
+        Return a displaced clone.
+
+        Parameters:
+
+            displacement:
+                The displacement vector to be applied.
+
+        Returns:
+
+            BuildingBlock: A displaced clone.
+        """
+        return super().with_displacement(displacement)
+
+    def with_position_matrix(self, position_matrix: np.ndarray) -> typing.Self:
+        """
+        Return a clone with atomic positions set by `position_matrix`.
+
+        Parameters:
+
+            position_matrix:
+                The position matrix of the clone. The shape of the
+                matrix is ``(n, 3)``.
+
+        Returns:
+
+            BuildingBlock: The clone.
+
+        """
+        return super().with_position_matrix(position_matrix)
 
     def with_rotation_about_axis(
         self,
         angle: float,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> BuildingBlock:
-        return self.clone()._with_rotation_about_axis(
-            angle=angle,
-            axis=axis,
-            origin=origin,
-        )
+    ) -> typing.Self:
+        """
+        Return a rotated clone.
+
+        The clone is rotated by `angle` about `axis` on the
+        `origin`.
+
+        Parameters:
+
+            angle:
+                The size of the rotation in radians.
+
+            axis:
+                The axis about which the rotation happens. Must have
+                unit magnitude.
+
+            origin:
+                The origin about which the rotation happens.
+
+        Returns:
+
+            BuildingBlock: A rotated clone.
+
+        """
+        return super().with_rotation_about_axis(angle, axis, origin)
 
     def with_rotation_between_vectors(
         self,
         start: np.ndarray,
         target: np.ndarray,
         origin: np.ndarray,
-    ) -> BuildingBlock:
-        return self.clone()._with_rotation_between_vectors(
-            start=start,
-            target=target,
-            origin=origin,
-        )
+    ) -> typing.Self:
+        """
+        Return a rotated clone.
+
+        The rotation is equal to a rotation from `start` to `target`.
+
+        Given two direction vectors, `start` and `target`, this method
+        applies the rotation required transform `start` to `target`
+        onto the clone. The rotation occurs about the `origin`.
+
+        For example, if the `start` and `target` vectors
+        are 45 degrees apart, a 45 degree rotation will be applied to
+        the clone. The rotation will be along the appropriate
+        direction.
+
+        The great thing about this method is that you as long as you
+        can associate a geometric feature of the molecule with a
+        vector, then the clone can be rotated so that this vector is
+        aligned with `target`. The defined vector can be virtually
+        anything. This means that any geometric feature of the molecule
+        can be easily aligned with any arbitrary direction.
+
+        Parameters:
+
+            start:
+                A vector which is to be rotated so that it transforms
+                into the `target` vector.
+
+            target:
+                The vector onto which `start` is rotated.
+
+            origin:
+                The point about which the rotation occurs.
+
+        Returns:
+
+            BuildingBlock: A rotated clone.
+
+        """
+        return super().with_rotation_between_vectors(start, target, origin)
 
     def with_rotation_to_minimize_angle(
         self,
@@ -969,8 +1041,45 @@ class BuildingBlock(Molecule):
         target: np.ndarray,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> BuildingBlock:
-        return self.clone()._with_rotation_to_minimize_angle(
+    ) -> typing.Self:
+        """
+        Return a rotated clone.
+
+        The clone is rotated by the rotation required to minimize
+        the angle between `start` and `target`.
+
+        Note that this function will not necessarily overlay the
+        `start` and `target` vectors. This is because the possible
+        rotation is restricted to the `axis`.
+
+        Parameters:
+
+            start:
+                The vector which is rotated.
+
+            target:
+                The vector which is stationary.
+
+            axis:
+                The vector about which the rotation happens. Must have
+                unit magnitude.
+
+            origin:
+                The origin about which the rotation happens.
+
+        Returns:
+
+            BuildingBlock: A rotated clone.
+
+        Raises:
+
+            :class:`ValueError`
+                If `target` has a magnitude of 0. In this case it is
+                not possible to calculate an angle between `start` and
+                `target`.
+
+        """
+        return super().with_rotation_to_minimize_angle(
             start=start,
             target=target,
             axis=axis,
@@ -980,22 +1089,68 @@ class BuildingBlock(Molecule):
     def with_structure_from_file(
         self,
         path: str,
-        extension: typing.Optional[str] = None,
-    ) -> BuildingBlock:
-        return typing.cast(
-            BuildingBlock,
-            super().with_structure_from_file(
-                path=path,
-                extension=extension,
-            ),
-        )
+        extension: str | None = None,
+    ) -> typing.Self:
+        """
+        Return a clone, with its structure taken from a file.
+
+        Multiple file types are supported, namely:
+
+        #. ``.mol``, ``.sdf`` - MDL V2000 and V3000 files
+        #. ``.xyz`` - XYZ files
+        #. ``.mae`` - Schrodinger Maestro files
+        #. ``.coord`` - Turbomole files
+        #. ``.pdb`` - PDB files
+
+        Parameters:
+
+            path:
+                The path to a molecular structure file holding updated
+                coordinates for the :class:`.Molecule`.
+
+            extension:
+                If you want to treat the file as though it has a
+                particular extension, put it here. Include the dot.
+
+        Returns:
+
+            BuildingBlock: A clone with atomic positions found in `path`.
+
+        """
+        return super().with_structure_from_file(path, extension)
 
     def write(
         self,
         path: str,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> BuildingBlock:
-        return typing.cast(BuildingBlock, super().write(path, atom_ids))
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> typing.Self:
+        """
+        Write the structure to a file.
+
+        This function will write the format based on the extension
+        of `path`.
+
+        #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
+        #. ``.xyz`` - XYZ file
+        #. ``.pdb`` - PDB file
+
+        Parameters:
+
+            path:
+                The `path` to which the molecule should be written.
+
+            atom_ids (int | list[int] | None):
+                The ids of atoms to write. If ``None``, all
+                atoms are used. If you use this parameter, the atom
+                ids in the file may not correspond to the atom ids
+                in the molecule.
+
+        Returns:
+
+            BuildingBlock: The molecule.
+
+        """
+        return super().write(path, atom_ids)
 
     def __str__(self) -> str:
         if self._functional_groups:

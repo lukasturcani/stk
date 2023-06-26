@@ -1,20 +1,6 @@
-"""
-Molecule
-========
-
-.. toctree::
-    :maxdepth: 2
-
-    Building Block <stk.molecular.molecules.building_block>
-    Constructed Molecule <stk.molecular.molecules.constructed_molecule>
-
-"""
-
-
-from __future__ import annotations
-
 import os
 import typing
+from collections.abc import Iterable, Iterator
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
@@ -28,7 +14,6 @@ from stk._internal.utilities.molecule import (
 )
 from stk._internal.utilities.updaters import mae, mdl_mol, pdb, turbomole, xyz
 from stk._internal.utilities.utilities import (
-    OneOrMany,
     rotation_matrix,
     rotation_matrix_arbitrary_axis,
     vector_angle,
@@ -36,8 +21,6 @@ from stk._internal.utilities.utilities import (
 from stk._internal.utilities.writers.mdl_mol import _write_mdl_mol_file
 from stk._internal.utilities.writers.pdb import _write_pdb_file
 from stk._internal.utilities.writers.xyz import _write_xyz_file
-
-_T = typing.TypeVar("_T", bound="Molecule")
 
 
 class Molecule:
@@ -113,8 +96,8 @@ class Molecule:
 
     def __init__(
         self,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: Iterable[Atom],
+        bonds: Iterable[Bond],
         position_matrix: np.ndarray,
     ) -> None:
         """
@@ -122,10 +105,10 @@ class Molecule:
 
         Parameters:
 
-            atoms:
+            atoms (list[Atom]):
                 The atoms which compose the molecule.
 
-            bonds:
+            bonds (list[Bond]):
                 The bonds of the molecule.
 
             position_matrix:
@@ -134,8 +117,8 @@ class Molecule:
 
         """
 
-        self._atoms = atoms
-        self._bonds = bonds
+        self._atoms = tuple(atoms)
+        self._bonds = tuple(bonds)
         # Take the transpose because it will make some matrix
         # multiplications faster.
         self._position_matrix = np.array(
@@ -143,10 +126,7 @@ class Molecule:
             dtype=np.float64,
         )
 
-    def _with_displacement(
-        self: _T,
-        displacement: np.ndarray,
-    ) -> _T:
+    def _with_displacement(self, displacement: np.ndarray) -> typing.Self:
         """
         Modify molecule.
 
@@ -155,10 +135,7 @@ class Molecule:
         self._position_matrix = (self._position_matrix.T + displacement).T
         return self
 
-    def with_displacement(
-        self,
-        displacement: np.ndarray,
-    ) -> Molecule:
+    def with_displacement(self, displacement: np.ndarray) -> typing.Self:
         """
         Return a displaced clone.
 
@@ -169,18 +146,18 @@ class Molecule:
 
         Returns:
 
-            A displaced clone.
+            Molecule: A displaced clone.
 
         """
 
         return self.clone()._with_displacement(displacement)
 
     def _with_rotation_about_axis(
-        self: _T,
+        self,
         angle: float,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> _T:
+    ) -> typing.Self:
         """
         Modify molecule.
 
@@ -203,7 +180,7 @@ class Molecule:
         angle: float,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> Molecule:
+    ) -> typing.Self:
         """
         Return a rotated clone.
 
@@ -224,7 +201,7 @@ class Molecule:
 
         Returns:
 
-            A rotated clone.
+            Molecule: A rotated clone.
 
         """
 
@@ -235,11 +212,11 @@ class Molecule:
         )
 
     def _with_rotation_between_vectors(
-        self: _T,
+        self,
         start: np.ndarray,
         target: np.ndarray,
         origin: np.ndarray,
-    ) -> _T:
+    ) -> typing.Self:
         """
         Modify molecule.
 
@@ -262,7 +239,7 @@ class Molecule:
         start: np.ndarray,
         target: np.ndarray,
         origin: np.ndarray,
-    ) -> Molecule:
+    ) -> typing.Self:
         """
         Return a rotated clone.
 
@@ -298,7 +275,7 @@ class Molecule:
 
         Returns:
 
-            A rotated clone.
+            Molecule: A rotated clone.
 
         """
 
@@ -309,12 +286,12 @@ class Molecule:
         )
 
     def _with_rotation_to_minimize_angle(
-        self: _T,
+        self,
         start: np.ndarray,
         target: np.ndarray,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> _T:
+    ) -> typing.Self:
         # If the vector being rotated is not finite, exit. This is
         # probably due to a planar molecule.
         if not all(np.isfinite(x) for x in start):
@@ -361,7 +338,7 @@ class Molecule:
         target: np.ndarray,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> Molecule:
+    ) -> typing.Self:
         """
         Return a rotated clone.
 
@@ -389,7 +366,7 @@ class Molecule:
 
         Returns:
 
-            A rotated clone.
+            Molecule: A rotated clone.
 
         Raises:
 
@@ -407,7 +384,7 @@ class Molecule:
             origin=origin,
         )
 
-    def _clone(self: _T) -> _T:
+    def _clone(self) -> typing.Self:
         clone = self.__class__.__new__(self.__class__)
         Molecule.__init__(
             self=clone,
@@ -417,7 +394,7 @@ class Molecule:
         )
         return clone
 
-    def clone(self) -> Molecule:
+    def clone(self) -> typing.Self:
         """
         Return a clone.
 
@@ -430,18 +407,16 @@ class Molecule:
 
     def get_atomic_positions(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> typing.Iterator[np.ndarray]:
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> Iterator[np.ndarray]:
         """
         Yield the positions of atoms.
 
         Parameters:
 
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of the atoms whose positions are desired.
-                If ``None``, then the positions of all atoms will be
-                yielded. Can be a single :class:`int`, if the position
-                of a single atom is desired.
+                If ``None``, all atoms are used.
 
         Yields:
 
@@ -462,17 +437,16 @@ class Molecule:
 
     def get_atoms(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> typing.Iterator[Atom]:
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> Iterator[Atom]:
         """
         Yield the atoms in the molecule, ordered by id.
 
         Parameters:
 
-            atom_ids:
-                The ids of atoms to yield. Can be a single
-                :class:`int` if a single atom is wanted, or ``None`` if
-                all atoms are wanted.
+            atom_ids (int | list[int] | None):
+                The ids of atoms to yield. If ``None``, all
+                atoms are used.
 
         Yields:
 
@@ -500,7 +474,7 @@ class Molecule:
 
         return len(self._atoms)
 
-    def get_bonds(self) -> typing.Iterator[Bond]:
+    def get_bonds(self) -> Iterator[Bond]:
         """
         Yield the bond in the molecule.
 
@@ -527,18 +501,16 @@ class Molecule:
 
     def get_centroid(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: int | Iterable[int] | None = None,
     ) -> np.ndarray:
         """
         Return the centroid.
 
         Parameters:
 
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of atoms which are used to calculate the
-                centroid. Can be a single :class:`int`, if a single
-                atom is to be used, or ``None`` if all atoms are to be
-                used.
+                centroid. If ``None``, all atoms are used.
 
         Returns:
 
@@ -568,18 +540,16 @@ class Molecule:
 
     def get_direction(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: int | Iterable[int] | None = None,
     ) -> np.ndarray:
         """
         Return a vector of best fit through the atoms.
 
         Parameters:
 
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of atoms which should be used to calculate the
-                vector. Can be a single :class:`int`, if a single atom
-                is to be used, or ``None``, if all atoms are to be
-                used.
+                vector. If ``None``, all atoms are used.
 
         Returns:
 
@@ -610,7 +580,7 @@ class Molecule:
 
     def get_maximum_diameter(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: int | Iterable[int] | None = None,
     ) -> float:
         """
         Return the maximum diameter.
@@ -620,11 +590,9 @@ class Molecule:
 
         Parameters:
 
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of atoms which are considered when looking for
-                the maximum diameter. Can be a single :class:`int`, if
-                a single atom is to be used, or ``None``, if all atoms
-                are to be used.
+                the maximum diameter. If ``None``, all atoms are used.
 
         Returns:
 
@@ -652,18 +620,16 @@ class Molecule:
 
     def get_plane_normal(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: int | Iterable[int] | None = None,
     ) -> np.ndarray:
         """
         Return the normal to the plane of best fit.
 
         Parameters:
 
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of atoms which should be used to calculate the
-                plane. Can be a single :class:`int`, if a
-                single atom is to be used, or ``None``, if all atoms
-                are to be used.
+                plane. If ``None``, all atoms are used.
 
         Returns:
 
@@ -704,10 +670,10 @@ class Molecule:
         return np.array(self._position_matrix.T)
 
     def _with_centroid(
-        self: _T,
+        self,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]],
-    ) -> _T:
+        atom_ids: int | Iterable[int] | None,
+    ) -> typing.Self:
         centroid = self.get_centroid(atom_ids=atom_ids)
         self._with_displacement(position - centroid)
         return self
@@ -715,8 +681,8 @@ class Molecule:
     def with_centroid(
         self,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> Molecule:
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> typing.Self:
         """
         Return a clone with its centroid at `position`.
 
@@ -726,24 +692,22 @@ class Molecule:
                 This array holds the position on which the centroid of
                 the clone is going to be placed.
 
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of atoms which should have their centroid set
-                to `position`. Can be a single :class:`int`, if a
-                single atom is to be used, or ``None``, if all atoms
-                are to be used.
+                to `position`. If ``None``, all atoms are used.
 
         Returns:
 
-            A clone with its centroid at `position`.
+            Molecule: A clone with its centroid at `position`.
 
         """
 
         return self.clone()._with_centroid(position, atom_ids)
 
     def _with_position_matrix(
-        self: _T,
+        self,
         position_matrix: np.ndarray,
-    ) -> _T:
+    ) -> typing.Self:
         """
         Modify molecule.
 
@@ -752,10 +716,7 @@ class Molecule:
         self._position_matrix = np.array(position_matrix.T)
         return self
 
-    def with_position_matrix(
-        self,
-        position_matrix: np.ndarray,
-    ) -> Molecule:
+    def with_position_matrix(self, position_matrix: np.ndarray) -> typing.Self:
         """
         Return a clone with atomic positions set by `position_matrix`.
 
@@ -767,7 +728,7 @@ class Molecule:
 
         Returns:
 
-            The clone.
+            Molecule: The clone.
 
         """
         return self.clone()._with_position_matrix(position_matrix)
@@ -810,8 +771,8 @@ class Molecule:
     def with_structure_from_file(
         self,
         path: str,
-        extension: typing.Optional[str] = None,
-    ) -> Molecule:
+        extension: str | None = None,
+    ) -> typing.Self:
         """
         Return a clone, with its structure taken from a file.
 
@@ -835,7 +796,7 @@ class Molecule:
 
         Returns:
 
-            A clone with atomic positions found in `path`.
+            Molecule: A clone with atomic positions found in `path`.
 
         """
 
@@ -851,7 +812,7 @@ class Molecule:
             ".pdb": pdb._with_structure_from_pdb,
         }[extension](self.clone(), path)
 
-    def with_canonical_atom_ordering(self) -> Molecule:
+    def with_canonical_atom_ordering(self) -> typing.Self:
         """
         Return a clone, with canonically ordered atoms.
 
@@ -863,7 +824,7 @@ class Molecule:
 
         return self.clone()._with_canonical_atom_ordering()
 
-    def _with_canonical_atom_ordering(self: _T) -> _T:
+    def _with_canonical_atom_ordering(self) -> typing.Self:
         """
         Modify the molecule.
 
@@ -920,8 +881,8 @@ class Molecule:
     def write(
         self,
         path: str,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> Molecule:
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> typing.Self:
         """
         Write the structure to a file.
 
@@ -937,16 +898,15 @@ class Molecule:
             path:
                 The `path` to which the molecule should be written.
 
-            atom_ids:
-                The atom ids of atoms to write. Can be a single
-                :class:`int`, if a single atom is to be used, or
-                ``None``, if all atoms are to be used. If you use this
-                parameter, the atom ids in the file may not correspond
-                to the atom ids in the molecule.
+            atom_ids (int | list[int] | None):
+                The atom ids of atoms to write. If ``None``,
+                all atoms are used. If you use this parameter, the
+                atom ids in the file may not correspond to the atom
+                ids in the molecule.
 
         Returns:
 
-            The molecule.
+            Molecule: The molecule.
 
         """
 

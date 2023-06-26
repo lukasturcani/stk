@@ -19,10 +19,11 @@
 
    Building Block <_autosummary/stk.BuildingBlock>
    Constructed Molecule <_autosummary/stk.ConstructedMolecule>
-   Functional Groups <_autosummary/stk.FunctionalGroup>
-   Functional Group Factories <_autosummary/stk.FunctionalGroupFactory>
-   Reactions <_autosummary/stk.Reaction>
-   Reaction Factories <_autosummary/stk.ReactionFactory>
+   Functional Groups <functional_groups>
+   Functional Group Factories <functional_group_factories>
+   Key Makers <key_makers>
+   Reactions <reactions>
+   Reaction Factories <reaction_factories>
    Writers <writers>
 
 .. toctree::
@@ -31,14 +32,23 @@
    :maxdepth: 2
 
    Polymers <polymer>
-   Organic & Metal-Organic Cages <_autosummary/stk.cage>
-   Covalent Organic Frameworks <_autosummary/stk.cof>
-   Metal Complexes <_autosummary/stk.metal_complex>
-   Host Guest Complex <_autosummary/stk.host_guest>
-   Macrocycle <_autosummary/stk.macrocycle>
-   [n]Rotaxane <_autosummary/stk.rotaxane>
+   Organic & Metal-Organic Cages <cage>
+   Covalent Organic Frameworks <cof>
+   Metal Complexes <metal_complex>
+   Host Guest Complex <_autosummary/stk.host_guest.Complex>
+   Macrocycle <_autosummary/stk.macrocycle.Macrocycle>
+   [n]Rotaxane <_autosummary/stk.rotaxane.NRotaxane>
    Adding Topology Graphs <_autosummary/stk.TopologyGraph>
-   Optimizers <_autosummary/stk.Optimizer>
+   Optimizers <optimizers>
+
+.. toctree::
+   :hidden:
+   :caption: Molecular Databases
+   :maxdepth: 2
+
+    Molecule <molecule_databases>
+    Constructed Molecule <constructed_molecule_databases>
+    Value <value_databases>
 
 .. toctree::
    :hidden:
@@ -48,9 +58,9 @@
    Overview <_autosummary/stk.EvolutionaryAlgorithm>
    Basic Example <basic_ea_example>
    Intermediate Example <intermediate_ea_example>
-   Fitness Calculators <_autosummary/stk.FitnessCalculator>
-   Fitness Normalizers <_autosummary/stk.FitnessNormalizer>
-   Selection <_autosummary/stk.Selector>
+   Fitness Calculators <fitness_calculators>
+   Fitness Normalizers <fitness_normalizers>
+   Selection <selection>
    Mutation <mutation>
    Crossover <crossover>
    Plotting <plotters>

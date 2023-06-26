@@ -1,54 +1,34 @@
-"""
-Molecule Mutator
-================
+import typing
 
-.. toctree::
-    :maxdepth: 2
+from stk._internal.ea.mutation.record import MutationRecord
 
-    Random Building Block <\
-stk.ea.mutation.mutators.molecule.random_building_block\
->
-    Random Topology Graph <\
-stk.ea.mutation.mutators.molecule.random_topology_graph\
->
-    Similar Building Block <\
-stk.ea.mutation.mutators.molecule.similar_building_block\
->
-
-"""
+T = typing.TypeVar("T")
 
 
-class MoleculeMutator:
+class MoleculeMutator(typing.Protocol[T]):
     """
-    Abstract base class for molecule mutators.
+    Performs mutation operations.
 
-    Examples
-    --------
-    *Subclass Implementation*
+    Examples:
 
-    You only need to implement :meth:`.mutate`. The source code of any
-    of the classes listed in :mod:`.mutator` can serve as good
-    examples.
+        *Implementation mutation operations*
+
+        You only need to implement :meth:`.mutate`. The source code of any
+        of the classes listed in :mod:`.mutator` can serve as good
+        examples.
 
     """
 
-    def mutate(self, record):
+    def mutate(self, record: T) -> MutationRecord[T] | None:
         """
         Return a mutant of `record`.
 
-        Parameters
-        ----------
-        record : :class:`.MoleculeRecord`
-            The molecule to be mutated.
+        Parameters:
+            record:
+                The molecule to be mutated.
 
-        Returns
-        -------
-        :class:`.MutationRecord`
-            A record of the mutation.
-
-        None : :class:`NoneType`
-            If `record` cannot be mutated.
-
+        Returns:
+            A record of the mutation or ``None``
+            if `record` cannot be mutated.
         """
-
-        raise NotImplementedError()
+        ...

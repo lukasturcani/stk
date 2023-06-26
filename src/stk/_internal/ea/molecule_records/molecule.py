@@ -1,88 +1,74 @@
-"""
-Molecule Record
-===============
-
-"""
+import typing
 
 from stk._internal.constructed_molecule import ConstructedMolecule
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
 
 
 class MoleculeRecord:
     """
     An abstract base class for molecular records used by the EA.
 
-    Notes
-    -----
-    You might notice that the public methods of this abstract base
-    class are implemented. This is a default implementation provided
-    purely for convenience. Subclasses can freely ignore or
-    override this implementation.
+    Notes:
+
+        You might notice that the public methods of this abstract base
+        class are implemented. This is a default implementation provided
+        purely for convenience. Subclasses can freely ignore or
+        override this implementation.
 
     """
 
-    def __init__(self, topology_graph):
+    def __init__(self, topology_graph: TopologyGraph) -> None:
         """
-        Initialize a :class:`.MoleculeRecord` instance.
-
-        Parameters
-        ----------
-        topology_graph : :class:`.TopologyGraph`
-            The topology graph of a :class:`.ConstructedMolecule`.
-
+        Parameters:
+            topology_graph:
+                The topology graph of a :class:`.ConstructedMolecule`.
         """
-
         self._molecule = ConstructedMolecule(topology_graph)
         self._topology_graph = topology_graph
         self._fitness_value = None
         self._normalized_fitness_value = None
 
-    def get_molecule(self):
+    def get_molecule(self) -> ConstructedMolecule:
         """
         Get the molecule held by the record.
 
-        Returns
-        -------
-        :class:`.ConstructedMolecule`
+        Returns:
             The molecule held by the record.
 
         """
 
         return self._molecule
 
-    def get_topology_graph(self):
+    def get_topology_graph(self) -> TopologyGraph:
         """
         Get the topology graph of the molecule.
 
-        Returns
-        -------
-        :class:`.TopologyGraph`
+        Returns:
             The topology graph.
 
         """
 
         return self._topology_graph
 
-    def get_fitness_value(self, normalized=True):
+    def get_fitness_value(
+        self, normalized: bool = True
+    ) -> typing.Any | float | None:
         """
         Get the fitness value of the molecule in the record.
 
-        Parameters
-        ----------
-        normalized : :class:`bool`, optional
-            Toggles the return of the normalized vs unnormalized
-            fitness value. The unnormalized fitness value is
-            guaranteed to be constant for the same molecule
-            across generations, while the normalized one is allowed
-            to change.
+        Parameters:
 
-        Returns
-        -------
-        :class:`object`
+            normalized:
+                Toggles the return of the normalized vs unnormalized
+                fitness value. The unnormalized fitness value is
+                guaranteed to be constant for the same molecule
+                across generations, while the normalized one is allowed
+                to change.
+
+        Returns:
             The fitness value.
-
-        None : :class:`NoneType`
-            If a fitness value has not been assigned to the record.
-
         """
 
         return (
@@ -91,14 +77,13 @@ class MoleculeRecord:
             else self._fitness_value
         )
 
-    def clone(self):
+    def clone(self) -> typing.Self:
         """
         Return a clone.
 
-        Returns
-        -------
-        :class:`.MoleculeRecord`
-            The clone. Has the same type as the original record.
+        Returns:
+            MoleculeRecord: The clone. Has the same type as
+            the original record.
 
         """
 
@@ -109,24 +94,26 @@ class MoleculeRecord:
         clone._normalized_fitness_value = self._normalized_fitness_value
         return clone
 
-    def with_fitness_value(self, fitness_value, normalized=True):
+    def with_fitness_value(
+        self,
+        fitness_value: typing.Any,
+        normalized: bool = True,
+    ) -> typing.Self:
         """
         Return a clone holding a different fitness value.
 
-        Parameters
-        ----------
-        fitness_value : :class:`object`
-            The fitness value of the clone.
+        Parameters:
+            fitness_value:
+                The fitness value of the clone.
 
-        normalized : :class:`bool`, optional
-            Toggles if the normalized or unnormalized fitness value is
-            being set. If ``False``, both the normalized and
-            unnormalized fitness values with be set to `fitness_value`.
+            normalized:
+                Toggles if the normalized or unnormalized fitness value is
+                being set. If ``False``, both the normalized and
+                unnormalized fitness values with be set to `fitness_value`.
 
-        Returns
-        -------
-        :class:`.MoleculeRecord`
-            The clone. Has the same type as the original record.
+        Returns:
+            MoleculeRecord: The clone. Has the same type as
+            the original record.
 
         """
 

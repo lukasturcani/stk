@@ -1,19 +1,6 @@
-"""
-Molecule Key Maker
-==================
-
-.. toctree::
-    :maxdepth: 2
-
-    InChI <stk.molecular.key_makers.inchi>
-    InChIKey <stk.molecular.key_makers.inchi_key>
-    SMILES <stk.molecular.key_makers.smiles>
-
-"""
-
 from __future__ import annotations
 
-import typing
+from collections.abc import Callable
 
 from stk._internal.molecule import Molecule
 
@@ -76,7 +63,7 @@ class MoleculeKeyMaker:
     def __init__(
         self,
         key_name: str,
-        get_key: typing.Callable[[Molecule], object],
+        get_key: Callable[[Molecule], object],
     ) -> None:
         """
         Initialize a :class:`.MoleculeKeyMaker` instance.

@@ -3,7 +3,7 @@ Crossover
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     Molecule <_autosummary/stk.MoleculeCrosser>
-    Compound <compound_crossers>
+    Random Crosser <_autosummary/stk.RandomCrosser>

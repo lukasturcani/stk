@@ -1,17 +1,3 @@
-"""
-Constructed Molecule Database
-=============================
-
-.. toctree::
-    :maxdepth: 2
-
-    Constructed Molecule MongoDB <\
-stk.databases.mongo_db.constructed_molecule\
->
-
-"""
-
-
 class ConstructedMoleculeDatabase:
     """
     Abstract base class for storing constructed molecules.

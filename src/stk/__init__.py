@@ -306,6 +306,7 @@ from stk._internal.key_makers.smiles import Smiles
 from stk._internal.molecule import Molecule
 from stk._internal.optimizers.collapser import Collapser
 from stk._internal.optimizers.mchammer import MCHammer
+from stk._internal.optimizers.null import NullOptimizer
 from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.optimizers.periodic_collapser import PeriodicCollapser
 from stk._internal.optimizers.spinner import Spinner
@@ -324,6 +325,7 @@ from stk._internal.reactions.one_one_reaction import OneOneReaction
 from stk._internal.reactions.one_two_reaction import OneTwoReaction
 from stk._internal.reactions.reaction.reaction import Reaction
 from stk._internal.reactions.reaction.reaction_result import ReactionResult
+from stk._internal.reactions.ring_amine_reaction import RingAmineReaction
 from stk._internal.reactions.two_two_reaction import TwoTwoReaction
 from stk._internal.topology_graphs.edge import Edge
 from stk._internal.topology_graphs.edge_group import EdgeGroup
@@ -385,6 +387,7 @@ __all__ = [
     "Batch",
     "Add",
     "NullFitnessNormalizer",
+    "NullOptimizer",
     "Power",
     "DivideByMean",
     "Sum",
@@ -443,6 +446,7 @@ __all__ = [
     "Iodo",
     "PrimaryAmino",
     "RingAmine",
+    "RingAmineReaction",
     "SecondaryAmino",
     "SingleAtom",
     "Thioacid",

@@ -1,31 +1,6 @@
-"""
-Optimizer
-=========
-
-.. toctree::
-    :maxdepth: 2
-
-    Collapser <\
-stk.molecular.topology_graphs.topology_graph.optimizers.collapser\
->
-
-    Periodic Collapser <\
-stk.molecular.topology_graphs.topology_graph.optimizers.\
-periodic_collapser\
->
-
-    MCHammer <\
-stk.molecular.topology_graphs.topology_graph.optimizers.mchammer\
->
-    Spinner <\
-stk.molecular.topology_graphs.topology_graph.optimizers.spinner\
->
-
-    NullOptimizer <\
-stk.molecular.topology_graphs.topology_graph.optimizers.null\
->
-
-"""
+from stk._internal.construction_state.construction_state import (
+    ConstructionState,
+)
 
 
 class Optimizer:
@@ -37,18 +12,15 @@ class Optimizer:
 
     """
 
-    def optimize(self, state):
+    def optimize(self, state: ConstructionState) -> ConstructionState:
         """
         Optimize the structure of a molecule under construction.
 
-        Parameters
-        ----------
-        state : :class:`.ConstructionState`
-            The molecule being constructed.
+        Parameters:
+            state:
+                The molecule being constructed.
 
-        Returns
-        -------
-        :class:`.ConstructionState`
+        Returns:
             The optimized construction state.
 
         """

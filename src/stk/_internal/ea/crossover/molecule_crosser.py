@@ -1,49 +1,39 @@
-"""
-Molecule Crosser
-================
+import typing
+from collections.abc import Iterator, Sequence
 
-.. toctree::
-    :maxdepth: 2
+from stk._internal.ea.crossover.record import CrossoverRecord
 
-    Genetic Recombination <\
-stk.ea.crossover.crossers.molecule.genetic_recombination\
->
-
-"""
+T = typing.TypeVar("T")
 
 
-class MoleculeCrosser:
+class MoleculeCrosser(typing.Protocol[T]):
     """
-    Abstract base class for molecule crossers.
+    Performs crossover operations.
 
     Crossers take multiple molecules and recombine them to make
     new, offspring, molecules.
 
-    Examples
-    --------
-    *Subclass Implementation*
+    Examples:
 
-    You only need to implement :meth:`.cross`. The source code of any
-    of the classes listed in :mod:`.crosser` can serve as good
-    examples.
+        *Implementing crossover operations*
+
+        You only need to implement :meth:`.cross`. The source code of any
+        of the classes listed in :mod:`.crosser` can serve as good
+        examples.
 
     """
 
-    def cross(self, records):
+    def cross(self, records: Sequence[T]) -> Iterator[CrossoverRecord[T]]:
         """
         Cross `records`.
 
-        Parameters
-        ----------
-        records : :class:`iterable` of :class:`.MoleculeRecord`
-            The molecule records on which a crossover operation is
-            performed.
+        Parameters:
+            records (list[T]):
+                The molecule records on which a crossover operation is
+                performed.
 
-        Yields
-        ------
-        :class:`.CrossoverRecord`
+        Yields:
             A record of a crossover operation.
 
         """
-
-        raise NotImplementedError()
+        ...

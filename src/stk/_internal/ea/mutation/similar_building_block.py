@@ -1,22 +1,18 @@
-"""
-Similar Building Block
-======================
-
-"""
-
+import typing
+from collections.abc import Callable, Iterable, Iterator
 from functools import partial
 
 import numpy as np
 
+from stk._internal.building_block import BuildingBlock
 from stk._internal.ea.molecule_records.molecule import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.key_makers.inchi import Inchi
+from stk._internal.key_makers.molecule import MoleculeKeyMaker
 from stk._internal.utilities.utilities import dice_similarity
 
-from .mutator import MoleculeMutator
 
-
-class SimilarBuildingBlock(MoleculeMutator):
+class SimilarBuildingBlock:
     """
     Substitutes similar building blocks.
 
@@ -25,100 +21,110 @@ class SimilarBuildingBlock(MoleculeMutator):
     Repeated mutations on the same molecule will substituted the next
     most similar molecule from the set.
 
-    Examples
-    --------
-    *Constructed Molecule Mutation*
+    Examples:
 
-    .. testcode:: constructed-molecule-mutation
+        *Constructed Molecule Mutation*
 
-        import stk
+        .. testcode:: constructed-molecule-mutation
 
-        # Create a molecule which is to be mutated.
-        bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
-        bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-        polymer = stk.MoleculeRecord(
-            topology_graph=stk.polymer.Linear((bb1, bb2), 'AB', 3),
-        )
+            import stk
 
-        # Create molecules used to substitute building blocks.
-        building_blocks = (
-            stk.BuildingBlock(
-                smiles='NC[Si]CCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            ),
-            stk.BuildingBlock(
-                smiles='NCCCCCCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            ),
-            stk.BuildingBlock(
-                smiles='NC1CCCCC1N',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            ),
-        )
+            # Create a molecule which is to be mutated.
+            bb1 = stk.BuildingBlock('NCCN', [stk.PrimaryAminoFactory()])
+            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            polymer = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear((bb1, bb2), 'AB', 3),
+            )
 
-        # Create the mutator.
+            # Create molecules used to substitute building blocks.
+            building_blocks = (
+                stk.BuildingBlock(
+                    smiles='NC[Si]CCN',
+                    functional_groups=[stk.PrimaryAminoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='NCCCCCCCN',
+                    functional_groups=[stk.PrimaryAminoFactory()],
+                ),
+                stk.BuildingBlock(
+                    smiles='NC1CCCCC1N',
+                    functional_groups=[stk.PrimaryAminoFactory()],
+                ),
+            )
 
-        def has_primary_amino_group(building_block):
-            fg, = building_block.get_functional_groups(0)
-            return type(fg) is stk.PrimaryAmino
+            # Create the mutator.
 
-        similar_bb = stk.SimilarBuildingBlock(
-            building_blocks=building_blocks,
-            is_replaceable=has_primary_amino_group,
-        )
+            def has_primary_amino_group(building_block):
+                fg, = building_block.get_functional_groups(0)
+                return type(fg) is stk.PrimaryAmino
 
-        # Mutate a molecule.
-        mutation_record1 = similar_bb.mutate(polymer)
+            similar_bb = stk.SimilarBuildingBlock(
+                building_blocks=building_blocks,
+                is_replaceable=has_primary_amino_group,
+            )
 
-        # Mutate the molecule a second time.
-        mutation_record2 = similar_bb.mutate(polymer)
+            # Mutate a molecule.
+            mutation_record1 = similar_bb.mutate(polymer)
+
+            # Mutate the molecule a second time.
+            mutation_record2 = similar_bb.mutate(polymer)
 
     """
 
     def __init__(
         self,
-        building_blocks,
-        is_replaceable,
-        key_maker=Inchi(),
-        name="SimilarBuildingBlock",
-        random_seed=None,
-    ):
+        building_blocks: Iterable[BuildingBlock],
+        is_replaceable: Callable[[BuildingBlock], bool],
+        key_maker: MoleculeKeyMaker = Inchi(),
+        name: str = "SimilarBuildingBlock",
+        random_seed: int | np.random.Generator | None = None,
+    ) -> None:
         """
-        Initialize a :class:`.SimilarBuildingBlock` instance.
+        Parameters:
 
-        Parameters
-        ----------
-        building_blocks : :class:`tuple` of :class:`.BuildingBlock`
-            A group of molecules which are used to replace building
-            blocks in molecules being mutated.
+            building_blocks (list[BuildingBlock]):
+                A group of molecules which are used to replace building
+                blocks in molecules being mutated.
 
-        is_replaceable : :class:`callable`
-            A function which takes a :class:`.BuildingBlock` and
-            returns ``True`` or ``False``. This function is applied to
-            every building block in the molecule being mutated.
-            Building blocks which returned ``True`` are liable for
-            substitution by one of the molecules in `building_blocks`.
+            is_replaceable:
+                This function is applied to every building block in
+                the molecule being mutated. Building blocks
+                which returned ``True`` are liable for substitution
+                by one of the molecules in `building_blocks`.
 
-        key_maker : :class:`.MoleculeKeyMaker`, optional
-            Molecules which return the same key, will iterate through
-            the same set of similar molecules.
+            key_maker:
+                Molecules which return the same key, will iterate through
+                the same set of similar molecules.
 
-        name : :class:`str`, optional
-            A name to help identify the mutator instance.
+            name:
+                A name to help identify the mutator instance.
 
-        random_seed : :class:`bool`, optional
-            The random seed to use.
-
+            random_seed:
+                The random seed to use.
         """
-
-        self._building_blocks = building_blocks
+        if random_seed is None or isinstance(random_seed, int):
+            random_seed = np.random.default_rng(random_seed)
+        self._building_blocks = tuple(building_blocks)
         self._is_replaceable = is_replaceable
         self._key_maker = key_maker
         self._name = name
-        self._generator = np.random.RandomState(random_seed)
-        self._similar_building_blocks = {}
+        self._generator = random_seed
+        self._similar_building_blocks: dict[
+            typing.Any, dict[typing.Any, Iterator[BuildingBlock]]
+        ] = {}
 
-    def mutate(self, record):
+    def mutate(self, record: MoleculeRecord) -> MutationRecord[MoleculeRecord]:
+        """
+        Return a mutant of `record`.
+
+        Parameters:
+            record:
+                The molecule to be mutated.
+
+        Returns:
+            A record of the mutation or ``None``
+            if `record` cannot be mutated.
+        """
         key = self._key_maker.get_key(record.get_molecule())
         if key not in self._similar_building_blocks:
             # Maps the key to a dict. The dict maps each
@@ -133,11 +139,18 @@ class SimilarBuildingBlock(MoleculeMutator):
         replaceable_building_blocks = tuple(
             filter(
                 self._is_replaceable,
-                record.get_molecule().get_building_blocks(),
+                (
+                    bb
+                    for bb in record.get_molecule().get_building_blocks()
+                    # TODO: this is actually a type error -- maybe
+                    # get_building_blocks needs to return BuildingBlock
+                    # instances?
+                    if isinstance(bb, BuildingBlock)
+                ),
             )
         )
         replaced_building_block = self._generator.choice(
-            a=replaceable_building_blocks,
+            a=replaceable_building_blocks,  # type: ignore
         )
 
         # If the building block has not been chosen before, create an

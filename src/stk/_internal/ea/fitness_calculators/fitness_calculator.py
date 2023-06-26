@@ -1,16 +1,3 @@
-"""
-Fitness Calculator
-==================
-
-.. toctree::
-    :maxdepth: 2
-
-    Fitness Function <stk.ea.fitness_calculators.fitness_function>
-    Property Vector <stk.ea.fitness_calculators.property_vector>
-
-"""
-
-
 class FitnessCalculator:
     """
     Abstract base class for fitness value calculators.

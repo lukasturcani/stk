@@ -1,13 +1,13 @@
-"""
-Progress Plotter
-================
-
-"""
+import typing
+from collections.abc import Callable, Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+from stk._internal.ea.generation import Generation
+from stk._internal.ea.molecule_records.molecule import MoleculeRecord
 
 plt.switch_backend("agg")
 
@@ -19,301 +19,300 @@ class ProgressPlotter:
     The produced plot will show the EA generations on the x axis and
     the min, mean and max values of an attribute on the y axis.
 
-    Examples
-    --------
-    *Plotting How Fitness Values Change Across Generations*
+    Examples:
 
-    .. testcode:: plotting-how-fitness-values-change-across-generations
+        *Plotting How Fitness Values Change Across Generations*
 
-        import stk
+        .. testcode:: plotting-how-fitness-values-change-across-generations
 
-        # Initialize an EA somehow.
-        ea = stk.EvolutionaryAlgorithm(
-            initial_population=(
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
+            import stk
+
+            # Initialize an EA somehow.
+            ea = stk.EvolutionaryAlgorithm(
+                initial_population=(
+                    stk.MoleculeRecord(
+                        topology_graph=stk.polymer.Linear(
+                            building_blocks=(
+                                stk.BuildingBlock(
+                                    smiles='BrCCBr',
+                                    functional_groups=[stk.BromoFactory()],
+                                ),
                             ),
+                            repeating_unit='A',
+                            num_repeating_units=i,
                         ),
-                        repeating_unit='A',
-                        num_repeating_units=i,
-                    ),
-                )
-                for i in range(2, 22)
-            ),
-            fitness_calculator=stk.FitnessFunction(
-                fitness_function=lambda molecule:
-                    molecule.get_num_atoms(),
-            ),
-            mutator=stk.RandomBuildingBlock(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC[Si]CCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles='BrCCCCCCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
+                    )
+                    for i in range(2, 22)
                 ),
-                is_replaceable=lambda building_block: True
-            ),
-            crosser=stk.GeneticRecombination(
-                get_gene=lambda building_block: 0
-            ),
-            generation_selector=stk.Best(
-                num_batches=22,
-                duplicate_molecules=False,
-            ),
-            mutation_selector=stk.Roulette(
-                num_batches=5,
-                random_seed=10,
-            ),
-            crossover_selector=stk.Roulette(
-                num_batches=5,
-                batch_size=2,
-                random_seed=10,
-            ),
-            num_processes=1,
-        )
+                fitness_calculator=stk.FitnessFunction(
+                    fitness_function=lambda molecule:
+                        molecule.get_num_atoms(),
+                ),
+                mutator=stk.RandomBuildingBlock(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC[Si]CCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCCCCCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    is_replaceable=lambda building_block: True
+                ),
+                crosser=stk.GeneticRecombination(
+                    get_gene=lambda building_block: 0
+                ),
+                generation_selector=stk.Best(
+                    num_batches=22,
+                    duplicate_molecules=False,
+                ),
+                mutation_selector=stk.Roulette(
+                    num_batches=5,
+                    random_seed=10,
+                ),
+                crossover_selector=stk.Roulette(
+                    num_batches=5,
+                    batch_size=2,
+                    random_seed=10,
+                ),
+                num_processes=1,
+            )
 
-        generations = []
-        for generation in ea.get_generations(10):
-            generations.append(generation)
+            generations = []
+            for generation in ea.get_generations(10):
+                generations.append(generation)
 
-        # Make the plotter which plots the fitness change across
-        # generations.
-        progress = stk.ProgressPlotter(
-            generations=generations,
-            get_property=lambda record: record.get_fitness_value(),
-            y_label='Fitness'
-        )
-        progress.write('fitness_plot.png')
+            # Make the plotter which plots the fitness change across
+            # generations.
+            progress = stk.ProgressPlotter(
+                generations=generations,
+                get_property=lambda record: record.get_fitness_value(),
+                y_label='Fitness'
+            )
+            progress.write('fitness_plot.png')
 
-    .. testcode:: plotting-how-fitness-values-change-across-generations
-        :hide:
+        .. testcode:: plotting-how-fitness-values-change-across-generations
+            :hide:
 
-        import os
+            import os
 
-        assert os.path.exists('fitness_plot.png')
-        os.remove('fitness_plot.png')
+            assert os.path.exists('fitness_plot.png')
+            os.remove('fitness_plot.png')
 
-    *Plotting How a Molecular Property Changes Across Generations*
+        *Plotting How a Molecular Property Changes Across Generations*
 
-    As an example, plotting how the number of atoms changes across
-    generations
+        As an example, plotting how the number of atoms changes across
+        generations
 
-    .. testcode:: plotting-how-a-molecular-property-changes
+        .. testcode:: plotting-how-a-molecular-property-changes
 
-        import stk
+            import stk
 
-        # Initialize an EA somehow.
-        ea = stk.EvolutionaryAlgorithm(
-            initial_population=(
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
+            # Initialize an EA somehow.
+            ea = stk.EvolutionaryAlgorithm(
+                initial_population=(
+                    stk.MoleculeRecord(
+                        topology_graph=stk.polymer.Linear(
+                            building_blocks=(
+                                stk.BuildingBlock(
+                                    smiles='BrCCBr',
+                                    functional_groups=[stk.BromoFactory()],
+                                ),
                             ),
+                            repeating_unit='A',
+                            num_repeating_units=i,
                         ),
-                        repeating_unit='A',
-                        num_repeating_units=i,
-                    ),
-                )
-                for i in range(2, 22)
-            ),
-            fitness_calculator=stk.FitnessFunction(
-                fitness_function=lambda molecule:
-                    molecule.get_num_atoms(),
-            ),
-            mutator=stk.RandomBuildingBlock(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC[Si]CCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles='BrCCCCCCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
+                    )
+                    for i in range(2, 22)
                 ),
-                is_replaceable=lambda building_block: True
-            ),
-            crosser=stk.GeneticRecombination(
-                get_gene=lambda building_block: 0
-            ),
-            generation_selector=stk.Best(
-                num_batches=22,
-                duplicate_molecules=False,
-            ),
-            mutation_selector=stk.Roulette(
-                num_batches=5,
-                random_seed=10,
-            ),
-            crossover_selector=stk.Roulette(
-                num_batches=5,
-                batch_size=2,
-                random_seed=10,
-            ),
-            num_processes=1,
-        )
+                fitness_calculator=stk.FitnessFunction(
+                    fitness_function=lambda molecule:
+                        molecule.get_num_atoms(),
+                ),
+                mutator=stk.RandomBuildingBlock(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC[Si]CCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCCCCCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    is_replaceable=lambda building_block: True
+                ),
+                crosser=stk.GeneticRecombination(
+                    get_gene=lambda building_block: 0
+                ),
+                generation_selector=stk.Best(
+                    num_batches=22,
+                    duplicate_molecules=False,
+                ),
+                mutation_selector=stk.Roulette(
+                    num_batches=5,
+                    random_seed=10,
+                ),
+                crossover_selector=stk.Roulette(
+                    num_batches=5,
+                    batch_size=2,
+                    random_seed=10,
+                ),
+                num_processes=1,
+            )
 
-        generations = []
-        for generation in ea.get_generations(10):
-            generations.append(generation)
+            generations = []
+            for generation in ea.get_generations(10):
+                generations.append(generation)
 
-        # Make the plotter which plots the number of atoms across
-        # generations.
-        progress = stk.ProgressPlotter(
-            generations=generations,
-            get_property=lambda record:
-                record.get_molecule().get_num_atoms(),
-            y_label='Number of Atoms'
-        )
-        progress.write('number_of_atoms_plot.png')
+            # Make the plotter which plots the number of atoms across
+            # generations.
+            progress = stk.ProgressPlotter(
+                generations=generations,
+                get_property=lambda record:
+                    record.get_molecule().get_num_atoms(),
+                y_label='Number of Atoms'
+            )
+            progress.write('number_of_atoms_plot.png')
 
-    .. testcode:: plotting-how-a-molecular-property-changes
-        :hide:
+        .. testcode:: plotting-how-a-molecular-property-changes
+            :hide:
 
-        import os
+            import os
 
-        assert os.path.exists('number_of_atoms_plot.png')
-        os.remove('number_of_atoms_plot.png')
+            assert os.path.exists('number_of_atoms_plot.png')
+            os.remove('number_of_atoms_plot.png')
 
-    *Excluding Molecules From the Plot*
+        *Excluding Molecules From the Plot*
 
-    Sometimes, you want to ignore some molecules from the plot you
-    make. For example, If the fitness calculation failed on a
-    molecule, you not want to include in a plot of fitness.
+        Sometimes, you want to ignore some molecules from the plot you
+        make. For example, If the fitness calculation failed on a
+        molecule, you not want to include in a plot of fitness.
 
-    .. testcode:: excluding-molecules-from-the-plot
+        .. testcode:: excluding-molecules-from-the-plot
 
-        import stk
+            import stk
 
-        # Initialize an EA somehow.
-        ea = stk.EvolutionaryAlgorithm(
-            initial_population=(
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
+            # Initialize an EA somehow.
+            ea = stk.EvolutionaryAlgorithm(
+                initial_population=(
+                    stk.MoleculeRecord(
+                        topology_graph=stk.polymer.Linear(
+                            building_blocks=(
+                                stk.BuildingBlock(
+                                    smiles='BrCCBr',
+                                    functional_groups=[stk.BromoFactory()],
+                                ),
                             ),
+                            repeating_unit='A',
+                            num_repeating_units=i,
                         ),
-                        repeating_unit='A',
-                        num_repeating_units=i,
-                    ),
-                )
-                for i in range(2, 22)
-            ),
-            fitness_calculator=stk.FitnessFunction(
-                fitness_function=lambda molecule:
-                    molecule.get_num_atoms(),
-            ),
-            mutator=stk.RandomBuildingBlock(
-                building_blocks=(
-                    stk.BuildingBlock(
-                        smiles='BrC[Si]CCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
-                    stk.BuildingBlock(
-                        smiles='BrCCCCCCCBr',
-                        functional_groups=[stk.BromoFactory()],
-                    ),
+                    )
+                    for i in range(2, 22)
                 ),
-                is_replaceable=lambda building_block: True
-            ),
-            crosser=stk.GeneticRecombination(
-                get_gene=lambda building_block: 0
-            ),
-            generation_selector=stk.Best(
-                num_batches=22,
-                duplicate_molecules=False,
-            ),
-            mutation_selector=stk.Roulette(
-                num_batches=5,
-                random_seed=10,
-            ),
-            crossover_selector=stk.Roulette(
-                num_batches=5,
-                batch_size=2,
-                random_seed=10,
-            ),
-            num_processes=1,
-        )
+                fitness_calculator=stk.FitnessFunction(
+                    fitness_function=lambda molecule:
+                        molecule.get_num_atoms(),
+                ),
+                mutator=stk.RandomBuildingBlock(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles='BrC[Si]CCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles='BrCCCCCCCBr',
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    is_replaceable=lambda building_block: True
+                ),
+                crosser=stk.GeneticRecombination(
+                    get_gene=lambda building_block: 0
+                ),
+                generation_selector=stk.Best(
+                    num_batches=22,
+                    duplicate_molecules=False,
+                ),
+                mutation_selector=stk.Roulette(
+                    num_batches=5,
+                    random_seed=10,
+                ),
+                crossover_selector=stk.Roulette(
+                    num_batches=5,
+                    batch_size=2,
+                    random_seed=10,
+                ),
+                num_processes=1,
+            )
 
-        generations = []
-        for generation in ea.get_generations(10):
-            generations.append(generation)
+            generations = []
+            for generation in ea.get_generations(10):
+                generations.append(generation)
 
-        # Make the plotter which plots the fitness change across
-        # generations.
-        progress = stk.ProgressPlotter(
-            generations=generations,
-            get_property=lambda record: record.get_fitness_value(),
-            y_label='Fitness',
-            # Only plot records whose unnormalized fitness value is not
-            # None, which means the fitness calculation did not fail.
-            filter=lambda record:
-                record.get_fitness_value(normalized=False) is not None,
-        )
-        progress.write('fitness_plot.png')
+            # Make the plotter which plots the fitness change across
+            # generations.
+            progress = stk.ProgressPlotter(
+                generations=generations,
+                get_property=lambda record: record.get_fitness_value(),
+                y_label='Fitness',
+                # Only plot records whose unnormalized fitness value is not
+                # None, which means the fitness calculation did not fail.
+                filter=lambda record:
+                    record.get_fitness_value(normalized=False) is not None,
+            )
+            progress.write('fitness_plot.png')
 
-    .. testcode:: excluding-molecules-from-the-plot
-        :hide:
+        .. testcode:: excluding-molecules-from-the-plot
+            :hide:
 
-        import os
+            import os
 
-        assert os.path.exists('fitness_plot.png')
-        os.remove('fitness_plot.png')
+            assert os.path.exists('fitness_plot.png')
+            os.remove('fitness_plot.png')
 
     """
 
     def __init__(
         self,
-        generations,
-        get_property,
-        y_label,
-        filter=lambda record: True,
-    ):
+        generations: Iterable[Generation],
+        get_property: Callable[[MoleculeRecord], float],
+        y_label: str,
+        filter: Callable[[MoleculeRecord], bool] = lambda record: True,
+    ) -> None:
         """
-        Initialize a :class:`ProgressPlotter` instance.
+        Parameters:
 
-        Parameters
-        ----------
-        generations : :class:`iterable` of :class:`.Generation`
-            The generations of the EA, which are plotted.
+            generations (list[Generation]):
+                The generations of the EA, which are plotted.
 
-        get_property : :class:`callable`
-            A :class:`callable` which takes a :class:`.MoleculeRecord`
-            and returns a property value of that molecule, which is
-            used for the plot. The :class:`callable` must return a
-            valid value for each
-            :class:`.MoleculeRecord` in `generations`.
+            get_property:
+                A :class:`callable` which takes a :class:`.MoleculeRecord`
+                and returns a property value of that molecule, which is
+                used for the plot. The :class:`callable` must return a
+                valid value for each
+                :class:`.MoleculeRecord` in `generations`.
 
-        y_label : :class:`str`
-            The y label for the produced graph.
+            y_label:
+                The y label for the produced graph.
 
-        filter : :class:`callable`, optional
-            Takes an :class:`.MoleculeRecord` and returns
-            ``True`` or ``False``. Only records which return ``True``
-            are included in the plot. By default, all records will be
-            plotted.
-
+            filter:
+                Takes an :class:`.MoleculeRecord` and returns
+                ``True`` or ``False``. Only records which return ``True``
+                are included in the plot. By default, all records will be
+                plotted.
         """
-
         self._get_property = get_property
         self._y_label = y_label
         self._filter = filter
         self._plot_data = self._get_plot_data(generations)
 
-    def _get_plot_data(self, generations):
+    def _get_plot_data(
+        self,
+        generations: Iterable[Generation],
+    ) -> pd.DataFrame:
         self._num_generations = 0
         data = []
         for id_, generation in enumerate(generations):
@@ -346,35 +345,31 @@ class ProgressPlotter:
             )
         return pd.concat(data, ignore_index=True)
 
-    def get_plot_data(self):
+    def get_plot_data(self) -> pd.DataFrame:
         """
         Get the plot data.
 
-        Returns
-        -------
-        :class:`pandas.DataFrame`
+        Returns:
             A data frame holding the plot data.
 
         """
 
         return self._plot_data.copy()
 
-    def write(self, path, dpi=500):
+    def write(self, path: str, dpi: int = 500) -> typing.Self:
         """
         Write a progress plot to a file.
 
-        Parameters
-        ----------
-        path : :class:`str`
-            The path into which the plot is written.
+        Parameters:
 
-        dpi : :class:`int`, optional
-            The dpi of the image.
+            path:
+                The path into which the plot is written.
 
-        Returns
-        -------
-        :class:`.ProgressPlotter`
-            The plotter is returned.
+            dpi:
+                The dpi of the image.
+
+        Returns:
+            ProgressPlotter: The plotter is returned.
 
         """
 
