@@ -123,7 +123,7 @@ class Tournament(Selector[T]):
         while (
             len(batches) > 1 and yielded_batches.get_num() < self._num_batches
         ):
-            tournament_size = self._generator.randint(
+            tournament_size = self._generator.integers(
                 low=2, high=len(batches) + 1
             )
             competitors = self._generator.choice(

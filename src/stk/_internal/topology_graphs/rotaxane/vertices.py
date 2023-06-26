@@ -1,9 +1,3 @@
-"""
-Rotaxane Vertices
-=================
-
-"""
-
 import rdkit.Chem.AllChem as rdkit
 
 from stk._internal.topology_graphs.vertex import Vertex

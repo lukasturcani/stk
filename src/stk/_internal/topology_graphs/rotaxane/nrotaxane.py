@@ -5,6 +5,9 @@ import numpy as np
 from stk._internal.building_block import BuildingBlock
 from stk._internal.optimizers.null import NullOptimizer
 from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
@@ -437,6 +440,9 @@ class NRotaxane(TopologyGraph):
 
         """
 
+        if not isinstance(repeating_unit, str):
+            repeating_unit = tuple(repeating_unit)
+
         if orientations is None:
             orientations = tuple(0.0 for _ in range(len(repeating_unit)))
         else:
@@ -461,7 +467,7 @@ class NRotaxane(TopologyGraph):
         )
         self._num_repeating_units = num_repeating_units
 
-        vertices = [AxleVertex(0, [0, 0, 0])]
+        vertices: list[AxleVertex | CycleVertex] = [AxleVertex(0, (0, 0, 0))]
         distance = 1 / (chain_length + 1)
         choices = [True, False]
         for vertex_id, flip_chance in enumerate(orientations, 1):
@@ -478,7 +484,7 @@ class NRotaxane(TopologyGraph):
 
         # Save the chosen orientations for __repr__.
         self._orientations = tuple(
-            int(vertex.get_flip()) for vertex in vertices[1:]
+            int(vertex.get_flip()) for vertex in vertices[1:]  # type:ignore
         )
 
         super().__init__(
@@ -488,7 +494,7 @@ class NRotaxane(TopologyGraph):
                 vertices=vertices,
             ),
             edges=(),
-            reaction_factory=None,
+            reaction_factory=GenericReactionFactory(),
             construction_stages=(),
             num_processes=num_processes,
             optimizer=optimizer,

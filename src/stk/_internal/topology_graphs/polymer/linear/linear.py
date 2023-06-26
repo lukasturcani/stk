@@ -541,7 +541,7 @@ class Linear(TopologyGraph):
         head_orientation: float,
         body_orientations: abc.Iterable[float],
         tail_orientation: float,
-        random_seed: int | None,
+        random_seed: int | np.random.Generator | None,
     ) -> _VerticesAndEdges:
         """
         Get the vertices and edges of the topology graph.
