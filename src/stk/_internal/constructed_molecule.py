@@ -2,6 +2,7 @@ import logging
 import typing
 from collections.abc import Iterable, Iterator
 
+import atomlite
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
@@ -207,6 +208,45 @@ class ConstructedMolecule(Molecule):
             for building_block in construction_result.get_building_blocks()
         }
         return obj
+
+    @classmethod
+    def init_from_atomlite_entry(cls, entry: atomlite.Entry) -> typing.Self:
+        """
+        Initialize a :class:`.ConstructedMolecule`.
+
+        Parameters:
+            entry: The database entry.
+
+        Returns:
+            ConstructedMolecule: The constructed molecule.
+        """
+        atoms = tuple(
+            Atom(id_, atomic_number, charge)
+            for id_, (atomic_number, charge) in enumerate(
+                zip(
+                    entry.molecule["atomic_numbers"],
+                    entry.molecule["atom_charges"],
+                    strict=True,
+                )
+            )
+        )
+        return cls.init(
+            atoms=atoms,
+            bonds=(
+                Bond(atoms[atom1], atoms[atom2], int(order))
+                for atom1, atom2, order in zip(
+                    entry.molecule["bonds"]["atom1"],
+                    entry.molecule["bonds"]["atom2"],
+                    entry.molecule["bonds"]["order"],
+                    strict=True,
+                )
+            ),
+            position_matrix=np.array(entry.molecule["conformers"][0]),
+            atom_infos=(
+                AtomInfo(atoms[atom_index])
+                for atom_index in entry.properties["_stk"]
+            ),
+        )
 
     def clone(self) -> typing.Self:
         """
