@@ -26,6 +26,9 @@ logger = logging.getLogger(__name__)
 T = typing.TypeVar("T", bound="ConstructedMolecule")
 
 
+NumBuildingBlocks: typing.TypeAlias = dict[Molecule, int]
+
+
 class ConstructedMolecule(Molecule):
     """
     Represents constructed molecules.
@@ -108,31 +111,31 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init(
         cls,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: Iterable[Atom],
+        bonds: Iterable[Bond],
         position_matrix: np.ndarray,
-        atom_infos: tuple[AtomInfo, ...],
-        bond_infos: tuple[BondInfo, ...],
-        num_building_blocks: dict[Molecule, int],
+        atom_infos: Iterable[AtomInfo],
+        bond_infos: Iterable[BondInfo],
+        num_building_blocks: "NumBuildingBlocks",
     ) -> typing.Self:
         """
         Initialize a :class:`.ConstructedMolecule` from its components.
 
         Parameters:
 
-            atoms:
+            atoms (list[Atom]):
                 The atoms of the molecule.
 
-            bond:
+            bonds (list[Bond]):
                 The bonds of the molecule.
 
             position_matrix:
                 A ``(n, 3)`` position matrix of the molecule.
 
-            atom_infos:
+            atom_infos (list[AtomInfo]):
                 The atom infos of the molecule.
 
-            bond_infos:
+            bond_infos (list[BondInfo]):
                 The bond infos of the molecule.
 
             num_building_blocks:
@@ -140,15 +143,12 @@ class ConstructedMolecule(Molecule):
                 the number of times it is present in it.
 
         Returns:
-
             ConstructedMolecule: The constructed molecule.
-
         """
-
         molecule = cls.__new__(cls)
         Molecule.__init__(molecule, atoms, bonds, position_matrix)
-        molecule._atom_infos = atom_infos
-        molecule._bond_infos = bond_infos
+        molecule._atom_infos = tuple(atom_infos)
+        molecule._bond_infos = tuple(bond_infos)
         molecule._num_building_blocks = dict(num_building_blocks)
         return molecule
 
