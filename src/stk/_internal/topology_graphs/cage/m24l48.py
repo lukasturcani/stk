@@ -18,7 +18,7 @@ class M24L48(Cage):
 
         import moldoc.molecule as molecule
         import stk
-        
+
         four_c_bb = stk.BuildingBlock(
             smiles="[Br][C]([Br])([Br])[Br]",
             position_matrix=[
@@ -70,11 +70,11 @@ class M24L48(Cage):
             ),
         )
 
-    Metal building blocks (COLOUR1) with four functional groups are
-    required for this topology.
+    Metal building blocks (COLOUR1) with four functional groups
+    are required for this topology.
 
-    Ligand building blocks (COLOUR2) with two functional groups are required for
-    this topology.
+    Ligand building blocks (COLOUR2) with two functional groups
+    are required for this topology.
 
     :class:`.MCHammer` optimization is recommended for construction.
 
@@ -84,7 +84,7 @@ class M24L48(Cage):
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
-        | 4-functional groups (u'\u25FC', COLOUR1): 0 to 23
+        | 4-functional groups (\u25FC, COLOUR1): 0 to 23
         | 2-functional groups (u'\u25FC', COLOUR2): 24 to 71
 
     See :class:`.Cage` for more details and examples.

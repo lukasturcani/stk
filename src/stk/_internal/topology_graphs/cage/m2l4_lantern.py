@@ -79,7 +79,7 @@ class M2L4Lantern(Cage):
 
         import moldoc.molecule as molecule
         import stk
-        
+
         four_c_bb = stk.BuildingBlock(
             smiles="[Br][C]([Br])([Br])[Br]",
             position_matrix=[
@@ -131,12 +131,12 @@ class M2L4Lantern(Cage):
             ),
         )
 
-    Metal building blocks (COLOUR1) with four functional groups are
-    required for this topology.
+    Metal building blocks (COLOUR1) with four functional groups
+    are required for this topology.
 
-    Ligand building blocks (COLOUR2) with two functional groups are required for
-    this topology.
-    
+    Ligand building blocks (COLOUR2) with two functional groups
+    are required for this topology.
+
     :class:`.MCHammer` optimization is recommended for construction.
 
     When using a :class:`dict` for the `building_blocks` parameter,

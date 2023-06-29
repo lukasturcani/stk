@@ -67,12 +67,12 @@ class FourPlusSix(Cage):
             ),
         )
 
-    Nonlinear building blocks (COLOUR1) with three functional groups are
-    required for this topology.
+    Nonlinear building blocks (COLOUR1) with three functional groups
+    are required for this topology.
 
-    Linear building blocks (COLOUR2) with two functional groups are required for
-    this topology.
-    
+    Linear building blocks (COLOUR2) with two functional groups
+    are required for this topology.
+
     :class:`.MCHammer` optimization is recommended for construction.
 
     When using a :class:`dict` for the `building_blocks` parameter,
