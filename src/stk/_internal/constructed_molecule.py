@@ -244,9 +244,74 @@ class ConstructedMolecule(Molecule):
             position_matrix=np.array(entry.molecule["conformers"][0]),
             atom_infos=(
                 AtomInfo(atoms[atom_index])
-                for atom_index in entry.properties["_stk"]
+                for atom_index in entry.properties["_stk"][""]
             ),
         )
+
+    def to_atomlite_entry(
+        self,
+        key: str,
+        properties: dict[str, atomlite.Json] | None = None,
+    ) -> atomlite.Entry:
+        if properties is None:
+            properties = {}
+
+        building_blocks = list(self._num_building_blocks)
+        atom_ids = []
+        building_block_atom_ids = []
+        atom_building_block_indices = []
+        atom_building_block_ids = []
+        for atom_info in self._atom_infos:
+            atom_ids.append(atom_info.get_atom().get_id())
+            building_block_atom_ids.append(
+                atom.get_id()
+                if (atom := atom_info.get_building_block_atom()) is not None
+                else None
+            )
+            atom_building_block_ids.append(atom_info.get_building_block_id())
+            atom_building_block_indices.append(
+                building_blocks.index(building_block)
+                if (building_block := atom_info.get_building_block())
+                is not None
+                else None
+            )
+
+        bond_ids = []
+        bond_building_block_indices = []
+        bond_building_block_ids = []
+        for bond_info in self._bond_infos:
+            bond_ids.append(bond_info.get_bond())
+            bond_building_block_indices.append(
+                building_blocks.index(building_block)
+                if (building_block := bond_info.get_building_block())
+                is not None
+                else None
+            )
+            bond_building_block_ids.append(bond_info.get_building_block_id())
+
+        properties["_stk"] = {
+            "building_blocks": [
+                atomlite.json_from_rdkit(building_block.to_rdkit_mol())  # type: ignore
+                for building_block in self._num_building_blocks
+            ],
+            "atom_infos": {
+                "atom_ids": atom_ids,  # type: ignore
+                "building_block_atom_ids": building_block_atom_ids,  # type: ignore
+                "building_block_indices": atom_building_block_indices,  # type: ignore
+                "building_block_ids": atom_building_block_ids,  # type: ignore
+            },
+            "bond_infos": {
+                "bond_ids": bond_ids,
+                "building_block_indices": bond_building_block_indices,  # type: ignore
+                "building_block_ids": atom_building_block_ids,  # type: ignore
+            },
+            "num_bulding_blocks": [
+                [building_blocks.index(building_block), num]
+                for building_block, num in self._num_building_blocks.items()
+            ],
+        }
+        entry = atomlite.Entry.from_rdkit(key, self.to_rdkit_mol(), properties)
+        return entry
 
     def clone(self) -> typing.Self:
         """
@@ -272,11 +337,8 @@ class ConstructedMolecule(Molecule):
         yielded at the same time.
 
         Yields:
-
             A building block of the constructed molecule.
-
         """
-
         yield from self._num_building_blocks
 
     def get_num_building_block(
@@ -287,18 +349,14 @@ class ConstructedMolecule(Molecule):
         Get the number of times `building_block` is present.
 
         Parameters:
-
             building_block:
                 The building block whose frequency in the constructed
                 molecule is desired.
 
         Returns:
-
             The number of times `building_block` was used in the
             construction of the constructed molecule.
-
         """
-
         return self._num_building_blocks[building_block]
 
     def get_atom_infos(
@@ -309,14 +367,12 @@ class ConstructedMolecule(Molecule):
         Yield data about atoms in the molecule.
 
         Parameters:
-
             atom_ids (int | list[int] | None):
                 The ids of atoms whose data is desired. If ``None``,
                 data on all atoms will be yielded. Can be a single
                 :class:`int`, if data on a single atom is desired.
 
         Yields:
-
             Data about an atom.
 
         """
@@ -334,9 +390,7 @@ class ConstructedMolecule(Molecule):
         Yield data about bonds in the molecule.
 
         Yields:
-
             Data about a bond.
-
         """
 
         yield from self._bond_infos
@@ -453,7 +507,6 @@ class ConstructedMolecule(Molecule):
         Return a clone with its centroid at `position`.
 
         Parameters:
-
             position:
                 This array holds the position on which the centroid of
                 the clone is going to be placed.
@@ -461,11 +514,8 @@ class ConstructedMolecule(Molecule):
             atom_ids (int | list[int] | None):
                 The ids of atoms which should have their centroid set
                 to `position`. If ``None``, all atoms are used.
-
         Returns:
-
             ConstructedMolecule: A clone with its centroid at `position`.
-
         """
         return super().with_centroid(position, atom_ids)
 
@@ -477,14 +527,10 @@ class ConstructedMolecule(Molecule):
         Return a displaced clone.
 
         Parameters:
-
             displacement:
                 The displacement vector to be applied.
-
         Returns:
-
             ConstructedMolecule: A displaced clone.
-
         """
         return super().with_displacement(displacement)
 
@@ -496,15 +542,11 @@ class ConstructedMolecule(Molecule):
         Return a clone with atomic positions set by `position_matrix`.
 
         Parameters:
-
             position_matrix:
                 The position matrix of the clone. The shape of the
                 matrix is ``(n, 3)``.
-
         Returns:
-
             ConstructedMolecule: The clone.
-
         """
         return super().with_position_matrix(position_matrix)
 
@@ -530,7 +572,6 @@ class ConstructedMolecule(Molecule):
                 The origin about which the rotation happens.
         Returns:
             ConstructedMolecule: A rotated clone.
-
         """
         return super().with_rotation_about_axis(angle, axis, origin)
 
@@ -562,21 +603,15 @@ class ConstructedMolecule(Molecule):
         can be easily aligned with any arbitrary direction.
 
         Parameters:
-
             start:
                 A vector which is to be rotated so that it transforms
                 into the `target` vector.
-
             target:
                 The vector onto which `start` is rotated.
-
             origin:
                 The point about which the rotation occurs.
-
         Returns:
-
             ConstructedMolecule: A rotated clone.
-
         """
         return super().with_rotation_between_vectors(start, target, origin)
 
@@ -622,7 +657,6 @@ class ConstructedMolecule(Molecule):
                 If `target` has a magnitude of 0. In this case it is
                 not possible to calculate an angle between `start` and
                 `target`.
-
         """
         return super().with_rotation_to_minimize_angle(
             start=start,
@@ -660,7 +694,6 @@ class ConstructedMolecule(Molecule):
         Returns:
 
             ConstructedMolecule: A clone with atomic positions found in `path`.
-
         """
         return super().with_structure_from_file(path, extension)
 
@@ -680,19 +713,14 @@ class ConstructedMolecule(Molecule):
         #. ``.pdb`` - PDB file
 
         Parameters:
-
             path:
                 The `path` to which the molecule should be written.
-
             atom_ids (int | list[int] | None):
                 The atom ids of atoms to write. If ``None``,
                 all atoms are used. If you use this parameter, the
                 atom ids in the file may not correspond to the atom
                 ids in the molecule.
-
         Returns:
-
             ConstructedMolecule: The molecule.
-
         """
         return super().write(path, atom_ids)

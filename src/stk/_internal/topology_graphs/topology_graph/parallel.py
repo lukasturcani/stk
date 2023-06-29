@@ -1,11 +1,3 @@
-"""
-Parallel Topology Graph
-=======================
-
-"""
-
-from __future__ import annotations
-
 import pathos
 
 from stk._internal.construction_state.construction_state import (
@@ -18,26 +10,24 @@ from .utilities import _Placement
 class _Parallel:
     """
     Holds parallel implementations of topology graph methods.
-
     """
 
-    def __init__(self, stages, num_processes):
+    def __init__(
+        self, stages: tuple[tuple[int, ...], ...], num_processes: int
+    ) -> None:
         """
         Initialize a :class:`._Parallel` instance.
 
-        Parameters
-        ----------
-        stages : :class:`tuple`
-            A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
-            where each nested :class:`tuple` holds the
-            :class:`.Vertex` objects used for placement in a particular
-            stage.
+        Parameters:
+            stages: :class:`tuple`
+                A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
+                where each nested :class:`tuple` holds the
+                :class:`.Vertex` objects used for placement in a particular
+                stage.
 
-        num_processes : :class:`int`
-            The number of parallel processes to spawn.
-
+            num_processes:
+                The number of parallel processes to spawn.
         """
-
         self._stages = stages
         self._num_processes = num_processes
 
@@ -73,9 +63,6 @@ class _Parallel:
         Get the number of placement stages.
 
         Returns:
-
             The number of placement stages.
-
         """
-
         return len(self._stages)

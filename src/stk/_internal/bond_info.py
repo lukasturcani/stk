@@ -42,9 +42,7 @@ class BondInfo:
 
         Returns:
             The bond.
-
         """
-
         return self._bond
 
     def get_building_block(self) -> Molecule | None:

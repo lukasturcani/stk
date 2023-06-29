@@ -106,7 +106,7 @@ class ConstructedMoleculeJsonizer:
     ) -> None:
         """
         Parameters:
-            key_makers:
+            key_makers (list[MoleculeKeyMaker]):
                 Used to make the keys of molecules, which should be
                 included in their JSON representations. Keys allow
                 molecular data to reference itself when split across

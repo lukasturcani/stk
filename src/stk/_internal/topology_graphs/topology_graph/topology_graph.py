@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing
 from collections import abc
 from functools import partial
@@ -28,11 +26,6 @@ from stk._internal.topology_graphs.topology_graph.utilities import (
 )
 from stk._internal.topology_graphs.vertex import Vertex
 from stk._internal.utilities.utilities import flatten
-
-_TopologyGraphT = typing.TypeVar(
-    "_TopologyGraphT",
-    bound="TopologyGraph",
-)
 
 
 class TopologyGraph:
@@ -170,10 +163,7 @@ class TopologyGraph:
         edges: tuple[Edge, ...],
         reaction_factory: ReactionFactory,
         construction_stages: tuple[
-            # TODO: Use typing.Callable here for now so that Sphinx
-            # generates hyperlinks in the compiled docs. This should
-            # eventually be replaced by abc.Callable.
-            typing.Callable[[Vertex], bool],
+            abc.Callable[[Vertex], bool],
             ...,
         ],
         num_processes: int,
@@ -264,9 +254,9 @@ class TopologyGraph:
         self._optimizer = optimizer
 
     def _with_building_blocks(
-        self: _TopologyGraphT,
+        self,
         building_block_map: dict[BuildingBlock, BuildingBlock],
-    ) -> _TopologyGraphT:
+    ) -> typing.Self:
         """
         Modify the topology graph.
 
@@ -312,7 +302,7 @@ class TopologyGraph:
     def with_building_blocks(
         self,
         building_block_map: dict[BuildingBlock, BuildingBlock],
-    ) -> TopologyGraph:
+    ) -> typing.Self:
         """
         Return a clone holding different building blocks.
 
@@ -325,26 +315,21 @@ class TopologyGraph:
                 replaced in the clone, it can be omitted from the map.
 
         Returns:
-
             The clone.
-
         """
-
         return self.clone()._with_building_blocks(building_block_map)
 
-    def clone(self) -> TopologyGraph:
+    def clone(self) -> typing.Self:
         """
         Return a clone.
 
         Returns:
-
             The clone.
-
         """
 
         return self._clone()
 
-    def _clone(self: _TopologyGraphT) -> _TopologyGraphT:
+    def _clone(self) -> typing.Self:
         clone = self.__class__.__new__(self.__class__)
         clone._scale = self._scale
         clone._building_block_vertices = dict(self._building_block_vertices)
@@ -355,7 +340,7 @@ class TopologyGraph:
         clone._edge_groups = self._edge_groups
         return clone
 
-    def get_building_blocks(self) -> typing.Iterator[BuildingBlock]:
+    def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:
         """
         Yield the building blocks.
 
@@ -366,7 +351,6 @@ class TopologyGraph:
         same time.
 
         Yields:
-
             A building block of the topology graph.
 
         """
@@ -396,13 +380,11 @@ class TopologyGraph:
         Get the number of times `building_block` is present.
 
         Parameters:
-
             building_block:
                 The building block whose frequency in the topology
                 graph is desired.
 
         Returns:
-
             The number of times `building_block` is present in the
             topology graph.
 
@@ -410,7 +392,7 @@ class TopologyGraph:
 
         return len(self._building_block_vertices.get(building_block, []))
 
-    def _get_lattice_constants(self) -> typing.Iterator[np.ndarray]:
+    def _get_lattice_constants(self) -> abc.Iterator[np.ndarray]:
         """
         Yield the lattice constants of the topology graph.
 
@@ -451,12 +433,10 @@ class TopologyGraph:
         Get the result of the construction.
 
         Parameters:
-
             state:
                 The state of the molecule being constructed.
 
         Returns:
-
             The data describing the :class:`.ConstructedMolecule`.
 
         """
@@ -488,18 +468,14 @@ class TopologyGraph:
         based on the size of the building blocks.
 
         Parameters:
-
             building_block_vertices:
                 Maps every :class:`.BuildingBlock` of the topology
                 graph, to the :class:`.Vertex` instances it is meant
                 to be placed on.
 
         Returns:
-
             The scale.
-
         """
-
         raise NotImplementedError()
 
     def _place_building_blocks(
@@ -510,12 +486,10 @@ class TopologyGraph:
         Place the building blocks onto the vertices.
 
         Parameters:
-
             state:
                 Holds data necessary to construct the molecule.
 
         Returns:
-
             The new construction state, updated to account for the
             placed building blocks.
 
@@ -531,17 +505,14 @@ class TopologyGraph:
         Perform the reactions on the building blocks.
 
         Parameters:
-
             state:
                 The current state of the construction process.
 
         Returns:
-
             The new construction state, updated to account for the
             reactions between building blocks.
 
         """
-
         get_reaction = partial(
             self._reaction_factory.get_reaction,
             state,
@@ -556,16 +527,13 @@ class TopologyGraph:
     def _get_stages(
         self,
         construction_stages,
-    ) -> typing.Iterator[tuple[int, ...]]:
+    ) -> abc.Iterator[tuple[int, ...]]:
         """
         Yield the parallelizable stages of construction.
 
         Yields:
-
             Vertices ids, which can be placed in parallel.
-
         """
-
         stages: tuple[list[int], ...] = tuple(
             [] for i in range(len(construction_stages) + 1)
         )

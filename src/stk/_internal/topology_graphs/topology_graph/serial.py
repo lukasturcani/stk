@@ -1,11 +1,3 @@
-"""
-Serial Topology Graph
-=====================
-
-"""
-
-from __future__ import annotations
-
 from stk._internal.construction_state.construction_state import (
     ConstructionState,
 )
@@ -16,23 +8,17 @@ from .utilities import _Placement
 class _Serial:
     """
     Holds serial implementations of topology graph methods.
-
     """
 
-    def __init__(self, stages):
+    def __init__(self, stages: tuple[tuple[int, ...], ...]) -> None:
         """
-        Initialize a :class:`._Serial` instance.
-
-        Parameters
-        ----------
-        stages : :class:`tuple`
-            A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
-            where each nested :class:`tuple` holds the
-            :class:`.Vertex` objects used for placement in a particular
-            stage.
-
+        Parameters:
+            stages:
+                A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
+                where each nested :class:`tuple` holds the
+                :class:`.Vertex` objects used for placement in a particular
+                stage.
         """
-
         self._stages = stages
 
     def _place_building_blocks(
@@ -61,14 +47,11 @@ class _Serial:
             )
         return state
 
-    def get_num_stages(self):
+    def get_num_stages(self) -> int:
         """
         Get the number of placement stages.
 
         Returns:
-
             The number of placement stages.
-
         """
-
         return len(self._stages)
