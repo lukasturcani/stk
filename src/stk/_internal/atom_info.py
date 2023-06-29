@@ -5,7 +5,6 @@ from stk._internal.molecule import Molecule
 class AtomInfo:
     """
     Holds additional info about :class:`.ConstructedMolecule` atoms.
-
     """
 
     def __init__(
