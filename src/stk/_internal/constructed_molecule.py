@@ -220,32 +220,69 @@ class ConstructedMolecule(Molecule):
         Returns:
             ConstructedMolecule: The constructed molecule.
         """
+        properties = entry.properties["_stk"]
+        molecule = atomlite.json_to_rdkit(entry.molecule)
         atoms = tuple(
-            Atom(id_, atomic_number, charge)
-            for id_, (atomic_number, charge) in enumerate(
-                zip(
-                    entry.molecule["atomic_numbers"],
-                    entry.molecule["atom_charges"],
-                    strict=True,
-                )
+            Atom(atom.GetIdx(), atom.GetAtomicNum(), atom.GetFormalCharge())
+            for atom in molecule.GetAtoms()
+        )
+        periodic_bonds = properties["periodic_bonds"]  # type: ignore
+        bonds = tuple(
+            Bond(
+                atom1=atoms[bond.GetBeginAtomIdx()],
+                atom2=atoms[bond.GetEndAtomIdx()],
+                order=(
+                    9
+                    if bond.GetBondType() == rdkit.BondType.DATIVE
+                    else bond.GetBondTypeAsDouble()
+                ),
+                periodicity=periodic_bonds.get(bond.GetBondIdx(), (0, 0, 0)),  # type: ignore
             )
+            for bond in molecule.GetBonds()
+        )
+        building_blocks = tuple(
+            atomlite.json_to_rdkit(building_block)  # type: ignore
+            for building_block in properties["building_blocks"]  # type: ignore
         )
         return cls.init(
             atoms=atoms,
-            bonds=(
-                Bond(atoms[atom1], atoms[atom2], int(order))
-                for atom1, atom2, order in zip(
-                    entry.molecule["bonds"]["atom1"],
-                    entry.molecule["bonds"]["atom2"],
-                    entry.molecule["bonds"]["order"],
+            bonds=bonds,
+            position_matrix=molecule.GetConformer().GetPositions(),
+            atom_infos=(
+                AtomInfo(
+                    atom=atoms[atom_id],
+                    building_block_atom=next(
+                        building_blocks[bb_index].get_atoms(bb_atom_id)
+                    ),
+                    building_block=building_blocks[bb_index],
+                    building_block_id=bb_id,
+                )
+                for atom_id, bb_atom_id, bb_index, bb_id in zip(
+                    properties["atom_infos"]["atom_ids"],  # type: ignore
+                    properties["atom_infos"]["building_block_atom_ids"],  # type: ignore
+                    properties["atom_infos"]["building_block_indices"],  # type: ignore
+                    properties["atom_infos"]["building_block_ids"],  # type: ignore
                     strict=True,
                 )
             ),
-            position_matrix=np.array(entry.molecule["conformers"][0]),
-            atom_infos=(
-                AtomInfo(atoms[atom_index])
-                for atom_index in entry.properties["_stk"][""]
+            bond_infos=(
+                BondInfo(
+                    bond=bonds[idx],
+                    building_block=building_blocks[bb_index],
+                    building_block_id=bb_id,
+                )
+                for idx, (bb_index, bb_id) in enumerate(
+                    zip(
+                        properties["bond_infos"]["building_block_indices"],  # type: ignore
+                        properties["bond_infos"]["building_block_ids"],  # type: ignore
+                        strict=True,
+                    )
+                )
             ),
+            num_building_blocks={  # type: ignore
+                int(building_blocks[building_block]): num  # type: ignore
+                for building_block, num in properties["num_building_blocks"]  # type: ignore
+            },
         )
 
     def to_atomlite_entry(
@@ -276,11 +313,9 @@ class ConstructedMolecule(Molecule):
                 else None
             )
 
-        bond_ids = []
         bond_building_block_indices = []
         bond_building_block_ids = []
         for bond_info in self._bond_infos:
-            bond_ids.append(bond_info.get_bond())
             bond_building_block_indices.append(
                 building_blocks.index(building_block)
                 if (building_block := bond_info.get_building_block())
@@ -301,7 +336,6 @@ class ConstructedMolecule(Molecule):
                 "building_block_ids": atom_building_block_ids,  # type: ignore
             },
             "bond_infos": {
-                "bond_ids": bond_ids,
                 "building_block_indices": bond_building_block_indices,  # type: ignore
                 "building_block_ids": atom_building_block_ids,  # type: ignore
             },
@@ -310,8 +344,7 @@ class ConstructedMolecule(Molecule):
                 for building_block, num in self._num_building_blocks.items()
             ],
         }
-        entry = atomlite.Entry.from_rdkit(key, self.to_rdkit_mol(), properties)
-        return entry
+        return atomlite.Entry.from_rdkit(key, self.to_rdkit_mol(), properties)
 
     def clone(self) -> typing.Self:
         """
