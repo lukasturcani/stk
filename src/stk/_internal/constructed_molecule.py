@@ -236,7 +236,7 @@ class ConstructedMolecule(Molecule):
                     if bond.GetBondType() == rdkit.BondType.DATIVE
                     else bond.GetBondTypeAsDouble()
                 ),
-                periodicity=periodic_bonds.get(bond.GetBondIdx(), (0, 0, 0)),  # type: ignore
+                periodicity=periodic_bonds.get(bond.GetIdx(), (0, 0, 0)),  # type: ignore
             )
             for bond in molecule.GetBonds()
         )
@@ -280,7 +280,7 @@ class ConstructedMolecule(Molecule):
                 )
             ),
             num_building_blocks={  # type: ignore
-                int(building_blocks[building_block]): num  # type: ignore
+                building_blocks[int(building_block)]: num  # type: ignore
                 for building_block, num in properties["num_building_blocks"]  # type: ignore
             },
         )
@@ -339,10 +339,15 @@ class ConstructedMolecule(Molecule):
                 "building_block_indices": bond_building_block_indices,  # type: ignore
                 "building_block_ids": atom_building_block_ids,  # type: ignore
             },
-            "num_bulding_blocks": [
+            "num_building_blocks": [
                 [building_blocks.index(building_block), num]
                 for building_block, num in self._num_building_blocks.items()
             ],
+            "periodic_bonds": {
+                idx: bond.get_periodicity()
+                for idx, bond in enumerate(self._bonds)
+                if bond.get_periodicity() != (0, 0, 0)
+            },
         }
         return atomlite.Entry.from_rdkit(key, self.to_rdkit_mol(), properties)
 
