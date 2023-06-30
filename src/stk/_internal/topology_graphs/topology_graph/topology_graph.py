@@ -149,7 +149,6 @@ class TopologyGraph:
             clone = linear.with_building_blocks({
                 bb1: bb3,
             })
-
     """
 
     _implementation: _TopologyGraphImplementation
@@ -168,11 +167,9 @@ class TopologyGraph:
         ],
         num_processes: int,
         optimizer: Optimizer,
-        edge_groups: typing.Optional[tuple[EdgeGroup, ...]] = None,
+        edge_groups: tuple[EdgeGroup, ...] | None = None,
     ) -> None:
         """
-        Initialize an instance of :class:`.TopologyGraph`.
-
         Parameters:
 
             building_block_vertices:
@@ -222,9 +219,7 @@ class TopologyGraph:
             edge_groups:
                 The edge groups of the topology graph, if ``None``,
                 every :class:`.Edge` is in its own edge group.
-
         """
-
         self._scale = scale = self._get_scale(building_block_vertices)
 
         def apply_scale(item):
@@ -326,7 +321,6 @@ class TopologyGraph:
         Returns:
             The clone.
         """
-
         return self._clone()
 
     def _clone(self) -> typing.Self:
@@ -352,9 +346,7 @@ class TopologyGraph:
 
         Yields:
             A building block of the topology graph.
-
         """
-
         vertex_building_blocks = {}
         num_vertices = 0
         for (
@@ -387,9 +379,7 @@ class TopologyGraph:
         Returns:
             The number of times `building_block` is present in the
             topology graph.
-
         """
-
         return len(self._building_block_vertices.get(building_block, []))
 
     def _get_lattice_constants(self) -> abc.Iterator[np.ndarray]:
@@ -401,11 +391,8 @@ class TopologyGraph:
         By default, this is an empty generator.
 
         Yields:
-
             A lattice constant.
-
         """
-
         return
         yield
 
@@ -414,11 +401,8 @@ class TopologyGraph:
         Construct a :class:`.ConstructedMolecule`.
 
         Returns:
-
             The data describing the :class:`.ConstructedMolecule`.
-
         """
-
         state = self._get_construction_state()
         state = self._place_building_blocks(state)
         state = self._run_reactions(state)
@@ -438,9 +422,7 @@ class TopologyGraph:
 
         Returns:
             The data describing the :class:`.ConstructedMolecule`.
-
         """
-
         return ConstructionResult(state)
 
     def _get_construction_state(self) -> ConstructionState:
@@ -492,9 +474,7 @@ class TopologyGraph:
         Returns:
             The new construction state, updated to account for the
             placed building blocks.
-
         """
-
         return self._implementation._place_building_blocks(state)
 
     def _run_reactions(
@@ -511,7 +491,6 @@ class TopologyGraph:
         Returns:
             The new construction state, updated to account for the
             reactions between building blocks.
-
         """
         get_reaction = partial(
             self._reaction_factory.get_reaction,
