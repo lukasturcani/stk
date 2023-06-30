@@ -53,4 +53,4 @@ enter-docker:
 
 # Start a MongoDB instance in docker.
 mongo:
-  docker run -d --rm -p 27017:27017 --name mongo -d mongo:latest
+  docker run -d --rm -p 27017:27017 --name mongo mongo:latest
