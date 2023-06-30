@@ -50,3 +50,7 @@ enter-docker:
   docker run -it --rm \
     --mount type=bind,source="$(pwd)",target=/code \
     stk-test-environment:latest /bin/sh
+
+# Start a MongoDB instance in docker.
+mongo:
+  docker run -d --rm -p 27017:27017 --name mongo mongo:latest
