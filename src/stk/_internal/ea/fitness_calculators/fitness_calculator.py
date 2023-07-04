@@ -16,15 +16,15 @@ class FitnessCalculator:
         serve as good examples.
     """
 
-    def get_fitness_value(self, molecule: MoleculeRecord) -> typing.Any:
+    def get_fitness_value(self, record: MoleculeRecord) -> typing.Any:
         """
-        Return the fitness value of `molecule`.
+        Return the fitness value of a molecule.
 
         Parameters:
-            molecule:
+            record:
                 The molecule whose fitness value should be calculated.
 
         Returns:
-            The fitness value of `molecule`.
+            The fitness value.
         """
         raise NotImplementedError()

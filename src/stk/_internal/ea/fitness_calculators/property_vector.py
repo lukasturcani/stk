@@ -21,14 +21,14 @@ class PropertyVector(FitnessCalculator):
 
             # First, create the functions which calculate the properties
             # of molecules.
-            def get_num_atoms(molecule):
-                return molecule.get_num_atoms()
+            def get_num_atoms(record):
+                return record.get_molecule().get_num_atoms()
 
-            def get_num_bonds(molecule):
-                return molecule.get_num_bonds()
+            def get_num_bonds(record):
+                return record.get_molecule().get_num_bonds()
 
-            def get_diameter(molecule):
-                return molecule.get_maximum_diameter()
+            def get_diameter(record):
+                return record.get_molecule().get_maximum_diameter()
 
             # Next, create the fitness calculator.
             fitness_calculator = stk.PropertyVector(
@@ -42,9 +42,14 @@ class PropertyVector(FitnessCalculator):
             # Calculate the fitness value of a molecule.
             # "value" is a tuple, holding the number of atoms, number of
             # bonds and the diameter of the molecule.
-            value = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(stk.BuildingBlock('BrCCBr'), ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
             )
+            value = fitness_calculator.get_fitness_value(record)
 
         .. testcode:: calculating-fitness-values
             :hide:
@@ -107,14 +112,14 @@ class PropertyVector(FitnessCalculator):
             )
 
             # Define the functions which calculate molecular properties.
-            def get_num_atoms(molecule):
-                return molecule.get_num_atoms()
+            def get_num_atoms(record):
+                return record.get_molecule().get_num_atoms()
 
-            def get_num_bonds(molecule):
-                return molecule.get_num_bonds()
+            def get_num_bonds(record):
+                return record.get_molecule().get_num_bonds()
 
-            def get_diameter(molecule):
-                return molecule.get_maximum_diameter()
+            def get_diameter(record):
+                return record.get_molecule().get_maximum_diameter()
 
             # Create the fitness calculator.
             fitness_calculator = stk.PropertyVector(
@@ -127,12 +132,17 @@ class PropertyVector(FitnessCalculator):
             )
 
             # Calculate fitness values.
-            value1 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(stk.BuildingBlock('BrCCBr'), ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
             )
+            value1 = fitness_calculator.get_fitness_value(record)
 
             # You can retrieve the fitness values from the database.
-            value2 = fitness_db.get(stk.BuildingBlock('BrCCBr'))
+            value2 = fitness_db.get(record.get_molecule())
 
         .. testcode:: storing-fitness-values-in-a-database
             :hide:
@@ -205,14 +215,14 @@ class PropertyVector(FitnessCalculator):
             )
 
             # Define the functions which calculate molecular properties.
-            def get_num_atoms(molecule):
-                return molecule.get_num_atoms()
+            def get_num_atoms(record):
+                return record.get_molecule().get_num_atoms()
 
-            def get_num_bonds(molecule):
-                return molecule.get_num_bonds()
+            def get_num_bonds(record):
+                return record.get_molecule().get_num_bonds()
 
-            def get_diameter(molecule):
-                return molecule.get_maximum_diameter()
+            def get_diameter(record):
+                return record.get_molecule().get_maximum_diameter()
 
             # Create the fitness calculator.
             fitness_calculator = stk.PropertyVector(
@@ -228,21 +238,22 @@ class PropertyVector(FitnessCalculator):
             # Assuming that a fitness value for this molecule was not
             # deposited into the database in a previous session, this
             # will calculate the fitness value.
-            value1 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(stk.BuildingBlock('BrCCBr'), ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
             )
+            value1 = fitness_calculator.get_fitness_value(record)
             # This will not re-calculate the fitness value, instead,
             # value1 will be retrieved from the database.
-            value2 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
-            )
+            value2 = fitness_calculator.get_fitness_value(record)
 
         .. testcode:: caching-fitness-values
             :hide:
 
-            value3 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
-            )
+            value3 = fitness_calculator.get_fitness_value(record)
             assert value2 is value3
 
         .. testcleanup:: caching-fitness-values

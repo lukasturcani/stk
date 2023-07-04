@@ -12,6 +12,7 @@ class FitnessFunction(FitnessCalculator):
     Takes a function and uses it as a fitness calculator.
 
     Examples:
+
         *Calculating Fitness Values*
 
         .. testcode:: calculating-fitness-values
@@ -21,8 +22,8 @@ class FitnessFunction(FitnessCalculator):
             # First create a function to use as the fitness function. For
             # example, assume that the fitness value is given by the number
             # of atoms.
-            def get_num_atoms(molecule):
-                return molecule.get_num_atoms()
+            def get_num_atoms(record):
+                return record.get_molecule().get_num_atoms()
 
             # Then use it to create a fitness calculator.
             fitness_calculator = stk.FitnessFunction(
@@ -30,9 +31,14 @@ class FitnessFunction(FitnessCalculator):
             )
 
             # Use the fitness calculator to get fitness values.
-            value1 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(stk.BuildingBlock('BrCCBr'), ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
             )
+            value1 = fitness_calculator.get_fitness_value(record)
 
         .. testcode:: calculating-fitness-values
             :hide:
@@ -90,8 +96,8 @@ class FitnessFunction(FitnessCalculator):
             )
 
             # Define a fitness function.
-            def get_num_atoms(molecule):
-                return molecule.get_num_atoms()
+            def get_num_atoms(record):
+                return record.get_molecule().get_num_atoms()
 
             # Create a fitness calculator.
             fitness_calculator = stk.FitnessFunction(
@@ -100,9 +106,14 @@ class FitnessFunction(FitnessCalculator):
             )
 
             # Calculate fitness values.
-            value = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(stk.BuildingBlock('BrCCBr'), ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
             )
+            value = fitness_calculator.get_fitness_value(record)
 
             # You can retrieve the fitness values from the database.
             value1 = fitness_db.get(stk.BuildingBlock('BrCCBr'))
@@ -178,8 +189,8 @@ class FitnessFunction(FitnessCalculator):
             )
 
             # Define a fitness function.
-            def get_num_atoms(molecule):
-                return molecule.get_num_atoms()
+            def get_num_atoms(record):
+                return record.get_molecule().get_num_atoms()
 
             # Create a fitness calculator.
             fitness_calculator = stk.FitnessFunction(
@@ -191,14 +202,17 @@ class FitnessFunction(FitnessCalculator):
             # Assuming that a fitness value for this molecule was not
             # deposited into the database in a previous session, this
             # will calculate the fitness value.
-            value1 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(stk.BuildingBlock('BrCCBr'), ),
+                    repeating_unit='A',
+                    num_repeating_units=1,
+                ),
             )
+            value1 = fitness_calculator.get_fitness_value(record)
             # This will not re-calculate the fitness value, instead,
             # value1 will be retrieved from the database.
-            value2 = fitness_calculator.get_fitness_value(
-                molecule=stk.BuildingBlock('BrCCBr'),
-            )
+            value2 = fitness_calculator.get_fitness_value(record)
 
         .. testcode:: caching-fitness-values
             :hide:
@@ -241,18 +255,18 @@ class FitnessFunction(FitnessCalculator):
         self._input_database = input_database
         self._output_database = output_database
 
-    def get_fitness_value(self, molecule: MoleculeRecord) -> typing.Any:
+    def get_fitness_value(self, record: MoleculeRecord) -> typing.Any:
         if self._input_database is not None:
             try:
                 fitness_value = self._input_database.get(
-                    molecule=molecule.get_molecule(),
+                    molecule=record.get_molecule(),
                 )
             except KeyError:
-                fitness_value = self._fitness_function(molecule)
+                fitness_value = self._fitness_function(record)
         else:
-            fitness_value = self._fitness_function(molecule)
+            fitness_value = self._fitness_function(record)
 
         if self._output_database is not None:
-            self._output_database.put(molecule.get_molecule(), fitness_value)
+            self._output_database.put(record.get_molecule(), fitness_value)
 
         return fitness_value
