@@ -233,8 +233,6 @@ class FitnessFunction(FitnessCalculator):
         output_database: ValueDatabase | None = None,
     ) -> None:
         """
-        Initialize a :class:`.FitnessFunction` instance.
-
         Parameters:
             fitness_function:
                 Takes a single parameter, the molecule

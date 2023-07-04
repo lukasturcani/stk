@@ -11,9 +11,7 @@ class FitnessCalculator:
 
         *Subclass Implementation*
 
-        You only need to implement :meth:`.get_fitness_value`. The source
-        cod of any of the classes listed in :mod:`.fitness_calculator`, can
-        serve as good examples.
+        You only need to implement :meth:`.get_fitness_value`.
     """
 
     def get_fitness_value(self, record: MoleculeRecord) -> typing.Any:
@@ -23,7 +21,6 @@ class FitnessCalculator:
         Parameters:
             record:
                 The molecule whose fitness value should be calculated.
-
         Returns:
             The fitness value.
         """
