@@ -4,7 +4,7 @@ on: [workflow_dispatch]
 
 jobs:
   build-and-publish-testing-image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       packages: write
       contents: read
@@ -23,6 +23,8 @@ jobs:
       - name: Build image
         run: >
           pip install pip-tools
+
+          pip install --upgrade setuptools
 
           pip-compile
           -o docker_testing_environment/requirements.txt
