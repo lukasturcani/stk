@@ -24,6 +24,7 @@ jobs:
       - name: Build stk
         run: |
           . /deps/venv/bin/activate
+          pip freeze --all
           python -m build
       - name: Publish stk
         run: >
