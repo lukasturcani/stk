@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/lukasturcani/stk-test-environment
 
@@ -17,14 +17,18 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
-      - name: Add stk to the conda environment
-        run: conda run -n stk
+      - name: Install stk
+        run: |
+          . /deps/venv/bin/activate
           pip install --no-deps -e .
       - name: Build stk
-        run: conda run -n stk
+        run: |
+          . /deps/venv/bin/activate
           python -m build
       - name: Publish stk
-        run: conda run -n stk
+        run: >
+          . /deps/venv/bin/activate
+
           twine upload
           -u ${{ secrets.PYPI_USERNAME }}
           -p ${{ secrets.PYPI_PASSWORD }}
