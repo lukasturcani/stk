@@ -44,7 +44,7 @@ on GitHub, and you can update your ``stk`` with::
     $ pip install stk --upgrade
 
 ``stk`` requires Python 3.11, if you are using an older version
-of Python you can use an older version of :mod:`.stk`::
+of Python you can use an older version of ``stk``::
 
   $ pip install stk==2022.6.17.0
 
