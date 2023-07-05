@@ -1,7 +1,6 @@
 import logging
 import os
 import typing
-import warnings
 from collections.abc import Collection, Iterable, Iterator
 from functools import partial
 
