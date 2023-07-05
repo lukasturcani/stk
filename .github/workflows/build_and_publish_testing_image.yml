@@ -24,6 +24,8 @@ jobs:
         run: >
           pip install pip-tools
 
+          pip install --upgrade setuptools
+
           pip-compile
           -o docker_testing_environment/requirements.txt
           --extra dev
