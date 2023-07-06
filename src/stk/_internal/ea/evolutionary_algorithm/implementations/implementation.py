@@ -1,41 +1,50 @@
-"""
-Evolutionary Algorithm Implementation
-=====================================
+import itertools
+import logging
+import typing
+from collections.abc import Callable, Iterable, Iterator
 
-"""
-
-import itertools as it
-
+from stk._internal.ea.crossover.molecule_crosser import MoleculeCrosser
+from stk._internal.ea.crossover.record import CrossoverRecord
+from stk._internal.ea.fitness_calculators.fitness_calculator import (
+    FitnessCalculator,
+)
+from stk._internal.ea.fitness_normalizers.fitness_normalizer import (
+    FitnessNormalizer,
+)
+from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.mutation.mutator import MoleculeMutator
+from stk._internal.ea.mutation.record import MutationRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.selector import Selector
+from stk._internal.key_makers.molecule import MoleculeKeyMaker
 from stk._internal.utilities.utilities import dedupe
 
 from ...generation import Generation
 
+T = typing.TypeVar("T")
+A = typing.TypeVar("A")
+B = typing.TypeVar("B")
 
-class Implementation:
+
+class Implementation(typing.Generic[T]):
     """
     An implementation of the default evolutionary algorithm.
-
     """
 
     def __init__(
         self,
-        initial_population,
-        fitness_calculator,
-        mutator,
-        crosser,
-        generation_selector,
-        mutation_selector,
-        crossover_selector,
-        fitness_normalizer,
-        key_maker,
-        logger,
-    ):
-        """
-        Initialize an :class:`.Implementation` instance.
-
-        """
-
-        self._initial_population = initial_population
+        initial_population: Iterable[MoleculeRecord],
+        fitness_calculator: FitnessCalculator,
+        mutator: MoleculeMutator[T],
+        crosser: MoleculeCrosser[T],
+        generation_selector: Selector[T],
+        mutation_selector: Selector[T],
+        crossover_selector: Selector[T],
+        fitness_normalizer: FitnessNormalizer,
+        key_maker: MoleculeKeyMaker,
+        logger: logging.Logger,
+    ) -> None:
+        self._initial_population = tuple(initial_population)
         self._fitness_calculator = fitness_calculator
         self._mutator = mutator
         self._crosser = crosser
@@ -46,11 +55,15 @@ class Implementation:
         self._key_maker = key_maker
         self._logger = logger
 
-    def _get_generations(self, num_generations, map_):
-        def get_mutation_record(batch):
+    def _get_generations(
+        self,
+        num_generations: int,
+        map_: Callable[[A], B],
+    ) -> Iterator[Generation]:
+        def get_mutation_record(batch: Batch) -> MutationRecord[T] | None:
             return self._mutator.mutate(batch[0])
 
-        def get_key(record):
+        def get_key(record: MoleculeRecord) -> typing.Any:
             return self._key_maker.get_key(record.get_molecule())
 
         population = self._initial_population
@@ -99,7 +112,11 @@ class Implementation:
                     map_=map_,
                     population=tuple(
                         dedupe(
-                            iterable=it.chain(population, offspring, mutants),
+                            iterable=itertools.chain(
+                                population,
+                                offspring,
+                                mutants,
+                            ),
                             key=get_key,
                         )
                     ),
@@ -120,11 +137,15 @@ class Implementation:
                 crossover_records=crossover_records,
             )
 
-    def _get_crossover_records(self, population):
+    def _get_crossover_records(self, population) -> Iterator[CrossoverRecord]:
         for batch in self._crossover_selector.select(population):
             yield from self._crosser.cross(batch)
 
-    def _with_fitness_values(self, map_, population):
+    def _with_fitness_values(
+        self,
+        map_,
+        population,
+    ) -> Iterator[MoleculeRecord]:
         fitness_values = map_(
             self._fitness_calculator.get_fitness_value,
             population,

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Callable
 
 from stk._internal.molecule import Molecule
@@ -22,12 +20,6 @@ class MoleculeKeyMaker:
 
     Examples:
 
-        *Subclass Implementation*
-
-        The source code of any of the subclasses, listed in
-        :mod:`molecule_key_maker <.key_makers.molecule>`, can
-        serve as good examples.
-
         *Creating a New Key Maker Directly*
 
         Apart from using the subclasses provided, a
@@ -42,7 +34,7 @@ class MoleculeKeyMaker:
             # method.
             get_num_atoms = stk.MoleculeKeyMaker(
                 key_name='num_atoms',
-                get_key=lambda molecule: molecule.get_num_atoms(),
+                get_key=lambda molecule: str(molecule.get_num_atoms()),
             )
 
             # Use the MoleculeKeyMaker instance.
@@ -55,31 +47,25 @@ class MoleculeKeyMaker:
         .. testcode:: creating-a-new-key-maker-directly
             :hide:
 
-            assert json['molecule']['num_atoms'] == 12
-            assert json['matrix']['num_atoms'] == 12
+            assert json['molecule']['num_atoms'] == '12'
+            assert json['matrix']['num_atoms'] == '12'
 
     """
 
     def __init__(
         self,
         key_name: str,
-        get_key: Callable[[Molecule], object],
+        get_key: Callable[[Molecule], str],
     ) -> None:
         """
-        Initialize a :class:`.MoleculeKeyMaker` instance.
-
         Parameters:
-
             key_name:
                 The name of the key.
-
             get_key:
                 Takes a single parameter, `molecule`, and returns the
                 key to use for that molecule. The value passed to the
                 parameter must be a :class:`.Molecule` instance.
-
         """
-
         self._key_name = key_name
         self._get_key = get_key
 
@@ -88,28 +74,20 @@ class MoleculeKeyMaker:
         Get the name of the key.
 
         Returns:
-
             The name of the key.
-
         """
-
         return self._key_name
 
-    def get_key(self, molecule: Molecule) -> object:
+    def get_key(self, molecule: Molecule) -> str:
         """
         Get the key of `molecule`.
 
         Parameters:
-
             molecule:
                 The molecule for which a key is needed.
-
         Returns:
-
             The key of `molecule`.
-
         """
-
         return self._get_key(molecule)
 
     def __str__(self) -> str:

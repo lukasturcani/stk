@@ -1,11 +1,3 @@
-"""
-InChI
-=====
-
-"""
-
-from __future__ import annotations
-
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 from stk._internal.key_makers.utilities import get_inchi
 from stk._internal.molecule import Molecule
@@ -51,14 +43,6 @@ class Inchi(MoleculeKeyMaker):
             )
 
     """
-
-    def __init__(self) -> None:
-        """
-        Initialize a :class:`.Inchi` instance.
-
-        """
-
-        pass
 
     def get_key_name(self) -> str:
         return "InChI"

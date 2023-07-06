@@ -1,11 +1,3 @@
-"""
-InChIKey
-========
-
-"""
-
-from __future__ import annotations
-
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 from stk._internal.key_makers.utilities import get_inchi_key
 from stk._internal.molecule import Molecule
@@ -43,16 +35,7 @@ class InchiKey(MoleculeKeyMaker):
                 json['molecule']['InChIKey']
                 == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
             )
-
     """
-
-    def __init__(self) -> None:
-        """
-        Initialize an :class:`.InchiKey` instance.
-
-        """
-
-        pass
 
     def get_key_name(self) -> str:
         return "InChIKey"
