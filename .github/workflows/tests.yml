@@ -41,6 +41,7 @@ jobs:
     services:
       MongoDB:
         image: mongo
+        ports: ["27017:27017"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -48,12 +49,13 @@ jobs:
           python-version: "3.11"
           cache: "pip"
       - run: "pip install -e '.[dev]'"
-      - run: pytest --mongodb_uri='mongodb://MongoDB:27017/'
+      - run: pytest
   doctest:
     runs-on: ubuntu-22.04
     services:
       MongoDB:
         image: mongo
+        ports: ["27017:27017"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -61,7 +63,7 @@ jobs:
           python-version: "3.11"
           cache: "pip"
       - run: "pip install -e '.[dev]'"
-      - run: MONGODB_URI='mongodb://MongoDB:27017/' make -C docs doctest
+      - run: make -C docs doctest
   basic-ea:
     runs-on: ubuntu-22.04
     services:
@@ -90,6 +92,7 @@ jobs:
     services:
       MongoDB:
         image: mongo
+        ports: ["27017:27017"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -98,7 +101,7 @@ jobs:
           cache: "pip"
       - run: "pip install -e '.[dev]'"
       - run: git clone https://github.com/lukasturcani/intermediate_ea --depth 1
-      - run: python intermediate_ea/intermediate_ea.py --mongodb_uri mongodb://MongoDB:27017
+      - run: python intermediate_ea/intermediate_ea.py
       - uses: actions/upload-artifact@v2
         with:
           name: intermediate-ea-fitness-plot
