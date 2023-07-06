@@ -75,7 +75,7 @@ jobs:
           cache: "pip"
       - run: "pip install -e '.[dev]'"
       - run: git clone https://github.com/lukasturcani/basic_ea --depth 1
-      - run: python basic_ea/basic_ea.py --mongodb_uri mongodb://MongoDB:27017
+      - run: python basic_ea/basic_ea.py
       - uses: actions/upload-artifact@v2
         with:
           name: basic-ea-fitness-plot
