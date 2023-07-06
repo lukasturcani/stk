@@ -9,8 +9,8 @@ on:
 jobs:
   publish-release:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
+    # container:
+    #   image: ghcr.io/lukasturcani/stk-test-environment
 
     env:
       VERSION: ${{ github.ref_name }}
@@ -18,23 +18,18 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-      - name: Build stk
-        run: |
-          . /deps/venv/bin/activate
-          pip freeze --all
-          ls -al src/stk
-          python -m build
-      - name: Publish stk
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install --no-deps -e .
+      - run: python -m build
+      - name: Publish
         run: >
-          . /deps/venv/bin/activate
-
           tar xf dist/stk*.tar.gz
 
           ls -al .
+
           ls -al stk*/src/stk
           # twine upload
           # -u ${{ secrets.PYPI_USERNAME }}
