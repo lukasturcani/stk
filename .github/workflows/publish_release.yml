@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - run: pip install --no-deps -e .
+      - run: pip install -e '.[dev]'
       - run: python -m build
       - name: Publish
         run: >
