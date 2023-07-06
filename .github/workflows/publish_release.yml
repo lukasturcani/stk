@@ -35,7 +35,7 @@ jobs:
           tar xf dist/stk*.tar.gz
 
           ls -al .
-          ls -al stk*/
+          ls -al stk*/src/stk
           # twine upload
           # -u ${{ secrets.PYPI_USERNAME }}
           # -p ${{ secrets.PYPI_PASSWORD }}
