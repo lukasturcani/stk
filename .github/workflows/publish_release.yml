@@ -32,6 +32,7 @@ jobs:
         run: >
           . /deps/venv/bin/activate
 
+          echo dist/stk*
           tar xf dist/stk*
 
           ls -al dist/stk*/
