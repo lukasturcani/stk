@@ -11,7 +11,7 @@ from stk._internal.ea.fitness_calculators.fitness_calculator import (
 from stk._internal.ea.fitness_normalizers.fitness_normalizer import (
     FitnessNormalizer,
 )
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.ea.selection.batch import Batch
@@ -24,6 +24,7 @@ from ...generation import Generation
 T = typing.TypeVar("T")
 A = typing.TypeVar("A")
 B = typing.TypeVar("B")
+Map: typing.TypeAlias = Callable[[Callable[[A], B], Iterable[A]], B]
 
 
 class Implementation(typing.Generic[T]):
@@ -58,7 +59,7 @@ class Implementation(typing.Generic[T]):
     def _get_generations(
         self,
         num_generations: int,
-        map_: Callable[[A], B],
+        map_: Map,
     ) -> Iterator[Generation]:
         def get_mutation_record(batch: Batch) -> MutationRecord[T] | None:
             return self._mutator.mutate(batch[0])
@@ -69,12 +70,11 @@ class Implementation(typing.Generic[T]):
         population = self._initial_population
 
         self._logger.info("Calculating fitness values of initial population.")
-        population = tuple(self._with_fitness_values(map_, population))
-        population = tuple(
-            self._fitness_normalizer.normalize(
-                population=population,
-            )
-        )
+        fitness_values = {
+            record: self._fitness_calculator.get_fitness_value(record)
+            for record in population
+        }
+        population = tuple(self._fitness_normalizer.normalize(population))
         yield Generation(
             molecule_records=population,
             mutation_records=(),
@@ -140,18 +140,3 @@ class Implementation(typing.Generic[T]):
     def _get_crossover_records(self, population) -> Iterator[CrossoverRecord]:
         for batch in self._crossover_selector.select(population):
             yield from self._crosser.cross(batch)
-
-    def _with_fitness_values(
-        self,
-        map_,
-        population,
-    ) -> Iterator[MoleculeRecord]:
-        fitness_values = map_(
-            self._fitness_calculator.get_fitness_value,
-            population,
-        )
-        for record, fitness_value in zip(population, fitness_values):
-            yield record.with_fitness_value(
-                fitness_value=fitness_value,
-                normalized=False,
-            )
