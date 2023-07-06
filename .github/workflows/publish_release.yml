@@ -1,23 +1,15 @@
 name: Publish release
-
 on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+.[0-9]+'
-  pull_request:
-
 jobs:
   publish-release:
     runs-on: ubuntu-22.04
-    # container:
-    #   image: ghcr.io/lukasturcani/stk-test-environment
-
     env:
       VERSION: ${{ github.ref_name }}
-
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
@@ -25,13 +17,8 @@ jobs:
       - run: pip install -e '.[dev]'
       - run: python -m build
       - name: Publish
-        run: >
-          tar xf dist/stk*.tar.gz
-
-          ls -al .
-
-          ls -al stk*/src/stk
-          # twine upload
-          # -u ${{ secrets.PYPI_USERNAME }}
-          # -p ${{ secrets.PYPI_PASSWORD }}
-          # dist/*
+        run:
+          twine upload
+          -u ${{ secrets.PYPI_USERNAME }}
+          -p ${{ secrets.PYPI_PASSWORD }}
+          dist/*
