@@ -5,8 +5,10 @@ from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
 
+T = typing.TypeVar("T", bound=TopologyGraph)
 
-class MoleculeRecord:
+
+class MoleculeRecord(typing.Generic[T]):
     """
     An abstract base class for molecular records used by the EA.
 
@@ -19,7 +21,7 @@ class MoleculeRecord:
 
     """
 
-    def __init__(self, topology_graph: TopologyGraph) -> None:
+    def __init__(self, topology_graph: T) -> None:
         """
         Parameters:
             topology_graph:
@@ -36,20 +38,16 @@ class MoleculeRecord:
 
         Returns:
             The molecule held by the record.
-
         """
-
         return self._molecule
 
-    def get_topology_graph(self) -> TopologyGraph:
+    def get_topology_graph(self) -> T:
         """
         Get the topology graph of the molecule.
 
         Returns:
             The topology graph.
-
         """
-
         return self._topology_graph
 
     def get_fitness_value(
@@ -59,18 +57,15 @@ class MoleculeRecord:
         Get the fitness value of the molecule in the record.
 
         Parameters:
-
             normalized:
                 Toggles the return of the normalized vs unnormalized
                 fitness value. The unnormalized fitness value is
                 guaranteed to be constant for the same molecule
                 across generations, while the normalized one is allowed
                 to change.
-
         Returns:
             The fitness value.
         """
-
         return (
             self._normalized_fitness_value
             if normalized
@@ -84,9 +79,7 @@ class MoleculeRecord:
         Returns:
             MoleculeRecord: The clone. Has the same type as
             the original record.
-
         """
-
         clone = self.__class__.__new__(self.__class__)
         clone._molecule = self._molecule
         clone._topology_graph = self._topology_graph
@@ -105,18 +98,14 @@ class MoleculeRecord:
         Parameters:
             fitness_value:
                 The fitness value of the clone.
-
             normalized:
                 Toggles if the normalized or unnormalized fitness value is
                 being set. If ``False``, both the normalized and
                 unnormalized fitness values with be set to `fitness_value`.
-
         Returns:
             MoleculeRecord: The clone. Has the same type as
             the original record.
-
         """
-
         return self.clone()._with_fitness_value(
             fitness_value=fitness_value,
             normalized=normalized,
