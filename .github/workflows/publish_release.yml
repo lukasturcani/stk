@@ -1,36 +1,23 @@
 name: Publish release
-
 on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+.[0-9]+'
-
 jobs:
   publish-release:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     env:
       VERSION: ${{ github.ref_name }}
-
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-      - name: Build stk
-        run: |
-          . /deps/venv/bin/activate
-          pip freeze --all
-          ls -al src/stk
-          python -m build
-      - name: Publish stk
-        run: >
-          . /deps/venv/bin/activate
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e '.[dev]'
+      - run: python -m build
+      - name: Publish
+        run:
           twine upload
           -u ${{ secrets.PYPI_USERNAME }}
           -p ${{ secrets.PYPI_PASSWORD }}

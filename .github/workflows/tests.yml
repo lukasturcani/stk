@@ -1,195 +1,112 @@
 name: Tests
-
 on:
   push:
     branches:
       - master
   pull_request:
   workflow_dispatch:
-
 jobs:
   ruff:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Run ruff
-        run: |
-          . /deps/venv/bin/activate
-          ruff .
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install '.[dev]'"
+      - run: ruff .
   mypy:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Run mypy
-        run: |
-          . /deps/venv/bin/activate
-          mypy src
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install -e '.[dev]'"
+      - run: mypy src
   black:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Run black
-        run: |
-          . /deps/venv/bin/activate
-          black --check .
-
-  pytest-stable-linux:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install -e '.[dev]'"
+      - run: black --check .
+  pytest:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     services:
       MongoDB:
         image: mongo
-
+        ports: ["27017:27017"]
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Run pytest
-        run: |
-          . /deps/venv/bin/activate
-          pytest --mongodb_uri='mongodb://MongoDB:27017/'
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install -e '.[dev]'"
+      - run: pytest
   doctest:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     services:
       MongoDB:
         image: mongo
-
+        ports: ["27017:27017"]
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Run doctest
-        run: |
-          . /deps/venv/bin/activate
-          MONGODB_URI='mongodb://MongoDB:27017/' make -C docs doctest
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install -e '.[dev]'"
+      - run: make -C docs doctest
   basic-ea:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     services:
       MongoDB:
         image: mongo
-
+        ports: ["27017:27017"]
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Install dependencies
-        run: git clone https://github.com/lukasturcani/basic_ea
-          --depth 1
-
-      - name: Run the EA
-        run: >
-          . /deps/venv/bin/activate
-
-          python basic_ea/basic_ea.py
-          --mongodb_uri mongodb://MongoDB:27017
-
-      - name: Upload fitness plot
-        uses: actions/upload-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install -e '.[dev]'"
+      - run: git clone https://github.com/lukasturcani/basic_ea --depth 1
+      - run: python basic_ea/basic_ea.py
+      - uses: actions/upload-artifact@v2
         with:
           name: basic-ea-fitness-plot
           path: fitness_progress.png
-
-      - name: Upload rotatable bonds plot
-        uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v2
         with:
           name: basic-ea-rotatable-bonds-plot
           path: rotatable_bonds_progress.png
-
   intermediate-ea:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/stk-test-environment
-
     services:
       MongoDB:
         image: mongo
-
+        ports: ["27017:27017"]
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-
-      - name: Install stk
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-
-      - name: Install dependencies
-        run: git clone
-          https://github.com/lukasturcani/intermediate_ea
-          --depth 1
-
-      - name: Run the EA
-        run: >
-          . /deps/venv/bin/activate
-
-          python intermediate_ea/intermediate_ea.py
-          --mongodb_uri mongodb://MongoDB:27017
-
-      - name: Upload fitness plot
-        uses: actions/upload-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: "pip install -e '.[dev]'"
+      - run: git clone https://github.com/lukasturcani/intermediate_ea --depth 1
+      - run: python intermediate_ea/intermediate_ea.py
+      - uses: actions/upload-artifact@v2
         with:
           name: intermediate-ea-fitness-plot
           path: fitness_progress.png
-
-      - name: Upload rotatable bonds plot
-        uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v2
         with:
           name: intermediate-ea-rotatable-bonds-plot
           path: rotatable_bonds_progress.png
