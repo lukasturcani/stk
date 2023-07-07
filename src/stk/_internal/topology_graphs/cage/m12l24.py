@@ -47,35 +47,15 @@ class M12L24(Cage):
                 building_blocks=(bb1, bb2),
             ),
         )
-        rgb1 = [192, 87, 161]
-        rgb2 = [97, 201, 217]
-        points = cage.get_num_atoms()
-        colour_list = [
-            [
-                (rgb1[0]-rgb2[0])*i,
-                (rgb1[1]-rgb2[1])*i,
-                (rgb1[2]-rgb2[2])*i,
-            ]
-            for i in range(points)
-        ]
 
         moldoc_display_molecule = molecule.Molecule(
             atoms=(
                 molecule.Atom(
                     atomic_number=atom.get_atomic_number(),
                     position=position,
-                    config=molecule.AtomConfig(
-                        color=molecule.Color(
-                            red=col[0],
-                            green=col[1],
-                            blue=col[2],
-                        ),
-                        size=2.0,
-                    )
-                ) for atom, position, col in zip(
+                ) for atom, position in zip(
                     cage.get_atoms(),
                     cage.get_position_matrix(),
-                    colour_list,
                 )
             ),
             bonds=(
