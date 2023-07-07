@@ -112,9 +112,9 @@ class M2L4Lantern(Cage):
         points = cage.get_num_atoms()
         colour_list = [
             [
-                rgb1[0] + ((rgb2[0]-rgb1[0])/points)*i,
-                rgb1[1] + ((rgb2[1]-rgb1[1])/points)*i,
-                rgb1[2] + ((rgb2[2]-rgb1[2])/points)*i,
+                int(rgb1[0] + ((rgb2[0]-rgb1[0])/points)*i),
+                int(rgb1[1] + ((rgb2[1]-rgb1[1])/points)*i),
+                int(rgb1[2] + ((rgb2[2]-rgb1[2])/points)*i),
             ]
             for i in range(points)
         ]
