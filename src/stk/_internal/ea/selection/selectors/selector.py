@@ -3,7 +3,7 @@ import logging
 import typing
 from collections.abc import Callable, Iterator, Sequence, Set
 
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from ..batch import Batch, BatchKey
@@ -62,18 +62,16 @@ class Selector(typing.Generic[T]):
 
         The source code of the classes listed in :mod:`.selector` can serve
         as good examples.
-
     """
 
     def __init__(
         self,
         key_maker: MoleculeKeyMaker,
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]],
+        fitness_modifier: Callable[[dict[T, float]], dict[T, float]],
         batch_size: int,
     ) -> None:
         """
         Parameters:
-
             key_maker:
                 Used to get the keys of molecules, which are used to
                 determine if two molecule records are duplicates of each
@@ -94,36 +92,33 @@ class Selector(typing.Generic[T]):
 
     def select(
         self,
-        population: Sequence[T],
+        population: dict[T, float],
         included_batches: Set[BatchKey] | None = None,
         excluded_batches: Set[BatchKey] | None = None,
-    ) -> Iterator[Batch]:
+    ) -> Iterator[Batch[T]]:
         """
         Yield batches of molecule records from `population`.
 
         Parameters:
-
-            population (list[T]):
+            population:
                 A collection of molecules from which batches are selected.
 
-            included_batches (set[str]):
+            included_batches (set[str] | None):
                 The identity keys of batches which are allowed to be
                 yielded, if ``None`` all batches can be yielded. If not
                 ``None`` only batches `included_batches` will be yielded.
 
-            excluded_batches (set[str]):
+            excluded_batches (set[str] | None):
                 The identity keys of batches which are not allowed to be
                 yielded. If ``None``, no batch is forbidden from being
                 yielded.
 
         Yields:
-
             A batch of selected molecule records.
         """
         batches = tuple(
             self._get_batches(
-                population=population,
-                fitness_values=self._fitness_modifier(population),
+                population=self._fitness_modifier(population),
                 included_batches=included_batches,
                 excluded_batches=excluded_batches,
             )
@@ -144,11 +139,10 @@ class Selector(typing.Generic[T]):
 
     def _get_batches(
         self,
-        population: Sequence[T],
-        fitness_values: dict[T, float],
+        population: dict[T, float],
         included_batches: Set[BatchKey] | None,
         excluded_batches: Set[BatchKey] | None,
-    ) -> Iterator[Batch]:
+    ) -> Iterator[Batch[T]]:
         """
         Get batches molecules from `population`.
 
@@ -156,10 +150,6 @@ class Selector(typing.Generic[T]):
 
             population:
                 The molecule records which are to be batched.
-
-            fitness_values:
-                Maps each :class:`.MoleculeRecord` in `population` to the
-                fitness value which should be used for it.
 
             included_batches:
                 The identity keys of batches which are allowed to be
@@ -175,20 +165,19 @@ class Selector(typing.Generic[T]):
                 A batch of molecules from `population`.
         """
 
-        def is_included(batch: Batch) -> bool:
+        def is_included(batch: Batch[T]) -> bool:
             if included_batches is None:
                 return True
             return batch.get_identity_key() in included_batches
 
-        def is_excluded(batch: Batch) -> bool:
+        def is_excluded(batch: Batch[T]) -> bool:
             if excluded_batches is None:
                 return False
             return batch.get_identity_key() in excluded_batches
 
         for records in itertools.combinations(population, self._batch_size):
             batch = Batch(
-                records=records,
-                fitness_values=fitness_values,
+                records=((record, population[record]) for record in records),
                 key_maker=self._key_maker,
             )
             if is_included(batch) and not is_excluded(batch):
@@ -196,9 +185,9 @@ class Selector(typing.Generic[T]):
 
     def _select_from_batches(
         self,
-        batches: Sequence[Batch],
+        batches: Sequence[Batch[T]],
         yielded_batches: YieldedBatches,
-    ) -> Iterator[Batch]:
+    ) -> Iterator[Batch[T]]:
         """
         Yield batches from `batches`.
 
@@ -212,6 +201,3 @@ class Selector(typing.Generic[T]):
             A selected batch.
         """
         raise NotImplementedError()
-
-    def _get_fitness_values(self, population: Sequence[T]) -> dict[T, float]:
-        return {record: record.get_fitness_value() for record in population}

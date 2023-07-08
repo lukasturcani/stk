@@ -7,7 +7,7 @@ from stk._internal.ea.fitness_normalizers.fitness_normalizer import (
     FitnessNormalizer,
 )
 from stk._internal.ea.generation import Generation
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.selection.selectors.selector import Selector
 from stk._internal.key_makers.inchi import Inchi
@@ -19,7 +19,7 @@ from .implementations.serial import Serial
 
 logger = logging.getLogger(__name__)
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
 class EvolutionaryAlgorithm:

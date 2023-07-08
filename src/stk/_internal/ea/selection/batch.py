@@ -2,13 +2,15 @@ import typing
 from collections import Counter
 from collections.abc import Iterable, Iterator
 
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 BatchKey: typing.TypeAlias = frozenset[tuple[str, int]]
 
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
-class Batch:
+
+class Batch(typing.Generic[T]):
     """
     Represents a batch of molecule records.
 
@@ -188,29 +190,23 @@ class Batch:
 
     def __init__(
         self,
-        records: Iterable[MoleculeRecord],
-        fitness_values: dict[MoleculeRecord, float],
+        records: dict[T, float] | Iterable[tuple[T, float]],
         key_maker: MoleculeKeyMaker,
     ) -> None:
         """
         Parameters:
-
-            records:
-                The molecule records which are part of the batch.
-
-            fitness_values:
-                Maps each :class:`.MoleculeRecord` in `records` to the
-                fitness value which should be used for it.
-
+            records (dict[T, float]):
+                The records which form the batch, mapped to their
+                fitness values.
             key_maker:
                 Used to make keys for molecules, which are used to
                 determine the identity key of the batch. If two
                 batches have the same molecule keys, the same number of
                 times, they will have the same identity key.
         """
-        self._records = tuple(records)
-        self._fitness_value = sum(map(fitness_values.get, records))
-        molecules = (record.get_molecule() for record in records)
+        self._records = dict(records)
+        self._fitness_value = sum(self._records.values())
+        molecules = (record.get_molecule() for record in self._records)
         self._identity_key = frozenset(
             Counter(map(key_maker.get_key, molecules)).items()
         )
@@ -246,11 +242,8 @@ class Batch:
         """
         return self._identity_key
 
-    def __iter__(self) -> Iterator[MoleculeRecord]:
+    def __iter__(self) -> Iterator[T]:
         return iter(self._records)
-
-    def __getitem__(self, index: int) -> MoleculeRecord:
-        return self._records[index]
 
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Batch):

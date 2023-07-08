@@ -1,13 +1,18 @@
 import itertools
 import typing
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 
+from stk._internal.ea.molecule_record import MoleculeRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.utilities.yielded_batches import (
+    YieldedBatches,
+)
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from .selector import Selector
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
 class Worst(Selector[T]):
@@ -43,7 +48,6 @@ class Worst(Selector[T]):
             for batch in worst.select(population):
                 # Do stuff with batch.
                 pass
-
     """
 
     def __init__(
@@ -53,8 +57,9 @@ class Worst(Selector[T]):
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
         key_maker: MoleculeKeyMaker = Inchi(),
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]]
-        | None = None,
+        fitness_modifier: Callable[
+            [dict[T, float]], dict[T, float]
+        ] = lambda x: x,
     ) -> None:
         """
         Parameters:
@@ -87,28 +92,29 @@ class Worst(Selector[T]):
                 :class:`.Selector` should use. If ``None``, the regular
                 fitness values of the records are used.
         """
-        if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
-
         super().__init__(key_maker, fitness_modifier, batch_size)
 
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
 
-    def _select_from_batches(self, batches, yielded_batches):
-        batches = sorted(batches)
+    def _select_from_batches(
+        self,
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches,
+    ) -> Iterator[Batch[T]]:
+        selected_batches: Iterable[Batch[T]] = sorted(batches)
 
         if not self._duplicate_molecules:
-            batches = filter(
+            selected_batches = filter(
                 yielded_batches.has_no_yielded_molecules,
                 batches,
             )
 
         if not self._duplicate_batches:
-            batches = filter(
+            selected_batches = filter(
                 yielded_batches.is_unyielded_batch,
                 batches,
             )
 
-        yield from itertools.islice(batches, self._num_batches)
+        yield from itertools.islice(selected_batches, self._num_batches)

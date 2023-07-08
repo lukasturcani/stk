@@ -1,13 +1,14 @@
 import itertools
 import typing
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from .selector import Selector
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
 class Best(Selector[T]):
@@ -111,8 +112,9 @@ class Best(Selector[T]):
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
         key_maker: MoleculeKeyMaker = Inchi(),
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]]
-        | None = None,
+        fitness_modifier: Callable[
+            [dict[T, float]], dict[T, float]
+        ] = lambda x: x,
     ) -> None:
         """
         Parameters:
@@ -141,14 +143,9 @@ class Best(Selector[T]):
                 Takes the `population` on which :meth:`~.Selector.select`
                 is called and returns a :class:`dict`, which maps records
                 in the `population` to the fitness values the
-                :class:`.Selector` should use. If ``None``, the regular
-                fitness values of the records are used.
+                :class:`.Selector` should use.
         """
-        if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
-
         super().__init__(key_maker, fitness_modifier, batch_size)
-
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches

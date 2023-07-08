@@ -44,6 +44,9 @@ class Inchi(MoleculeKeyMaker):
 
     """
 
+    def __init__(self) -> None:
+        return
+
     def get_key_name(self) -> str:
         return "InChI"
 
