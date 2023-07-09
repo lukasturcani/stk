@@ -2,7 +2,7 @@ from collections.abc import Callable, Iterable
 
 import numpy as np
 
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,

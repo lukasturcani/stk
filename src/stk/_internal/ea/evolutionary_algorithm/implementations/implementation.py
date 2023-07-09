@@ -155,4 +155,4 @@ class Implementation(typing.Generic[T]):
         population: dict[T, float],
     ) -> Iterator[CrossoverRecord[T]]:
         for batch in self._crossover_selector.select(population):
-            yield from self._crosser.cross(batch)
+            yield from self._crosser.cross(tuple(batch))

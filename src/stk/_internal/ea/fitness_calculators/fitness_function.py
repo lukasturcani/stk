@@ -2,7 +2,7 @@ import typing
 from collections import abc
 
 from stk._internal.databases.value import ValueDatabase
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 
 from .fitness_calculator import FitnessCalculator
 

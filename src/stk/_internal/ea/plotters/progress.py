@@ -7,7 +7,7 @@ import pandas as pd
 import seaborn as sns
 
 from stk._internal.ea.generation import Generation
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 
 plt.switch_backend("agg")
 

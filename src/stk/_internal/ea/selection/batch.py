@@ -250,16 +250,16 @@ class Batch(typing.Generic[T]):
             return NotImplemented
         return self._fitness_value == other._fitness_value
 
-    def __gt__(self, other: "Batch") -> bool:
+    def __gt__(self, other: "Batch[T]") -> bool:
         return self._fitness_value > other._fitness_value
 
-    def __ge__(self, other: "Batch") -> bool:
+    def __ge__(self, other: "Batch[T]") -> bool:
         return self._fitness_value >= other._fitness_value
 
-    def __lt__(self, other: "Batch") -> bool:
+    def __lt__(self, other: "Batch[T]") -> bool:
         return self._fitness_value < other._fitness_value
 
-    def __le__(self, other: "Batch") -> bool:
+    def __le__(self, other: "Batch[T]") -> bool:
         return self._fitness_value <= other._fitness_value
 
     def __repr__(self) -> str:

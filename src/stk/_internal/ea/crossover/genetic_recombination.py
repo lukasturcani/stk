@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterable, Iterator, Sequence
 
 from stk._internal.building_block import BuildingBlock
 from stk._internal.ea.crossover.record import CrossoverRecord
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 
 
 class GeneticRecombination:

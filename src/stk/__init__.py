@@ -59,7 +59,7 @@ from stk._internal.ea.fitness_normalizers.sequence import NormalizerSequence
 from stk._internal.ea.fitness_normalizers.shift_up import ShiftUp
 from stk._internal.ea.fitness_normalizers.sum import Sum
 from stk._internal.ea.generation import Generation
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.mutation.random import RandomMutator
 from stk._internal.ea.mutation.random_building_block import RandomBuildingBlock

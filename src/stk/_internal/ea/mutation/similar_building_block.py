@@ -5,7 +5,7 @@ from functools import partial
 import numpy as np
 
 from stk._internal.building_block import BuildingBlock
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
