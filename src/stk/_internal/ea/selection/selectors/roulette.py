@@ -1,9 +1,13 @@
 import typing
-from collections.abc import Callable
+from collections.abc import Callable, Iterator, Sequence
 
 import numpy as np
 
 from stk._internal.ea.molecule_record import MoleculeRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.utilities.yielded_batches import (
+    YieldedBatches,
+)
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
@@ -156,11 +160,18 @@ class Roulette(Selector[T]):
             float("inf") if num_batches is None else num_batches
         )
 
-    def _select_from_batches(self, batches, yielded_batches):
+    def _select_from_batches(
+        self,
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches,
+    ) -> Iterator[Batch[T]]:
         while batches and yielded_batches.get_num() < self._num_batches:
             total = sum(batch.get_fitness_value() for batch in batches)
             weights = [batch.get_fitness_value() / total for batch in batches]
-            yield self._generator.choice(batches, p=weights)
+            yield self._generator.choice(
+                batches,
+                p=weights,
+            )
 
             if not self._duplicate_molecules:
                 batches = filter(

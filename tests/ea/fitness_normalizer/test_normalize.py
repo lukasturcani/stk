@@ -1,26 +1,13 @@
-import itertools as it
+import itertools
+from typing import Any
 
 import numpy as np
+import stk
 
-from tests.utilities import is_equivalent
+from .case_data import CaseData
 
 
-def test_normalize(case_data):
-    """
-    Test :meth:`.FitnessNormalizer.normalize`.
-
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the fitness normalizer to test and the
-        normalized population.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
+def test_normalize(case_data: CaseData) -> None:
     _test_normalize(
         fitness_normalizer=case_data.fitness_normalizer,
         population=case_data.population,
@@ -29,43 +16,13 @@ def test_normalize(case_data):
 
 
 def _test_normalize(
-    fitness_normalizer,
-    population,
-    normalized,
-):
-    """
-    Test :meth:`.FitnessNormalizer.normalize`.
-
-    Parameters
-    ----------
-    fitness_normalizer : :class:`.FitnessNormalizer`
-        The fitness normalizer to test.
-
-    population : :class:`tuple` of :class:`.MoleculeRecord`
-        The population which is normalized.
-
-    normalized : :class:`tuple` of :class:`.MoleculeRecord`
-        The normalized `population`.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    for record1, record2 in it.zip_longest(
-        fitness_normalizer.normalize(population),
-        normalized,
-    ):
-        is_equivalent(
-            record1.get_molecule(),
-            record2.get_molecule(),
-        )
-        fitness_value = record1.get_fitness_value()
+    fitness_normalizer: stk.FitnessNormalizer[stk.MoleculeRecord[Any]],
+    population: dict[stk.MoleculeRecord[Any], Any],
+    normalized: dict[stk.MoleculeRecord[Any], Any],
+) -> None:
+    result = fitness_normalizer.normalize(population)
+    assert len(result) == len(population)
+    for record, fitness_value in result.items():
         if isinstance(fitness_value, np.ndarray):
             fitness_value = tuple(fitness_value)
-
-        assert fitness_value == record2.get_fitness_value()
-        assert record1.get_fitness_value(
-            normalized=False
-        ) == record2.get_fitness_value(normalized=False)
+        assert fitness_value == normalized[record]

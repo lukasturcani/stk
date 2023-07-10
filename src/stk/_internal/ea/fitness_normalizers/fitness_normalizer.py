@@ -1,4 +1,5 @@
 import typing
+from typing import Any
 
 T = typing.TypeVar("T")
 
@@ -17,7 +18,7 @@ class FitnessNormalizer(typing.Generic[T]):
     does not.
     """
 
-    def normalize(self, fitness_values: dict[T, typing.Any]) -> dict[T, float]:
+    def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
         """
         Normalize some fitness values.
 

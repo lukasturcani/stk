@@ -1,7 +1,7 @@
 import itertools
 import logging
 import typing
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator
 
 from stk._internal.ea.crossover.molecule_crosser import MoleculeCrosser
 from stk._internal.ea.crossover.record import CrossoverRecord

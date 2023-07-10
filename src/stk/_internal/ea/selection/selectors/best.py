@@ -1,8 +1,12 @@
 import itertools
 import typing
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Iterator, Sequence
 
 from stk._internal.ea.molecule_record import MoleculeRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.utilities.yielded_batches import (
+    YieldedBatches,
+)
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
@@ -151,19 +155,23 @@ class Best(Selector[T]):
         self._num_batches = num_batches
         self._batch_size = batch_size
 
-    def _select_from_batches(self, batches, yielded_batches):
-        batches = sorted(batches, reverse=True)
+    def _select_from_batches(
+        self,
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches,
+    ) -> Iterator[Batch[T]]:
+        selected_batches: Iterable[Batch[T]] = sorted(batches, reverse=True)
 
         if not self._duplicate_molecules:
-            batches = filter(
+            selected_batches = filter(
                 yielded_batches.has_no_yielded_molecules,
                 batches,
             )
 
         if not self._duplicate_batches:
-            batches = filter(
+            selected_batches = filter(
                 yielded_batches.is_unyielded_batch,
                 batches,
             )
 
-        yield from itertools.islice(batches, self._num_batches)
+        yield from itertools.islice(selected_batches, self._num_batches)
