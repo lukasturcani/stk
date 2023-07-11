@@ -101,7 +101,6 @@ class Roulette(Selector[T]):
             for selected1, selected2 in roulette.select(population):
                 # Do stuff to the molecules.
                 pass
-
     """
 
     def __init__(
@@ -167,19 +166,19 @@ class Roulette(Selector[T]):
             total = sum(batch.get_fitness_value() for batch in batches)
             weights = [batch.get_fitness_value() / total for batch in batches]
             yield self._generator.choice(
-                batches,
+                batches,  # type: ignore
                 p=weights,
             )
 
             if not self._duplicate_molecules:
-                batches = filter(
+                batches_ = filter(
                     yielded_batches.has_no_yielded_molecules,
                     batches,
                 )
             if not self._duplicate_batches:
-                batches = filter(
+                batches_ = filter(
                     yielded_batches.is_unyielded_batch,
                     batches,
                 )
             if not self._duplicate_molecules or not self._duplicate_batches:
-                batches = tuple(batches)
+                batches = tuple(batches_)
