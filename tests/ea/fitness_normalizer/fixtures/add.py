@@ -16,7 +16,7 @@ def _get_case_data_1() -> CaseData:
             filter=lambda fitness_values, record: fitness_values[record]
             is not None,
         ),
-        population={
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
             ): (1, 10, 100),

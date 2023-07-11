@@ -13,28 +13,28 @@ def _get_case_data_1() -> CaseData:
 
     return CaseData(
         fitness_normalizer=stk.NullFitnessNormalizer(),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): 1,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(2),
+            ): 2,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(3),
-        ),
-        normalized=(
+            ): 3,
+        },
+        normalized={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): 1,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(2),
+            ): 2,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(3),
-        ),
+            ): 3,
+        },
     )
 
 
@@ -42,5 +42,5 @@ def _get_case_data_1() -> CaseData:
     scope="session",
     params=(_get_case_data_1,),
 )
-def null(request) -> CaseData:
+def null(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

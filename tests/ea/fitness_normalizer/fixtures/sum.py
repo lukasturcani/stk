@@ -12,33 +12,33 @@ def _get_case_data_1() -> CaseData:
     )
     return CaseData(
         fitness_normalizer=stk.Sum(
-            filter=lambda population, record: record.get_fitness_value()
+            filter=lambda fitness_values, record: fitness_values[record]
             is not None,
         ),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((1, -5, 5)),
+            ): (1, -5, 5),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((3, -10, 2)),
+            ): (3, -10, 2),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((2, 20, 1)),
-            stk.MoleculeRecord(topology_graph),
-        ),
-        normalized=(
+            ): (2, 20, 1),
+            stk.MoleculeRecord(topology_graph): None,
+        },
+        normalized={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): 1,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(-5),
+            ): -5,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(23),
-            stk.MoleculeRecord(topology_graph),
-        ),
+            ): 23,
+            stk.MoleculeRecord(topology_graph): None,
+        },
     )
 
 
@@ -46,5 +46,5 @@ def _get_case_data_1() -> CaseData:
     scope="session",
     params=(_get_case_data_1,),
 )
-def sum(request) -> CaseData:
+def sum(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

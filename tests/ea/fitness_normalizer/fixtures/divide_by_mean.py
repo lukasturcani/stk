@@ -12,28 +12,28 @@ def _get_case_data_1() -> CaseData:
     )
     return CaseData(
         fitness_normalizer=stk.DivideByMean(),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): 1,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(2),
+            ): 2,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(3),
-        ),
-        normalized=(
+            ): 3,
+        },
+        normalized={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(0.5),
+            ): 0.5,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): 1,
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1.5),
-        ),
+            ): 1.5,
+        },
     )
 
 
@@ -45,33 +45,33 @@ def _get_case_data_2() -> CaseData:
     )
     return CaseData(
         fitness_normalizer=stk.DivideByMean(
-            filter=lambda population, record: record.get_fitness_value()
+            filter=lambda fitness_values, record: fitness_values[record]
             is not None,
         ),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((1, 10, 100)),
+            ): (1, 10, 100),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((2, 20, 200)),
+            ): (2, 20, 200),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((3, 30, 300)),
-            stk.MoleculeRecord(topology_graph),
-        ),
-        normalized=(
+            ): (3, 30, 300),
+            stk.MoleculeRecord(topology_graph): None,
+        },
+        normalized={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((0.5, 0.5, 0.5)),
+            ): (0.5, 0.5, 0.5),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((1, 1, 1)),
+            ): (1, 1, 1),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((1.5, 1.5, 1.5)),
-            stk.MoleculeRecord(topology_graph),
-        ),
+            ): (1.5, 1.5, 1.5),
+            stk.MoleculeRecord(topology_graph): None,
+        },
     )
 
 

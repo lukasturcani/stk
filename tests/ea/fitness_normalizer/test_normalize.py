@@ -9,7 +9,7 @@ from .case_data import CaseData
 def test_normalize(case_data: CaseData) -> None:
     _test_normalize(
         fitness_normalizer=case_data.fitness_normalizer,
-        population=case_data.population,
+        population=case_data.fitness_values,
         normalized=case_data.normalized,
     )
 
