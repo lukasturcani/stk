@@ -1,27 +1,15 @@
-import itertools as it
+import itertools
+import typing
+from collections.abc import Sequence
 
 import stk
 
+from .case_data import CaseData
 
-def test_select(case_data):
-    """
-    Test :meth:`.Selector.select`.
+T = typing.TypeVar("T", bound=stk.MoleculeRecord)
 
-    This test checks that the correct batches have been yielded and
-    in the correct order.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the selector to test and the batches which
-        should be selected.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
+def test_select(case_data: CaseData) -> None:
     _test_select(
         selector=case_data.selector,
         population=case_data.population,
@@ -29,29 +17,13 @@ def test_select(case_data):
     )
 
 
-def _test_select(selector, population, selected):
-    """
-    Test :meth:`.Selector.select`.
-
-    Parameters
-    ----------
-    selector : :class:`.Selector`
-        The selector to test.
-
-    population : :class:`tuple` of :class:`.MoleculeRecord`
-        The population from which batches are selected.
-
-    selected : :class:`tuple` of :class:`.Batch`
-            The batches which should be selected.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
+def _test_select(
+    selector: stk.Selector[T],
+    population: dict[T, float],
+    selected: Sequence[stk.Batch[T]],
+) -> None:
     inchi = stk.Inchi()
-    for batch1, batch2 in it.zip_longest(
+    for batch1, batch2 in itertools.zip_longest(
         selector.select(population),
         selected,
     ):
