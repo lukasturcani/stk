@@ -5,9 +5,7 @@ import numpy as np
 
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.selection.batch import Batch
-from stk._internal.ea.selection.selectors.utilities.yielded_batches import (
-    YieldedBatches,
-)
+from stk._internal.ea.selection.selectors.yielded_batches import YieldedBatches
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
@@ -128,7 +126,7 @@ class StochasticUniversalSampling(Selector[T]):
     def _select_from_batches(
         self,
         batches: Sequence[Batch[T]],
-        yielded_batches: YieldedBatches,
+        yielded_batches: YieldedBatches[T],
     ) -> Iterator[Batch[T]]:
         batches = sorted(batches, reverse=True)
 
@@ -168,7 +166,7 @@ class StochasticUniversalSampling(Selector[T]):
     def _select_with_stochastic_universal_sampling(
         self,
         batches: Sequence[Batch[T]],
-        yielded_batches: YieldedBatches,
+        yielded_batches: YieldedBatches[T],
     ) -> Iterator[Batch[T]]:
         total = sum(batch.get_fitness_value() for batch in batches)
         batch_positions = []
@@ -177,8 +175,9 @@ class StochasticUniversalSampling(Selector[T]):
             batch_position += batch.get_fitness_value() / total
             batch_positions.append(batch_position)
 
-        num_batches = min(
-            self._num_batches - yielded_batches.get_num(), len(batches)
+        num_batches = typing.cast(
+            int,
+            min(self._num_batches - yielded_batches.get_num(), len(batches)),
         )
         pointer_distance = 1 / num_batches
         pointers = []

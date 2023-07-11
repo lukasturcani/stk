@@ -5,9 +5,7 @@ import numpy as np
 
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.selection.batch import Batch
-from stk._internal.ea.selection.selectors.utilities.yielded_batches import (
-    YieldedBatches,
-)
+from stk._internal.ea.selection.selectors.yielded_batches import YieldedBatches
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
@@ -121,7 +119,7 @@ class Tournament(Selector[T]):
     def _select_from_batches(
         self,
         batches: Sequence[Batch[T]],
-        yielded_batches: YieldedBatches,
+        yielded_batches: YieldedBatches[T],
     ) -> Iterator[Batch[T]]:
         # The tournament can only take place if there is more than 1
         # batch.

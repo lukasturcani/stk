@@ -7,7 +7,7 @@ from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from ..batch import Batch, BatchKey
-from .utilities.yielded_batches import YieldedBatches
+from .yielded_batches import YieldedBatches
 
 T = typing.TypeVar("T", bound=MoleculeRecord)
 logger = logging.getLogger(__name__)
@@ -124,7 +124,7 @@ class Selector(typing.Generic[T]):
             )
         )
 
-        yielded_batches = YieldedBatches(self._key_maker)
+        yielded_batches: YieldedBatches[T] = YieldedBatches(self._key_maker)
         for batch in self._select_from_batches(
             batches=batches,
             yielded_batches=yielded_batches,
@@ -186,7 +186,7 @@ class Selector(typing.Generic[T]):
     def _select_from_batches(
         self,
         batches: Sequence[Batch[T]],
-        yielded_batches: YieldedBatches,
+        yielded_batches: YieldedBatches[T],
     ) -> Iterator[Batch[T]]:
         """
         Yield batches from `batches`.

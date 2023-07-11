@@ -5,9 +5,7 @@ import numpy as np
 
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.selection.batch import Batch
-from stk._internal.ea.selection.selectors.utilities.yielded_batches import (
-    YieldedBatches,
-)
+from stk._internal.ea.selection.selectors.yielded_batches import YieldedBatches
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
@@ -163,7 +161,7 @@ class Roulette(Selector[T]):
     def _select_from_batches(
         self,
         batches: Sequence[Batch[T]],
-        yielded_batches: YieldedBatches,
+        yielded_batches: YieldedBatches[T],
     ) -> Iterator[Batch[T]]:
         while batches and yielded_batches.get_num() < self._num_batches:
             total = sum(batch.get_fitness_value() for batch in batches)
