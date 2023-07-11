@@ -1,75 +1,67 @@
-"""
-Normalizer Sequence
-===================
-
-"""
+import typing
+from collections.abc import Iterable
+from typing import Any
 
 from .fitness_normalizer import FitnessNormalizer
 
+T = typing.TypeVar("T")
 
-class NormalizerSequence(FitnessNormalizer):
+
+class NormalizerSequence(FitnessNormalizer[T]):
     """
     Applies other normalizers in sequence.
 
-    Examples
-    --------
-    *Using Multiple Fitness Normalizers*
+    Examples:
 
-    You want to apply multiple fitness normalizations in sequence,
-    for example, by first using :class:`.DivideByMean`, followed by
-    :class:`.Sum`
+        *Using Multiple Fitness Normalizers*
 
-    .. testcode:: using-multiple-fitness-normalizers
+        You want to apply multiple fitness normalizations in sequence,
+        for example, by first using :class:`.DivideByMean`, followed by
+        :class:`.Sum`
 
-        import stk
-        import numpy as np
+        .. testcode:: using-multiple-fitness-normalizers
 
-        building_block = stk.BuildingBlock(
-            smiles='BrCCBr',
-            functional_groups=[stk.BromoFactory()],
-        )
+            import stk
+            import numpy as np
 
-        population = (
-            stk.MoleculeRecord(
+            building_block = stk.BuildingBlock(
+                smiles='BrCCBr',
+                functional_groups=[stk.BromoFactory()],
+            )
+            record = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(building_block, ),
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
-            ).with_fitness_value(
-                fitness_value=(1, 100, 1000),
-                normalized=False,
-            ),
-        )
-
-        # Create the normalizer.
-        normalizer = stk.NormalizerSequence(
-            fitness_normalizers=(
-                stk.DivideByMean(),
-                stk.Sum(),
-            ),
-        )
-        normalized_population = normalizer.normalize(population)
-        normalized_record, = normalized_population
-        assert normalized_record.get_fitness_value() == 3
-
+            )
+            fitness_values = {
+                record: (1, 100, 1000),
+            }
+            # Create the normalizer.
+            normalizer = stk.NormalizerSequence(
+                fitness_normalizers=(
+                    stk.DivideByMean(),
+                    stk.Sum(),
+                ),
+            )
+            normalized_fitness_values = normalizer.normalize(fitness_values)
+            assert normalized_fitness_values[record] == 3
     """
 
-    def __init__(self, fitness_normalizers):
+    def __init__(
+        self,
+        fitness_normalizers: Iterable[FitnessNormalizer[T]],
+    ) -> None:
         """
-        Initialize a :class:`.NormalizerSequence`.
-
-        Parameters
-        ----------
-        fitness_normalizers : :class:`iterable`
-            The :class:`.FitnessNormalizer` instances which should be
-            used in sequence.
-
+        Parameters:
+            fitness_normalizers:
+                The :class:`.FitnessNormalizer` instances which should be
+                used in sequence.
         """
-
         self._fitness_normalizers = tuple(fitness_normalizers)
 
-    def normalize(self, population):
+    def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
         for normalizer in self._fitness_normalizers:
-            population = tuple(normalizer.normalize(population))
-        yield from population
+            fitness_values = normalizer.normalize(fitness_values)
+        return fitness_values

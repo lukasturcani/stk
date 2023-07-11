@@ -17,7 +17,7 @@ class DivideByMean(FitnessNormalizer[T]):
     Divides fitness values by the population mean.
 
     While this function can be used if the fitness value of each
-    :class:`.Molecule` in the population is a single
+    molecule in the population is a single
     number, it is most useful when the fitness value is a
     :class:`tuple` of numbers. In this case, it is necessary to somehow
     combine the numbers so that a single fitness value is produced.
@@ -54,42 +54,34 @@ class DivideByMean(FitnessNormalizer[T]):
                 smiles='BrCCBr',
                 functional_groups=[stk.BromoFactory()],
             )
-
-            population = (
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(building_block, ),
-                        repeating_unit='A',
-                        num_repeating_units=2,
-                    ),
-                ).with_fitness_value(
-                    fitness_value=(1., 2., 3.),
-                    normalized=False,
-                ),
-                # This will have a fitness value of None.
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(building_block, ),
-                        repeating_unit='A',
-                        num_repeating_units=2,
-                    ),
+            record1 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
                 ),
             )
-
+            record2 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            )
+            fitness_values = {
+                record1: (1., 2., 3.),
+                record2: None,
+            }
             mean_scaler = stk.DivideByMean(
                 # Only normalize values which are not None.
-                filter=lambda population, record:
-                    record.get_fitness_value() is not None
+                filter=lambda fitness_values, record:
+                    fitness_values[record] is not None
             )
-            # Calling mean_scaler.normalize() will return a new
-            # population holding the molecule records with normalized
-            # fitness values.
-            normalized_population = tuple(mean_scaler.normalize(
-                population=population,
-            ))
-            normalized_record1, normalized_record2 = normalized_population
+            normalized_fitness_values = mean_scaler.normalize(
+                fitness_values=fitness_values,
+            )
             assert np.all(np.equal(
-                normalized_record1.get_fitness_value(),
+                normalized_fitness_values[record1],
                 (1, 1, 1),
             ))
     """
@@ -98,7 +90,7 @@ class DivideByMean(FitnessNormalizer[T]):
         self,
         filter: Callable[
             [dict[T, Any], T], bool
-        ] = lambda population, record: True,
+        ] = lambda fitness_values, record: True,
     ) -> None:
         """
         Parameters:
@@ -107,28 +99,28 @@ class DivideByMean(FitnessNormalizer[T]):
                 molecules which return ``True`` will have fitness values
                 normalized. By default, all molecules will have fitness
                 values normalized.
-                The instance passed to the `population` argument of
+                The instance passed to the `fitness_values` argument of
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
         """
         self._filter = filter
 
-    def normalize(self, population: dict[T, Any]) -> dict[T, Any]:
+    def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
         filtered = {
             record: fitness_value
-            for record, fitness_value in population.items()
-            if self._filter(population, record)
+            for record, fitness_value in fitness_values.items()
+            if self._filter(fitness_values, record)
         }
         mean = np.mean(
-            a=[population[record] for record in filtered],
+            a=[fitness_values[record] for record in filtered],
             axis=0,
         )
         logger.debug(f"Means used: {mean}")
 
         return {
             record: np.divide(fitness_value, mean)
-            if self._filter(population, record)
+            if self._filter(fitness_values, record)
             else fitness_value
-            for record, fitness_value in population.items()
+            for record, fitness_value in fitness_values.items()
         }

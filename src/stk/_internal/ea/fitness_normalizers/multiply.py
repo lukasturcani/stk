@@ -1,5 +1,5 @@
 import typing
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from typing import Any
 
 import numpy as np
@@ -44,25 +44,20 @@ class Multiply(FitnessNormalizer[T]):
                 smiles='BrCCBr',
                 functional_groups=[stk.BromoFactory()],
             )
-
-            population = (
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(building_block, ),
-                        repeating_unit='A',
-                        num_repeating_units=2,
-                    ),
-                ).with_fitness_value(
-                    fitness_value=(1, 1, 1),
-                    normalized=False,
+            record = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
                 ),
             )
-
+            fitness_values = {
+                record: (1, 1, 1),
+            }
             normalizer = stk.Multiply((1, 2, 3))
-            normalized_population = tuple(normalizer.normalize(population))
-            normalized_record, = normalized_population
+            normalized_fitness_values = normalizer.normalize(fitness_values)
             assert np.all(np.equal(
-                normalized_record.get_fitness_value(),
+                normalized_fitness_values[record],
                 (1, 2, 3),
             ))
 
@@ -83,53 +78,44 @@ class Multiply(FitnessNormalizer[T]):
                 smiles='BrCCBr',
                 functional_groups=[stk.BromoFactory()],
             )
-
-            population = (
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(building_block, ),
-                        repeating_unit='A',
-                        num_repeating_units=2,
-                    ),
-                ).with_fitness_value(
-                    fitness_value=(1, 1, 1),
-                    normalized=False,
-                ),
-                # This will have a fitness value of None.
-                stk.MoleculeRecord(
-                    topology_graph=stk.polymer.Linear(
-                        building_blocks=(building_block, ),
-                        repeating_unit='A',
-                        num_repeating_units=2,
-                    ),
+            record1 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
                 ),
             )
-
+            record2 = stk.MoleculeRecord(
+                topology_graph=stk.polymer.Linear(
+                    building_blocks=(building_block, ),
+                    repeating_unit='A',
+                    num_repeating_units=2,
+                ),
+            )
+            fitness_values = {
+                record1: (1, 1, 1),
+                record2: None,
+            }
             normalizer = stk.Multiply(
                 coefficient=(1, 2, 3),
                 # Only normalize values which are not None.
-                filter=lambda population, record:
-                    record.get_fitness_value() is not None,
+                filter=lambda fitness_values, record:
+                    fitness_values[record] is not None,
             )
-
-            # Calling normalizer.normalize() will return a new
-            # population holding the molecule records with normalized
-            # fitness values.
-            normalized_population = tuple(normalizer.normalize(
-                population=population,
-            ))
-            normalized_record1, normalized_record2 = normalized_population
+            normalized_fitness_values = normalizer.normalize(fitness_values)
             assert np.all(np.equal(
-                normalized_record1.get_fitness_value(),
+                normalized_fitness_values[record1],
                 (1, 2, 3),
             ))
-            assert normalized_record2.get_fitness_value() is None
+            assert normalized_fitness_values[record2] is None
     """
 
     def __init__(
         self,
         coefficient: float | Iterable[float],
-        filter=lambda population, record: True,
+        filter: Callable[
+            [dict[T, Any], T], bool
+        ] = lambda fitness_values, record: True,
     ) -> None:
         """
         Parameters:
@@ -143,7 +129,7 @@ class Multiply(FitnessNormalizer[T]):
                 molecules which return ``True`` will have fitness values
                 normalized. By default, all molecules will have fitness
                 values normalized.
-                The instance passed to the `population` argument of
+                The instance passed to the `fitness_values` argument of
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
@@ -153,17 +139,10 @@ class Multiply(FitnessNormalizer[T]):
         self._coefficient = coefficient
         self._filter = filter
 
-    def normalize(self, population: dict[T, Any]) -> dict[T, Any]:
-        for record in population:
-            if self._filter(population, record):
-                # Use np.multiply here so that both lists and arrays
-                # work properly. If * is used [8]*3 will wrongly make
-                # [8, 8, 8].
-                yield record.with_fitness_value(
-                    fitness_value=np.multiply(
-                        self._coefficient,
-                        record.get_fitness_value(),
-                    ),
-                )
-            else:
-                yield record
+    def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
+        return {
+            record: np.multiply(self._coefficient, fitness_value)
+            if self._filter(fitness_values, record)
+            else fitness_value
+            for record, fitness_value in fitness_values.items()
+        }
