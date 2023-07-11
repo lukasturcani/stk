@@ -82,5 +82,5 @@ def _get_case_data_2() -> CaseData:
         _get_case_data_2,
     ),
 )
-def divide_by_mean(request) -> CaseData:
+def divide_by_mean(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

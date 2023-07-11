@@ -13,7 +13,7 @@ def _get_case_data_1() -> CaseData:
     return CaseData(
         fitness_normalizer=stk.Add(
             number=(1, 2, 3),
-            filter=lambda population, record: record.get_fitness_value()
+            filter=lambda fitness_values, record: fitness_values[record]
             is not None,
         ),
         population={
