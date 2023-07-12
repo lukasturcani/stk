@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing
 from collections import abc
 from dataclasses import dataclass
@@ -409,24 +407,22 @@ class Linear(TopologyGraph):
 
     def __init__(
         self,
-        building_blocks: tuple[BuildingBlock, ...],
-        repeating_unit: typing.Union[str, tuple[int, ...]],
+        building_blocks: abc.Iterable[BuildingBlock],
+        repeating_unit: str | abc.Iterable[int],
         num_repeating_units: int,
-        orientations: tuple[float, ...] | None = None,
+        orientations: abc.Iterable[float] | None = None,
         random_seed: int | np.random.Generator | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
         """
-        Initialize a :class:`Linear` instance.
-
         Parameters:
 
-            building_blocks:
+            building_blocks (list[BuildingBlock]):
                 The building blocks of the polymer.
 
-            repeating_unit:
+            repeating_unit (str | list[int]):
                 A string specifying the repeating unit of the polymer.
                 For example, ``'AB'`` or ``'ABB'``. The first building
                 block passed to `building_blocks` is ``'A'`` and so on.
@@ -439,7 +435,7 @@ class Linear(TopologyGraph):
                 The number of repeating units which are used to make
                 the polymer.
 
-            orientations:
+            orientations (list[float]):
                 For each character in the repeating unit, a value
                 between ``0`` and ``1`` (both inclusive) must be given
                 in a :class:`tuple`. It indicates the probability that
@@ -486,8 +482,13 @@ class Linear(TopologyGraph):
 
         """
 
+        if not isinstance(repeating_unit, str):
+            repeating_unit = tuple(repeating_unit)
+
         if orientations is None:
             orientations = tuple(0.0 for _ in range(len(repeating_unit)))
+        else:
+            orientations = tuple(orientations)
 
         if len(orientations) == len(repeating_unit):
             orientations = orientations * num_repeating_units
@@ -526,7 +527,7 @@ class Linear(TopologyGraph):
 
         super().__init__(
             building_block_vertices=self._get_building_block_vertices(
-                building_blocks=building_blocks,
+                building_blocks=tuple(building_blocks),
                 vertices=vertices,
             ),
             edges=edges,
@@ -542,7 +543,7 @@ class Linear(TopologyGraph):
         body_orientations: abc.Iterable[float],
         tail_orientation: float,
         random_seed: int | np.random.Generator | None,
-    ) -> _VerticesAndEdges:
+    ) -> "_VerticesAndEdges":
         """
         Get the vertices and edges of the topology graph.
 
@@ -607,7 +608,7 @@ class Linear(TopologyGraph):
             edges=tuple(edges),
         )
 
-    def clone(self) -> Linear:
+    def clone(self) -> typing.Self:
         clone = self._clone()
         clone._repeating_unit = self._repeating_unit
         clone._num_repeating_units = self._num_repeating_units
@@ -694,7 +695,7 @@ class Linear(TopologyGraph):
     def with_building_blocks(
         self,
         building_block_map: dict[BuildingBlock, BuildingBlock],
-    ) -> Linear:
+    ) -> typing.Self:
         return self.clone()._with_building_blocks(building_block_map)
 
     def __repr__(self) -> str:

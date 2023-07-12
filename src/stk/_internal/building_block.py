@@ -45,9 +45,9 @@ class BuildingBlock(Molecule):
     def __init__(
         self,
         smiles: str,
-        functional_groups: Iterable[
-            FunctionalGroup | FunctionalGroupFactory
-        ] = (),
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
         placer_ids: Iterable[int] | None = None,
         position_matrix: np.ndarray | None = None,
     ) -> None:
@@ -57,7 +57,9 @@ class BuildingBlock(Molecule):
             smiles:
                 A SMILES string of the molecule.
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup | \
+FunctionalGroupFactory | list[FunctionalGroup] | \
+list[FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -98,6 +100,12 @@ class BuildingBlock(Molecule):
                 If embedding the molecule fails.
 
         """
+
+        if isinstance(
+            functional_groups,
+            FunctionalGroup | FunctionalGroupFactory,
+        ):
+            functional_groups = (functional_groups,)
 
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
         if position_matrix is None:

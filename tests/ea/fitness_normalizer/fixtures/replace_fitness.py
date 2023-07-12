@@ -6,11 +6,13 @@ from ..case_data import CaseData
 
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
-    return CaseData(
+    return CaseData.new(
         fitness_normalizer=stk.ReplaceFitness(
             get_replacement=lambda fitness_values: min(
                 fitness_value
@@ -24,28 +26,14 @@ def _get_case_data_1() -> CaseData:
         fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ): 1,
+            ): (1, 1),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ): 2,
+            ): (2, 2),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ): 3,
-            stk.MoleculeRecord(topology_graph): None,
-        },
-        normalized={
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ): 1,
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ): 2,
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ): 3,
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ): 0.5,
+            ): (3, 3),
+            stk.MoleculeRecord(topology_graph): (None, 0.5),
         },
     )
 
