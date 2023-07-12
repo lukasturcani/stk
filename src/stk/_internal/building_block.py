@@ -30,6 +30,10 @@ class BuildingBlock(Molecule):
     :class:`.FunctionalGroup` instances to identify which atoms are
     modified during construction.
 
+    See Also:
+        * :class:`.Atom`: Represents atoms of a building block.
+        * :class:`.Bond`: Represents bonds of a building block.
+
     """
 
     # Maps file extensions to functions which can be used to
