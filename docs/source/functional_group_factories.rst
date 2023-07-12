@@ -4,7 +4,7 @@ Functional Group Factories
 .. toctree::
   :maxdepth: 1
 
-  Functional Group Factory <_autosummary/stk.FunctionalGroupFactory>
+  Functional Group Factory Overview and Examples  <_autosummary/stk.FunctionalGroupFactory>
   Alcohol Factory <_autosummary/stk.AlcoholFactory>
   Aldehyde Factory <_autosummary/stk.AldehydeFactory>
   Amide Factory <_autosummary/stk.AmideFactory>

@@ -4,7 +4,7 @@ Metal Complexes
 .. toctree::
   :maxdepth: 1
 
-  Metal Complex <_autosummary/stk.metal_complex.MetalComplex>
+  Metal Complex Overview and Examples <_autosummary/stk.metal_complex.MetalComplex>
   Paddlewheel <_autosummary/stk.metal_complex.Paddlewheel>
   Porphyrin <_autosummary/stk.metal_complex.Porphyrin>
   Octahedral <_autosummary/stk.metal_complex.Octahedral>

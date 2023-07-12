@@ -4,7 +4,7 @@ Covalent Organic Frameworks
 .. toctree::
     :maxdepth: 1
 
-    Cof <_autosummary/stk.cof.Cof>
+    Cof Overview and Examples  <_autosummary/stk.cof.Cof>
     Hexagonal <_autosummary/stk.cof.Hexagonal>
     Honeycomb <_autosummary/stk.cof.Honeycomb>
     Kagome <_autosummary/stk.cof.Kagome>
