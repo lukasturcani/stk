@@ -1,13 +1,6 @@
-"""
-Constructed Molecule
-====================
-
-"""
-
-from __future__ import annotations
-
 import logging
 import typing
+from collections.abc import Iterable, Iterator
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
@@ -27,9 +20,13 @@ from stk._internal.utilities.molecule import (
     get_bond_info_atom_ids,
     sort_bond_atoms_by_id,
 )
-from stk._internal.utilities.utilities import OneOrMany
 
 logger = logging.getLogger(__name__)
+
+T = typing.TypeVar("T", bound="ConstructedMolecule")
+
+
+NumBuildingBlocks: typing.TypeAlias = dict[Molecule, int]
 
 
 class ConstructedMolecule(Molecule):
@@ -100,20 +97,12 @@ class ConstructedMolecule(Molecule):
     _bond_infos: tuple[BondInfo, ...]
     _num_building_blocks: dict[Molecule, int]
 
-    def __init__(
-        self,
-        topology_graph: TopologyGraph,
-    ) -> None:
+    def __init__(self, topology_graph: TopologyGraph) -> None:
         """
-        Initialize a :class:`.ConstructedMolecule`.
-
         Parameters:
-
             topology_graph:
                 The topology graph of the constructed molecule.
-
         """
-
         self._init_from_construction_result(
             obj=self,
             construction_result=topology_graph.construct(),
@@ -122,31 +111,31 @@ class ConstructedMolecule(Molecule):
     @classmethod
     def init(
         cls,
-        atoms: tuple[Atom, ...],
-        bonds: tuple[Bond, ...],
+        atoms: Iterable[Atom],
+        bonds: Iterable[Bond],
         position_matrix: np.ndarray,
-        atom_infos: tuple[AtomInfo, ...],
-        bond_infos: tuple[BondInfo, ...],
-        num_building_blocks: dict[Molecule, int],
-    ) -> ConstructedMolecule:
+        atom_infos: Iterable[AtomInfo],
+        bond_infos: Iterable[BondInfo],
+        num_building_blocks: "NumBuildingBlocks",
+    ) -> typing.Self:
         """
         Initialize a :class:`.ConstructedMolecule` from its components.
 
         Parameters:
 
-            atoms:
+            atoms (list[Atom]):
                 The atoms of the molecule.
 
-            bond:
+            bonds (list[Bond]):
                 The bonds of the molecule.
 
             position_matrix:
                 A ``(n, 3)`` position matrix of the molecule.
 
-            atom_infos:
+            atom_infos (list[AtomInfo]):
                 The atom infos of the molecule.
 
-            bond_infos:
+            bond_infos (list[BondInfo]):
                 The bond infos of the molecule.
 
             num_building_blocks:
@@ -154,15 +143,12 @@ class ConstructedMolecule(Molecule):
                 the number of times it is present in it.
 
         Returns:
-
-            The constructed molecule.
-
+            ConstructedMolecule: The constructed molecule.
         """
-
         molecule = cls.__new__(cls)
         Molecule.__init__(molecule, atoms, bonds, position_matrix)
-        molecule._atom_infos = atom_infos
-        molecule._bond_infos = bond_infos
+        molecule._atom_infos = tuple(atom_infos)
+        molecule._bond_infos = tuple(bond_infos)
         molecule._num_building_blocks = dict(num_building_blocks)
         return molecule
 
@@ -170,22 +156,17 @@ class ConstructedMolecule(Molecule):
     def init_from_construction_result(
         cls,
         construction_result: ConstructionResult,
-    ) -> ConstructedMolecule:
+    ) -> typing.Self:
         """
         Initialize a :class:`.ConstructedMolecule`.
 
         Parameters:
-
             construction_result:
                 The result of a construction, from which the
                 :class:`.ConstructedMolecule` should be initialized.
-
         Returns:
-
-            The constructed molecule.
-
+            ConstructedMolecule: The constructed molecule.
         """
-
         return cls._init_from_construction_result(
             obj=cls.__new__(cls),
             construction_result=construction_result,
@@ -193,16 +174,15 @@ class ConstructedMolecule(Molecule):
 
     @staticmethod
     def _init_from_construction_result(
-        obj: ConstructedMolecule,
+        obj: T,
         construction_result: ConstructionResult,
-    ) -> ConstructedMolecule:
+    ) -> T:
         """
         Initialize a :class:`.ConstructedMolecule`.
 
         This modifies `obj`.
 
         Parameters:
-
             obj:
                 The constructed molecule to initialize.
 
@@ -211,11 +191,8 @@ class ConstructedMolecule(Molecule):
                 :class:`.ConstructedMolecule` should be initialized.
 
         Returns:
-
             The `obj` instance.
-
         """
-
         super(ConstructedMolecule, obj).__init__(
             atoms=construction_result.get_atoms(),
             bonds=construction_result.get_bonds(),
@@ -231,14 +208,20 @@ class ConstructedMolecule(Molecule):
         }
         return obj
 
-    def clone(self) -> ConstructedMolecule:
-        clone = self._clone()
+    def clone(self) -> typing.Self:
+        """
+        Return a clone.
+
+        Returns:
+            ConstructedMolecule: The clone.
+        """
+        clone = super().clone()
         clone._atom_infos = self._atom_infos
         clone._bond_infos = self._bond_infos
         clone._num_building_blocks = dict(self._num_building_blocks)
         return clone
 
-    def get_building_blocks(self) -> typing.Iterator[Molecule]:
+    def get_building_blocks(self) -> Iterator[Molecule]:
         """
         Yield the building blocks of the constructed molecule.
 
@@ -249,11 +232,8 @@ class ConstructedMolecule(Molecule):
         yielded at the same time.
 
         Yields:
-
             A building block of the constructed molecule.
-
         """
-
         yield from self._num_building_blocks
 
     def get_num_building_block(
@@ -264,36 +244,30 @@ class ConstructedMolecule(Molecule):
         Get the number of times `building_block` is present.
 
         Parameters:
-
             building_block:
                 The building block whose frequency in the constructed
                 molecule is desired.
 
         Returns:
-
             The number of times `building_block` was used in the
             construction of the constructed molecule.
-
         """
-
         return self._num_building_blocks[building_block]
 
     def get_atom_infos(
         self,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> typing.Iterator[AtomInfo]:
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> Iterator[AtomInfo]:
         """
         Yield data about atoms in the molecule.
 
         Parameters:
-
-            atom_ids:
+            atom_ids (int | list[int] | None):
                 The ids of atoms whose data is desired. If ``None``,
                 data on all atoms will be yielded. Can be a single
                 :class:`int`, if data on a single atom is desired.
 
         Yields:
-
             Data about an atom.
 
         """
@@ -306,22 +280,26 @@ class ConstructedMolecule(Molecule):
         for atom_id in atom_ids:
             yield self._atom_infos[atom_id]
 
-    def get_bond_infos(self) -> typing.Iterator[BondInfo]:
+    def get_bond_infos(self) -> Iterator[BondInfo]:
         """
         Yield data about bonds in the molecule.
 
         Yields:
-
             Data about a bond.
-
         """
 
         yield from self._bond_infos
 
-    def with_canonical_atom_ordering(self) -> ConstructedMolecule:
+    def with_canonical_atom_ordering(self) -> typing.Self:
+        """
+        Return a clone, with canonically ordered atoms.
+
+        Returns:
+            ConstructedMolecule: The clone.
+        """
         return self.clone()._with_canonical_atom_ordering()
 
-    def _with_canonical_atom_ordering(self) -> ConstructedMolecule:
+    def _with_canonical_atom_ordering(self) -> typing.Self:
         # Make all building blocks canonically ordered too.
         building_blocks = {
             building_block: building_block.with_canonical_atom_ordering()
@@ -418,45 +396,119 @@ class ConstructedMolecule(Molecule):
     def with_centroid(
         self,
         position: np.ndarray,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> ConstructedMolecule:
-        return self.clone()._with_centroid(position, atom_ids)
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> typing.Self:
+        """
+        Return a clone with its centroid at `position`.
+
+        Parameters:
+            position:
+                This array holds the position on which the centroid of
+                the clone is going to be placed.
+
+            atom_ids (int | list[int] | None):
+                The ids of atoms which should have their centroid set
+                to `position`. If ``None``, all atoms are used.
+        Returns:
+            ConstructedMolecule: A clone with its centroid at `position`.
+        """
+        return super().with_centroid(position, atom_ids)
 
     def with_displacement(
         self,
         displacement: np.ndarray,
-    ) -> ConstructedMolecule:
-        return self.clone()._with_displacement(displacement)
+    ) -> typing.Self:
+        """
+        Return a displaced clone.
+
+        Parameters:
+            displacement:
+                The displacement vector to be applied.
+        Returns:
+            ConstructedMolecule: A displaced clone.
+        """
+        return super().with_displacement(displacement)
 
     def with_position_matrix(
         self,
         position_matrix: np.ndarray,
-    ) -> ConstructedMolecule:
-        return self.clone()._with_position_matrix(position_matrix)
+    ) -> typing.Self:
+        """
+        Return a clone with atomic positions set by `position_matrix`.
+
+        Parameters:
+            position_matrix:
+                The position matrix of the clone. The shape of the
+                matrix is ``(n, 3)``.
+        Returns:
+            ConstructedMolecule: The clone.
+        """
+        return super().with_position_matrix(position_matrix)
 
     def with_rotation_about_axis(
         self,
         angle: float,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> ConstructedMolecule:
-        return self.clone()._with_rotation_about_axis(
-            angle=angle,
-            axis=axis,
-            origin=origin,
-        )
+    ) -> typing.Self:
+        """
+        Return a rotated clone.
+
+        The clone is rotated by `angle` about `axis` on the
+        `origin`.
+
+        Parameters:
+            angle:
+                The size of the rotation in radians.
+            axis:
+                The axis about which the rotation happens. Must have
+                unit magnitude.
+            origin:
+                The origin about which the rotation happens.
+        Returns:
+            ConstructedMolecule: A rotated clone.
+        """
+        return super().with_rotation_about_axis(angle, axis, origin)
 
     def with_rotation_between_vectors(
         self,
         start: np.ndarray,
         target: np.ndarray,
         origin: np.ndarray,
-    ) -> ConstructedMolecule:
-        return self.clone()._with_rotation_between_vectors(
-            start=start,
-            target=target,
-            origin=origin,
-        )
+    ) -> typing.Self:
+        """
+        Return a rotated clone.
+
+        The rotation is equal to a rotation from `start` to `target`.
+
+        Given two direction vectors, `start` and `target`, this method
+        applies the rotation required transform `start` to `target`
+        onto the clone. The rotation occurs about the `origin`.
+
+        For example, if the `start` and `target` vectors
+        are 45 degrees apart, a 45 degree rotation will be applied to
+        the clone. The rotation will be along the appropriate
+        direction.
+
+        The great thing about this method is that you as long as you
+        can associate a geometric feature of the molecule with a
+        vector, then the clone can be rotated so that this vector is
+        aligned with `target`. The defined vector can be virtually
+        anything. This means that any geometric feature of the molecule
+        can be easily aligned with any arbitrary direction.
+
+        Parameters:
+            start:
+                A vector which is to be rotated so that it transforms
+                into the `target` vector.
+            target:
+                The vector onto which `start` is rotated.
+            origin:
+                The point about which the rotation occurs.
+        Returns:
+            ConstructedMolecule: A rotated clone.
+        """
+        return super().with_rotation_between_vectors(start, target, origin)
 
     def with_rotation_to_minimize_angle(
         self,
@@ -464,8 +516,44 @@ class ConstructedMolecule(Molecule):
         target: np.ndarray,
         axis: np.ndarray,
         origin: np.ndarray,
-    ) -> ConstructedMolecule:
-        return self.clone()._with_rotation_to_minimize_angle(
+    ) -> typing.Self:
+        """
+        Return a rotated clone.
+
+        The clone is rotated by the rotation required to minimize
+        the angle between `start` and `target`.
+
+        Note that this function will not necessarily overlay the
+        `start` and `target` vectors. This is because the possible
+        rotation is restricted to the `axis`.
+
+        Parameters:
+
+            start:
+                The vector which is rotated.
+
+            target:
+                The vector which is stationary.
+
+            axis:
+                The vector about which the rotation happens. Must have
+                unit magnitude.
+
+            origin:
+                The origin about which the rotation happens.
+
+        Returns:
+
+            ConstructedMolecule: A rotated clone.
+
+        Raises:
+
+            :class:`ValueError`
+                If `target` has a magnitude of 0. In this case it is
+                not possible to calculate an angle between `start` and
+                `target`.
+        """
+        return super().with_rotation_to_minimize_angle(
             start=start,
             target=target,
             axis=axis,
@@ -475,19 +563,59 @@ class ConstructedMolecule(Molecule):
     def with_structure_from_file(
         self,
         path: str,
-        extension: typing.Optional[str] = None,
-    ) -> ConstructedMolecule:
-        return typing.cast(
-            ConstructedMolecule,
-            super().with_structure_from_file(path, extension),
-        )
+        extension: str | None = None,
+    ) -> typing.Self:
+        """
+        Return a clone, with its structure taken from a file.
+
+        Multiple file types are supported, namely:
+
+        #. ``.mol``, ``.sdf`` - MDL V2000 and V3000 files
+        #. ``.xyz`` - XYZ files
+        #. ``.mae`` - Schrodinger Maestro files
+        #. ``.coord`` - Turbomole files
+        #. ``.pdb`` - PDB files
+
+        Parameters:
+
+            path:
+                The path to a molecular structure file holding updated
+                coordinates for the :class:`.Molecule`.
+
+            extension:
+                If you want to treat the file as though it has a
+                particular extension, put it here. Include the dot.
+
+        Returns:
+
+            ConstructedMolecule: A clone with atomic positions found in `path`.
+        """
+        return super().with_structure_from_file(path, extension)
 
     def write(
         self,
         path: str,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-    ) -> ConstructedMolecule:
-        return typing.cast(
-            ConstructedMolecule,
-            super().write(path, atom_ids),
-        )
+        atom_ids: int | Iterable[int] | None = None,
+    ) -> typing.Self:
+        """
+        Write the structure to a file.
+
+        This function will write the format based on the extension
+        of `path`.
+
+        #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
+        #. ``.xyz`` - XYZ file
+        #. ``.pdb`` - PDB file
+
+        Parameters:
+            path:
+                The `path` to which the molecule should be written.
+            atom_ids (int | list[int] | None):
+                The atom ids of atoms to write. If ``None``,
+                all atoms are used. If you use this parameter, the
+                atom ids in the file may not correspond to the atom
+                ids in the molecule.
+        Returns:
+            ConstructedMolecule: The molecule.
+        """
+        return super().write(path, atom_ids)

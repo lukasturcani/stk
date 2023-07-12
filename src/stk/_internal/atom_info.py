@@ -1,12 +1,3 @@
-"""
-Atom Info
-=========
-
-"""
-
-
-import typing
-
 from stk._internal.atom import Atom
 from stk._internal.molecule import Molecule
 
@@ -14,19 +5,16 @@ from stk._internal.molecule import Molecule
 class AtomInfo:
     """
     Holds additional info about :class:`.ConstructedMolecule` atoms.
-
     """
 
     def __init__(
         self,
         atom: Atom,
-        building_block_atom: typing.Optional[Atom],
-        building_block: typing.Optional[Molecule],
-        building_block_id: typing.Optional[int],
+        building_block_atom: Atom | None,
+        building_block: Molecule | None,
+        building_block_id: int | None,
     ) -> None:
         """
-        Initialize an :class:`.AtomInfo` instance.
-
         Parameters:
 
             atom:
@@ -53,9 +41,7 @@ class AtomInfo:
                 Can be ``None``, if the atom was not part of a
                 building block, but was added by the construction
                 process instead.
-
         """
-
         self._atom = atom
         self._building_block_atom = building_block_atom
         self._building_block = building_block
@@ -73,7 +59,7 @@ class AtomInfo:
 
         return self._atom
 
-    def get_building_block_atom(self) -> typing.Optional[Atom]:
+    def get_building_block_atom(self) -> Atom | None:
         """
         Get the original atom held by the building block.
 
@@ -87,7 +73,7 @@ class AtomInfo:
 
         return self._building_block_atom
 
-    def get_building_block(self) -> typing.Optional[Molecule]:
+    def get_building_block(self) -> Molecule | None:
         """
         Get the building block from which the atom originates.
 
@@ -101,7 +87,7 @@ class AtomInfo:
 
         return self._building_block
 
-    def get_building_block_id(self) -> typing.Optional[int]:
+    def get_building_block_id(self) -> int | None:
         """
         Get the id of the atom's building block.
 

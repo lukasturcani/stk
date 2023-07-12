@@ -13,6 +13,9 @@ from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
 from stk._internal.building_block import BuildingBlock
 from stk._internal.constructed_molecule import ConstructedMolecule
+from stk._internal.construction_result.construction_result import (
+    ConstructionResult,
+)
 from stk._internal.construction_state.construction_state import (
     ConstructionState,
 )
@@ -478,6 +481,7 @@ __all__ = [
     "MoleculeKeyMaker",
     "Molecule",
     "ConstructionState",
+    "ConstructionResult",
     "ReactionResult",
     "GraphState",
     "OneOneReaction",

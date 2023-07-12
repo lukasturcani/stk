@@ -817,7 +817,7 @@ class BuildingBlock(Molecule):
         Returns:
             BuildingBlock: The clone.
         """
-        clone = self._clone()
+        clone = super().clone()
         clone._functional_groups = self._functional_groups
         clone._placer_ids = self._placer_ids
         clone._core_ids = self._core_ids
