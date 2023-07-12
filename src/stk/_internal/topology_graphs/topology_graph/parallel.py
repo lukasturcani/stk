@@ -19,7 +19,7 @@ class _Parallel:
         Initialize a :class:`._Parallel` instance.
 
         Parameters:
-            stages: :class:`tuple`
+            stages:
                 A :class:`tuple` of the form ``((v1, v2, v3), (v4, v5))``,
                 where each nested :class:`tuple` holds the
                 :class:`.Vertex` objects used for placement in a particular

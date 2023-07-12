@@ -20,7 +20,6 @@ dependencies = [
   "SpinDry",
   "vabene",
   "rdkit",
-  "atomlite",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]

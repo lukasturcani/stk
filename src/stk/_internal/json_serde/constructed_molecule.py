@@ -159,7 +159,9 @@ class ConstructedMoleculeJsonizer:
                 None,
             )
 
-        def bond_info_to_json(bond_info: BondInfo) -> tuple[int | None, int]:
+        def bond_info_to_json(
+            bond_info: BondInfo,
+        ) -> tuple[int | None, int | None]:
             return (
                 building_block_indices[bond_info.get_building_block()],
                 bond_info.get_building_block_id(),
@@ -195,9 +197,9 @@ class ConstructedMoleculeJsonizer:
         for key_maker in self._key_makers:
             key_name = key_maker.get_key_name()
             key = key_maker.get_key(molecule)
-            molecule_json["molecule"][key_name] = key
-            molecule_json["matrix"][key_name] = key
-            constructed_molecule_json[key_name] = key
+            molecule_json["molecule"][key_name] = key  # type: ignore
+            molecule_json["matrix"][key_name] = key  # type: ignore
+            constructed_molecule_json[key_name] = key  # type: ignore
 
         building_block_jsons = tuple(
             map(
@@ -219,8 +221,8 @@ class ConstructedMoleculeJsonizer:
                 building_block_jsons,
             ):
                 key = key_maker.get_key(building_block)
-                json["molecule"][key_name] = key
-                json["matrix"][key_name] = key
+                json["molecule"][key_name] = key  # type: ignore
+                json["matrix"][key_name] = key  # type: ignore
 
         return {
             "molecule": molecule_json["molecule"],
