@@ -232,7 +232,7 @@ class SelectionPlotter:
         ax.get_legend().remove()
         # https://tinyurl.com/2p9drmkh
         plt.rcParams["axes.grid"] = False
-        ax.figure.colorbar(sm).set_label(self._heat_map_label)
+        ax.figure.colorbar(sm, ax=ax).set_label(self._heat_map_label)
         plt.tight_layout()
         fig.savefig(f"{self._filename}_{self._plots}.png", dpi=fig.dpi)
         plt.close("all")

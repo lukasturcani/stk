@@ -446,7 +446,7 @@ class Cof(TopologyGraph):
 
         self._check_building_block_vertices(
             num_vertices=(
-                np.product(lattice_size) * len(self._vertex_prototypes)
+                np.prod(lattice_size) * len(self._vertex_prototypes)
             ),
             building_block_vertices=building_block_vertices,
         )

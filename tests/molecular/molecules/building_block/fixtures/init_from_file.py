@@ -7,7 +7,6 @@ from ..case_data import CaseData
 @pytest.fixture(
     params=[
         "building_block.mol",
-        "building_block.pdb",
     ],
 )
 def path(tmpdir, request):

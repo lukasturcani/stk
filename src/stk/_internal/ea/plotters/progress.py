@@ -45,8 +45,8 @@ class ProgressPlotter:
                     for i in range(2, 22)
                 ),
                 fitness_calculator=stk.FitnessFunction(
-                    fitness_function=lambda molecule:
-                        molecule.get_num_atoms(),
+                    fitness_function=lambda record:
+                        record.get_molecule().get_num_atoms(),
                 ),
                 mutator=stk.RandomBuildingBlock(
                     building_blocks=(
@@ -128,8 +128,8 @@ class ProgressPlotter:
                     for i in range(2, 22)
                 ),
                 fitness_calculator=stk.FitnessFunction(
-                    fitness_function=lambda molecule:
-                        molecule.get_num_atoms(),
+                    fitness_function=lambda record:
+                        record.get_molecule().get_num_atoms(),
                 ),
                 mutator=stk.RandomBuildingBlock(
                     building_blocks=(
@@ -213,8 +213,8 @@ class ProgressPlotter:
                     for i in range(2, 22)
                 ),
                 fitness_calculator=stk.FitnessFunction(
-                    fitness_function=lambda molecule:
-                        molecule.get_num_atoms(),
+                    fitness_function=lambda record:
+                        record.get_molecule().get_num_atoms(),
                 ),
                 mutator=stk.RandomBuildingBlock(
                     building_blocks=(

@@ -40,13 +40,6 @@ fix:
   black .
   ruff --fix .
 
-# Build the docker testing environment.
-build-testing-environment:
-  pip-compile -o docker_testing_environment/requirements.txt --extra dev pyproject.toml
-  docker buildx build -t stk-test-environment:latest ./docker_testing_environment
-
-# Enter the docker testing environment.
-enter-docker:
-  docker run -it --rm \
-    --mount type=bind,source="$(pwd)",target=/code \
-    stk-test-environment:latest /bin/sh
+# Start a MongoDB instance in docker.
+mongo:
+  docker run -d --rm -p 27017:27017 --name mongo mongo:latest

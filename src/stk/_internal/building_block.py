@@ -1,7 +1,6 @@
 import logging
 import os
 import typing
-import warnings
 from collections.abc import Collection, Iterable, Iterator
 from functools import partial
 
@@ -38,12 +37,6 @@ class BuildingBlock(Molecule):
     _init_funcs = {
         ".mol": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
         ".sdf": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
-        ".pdb": partial(
-            rdkit.MolFromPDBFile,
-            sanitize=False,
-            removeHs=False,
-            proximityBonding=False,
-        ),
     }
 
     _placer_ids: frozenset[int]
@@ -451,15 +444,6 @@ class BuildingBlock(Molecule):
         """
 
         _, extension = os.path.splitext(path)
-
-        if extension == ".pdb":
-            warnings.warn(
-                "Loading from .pdb files is deprecated and will be "
-                "removed from stk versions released after 1st Nov "
-                "2022. Please use .mol files for loading molecules "
-                "instead.",
-                category=FutureWarning,
-            )
 
         if extension not in cls._init_funcs:
             raise ValueError(f'Unable to initialize from "{extension}" files.')

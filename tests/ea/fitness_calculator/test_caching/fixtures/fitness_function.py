@@ -1,3 +1,4 @@
+import pymongo
 import pytest
 import stk
 
@@ -7,17 +8,7 @@ from .utilities import Counter
 _counter = Counter()
 
 
-def _get_case_data(mongo_client):
-    """
-    Get a :class:`.CaseData` instance.
-
-    Parameters
-    ----------
-    mongo_client : :class:`pymongo.MongoClient`
-        The mongo client the database should connect to.
-
-    """
-
+def _get_case_data(mongo_client: pymongo.MongoClient) -> CaseData:
     # The basic idea here is that the _counter.get_count method will
     # return a different "fitness value" each time it is called.
     # When the test runs fitness_calculator.get_fitness_value(), if
@@ -36,12 +27,18 @@ def _get_case_data(mongo_client):
         input_database=db,
         output_database=db,
     )
-    molecule = stk.BuildingBlock("BrCCBr")
-    fitness_value = fitness_calculator.get_fitness_value(molecule)
+    record = stk.MoleculeRecord(
+        topology_graph=stk.polymer.Linear(
+            building_blocks=(stk.BuildingBlock("BrCCBr"),),
+            repeating_unit="A",
+            num_repeating_units=1,
+        ),
+    )
+    fitness_value = fitness_calculator.get_fitness_value(record)
 
     return CaseData(
         fitness_calculator=fitness_calculator,
-        molecule=molecule,
+        record=record,
         fitness_value=fitness_value,
     )
 
@@ -49,5 +46,8 @@ def _get_case_data(mongo_client):
 @pytest.fixture(
     params=(_get_case_data,),
 )
-def fitness_function(request, mongo_client):
+def fitness_function(
+    request: pytest.FixtureRequest,
+    mongo_client: pymongo.MongoClient,
+) -> CaseData:
     return request.param(mongo_client)
