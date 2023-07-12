@@ -6,6 +6,7 @@
    :members:
    :inherited-members:
    :undoc-members:
+   :show-inheritance:
 
    {% block methods %}
    {% if methods %}

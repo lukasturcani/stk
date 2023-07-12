@@ -77,7 +77,8 @@
 Introduction
 ============
 
-GitHub: https://www.github.com/lukasturcani/stk
+| GitHub: https://www.github.com/lukasturcani/stk
+| Discord: https://discord.gg/zbCUzuxe2B
 
 
 Installation

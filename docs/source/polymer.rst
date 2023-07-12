@@ -3,6 +3,6 @@ Polymer
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    Linear (this is a link, click me) <_autosummary/stk.polymer.Linear>
+    Linear <_autosummary/stk.polymer.Linear>

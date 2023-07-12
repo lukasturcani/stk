@@ -4,7 +4,7 @@ Functional Groups
 .. toctree::
   :maxdepth: 1
 
-  Functional Group <_autosummary/stk.FunctionalGroup>
+  Overview and Examples <_autosummary/stk.FunctionalGroup>
   Alcohol <_autosummary/stk.Alcohol>
   Aldehyde <_autosummary/stk.Aldehyde>
   Alkene <_autosummary/stk.Alkene>
