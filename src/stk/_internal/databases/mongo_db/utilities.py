@@ -1,11 +1,5 @@
-"""
-MongoDB Utilities
-=================
-
-"""
-
-from collections.abc import Sequence
-from typing import Iterable, Optional
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 
 class HashableDict(dict):
@@ -29,9 +23,9 @@ def _to_hashable(item):
 
 
 def get_any_value(
-    mapping: dict[str, Sequence[dict]],
+    mapping: dict[str, Sequence[dict[Any, Any]]],
     keys: Iterable[str],
-) -> Optional[dict]:
+) -> dict[Any, Any] | None:
     """
     Return any value in `mapping` for any of the `keys`.
 
