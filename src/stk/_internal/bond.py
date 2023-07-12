@@ -1,16 +1,6 @@
-"""
-Bond
-====
-
-"""
-
-from __future__ import annotations
-
-from typing import TypeVar
+import typing
 
 from stk._internal.atom import Atom
-
-_T = TypeVar("_T", bound="Bond")
 
 
 class Bond:
@@ -18,7 +8,6 @@ class Bond:
     Represents an atomic bond.
 
     Examples:
-
         *Changing the Atoms of a Bond*
 
         You want to substitute the atoms in the bond for other atoms.
@@ -39,7 +28,6 @@ class Bond:
             assert isinstance(clone.get_atom1(), stk.H)
             assert clone.get_atom2().get_id() == 12
             assert isinstance(clone.get_atom2(), stk.C)
-
     """
 
     def __init__(
@@ -50,8 +38,6 @@ class Bond:
         periodicity: tuple[int, int, int] = (0, 0, 0),
     ) -> None:
         """
-        Initialize a :class:`Bond`.
-
         Parameters:
 
             atom1:
@@ -70,9 +56,7 @@ class Bond:
                 periodic across the x axis in the positive direction,
                 is not periodic across the y axis and is periodic
                 across the z axis in the negative direction.
-
         """
-
         self._atom1 = atom1
         self._atom2 = atom2
         self._order = order
@@ -83,11 +67,8 @@ class Bond:
         Get the first atom of the bond.
 
         Returns:
-
             The first atom of the bond.
-
         """
-
         return self._atom1
 
     def get_atom2(self) -> Atom:
@@ -95,11 +76,8 @@ class Bond:
         Get the second atom of the bond.
 
         Returns:
-
             The second atom of the bond.
-
         """
-
         return self._atom2
 
     def get_order(self) -> int:
@@ -107,11 +85,8 @@ class Bond:
         Get the bond order of the bond.
 
         Returns:
-
             The bond order.
-
         """
-
         return self._order
 
     def get_periodicity(self) -> tuple[int, int, int]:
@@ -119,7 +94,6 @@ class Bond:
         Get the periodicity of the bond.
 
         Returns:
-
             The directions across which the bond is periodic. For
             example, ``(1, 0, -1)`` means that when going from
             `atom1` to `atom2` the bond is
@@ -128,19 +102,15 @@ class Bond:
             axis in the negative direction.
 
         """
-
         return self._periodicity
 
-    def clone(self) -> Bond:
+    def clone(self) -> typing.Self:
         """
         Return a clone.
 
         Returns:
-
-            The clone.
-
+            Bond: The clone.
         """
-
         clone = self.__class__.__new__(self.__class__)
         Bond.__init__(
             self=clone,
@@ -151,22 +121,20 @@ class Bond:
         )
         return clone
 
-    def _with_atoms(self: _T, atom_map: dict[int, Atom]) -> _T:
+    def _with_atoms(self, atom_map: dict[int, Atom]) -> typing.Self:
         """
         Modify the bond.
 
         """
-
         self._atom1 = atom_map.get(self._atom1.get_id(), self._atom1)
         self._atom2 = atom_map.get(self._atom2.get_id(), self._atom2)
         return self
 
-    def with_atoms(self, atom_map: dict[int, Atom]) -> Bond:
+    def with_atoms(self, atom_map: dict[int, Atom]) -> typing.Self:
         """
         Return a clone holding different atoms.
 
         Parameters:
-
             atom_map:
                 Maps the id of an atom in the bond to the new atom the
                 clone should hold. If the id of an atom in the bond is
@@ -174,19 +142,15 @@ class Bond:
                 in the clone.
 
         Returns:
-
-            The clone.
-
+            Bond: The clone.
         """
-
         return self.clone()._with_atoms(atom_map)
 
-    def with_ids(self, id_map: dict[int, int]) -> Bond:
+    def with_ids(self, id_map: dict[int, int]) -> typing.Self:
         """
         Return a clone holding different atom ids.
 
         Parameters:
-
             id_map:
                 Maps the id of an atom in the bond to the new id the
                 clone should hold. If the id of an atom in the bond is
@@ -194,14 +158,11 @@ class Bond:
                 in the clone.
 
         Returns:
-
-            The clone.
-
+            Bond: The clone.
         """
-
         return self.clone()._with_ids(id_map)
 
-    def _with_ids(self, id_map: dict[int, int]) -> Bond:
+    def _with_ids(self, id_map: dict[int, int]) -> typing.Self:
         id1 = self._atom1.get_id()
         if id1 in id_map:
             self._atom1 = self._atom1.with_id(id_map[id1])
@@ -217,11 +178,8 @@ class Bond:
         Return ``True`` if the bond is periodic.
 
         Returns:
-
             ``True`` if the bond is periodic.
-
         """
-
         return any(direction != 0 for direction in self._periodicity)
 
     def __repr__(self) -> str:

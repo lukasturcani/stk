@@ -27,6 +27,9 @@ autosummary_imported_members = True
 
 autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
+autodoc_type_aliases = {
+    "NumBuildingBlocks": "dict[Molecule, int]",
+}
 autoclass_content = "both"
 
 intersphinx_mapping = {
