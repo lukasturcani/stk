@@ -4,7 +4,7 @@ Organic & Metal-Organic Cages
 .. toctree::
   :maxdepth: 1
 
-  Cage Overview and Examples <_autosummary/stk.cage.Cage>
+  Overview and Examples <_autosummary/stk.cage.Cage>
 
 Organic
 -------
