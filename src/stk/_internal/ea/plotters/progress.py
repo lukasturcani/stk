@@ -1,3 +1,4 @@
+import pathlib
 import typing
 from collections.abc import Callable, Iterable
 
@@ -11,8 +12,10 @@ from stk._internal.ea.molecule_record import MoleculeRecord
 
 plt.switch_backend("agg")
 
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
-class ProgressPlotter:
+
+class ProgressPlotter(typing.Generic[T]):
     """
     Plots how a property changes during an EA run.
 
@@ -277,29 +280,27 @@ class ProgressPlotter:
 
     def __init__(
         self,
-        generations: Iterable[Generation],
-        get_property: Callable[[MoleculeRecord], float],
+        generations: Iterable[Generation[T]],
+        get_property: Callable[[T], float],
         y_label: str,
-        filter: Callable[[MoleculeRecord], bool] = lambda record: True,
+        filter: Callable[[T], bool] = lambda record: True,
     ) -> None:
         """
         Parameters:
 
-            generations (list[Generation]):
+            generations (list[Generation[T]]):
                 The generations of the EA, which are plotted.
 
             get_property:
-                A :class:`callable` which takes a :class:`.MoleculeRecord`
+                A function which takes a :class:`.MoleculeRecord`
                 and returns a property value of that molecule, which is
-                used for the plot. The :class:`callable` must return a
-                valid value for each
-                :class:`.MoleculeRecord` in `generations`.
+                used for the plot.
 
             y_label:
                 The y label for the produced graph.
 
             filter:
-                Takes an :class:`.MoleculeRecord` and returns
+                Takes a :class:`.MoleculeRecord` and returns
                 ``True`` or ``False``. Only records which return ``True``
                 are included in the plot. By default, all records will be
                 plotted.
@@ -311,7 +312,7 @@ class ProgressPlotter:
 
     def _get_plot_data(
         self,
-        generations: Iterable[Generation],
+        generations: Iterable[Generation[T]],
     ) -> pd.DataFrame:
         self._num_generations = 0
         data = []
@@ -356,7 +357,7 @@ class ProgressPlotter:
 
         return self._plot_data.copy()
 
-    def write(self, path: str, dpi: int = 500) -> typing.Self:
+    def write(self, path: pathlib.Path | str, dpi: int = 500) -> typing.Self:
         """
         Write a progress plot to a file.
 

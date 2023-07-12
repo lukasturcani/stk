@@ -1,22 +1,12 @@
-def test_progress_plotter(tmp_path, case_data):
-    """
-    Test :class:`.ProgressPlotter`.
+import pathlib
 
-    Parameters
-    ----------
-    tmp_path : :class:`pathlib2.Path`
-        A directory into which the plot is written.
+import pandas as pd
+import stk
 
-    case_data : :class:`.CaseData`
-        A test case. Holds the plotter to test and the correct plot
-        data.
+from .case_data import CaseData
 
-    Returns
-    -------
-    None : :class:`NoneType`
 
-    """
-
+def test_progress_plotter(tmp_path: pathlib.Path, case_data: CaseData) -> None:
     _test_progress_plotter(
         plotter=case_data.plotter,
         path=tmp_path / "plot.png",
@@ -24,26 +14,10 @@ def test_progress_plotter(tmp_path, case_data):
     )
 
 
-def _test_progress_plotter(plotter, path, plot_data):
-    """
-    Test :class:`.ProgressPlotter`.
-
-    Parameters
-    ----------
-    plotter : :class:`.ProgressPlotter`
-        The plotter to test.
-
-    path : :class:`pathlib2.Path`
-        The path into which the plot is written.
-
-    plot_data : :class:`pandas.DataFrame`
-        The correct plot data.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
+def _test_progress_plotter(
+    plotter: stk.ProgressPlotter,
+    path: pathlib.Path,
+    plot_data: pd.DataFrame,
+) -> None:
     plotter.write(path)
     assert plotter.get_plot_data().equals(plot_data)

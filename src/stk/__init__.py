@@ -61,7 +61,7 @@ from stk._internal.ea.fitness_normalizers.replace_fitness import ReplaceFitness
 from stk._internal.ea.fitness_normalizers.sequence import NormalizerSequence
 from stk._internal.ea.fitness_normalizers.shift_up import ShiftUp
 from stk._internal.ea.fitness_normalizers.sum import Sum
-from stk._internal.ea.generation import Generation
+from stk._internal.ea.generation import FitnessValues, Generation
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.mutation.random import RandomMutator
@@ -493,6 +493,7 @@ __all__ = [
     "macrocycle",
     "EdgeGroup",
     "PeriodicCollapser",
+    "FitnessValues",
     "__version__",
     "Ac",
     "Ag",

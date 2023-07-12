@@ -8,8 +8,20 @@ from stk._internal.ea.mutation.record import MutationRecord
 
 @dataclass(frozen=True, slots=True)
 class FitnessValues:
+    """
+    Fitness values of a molecule.
+
+    Parameters:
+        raw:
+            Fitness value before normalization.
+        normalized:
+            Fitness value after normalization.
+    """
+
     raw: typing.Any
+    """Fitness value before normalization."""
     normalized: float
+    """Fitness value after normalization."""
 
 
 T = typing.TypeVar("T")
@@ -37,13 +49,22 @@ class Generation(typing.Generic[T]):
                 The records of molecules in the generation.
             mutation_records (list[MutationRecord[T]]):
                 The records of mutations done during the generation.
-            crossover_record (list[CrossoverRecord[T]]):
+            crossover_records (list[CrossoverRecord[T]]):
                 The records of crossover operations done during the
                 generation.
         """
         self._fitness_values = dict(fitness_values)
         self._mutation_records = tuple(mutation_records)
         self._crossover_records = tuple(crossover_records)
+
+    def get_fitness_values(self) -> dict[T, FitnessValues]:
+        """
+        Get the fitness values of the generation.
+
+        Returns:
+            The fitness values.
+        """
+        return dict(self._fitness_values)
 
     def get_molecule_records(self) -> Iterator[T]:
         """

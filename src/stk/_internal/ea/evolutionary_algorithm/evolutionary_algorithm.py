@@ -3,6 +3,9 @@ import typing
 from collections.abc import Iterable, Iterator
 
 from stk._internal.ea.crossover.molecule_crosser import MoleculeCrosser
+from stk._internal.ea.fitness_calculators.fitness_calculator import (
+    FitnessCalculator,
+)
 from stk._internal.ea.fitness_normalizers.fitness_normalizer import (
     FitnessNormalizer,
 )
@@ -22,7 +25,7 @@ logger = logging.getLogger(__name__)
 T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
-class EvolutionaryAlgorithm:
+class EvolutionaryAlgorithm(typing.Generic[T]):
     """
     An abstract base class for evolutionary algorithms.
 
@@ -61,21 +64,21 @@ class EvolutionaryAlgorithm:
 
     def __init__(
         self,
-        initial_population: Iterable[MoleculeRecord],
-        fitness_calculator,
+        initial_population: Iterable[T],
+        fitness_calculator: FitnessCalculator[T],
         mutator: MoleculeMutator[T],
         crosser: MoleculeCrosser[T],
         generation_selector: Selector[T],
         mutation_selector: Selector[T],
         crossover_selector: Selector[T],
-        fitness_normalizer: FitnessNormalizer = NullFitnessNormalizer(),
+        fitness_normalizer: FitnessNormalizer[T] = NullFitnessNormalizer(),
         key_maker: MoleculeKeyMaker = Inchi(),
         num_processes: int | None = None,
     ) -> None:
         """
         Parameters:
 
-            initial_population:
+            initial_population (list[T]):
                 The initial population the EA should use.
 
             fitness_calculator:
@@ -137,7 +140,7 @@ class EvolutionaryAlgorithm:
                 num_processes=num_processes,
             )
 
-    def get_generations(self, num_generations: int) -> Iterator[Generation]:
+    def get_generations(self, num_generations: int) -> Iterator[Generation[T]]:
         """
         Yield the generations of the evolutionary algorithm.
 
