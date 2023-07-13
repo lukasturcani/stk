@@ -1,31 +1,12 @@
-class CaseData:
-    """
-    A test case.
+import typing
+from dataclasses import dataclass
 
-    Attributes
-    ----------
-    selector : :class:`.Selector`
-        The selector whose selections will be plotted.
+import stk
 
-    population : :class:`tuple` of :class:`.MoleculeRecord`
-        The population from which the :attr:`.selector` selects.
+T = typing.TypeVar("T", bound=stk.MoleculeRecord)
 
 
-    """
-
-    def __init__(self, selector, population):
-        """
-        Initialize a :class:`.CaseData` instance.
-
-        Parameters
-        ----------
-        selector : :class:`.Selector`
-            The selector whose selections will be plotted.
-
-        population : :class:`tuple` of :class:`.MoleculeRecord`
-            The population from which the `selector` selects.
-
-        """
-
-        self.selector = selector
-        self.population = population
+@dataclass(frozen=True, slots=True)
+class CaseData(typing.Generic[T]):
+    selector: stk.Selector[T]
+    population: dict[T, float]
