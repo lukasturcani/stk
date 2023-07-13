@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Any
 
 import pytest
 import stk
@@ -6,56 +6,52 @@ import stk
 from ..case_data import CaseData
 
 
-def get_topology_graph(num_repeating_units):
+def get_topology_graph(num_repeating_units: int) -> stk.TopologyGraph:
     return stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )
 
 
 @pytest.fixture(scope="session")
-def remove_batches_population_1() -> tuple[stk.MoleculeRecord, ...]:
-    return (
+def remove_batches_population_1() -> dict[stk.MoleculeRecord[Any], float]:
+    return {
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(2),
-        ).with_fitness_value(10),
+        ): 10,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(3),
-        ).with_fitness_value(9),
+        ): 9,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(4),
-        ).with_fitness_value(2),
+        ): 2,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(5),
-        ).with_fitness_value(1),
+        ): 1,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(6),
-        ).with_fitness_value(1),
-    )
+        ): 1,
+    }
 
 
 @pytest.fixture(
     scope="session",
     params=(
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.RemoveBatches(
                 remover=stk.Worst(4),
                 selector=stk.Best(),
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records=(population[0],),
-                    fitness_values={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=[[0]],
         ),
     ),
 )
 def remove_batches(
-    request,
-    remove_batches_population_1: tuple[stk.MoleculeRecord, ...],
+    request: pytest.FixtureRequest,
+    remove_batches_population_1: dict[stk.MoleculeRecord[Any], float],
 ) -> CaseData:
     return request.param(remove_batches_population_1)
