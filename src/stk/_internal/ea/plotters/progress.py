@@ -1,13 +1,12 @@
 import pathlib
 import typing
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from stk._internal.ea.generation import Generation
 from stk._internal.ea.molecule_record import MoleculeRecord
 
 plt.switch_backend("agg")
@@ -258,7 +257,6 @@ class ProgressPlotter(typing.Generic[T]):
 
             assert os.path.exists('fitness_plot.png')
             os.remove('fitness_plot.png')
-
     """
 
     def __init__(
