@@ -106,13 +106,13 @@ class Worst(Selector[T]):
         if not self._duplicate_molecules:
             selected_batches = filter(
                 yielded_batches.has_no_yielded_molecules,
-                batches,
+                selected_batches,
             )
 
         if not self._duplicate_batches:
             selected_batches = filter(
                 yielded_batches.is_unyielded_batch,
-                batches,
+                selected_batches,
             )
 
         yield from itertools.islice(selected_batches, self._num_batches)
