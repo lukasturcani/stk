@@ -1,37 +1,14 @@
-class CaseData:
-    """
-    A test case.
+import typing
+from collections.abc import Sequence
+from dataclasses import dataclass
 
-    Attributes
-    ----------
-    selector : :class:`.Selector`
-        The selector to test.
+import stk
 
-    population : :class:`tuple` of :class:`.MoleculeRecord`
-        The population from which batches are selected.
+T = typing.TypeVar("T", bound=stk.MoleculeRecord)
 
-    selected : :class:`tuple` of :class:`.Batch`
-            The batches which should be selected.
 
-    """
-
-    def __init__(self, selector, population, selected):
-        """
-        Initialize a :class:`.CaseData` instance.
-
-        Parameters
-        ----------
-        selector : :class:`.Selector`
-            The selector to test.
-
-        population : :class:`tuple` of :class:`.MoleculeRecord`
-            The population from which batches are selected.
-
-        selected : :class:`tuple` of :class:`.Batch`
-            The batches which should be selected.
-
-        """
-
-        self.selector = selector
-        self.population = population
-        self.selected = selected
+@dataclass(frozen=True, slots=True)
+class CaseData(typing.Generic[T]):
+    selector: stk.Selector[T]
+    population: dict[T, float]
+    selected: Sequence[stk.Batch[T]]

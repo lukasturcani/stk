@@ -10,7 +10,9 @@ from .utilities import get_rank_fitness
 
 def get_topology_graph(num_repeating_units: int) -> stk.polymer.Linear:
     return stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=num_repeating_units,
     )
@@ -52,231 +54,69 @@ def above_average_population_2() -> dict[stk.MoleculeRecord[Any], float]:
 @pytest.fixture(
     scope="session",
     params=(
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={population[1]: 9},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=([0], [0], [1]),
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(num_batches=2),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=([0], [0]),
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 duplicate_molecules=False,
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={population[1]: 9},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=([0], [1]),
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 duplicate_batches=False,
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={population[0]: 10},
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={population[1]: 9},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=([0], [1]),
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 batch_size=2,
             ),
             population=population,
             selected=(
-                stk.Batch(
-                    records=dict(zip(population, (10, 9))),
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records=dict(zip(population, (10, 9))),
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[3]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[4]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[1]: 9,
-                        population[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[1]: 9,
-                        population[3]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[1]: 9,
-                        population[4]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
+                [0, 1],
+                [0, 1],
+                [0, 2],
+                [0, 3],
+                [0, 4],
+                [1, 2],
+                [1, 3],
+                [1, 4],
             ),
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 num_batches=3,
                 batch_size=2,
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[1]: 9,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[1]: 9,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=([0, 1], [0, 1], [0, 2]),
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 batch_size=2,
                 duplicate_molecules=False,
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[1]: 9,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=[[0, 1]],
         ),
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 batch_size=2,
                 duplicate_batches=False,
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[1]: 9,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[3]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[0]: 10,
-                        population[4]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[1]: 9,
-                        population[2]: 2,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[1]: 9,
-                        population[3]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-                stk.Batch(
-                    records={
-                        population[1]: 9,
-                        population[4]: 1,
-                    },
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=([0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4]),
         ),
     ),
 )
@@ -290,17 +130,12 @@ def above_average_population_1_case_data(
 @pytest.fixture(
     scope="session",
     params=(
-        lambda population: CaseData(
+        lambda population: CaseData.new(
             selector=stk.AboveAverage(
                 fitness_modifier=get_rank_fitness,
             ),
             population=population,
-            selected=(
-                stk.Batch(
-                    records={population[0]: 1},
-                    key_maker=stk.Inchi(),
-                ),
-            ),
+            selected=[[0]],
         ),
     ),
 )

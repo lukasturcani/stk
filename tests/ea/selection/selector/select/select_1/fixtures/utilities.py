@@ -1,7 +1,14 @@
-def get_rank_fitness(population):
-    population = sorted(
-        population,
-        key=lambda record: record.get_fitness_value(),
+import typing
+
+T = typing.TypeVar("T")
+
+
+def get_rank_fitness(population: dict[T, float]) -> dict[T, float]:
+    sorted_population = sorted(
+        zip(population.values(), population.keys()),
         reverse=True,
     )
-    return {record: 1 / rank for rank, record in enumerate(population, 1)}
+    return {
+        record: 1 / rank
+        for rank, (_, record) in enumerate(sorted_population, 1)
+    }

@@ -12,5 +12,5 @@ from .fixtures import *  # noqa
         lazy_fixture("tournament"),
     ),
 )
-def case_data(request):
+def case_data(request: pytest.FixtureRequest) -> CaseData:
     return request.param
