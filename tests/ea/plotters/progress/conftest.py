@@ -43,36 +43,14 @@ def get_generation(
     params=(
         lambda: CaseData(
             plotter=stk.ProgressPlotter(
-                generations=(
-                    stk.Generation(
-                        fitness_values=get_generation(0, 1, 2),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        fitness_values=get_generation(10, 20, 30),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        fitness_values=get_generation(40, 50, 60),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        fitness_values=get_generation(40, 50, 60),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        fitness_values=get_generation(70, 80, 90),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                ),
-                get_property=lambda record: record.get_fitness_value(),
+                property=[
+                    (0, 1, 2),
+                    (10, 20, 30),
+                    (40, 50, 60),
+                    (40, 50, 60),
+                    (70, 80, 90),
+                ],
                 y_label="Fitness Value",
-                filter=lambda record: record.get_fitness_value() is not None,
             ),
             plot_data=pd.DataFrame(
                 {

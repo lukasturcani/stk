@@ -1,6 +1,6 @@
 import pathlib
 import typing
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,36 +32,27 @@ class ProgressPlotter(typing.Generic[T]):
 
             # Initialize an EA somehow.
             ea = stk.EvolutionaryAlgorithm(
-                initial_population=(
+                initial_population=[
                     stk.MoleculeRecord(
                         topology_graph=stk.polymer.Linear(
-                            building_blocks=(
-                                stk.BuildingBlock(
-                                    smiles='BrCCBr',
-                                    functional_groups=[stk.BromoFactory()],
-                                ),
-                            ),
+                            building_blocks=[
+                                stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                            ],
                             repeating_unit='A',
                             num_repeating_units=i,
                         ),
                     )
                     for i in range(2, 22)
-                ),
+                ],
                 fitness_calculator=stk.FitnessFunction(
                     fitness_function=lambda record:
                         record.get_molecule().get_num_atoms(),
                 ),
                 mutator=stk.RandomBuildingBlock(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrC[Si]CCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                        stk.BuildingBlock(
-                            smiles='BrCCCCCCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrC[Si]CCBr', stk.BromoFactory()),
+                        stk.BuildingBlock('BrCCCCCCCBr', stk.BromoFactory()),
+                    ],
                     is_replaceable=lambda building_block: True
                 ),
                 crosser=stk.GeneticRecombination(
@@ -83,15 +74,20 @@ class ProgressPlotter(typing.Generic[T]):
                 num_processes=1,
             )
 
-            generations = []
+            fitness_values = []
             for generation in ea.get_generations(10):
-                generations.append(generation)
+                fitness_values.append(
+                    [
+                        fitness_value.raw
+                        for fitness_value
+                        in generation.get_fitness_values().values()
+                    ]
+                )
 
             # Make the plotter which plots the fitness change across
             # generations.
             progress = stk.ProgressPlotter(
-                generations=generations,
-                get_property=lambda record: record.get_fitness_value(),
+                property=fitness_values,
                 y_label='Fitness'
             )
             progress.write('fitness_plot.png')
@@ -115,36 +111,27 @@ class ProgressPlotter(typing.Generic[T]):
 
             # Initialize an EA somehow.
             ea = stk.EvolutionaryAlgorithm(
-                initial_population=(
+                initial_population=[
                     stk.MoleculeRecord(
                         topology_graph=stk.polymer.Linear(
-                            building_blocks=(
-                                stk.BuildingBlock(
-                                    smiles='BrCCBr',
-                                    functional_groups=[stk.BromoFactory()],
-                                ),
-                            ),
+                            building_blocks=[
+                                stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                            ],
                             repeating_unit='A',
                             num_repeating_units=i,
                         ),
                     )
                     for i in range(2, 22)
-                ),
+                ],
                 fitness_calculator=stk.FitnessFunction(
                     fitness_function=lambda record:
                         record.get_molecule().get_num_atoms(),
                 ),
                 mutator=stk.RandomBuildingBlock(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrC[Si]CCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                        stk.BuildingBlock(
-                            smiles='BrCCCCCCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrC[Si]CCBr', stk.BromoFactory()),
+                        stk.BuildingBlock('BrCCCCCCCBr', stk.BromoFactory()),
+                    ],
                     is_replaceable=lambda building_block: True
                 ),
                 crosser=stk.GeneticRecombination(
@@ -166,16 +153,19 @@ class ProgressPlotter(typing.Generic[T]):
                 num_processes=1,
             )
 
-            generations = []
+            num_atoms = []
             for generation in ea.get_generations(10):
-                generations.append(generation)
+                num_atoms.append(
+                    [
+                        record.get_molecule().get_num_atoms()
+                        for record in generation.get_molecule_records()
+                    ]
+                )
 
             # Make the plotter which plots the number of atoms across
             # generations.
             progress = stk.ProgressPlotter(
-                generations=generations,
-                get_property=lambda record:
-                    record.get_molecule().get_num_atoms(),
+                property=num_atoms,
                 y_label='Number of Atoms'
             )
             progress.write('number_of_atoms_plot.png')
@@ -200,36 +190,27 @@ class ProgressPlotter(typing.Generic[T]):
 
             # Initialize an EA somehow.
             ea = stk.EvolutionaryAlgorithm(
-                initial_population=(
+                initial_population=[
                     stk.MoleculeRecord(
                         topology_graph=stk.polymer.Linear(
-                            building_blocks=(
-                                stk.BuildingBlock(
-                                    smiles='BrCCBr',
-                                    functional_groups=[stk.BromoFactory()],
-                                ),
-                            ),
+                            building_blocks=[
+                                stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                            ],
                             repeating_unit='A',
                             num_repeating_units=i,
                         ),
                     )
                     for i in range(2, 22)
-                ),
+                ],
                 fitness_calculator=stk.FitnessFunction(
                     fitness_function=lambda record:
                         record.get_molecule().get_num_atoms(),
                 ),
                 mutator=stk.RandomBuildingBlock(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrC[Si]CCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                        stk.BuildingBlock(
-                            smiles='BrCCCCCCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrC[Si]CCBr', stk.BromoFactory()),
+                        stk.BuildingBlock('BrCCCCCCCBr', stk.BromoFactory()),
+                    ],
                     is_replaceable=lambda building_block: True
                 ),
                 crosser=stk.GeneticRecombination(
@@ -251,20 +232,22 @@ class ProgressPlotter(typing.Generic[T]):
                 num_processes=1,
             )
 
-            generations = []
+            fitness_values = []
             for generation in ea.get_generations(10):
-                generations.append(generation)
+                fitness_values.append(
+                    [
+                        fitness_value.normalized
+                        for fitness_value
+                        in generation.get_fitness_values().values()
+                        if fitness_value.raw is not None
+                    ]
+                )
 
             # Make the plotter which plots the fitness change across
             # generations.
             progress = stk.ProgressPlotter(
-                generations=generations,
-                get_property=lambda record: record.get_fitness_value(),
+                property=fitness_values,
                 y_label='Fitness',
-                # Only plot records whose unnormalized fitness value is not
-                # None, which means the fitness calculation did not fail.
-                filter=lambda record:
-                    record.get_fitness_value(normalized=False) is not None,
             )
             progress.write('fitness_plot.png')
 
@@ -280,54 +263,30 @@ class ProgressPlotter(typing.Generic[T]):
 
     def __init__(
         self,
-        generations: Iterable[Generation[T]],
-        get_property: Callable[[T], float],
+        property: Iterable[Sequence[float]],
         y_label: str,
-        filter: Callable[[T], bool] = lambda record: True,
     ) -> None:
         """
         Parameters:
-
-            generations (list[Generation[T]]):
+            generations (list[list[float]]):
                 The generations of the EA, which are plotted.
-
-            get_property:
-                A function which takes a :class:`.MoleculeRecord`
-                and returns a property value of that molecule, which is
-                used for the plot.
-
             y_label:
                 The y label for the produced graph.
-
-            filter:
-                Takes a :class:`.MoleculeRecord` and returns
-                ``True`` or ``False``. Only records which return ``True``
-                are included in the plot. By default, all records will be
-                plotted.
         """
-        self._get_property = get_property
+        self._property = tuple(property)
         self._y_label = y_label
         self._filter = filter
-        self._plot_data = self._get_plot_data(generations)
+        self._plot_data = self._get_plot_data()
 
-    def _get_plot_data(
-        self,
-        generations: Iterable[Generation[T]],
-    ) -> pd.DataFrame:
+    def _get_plot_data(self) -> pd.DataFrame:
         self._num_generations = 0
         data = []
-        for id_, generation in enumerate(generations):
+        for id_, property in enumerate(self._property):
             self._num_generations += 1
-
-            filtered = filter(
-                self._filter,
-                generation.get_molecule_records(),
-            )
-            properties = tuple(map(self._get_property, filtered))
 
             # If there are no values after filtering, don't plot
             # anything for the generation.
-            if not properties:
+            if not property:
                 continue
 
             data.append(
@@ -335,9 +294,9 @@ class ProgressPlotter(typing.Generic[T]):
                     data={
                         "Generation": [id_, id_, id_],
                         self._y_label: [
-                            max(properties),
-                            np.mean(properties),
-                            min(properties),
+                            max(property),
+                            np.mean(property),
+                            min(property),
                         ],
                         "Type": ["Max", "Mean", "Min"],
                     },
@@ -352,9 +311,7 @@ class ProgressPlotter(typing.Generic[T]):
 
         Returns:
             A data frame holding the plot data.
-
         """
-
         return self._plot_data.copy()
 
     def write(self, path: pathlib.Path | str, dpi: int = 500) -> typing.Self:
@@ -371,9 +328,7 @@ class ProgressPlotter(typing.Generic[T]):
 
         Returns:
             ProgressPlotter: The plotter is returned.
-
         """
-
         sns.set(style="darkgrid")
         fig = plt.figure(figsize=[8, 4.5])
         palette = sns.color_palette("deep")
