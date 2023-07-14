@@ -275,7 +275,7 @@ class PropertyVector(FitnessCalculator[T]):
     ) -> None:
         """
         Parameters:
-            property_functions (list[collections.abc.Callable[[T], typing.Any]]):
+            property_functions (list[~collections.abc.Callable[[T], typing.Any]]):
                 A group of functions, each of which is used to
                 calculate a single property of the molecule.
 
