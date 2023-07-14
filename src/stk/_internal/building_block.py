@@ -1,5 +1,6 @@
 import logging
 import os
+import pathlib
 import typing
 from collections.abc import Collection, Iterable, Iterator
 from functools import partial
@@ -1117,7 +1118,7 @@ list[FunctionalGroupFactory]):
 
     def write(
         self,
-        path: str,
+        path: pathlib.Path | str,
         atom_ids: int | Iterable[int] | None = None,
     ) -> typing.Self:
         """
