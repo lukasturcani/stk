@@ -4,7 +4,7 @@ from collections.abc import Iterator, Set
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.selection.batch import Batch, BatchKey
 
-from .selector import Selector
+from .selector import ExcludedBatches, IncludedBatches, Selector
 
 T = typing.TypeVar("T", bound=MoleculeRecord)
 
@@ -64,8 +64,8 @@ class RemoveMolecules(Selector[T]):
     def select(
         self,
         population: dict[T, float],
-        included_batches: Set[BatchKey] | None = None,
-        excluded_batches: Set[BatchKey] | None = None,
+        included_batches: "IncludedBatches" = None,
+        excluded_batches: "ExcludedBatches" = None,
     ) -> Iterator[Batch[T]]:
         remover_batches = self._remover.select(
             population=population,
