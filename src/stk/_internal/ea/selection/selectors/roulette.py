@@ -47,24 +47,21 @@ class Roulette(Selector[T]):
             # Make the selector.
             roulette = stk.Roulette(num_batches=5)
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Select the molecules.
-            for selected, in roulette.select(population):
+            for selected, in roulette.select(fitness_values):
                 # Do stuff with each selected molecule.
                 pass
 
@@ -81,24 +78,21 @@ class Roulette(Selector[T]):
             # Make the selector.
             roulette = stk.Roulette(num_batches=5, batch_size=2)
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Select the molecules.
-            for selected1, selected2 in roulette.select(population):
+            for selected1, selected2 in roulette.select(fitness_values):
                 # Do stuff to the molecules.
                 pass
     """

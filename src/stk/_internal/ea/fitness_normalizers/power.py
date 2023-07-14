@@ -26,20 +26,17 @@ class Power(FitnessNormalizer[T]):
 
             import stk
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -77,13 +74,10 @@ class Power(FitnessNormalizer[T]):
             import stk
             import numpy as np
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -111,20 +105,17 @@ class Power(FitnessNormalizer[T]):
             import stk
             import numpy as np
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -171,7 +162,7 @@ class Power(FitnessNormalizer[T]):
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
         """
-        if not isinstance(power, float):
+        if not isinstance(power, int | float):
             power = tuple(power)
         self._power = power
         self._filter = filter

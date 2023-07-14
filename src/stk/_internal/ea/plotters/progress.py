@@ -35,7 +35,10 @@ class ProgressPlotter(typing.Generic[T]):
                     stk.MoleculeRecord(
                         topology_graph=stk.polymer.Linear(
                             building_blocks=[
-                                stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                                stk.BuildingBlock(
+                                    smiles='BrCCBr',
+                                    functional_groups=stk.BromoFactory(),
+                                ),
                             ],
                             repeating_unit='A',
                             num_repeating_units=i,
