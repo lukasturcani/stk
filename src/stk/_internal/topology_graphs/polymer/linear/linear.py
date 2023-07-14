@@ -46,17 +46,11 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock(
-                smiles='O=CCC=O',
-                functional_groups=[stk.AldehydeFactory()],
-            )
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                 ),
@@ -67,14 +61,11 @@ class Linear(TopologyGraph):
             import moldoc.molecule as molecule
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                 ),
@@ -109,15 +100,12 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
 
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                     # Setting scale_steps to False tends to lead to a
@@ -131,15 +119,12 @@ class Linear(TopologyGraph):
             import moldoc.molecule as molecule
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
 
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                     # Setting scale_steps to False tends to lead to a
@@ -176,22 +161,13 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCC(F)N',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock(
-                smiles='O=CCC=O',
-                functional_groups=[stk.AldehydeFactory()],
-            )
-            bb3 = stk.BuildingBlock(
-                smiles='BrCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
+            bb1 = stk.BuildingBlock('NCC(F)N', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
+            bb3 = stk.BuildingBlock('BrCCN', stk.PrimaryAminoFactory())
 
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2, bb3),
+                    building_blocks=[bb1, bb2, bb3],
                     repeating_unit='ABABC',
                     num_repeating_units=1,
                 ),
@@ -248,18 +224,15 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-            bb2 = stk.BuildingBlock(
-                smiles='NC(Br)CN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
+            bb1 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
+            bb2 = stk.BuildingBlock('NC(Br)CN', stk.PrimaryAminoFactory())
 
             p1 = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=5,
-                    orientations=(1, 0.5),
+                    orientations=[1, 0.5],
                 ),
             )
 
@@ -317,10 +290,10 @@ class Linear(TopologyGraph):
 
             # chain will always construct the same polymer.
             chain = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45),
+                orientations=[0.65, 0.45],
             )
             # p2 and p3 are guaranteed to be the same as they used the
             # same topology graph.
@@ -330,10 +303,10 @@ class Linear(TopologyGraph):
             # chain2 may lead to a different polymer than chain,
             # despite being initialized with the same parameters.
             chain2 = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45)
+                orientations=[0.65, 0.45]
             )
 
             # p4 and p5 are guaranteed to be the same because they used
@@ -351,19 +324,19 @@ class Linear(TopologyGraph):
             # and chain4 used the same random seed.
 
             chain3 = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45),
+                orientations=[0.65, 0.45],
                 random_seed=4,
             )
             p6 = stk.ConstructedMolecule(chain3)
 
             chain4 = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45),
+                orientations=[0.65, 0.45],
                 random_seed=4,
             )
             p7 = stk.ConstructedMolecule(chain4)
@@ -377,32 +350,25 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-            bb3 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
+            bb3 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
 
             # p1 and p2 are different ways to write the same thing.
             p1 = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2, bb3),
+                    building_blocks=[bb1, bb2, bb3],
                     repeating_unit='ACB',
                     num_repeating_units=1,
                 ),
             )
             p2 = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2, bb3),
-                    repeating_unit=(0, 2, 1),
+                    building_blocks=[bb1, bb2, bb3],
+                    repeating_unit=[0, 2, 1],
                     num_repeating_units=1,
                 ),
             )
-
     """
 
     def __init__(
