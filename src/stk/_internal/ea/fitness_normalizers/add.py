@@ -127,7 +127,7 @@ class Add(FitnessNormalizer[T]):
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
         """
-        if not isinstance(number, float):
+        if not isinstance(number, int | float):
             number = tuple(number)
         self._number = number
         self._filter = filter

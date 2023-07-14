@@ -147,7 +147,7 @@ class Power(FitnessNormalizer[T]):
     ) -> None:
         """
         Parameters:
-            power:
+            power (float | list[float]):
                 The power each fitness value is raised to. Can
                 be a single number or multiple numbers, depending on the
                 form of the fitness value.

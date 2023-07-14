@@ -54,7 +54,7 @@ class Selector(typing.Generic[T]):
 
     See Also:
 
-        :class:`.Batch`
+        * :class:`.Batch`: Represents batches of selected molecules.
 
     Examples:
 
@@ -103,12 +103,12 @@ class Selector(typing.Generic[T]):
             population:
                 A collection of molecules from which batches are selected.
 
-            included_batches (set[str] | None):
+            included_batches:
                 The identity keys of batches which are allowed to be
                 yielded, if ``None`` all batches can be yielded. If not
                 ``None`` only batches `included_batches` will be yielded.
 
-            excluded_batches (set[str] | None):
+            excluded_batches:
                 The identity keys of batches which are not allowed to be
                 yielded. If ``None``, no batch is forbidden from being
                 yielded.

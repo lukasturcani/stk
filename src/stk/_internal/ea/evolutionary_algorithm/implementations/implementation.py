@@ -60,10 +60,8 @@ class Implementation(typing.Generic[T]):
         self,
         num_generations: int,
         map_: Map,
-    ) -> Iterator[Generation]:
-        def get_mutation_record(
-            batch: Batch,
-        ) -> MutationRecord[T] | None:
+    ) -> Iterator[Generation[T]]:
+        def get_mutation_record(batch: Batch[T]) -> MutationRecord[T] | None:
             return self._mutator.mutate(next(iter(batch)))
 
         def get_key(record: T) -> str:

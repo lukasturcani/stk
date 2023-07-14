@@ -128,7 +128,7 @@ class Multiply(FitnessNormalizer[T]):
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
         """
-        if not isinstance(coefficient, float):
+        if not isinstance(coefficient, int | float):
             coefficient = tuple(coefficient)
         self._coefficient = coefficient
         self._filter = filter
