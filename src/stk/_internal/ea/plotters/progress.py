@@ -275,7 +275,7 @@ class ProgressPlotter(typing.Generic[T]):
     ) -> None:
         """
         Parameters:
-            generations (list[list[float]]):
+            property (list[list[float]]):
                 The generations of the EA, which are plotted.
             y_label:
                 The y label for the produced graph.

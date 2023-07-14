@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterable
+from typing import Any
 
 import numpy as np
 
@@ -97,7 +98,10 @@ class RandomBuildingBlock:
         self._name = name
         self._generator = random_seed
 
-    def mutate(self, record: MoleculeRecord) -> MutationRecord[MoleculeRecord]:
+    def mutate(
+        self,
+        record: MoleculeRecord[Any],
+    ) -> MutationRecord[MoleculeRecord[Any]]:
         """
         Return a mutant of `record`.
 

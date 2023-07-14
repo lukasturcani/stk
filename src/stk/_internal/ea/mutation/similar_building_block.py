@@ -1,6 +1,7 @@
 import typing
 from collections.abc import Callable, Iterable, Iterator
 from functools import partial
+from typing import Any
 
 import numpy as np
 
@@ -113,7 +114,10 @@ class SimilarBuildingBlock:
             typing.Any, dict[typing.Any, Iterator[BuildingBlock]]
         ] = {}
 
-    def mutate(self, record: MoleculeRecord) -> MutationRecord[MoleculeRecord]:
+    def mutate(
+        self,
+        record: MoleculeRecord[Any],
+    ) -> MutationRecord[MoleculeRecord[Any]]:
         """
         Return a mutant of `record`.
 
