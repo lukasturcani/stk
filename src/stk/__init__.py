@@ -73,7 +73,7 @@ from stk._internal.ea.mutation.similar_building_block import (
 )
 from stk._internal.ea.plotters.progress import ProgressPlotter
 from stk._internal.ea.plotters.selection import SelectionPlotter
-from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.batch import Batch, BatchKey
 from stk._internal.ea.selection.selectors.above_average import AboveAverage
 from stk._internal.ea.selection.selectors.best import Best
 from stk._internal.ea.selection.selectors.filter_batches import FilterBatches
@@ -348,6 +348,9 @@ from stk._internal.writers.turbomole import TurbomoleWriter
 from stk._internal.writers.xyz import XyzWriter
 from stk._version import __version__
 
+BatchKey = BatchKey
+"""A unique key for a :class:`.Batch`."""
+
 __all__ = [
     "Atom",
     "AtomInfo",
@@ -388,6 +391,7 @@ __all__ = [
     "FilterMolecules",
     "Roulette",
     "Batch",
+    "BatchKey",
     "Add",
     "NullFitnessNormalizer",
     "NullOptimizer",

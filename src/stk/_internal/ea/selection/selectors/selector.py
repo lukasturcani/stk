@@ -12,6 +12,9 @@ from .yielded_batches import YieldedBatches
 T = typing.TypeVar("T", bound=MoleculeRecord)
 logger = logging.getLogger(__name__)
 
+IncludedBatches: typing.TypeAlias = "Set[BatchKey] | None"
+ExcludedBatches: typing.TypeAlias = "Set[BatchKey] | None"
+
 
 class Selector(typing.Generic[T]):
     """
@@ -93,8 +96,8 @@ class Selector(typing.Generic[T]):
     def select(
         self,
         population: dict[T, float],
-        included_batches: Set[BatchKey] | None = None,
-        excluded_batches: Set[BatchKey] | None = None,
+        included_batches: "IncludedBatches" = None,
+        excluded_batches: "ExcludedBatches" = None,
     ) -> Iterator[Batch[T]]:
         """
         Yield batches of molecule records from `population`.
