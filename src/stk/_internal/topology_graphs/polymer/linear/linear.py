@@ -395,7 +395,7 @@ class Linear(TopologyGraph):
 
                 The repeating unit can also be specified by the
                 indices of `building_blocks`, for example ``'ABB'``
-                can be written as ``(0, 1, 1)``.
+                can be written as ``[0, 1, 1]``.
 
             num_repeating_units:
                 The number of repeating units which are used to make
