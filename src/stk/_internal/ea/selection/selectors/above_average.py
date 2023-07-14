@@ -33,7 +33,7 @@ class AboveAverage(Selector[T]):
             # Make the selector.
             above_avg = stk.AboveAverage()
 
-            fitness_values = {
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
                         building_blocks=[

@@ -28,21 +28,18 @@ class Worst(Selector[T]):
             import stk
 
             worst = stk.Worst(num_batches=5, batch_size=3)
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(10)
-            )
+            }
             for batch in worst.select(population):
                 # Do stuff with batch.
                 pass

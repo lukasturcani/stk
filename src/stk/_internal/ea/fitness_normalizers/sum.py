@@ -1,4 +1,5 @@
 import typing
+from collections.abc import Callable
 from typing import Any
 
 from .fitness_normalizer import FitnessNormalizer
@@ -25,13 +26,10 @@ class Sum(FitnessNormalizer[T]):
 
             import stk
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -57,20 +55,17 @@ class Sum(FitnessNormalizer[T]):
 
             import stk
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -85,18 +80,20 @@ class Sum(FitnessNormalizer[T]):
                     fitness_values[record] is not None,
             )
             normalized_fitness_values = normalizer.normalize(fitness_values)
-            assert normalized_record1.get_fitness_value() == 2
-            assert normalized_record2.get_fitness_value() is None
+            assert normalized_fitness_values[record1] == 2
+            assert normalized_fitness_values[record2] is None
     """
 
-    def __init__(self, filter=lambda fitness_values, record: True) -> None:
+    def __init__(
+        self,
+        filter: Callable[
+            [dict[T, Any], T], bool
+        ] = lambda fitness_values, record: True,
+    ) -> None:
         """
         Parameters:
-            filter : :class:`callable`, optional
-                Takes two parameters, first is a :class:`tuple`
-                of :class:`.MoleculeRecord` instances,
-                and the second is a :class:`.MoleculeRecord`. The
-                :class:`callable` returns ``True`` or ``False``. Only
+            filter:
+                A function wihch returns ``True`` or ``False``. Only
                 molecules which return ``True`` will have fitness values
                 normalized. By default, all molecules will have fitness
                 values normalized.

@@ -30,36 +30,27 @@ class Batch(typing.Generic[T]):
 
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record3 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -67,18 +58,15 @@ class Batch(typing.Generic[T]):
 
             batches = (
                 stk.Batch(
-                    records=(record1, ),
-                    fitness_values={record1: 1},
+                    records={record1: 1},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(record2, ),
-                    fitness_values={record2: 2},
+                    records={record2: 2},
                     key_maker=stk.Inchi(),
                 ),
                 stk.Batch(
-                    records=(record3, ),
-                    fitness_values={record3: 3},
+                    records={record3: 3},
                     key_maker=stk.Inchi(),
                 ),
             )
@@ -101,37 +89,29 @@ class Batch(typing.Generic[T]):
 
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             batch1 = stk.Batch(
-                records=(record1, ),
-                fitness_values={record1: 1},
+                records={record1: 1},
                 key_maker=stk.Inchi(),
             )
 
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             batch2 = stk.Batch(
-                records=(record2, ),
-                fitness_values={record2: 2},
+                records={record2: 2},
                 key_maker=stk.Inchi(),
             )
 
@@ -154,31 +134,24 @@ class Batch(typing.Generic[T]):
 
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(
-                        stk.BuildingBlock(
-                            smiles='BrCCBr',
-                            functional_groups=[stk.BromoFactory()],
-                        ),
-                    ),
+                    building_blocks=[
+                        stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                    ],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             batch = stk.Batch(
-                records=(record1, record2),
-                fitness_values={record1: 1, record2: 2},
+                records={record1: 1, record2: 2},
                 key_maker=stk.Inchi(),
             )
             for record in batch:

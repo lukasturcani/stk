@@ -44,7 +44,7 @@ class SelectionPlotter(typing.Generic[T]):
             roulette = stk.Roulette(num_batches=10)
 
             # Make a population.
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
                         building_blocks=(
@@ -56,9 +56,9 @@ class SelectionPlotter(typing.Generic[T]):
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Make a plotter. You do not have to assign it to a variable.
             stk.SelectionPlotter('roulette_counter', roulette)

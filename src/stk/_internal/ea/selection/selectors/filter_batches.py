@@ -31,21 +31,18 @@ class FilterBatches(Selector[T]):
                 selector=stk.Roulette(7),
             )
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             for batch in selector.select(population):
                 # Do stuff with batch. It is one of the 10 best batches and

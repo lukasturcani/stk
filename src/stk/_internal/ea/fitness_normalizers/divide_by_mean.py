@@ -50,20 +50,17 @@ class DivideByMean(FitnessNormalizer[T]):
             import stk
             import numpy as np
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record1 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
             )
             record2 = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),

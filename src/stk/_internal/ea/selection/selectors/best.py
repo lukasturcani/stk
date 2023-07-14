@@ -30,32 +30,26 @@ class Best(Selector[T]):
             # Make the selector.
             best = stk.Best()
 
-            population = (
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(1),
+                ): 1,
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(2)
-            )
+                ): 2
+            }
 
             # Select the molecules.
             for selected, in best.select(population):
@@ -74,32 +68,26 @@ class Best(Selector[T]):
             # Make the selector.
             best = stk.Best(batch_size=2)
 
-            population = (
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(1),
+                ): 1,
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(2)
-            )
+                ): 2
+            }
 
             # Select the molecules.
             for selected1, selected2 in best.select(population):

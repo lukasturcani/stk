@@ -132,7 +132,7 @@ class Power(FitnessNormalizer[T]):
             )
             normalized_fitness_values = normalizer.normalize(fitness_values)
             assert np.all(np.equal(
-                normalized_fitness_values[record1]
+                normalized_fitness_values[record1],
                 (2, 0.5, 4),
             ))
             assert normalized_fitness_values[record2] is None

@@ -61,7 +61,7 @@ class Roulette(Selector[T]):
             }
 
             # Select the molecules.
-            for selected, in roulette.select(fitness_values):
+            for selected, in roulette.select(population):
                 # Do stuff with each selected molecule.
                 pass
 
@@ -92,7 +92,7 @@ class Roulette(Selector[T]):
             }
 
             # Select the molecules.
-            for selected1, selected2 in roulette.select(fitness_values):
+            for selected1, selected2 in roulette.select(population):
                 # Do stuff to the molecules.
                 pass
     """

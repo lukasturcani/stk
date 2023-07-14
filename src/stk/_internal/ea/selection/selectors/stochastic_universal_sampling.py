@@ -46,21 +46,18 @@ class StochasticUniversalSampling(Selector[T]):
             # Make the selector.
             stochastic_sampling = stk.StochasticUniversalSampling(5)
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Select the molecules.
             for selected, in stochastic_sampling.select(population):

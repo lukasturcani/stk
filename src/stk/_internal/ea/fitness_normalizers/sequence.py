@@ -24,13 +24,10 @@ class NormalizerSequence(FitnessNormalizer[T]):
             import stk
             import numpy as np
 
-            building_block = stk.BuildingBlock(
-                smiles='BrCCBr',
-                functional_groups=[stk.BromoFactory()],
-            )
+            building_block = stk.BuildingBlock('BrCCBr', stk.BromoFactory())
             record = stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(building_block, ),
+                    building_blocks=[building_block],
                     repeating_unit='A',
                     num_repeating_units=2,
                 ),
@@ -40,10 +37,10 @@ class NormalizerSequence(FitnessNormalizer[T]):
             }
             # Create the normalizer.
             normalizer = stk.NormalizerSequence(
-                fitness_normalizers=(
+                fitness_normalizers=[
                     stk.DivideByMean(),
                     stk.Sum(),
-                ),
+                ],
             )
             normalized_fitness_values = normalizer.normalize(fitness_values)
             assert normalized_fitness_values[record] == 3
@@ -55,7 +52,7 @@ class NormalizerSequence(FitnessNormalizer[T]):
     ) -> None:
         """
         Parameters:
-            fitness_normalizers:
+            fitness_normalizers (list[FitnessNormalizer[T]]):
                 The :class:`.FitnessNormalizer` instances which should be
                 used in sequence.
         """
