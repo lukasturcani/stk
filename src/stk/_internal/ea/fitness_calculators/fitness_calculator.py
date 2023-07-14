@@ -1,6 +1,8 @@
 import typing
 
-T = typing.TypeVar("T")
+from stk._internal.ea.molecule_record import MoleculeRecord
+
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
 class FitnessCalculator(typing.Generic[T]):

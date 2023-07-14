@@ -6,8 +6,10 @@ from stk._internal.ea.molecule_record import MoleculeRecord
 
 from .fitness_calculator import FitnessCalculator
 
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
-class FitnessFunction(FitnessCalculator):
+
+class FitnessFunction(FitnessCalculator[T]):
     """
     Takes a function and uses it as a fitness calculator.
 
@@ -228,7 +230,7 @@ class FitnessFunction(FitnessCalculator):
 
     def __init__(
         self,
-        fitness_function: abc.Callable[[MoleculeRecord], typing.Any],
+        fitness_function: abc.Callable[[T], typing.Any],
         input_database: ValueDatabase | None = None,
         output_database: ValueDatabase | None = None,
     ) -> None:
@@ -253,7 +255,7 @@ class FitnessFunction(FitnessCalculator):
         self._input_database = input_database
         self._output_database = output_database
 
-    def get_fitness_value(self, record: MoleculeRecord) -> typing.Any:
+    def get_fitness_value(self, record: T) -> typing.Any:
         if self._input_database is not None:
             try:
                 fitness_value = self._input_database.get(
