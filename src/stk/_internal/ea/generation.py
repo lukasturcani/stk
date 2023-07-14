@@ -39,7 +39,7 @@ class Generation(typing.Generic[T]):
 
     def __init__(
         self,
-        fitness_values: dict[T, FitnessValues],
+        fitness_values: "dict[T, FitnessValues]",
         mutation_records: Iterable[MutationRecord[T]],
         crossover_records: Iterable[CrossoverRecord[T]],
     ) -> None:
