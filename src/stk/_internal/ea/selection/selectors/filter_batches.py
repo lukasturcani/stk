@@ -1,8 +1,6 @@
 import typing
-from collections.abc import Set
 
 from stk._internal.ea.molecule_record import MoleculeRecord
-from stk._internal.ea.selection.batch import BatchKey
 
 from .selector import ExcludedBatches, IncludedBatches, Selector
 

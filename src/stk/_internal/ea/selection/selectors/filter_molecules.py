@@ -1,8 +1,8 @@
 import typing
-from collections.abc import Iterator, Set
+from collections.abc import Iterator
 
 from stk._internal.ea.molecule_record import MoleculeRecord
-from stk._internal.ea.selection.batch import Batch, BatchKey
+from stk._internal.ea.selection.batch import Batch
 
 from .selector import ExcludedBatches, IncludedBatches, Selector
 
