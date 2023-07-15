@@ -17,6 +17,7 @@ from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.ea.selection.batch import Batch
 from stk._internal.ea.selection.selectors.selector import Selector
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
+from stk._internal.key_makers.smiles import Smiles
 from stk._internal.utilities.utilities import dedupe
 
 from ...generation import FitnessValues, Generation
@@ -154,3 +155,11 @@ class Implementation(typing.Generic[T]):
     ) -> Iterator[CrossoverRecord[T]]:
         for batch in self._crossover_selector.select(population):
             yield from self._crosser.cross(tuple(batch))
+
+
+def get_key(record: stk.MoleculeRecord[typing.Any]) -> tuple[str, str]:
+    bb1, bb2 = record.get_topology_graph().get_building_blocks()
+    return (
+        Smiles().get_key(bb1),
+        Smiles().get_key(bb2),
+    )
