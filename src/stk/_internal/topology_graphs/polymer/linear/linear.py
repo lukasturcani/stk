@@ -580,6 +580,7 @@ class Linear(TopologyGraph):
 
     def clone(self) -> typing.Self:
         clone = self._clone()
+        clone._repr = self._repr
         clone._repeating_unit = self._repeating_unit
         clone._num_repeating_units = self._num_repeating_units
         clone._orientations = self._orientations
