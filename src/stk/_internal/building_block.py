@@ -62,9 +62,9 @@ class BuildingBlock(Molecule):
             smiles:
                 A SMILES string of the molecule.
 
-            functional_groups (FunctionalGroup | \
-FunctionalGroupFactory | list[FunctionalGroup] | \
-list[FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -106,12 +106,6 @@ list[FunctionalGroupFactory]):
 
         """
 
-        if isinstance(
-            functional_groups,
-            FunctionalGroup | FunctionalGroupFactory,
-        ):
-            functional_groups = (functional_groups,)
-
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
         if position_matrix is None:
             params = rdkit.ETKDGv2()
@@ -143,9 +137,9 @@ list[FunctionalGroupFactory]):
     def init_from_molecule(
         cls,
         molecule: Molecule,
-        functional_groups: Iterable[
-            FunctionalGroup | FunctionalGroupFactory
-        ] = (),
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
         placer_ids: Iterable[int] | None = None,
     ) -> typing.Self:
         """
@@ -156,7 +150,9 @@ list[FunctionalGroupFactory]):
             molecule:
                 The molecule to initialize from.
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -204,9 +200,9 @@ list[FunctionalGroupFactory]):
     def init_from_vabene_molecule(
         cls,
         molecule: vabene.Molecule,
-        functional_groups: Iterable[
-            FunctionalGroup | FunctionalGroupFactory
-        ] = (),
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
         placer_ids: Iterable[int] | None = None,
         position_matrix: np.ndarray | None = None,
     ) -> typing.Self:
@@ -223,7 +219,9 @@ list[FunctionalGroupFactory]):
             molecule:
                 The :class:`vabene.Molecule` from which to initialize.
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -318,9 +316,9 @@ list[FunctionalGroupFactory]):
         atoms: Iterable[Atom],
         bonds: Iterable[Bond],
         position_matrix: np.ndarray,
-        functional_groups: Iterable[
-            FunctionalGroup | FunctionalGroupFactory
-        ] = (),
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
         placer_ids: Iterable[int] | None = None,
     ) -> typing.Self:
         """
@@ -337,7 +335,9 @@ list[FunctionalGroupFactory]):
             position_matrix:
                 An ``(n, 3)`` position matrix of the building block.
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -399,9 +399,9 @@ list[FunctionalGroupFactory]):
     def init_from_file(
         cls,
         path: str,
-        functional_groups: Iterable[
-            FunctionalGroup | FunctionalGroupFactory
-        ] = (),
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
         placer_ids: Iterable[int] | None = None,
     ) -> typing.Self:
         """
@@ -415,7 +415,9 @@ list[FunctionalGroupFactory]):
 
                     #. ``.mol``, ``.sdf`` - MDL V3000 MOL file
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -476,9 +478,9 @@ list[FunctionalGroupFactory]):
     def init_from_rdkit_mol(
         cls,
         molecule: rdkit.Mol,
-        functional_groups: Iterable[
-            FunctionalGroup | FunctionalGroupFactory
-        ] = (),
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
         placer_ids: Iterable[int] | None = None,
     ) -> typing.Self:
         """
@@ -496,7 +498,9 @@ list[FunctionalGroupFactory]):
             molecule:
                 The molecule.
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -543,7 +547,9 @@ list[FunctionalGroupFactory]):
     def _init_from_rdkit_mol(
         self,
         molecule: rdkit.Mol,
-        functional_groups: Iterable[FunctionalGroup | FunctionalGroupFactory],
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory],
         placer_ids: Iterable[int] | None,
     ) -> None:
         """
@@ -554,7 +560,9 @@ list[FunctionalGroupFactory]):
             molecule:
                 The molecule.
 
-            functional_groups (list[FunctionalGroup | FunctionalGroupFactory]):
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
                 :class:`.FunctionalGroup` instances added to the
                 building block and :class:`.FunctionalGroupFactory`
                 instances used to create :class:`.FunctionalGroup`
@@ -704,7 +712,9 @@ list[FunctionalGroupFactory]):
 
     def _extract_functional_groups(
         self,
-        functional_groups: Iterable[FunctionalGroup | FunctionalGroupFactory],
+        functional_groups: FunctionalGroup
+        | FunctionalGroupFactory
+        | Iterable[FunctionalGroup | FunctionalGroupFactory],
     ) -> Iterator[FunctionalGroup]:
         """
         Yield functional groups.
@@ -728,6 +738,12 @@ list[FunctionalGroupFactory]):
             by a factory in `functional_groups`.
 
         """
+
+        if isinstance(
+            functional_groups,
+            FunctionalGroup | FunctionalGroupFactory,
+        ):
+            functional_groups = (functional_groups,)
 
         for functional_group in functional_groups:
             if isinstance(functional_group, FunctionalGroup):
