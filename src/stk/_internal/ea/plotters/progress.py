@@ -7,14 +7,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from stk._internal.ea.molecule_record import MoleculeRecord
-
 plt.switch_backend("agg")
 
-T = typing.TypeVar("T", bound=MoleculeRecord)
 
-
-class ProgressPlotter(typing.Generic[T]):
+class ProgressPlotter:
     """
     Plots how a property changes during an EA run.
 

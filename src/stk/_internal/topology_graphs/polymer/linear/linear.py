@@ -447,6 +447,10 @@ class Linear(TopologyGraph):
                 to `repeating_unit` or to the total number of vertices.
 
         """
+        self._repr = (
+            f"Linear({building_blocks!r}, "
+            f"{repeating_unit!r}, {num_repeating_units!r})"
+        )
 
         if not isinstance(repeating_unit, str):
             repeating_unit = tuple(repeating_unit)
@@ -665,11 +669,7 @@ class Linear(TopologyGraph):
         return self.clone()._with_building_blocks(building_block_map)
 
     def __repr__(self) -> str:
-        return (
-            f"polymer.Linear({self._repeating_unit!r}, "
-            f"{self._num_repeating_units!r}, "
-            f"{self._orientations!r})"
-        )
+        return self._repr
 
 
 @dataclass(frozen=True)

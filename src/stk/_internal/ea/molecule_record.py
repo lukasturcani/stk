@@ -46,3 +46,6 @@ class MoleculeRecord(typing.Generic[T]):
             The topology graph.
         """
         return self._topology_graph
+
+    def __repr__(self) -> str:
+        return f"MoleculeRecord({self._topology_graph!r})"

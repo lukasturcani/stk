@@ -380,6 +380,7 @@ class BuildingBlock(Molecule):
             bonds=bonds,
             position_matrix=position_matrix,
         )
+        building_block._fg_repr = repr(functional_groups)
         functional_groups = building_block._extract_functional_groups(
             functional_groups=functional_groups,
         )
@@ -594,6 +595,7 @@ class BuildingBlock(Molecule):
 
         """
 
+        self._fg_repr = repr(functional_groups)
         atoms = tuple(
             Atom(a.GetIdx(), a.GetAtomicNum(), a.GetFormalCharge())
             for a in molecule.GetAtoms()
@@ -847,6 +849,7 @@ class BuildingBlock(Molecule):
             BuildingBlock: The clone.
         """
         clone = super().clone()
+        clone._fg_repr = self._fg_repr
         clone._functional_groups = self._functional_groups
         clone._placer_ids = self._placer_ids
         clone._core_ids = self._core_ids
@@ -1166,15 +1169,10 @@ class BuildingBlock(Molecule):
         return super().write(path, atom_ids)
 
     def __str__(self) -> str:
-        if self._functional_groups:
-            fg_repr = f", {self._functional_groups!r}"
-        else:
-            fg_repr = ""
-
         smiles = rdkit.MolToSmiles(
             mol=rdkit.RemoveHs(self.to_rdkit_mol()),
         )
-        return f"{self.__class__.__name__}({smiles!r}{fg_repr})"
+        return f"{self.__class__.__name__}({smiles!r}, {self._fg_repr})"
 
     def __repr__(self) -> str:
         return str(self)
