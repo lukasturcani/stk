@@ -155,11 +155,3 @@ class Implementation(typing.Generic[T]):
     ) -> Iterator[CrossoverRecord[T]]:
         for batch in self._crossover_selector.select(population):
             yield from self._crosser.cross(tuple(batch))
-
-
-def get_key(record: stk.MoleculeRecord[typing.Any]) -> tuple[str, str]:
-    bb1, bb2 = record.get_topology_graph().get_building_blocks()
-    return (
-        Smiles().get_key(bb1),
-        Smiles().get_key(bb2),
-    )
