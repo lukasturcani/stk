@@ -21,6 +21,9 @@ def get_topology_graph(num_repeating_units: int) -> stk.TopologyGraph:
 def best_population_1() -> dict[stk.MoleculeRecord[Any], float]:
     return {
         stk.MoleculeRecord(
+            topology_graph=get_topology_graph(1),
+        ): 1,
+        stk.MoleculeRecord(
             topology_graph=get_topology_graph(2),
         ): 10,
         stk.MoleculeRecord(
@@ -28,13 +31,13 @@ def best_population_1() -> dict[stk.MoleculeRecord[Any], float]:
         ): 9,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(4),
-        ): 2,
+        ): 4,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(5),
-        ): 1,
+        ): 3,
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(6),
-        ): 1,
+        ): 2,
     }
 
 
@@ -59,12 +62,12 @@ def best_population_2() -> dict[stk.MoleculeRecord[Any], float]:
         lambda population: CaseData.new(
             selector=stk.Best(),
             population=population,
-            selected=([0], [1], [2], [3], [4]),
+            selected=([1], [2], [3], [0], [4], [5]),
         ),
         lambda population: CaseData.new(
             selector=stk.Best(num_batches=2),
             population=population,
-            selected=([0], [1]),
+            selected=([1], [2]),
         ),
         lambda population: CaseData.new(
             selector=stk.Best(
@@ -72,16 +75,21 @@ def best_population_2() -> dict[stk.MoleculeRecord[Any], float]:
             ),
             population=population,
             selected=(
-                [0, 1],
-                [0, 2],
-                [0, 3],
-                [0, 4],
                 [1, 2],
                 [1, 3],
                 [1, 4],
                 [2, 3],
+                [1, 5],
                 [2, 4],
+                [0, 1],
+                [2, 5],
+                [0, 2],
                 [3, 4],
+                [3, 5],
+                [0, 3],
+                [4, 5],
+                [0, 4],
+                [0, 5],
             ),
         ),
         lambda population: CaseData.new(
@@ -90,7 +98,7 @@ def best_population_2() -> dict[stk.MoleculeRecord[Any], float]:
                 batch_size=2,
             ),
             population=population,
-            selected=([0, 1], [0, 2], [0, 3]),
+            selected=([1, 2], [1, 3], [1, 4]),
         ),
         lambda population: CaseData.new(
             selector=stk.Best(
@@ -98,7 +106,7 @@ def best_population_2() -> dict[stk.MoleculeRecord[Any], float]:
                 duplicate_molecules=False,
             ),
             population=population,
-            selected=([0, 1], [2, 3]),
+            selected=([1, 2], [3, 4], [0, 5]),
         ),
     ),
 )
