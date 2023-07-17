@@ -62,7 +62,7 @@ def best_population_2() -> dict[stk.MoleculeRecord[Any], float]:
         lambda population: CaseData.new(
             selector=stk.Best(),
             population=population,
-            selected=([1], [2], [3], [0], [4], [5]),
+            selected=([1], [2], [3], [4], [5], [0]),
         ),
         lambda population: CaseData.new(
             selector=stk.Best(num_batches=2),
