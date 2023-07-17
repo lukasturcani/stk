@@ -17,8 +17,6 @@ from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.ea.selection.batch import Batch
 from stk._internal.ea.selection.selectors.selector import Selector
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
-from stk._internal.key_makers.smiles import Smiles
-from stk._internal.utilities.utilities import dedupe
 
 from ...generation import FitnessValues, Generation
 
@@ -68,13 +66,15 @@ class Implementation(typing.Generic[T]):
         def get_key(record: T) -> str:
             return self._key_maker.get_key(record.get_molecule())
 
-        population = self._initial_population
+        population, keys = dedupe(self._initial_population, get_key)
 
         self._logger.info("Calculating fitness values of initial population.")
-        fitness_values = {
-            record: self._fitness_calculator.get_fitness_value(record)
-            for record in population
-        }
+        fitness_values = dict(
+            zip(
+                population,
+                map_(self._fitness_calculator.get_fitness_value, population),
+            )
+        )
         normalized_fitness_values = self._fitness_normalizer.normalize(
             fitness_values=fitness_values,
         )
@@ -108,28 +108,41 @@ class Implementation(typing.Generic[T]):
 
             self._logger.info("Calculating fitness values.")
 
-            offspring = (
-                record.get_molecule_record() for record in crossover_records
+            offspring, keys = dedupe(
+                items=(
+                    record.get_molecule_record()
+                    for record in crossover_records
+                ),
+                get_key=get_key,
+                seen=keys,
             )
-            mutants = (
-                record.get_molecule_record() for record in mutation_records
+            mutants, keys = dedupe(
+                items=(
+                    record.get_molecule_record() for record in mutation_records
+                ),
+                get_key=get_key,
+                seen=keys,
             )
-
             fitness_values.update(
-                (record, self._fitness_calculator.get_fitness_value(record))
-                for record in dedupe(
-                    iterable=itertools.chain(offspring, mutants),
-                    key=get_key,
+                zip(
+                    itertools.chain(offspring, mutants),
+                    map_(
+                        self._fitness_calculator.get_fitness_value,
+                        itertools.chain(offspring, mutants),
+                    ),
                 )
             )
             normalized_fitness_values = self._fitness_normalizer.normalize(
                 fitness_values=fitness_values,
             )
-            population = tuple(
-                molecule_record
-                for molecule_record, in self._generation_selector.select(
-                    population=normalized_fitness_values
-                )
+            population, keys = dedupe(
+                items=(
+                    molecule_record
+                    for molecule_record, in self._generation_selector.select(
+                        population=normalized_fitness_values
+                    )
+                ),
+                get_key=get_key,
             )
             fitness_values = {
                 record: fitness_values[record] for record in population
@@ -155,3 +168,18 @@ class Implementation(typing.Generic[T]):
     ) -> Iterator[CrossoverRecord[T]]:
         for batch in self._crossover_selector.select(population):
             yield from self._crosser.cross(tuple(batch))
+
+
+def dedupe(
+    items: Iterable[A],
+    get_key: Callable[[A], str],
+    seen: set[str] | None = None,
+) -> tuple[list[A], set[str]]:
+    if seen is None:
+        seen = set()
+    unique = []
+    for item in items:
+        if (key := get_key(item)) not in seen:
+            unique.append(item)
+            seen.add(key)
+    return unique, seen
