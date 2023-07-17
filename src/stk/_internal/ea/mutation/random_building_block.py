@@ -1,11 +1,16 @@
+import typing
 from collections.abc import Callable, Iterable
-from typing import Any
 
 import numpy as np
 
 from stk._internal.building_block import BuildingBlock
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
+
+T = typing.TypeVar("T", bound=TopologyGraph)
 
 
 class RandomBuildingBlock:
@@ -100,8 +105,8 @@ class RandomBuildingBlock:
 
     def mutate(
         self,
-        record: MoleculeRecord[Any],
-    ) -> MutationRecord[MoleculeRecord[Any]]:
+        record: MoleculeRecord[T],
+    ) -> MutationRecord[MoleculeRecord[T]]:
         """
         Return a mutant of `record`.
 
