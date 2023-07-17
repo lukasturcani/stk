@@ -1,7 +1,6 @@
 import typing
 from collections.abc import Callable, Iterable, Iterator
 from functools import partial
-from typing import Any
 
 import numpy as np
 
@@ -10,7 +9,12 @@ from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
+from stk._internal.topology_graphs.topology_graph.topology_graph import (
+    TopologyGraph,
+)
 from stk._internal.utilities.utilities import dice_similarity
+
+T = typing.TypeVar("T", bound=TopologyGraph)
 
 
 class SimilarBuildingBlock:
@@ -116,8 +120,8 @@ class SimilarBuildingBlock:
 
     def mutate(
         self,
-        record: MoleculeRecord[Any],
-    ) -> MutationRecord[MoleculeRecord[Any]]:
+        record: MoleculeRecord[T],
+    ) -> MutationRecord[MoleculeRecord[T]]:
         """
         Return a mutant of `record`.
 
@@ -126,8 +130,7 @@ class SimilarBuildingBlock:
                 The molecule to be mutated.
 
         Returns:
-            A record of the mutation or ``None``
-            if `record` cannot be mutated.
+            A record of the mutation.
         """
         key = self._key_maker.get_key(record.get_molecule())
         if key not in self._similar_building_blocks:
