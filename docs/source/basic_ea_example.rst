@@ -89,35 +89,21 @@ While this is a perfectly valid EA loop, we can make it a lot better.
 Adding a Database
 -----------------
 
-See Also
-    :ref:`placing-and-retrieving-molecules-from-a-database`
-
-
-
 One of the main things that will significantly improve our quality of
 life, is replacing our file writing, with a molecular database.
-This means using a subclass of :class:`.ConstructedMoleculeDatabase`,
-because the molecules produced by the EA are always constructed
-molecules.
+We will use AtomLite_ for this.
 
-We won't define which :class:`.ConstructedMoleculeDatabase` we want to
-use just yet, for now, all we need to know is that a
-:class:`.ConstructedMoleculeDatabase` guarantees the methods
-:meth:`~.ConstructedMoleculeDatabase.put` and
-:meth:`~.ConstructedMoleculeDatabase.get`.
-When using
-:meth:`~.ConstructedMoleculeDatabase.put`,
-the molecules are immediately deposited into the database, there is no
-staging area.
+AtomLite_ is a molecular database which written to a simple file, making
+it really easy to get started.
 
-So let's first assume we have defined some kind of
-:class:`.ConstructedMoleculeDatabase`
+.. _AtomLite: https://atomlite.readthedocs.io
+
+So let's create our database in the ``basci_ea.db`` file:
 
 .. code-block:: python
 
-    # This will be a ConstructedMoleculeDatabase instance, which we
-    # will define later.
-    db = ...
+  import atomlite
+  db = atomlite.Database("basic_ea.db")
 
 
 Now we can modify the EA loop to use the database instead of
@@ -128,12 +114,15 @@ writing a bunch of files
 
     # Go through 50 generations of the EA.
     for generation in ea.get_generations(50):
-        for record in generation.get_molecule_records():
-            db.put(record.get_molecule())
-
-
-Already our EA loop is much nicer.
-
+        db.update_entries(
+            (
+                atomlite.Entry.from_rdkit(
+                    key=stk.Smiles().get_key(record.get_molecule()),
+                    molecule=record.get_molecule().to_rdkit_mol(),
+                )
+                for record in generation.get_molecule_records()
+            )
+        )
 
 Plotting the EA Progress
 ========================
@@ -145,15 +134,27 @@ can use a :class:`.ProgressPlotter` to do this.
 
 The :class:`.ProgressPlotter` needs to know what generations it
 should plot, so we have to modify our loop so that it stores the
-previous generations
+fitness values in each generation
 
 .. code-block:: python
 
-    generations = []
+    fitness_values = []
     for generation in ea.get_generations(50):
-        for record in generation.get_molecule_records():
-            db.put(record.get_molecule())
-        generations.append(generation)
+        db.update_entries(
+            (
+                atomlite.Entry.from_rdkit(
+                    key=stk.Smiles().get_key(record.get_molecule()),
+                    molecule=record.get_molecule().to_rdkit_mol(),
+                )
+                for record in generation.get_molecule_records()
+            )
+        )
+        fitness_values.append(
+            [
+                fitness_value.normalized
+                for fitness_value in generation.get_fitness_values().values()
+            ]
+        )
 
 Now that we have the generations, we can use a
 :class:`.ProgressPlotter` to plot them
@@ -161,8 +162,7 @@ Now that we have the generations, we can use a
 .. code-block:: python
 
     fitness_progress = stk.ProgressPlotter(
-        generations=generations,
-        get_property=lambda record: record.get_fitness_value(),
+        property=fitness_values,
         y_label='Fitness Value',
     )
     fitness_progress.write('fitness_progress.png')
@@ -189,15 +189,26 @@ Ok, we now have a half-decent EA loop, so let's review it.
     )
 
     # Go through 50 generations of the EA.
-    generations = []
+    fitness_values = []
     for generation in ea.get_generations(50):
-        for record in generation.get_molecule_records():
-            db.put(record.get_molecule())
-        generations.append(generation)
+        db.update_entries(
+            (
+                atomlite.Entry.from_rdkit(
+                    key=stk.Smiles().get_key(record.get_molecule()),
+                    molecule=record.get_molecule().to_rdkit_mol(),
+                )
+                for record in generation.get_molecule_records()
+            )
+        )
+        fitness_values.append(
+            [
+                fitness_value.normalized
+                for fitness_value in generation.get_fitness_values().values()
+            ]
+        )
 
     fitness_progress = stk.ProgressPlotter(
-        generations=generations,
-        get_property=lambda record: record.get_fitness_value(),
+        property=fitness_values,
         y_label='Fitness Value',
     )
     fitness_progress.write('fitness_progress.png')
@@ -221,7 +232,7 @@ The user answers the first question by defining a
 a fitness value, and this is the value that the EA will optimize.
 The simplest way to define a :class:`.FitnessCalculator` is to
 first define a simple Python function, which takes a
-:class:`.ConstructedMolecule` instance, and returns the fitness
+:class:`.MoleculeRecord` instance, and returns the fitness
 value of that molecule.
 
 For example, in many applications it is desirable to have rigid
@@ -238,9 +249,7 @@ bonds in a molecule
     import rdkit.Chem.AllChem as rdkit
 
     def get_rigidity(molecule):
-        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(
-            mol=rdkit_molecule,
-        )
+        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(molecule)
         # Add 1 to the denominator to prevent division by 0.
         return 1 / (num_rotatable_bonds + 1)
 
@@ -272,8 +281,8 @@ an easy thing to do is just divide the rigidity by the complexity
 
 .. code-block:: python
 
-    def get_fitness_value(molecule):
-        rdkit_molecule = molecule.to_rdkit_mol()
+    def get_fitness_value(record):
+        rdkit_molecule = record.get_molecule().to_rdkit_mol()
         rdkit.SanitizeMol(rdkit_molecule)
         # Multiply by 100 just to scale the values up a bit, which
         # makes for nicer plots later.
@@ -309,7 +318,7 @@ these files
 
 .. code-block:: python
 
-    def get_building_blocks(path, functional_group_factory):
+    def get_building_blocks(path, functional_group_factory, generator):
         with open(path, 'r') as f:
             content = f.readlines()
 
@@ -321,15 +330,14 @@ these files
             rdkit.Kekulize(molecule)
             building_block = stk.BuildingBlock.init_from_rdkit_mol(
                 molecule=molecule,
-                functional_groups=[functional_group_factory],
+                functional_groups=functional_group_factory,
             )
             yield building_block.with_position_matrix(
-                position_matrix=get_position_matrix(building_block),
+                position_matrix=get_position_matrix(building_block, generator),
             )
 
 
-    def get_position_matrix(molecule):
-        generator = np.random.RandomState(4)
+    def get_position_matrix(molecule, generator):
         position_matrix = generator.uniform(
             low=-500,
             high=500,
@@ -351,18 +359,22 @@ to generate our building blocks
 .. code-block:: python
 
     import pathlib
+    import numpy as np
 
+    generator = np.random.default_rng(4)
     fluoros = tuple(get_building_blocks(
         # Assume that fluoros.txt is in the same folder as this
         # code.
         path=pathlib.Path(__file__).parent / 'fluoros.txt',
         functional_group_factory=stk.FluoroFactory(),
+        generator=generator,
     ))
     bromos = tuple(get_building_blocks(
         # Assume that bromos.txt is in the same folder as this
         # code.
         path=pathlib.Path(__file__).parent / 'bromos.txt',
         functional_group_factory=stk.BromoFactory(),
+        generator=generator,
     ))
 
 In this example, the EA will create ``AB`` dimers, using the
@@ -373,7 +385,7 @@ building blocks
 .. code-block:: python
 
     def get_initial_population(fluoros, bromos):
-        for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
+        for fluoro, bromo in itertools.product(fluoros, bromos):
             yield stk.MoleculeRecord(
                 topology_graph=stk.polymer.Linear(
                     building_blocks=(fluoro, bromo),
@@ -383,7 +395,7 @@ building blocks
             )
 
 
-    initial_population = tuple(get_initial_population(fluoros, bromos))
+    initial_population = tuple(get_initial_population(fluoros[:5], bromos[:5]))
 
 Next, we can define our mutation operations. There are a multiple
 options, as you can see in the sidebar. One thing that you might
@@ -416,31 +428,31 @@ you want to use, for example
             stk.RandomBuildingBlock(
                 building_blocks=fluoros,
                 is_replaceable=is_fluoro,
-                random_seed=generator.randint(0, 1000),
+                random_seed=generator,
             ),
             # Substitutes a building block with a fluoro group with
             # a similar building block in fluoros.
             stk.SimilarBuildingBlock(
                 building_blocks=fluoros,
                 is_replaceable=is_fluoro,
-                random_seed=generator.randint(0, 1000),
+                random_seed=generator,
             ),
             # Substitutes a building block with a bromo group with
             # a random building block in bromos.
             stk.RandomBuildingBlock(
                 building_blocks=bromos,
                 is_replaceable=is_bromo,
-                random_seed=generator.randint(0, 1000),
+                random_seed=generator,
             ),
             # Substitutes a building block with a bromo group with
             # a similar building block in bromos.
             stk.SimilarBuildingBlock(
                 building_blocks=bromos,
                 is_replaceable=is_bromo,
-                random_seed=generator.randint(0, 1000),
+                random_seed=generator,
             ),
         ),
-        random_seed=generator.randint(0, 1000),
+        random_seed=generator,
     )
 
 When :meth:`~.Mutator.mutate` is called on a :class:`.RandomMutator`,
@@ -456,7 +468,7 @@ remaining ones too
 
     ea = stk.EvolutionaryAlgorithm(
         initial_population=tuple(
-            get_initial_population(fluoros, bromos)
+            get_initial_population(fluoros[:5], bromos[:5])
         ),
         fitness_calculator=stk.FitnessFunction(get_fitness_value),
         mutator=stk.RandomMutator(
@@ -464,25 +476,25 @@ remaining ones too
                 stk.RandomBuildingBlock(
                     building_blocks=fluoros,
                     is_replaceable=is_fluoro,
-                    random_seed=generator.randint(0, 1000),
+                    random_seed=generator,
                 ),
                 stk.SimilarBuildingBlock(
                     building_blocks=fluoros,
                     is_replaceable=is_fluoro,
-                    random_seed=generator.randint(0, 1000),
+                    random_seed=generator,
                 ),
                 stk.RandomBuildingBlock(
                     building_blocks=bromos,
                     is_replaceable=is_bromo,
-                    random_seed=generator.randint(0, 1000),
+                    random_seed=generator,
                 ),
                 stk.SimilarBuildingBlock(
                     building_blocks=bromos,
                     is_replaceable=is_bromo,
-                    random_seed=generator.randint(0, 1000),
+                    random_seed=generator,
                 ),
             ),
-            random_seed=generator.randint(0, 1000),
+            random_seed=generator,
         ),
         crosser=stk.GeneticRecombination(
             get_gene=get_functional_group_type,
@@ -493,273 +505,21 @@ remaining ones too
         ),
         mutation_selector=stk.Roulette(
             num_batches=5,
-            random_seed=generator.randint(0, 1000),
+            random_seed=generator,
         ),
         crossover_selector=stk.Roulette(
             num_batches=3,
             batch_size=2,
-            random_seed=generator.randint(0, 1000),
+            random_seed=generator,
         ),
     )
-
-Defining a Database
--------------------
-
-The last thing we need to do is define the database. The default
-database of :mod:`stk` is MongoDB, which can be used with
-:class:`.ConstructedMoleculeMongoDb`. Before using this class, you
-need to have a MongoDB database, if you want to install one locally
-you can see how here__.
-
-__ https://docs.mongodb.com/manual/installation/
-
-Note that this is easy to do, and well worth the minimal effort it
-requires to setup. Obviously, if you really don't want to
-use the database, you do not have to create it, and you can remove
-references to it in your EA loop.
-
-Assuming everything is setup, we can create our database instance
-
-.. code-block:: python
-
-    import pymongo
-
-    # Connect to a MongoDB. This example connects to a local
-    # MongoDB, but you can connect to a remote DB too with
-    # MongoClient() - read the documentation for pymongo to see how
-    # to do that.
-    client = pymongo.MongoClient()
-    db = stk.ConstructedMoleculeMongoDb(client)
-
 
 Final Version
 =============
 
-The final version of our code is
+The final version of our code is best seen here_.
 
-.. code-block:: python
-
-    import stk
-    import rdkit.Chem.AllChem as rdkit
-    from rdkit.Chem.GraphDescriptors import BertzCT
-    from rdkit import RDLogger
-    import pymongo
-    import numpy as np
-    import itertools as it
-    import logging
-    import pathlib
-
-    rdkit_logger = RDLogger.logger()
-    rdkit_logger.setLevel(RDLogger.CRITICAL)
-    logger = logging.getLogger(__name__)
-
-
-    def get_building_blocks(path, functional_group_factory):
-        with open(path, 'r') as f:
-            content = f.readlines()
-
-        for smiles in content:
-            molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
-            molecule.AddConformer(
-                conf=rdkit.Conformer(molecule.GetNumAtoms()),
-            )
-            rdkit.Kekulize(molecule)
-            building_block = stk.BuildingBlock.init_from_rdkit_mol(
-                molecule=molecule,
-                functional_groups=[functional_group_factory],
-            )
-            yield building_block.with_position_matrix(
-                position_matrix=get_position_matrix(building_block),
-            )
-
-
-    def get_position_matrix(molecule):
-        generator = np.random.RandomState(4)
-        position_matrix = generator.uniform(
-            low=-500,
-            high=500,
-            size=(molecule.get_num_atoms(), 3),
-        )
-        molecule = molecule.with_position_matrix(position_matrix)
-        rdkit_molecule = molecule.to_rdkit_mol()
-        rdkit.SanitizeMol(rdkit_molecule)
-        rdkit.Compute2DCoords(rdkit_molecule)
-        try:
-            rdkit.MMFFOptimizeMolecule(rdkit_molecule)
-        except Exception:
-            pass
-        return rdkit_molecule.GetConformer().GetPositions()
-
-
-    def get_initial_population(fluoros, bromos):
-        for fluoro, bromo in it.product(fluoros[:5], bromos[:5]):
-            yield stk.MoleculeRecord(
-                topology_graph=stk.polymer.Linear(
-                    building_blocks=(fluoro, bromo),
-                    repeating_unit='AB',
-                    num_repeating_units=1,
-                ),
-            )
-
-
-    def get_rigidity(molecule):
-        num_rotatable_bonds = rdkit.CalcNumRotatableBonds(molecule)
-        # Add 1 to the denominator to prevent division by 0.
-        return 1 / (num_rotatable_bonds + 1)
-
-
-    def get_complexity(molecule):
-        num_bad_rings = sum(
-            1 for ring in rdkit.GetSymmSSSR(molecule) if len(ring) < 5
-        )
-        return BertzCT(molecule) + 10*num_bad_rings**2
-
-
-    def get_fitness_value(molecule):
-        rdkit_molecule = molecule.to_rdkit_mol()
-        rdkit.SanitizeMol(rdkit_molecule)
-        return 100*(
-            get_rigidity(rdkit_molecule)
-            / get_complexity(rdkit_molecule)
-        )
-
-
-    def get_functional_group_type(building_block):
-        functional_group, = building_block.get_functional_groups(0)
-        return functional_group.__class__
-
-
-    def is_fluoro(building_block):
-        functional_group, = building_block.get_functional_groups(0)
-        return functional_group.__class__ is stk.Fluoro
-
-
-    def is_bromo(building_block):
-        functional_group, = building_block.get_functional_groups(0)
-        return functional_group.__class__ is stk.Bromo
-
-
-    def get_num_rotatable_bonds(record):
-        molecule = record.get_molecule().to_rdkit_mol()
-        rdkit.SanitizeMol(molecule)
-        return rdkit.CalcNumRotatableBonds(molecule)
-
-
-    def write(molecule, path):
-        rdkit_molecule = molecule.to_rdkit_mol()
-        rdkit.SanitizeMol(rdkit_molecule)
-        rdkit_molecule = rdkit.RemoveHs(rdkit_molecule)
-        building_block = stk.BuildingBlock.init_from_rdkit_mol(
-            molecule=rdkit_molecule,
-        )
-        building_block.with_position_matrix(
-            position_matrix=get_position_matrix(building_block),
-        ).write(path)
-
-
-    def main():
-        logging.basicConfig(level=logging.INFO)
-
-        # Use a random seed to get reproducible results.
-        random_seed = 4
-        generator = np.random.RandomState(random_seed)
-
-        logger.info('Making building blocks.')
-
-        # Load the building block databases.
-        fluoros = tuple(get_building_blocks(
-            path=pathlib.Path(__file__).parent / 'fluoros.txt',
-            functional_group_factory=stk.FluoroFactory(),
-        ))
-        bromos = tuple(get_building_blocks(
-            path=pathlib.Path(__file__).parent / 'bromos.txt',
-            functional_group_factory=stk.BromoFactory(),
-        ))
-
-        db = stk.ConstructedMoleculeMongoDb(pymongo.MongoClient())
-        ea = stk.EvolutionaryAlgorithm(
-            initial_population=tuple(
-                get_initial_population(fluoros, bromos)
-            ),
-            fitness_calculator=stk.FitnessFunction(get_fitness_value),
-            mutator=stk.RandomMutator(
-                mutators=(
-                    stk.RandomBuildingBlock(
-                        building_blocks=fluoros,
-                        is_replaceable=is_fluoro,
-                        random_seed=generator.randint(0, 1000),
-                    ),
-                    stk.SimilarBuildingBlock(
-                        building_blocks=fluoros,
-                        is_replaceable=is_fluoro,
-                        random_seed=generator.randint(0, 1000),
-                    ),
-                    stk.RandomBuildingBlock(
-                        building_blocks=bromos,
-                        is_replaceable=is_bromo,
-                        random_seed=generator.randint(0, 1000),
-                    ),
-                    stk.SimilarBuildingBlock(
-                        building_blocks=bromos,
-                        is_replaceable=is_bromo,
-                        random_seed=generator.randint(0, 1000),
-                    ),
-                ),
-                random_seed=generator.randint(0, 1000),
-            ),
-            crosser=stk.GeneticRecombination(
-                get_gene=get_functional_group_type,
-            ),
-            generation_selector=stk.Best(
-                num_batches=25,
-                duplicate_molecules=False,
-            ),
-            mutation_selector=stk.Roulette(
-                num_batches=5,
-                random_seed=generator.randint(0, 1000),
-            ),
-            crossover_selector=stk.Roulette(
-                num_batches=3,
-                batch_size=2,
-                random_seed=generator.randint(0, 1000),
-            ),
-            # We don't need to do a normalization in this example.
-            fitness_normalizer=stk.NullFitnessNormalizer(),
-        )
-
-        logger.info('Starting EA.')
-
-        generations = []
-        for generation in ea.get_generations(50):
-            for record in generation.get_molecule_records():
-                db.put(record.get_molecule())
-            generations.append(generation)
-
-        # Write the final population.
-        for i, record in enumerate(generation.get_molecule_records()):
-            write(record.get_molecule(), f'final_{i}.mol')
-
-        logger.info('Making fitness plot.')
-
-        fitness_progress = stk.ProgressPlotter(
-            generations=generations,
-            get_property=lambda record: record.get_fitness_value(),
-            y_label='Fitness Value',
-        )
-        fitness_progress.write('fitness_progress.png')
-
-        logger.info('Making rotatable bonds plot.')
-
-        rotatable_bonds_progress = stk.ProgressPlotter(
-            generations=generations,
-            get_property=get_num_rotatable_bonds,
-            y_label='Number of Rotatable Bonds',
-        )
-        rotatable_bonds_progress.write('rotatable_bonds_progress.png')
-
-
-    if __name__ == '__main__':
-        main()
+.. _here: https://github.com/lukasturcani/basic_ea/blob/master/basic_ea.py
 
 
 The plot of fitness we produced looks like this:
