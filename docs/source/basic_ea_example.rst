@@ -91,14 +91,12 @@ Adding a Database
 
 One of the main things that will significantly improve our quality of
 life, is replacing our file writing, with a molecular database.
-We will use AtomLite_ for this.
-
-AtomLite_ is a molecular database which written to a simple file, making
-it really easy to get started.
+We will use AtomLite_ for this. AtomLite_ is a molecular database which
+is written to a file, making it really easy to get started.
 
 .. _AtomLite: https://atomlite.readthedocs.io
 
-So let's create our database in the ``basci_ea.db`` file:
+So let's create our database in the ``basic_ea.db`` file:
 
 .. code-block:: python
 
@@ -176,8 +174,9 @@ Ok, we now have a half-decent EA loop, so let's review it.
 .. code-block:: python
 
     import stk
+    import atomlite
 
-    db = ...
+    db = atomlite.Database("basic_ea")
     ea = stk.EvolutionaryAlgorithm(
         initial_population=...,
         fitness_calculator=...,
