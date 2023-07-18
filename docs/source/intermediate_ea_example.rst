@@ -143,7 +143,7 @@ according to the formula
 
 .. code-block::
 
-    new_fitness_value = old_fitness_values / mean_fitness_value
+    new_fitness_value = old_fitness_value / mean_fitness_value
 
 In order to calculate ``mean_fitness_value``, we have to be able to
 consider all the fitness values in the population.
