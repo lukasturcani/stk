@@ -9,6 +9,7 @@ maintainers = [
   { name = "Andrew Tarzia", email = "andrew.tarzia@gmail.com" },
 ]
 dependencies = [
+  "atomlite",
   "scipy",
   "matplotlib",
   "pandas",

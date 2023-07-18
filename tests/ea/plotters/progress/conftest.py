@@ -1,3 +1,5 @@
+from typing import Any
+
 import pandas as pd
 import pytest
 import stk
@@ -7,29 +9,33 @@ from .case_data import CaseData
 
 def _get_topology_graph() -> stk.polymer.Linear:
     return stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
 
 
-def get_generation(*fitness_values):
+def get_generation(
+    *fitness_values: float,
+) -> dict[stk.MoleculeRecord[Any], float | None]:
     v1, v2, v3, *_ = fitness_values
     topology_graph = _get_topology_graph()
-    return (
+    return {
         stk.MoleculeRecord(
             topology_graph=topology_graph,
-        ).with_fitness_value(v1),
+        ): v1,
         stk.MoleculeRecord(
             topology_graph=topology_graph,
-        ).with_fitness_value(v2),
+        ): v2,
         stk.MoleculeRecord(
             topology_graph=topology_graph,
-        ).with_fitness_value(v3),
+        ): v3,
         stk.MoleculeRecord(
             topology_graph=topology_graph,
-        ),
-    )
+        ): None,
+    }
 
 
 @pytest.fixture(
@@ -37,36 +43,14 @@ def get_generation(*fitness_values):
     params=(
         lambda: CaseData(
             plotter=stk.ProgressPlotter(
-                generations=(
-                    stk.Generation(
-                        molecule_records=get_generation(0, 1, 2),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        molecule_records=get_generation(10, 20, 30),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        molecule_records=get_generation(40, 50, 60),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        molecule_records=get_generation(40, 50, 60),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                    stk.Generation(
-                        molecule_records=get_generation(70, 80, 90),
-                        mutation_records=(),
-                        crossover_records=(),
-                    ),
-                ),
-                get_property=lambda record: record.get_fitness_value(),
+                property=[
+                    (0, 1, 2),
+                    (10, 20, 30),
+                    (40, 50, 60),
+                    (40, 50, 60),
+                    (70, 80, 90),
+                ],
                 y_label="Fitness Value",
-                filter=lambda record: record.get_fitness_value() is not None,
             ),
             plot_data=pd.DataFrame(
                 {
@@ -98,5 +82,5 @@ def get_generation(*fitness_values):
         ),
     ),
 )
-def case_data(request) -> CaseData:
+def case_data(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

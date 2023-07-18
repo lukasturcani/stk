@@ -1,11 +1,3 @@
-"""
-SMILES
-======
-
-"""
-
-from __future__ import annotations
-
 from stk._internal.molecule import Molecule
 
 from .molecule import MoleculeKeyMaker
@@ -38,16 +30,10 @@ class Smiles(MoleculeKeyMaker):
 
             assert json['molecule']['SMILES'] == 'NCCN'
             assert json['matrix']['SMILES'] == 'NCCN'
-
     """
 
     def __init__(self) -> None:
-        """
-        Initialize a :class:`.Smiles` instance.
-
-        """
-
-        pass
+        return
 
     def get_key_name(self) -> str:
         return "SMILES"

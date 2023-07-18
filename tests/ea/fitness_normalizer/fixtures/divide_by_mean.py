@@ -6,72 +6,53 @@ from ..case_data import CaseData
 
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
-    return CaseData(
+    return CaseData.new(
         fitness_normalizer=stk.DivideByMean(),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): (1, 0.5),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(2),
+            ): (2, 1),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(3),
-        ),
-        normalized=(
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(0.5),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(1),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(1.5),
-        ),
+            ): (3, 1.5),
+        },
     )
 
 
 def _get_case_data_2() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
-    return CaseData(
+    return CaseData.new(
         fitness_normalizer=stk.DivideByMean(
-            filter=lambda population, record: record.get_fitness_value()
+            filter=lambda fitness_values, record: fitness_values[record]
             is not None,
         ),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((1, 10, 100)),
+            ): ((1, 10, 100), (0.5, 0.5, 0.5)),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((2, 20, 200)),
+            ): ((2, 20, 200), (1, 1, 1)),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((3, 30, 300)),
-            stk.MoleculeRecord(topology_graph),
-        ),
-        normalized=(
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value((0.5, 0.5, 0.5)),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value((1, 1, 1)),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value((1.5, 1.5, 1.5)),
-            stk.MoleculeRecord(topology_graph),
-        ),
+            ): ((3, 30, 300), (1.5, 1.5, 1.5)),
+            stk.MoleculeRecord(topology_graph): (None, None),
+        },
     )
 
 
@@ -82,5 +63,5 @@ def _get_case_data_2() -> CaseData:
         _get_case_data_2,
     ),
 )
-def divide_by_mean(request) -> CaseData:
+def divide_by_mean(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

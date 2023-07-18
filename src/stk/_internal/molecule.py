@@ -1,4 +1,5 @@
 import os
+import pathlib
 import typing
 from collections.abc import Iterable, Iterator
 
@@ -868,7 +869,7 @@ class Molecule:
 
     def write(
         self,
-        path: str,
+        path: pathlib.Path | str,
         atom_ids: int | Iterable[int] | None = None,
     ) -> typing.Self:
         """

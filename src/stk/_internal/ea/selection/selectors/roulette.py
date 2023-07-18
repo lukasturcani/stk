@@ -1,14 +1,17 @@
 import typing
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 
 import numpy as np
 
+from stk._internal.ea.molecule_record import MoleculeRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.yielded_batches import YieldedBatches
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from .selector import Selector
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
 class Roulette(Selector[T]):
@@ -44,21 +47,18 @@ class Roulette(Selector[T]):
             # Make the selector.
             roulette = stk.Roulette(num_batches=5)
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Select the molecules.
             for selected, in roulette.select(population):
@@ -78,27 +78,23 @@ class Roulette(Selector[T]):
             # Make the selector.
             roulette = stk.Roulette(num_batches=5, batch_size=2)
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Select the molecules.
             for selected1, selected2 in roulette.select(population):
                 # Do stuff to the molecules.
                 pass
-
     """
 
     def __init__(
@@ -108,8 +104,9 @@ class Roulette(Selector[T]):
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
         key_maker: MoleculeKeyMaker = Inchi(),
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]]
-        | None = None,
+        fitness_modifier: Callable[
+            [dict[T, float]], dict[T, float]
+        ] = lambda x: x,
         random_seed: int | np.random.Generator | None = None,
     ) -> None:
         """
@@ -137,15 +134,11 @@ class Roulette(Selector[T]):
                 Takes the `population` on which :meth:`~.Selector.select`
                 is called and returns a :class:`dict`, which maps records
                 in the `population` to the fitness values the
-                :class:`.Selector` should use. If ``None``, the regular
-                fitness values of the records are used.
+                :class:`.Selector` should use.
 
             random_seed:
                 The random seed to use.
         """
-        if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
-
         super().__init__(key_maker, fitness_modifier, batch_size)
 
         if random_seed is None or isinstance(random_seed, int):
@@ -158,21 +151,28 @@ class Roulette(Selector[T]):
             float("inf") if num_batches is None else num_batches
         )
 
-    def _select_from_batches(self, batches, yielded_batches):
+    def _select_from_batches(
+        self,
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches[T],
+    ) -> Iterator[Batch[T]]:
         while batches and yielded_batches.get_num() < self._num_batches:
             total = sum(batch.get_fitness_value() for batch in batches)
             weights = [batch.get_fitness_value() / total for batch in batches]
-            yield self._generator.choice(batches, p=weights)
+            yield self._generator.choice(
+                batches,  # type: ignore
+                p=weights,
+            )
 
             if not self._duplicate_molecules:
-                batches = filter(
+                batches_ = filter(
                     yielded_batches.has_no_yielded_molecules,
                     batches,
                 )
             if not self._duplicate_batches:
-                batches = filter(
+                batches_ = filter(
                     yielded_batches.is_unyielded_batch,
                     batches,
                 )
             if not self._duplicate_molecules or not self._duplicate_batches:
-                batches = tuple(batches)
+                batches = tuple(batches_)

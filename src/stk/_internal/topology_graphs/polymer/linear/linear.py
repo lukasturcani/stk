@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing
 from collections import abc
 from dataclasses import dataclass
@@ -48,17 +46,11 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock(
-                smiles='O=CCC=O',
-                functional_groups=[stk.AldehydeFactory()],
-            )
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                 ),
@@ -69,14 +61,11 @@ class Linear(TopologyGraph):
             import moldoc.molecule as molecule
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                 ),
@@ -111,15 +100,12 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
 
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                     # Setting scale_steps to False tends to lead to a
@@ -133,15 +119,12 @@ class Linear(TopologyGraph):
             import moldoc.molecule as molecule
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
 
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=4,
                     # Setting scale_steps to False tends to lead to a
@@ -178,22 +161,13 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCC(F)N',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock(
-                smiles='O=CCC=O',
-                functional_groups=[stk.AldehydeFactory()],
-            )
-            bb3 = stk.BuildingBlock(
-                smiles='BrCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
+            bb1 = stk.BuildingBlock('NCC(F)N', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
+            bb3 = stk.BuildingBlock('BrCCN', stk.PrimaryAminoFactory())
 
             polymer = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2, bb3),
+                    building_blocks=[bb1, bb2, bb3],
                     repeating_unit='ABABC',
                     num_repeating_units=1,
                 ),
@@ -250,18 +224,15 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-            bb2 = stk.BuildingBlock(
-                smiles='NC(Br)CN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
+            bb1 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
+            bb2 = stk.BuildingBlock('NC(Br)CN', stk.PrimaryAminoFactory())
 
             p1 = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     repeating_unit='AB',
                     num_repeating_units=5,
-                    orientations=(1, 0.5),
+                    orientations=[1, 0.5],
                 ),
             )
 
@@ -319,10 +290,10 @@ class Linear(TopologyGraph):
 
             # chain will always construct the same polymer.
             chain = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45),
+                orientations=[0.65, 0.45],
             )
             # p2 and p3 are guaranteed to be the same as they used the
             # same topology graph.
@@ -332,10 +303,10 @@ class Linear(TopologyGraph):
             # chain2 may lead to a different polymer than chain,
             # despite being initialized with the same parameters.
             chain2 = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45)
+                orientations=[0.65, 0.45]
             )
 
             # p4 and p5 are guaranteed to be the same because they used
@@ -353,19 +324,19 @@ class Linear(TopologyGraph):
             # and chain4 used the same random seed.
 
             chain3 = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45),
+                orientations=[0.65, 0.45],
                 random_seed=4,
             )
             p6 = stk.ConstructedMolecule(chain3)
 
             chain4 = stk.polymer.Linear(
-                building_blocks=(bb1, bb2),
+                building_blocks=[bb1, bb2],
                 repeating_unit='AB',
                 num_repeating_units=5,
-                orientations=(0.65, 0.45),
+                orientations=[0.65, 0.45],
                 random_seed=4,
             )
             p7 = stk.ConstructedMolecule(chain4)
@@ -379,67 +350,58 @@ class Linear(TopologyGraph):
 
             import stk
 
-            bb1 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
-            bb2 = stk.BuildingBlock('O=CCC=O', [stk.AldehydeFactory()])
-            bb3 = stk.BuildingBlock(
-                smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
-            )
+            bb1 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
+            bb2 = stk.BuildingBlock('O=CCC=O', stk.AldehydeFactory())
+            bb3 = stk.BuildingBlock('NCCN', stk.PrimaryAminoFactory())
 
             # p1 and p2 are different ways to write the same thing.
             p1 = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2, bb3),
+                    building_blocks=[bb1, bb2, bb3],
                     repeating_unit='ACB',
                     num_repeating_units=1,
                 ),
             )
             p2 = stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
-                    building_blocks=(bb1, bb2, bb3),
-                    repeating_unit=(0, 2, 1),
+                    building_blocks=[bb1, bb2, bb3],
+                    repeating_unit=[0, 2, 1],
                     num_repeating_units=1,
                 ),
             )
-
     """
 
     def __init__(
         self,
-        building_blocks: tuple[BuildingBlock, ...],
-        repeating_unit: typing.Union[str, tuple[int, ...]],
+        building_blocks: abc.Iterable[BuildingBlock],
+        repeating_unit: str | abc.Iterable[int],
         num_repeating_units: int,
-        orientations: tuple[float, ...] | None = None,
+        orientations: abc.Iterable[float] | None = None,
         random_seed: int | np.random.Generator | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
         """
-        Initialize a :class:`Linear` instance.
-
         Parameters:
 
-            building_blocks:
+            building_blocks (list[BuildingBlock]):
                 The building blocks of the polymer.
 
-            repeating_unit:
+            repeating_unit (str | list[int]):
                 A string specifying the repeating unit of the polymer.
                 For example, ``'AB'`` or ``'ABB'``. The first building
                 block passed to `building_blocks` is ``'A'`` and so on.
 
                 The repeating unit can also be specified by the
                 indices of `building_blocks`, for example ``'ABB'``
-                can be written as ``(0, 1, 1)``.
+                can be written as ``[0, 1, 1]``.
 
             num_repeating_units:
                 The number of repeating units which are used to make
                 the polymer.
 
-            orientations:
+            orientations (list[float]):
                 For each character in the repeating unit, a value
                 between ``0`` and ``1`` (both inclusive) must be given
                 in a :class:`tuple`. It indicates the probability that
@@ -485,9 +447,18 @@ class Linear(TopologyGraph):
                 to `repeating_unit` or to the total number of vertices.
 
         """
+        self._repr = (
+            f"Linear({building_blocks!r}, "
+            f"{repeating_unit!r}, {num_repeating_units!r})"
+        )
+
+        if not isinstance(repeating_unit, str):
+            repeating_unit = tuple(repeating_unit)
 
         if orientations is None:
             orientations = tuple(0.0 for _ in range(len(repeating_unit)))
+        else:
+            orientations = tuple(orientations)
 
         if len(orientations) == len(repeating_unit):
             orientations = orientations * num_repeating_units
@@ -526,7 +497,7 @@ class Linear(TopologyGraph):
 
         super().__init__(
             building_block_vertices=self._get_building_block_vertices(
-                building_blocks=building_blocks,
+                building_blocks=tuple(building_blocks),
                 vertices=vertices,
             ),
             edges=edges,
@@ -542,7 +513,7 @@ class Linear(TopologyGraph):
         body_orientations: abc.Iterable[float],
         tail_orientation: float,
         random_seed: int | np.random.Generator | None,
-    ) -> _VerticesAndEdges:
+    ) -> "_VerticesAndEdges":
         """
         Get the vertices and edges of the topology graph.
 
@@ -607,8 +578,9 @@ class Linear(TopologyGraph):
             edges=tuple(edges),
         )
 
-    def clone(self) -> Linear:
+    def clone(self) -> typing.Self:
         clone = self._clone()
+        clone._repr = self._repr
         clone._repeating_unit = self._repeating_unit
         clone._num_repeating_units = self._num_repeating_units
         clone._orientations = self._orientations
@@ -694,15 +666,11 @@ class Linear(TopologyGraph):
     def with_building_blocks(
         self,
         building_block_map: dict[BuildingBlock, BuildingBlock],
-    ) -> Linear:
+    ) -> typing.Self:
         return self.clone()._with_building_blocks(building_block_map)
 
     def __repr__(self) -> str:
-        return (
-            f"polymer.Linear({self._repeating_unit!r}, "
-            f"{self._num_repeating_units!r}, "
-            f"{self._orientations!r})"
-        )
+        return self._repr
 
 
 @dataclass(frozen=True)

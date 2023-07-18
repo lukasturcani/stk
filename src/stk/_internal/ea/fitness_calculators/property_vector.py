@@ -1,13 +1,16 @@
 import typing
-from collections import abc
+from collections.abc import Callable, Iterable
+from typing import Any
 
 from stk._internal.databases.value import ValueDatabase
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 
 from .fitness_calculator import FitnessCalculator
 
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
-class PropertyVector(FitnessCalculator):
+
+class PropertyVector(FitnessCalculator[T]):
     """
     Uses multiple molecular properties as a fitness value.
 
@@ -266,15 +269,14 @@ class PropertyVector(FitnessCalculator):
 
     def __init__(
         self,
-        property_functions: abc.Iterable[
-            abc.Callable[[MoleculeRecord], typing.Any]
-        ],
+        property_functions: Iterable[Callable[[T], Any]],
         input_database: ValueDatabase | None = None,
         output_database: ValueDatabase | None = None,
     ) -> None:
         """
         Parameters:
-            property_functions:
+            property_functions \
+(list[~collections.abc.Callable[[T], typing.Any]]):
                 A group of functions, each of which is used to
                 calculate a single property of the molecule.
 
@@ -292,24 +294,24 @@ class PropertyVector(FitnessCalculator):
         self._input_database = input_database
         self._output_database = output_database
 
-    def get_fitness_value(self, molecule: MoleculeRecord) -> typing.Any:
+    def get_fitness_value(self, record: T) -> typing.Any:
         if self._input_database is not None:
             try:
                 fitness_value = self._input_database.get(
-                    molecule=molecule.get_molecule(),
+                    molecule=record.get_molecule(),
                 )
             except KeyError:
                 fitness_value = tuple(
-                    property_function(molecule)
+                    property_function(record)
                     for property_function in self._property_functions
                 )
         else:
             fitness_value = tuple(
-                property_function(molecule)
+                property_function(record)
                 for property_function in self._property_functions
             )
 
         if self._output_database is not None:
-            self._output_database.put(molecule.get_molecule(), fitness_value)
+            self._output_database.put(record.get_molecule(), fitness_value)
 
         return fitness_value

@@ -1,18 +1,21 @@
 import itertools
 import typing
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 
 import numpy as np
 
+from stk._internal.ea.molecule_record import MoleculeRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.yielded_batches import YieldedBatches
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from .selector import Selector
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
-class AboveAverage(Selector):
+class AboveAverage(Selector[T]):
     """
     Yields above average batches of molecules.
 
@@ -30,32 +33,26 @@ class AboveAverage(Selector):
             # Make the selector.
             above_avg = stk.AboveAverage()
 
-            population = (
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(1),
+                ): 1,
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(2)
-            )
+                ): 2,
+            }
 
             # Select the molecules.
             for selected, in above_avg.select(population):
@@ -74,32 +71,26 @@ class AboveAverage(Selector):
             # Make the selector.
             above_avg = stk.AboveAverage(batch_size=2)
 
-            population = (
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(1),
+                ): 1,
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(2)
-            )
+                ): 2,
+            }
 
             # Select the molecules.
             for selected1, selected2 in above_avg.select(population):
@@ -114,8 +105,9 @@ class AboveAverage(Selector):
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
         key_maker: MoleculeKeyMaker = Inchi(),
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]]
-        | None = None,
+        fitness_modifier: Callable[
+            [dict[T, float]], dict[T, float]
+        ] = lambda x: x,
     ) -> None:
         """
         Parameters:
@@ -143,51 +135,50 @@ class AboveAverage(Selector):
                 Takes the `population` on which :meth:`~Selector.select`
                 is called and returns a :class:`dict`, which maps records
                 in the `population` to the fitness values the
-                :class:`.Selector` should use. If ``None``, the regular
-                fitness values of the records are used.
+                :class:`.Selector` should use.
         """
-        if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
-
         super().__init__(key_maker, fitness_modifier, batch_size)
-
         self._duplicate_molecules = duplicate_molecules
         self._duplicate_batches = duplicate_batches
         self._num_batches = num_batches
 
-    def _select_from_batches(self, batches, yielded_batches):
+    def _select_from_batches(
+        self,
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches[T],
+    ) -> Iterator[Batch[T]]:
         mean = np.mean([batch.get_fitness_value() for batch in batches])
         # Yield highest fitness batches first.
-        batches = sorted(batches, reverse=True)
+        selected_batches: Iterable[Batch[T]] = sorted(batches, reverse=True)
         # Yield only batches with a fitness larger than the mean.
-        batches = itertools.takewhile(
-            lambda batch: batch.get_fitness_value() > mean, batches
+        selected_batches = itertools.takewhile(
+            lambda batch: batch.get_fitness_value() > mean, selected_batches
         )
         # Yield batches which are multiple times better than the mean
         # multiple times.
-        batches = (
+        selected_batches = (
             batch
-            for batch in batches
-            for _ in range(self._get_num_duplicates(batch, mean))
+            for batch in selected_batches
+            for _ in range(self._get_num_duplicates(batch, float(mean)))
         )
         # If duplicate molecules are not allowed, allow only
         # batches with no yielded molecules.
         if not self._duplicate_molecules:
-            batches = filter(
+            selected_batches = filter(
                 yielded_batches.has_no_yielded_molecules,
-                batches,
+                selected_batches,
             )
         # If duplicate batches are not allowed, allow only
         # unyielded batches.
         if not self._duplicate_batches:
-            batches = filter(
+            selected_batches = filter(
                 yielded_batches.is_unyielded_batch,
-                batches,
+                selected_batches,
             )
         # Limit the number of yielded batches to _num_batches.
-        yield from itertools.islice(batches, self._num_batches)
+        yield from itertools.islice(selected_batches, self._num_batches)
 
-    def _get_num_duplicates(self, batch, mean):
+    def _get_num_duplicates(self, batch: Batch[T], mean: float) -> int:
         if self._duplicate_batches and self._duplicate_molecules:
             return int(batch.get_fitness_value() // mean)
         return 1

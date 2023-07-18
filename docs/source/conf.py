@@ -29,6 +29,8 @@ autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
 autodoc_type_aliases = {
     "NumBuildingBlocks": "dict[Molecule, int]",
+    "IncludedBatches": "set[BatchKey] | None",
+    "ExcludedBatches": "set[BatchKey] | None",
 }
 autoclass_content = "both"
 

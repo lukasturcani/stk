@@ -1,14 +1,17 @@
 import typing
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 
 import numpy as np
 
+from stk._internal.ea.molecule_record import MoleculeRecord
+from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.selectors.yielded_batches import YieldedBatches
 from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
 from .selector import Selector
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
 class StochasticUniversalSampling(Selector[T]):
@@ -43,27 +46,23 @@ class StochasticUniversalSampling(Selector[T]):
             # Make the selector.
             stochastic_sampling = stk.StochasticUniversalSampling(5)
 
-            population = tuple(
+            population = {
                 stk.MoleculeRecord(
                     topology_graph=stk.polymer.Linear(
-                        building_blocks=(
-                            stk.BuildingBlock(
-                                smiles='BrCCBr',
-                                functional_groups=[stk.BromoFactory()],
-                            ),
-                        ),
+                        building_blocks=[
+                            stk.BuildingBlock('BrCCBr', stk.BromoFactory()),
+                        ],
                         repeating_unit='A',
                         num_repeating_units=2,
                     ),
-                ).with_fitness_value(i)
+                ): i
                 for i in range(100)
-            )
+            }
 
             # Select the molecules.
             for selected, in stochastic_sampling.select(population):
                 # Do stuff with each selected molecule.
                 pass
-
     """
 
     def __init__(
@@ -73,10 +72,11 @@ class StochasticUniversalSampling(Selector[T]):
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
         key_maker: MoleculeKeyMaker = Inchi(),
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]]
-        | None = None,
+        fitness_modifier: Callable[
+            [dict[T, float]], dict[T, float]
+        ] = lambda x: x,
         random_seed: int | np.random.Generator | None = None,
-    ):
+    ) -> None:
         """
         Parameters:
 
@@ -103,15 +103,11 @@ class StochasticUniversalSampling(Selector[T]):
                 Takes the `population` on which :meth:`~.Selector.select`
                 is called and returns a :class:`dict`, which maps records
                 in the `population` to the fitness values the
-                :class:`.Selector` should use. If ``None``, the regular
-                fitness values of the records are used.
+                :class:`.Selector` should use.
 
             random_seed:
                 The random seed to use.
         """
-        if fitness_modifier is None:
-            fitness_modifier = self._get_fitness_values
-
         super().__init__(key_maker, fitness_modifier, batch_size)
 
         if random_seed is None or isinstance(random_seed, int):
@@ -124,7 +120,11 @@ class StochasticUniversalSampling(Selector[T]):
             float("inf") if num_batches is None else num_batches
         )
 
-    def _select_from_batches(self, batches, yielded_batches):
+    def _select_from_batches(
+        self,
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches[T],
+    ) -> Iterator[Batch[T]]:
         batches = sorted(batches, reverse=True)
 
         # SUS may need to run multiple rounds if duplicate_molecules or
@@ -145,12 +145,12 @@ class StochasticUniversalSampling(Selector[T]):
 
             if yielded_batches.get_num() < self._num_batches:
                 if not self._duplicate_molecules:
-                    batches = filter(
+                    batches_ = filter(
                         yielded_batches.has_no_yielded_molecules,
                         batches,
                     )
                 if not self._duplicate_batches:
-                    batches = filter(
+                    batches_ = filter(
                         yielded_batches.is_unyielded_batch,
                         batches,
                     )
@@ -158,27 +158,28 @@ class StochasticUniversalSampling(Selector[T]):
                     not self._duplicate_molecules
                     or not self._duplicate_batches
                 ):
-                    batches = tuple(batches)
+                    batches = tuple(batches_)
 
     def _select_with_stochastic_universal_sampling(
         self,
-        batches,
-        yielded_batches,
-    ):
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches[T],
+    ) -> Iterator[Batch[T]]:
         total = sum(batch.get_fitness_value() for batch in batches)
         batch_positions = []
-        batch_position = 0
+        batch_position = 0.0
         for batch in batches:
             batch_position += batch.get_fitness_value() / total
             batch_positions.append(batch_position)
 
-        num_batches = min(
-            self._num_batches - yielded_batches.get_num(), len(batches)
+        num_batches = typing.cast(
+            int,
+            min(self._num_batches - yielded_batches.get_num(), len(batches)),
         )
         pointer_distance = 1 / num_batches
         pointers = []
         pointer = self._generator.uniform(0, pointer_distance)
-        for i in range(num_batches):
+        for _ in range(num_batches):
             pointers.append(pointer)
             pointer += pointer_distance
 

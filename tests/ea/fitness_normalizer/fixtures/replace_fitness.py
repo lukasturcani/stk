@@ -6,47 +6,35 @@ from ..case_data import CaseData
 
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
-    return CaseData(
+    return CaseData.new(
         fitness_normalizer=stk.ReplaceFitness(
-            get_replacement=lambda population: min(
-                record.get_fitness_value()
-                for record in population
-                if record.get_fitness_value() is not None
+            get_replacement=lambda fitness_values: min(
+                fitness_value
+                for fitness_value in fitness_values.values()
+                if fitness_value is not None
             )
             / 2,
-            filter=lambda population, record: record.get_fitness_value()
+            filter=lambda fitness_values, record: fitness_values[record]
             is None,
         ),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(1),
+            ): (1, 1),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(2),
+            ): (2, 2),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value(3),
-            stk.MoleculeRecord(topology_graph),
-        ),
-        normalized=(
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(1),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(2),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(3),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(0.5),
-        ),
+            ): (3, 3),
+            stk.MoleculeRecord(topology_graph): (None, 0.5),
+        },
     )
 
 
@@ -54,5 +42,5 @@ def _get_case_data_1() -> CaseData:
     scope="session",
     params=(_get_case_data_1,),
 )
-def replace_fitness(request) -> CaseData:
+def replace_fitness(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

@@ -1,15 +1,19 @@
 import itertools
 import logging
 import typing
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence, Set
 
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 
-from ..batch import Batch
-from .utilities.yielded_batches import YieldedBatches
+from ..batch import Batch, BatchKey
+from .yielded_batches import YieldedBatches
 
-T = typing.TypeVar("T")
+T = typing.TypeVar("T", bound=MoleculeRecord)
 logger = logging.getLogger(__name__)
+
+IncludedBatches: typing.TypeAlias = "Set[BatchKey] | None"
+ExcludedBatches: typing.TypeAlias = "Set[BatchKey] | None"
 
 
 class Selector(typing.Generic[T]):
@@ -53,7 +57,7 @@ class Selector(typing.Generic[T]):
 
     See Also:
 
-        :class:`.Batch`
+        * :class:`.Batch`: Represents batches of selected molecules.
 
     Examples:
 
@@ -61,18 +65,16 @@ class Selector(typing.Generic[T]):
 
         The source code of the classes listed in :mod:`.selector` can serve
         as good examples.
-
     """
 
     def __init__(
         self,
         key_maker: MoleculeKeyMaker,
-        fitness_modifier: Callable[[Sequence[T]], dict[T, float]],
+        fitness_modifier: Callable[[dict[T, float]], dict[T, float]],
         batch_size: int,
     ) -> None:
         """
         Parameters:
-
             key_maker:
                 Used to get the keys of molecules, which are used to
                 determine if two molecule records are duplicates of each
@@ -93,44 +95,39 @@ class Selector(typing.Generic[T]):
 
     def select(
         self,
-        population,
-        included_batches=None,
-        excluded_batches=None,
-    ) -> Iterator[Batch]:
+        population: dict[T, float],
+        included_batches: "IncludedBatches" = None,
+        excluded_batches: "ExcludedBatches" = None,
+    ) -> Iterator[Batch[T]]:
         """
         Yield batches of molecule records from `population`.
 
         Parameters:
-
-            population : :class:`tuple` of :class:`.MoleculeRecord`
+            population:
                 A collection of molecules from which batches are selected.
 
-            included_batches : :class:`set`, optional
+            included_batches:
                 The identity keys of batches which are allowed to be
                 yielded, if ``None`` all batches can be yielded. If not
                 ``None`` only batches `included_batches` will be yielded.
 
-            excluded_batches : class:`set`, optional
+            excluded_batches:
                 The identity keys of batches which are not allowed to be
                 yielded. If ``None``, no batch is forbidden from being
                 yielded.
 
         Yields:
-
             A batch of selected molecule records.
-
         """
-
         batches = tuple(
             self._get_batches(
-                population=population,
-                fitness_values=self._fitness_modifier(population),
+                population=self._fitness_modifier(population),
                 included_batches=included_batches,
                 excluded_batches=excluded_batches,
             )
         )
 
-        yielded_batches = YieldedBatches(self._key_maker)
+        yielded_batches: YieldedBatches[T] = YieldedBatches(self._key_maker)
         for batch in self._select_from_batches(
             batches=batches,
             yielded_batches=yielded_batches,
@@ -145,52 +142,45 @@ class Selector(typing.Generic[T]):
 
     def _get_batches(
         self,
-        population,
-        fitness_values,
-        included_batches,
-        excluded_batches,
-    ) -> Iterator[Batch]:
+        population: dict[T, float],
+        included_batches: Set[BatchKey] | None,
+        excluded_batches: Set[BatchKey] | None,
+    ) -> Iterator[Batch[T]]:
         """
         Get batches molecules from `population`.
 
         Parameters:
 
-            population : :class:`tuple` of :class:`.MoleculeRecord`
+            population:
                 The molecule records which are to be batched.
 
-            fitness_values : :class:`dict`
-                Maps each :class:`.MoleculeRecord` in `population` to the
-                fitness value which should be used for it.
-
-            included_batches : :class:`set`, optional
+            included_batches:
                 The identity keys of batches which are allowed to be
                 yielded, if ``None`` all batches can be yielded. If not
                 ``None`` only batches `included_batches` will be yielded.
 
-            excluded_batches : class:`set`, optional
+            excluded_batches:
                 The identity keys of batches which are not allowed to be
                 yielded. If ``None``, no batch is forbidden from being
                 yielded.
 
             Yields:
                 A batch of molecules from `population`.
-
         """
 
-        def is_included(batch):
+        def is_included(batch: Batch[T]) -> bool:
             if included_batches is None:
                 return True
             return batch.get_identity_key() in included_batches
 
-        def is_excluded(batch):
+        def is_excluded(batch: Batch[T]) -> bool:
             if excluded_batches is None:
                 return False
             return batch.get_identity_key() in excluded_batches
 
         for records in itertools.combinations(population, self._batch_size):
             batch = Batch(
-                records=records,
-                fitness_values=fitness_values,
+                records=((record, population[record]) for record in records),
                 key_maker=self._key_maker,
             )
             if is_included(batch) and not is_excluded(batch):
@@ -198,26 +188,19 @@ class Selector(typing.Generic[T]):
 
     def _select_from_batches(
         self,
-        batches,
-        yielded_batches,
-    ) -> Iterator[Batch]:
+        batches: Sequence[Batch[T]],
+        yielded_batches: YieldedBatches[T],
+    ) -> Iterator[Batch[T]]:
         """
         Yield batches from `batches`.
 
         Parameters:
-            batches : :class:`tuple` of :class:`.Batches`
+            batches:
                 Batches from which some are selected.
-
-            yielded_batches : :class:`.YieldedBatches`
+            yielded_batches:
                 Keeps track of which batches have been yielded. This
                 object automatically updates each time ``yield`` is called.
-
         Yields:
             A selected batch.
-
         """
-
         raise NotImplementedError()
-
-    def _get_fitness_values(self, population):
-        return {record: record.get_fitness_value() for record in population}

@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 import pytest
 
@@ -7,6 +8,8 @@ import pytest
     params=[
         "molecule.mol",
         "molecule.xyz",
+        pathlib.Path("molecule-path.mol"),
+        pathlib.Path("molecule-path.xyz"),
     ],
 )
 def path(request, tmpdir):

@@ -61,8 +61,8 @@ from stk._internal.ea.fitness_normalizers.replace_fitness import ReplaceFitness
 from stk._internal.ea.fitness_normalizers.sequence import NormalizerSequence
 from stk._internal.ea.fitness_normalizers.shift_up import ShiftUp
 from stk._internal.ea.fitness_normalizers.sum import Sum
-from stk._internal.ea.generation import Generation
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.generation import FitnessValues, Generation
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.mutator import MoleculeMutator
 from stk._internal.ea.mutation.random import RandomMutator
 from stk._internal.ea.mutation.random_building_block import RandomBuildingBlock
@@ -73,7 +73,7 @@ from stk._internal.ea.mutation.similar_building_block import (
 )
 from stk._internal.ea.plotters.progress import ProgressPlotter
 from stk._internal.ea.plotters.selection import SelectionPlotter
-from stk._internal.ea.selection.batch import Batch
+from stk._internal.ea.selection.batch import Batch, BatchKey
 from stk._internal.ea.selection.selectors.above_average import AboveAverage
 from stk._internal.ea.selection.selectors.best import Best
 from stk._internal.ea.selection.selectors.filter_batches import FilterBatches
@@ -348,6 +348,9 @@ from stk._internal.writers.turbomole import TurbomoleWriter
 from stk._internal.writers.xyz import XyzWriter
 from stk._version import __version__
 
+BatchKey = BatchKey
+"""A unique key for a :class:`.Batch`."""
+
 __all__ = [
     "Atom",
     "AtomInfo",
@@ -388,6 +391,7 @@ __all__ = [
     "FilterMolecules",
     "Roulette",
     "Batch",
+    "BatchKey",
     "Add",
     "NullFitnessNormalizer",
     "NullOptimizer",
@@ -493,6 +497,7 @@ __all__ = [
     "macrocycle",
     "EdgeGroup",
     "PeriodicCollapser",
+    "FitnessValues",
     "__version__",
     "Ac",
     "Ag",

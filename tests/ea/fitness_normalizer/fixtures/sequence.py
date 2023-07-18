@@ -6,50 +6,43 @@ from ..case_data import CaseData
 
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
 
-    def filter(population, record):
-        return record.get_fitness_value() is not None
-
-    return CaseData(
+    return CaseData.new(
         fitness_normalizer=stk.NormalizerSequence(
             fitness_normalizers=(
                 stk.Multiply(
                     coefficient=(1, 2, 4),
-                    filter=filter,
+                    filter=lambda fitness_values, record: fitness_values[
+                        record
+                    ]
+                    is not None,
                 ),
                 stk.Sum(
-                    filter=filter,
+                    filter=lambda fitness_values, record: fitness_values[
+                        record
+                    ]
+                    is not None,
                 ),
             ),
         ),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((4, 10, 1)),
+            ): ((4, 10, 1), 28),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((9, 20, 2)),
+            ): ((9, 20, 2), 57),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((16, 30, 4)),
-            stk.MoleculeRecord(topology_graph),
-        ),
-        normalized=(
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(28),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(57),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value(92),
-            stk.MoleculeRecord(topology_graph),
-        ),
+            ): ((16, 30, 4), 92),
+            stk.MoleculeRecord(topology_graph): (None, None),
+        },
     )
 
 
@@ -57,5 +50,5 @@ def _get_case_data_1() -> CaseData:
     scope="session",
     params=(_get_case_data_1,),
 )
-def sequence(request) -> CaseData:
+def sequence(request: pytest.FixtureRequest) -> CaseData:
     return request.param()

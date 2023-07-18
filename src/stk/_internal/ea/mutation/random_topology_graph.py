@@ -1,8 +1,9 @@
 from collections.abc import Callable, Iterable
+from typing import Any
 
 import numpy as np
 
-from stk._internal.ea.molecule_records.molecule import MoleculeRecord
+from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.ea.mutation.record import MutationRecord
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
@@ -80,7 +81,10 @@ class RandomTopologyGraph:
         self._name = name
         self._generator = random_seed
 
-    def mutate(self, record: MoleculeRecord) -> MutationRecord[MoleculeRecord]:
+    def mutate(
+        self,
+        record: MoleculeRecord[Any],
+    ) -> MutationRecord[MoleculeRecord[Any]]:
         """
         Return a mutant of `record`.
 

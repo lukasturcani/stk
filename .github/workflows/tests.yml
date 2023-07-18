@@ -79,11 +79,11 @@ jobs:
       - run: "pip install -e '.[dev]'"
       - run: git clone https://github.com/lukasturcani/basic_ea --depth 1
       - run: python basic_ea/basic_ea.py
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: basic-ea-fitness-plot
           path: fitness_progress.png
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: basic-ea-rotatable-bonds-plot
           path: rotatable_bonds_progress.png
@@ -102,11 +102,11 @@ jobs:
       - run: "pip install -e '.[dev]'"
       - run: git clone https://github.com/lukasturcani/intermediate_ea --depth 1
       - run: python intermediate_ea/intermediate_ea.py
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: intermediate-ea-fitness-plot
           path: fitness_progress.png
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: intermediate-ea-rotatable-bonds-plot
           path: rotatable_bonds_progress.png

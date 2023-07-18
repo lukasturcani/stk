@@ -6,39 +6,29 @@ from ..case_data import CaseData
 
 def _get_case_data_1() -> CaseData:
     topology_graph = stk.polymer.Linear(
-        building_blocks=(stk.BuildingBlock("BrCCBr", [stk.BromoFactory()]),),
+        building_blocks=[
+            stk.BuildingBlock("BrCCBr", stk.BromoFactory()),
+        ],
         repeating_unit="A",
         num_repeating_units=2,
     )
-    return CaseData(
+    return CaseData.new(
         fitness_normalizer=stk.ShiftUp(
-            filter=lambda population, record: record.get_fitness_value()
+            filter=lambda fitness_values, record: fitness_values[record]
             is not None,
         ),
-        population=(
+        fitness_values={
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((1, -5, 5)),
+            ): ((1, -5, 5), (1, 6, 5)),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((3, -10, 2)),
+            ): ((3, -10, 2), (3, 1, 2)),
             stk.MoleculeRecord(
                 topology_graph=topology_graph,
-            ).with_fitness_value((2, 20, 1)),
-            stk.MoleculeRecord(topology_graph),
-        ),
-        normalized=(
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value((1, 6, 5)),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value((3, 1, 2)),
-            stk.MoleculeRecord(
-                topology_graph=topology_graph,
-            ).with_fitness_value((2, 31, 1)),
-            stk.MoleculeRecord(topology_graph),
-        ),
+            ): ((2, 20, 1), (2, 31, 1)),
+            stk.MoleculeRecord(topology_graph): (None, None),
+        },
     )
 
 
@@ -46,5 +36,5 @@ def _get_case_data_1() -> CaseData:
     scope="session",
     params=(_get_case_data_1,),
 )
-def shift_up(request):
+def shift_up(request: pytest.FixtureRequest) -> CaseData:
     return request.param()
