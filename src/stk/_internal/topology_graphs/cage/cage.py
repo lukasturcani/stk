@@ -1235,3 +1235,12 @@ class Cage(TopologyGraph):
         building_block_map: dict[BuildingBlock, BuildingBlock],
     ) -> Cage:
         return self.clone()._with_building_blocks(building_block_map)
+
+    def get_vertex_alignments(self) -> dict[int, int]:
+        """
+        Get the vertex alignments.
+
+        Returns:
+            The vertex alignments.
+        """
+        return dict(self._vertex_alignments)
