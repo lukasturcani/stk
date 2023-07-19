@@ -88,11 +88,6 @@ To get :mod:`.stk`, you can install it with pip::
 
   $ pip install stk
 
-:mod:`.stk` requires Python 3.11, if you are using an older
-version of Python you can use an older version of :mod:`.stk`::
-
-  $ pip install stk==2022.6.17.0
-
 Overview
 --------
 
