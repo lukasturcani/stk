@@ -19,7 +19,6 @@ dependencies = [
   "pymongo[srv]",
   "MCHammer",
   "SpinDry",
-  "vabene",
   "rdkit",
 ]
 requires-python = ">=3.11"
@@ -91,7 +90,6 @@ module = [
   "mchammer.*",
   "spindry.*",
   "pymongo.*",
-  "vabene.*",
   "setuptools.*"
 ]
 ignore_missing_imports = true

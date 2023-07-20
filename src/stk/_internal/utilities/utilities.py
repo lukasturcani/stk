@@ -1,22 +1,6 @@
-"""
-Utilities
-=========
-
-
-This module defines general-purpose objects, functions and classes.
-
-Functions, classes, etc. defined here should not depend on any other
-part of ``stk``. They must be completely self-sufficient.
-
-"""
-
-import os
 import re
-import tarfile
-import time
 import typing
 from collections import deque
-from contextlib import contextmanager
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
@@ -280,67 +264,6 @@ class Cell:
         self.fgs = fgs
 
 
-class ChargedMolError(Exception):
-    def __init__(self, mol_file, msg):
-        self.mol_file = mol_file
-        self.msg = msg
-
-
-class MolFileError(Exception):
-    def __init__(self, mol_file, msg):
-        self.mol_file = mol_file
-        self.msg = msg
-
-
-class PopulationSizeError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-
-
-class LazyAttr:
-    """
-    A descriptor for creating lazy attributes.
-
-    """
-
-    def __init__(self, func):
-        self.func = func
-
-    def __get__(self, obj, cls):
-        if obj is None:
-            return self
-        val = self.func(obj)
-        setattr(obj, self.func.__name__, val)
-        return val
-
-
-def archive_output():
-    """
-    Places the ``output`` folder into ``stk_ea_runs``.
-
-    This function assumes that the ``output`` folder is in the current
-    working directory.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    if "output" not in os.listdir():
-        return
-
-    # Make the ``stk_ea_runs`` folder if it does not exist already.
-    if "stk_ea_runs" not in os.listdir():
-        os.mkdir("stk_ea_runs")
-
-    # Find out with what number the ``output`` folder should be
-    # labelled within ``stk_ea_runs``.
-    num = len(os.listdir("stk_ea_runs"))
-    new_dir = os.path.join("stk_ea_runs", str(num))
-    os.rename("output", new_dir)
-
-
 def dedupe(iterable, key=None, seen=None):
     """
     Yields items from `iterable` barring duplicates.
@@ -446,74 +369,6 @@ def flatten(iterable, excluded_types=None):
             yield from flatten(x, excluded_types)
         else:
             yield x
-
-
-def kabsch(coords1, coords2):
-    """
-    Return a rotation matrix to minimize dstance between 2 coord sets.
-
-    This is essentially an implementation of the Kabsch algorithm.
-    Given two sets of coordinates, `coords1` and `coords2`, this
-    function returns a rotation matrix. When the rotation matrix is
-    applied to `coords1` the resulting coordinates have their rms
-    distance to `coords2` minimized.
-
-    Parameters
-    ----------
-    coords1 : :class:`numpy.ndarray`
-        This array represents a matrix hodling coordinates which need
-        to be rotated to minimize their rms distance to coordinates in
-        `coords2`. The matrix is n x 3. Each row of the matrix holds
-        the x, y and z coordinates of one point, respectively. Here
-        ``n`` is the number of points.
-
-    coords2 : :class:`numpy.ndarray`
-        This array represents a matrix which holds the coordinates of
-        points the distance to which should be minimized. The matrix is
-        ``n x 3``. Each row of the matrix holds the x, y and z
-        coordinates of one point, respectively. Here ``n`` is the
-        number of points.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        A rotation matrix. This will be a ``3 x 3`` matrix.
-
-    References
-    ----------
-    http://nghiaho.com/?page_id=671
-    https://en.wikipedia.org/wiki/Kabsch_algorithm
-
-    """
-
-    h = np.dot(coords1, coords2.T)
-    u, s, v = np.linalg.svd(h)
-
-    if int(np.linalg.det(v)) < 0:
-        v[:, 2] = -v[:, 2]
-
-    return np.dot(v, u)
-
-
-def matrix_centroid(matrix):
-    """
-    Returns the centroid of the coordinates held in `matrix`.
-
-    Parameters
-    ----------
-    matrix : :class:`np.ndarray`
-        A ``n x 3`` matrix. Each row holds the x, y and z
-        coordinate of some point, respectively.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        A numpy array which holds the x, y and z
-        coordinates of the centroid of the coordinates in `matrix`.
-
-    """
-
-    return np.sum(matrix, axis=0) / len(matrix)
 
 
 def mol_from_mae_file(mae_path):
@@ -643,29 +498,14 @@ def normalize_vector(vector):
     return np.divide(vector, np.linalg.norm(vector))
 
 
-def remake(mol):
-    """
-    Remakes a molecule from scratch.
-
-    Parameters
-    ----------
-    mol : :class:`rdkit.Mol`
-        The molecule to be remade.
-
-    Returns
-    -------
-    :class:`rdkit.Mol`
-        The remade molecule.
-
-    """
-
+def remake(molcule: rdkit.Mol) -> rdkit.Mol:
     emol = rdkit.EditableMol(rdkit.Mol())
-    for atom in mol.GetAtoms():
+    for atom in molcule.GetAtoms():
         new = rdkit.Atom(atom.GetAtomicNum())
         new.SetFormalCharge(atom.GetFormalCharge())
         emol.AddAtom(new)
 
-    for bond in mol.GetBonds():
+    for bond in molcule.GetBonds():
         emol.AddBond(
             beginAtomIdx=bond.GetBeginAtomIdx(),
             endAtomIdx=bond.GetEndAtomIdx(),
@@ -673,7 +513,7 @@ def remake(mol):
         )
 
     m = emol.GetMol()
-    m.AddConformer(mol.GetConformer())
+    m.AddConformer(molcule.GetConformer())
     return m
 
 
@@ -840,144 +680,6 @@ def dice_similarity(mol1, mol2, fp_radius=3):
         radius=fp_radius,
     )
     return rdkit.DataStructs.DiceSimilarity(fp1, fp2)
-
-
-def quaternion(u):
-    """
-    Returns a translation + rotation quaternion.
-
-    Parameters
-    ----------
-    u : :class:`list` of :class:`float`
-        A :class:`list` of length 3 holding the parameter for the
-        quarternion.
-
-    References
-    ----------
-    K. Shoemake, Uniform random rotations, Graphics Gems III,
-    pages 124-132. Academic, New York, 1992.
-
-    """
-
-    a, b, c = u
-    q = np.zeros(4, np.float64)
-    q[0] = np.sqrt(1.0 - a) * np.sin(2.0 * np.pi * b)
-    q[1] = np.sqrt(1.0 - a) * np.cos(2.0 * np.pi * b)
-    q[2] = np.sqrt(a) * np.sin(2.0 * np.pi * c)
-    q[3] = np.sqrt(a) * np.cos(2.0 * np.pi * c)
-    return q
-
-
-def translation_component(q):
-    """
-    Extracts translation vector from quaternion.
-
-    Parameters
-    ----------
-    q : :class:`numpy.ndarray`
-        A length 4 quaternion.
-
-    Returns
-    -------
-    :class:`numpy.ndarray`
-        The translation vector encoded within `q`.
-
-    """
-
-    rot_epsilon = 1e-6
-    q = np.copy(q)
-    if q[0] < 0.0:
-        q = -q
-    if q[0] > 1.0:
-        q /= np.sqrt(np.dot(q, q))
-
-    theta = 2.0 * np.arccos(q[0])
-    s = np.sqrt(1.0 - q[0] * q[0])
-    if s < rot_epsilon:
-        p = 2.0 * q[1:4]
-    else:
-        p = q[1:4] / s * theta
-    return p
-
-
-def tar_output():
-    """
-    Places all the content in the ``output`` folder into a .tgz file.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    tname = os.path.join("output", "output.tgz")
-    with tarfile.open(tname, "w:gz") as tar:
-        tar.add("output")
-
-
-def _printer(time_taken):
-    m, s = divmod(time_taken, 60)
-    h, m = divmod(m, 60)
-    print(f"\nTime taken was {int(h)} : {int(m)} : {int(s)}.\n\n")
-
-
-@contextmanager
-def time_it(output=_printer):
-    """
-    Times the code executed within the indent.
-
-    Parameters
-    ----------
-    output : :class:`callable`, optional
-        A function which takes the time taken for the code block to
-        execute as its only input. Can be used to redirect or format
-        the output.
-
-    Examples
-    --------
-    *Timing the Execution of a Function*
-
-    This is a context manager so it should be used as:
-
-    .. testsetup:: timing-the-execution-of-a-function
-
-        import stk
-        # Do not print the output in the test because the time taken
-        # is expected to vary wildy.
-        _time_it = stk.time_it
-        stk.time_it = lambda: _time_it(
-            output=lambda time_taken: print('test'),
-        )
-
-    .. testcode:: timing-the-execution-of-a-function
-
-        import stk
-
-        with stk.time_it():
-            print('a')
-            print('b')
-            print('c')
-
-    .. testoutput:: timing-the-execution-of-a-function
-        :hide:
-
-        a
-        b
-        c
-        test
-
-    .. testcleanup:: timing-the-execution-of-a-function
-
-        stk.time_it = _time_it
-
-    After all 3 functions are finished and the nested block is exited
-    the time taken to process the entire block is printed.
-
-    """
-
-    start = time.time()
-    yield
-    output(time.time() - start)
 
 
 def vector_angle(vector1, vector2):

@@ -1,136 +1,79 @@
-"""
-Atom
-====
+from dataclasses import dataclass
 
-"""
-
-from __future__ import annotations
+import rdkit.Chem.AllChem as rdkit
 
 
+@dataclass(frozen=True, slots=True)
 class Atom:
     """
-    An abstract base class for atoms.
-
-    A subclass is made for each element. The name of each subclass is
-    the periodic table symbol of that element.
-
-    Atoms of a particular element can be made with this
-    class or with the subclass representing that element.
+    Represents atoms.
 
     Examples:
 
-        *Initialization.*
+        *Creating atoms*
 
-        Initialization of an :class:`.Atom` can happen in one of two
-        ways. The atom can be initialized through the :class:`.Atom`
-        class or through the class representing the element.
+        You can create atoms by providing an id and an atomic number
+        or chemical symbol:
 
-        .. testcode:: initialization
+        .. testcode:: creating-atoms
 
             import stk
 
-            # h0 is an instance of the H class.
-            h0 = stk.Atom(id=0, atomic_number=1)
+            helium = stk.Atom.new(0, 2)
+            also_helium = stk.Atom.new(0, 'He')
 
-            # h1 is also an instance of the H class.
-            h1 = stk.H(id=1)
+        Charged atoms can be created by providing an optional charge:
 
-        When the class corresponding to the element is used directly,
-        the ``atomic_number`` is not provided. Here are a few more
-        examples.
+        .. testcode:: creating-atoms
 
-        .. testcode:: initialization
+            charged_helium = stk.Atom.new(0, 'He', 1)
 
-            # Both he0 and he1 are instances of the He class.
-            he0 = stk.Atom(id=2, atomic_number=2)
-            he1 = stk.He(id=3)
+        *Getting the element symbol*
 
-            # Both c0 and c1 are instances of the
-            # C class.
-            c0 = stk.Atom(id=4, atomic_number=6)
-            c1 = stk.C(id=5)
+        .. doctest:: getting-element
 
+            >>> import stk
+            >>> atom = stk.Atom.new(0, 1)
+            >>> atom.get_symbol()
+            'H'
+
+    Parameters:
+        id: The id of the atom.
+        atomic_number: The atomic number of the atom.
+        charge: The charge of the atom.
     """
 
-    # Maps each atomic number (int) to the relevant Atom subclass.
-    _elements: dict[int, type[Atom]] = {}
+    id: int
+    """The id of the atom."""
+    atomic_number: int
+    """The atomic number of the atom."""
+    charge: int = 0
+    """The charge of the atom."""
 
-    def __init__(
-        self,
-        id: int,
-        atomic_number: int,
-        charge: int = 0,
-    ) -> None:
+    @staticmethod
+    def new(id: int, element: int | str, charge: int = 0) -> "Atom":
         """
-        Initialize an :class:`Atom`.
+        Create a new atom.
 
         Parameters:
-
             id: The id of the atom.
-
-            atomic_number: The atomic number.
-
-            charge: The formal charge.
-
+            atomic_number: The atomic number of the atom.
+            charge: The charge of the atom.
+        Returns:
+            A new atom.
         """
+        atomic_number = (
+            element
+            if isinstance(element, int)
+            else rdkit.GetPeriodicTable().GetAtomicNumber(element)
+        )
+        return Atom(id, atomic_number, charge)
 
-        self._elements[atomic_number].__init__(self, id, charge)
-        self.__class__ = self._elements[atomic_number]
-
-    def get_id(self) -> int:
+    def get_symbol(self) -> str:
         """
-        Get the id of the atom.
+        Get the element symbol of the atom.
 
         Returns:
-            The id.
-
+            The element symbol.
         """
-
-        raise NotImplementedError()
-
-    def with_id(self, id: int) -> Atom:
-        """
-        Get a clone but with a different id.
-
-        Parameters:
-            id: The id of the clone.
-
-        Returns:
-            A clone with a new id.
-
-        """
-
-        raise NotImplementedError()
-
-    def get_atomic_number(self) -> int:
-        """
-        Get the atomic number of the atom.
-
-        Returns:
-            The atomic number.
-
-        """
-
-        raise NotImplementedError()
-
-    def get_charge(self) -> int:
-        """
-        Get the charge of the atom.
-
-        Returns:
-            The charge.
-
-        """
-
-        raise NotImplementedError()
-
-    def clone(self) -> Atom:
-        """
-        Return a clone.
-
-        Returns:
-            The clone.
-
-        """
-
-        raise NotImplementedError()
+        return rdkit.GetPeriodicTable().GetElementSymbol(self.atomic_number)

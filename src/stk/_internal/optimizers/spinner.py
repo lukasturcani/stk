@@ -62,7 +62,6 @@ class Spinner(Optimizer):
     References:
 
         .. [#spindry] https://github.com/andrewtarzia/SpinDry
-
     """
 
     def __init__(
@@ -118,7 +117,7 @@ class Spinner(Optimizer):
             atoms=(
                 spd.Atom(
                     id=atom.get_id(),
-                    element_string=atom.__class__.__name__,
+                    element_string=atom.get_symbol(),
                 )
                 for atom in state.get_atoms()
             ),

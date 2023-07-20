@@ -25,7 +25,7 @@ import stk
         ),
     ),
 )
-def molecule(request) -> stk.Molecule:
+def molcule(request) -> stk.Molecule:
     """
     A :class:`.Molecule` instance with at least 3 atoms.
 
