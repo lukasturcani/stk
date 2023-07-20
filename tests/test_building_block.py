@@ -49,8 +49,14 @@ def test_has_correct_molecular_graph() -> None:
 
 
 def test_has_correct_functional_groups() -> None:
-    bb = stk.BuildingBlock.from_smiles("BrCCBr", stk.bromo())
-    assert bb.functional_groups == [
+    bb1 = stk.BuildingBlock.from_smiles("BrCCBr", stk.bromo())
+    assert bb1.functional_groups == [
         stk.FunctionalGroup([1], [0]),
         stk.FunctionalGroup([2], [3]),
+    ]
+    bb2 = stk.BuildingBlock.from_smiles("BrCC(Br)CBr", stk.bromo())
+    assert bb2.functional_groups == [
+        stk.FunctionalGroup([1], [0]),
+        stk.FunctionalGroup([2], [3]),
+        stk.FunctionalGroup([4], [5]),
     ]
