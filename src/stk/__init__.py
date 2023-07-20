@@ -92,66 +92,7 @@ from stk._internal.ea.selection.selectors.stochastic_universal_sampling import (
 from stk._internal.ea.selection.selectors.tournament import Tournament
 from stk._internal.ea.selection.selectors.worst import Worst
 from stk._internal.functional_group import FunctionalGroup
-from stk._internal.functional_group_factories.alcohol_factory import (
-    AlcoholFactory,
-)
-from stk._internal.functional_group_factories.aldehyde_factory import (
-    AldehydeFactory,
-)
-from stk._internal.functional_group_factories.amide_factory import (
-    AmideFactory,
-)
-from stk._internal.functional_group_factories.boronic_acid_factory import (
-    BoronicAcidFactory,
-)
-from stk._internal.functional_group_factories.bromo_factory import (
-    BromoFactory,
-)
-from stk._internal.functional_group_factories.carboxylic_acid_factory import (
-    CarboxylicAcidFactory,
-)
-from stk._internal.functional_group_factories.dibromo_factory import (
-    DibromoFactory,
-)
-from stk._internal.functional_group_factories.difluoro_factory import (
-    DifluoroFactory,
-)
-from stk._internal.functional_group_factories.diol_factory import (
-    DiolFactory,
-)
-from stk._internal.functional_group_factories.fluoro_factory import (
-    FluoroFactory,
-)
-from stk._internal.functional_group_factories.functional_group_factory import (
-    FunctionalGroupFactory,
-)
-from stk._internal.functional_group_factories.iodo_factory import (
-    IodoFactory,
-)
-from stk._internal.functional_group_factories.primary_amino_factory import (
-    PrimaryAminoFactory,
-)
-from stk._internal.functional_group_factories.ring_amine_factory import (
-    RingAmineFactory,
-)
-from stk._internal.functional_group_factories.secondary_amino_factory import (
-    SecondaryAminoFactory,
-)
-from stk._internal.functional_group_factories.smarts import (
-    SmartsFunctionalGroupFactory,
-)
-from stk._internal.functional_group_factories.terminal_alkene_factory import (
-    TerminalAlkeneFactory,
-)
-from stk._internal.functional_group_factories.terminal_alkyne_factory import (
-    TerminalAlkyneFactory,
-)
-from stk._internal.functional_group_factories.thioacid_factory import (
-    ThioacidFactory,
-)
-from stk._internal.functional_group_factories.thiol_factory import (
-    ThiolFactory,
-)
+from stk._internal.functional_group_factory import FunctionalGroupFactory
 from stk._internal.json_serde.constructed_molecule import (
     ConstructedMoleculeDejsonizer,
     ConstructedMoleculeJsonizer,
@@ -277,27 +218,8 @@ __all__ = [
     "FitnessCalculator",
     "FitnessFunction",
     "FitnessNormalizer",
-    "AlcoholFactory",
-    "AldehydeFactory",
-    "AmideFactory",
-    "BoronicAcidFactory",
-    "BromoFactory",
-    "CarboxylicAcidFactory",
-    "DibromoFactory",
-    "DifluoroFactory",
-    "DiolFactory",
-    "FunctionalGroupFactory",
-    "FluoroFactory",
-    "IodoFactory",
-    "PrimaryAminoFactory",
-    "RingAmineFactory",
-    "SecondaryAminoFactory",
-    "SmartsFunctionalGroupFactory",
-    "TerminalAlkeneFactory",
-    "TerminalAlkyneFactory",
-    "ThioacidFactory",
-    "ThiolFactory",
     "FunctionalGroup",
+    "FunctionalGroupFactory",
     "RingAmineReaction",
     "cage",
     "polymer",
