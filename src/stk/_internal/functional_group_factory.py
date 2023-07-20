@@ -1,4 +1,4 @@
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
 
 import rdkit.Chem.AllChem as rdkit
@@ -37,12 +37,17 @@ class FunctionalGroupFactory:
         Yields:
             A functional group in `molecule`.
         """
-        for atom_ids in molecule.GetSubstructMatches(self.smarts):
+        for atom_ids in molecule.GetSubstructMatches(
+            query=rdkit.MolFromSmarts(self.smarts),
+        ):
             yield FunctionalGroup(
-                bonders=tuple(atom_ids[i] for i in self.bonders),
-                deleters=tuple(atom_ids[i] for i in self.deleters),
+                bonders=[atom_ids[i] for i in self.bonders],
+                deleters=[atom_ids[i] for i in self.deleters],
             )
 
 
-def bromo() -> FunctionalGroupFactory:
-    return FunctionalGroupFactory()
+def bromo(
+    bonders: Iterable[int] = (0,),
+    deleters: Iterable[int] = (1,),
+) -> FunctionalGroupFactory:
+    return FunctionalGroupFactory("[*][Br]", tuple(bonders), tuple(deleters))

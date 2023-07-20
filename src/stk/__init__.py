@@ -92,7 +92,10 @@ from stk._internal.ea.selection.selectors.stochastic_universal_sampling import (
 from stk._internal.ea.selection.selectors.tournament import Tournament
 from stk._internal.ea.selection.selectors.worst import Worst
 from stk._internal.functional_group import FunctionalGroup
-from stk._internal.functional_group_factory import FunctionalGroupFactory
+from stk._internal.functional_group_factory import (
+    FunctionalGroupFactory,
+    bromo,
+)
 from stk._internal.json_serde.constructed_molecule import (
     ConstructedMoleculeDejsonizer,
     ConstructedMoleculeJsonizer,
@@ -159,6 +162,8 @@ __all__ = [
     "BondInfo",
     "MoleculeRecord",
     "FunctionalGroup",
+    "FunctionalGroupFactory",
+    "bromo",
     "EvolutionaryAlgorithm",
     "MoleculeMutator",
     "RandomMutator",
@@ -218,8 +223,6 @@ __all__ = [
     "FitnessCalculator",
     "FitnessFunction",
     "FitnessNormalizer",
-    "FunctionalGroup",
-    "FunctionalGroupFactory",
     "RingAmineReaction",
     "cage",
     "polymer",
