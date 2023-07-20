@@ -13,7 +13,9 @@ class PlacementVertex:
         matrix: npt.NDArray[np.float32],
         position_anchor: npt.NDArray[np.float32],
     ) -> npt.NDArray[np.float32]:
-        pass
+        matrix = np.array(matrix, dtype=np.float32)
+        matrix += self.position - position_anchor
+        return matrix
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,7 +29,9 @@ class OrientationVertex:
         position_anchor: npt.NDArray[np.float32],
         rotation_anchor_axis: npt.NDArray[np.float32],
     ) -> npt.NDArray[np.float32]:
-        pass
+        matrix = np.array(matrix, dtype=np.float32)
+        matrix += self.position - position_anchor
+        return matrix
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,4 +47,6 @@ class RotationVertex:
         rotation_anchor_axis: npt.NDArray[np.float32],
         rotation_anchor_target: npt.NDArray[np.float32],
     ) -> npt.NDArray[np.float32]:
-        pass
+        matrix = np.array(matrix, dtype=np.float32)
+        matrix += self.position - position_anchor
+        return matrix
