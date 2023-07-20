@@ -20,6 +20,10 @@ from stk._internal.math import (
 from stk._internal.utilities.utilities import remake
 
 
+class EmbedError(Exception):
+    pass
+
+
 @dataclass(frozen=True, slots=True)
 class RotationAnchor:
     axis: npt.NDArray[np.float32]
@@ -58,8 +62,14 @@ class BuildingBlock:
         functional_groups: FunctionalGroup
         | FunctionalGroupFactory
         | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
+        position_matrix: npt.NDArray[np.float32] | None = None,
     ) -> "BuildingBlock":
         molecule = rdkit.AddHs(rdkit.MolFromSmiles(smiles))
+        if position_matrix is None:
+            params = rdkit.ETKDGv3()
+            params.randomSeed = 4
+            if rdkit.EmbedMolecule(molecule, params) == -1:
+                raise EmbedError("failed to embed building block")
         rdkit.Kekulize(molecule)
         return BuildingBlock.from_rdkit(molecule, functional_groups)
 
