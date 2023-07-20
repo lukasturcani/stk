@@ -1,5 +1,6 @@
-from stk._internal.bond import Bond
 from stk._internal.molecule import Molecule
+
+Bond = ""
 
 
 class BondInfo:

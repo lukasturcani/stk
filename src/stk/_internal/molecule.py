@@ -8,7 +8,6 @@ import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
 
 from stk._internal.atom import Atom
-from stk._internal.bond import Bond
 from stk._internal.utilities.molecule import (
     get_bond_atom_ids,
     sort_bond_atoms_by_id,
@@ -22,6 +21,8 @@ from stk._internal.utilities.utilities import (
 from stk._internal.utilities.writers.mdl_mol import _write_mdl_mol_file
 from stk._internal.utilities.writers.pdb import _write_pdb_file
 from stk._internal.utilities.writers.xyz import _write_xyz_file
+
+Bond = ""
 
 
 class Molecule:

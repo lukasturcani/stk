@@ -1,13 +1,4 @@
-"""
-Ring Amine Reaction
-===================
-
-"""
-
 import numpy as np
-
-from stk._internal.bond import Bond
-from stk._internal.elements import C, H
 
 from .reaction.new_atom import NewAtom
 from .reaction.reaction import Reaction

@@ -9,7 +9,6 @@ from stk import (
 )
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
-from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
 from stk._internal.building_block import BuildingBlock
 from stk._internal.constructed_molecule import ConstructedMolecule
@@ -151,29 +150,6 @@ from stk._internal.functional_group_factories.thioacid_factory import (
 from stk._internal.functional_group_factories.thiol_factory import (
     ThiolFactory,
 )
-from stk._internal.functional_groups.alcohol import Alcohol
-from stk._internal.functional_groups.aldehyde import Aldehyde
-from stk._internal.functional_groups.alkene import Alkene
-from stk._internal.functional_groups.alkyne import Alkyne
-from stk._internal.functional_groups.amide import Amide
-from stk._internal.functional_groups.boronic_acid import BoronicAcid
-from stk._internal.functional_groups.bromo import Bromo
-from stk._internal.functional_groups.carboxylic_acid import CarboxylicAcid
-from stk._internal.functional_groups.dibromo import Dibromo
-from stk._internal.functional_groups.difluoro import Difluoro
-from stk._internal.functional_groups.diol import Diol
-from stk._internal.functional_groups.fluoro import Fluoro
-from stk._internal.functional_groups.functional_group import FunctionalGroup
-from stk._internal.functional_groups.generic_functional_group import (
-    GenericFunctionalGroup,
-)
-from stk._internal.functional_groups.iodo import Iodo
-from stk._internal.functional_groups.primary_amino import PrimaryAmino
-from stk._internal.functional_groups.ring_amine import RingAmine
-from stk._internal.functional_groups.secondary_amino import SecondaryAmino
-from stk._internal.functional_groups.single_atom import SingleAtom
-from stk._internal.functional_groups.thioacid import Thioacid
-from stk._internal.functional_groups.thiol import Thiol
 from stk._internal.json_serde.constructed_molecule import (
     ConstructedMoleculeDejsonizer,
     ConstructedMoleculeJsonizer,
@@ -234,7 +210,6 @@ BatchKey = BatchKey
 __all__ = [
     "Atom",
     "AtomInfo",
-    "Bond",
     "BondInfo",
     "MoleculeRecord",
     "EvolutionaryAlgorithm",
@@ -436,65 +411,4 @@ __all__ = [
     "Lr",
     "Lu",
     "Lv",
-    "Mc",
-    "Md",
-    "Mg",
-    "Mn",
-    "Mo",
-    "Mt",
-    "N",
-    "Na",
-    "Nb",
-    "Nd",
-    "Ne",
-    "Nh",
-    "Ni",
-    "No",
-    "Np",
-    "O",
-    "Og",
-    "Os",
-    "P",
-    "Pa",
-    "Pb",
-    "Pd",
-    "Pm",
-    "Po",
-    "Pr",
-    "Pt",
-    "Pu",
-    "Ra",
-    "Rb",
-    "Re",
-    "Rf",
-    "Rg",
-    "Rh",
-    "Rn",
-    "Ru",
-    "S",
-    "Sb",
-    "Sc",
-    "Se",
-    "Sg",
-    "Si",
-    "Sm",
-    "Sn",
-    "Sr",
-    "Ta",
-    "Tb",
-    "Tc",
-    "Te",
-    "Th",
-    "Ti",
-    "Tl",
-    "Tm",
-    "Ts",
-    "U",
-    "V",
-    "W",
-    "Xe",
-    "Y",
-    "Yb",
-    "Zn",
-    "Zr",
 ]

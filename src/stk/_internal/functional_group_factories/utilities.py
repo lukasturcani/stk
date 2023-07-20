@@ -1,9 +1,3 @@
-"""
-Functional Group Factory Utilities
-==================================
-
-"""
-
 import rdkit.Chem.AllChem as rdkit
 
 

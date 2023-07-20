@@ -7,10 +7,10 @@ import rdkit.Chem.AllChem as rdkit
 
 from stk._internal.atom import Atom
 from stk._internal.bonds import DativeBond, IntegerBond
+from stk._internal.functional_group import FunctionalGroup
 from stk._internal.functional_group_factories.functional_group_factory import (
     FunctionalGroupFactory,
 )
-from stk._internal.functional_groups.functional_group import FunctionalGroup
 from stk._internal.math import (
     get_acute_vector,
     get_centroid,

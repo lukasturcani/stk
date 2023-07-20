@@ -1,12 +1,4 @@
-"""
-One-Two Reaction
-================
-
-"""
-
 import itertools as it
-
-from stk._internal.bond import Bond
 
 from .reaction.reaction import Reaction
 

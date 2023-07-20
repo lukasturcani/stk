@@ -8,7 +8,6 @@ import rdkit.Chem.AllChem as rdkit
 
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
-from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
 from stk._internal.construction_result.construction_result import (
     ConstructionResult,
@@ -25,6 +24,7 @@ from stk._internal.utilities.molecule import (
 logger = logging.getLogger(__name__)
 
 T = typing.TypeVar("T", bound="ConstructedMolecule")
+Bond = ""
 
 
 NumBuildingBlocks: typing.TypeAlias = dict[Molecule, int]

@@ -1,15 +1,7 @@
-"""
-Amide Factory
-=============
-
-"""
-
-
 from stk._internal.functional_group_factories.functional_group_factory import (
     FunctionalGroupFactory,
 )
 from stk._internal.functional_group_factories.utilities import get_atom_ids
-from stk._internal.functional_groups.amide import Amide
 
 
 class AmideFactory(FunctionalGroupFactory):

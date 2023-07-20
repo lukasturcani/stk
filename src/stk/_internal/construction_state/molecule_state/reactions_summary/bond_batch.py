@@ -1,10 +1,3 @@
-"""
-Bond Batch
-==========
-
-
-"""
-
 from stk._internal.bond_info import BondInfo
 
 

@@ -1,9 +1,3 @@
-"""
-Placements Summary
-==================
-
-"""
-
 from collections import defaultdict
 from typing import TYPE_CHECKING, Iterable
 
@@ -11,9 +5,8 @@ import numpy as np
 
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
-from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
-from stk._internal.functional_groups.functional_group import FunctionalGroup
+from stk._internal.functional_group import FunctionalGroup
 from stk._internal.topology_graphs.topology_graph.utilities import (
     _PlacementResult,
 )
@@ -23,6 +16,8 @@ from .bond_batch import _BondBatch
 
 if TYPE_CHECKING:
     from stk._internal.building_block import BuildingBlock
+
+Bond = ""
 
 
 class _PlacementsSummary:

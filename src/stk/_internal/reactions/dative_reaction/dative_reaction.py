@@ -1,11 +1,3 @@
-"""
-Dative Reaction
-===============
-
-"""
-
-from stk._internal.bond import Bond
-
 from ..reaction.reaction import Reaction
 from .utilities import is_metal
 

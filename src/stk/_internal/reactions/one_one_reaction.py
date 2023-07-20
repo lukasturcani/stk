@@ -1,11 +1,3 @@
-"""
-One-One Reaction
-================
-
-"""
-
-from stk._internal.bond import Bond
-
 from .reaction.reaction import Reaction
 
 

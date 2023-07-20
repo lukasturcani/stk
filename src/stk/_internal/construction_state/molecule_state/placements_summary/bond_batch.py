@@ -1,14 +1,7 @@
-"""
-Bond Batch
-==========
-
-"""
-
 from __future__ import annotations
 
 from typing import Iterable
 
-from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
 from stk._internal.building_block import BuildingBlock
 

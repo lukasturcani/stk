@@ -1,14 +1,6 @@
-"""
-Two-Two Reaction
-================
-
-"""
-
 import itertools as it
 
 from scipy.spatial.distance import euclidean
-
-from stk._internal.bond import Bond
 
 from .reaction.reaction import Reaction
 

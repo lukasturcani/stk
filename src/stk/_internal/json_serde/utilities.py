@@ -1,13 +1,8 @@
-"""
-JSON Deserialization Utilities
-==============================
-
-"""
-
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
-from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
+
+Bond = ""
 
 
 def to_atom(id, json):
