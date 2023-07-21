@@ -3,6 +3,8 @@ from dataclasses import dataclass
 import numpy as np
 import numpy.typing as npt
 
+from stk._internal.math import apply_rotation_between_vectors
+
 
 @dataclass(frozen=True, slots=True)
 class PlacementVertex:
@@ -31,6 +33,12 @@ class OrientationVertex:
     ) -> npt.NDArray[np.float32]:
         matrix = np.array(matrix, dtype=np.float32)
         matrix += self.position - position_anchor
+        apply_rotation_between_vectors(
+            matrix=matrix,
+            start=rotation_anchor_axis,
+            target=self.rotation_axis,
+            origin=self.position,
+        )
         return matrix
 
 

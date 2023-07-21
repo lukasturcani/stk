@@ -11,7 +11,7 @@ from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
 from stk._internal.bond_info import BondInfo
 from stk._internal.bonds import DativeBond, IntegerBond, PeriodicBond
-from stk._internal.building_block import BuildingBlock
+from stk._internal.building_block import BuildingBlock, RotationAnchor
 from stk._internal.constructed_molecule import ConstructedMolecule
 from stk._internal.construction_result.construction_result import (
     ConstructionResult,
@@ -108,6 +108,7 @@ from stk._internal.key_makers.inchi import Inchi
 from stk._internal.key_makers.inchi_key import InchiKey
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
 from stk._internal.key_makers.smiles import Smiles
+from stk._internal.math import get_centroid
 from stk._internal.molecule import Molecule
 from stk._internal.optimizers.collapser import Collapser
 from stk._internal.optimizers.mchammer import MCHammer
@@ -144,6 +145,11 @@ from stk._internal.utilities.utilities import (
     rotation_matrix_arbitrary_axis,
     vector_angle,
 )
+from stk._internal.vertices import (
+    OrientationVertex,
+    PlacementVertex,
+    RotationVertex,
+)
 from stk._internal.writers.mdl_mol import MolWriter
 from stk._internal.writers.pdb import PdbWriter
 from stk._internal.writers.turbomole import TurbomoleWriter
@@ -161,9 +167,14 @@ __all__ = [
     "DativeBond",
     "BondInfo",
     "MoleculeRecord",
+    "RotationAnchor",
     "FunctionalGroup",
     "FunctionalGroupFactory",
     "bromo",
+    "PlacementVertex",
+    "OrientationVertex",
+    "RotationVertex",
+    "get_centroid",
     "EvolutionaryAlgorithm",
     "MoleculeMutator",
     "RandomMutator",

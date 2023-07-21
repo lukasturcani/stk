@@ -175,3 +175,27 @@ class BuildingBlock:
             if rotation_axis is not None
             else None,
         )
+
+    def to_rdkit(self) -> rdkit.Mol:
+        mol = rdkit.EditableMol(rdkit.Mol())
+        for atom in self.atoms:
+            rdkit_atom = rdkit.Atom(atom.atomic_number)
+            rdkit_atom.SetFormalCharge(atom.charge)
+            mol.AddAtom(rdkit_atom)
+
+        for ibond in self.integer_bonds:
+            mol.AddBond(
+                beginAtomIdx=ibond.atom1.id,
+                endAtomIdx=ibond.atom2.id,
+                order=rdkit.BondType(ibond.order),
+            )
+        for dbond in self.dative_bonds:
+            mol.AddBond(dbond.atom1.id, dbond.atom2.id, rdkit.BondType.DATIVE)
+
+        mol = mol.GetMol()
+        conformer = rdkit.Conformer(len(self.atoms))
+        for atom_id, atom_coord in enumerate(self.position_matrix):
+            conformer.SetAtomPosition(atom_id, atom_coord.astype(np.float64))
+            mol.GetAtomWithIdx(atom_id).SetNoImplicit(True)
+        mol.AddConformer(conformer)
+        return mol
