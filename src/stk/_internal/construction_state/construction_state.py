@@ -222,7 +222,7 @@ class ConstructionState:
 
     def get_edges(self, vertex_id):
         """
-        Get the edges connect to a vertex.
+        Get the edges connected to a vertex.
 
         Parameters
         ----------
