@@ -6,3 +6,5 @@ Polymer and Small Molecules
 #. :class:`.NCore`
 
 """
+
+from . import vertices  # noqa
