@@ -19,7 +19,7 @@ from stk._internal.topology_graphs.topology_graph.topology_graph import (
 )
 from stk._internal.topology_graphs.vertex import Vertex
 
-from .vertices import (
+from ..vertices import (
     HeadVertex,
     LinearVertex,
     TailVertex,

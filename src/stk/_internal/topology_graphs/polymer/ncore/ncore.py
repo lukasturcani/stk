@@ -19,7 +19,7 @@ from stk._internal.topology_graphs.topology_graph.topology_graph import (
 )
 from stk._internal.topology_graphs.vertex import Vertex
 
-from .vertices import CoreVertex, TerminalVertex
+from ..vertices import CoreVertex, SubstituentVertex
 
 
 class NCore(TopologyGraph):
@@ -89,30 +89,23 @@ class NCore(TopologyGraph):
         if not isinstance(repeating_unit, str):
             repeating_unit = tuple(repeating_unit)
 
-        print(core_building_block)
         self._num_arms = core_building_block.get_num_functional_groups()
-        print(self._num_arms)
-        print(self._num_arms % len(repeating_unit))
         if self._num_arms % len(repeating_unit) != 0:
             raise ValueError(
-                "The repeating unit does not fit evenly onto the core "
-                f"building block with {self._num_arms} functional "
-                "groups."
+                f"The repeating unit {repeating_unit} does not fit "
+                "evenly onto the core building block with "
+                f"{self._num_arms} functional groups."
             )
 
         # Keep these for __repr__.
         self._repeating_unit = self._normalize_repeating_unit(
             repeating_unit=repeating_unit
         )
-        print(self._repeating_unit)
         self._num_repeating_units = int(self._num_arms / len(repeating_unit))
-        print(self._num_repeating_units)
 
         vertices_and_edges = self._get_vertices_and_edges(self._num_arms)
         vertices = vertices_and_edges.vertices
         edges = vertices_and_edges.edges
-        print(vertices)
-        print("e", edges)
 
         super().__init__(
             building_block_vertices=self._get_building_block_vertices(
@@ -156,7 +149,7 @@ class NCore(TopologyGraph):
         vertices: list[Vertex] = [CoreVertex(0, (0, 0, 0))]
         edges: list[Edge] = []
         for i, pos in enumerate(arm_positions):
-            vertices.append(TerminalVertex(i + 1, pos))
+            vertices.append(SubstituentVertex(i + 1, pos))
             edges.append(Edge(len(edges), vertices[0], vertices[-1]))
 
         return _VerticesAndEdges(
@@ -188,7 +181,7 @@ class NCore(TopologyGraph):
         vertices: tuple[Vertex, ...],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         building_block_vertices: dict[BuildingBlock, list[Vertex]] = {}
-        building_block_vertices[core_building_block] = (vertices[0],)
+        building_block_vertices[core_building_block] = [vertices[0]]
 
         bb_order = self._repeating_unit * self._num_repeating_units
         for bb_index, vertex in zip(bb_order, vertices[1:]):
@@ -196,61 +189,12 @@ class NCore(TopologyGraph):
             building_block_vertices[bb] = building_block_vertices.get(bb, [])
             building_block_vertices[bb].append(vertex)
 
-        print(building_block_vertices)
-        return self._with_unaligning_vertices(
-            building_block_vertices=building_block_vertices,
-        )
-
-    @staticmethod
-    def _with_unaligning_vertices(
-        building_block_vertices: dict[BuildingBlock, list[Vertex]],
-    ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
-        # clone: dict[BuildingBlock, abc.Sequence[Vertex]] = {}
-        # terminal_ids = {
-        #     0,
-        #     max(
-        #         vertex.get_id()
-        #         for vertex_list in building_block_vertices.values()
-        #         for vertex in vertex_list
-        #     ),
-        # }
-        for (
-            building_block,
-            vertices,
-        ) in building_block_vertices.items():
-            # Building blocks with 1 placer, cannot be aligned on
-            # linear vertices and must therefore use an
-            # UnaligningVertex. Building blocks with 1 placer can be
-            # placed on terminal vertices (HeadVertex or TailVertex).
-            # This can be discerned based on the knowledge that the
-            # first and last vertex are the Head and Tail,
-            # respectively.
-
-            # Not implemented currently, so just error if this happens.
-            if building_block.get_num_placers() == 1:
-                print(
-                    f"{building_block} has only 1 placer. "
-                    "Unaligning vertex not implemented yet. Ignoring."
-                )
-
-            # if building_block.get_num_placers() == 1:
-            #     clone[building_block] = tuple(
-            #         (
-            #             UnaligningVertex(
-            #                 id=vertex.get_id(),
-            #                 position=vertex.get_position(),
-            #                 flip=vertex.get_flip(),
-            #             )
-            #             if vertex.get_id() not in terminal_ids
-            #             else vertex
-            #         )
-            #         for vertex in vertices
-            #     )
-            # else:
-            #     clone[building_block] = vertices
-
-        # return clone
-        return building_block_vertices
+        # Have to do this to match the typing in the return statement
+        # (Sequence), suggestions for improvement would be great.
+        return {
+            i: tuple(building_block_vertices[i])
+            for i in building_block_vertices
+        }
 
     def _get_scale(
         self,
