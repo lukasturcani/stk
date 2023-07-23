@@ -247,7 +247,7 @@ class UnaligningVertex(LinearVertex):
 
 class CoreVertex(Vertex):
     """
-    Represents a vertex in the middle of a linear polymer chain.
+    Represents a vertex in the core of an ncore topology graph.
 
     """
 

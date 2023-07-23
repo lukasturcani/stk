@@ -24,13 +24,341 @@ from ..vertices import CoreVertex, SubstituentVertex
 
 class NCore(TopologyGraph):
     """
-    Represents a linear polymer topology graph.
+    Represents a core reacting with N arms topology graph.
 
-    Building blocks with two functional groups are required, unless the
-    building block's position is specified to only be at the capping
-    positions.
+    The core building block, with N functional groups, defines the
+    behaviour of this topology graph. The arm building blocks, which
+    must have only one functional group, are oriented in a circle around
+    the core based on N and the repeating units. The core is oriented
+    into the XY plane.
 
     Examples:
+
+        *Construction*
+
+        The number of functional groups in the core building block
+        define the topology graph
+
+        .. testcode:: construction
+
+            import stk
+
+            core1 = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core1,
+                arm_building_blocks=[arm],
+                repeating_unit="A",  # 'AAA' would work too.
+            ))
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            arm = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            core1 = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core1,
+                arm_building_blocks=[arm],
+                repeating_unit="A",
+            ))
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        ncore.get_atoms(),
+                        ncore.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in ncore.get_bonds()
+                ),
+            )
+
+        .. testcode:: construction
+
+            import stk
+
+            core2 = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core2,
+                arm_building_blocks=[arm],
+                repeating_unit="A",  # 'AAAAAAA' would work too.
+            ))
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            arm = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            core2 = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core2,
+                arm_building_blocks=[arm],
+                repeating_unit="A",
+            ))
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        ncore.get_atoms(),
+                        ncore.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in ncore.get_bonds()
+                ),
+            )
+
+        *Suggested Optimization*
+
+        For :class:`.NCore` topologies, it is recommend to use the
+        :class:`.MCHammer` optimizer.
+
+        .. testcode:: suggested-optimization
+
+            import stk
+
+            arm = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            core2 = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core2,
+                arm_building_blocks=[arm],
+                repeating_unit="A",
+                optimizer=stk.MCHammer(),
+            ))
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            arm = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            core2 = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core2,
+                arm_building_blocks=[arm],
+                repeating_unit="A",
+                optimizer=stk.MCHammer(),
+            ))
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        ncore.get_atoms(),
+                        ncore.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in ncore.get_bonds()
+                ),
+            )
+
+        *Construction with Distinct Arms*
+
+        Any combination of arm building blocks can be provided.
+
+        .. testcode:: construction-with-distinct-arms1
+
+            import stk
+
+            core = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm1 = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm2 = stk.BuildingBlock(
+                smiles="BrCN",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABABABA",
+            ))
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            core = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm1 = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm2 = stk.BuildingBlock(
+                smiles="BrCN",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABABAB",
+            ))
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        ncore.get_atoms(),
+                        ncore.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in ncore.get_bonds()
+                ),
+            )
+
+        Just be cautious of the repeating unit term, which must match
+        the available functional groups in the core. Units that are a
+        subset of available functional groups will be repeated.
+
+        .. testcode:: construction-with-distinct-arms2
+
+            import stk
+
+            core = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm1 = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm2 = stk.BuildingBlock(
+                smiles="BrCN",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABA",  # Same as 'ABAABA'.
+            ))
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            core = stk.BuildingBlock(
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C1Br",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm1 = stk.BuildingBlock(
+                smiles="BrC",
+                functional_groups=[stk.BromoFactory()],
+            )
+            arm2 = stk.BuildingBlock(
+                smiles="BrCN",
+                functional_groups=[stk.BromoFactory()],
+            )
+
+            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABA",
+            ))
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        ncore.get_atoms(),
+                        ncore.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in ncore.get_bonds()
+                ),
+            )
 
     """
 
@@ -46,16 +374,19 @@ class NCore(TopologyGraph):
         """
         Parameters:
 
-            core_building_block (list[BuildingBlock]):
+            core_building_block (BuildingBlock):
                 The central building block.
 
             arm_building_blocks (list[BuildingBlock]):
-                The building blocks to place on arms.
+                The building blocks to react with the core.
 
             repeating_unit (str | list[int]):
-                A string specifying the repeating unit of the polymer.
+                A string specifying the repeating unit of the arms.
                 For example, ``'AB'`` or ``'ABB'``. The first building
-                block passed to `building_blocks` is ``'A'`` and so on.
+                block passed to `arm_building_blocks` is ``'A'`` and
+                so on. The repeating unit must fit evenly onto the
+                `core_building_block`, defined by the number of
+                functional groups the core has.
 
                 The repeating unit can also be specified by the
                 indices of `building_blocks`, for example ``'ABB'``
@@ -127,6 +458,8 @@ class NCore(TopologyGraph):
 
         Parameters:
 
+            num_arms:
+                The number of arms to add to the core.
 
         Returns:
 
