@@ -11,7 +11,7 @@ from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
 from stk._internal.bond_info import BondInfo
 from stk._internal.bonds import DativeBond, IntegerBond, PeriodicBond
-from stk._internal.building_block import BuildingBlock, RotationAnchor
+from stk._internal.building_block import BuildingBlock, RotationBuildingBlock
 from stk._internal.constructed_molecule import ConstructedMolecule
 from stk._internal.construction_result.construction_result import (
     ConstructionResult,
@@ -171,6 +171,7 @@ __all__ = [
     "FunctionalGroup",
     "FunctionalGroupFactory",
     "bromo",
+    "RotationBuildingBlock",
     "PlacementVertex",
     "OrientationVertex",
     "RotationVertex",

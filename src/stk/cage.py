@@ -1,4 +1,5 @@
-from stk._internal.topology_graphs.cage.cage import Cage
+from stk._internal.building_block import RotationBuildingBlock as BuildingBlock
+from stk._internal.cage import Cage, four_plus_six
 from stk._internal.topology_graphs.cage.eight_plus_sixteen import (
     EightPlusSixteen,
 )
@@ -84,4 +85,6 @@ __all__ = [
     "NonLinearVertex",
     "UnaligningVertex",
     "AngledVertex",
+    "four_plus_six",
+    "BuildingBlock",
 ]

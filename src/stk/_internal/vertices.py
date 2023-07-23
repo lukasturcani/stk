@@ -1,8 +1,12 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol
 
 import numpy as np
 import numpy.typing as npt
 
+from stk._internal.atom import Atom
+from stk._internal.bonds import DativeBond, IntegerBond
 from stk._internal.math import apply_rotation_between_vectors
 
 
@@ -42,7 +46,7 @@ class OrientationVertex:
         return matrix
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class RotationVertex:
     position: npt.NDArray[np.float32]
     rotation_axis: npt.NDArray[np.float32]
@@ -57,4 +61,10 @@ class RotationVertex:
     ) -> npt.NDArray[np.float32]:
         matrix = np.array(matrix, dtype=np.float32)
         matrix += self.position - position_anchor
+        apply_rotation_between_vectors(
+            matrix=matrix,
+            start=rotation_anchor_axis,
+            target=self.rotation_axis,
+            origin=self.position,
+        )
         return matrix
