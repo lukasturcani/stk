@@ -1,23 +1,23 @@
 from stk._internal.topology_graphs.polymer.linear.linear import Linear
-from stk._internal.topology_graphs.polymer.linear.vertices import (
+from stk._internal.topology_graphs.polymer.ncore.ncore import NCore
+from stk._internal.topology_graphs.polymer.vertices import (
+    CoreVertex,
     HeadVertex,
     LinearVertex,
+    SubstituentVertex,
     TailVertex,
-    UnaligningVertex,
-)
-from stk._internal.topology_graphs.polymer.ncore.ncore import NCore
-from stk._internal.topology_graphs.polymer.ncore.vertices import (
     TerminalVertex,
-    CoreVertex,
+    UnaligningVertex,
 )
 
 __all__ = [
     "Linear",
     "NCore",
+    "TerminalVertex",
     "HeadVertex",
     "TailVertex",
     "LinearVertex",
     "UnaligningVertex",
     "CoreVertex",
-    "TerminalVertex",
+    "SubstituentVertex",
 ]
