@@ -31,7 +31,7 @@
    :caption: Topology Graphs
    :maxdepth: 2
 
-   Polymers <polymer>
+   Polymers & Small Molecules <polymer>
    Organic & Metal-Organic Cages <cage>
    Covalent Organic Frameworks <cof>
    Metal Complexes <metal_complex>
