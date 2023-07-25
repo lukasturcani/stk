@@ -1,9 +1,3 @@
-"""
-Small Molecule Vertices
-=======================
-
-"""
-
 import logging
 
 import numpy as np
