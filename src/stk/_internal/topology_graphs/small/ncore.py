@@ -307,7 +307,7 @@ class NCore(TopologyGraph):
             import stk
 
             core = stk.BuildingBlock(
-                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C1Br",
                 functional_groups=stk.BromoFactory(),
             )
             arm1 = stk.BuildingBlock(
