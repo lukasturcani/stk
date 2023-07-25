@@ -19,7 +19,7 @@ from stk._internal.topology_graphs.topology_graph.topology_graph import (
 )
 from stk._internal.topology_graphs.vertex import Vertex
 
-from ..vertices import CoreVertex, SubstituentVertex
+from .vertices import CoreVertex, SubstituentVertex
 
 
 class NCore(TopologyGraph):
@@ -45,16 +45,16 @@ class NCore(TopologyGraph):
 
             core1 = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core1,
-                arm_building_blocks=[arm],
+                arm_building_blocks=arm,
                 repeating_unit="A",  # 'AAA' would work too.
             ))
 
@@ -65,16 +65,16 @@ class NCore(TopologyGraph):
 
             arm = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             core1 = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core1,
-                arm_building_blocks=[arm],
+                arm_building_blocks=arm,
                 repeating_unit="A",
             ))
 
@@ -103,16 +103,16 @@ class NCore(TopologyGraph):
 
             core2 = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core2,
-                arm_building_blocks=[arm],
+                arm_building_blocks=arm,
                 repeating_unit="A",  # 'AAAAAAA' would work too.
             ))
 
@@ -123,16 +123,16 @@ class NCore(TopologyGraph):
 
             arm = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             core2 = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core2,
-                arm_building_blocks=[arm],
+                arm_building_blocks=arm,
                 repeating_unit="A",
             ))
 
@@ -166,16 +166,16 @@ class NCore(TopologyGraph):
 
             arm = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             core2 = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core2,
-                arm_building_blocks=[arm],
+                arm_building_blocks=arm,
                 repeating_unit="A",
                 optimizer=stk.MCHammer(),
             ))
@@ -187,16 +187,16 @@ class NCore(TopologyGraph):
 
             arm = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             core2 = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core2,
-                arm_building_blocks=[arm],
+                arm_building_blocks=arm,
                 repeating_unit="A",
                 optimizer=stk.MCHammer(),
             ))
@@ -230,18 +230,18 @@ class NCore(TopologyGraph):
 
             core = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm1 = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm2 = stk.BuildingBlock(
                 smiles="BrCN",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core,
                 arm_building_blocks=[arm1, arm2],
                 repeating_unit="ABABABA",
@@ -254,18 +254,18 @@ class NCore(TopologyGraph):
 
             core = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm1 = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm2 = stk.BuildingBlock(
                 smiles="BrCN",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core,
                 arm_building_blocks=[arm1, arm2],
                 repeating_unit="ABABAB",
@@ -300,18 +300,18 @@ class NCore(TopologyGraph):
 
             core = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm1 = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm2 = stk.BuildingBlock(
                 smiles="BrCN",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core,
                 arm_building_blocks=[arm1, arm2],
                 repeating_unit="ABA",  # Same as 'ABAABA'.
@@ -324,18 +324,18 @@ class NCore(TopologyGraph):
 
             core = stk.BuildingBlock(
                 smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C1Br",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm1 = stk.BuildingBlock(
                 smiles="BrC",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
             arm2 = stk.BuildingBlock(
                 smiles="BrCN",
-                functional_groups=[stk.BromoFactory()],
+                functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(stk.polymer.NCore(
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
                 core_building_block=core,
                 arm_building_blocks=[arm1, arm2],
                 repeating_unit="ABA",
@@ -365,7 +365,9 @@ class NCore(TopologyGraph):
     def __init__(
         self,
         core_building_block: BuildingBlock,
-        arm_building_blocks: abc.Iterable[BuildingBlock],
+        arm_building_blocks: typing.Union[
+            BuildingBlock, abc.Iterable[BuildingBlock]
+        ],
         repeating_unit: str | abc.Iterable[int],
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
@@ -377,7 +379,7 @@ class NCore(TopologyGraph):
             core_building_block (BuildingBlock):
                 The central building block.
 
-            arm_building_blocks (list[BuildingBlock]):
+            arm_building_blocks (BuildingBlock | list[BuildingBlock]):
                 The building blocks to react with the core.
 
             repeating_unit (str | list[int]):
@@ -411,6 +413,9 @@ class NCore(TopologyGraph):
                 to `repeating_unit` or to the total number of vertices.
 
         """
+
+        if isinstance(arm_building_blocks, BuildingBlock):
+            arm_building_blocks = (arm_building_blocks,)
 
         self._repr = (
             f"NCore({core_building_block!r}, {arm_building_blocks!r}, "

@@ -6,6 +6,7 @@ from stk import (
     metal_complex,
     polymer,
     rotaxane,
+    small,
 )
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
@@ -460,6 +461,7 @@ __all__ = [
     "Thiol",
     "cage",
     "polymer",
+    "small",
     "Collapser",
     "MCHammer",
     "ReactionFactory",
