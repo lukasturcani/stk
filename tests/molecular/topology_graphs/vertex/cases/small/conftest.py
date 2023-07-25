@@ -1,5 +1,3 @@
-import typing
-
 import numpy as np
 import pytest
 import stk
@@ -21,7 +19,7 @@ def case_data(request) -> pytest.FixtureRequest:
 @pytest.fixture
 def core(
     id: int,
-    position: typing.Union[tuple[float, float, float], np.ndarray],
+    position: tuple[float, float, float] | np.ndarray,
 ) -> CaseData:
     return CaseData(
         vertex=stk.small.CoreVertex(
@@ -37,7 +35,7 @@ def core(
 @pytest.fixture
 def substituent(
     id: int,
-    position: typing.Union[tuple[float, float, float], np.ndarray],
+    position: tuple[float, float, float] | np.ndarray,
 ) -> CaseData:
     return CaseData(
         vertex=stk.small.SubstituentVertex(

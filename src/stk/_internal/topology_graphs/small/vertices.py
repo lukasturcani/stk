@@ -59,9 +59,6 @@ class CoreVertex(Vertex):
             origin=self._position,
         ).get_position_matrix()
 
-    # def map_functional_groups_to_edges(self, building_block, edges):
-    #     return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
-
     def map_functional_groups_to_edges(
         self,
         building_block: BuildingBlock,

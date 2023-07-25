@@ -1,5 +1,4 @@
 import logging
-import typing
 
 import numpy as np
 
@@ -20,7 +19,7 @@ class LinearVertex(Vertex):
     def __init__(
         self,
         id: int,
-        position: typing.Union[tuple[float, float, float], np.ndarray],
+        position: tuple[float, float, float] | np.ndarray,
         flip: bool,
     ) -> None:
         """

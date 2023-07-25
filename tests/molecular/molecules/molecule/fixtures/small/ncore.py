@@ -81,7 +81,7 @@ from ...case_data import CaseData
         ),
     ),
 )
-def small_ncore(request) -> CaseData:
+def small_ncore(request: pytest.FixtureRequest) -> CaseData:
     return request.param(
         f"{request.fixturename}{request.param_index}",
     )
