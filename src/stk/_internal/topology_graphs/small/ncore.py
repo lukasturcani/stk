@@ -377,9 +377,7 @@ class NCore(TopologyGraph):
     def __init__(
         self,
         core_building_block: BuildingBlock,
-        arm_building_blocks: typing.Union[
-            BuildingBlock, abc.Iterable[BuildingBlock]
-        ],
+        arm_building_blocks: BuildingBlock | abc.Iterable[BuildingBlock],
         repeating_unit: str | abc.Iterable[int],
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
@@ -516,7 +514,7 @@ class NCore(TopologyGraph):
 
     @staticmethod
     def _normalize_repeating_unit(
-        repeating_unit: typing.Union[str, tuple[int, ...]],
+        repeating_unit: str | tuple[int, ...],
     ) -> tuple[int, ...]:
         if isinstance(repeating_unit, tuple):
             return repeating_unit
