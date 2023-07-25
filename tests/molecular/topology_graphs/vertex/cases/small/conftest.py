@@ -1,8 +1,9 @@
+import typing
+
 import numpy as np
 import pytest
 import stk
 from pytest_lazyfixture import lazy_fixture
-import typing
 
 from ...case_data import CaseData
 

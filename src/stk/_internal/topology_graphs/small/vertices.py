@@ -8,11 +8,11 @@ import logging
 
 import numpy as np
 
-from stk._internal.topology_graphs.vertex import Vertex
 from stk._internal.building_block import BuildingBlock
-from ..edge import Edge
+from stk._internal.topology_graphs.vertex import Vertex
 from stk._internal.utilities.utilities import get_acute_vector
 
+from ..edge import Edge
 from ..utilities import _EdgeSorter, _FunctionalGroupSorter
 
 logger = logging.getLogger(__name__)
