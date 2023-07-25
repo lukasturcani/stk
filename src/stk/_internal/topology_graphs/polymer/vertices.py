@@ -5,9 +5,12 @@ Polymer Vertices
 """
 
 import logging
-
+import typing
+import numpy as np
 
 from stk._internal.topology_graphs.vertex import Vertex
+from stk._internal.building_block import BuildingBlock
+from ..edge import Edge
 
 logger = logging.getLogger(__name__)
 
@@ -18,34 +21,38 @@ class LinearVertex(Vertex):
 
     """
 
-    def __init__(self, id, position, flip):
+    def __init__(
+        self,
+        id: int,
+        position: typing.Union[tuple[float, float, float], np.ndarray],
+        flip: bool,
+    ) -> None:
         """
         Initialize a :class:`.LinearVertex` instance.
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the vertex.
+        Parameters:
 
-        position : :class:`numpy.ndarray`
-            The position of the vertex.
+            id:
+                The id of the vertex.
 
-        flip : :class:`bool`
-            If ``True`` any building block placed by the vertex will
-            have its orientation along the chain flipped.
+            position:
+                The position of the vertex.
+
+            flip:
+                If ``True`` any building block placed by the vertex will
+                have its orientation along the chain flipped.
 
         """
 
         super().__init__(id, position)
         self._flip = flip
 
-    def get_flip(self):
+    def get_flip(self) -> bool:
         """
-        Return ``True`` if the vertex flips building blocks it places.
+        Return whether the vertex flips building blocks it places.
 
-        Returns
-        -------
-        :class:`bool`
+        Returns:
+
             ``True`` if the vertex flips building blocks it places.
 
         """
@@ -57,7 +64,11 @@ class LinearVertex(Vertex):
         clone._flip = self._flip
         return clone
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         assert building_block.get_num_functional_groups() == 2, (
             f"{building_block} needs to have exactly 2 functional "
             "groups but has "
@@ -80,7 +91,11 @@ class LinearVertex(Vertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         fg1_id, fg2_id = self._sort_functional_groups(building_block)
         edge1_id, edge2_id = self._sort_edges(edges)
         return {
@@ -89,7 +104,9 @@ class LinearVertex(Vertex):
         }
 
     @staticmethod
-    def _sort_functional_groups(building_block):
+    def _sort_functional_groups(
+        building_block: BuildingBlock,
+    ) -> tuple[int, int]:
         fg1, fg2 = building_block.get_functional_groups()
         x1, y1, z1 = building_block.get_centroid(
             atom_ids=fg1.get_placer_ids(),
@@ -100,7 +117,7 @@ class LinearVertex(Vertex):
         return (0, 1) if x1 < x2 else (1, 0)
 
     @staticmethod
-    def _sort_edges(edges):
+    def _sort_edges(edges: tuple[Edge, Edge]) -> tuple[Edge, Edge]:
         edge1, edge2 = edges
         x1, y1, z1 = edge1.get_position()
         x2, y2, z2 = edge2.get_position()
@@ -126,7 +143,11 @@ class TerminalVertex(LinearVertex):
 
     """
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         if (
             building_block.get_num_functional_groups() != 1
             and building_block.get_num_placers() > 1
@@ -151,7 +172,11 @@ class TerminalVertex(LinearVertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         if building_block.get_num_functional_groups() == 2:
             functional_groups = self._sort_functional_groups(
                 building_block=building_block,
@@ -197,11 +222,19 @@ class UnaligningVertex(LinearVertex):
 
     """
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         return building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
