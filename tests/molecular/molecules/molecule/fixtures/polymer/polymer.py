@@ -8,5 +8,5 @@ from .linear import *  # noqa
 @pytest.fixture(
     params=(lazy_fixture("polymer_linear"),),
 )
-def polymer(request):
+def polymer(request) -> pytest.FixtureRequest:
     return request.param

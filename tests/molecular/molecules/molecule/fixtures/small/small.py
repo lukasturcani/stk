@@ -8,5 +8,5 @@ from .ncore import *  # noqa
 @pytest.fixture(
     params=(lazy_fixture("small_ncore"),),
 )
-def polymer(request):
+def small(request) -> pytest.FixtureRequest:
     return request.param
