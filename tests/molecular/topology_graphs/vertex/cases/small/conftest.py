@@ -14,7 +14,7 @@ from ...case_data import CaseData
         lazy_fixture("core"),
     ),
 )
-def case_data(request):
+def case_data(request) -> pytest.FixtureRequest:
     return request.param
 
 
