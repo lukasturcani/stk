@@ -9,6 +9,8 @@ import logging
 import numpy as np
 
 from stk._internal.topology_graphs.vertex import Vertex
+from stk._internal.building_block import BuildingBlock
+from ..edge import Edge
 from stk._internal.utilities.utilities import get_acute_vector
 
 from ..utilities import _EdgeSorter, _FunctionalGroupSorter
@@ -22,7 +24,11 @@ class CoreVertex(Vertex):
 
     """
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         # Sets building block in XY plane, then aligns 0th functional
         # group with the 0th edge.
         assert building_block.get_num_functional_groups() > 2, (
@@ -62,7 +68,11 @@ class CoreVertex(Vertex):
     # def map_functional_groups_to_edges(self, building_block, edges):
     #     return {fg_id: edge.get_id() for fg_id, edge in enumerate(edges)}
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         # The idea is to order the functional groups in building_block
         # by their angle with the vector running from the placer
         # centroid to fg0, going in the clockwise direction.
@@ -93,7 +103,11 @@ class SubstituentVertex(Vertex):
 
     """
 
-    def place_building_block(self, building_block, edges):
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
         assert building_block.get_num_functional_groups() == 1, (
             f"{building_block} needs to have 1 functional "
             "groups but has "
@@ -119,5 +133,9 @@ class SubstituentVertex(Vertex):
             origin=self._position,
         ).get_position_matrix()
 
-    def map_functional_groups_to_edges(self, building_block, edges):
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
         return {0: edges[0].get_id()}

@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import stk
 from pytest_lazyfixture import lazy_fixture
+import typing
 
 from ...case_data import CaseData
 
@@ -17,7 +18,10 @@ def case_data(request):
 
 
 @pytest.fixture
-def core(id, position, flip):
+def core(
+    id: int,
+    position: typing.Union[tuple[float, float, float], np.ndarray],
+) -> CaseData:
     return CaseData(
         vertex=stk.small.CoreVertex(
             id=id,
@@ -30,7 +34,10 @@ def core(id, position, flip):
 
 
 @pytest.fixture
-def substituent(id, position, flip):
+def substituent(
+    id: int,
+    position: typing.Union[tuple[float, float, float], np.ndarray],
+) -> CaseData:
     return CaseData(
         vertex=stk.small.SubstituentVertex(
             id=id,
@@ -44,9 +51,4 @@ def substituent(id, position, flip):
 
 @pytest.fixture(params=(0,))
 def id(request):
-    return request.param
-
-
-@pytest.fixture(params=(True, False))
-def flip(request):
     return request.param
