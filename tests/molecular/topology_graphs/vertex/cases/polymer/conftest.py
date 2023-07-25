@@ -22,7 +22,7 @@ def center(
     id: int,
     position: tuple[float, float, float] | np.ndarray,
     flip: bool,
-) -> CaseData:
+):
     return CaseData(
         vertex=stk.polymer.LinearVertex(id, position, flip),
         id=id,
@@ -36,7 +36,7 @@ def head(
     id: int,
     position: tuple[float, float, float] | np.ndarray,
     flip: bool,
-) -> CaseData:
+):
     return CaseData(
         vertex=stk.polymer.HeadVertex(id, position, flip),
         id=id,
@@ -50,7 +50,7 @@ def tail(
     id: int,
     position: tuple[float, float, float] | np.ndarray,
     flip: bool,
-) -> CaseData:
+):
     return CaseData(
         vertex=stk.polymer.TailVertex(id, position, flip),
         id=id,
@@ -64,7 +64,7 @@ def unaligning(
     id: int,
     position: tuple[float, float, float] | np.ndarray,
     flip: bool,
-) -> CaseData:
+):
     return CaseData(
         vertex=stk.polymer.UnaligningVertex(
             id=id,
