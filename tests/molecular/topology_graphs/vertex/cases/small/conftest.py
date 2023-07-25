@@ -12,15 +12,12 @@ from ...case_data import CaseData
         lazy_fixture("core"),
     ),
 )
-def case_data(request: pytest.FixtureRequest) -> CaseData:
+def case_data(request):
     return request.param
 
 
 @pytest.fixture
-def core(
-    id: int,
-    position: tuple[float, float, float] | np.ndarray,
-) -> CaseData:
+def core(id, position, flip):
     return CaseData(
         vertex=stk.small.CoreVertex(
             id=id,
@@ -33,10 +30,7 @@ def core(
 
 
 @pytest.fixture
-def substituent(
-    id: int,
-    position: tuple[float, float, float] | np.ndarray,
-) -> CaseData:
+def substituent(id, position, flip):
     return CaseData(
         vertex=stk.small.SubstituentVertex(
             id=id,
@@ -49,5 +43,10 @@ def substituent(
 
 
 @pytest.fixture(params=(0,))
-def id(request: pytest.FixtureRequest) -> int:
+def id(request):
+    return request.param
+
+
+@pytest.fixture(params=(True, False))
+def flip(request):
     return request.param

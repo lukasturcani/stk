@@ -9,7 +9,7 @@ from ...case_data import CaseData
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.polymer.NCore(
+                topology_graph=stk.small.NCore(
                     core_building_block=(
                         stk.BuildingBlock(
                             smiles="BrC(Br)Br",
@@ -30,7 +30,7 @@ from ...case_data import CaseData
         ),
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.polymer.NCore(
+                topology_graph=stk.small.NCore(
                     core_building_block=(
                         stk.BuildingBlock(
                             smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
@@ -55,7 +55,7 @@ from ...case_data import CaseData
         ),
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.polymer.NCore(
+                topology_graph=stk.small.NCore(
                     core_building_block=(
                         stk.BuildingBlock(
                             smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",

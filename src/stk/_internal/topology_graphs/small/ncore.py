@@ -173,14 +173,12 @@ class NCore(TopologyGraph):
                 functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(
-                stk.small.NCore(
-                    core_building_block=core2,
-                    arm_building_blocks=arm,
-                    repeating_unit="A",
-                    optimizer=stk.MCHammer(),
-                )
-            )
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
+                core_building_block=core2,
+                arm_building_blocks=arm,
+                repeating_unit="A",
+                optimizer=stk.MCHammer(),
+            ))
 
         .. moldoc::
 
@@ -196,14 +194,12 @@ class NCore(TopologyGraph):
                 functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(
-                stk.small.NCore(
-                    core_building_block=core2,
-                    arm_building_blocks=arm,
-                    repeating_unit="A",
-                    optimizer=stk.MCHammer(),
-                )
-            )
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
+                core_building_block=core2,
+                arm_building_blocks=arm,
+                repeating_unit="A",
+                optimizer=stk.MCHammer(),
+            ))
 
             moldoc_display_molecule = molecule.Molecule(
                 atoms=(
@@ -245,13 +241,11 @@ class NCore(TopologyGraph):
                 functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(
-                stk.small.NCore(
-                    core_building_block=core,
-                    arm_building_blocks=[arm1, arm2],
-                    repeating_unit="ABABABA",
-                )
-            )
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABABABA",
+            ))
 
         .. moldoc::
 
@@ -271,13 +265,11 @@ class NCore(TopologyGraph):
                 functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(
-                stk.small.NCore(
-                    core_building_block=core,
-                    arm_building_blocks=[arm1, arm2],
-                    repeating_unit="ABABAB",
-                )
-            )
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABABAB",
+            ))
 
             moldoc_display_molecule = molecule.Molecule(
                 atoms=(
@@ -307,7 +299,7 @@ class NCore(TopologyGraph):
             import stk
 
             core = stk.BuildingBlock(
-                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C1Br",
+                smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
                 functional_groups=stk.BromoFactory(),
             )
             arm1 = stk.BuildingBlock(
@@ -319,13 +311,11 @@ class NCore(TopologyGraph):
                 functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(
-                stk.small.NCore(
-                    core_building_block=core,
-                    arm_building_blocks=[arm1, arm2],
-                    repeating_unit="ABA",  # Same as 'ABAABA'.
-                )
-            )
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABA",  # Same as 'ABAABA'.
+            ))
 
         .. moldoc::
 
@@ -345,13 +335,11 @@ class NCore(TopologyGraph):
                 functional_groups=stk.BromoFactory(),
             )
 
-            ncore = stk.ConstructedMolecule(
-                stk.small.NCore(
-                    core_building_block=core,
-                    arm_building_blocks=[arm1, arm2],
-                    repeating_unit="ABA",
-                )
-            )
+            ncore = stk.ConstructedMolecule(stk.small.NCore(
+                core_building_block=core,
+                arm_building_blocks=[arm1, arm2],
+                repeating_unit="ABA",
+            ))
 
             moldoc_display_molecule = molecule.Molecule(
                 atoms=(
@@ -377,7 +365,9 @@ class NCore(TopologyGraph):
     def __init__(
         self,
         core_building_block: BuildingBlock,
-        arm_building_blocks: BuildingBlock | abc.Iterable[BuildingBlock],
+        arm_building_blocks: typing.Union[
+            BuildingBlock, abc.Iterable[BuildingBlock]
+        ],
         repeating_unit: str | abc.Iterable[int],
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
@@ -386,7 +376,7 @@ class NCore(TopologyGraph):
         """
         Parameters:
 
-            core_building_block:
+            core_building_block (BuildingBlock):
                 The central building block.
 
             arm_building_blocks (BuildingBlock | list[BuildingBlock]):
@@ -467,7 +457,7 @@ class NCore(TopologyGraph):
         )
 
     @staticmethod
-    def _get_vertices_and_edges(num_arms: int) -> "_VerticesAndEdges":
+    def _get_vertices_and_edges(num_arms) -> "_VerticesAndEdges":
         """
         Get the vertices and edges of the topology graph.
 
@@ -514,7 +504,7 @@ class NCore(TopologyGraph):
 
     @staticmethod
     def _normalize_repeating_unit(
-        repeating_unit: str | tuple[int, ...],
+        repeating_unit: typing.Union[str, tuple[int, ...]],
     ) -> tuple[int, ...]:
         if isinstance(repeating_unit, tuple):
             return repeating_unit
@@ -537,6 +527,8 @@ class NCore(TopologyGraph):
             building_block_vertices[bb] = building_block_vertices.get(bb, [])
             building_block_vertices[bb].append(vertex)
 
+        # Have to do this to match the typing in the return statement
+        # (Sequence), suggestions for improvement would be great.
         return {
             i: tuple(building_block_vertices[i])
             for i in building_block_vertices

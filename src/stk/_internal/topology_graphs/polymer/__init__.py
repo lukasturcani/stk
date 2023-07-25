@@ -1,10 +1,10 @@
 """
-Polymer and Small Molecules
-===========================
+Polymer
+=======
 
 #. :class:`.Linear`
-#. :class:`.NCore`
 
 """
 
 from . import vertices  # noqa
+from .linear import *  # noqa
