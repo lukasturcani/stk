@@ -212,20 +212,20 @@ class _PlacementsSummary:
                 self._edge_functional_groups[edge_id].append(
                     functional_group.with_ids(id_map)
                 )
-        except IndexError:
-            # Change name?
-            raise IndexError(
+        except IndexError as error:
+            error.add_note(
                 "This error suggests that one of your building blocks "
                 "does not have the correct number of functional groups "
                 "for the topology graph:\n"
                 f"building block: {building_block}\n"
                 "num. functional groups: "
-                f"{building_block.get_num_functional_groups()}\n"
+                f"{building_block.get_num_functional_groups()}.\n"
                 f"expected num.: {len(functional_group_edges)}.\n"
                 "Alternatively, this may suggest a badly defined "
                 "topology graph (e.g., the wrong number of edges for a "
                 "vertex)."
             )
+            raise
 
     def get_atoms(self):
         """
