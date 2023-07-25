@@ -13,15 +13,13 @@ from ...case_data import CaseData
                     core_building_block=(
                         stk.BuildingBlock(
                             smiles="BrC(Br)Br",
-                            functional_groups=[stk.BromoFactory()],
+                            functional_groups=stk.BromoFactory(),
                         )
                     ),
-                    arm_building_blocks=[
-                        stk.BuildingBlock(
-                            smiles="BrC",
-                            functional_groups=[stk.BromoFactory()],
-                        )
-                    ],
+                    arm_building_blocks=stk.BuildingBlock(
+                        smiles="BrC",
+                        functional_groups=stk.BromoFactory(),
+                    ),
                     repeating_unit="A",
                 ),
             ),
@@ -34,15 +32,13 @@ from ...case_data import CaseData
                     core_building_block=(
                         stk.BuildingBlock(
                             smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                            functional_groups=[stk.BromoFactory()],
+                            functional_groups=stk.BromoFactory(),
                         )
                     ),
-                    arm_building_blocks=[
-                        stk.BuildingBlock(
-                            smiles="BrC",
-                            functional_groups=[stk.BromoFactory()],
-                        )
-                    ],
+                    arm_building_blocks=stk.BuildingBlock(
+                        smiles="BrC",
+                        functional_groups=stk.BromoFactory(),
+                    ),
                     repeating_unit="A",
                 ),
             ),
@@ -59,17 +55,17 @@ from ...case_data import CaseData
                     core_building_block=(
                         stk.BuildingBlock(
                             smiles="C(Br)1C(Br)C(Br)C(Br)C(Br)C(Br)C1Br",
-                            functional_groups=[stk.BromoFactory()],
+                            functional_groups=stk.BromoFactory(),
                         )
                     ),
                     arm_building_blocks=[
                         stk.BuildingBlock(
                             smiles="BrC",
-                            functional_groups=[stk.BromoFactory()],
+                            functional_groups=stk.BromoFactory(),
                         ),
                         stk.BuildingBlock(
                             smiles="BrCN",
-                            functional_groups=[stk.BromoFactory()],
+                            functional_groups=stk.BromoFactory(),
                         ),
                     ],
                     repeating_unit="ABABABA",
