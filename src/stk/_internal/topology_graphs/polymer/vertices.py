@@ -6,10 +6,12 @@ Polymer Vertices
 
 import logging
 import typing
+
 import numpy as np
 
-from stk._internal.topology_graphs.vertex import Vertex
 from stk._internal.building_block import BuildingBlock
+from stk._internal.topology_graphs.vertex import Vertex
+
 from ..edge import Edge
 
 from ..edge import Edge
