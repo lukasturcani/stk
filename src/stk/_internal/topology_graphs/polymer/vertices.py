@@ -89,7 +89,7 @@ class LinearVertex(Vertex):
         )
         return building_block.with_rotation_between_vectors(
             start=fg2_position - fg1_position,
-            target=[-1 if self._flip else 1, 0, 0],
+            target=np.array([-1 if self._flip else 1, 0, 0]),
             origin=self._position,
         ).get_position_matrix()
 
@@ -119,7 +119,7 @@ class LinearVertex(Vertex):
         return (0, 1) if x1 < x2 else (1, 0)
 
     @staticmethod
-    def _sort_edges(edges: tuple[Edge, Edge]) -> tuple[Edge, Edge]:
+    def _sort_edges(edges: tuple[Edge, ...]) -> tuple[int, ...]:
         edge1, edge2 = edges
         x1, y1, z1 = edge1.get_position()
         x2, y2, z2 = edge2.get_position()
@@ -144,6 +144,8 @@ class TerminalVertex(LinearVertex):
     or :class:`.TailVertex` instead.
 
     """
+
+    _cap_direction = 0
 
     def place_building_block(
         self,
@@ -170,7 +172,7 @@ class TerminalVertex(LinearVertex):
         return building_block.with_rotation_between_vectors(
             start=fg_centroid - core_centroid,
             # _cap_direction is defined by a subclass.
-            target=[self._cap_direction, 0, 0],
+            target=np.array([self._cap_direction, 0, 0]),
             origin=self._position,
         ).get_position_matrix()
 

@@ -52,7 +52,7 @@ class CoreVertex(Vertex):
         )
         building_block = building_block.with_rotation_between_vectors(
             start=normal,
-            target=[0, 0, 1],
+            target=np.array([0.0, 0.0, 1.0]),
             origin=self._position,
         )
         (fg,) = building_block.get_functional_groups(0)
