@@ -1,5 +1,5 @@
-Polymers and Small Molecules
-============================
+Polymers
+========
 
 
 .. toctree::
