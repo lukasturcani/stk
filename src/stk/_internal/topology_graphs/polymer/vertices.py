@@ -1,9 +1,3 @@
-"""
-Polymer Vertices
-================
-
-"""
-
 import logging
 import typing
 
