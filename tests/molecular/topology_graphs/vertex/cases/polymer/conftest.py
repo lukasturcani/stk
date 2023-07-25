@@ -13,12 +13,16 @@ from ...case_data import CaseData
         lazy_fixture("tail"),
     ),
 )
-def case_data(request):
+def case_data(request: pytest.FixtureRequest) -> CaseData:
     return request.param
 
 
 @pytest.fixture
-def center(id, position, flip):
+def center(
+    id: int,
+    position: tuple[float, float, float] | np.ndarray,
+    flip: bool,
+):
     return CaseData(
         vertex=stk.polymer.LinearVertex(id, position, flip),
         id=id,
@@ -28,7 +32,11 @@ def center(id, position, flip):
 
 
 @pytest.fixture
-def head(id, position, flip):
+def head(
+    id: int,
+    position: tuple[float, float, float] | np.ndarray,
+    flip: bool,
+):
     return CaseData(
         vertex=stk.polymer.HeadVertex(id, position, flip),
         id=id,
@@ -38,7 +46,11 @@ def head(id, position, flip):
 
 
 @pytest.fixture
-def tail(id, position, flip):
+def tail(
+    id: int,
+    position: tuple[float, float, float] | np.ndarray,
+    flip: bool,
+):
     return CaseData(
         vertex=stk.polymer.TailVertex(id, position, flip),
         id=id,
@@ -48,7 +60,11 @@ def tail(id, position, flip):
 
 
 @pytest.fixture
-def unaligning(id, position, flip):
+def unaligning(
+    id: int,
+    position: tuple[float, float, float] | np.ndarray,
+    flip: bool,
+):
     return CaseData(
         vertex=stk.polymer.UnaligningVertex(
             id=id,

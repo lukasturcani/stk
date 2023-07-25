@@ -12,7 +12,7 @@ from ...case_data import CaseData
         lazy_fixture("core"),
     ),
 )
-def case_data(request) -> pytest.FixtureRequest:
+def case_data(request: pytest.FixtureRequest) -> CaseData:
     return request.param
 
 
@@ -49,5 +49,5 @@ def substituent(
 
 
 @pytest.fixture(params=(0,))
-def id(request):
+def id(request: pytest.FixtureRequest) -> int:
     return request.param

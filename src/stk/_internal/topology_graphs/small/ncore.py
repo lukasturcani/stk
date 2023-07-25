@@ -467,7 +467,7 @@ class NCore(TopologyGraph):
         )
 
     @staticmethod
-    def _get_vertices_and_edges(num_arms) -> "_VerticesAndEdges":
+    def _get_vertices_and_edges(num_arms: int) -> "_VerticesAndEdges":
         """
         Get the vertices and edges of the topology graph.
 
