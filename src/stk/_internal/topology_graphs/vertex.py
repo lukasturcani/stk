@@ -36,7 +36,7 @@ class Vertex:
     def __init__(
         self,
         id: int,
-        position: typing.Union[tuple[float, float, float], np.ndarray],
+        position: tuple[float, float, float] | np.ndarray,
     ) -> None:
         """
         Initialize a :class:`.Vertex`.
