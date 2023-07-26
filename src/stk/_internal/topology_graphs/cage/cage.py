@@ -4,6 +4,8 @@ import typing
 from collections import Counter, abc, defaultdict
 from functools import partial
 
+import numpy as np
+
 from stk._internal.building_block import BuildingBlock
 from stk._internal.optimizers.null import NullOptimizer
 from stk._internal.optimizers.optimizer import Optimizer
@@ -878,11 +880,10 @@ class Cage(TopologyGraph):
 
     def __init__(
         self,
-        building_blocks: typing.Union[
-            typing.Iterable[BuildingBlock],
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
+        building_blocks: typing.Iterable[BuildingBlock]
+        | dict[BuildingBlock, tuple[int, ...]],
         vertex_alignments: typing.Optional[dict[int, int]] = None,
+        vertex_positions: typing.Optional[dict[int, np.ndarray]] = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -917,6 +918,18 @@ class Cage(TopologyGraph):
                 different structural isomers. The edge is referred to
                 by a number between ``0`` (inclusive) and the number of
                 edges the vertex is connected to (exclusive).
+
+            vertex_positions:
+                A mapping from the id of a :class:`.Vertex` to a custom
+                :class:`.BuildingBlock` position. The default vertex
+                alignment algorithm is still applied. Only vertices
+                which need to have their default position changed need
+                to be present in the :class:`dict`. Note that any
+                vertices with modified positions will not be scaled like
+                the rest of the building block positions and will not
+                use neighbor placements in its positioning if requested
+                by the default topology. If ``None`` then the default
+                placement algorithm is used for each vertex.
 
             reaction_factory:
                 The reaction factory to use for creating bonds between
@@ -953,20 +966,35 @@ class Cage(TopologyGraph):
 
         """
 
-        building_block_vertices = self._normalize_building_blocks(
-            building_blocks=building_blocks,
-        )
         self._vertex_alignments = (
             dict(vertex_alignments) if vertex_alignments is not None else {}
         )
+        self._vertex_positions = (
+            dict(vertex_positions) if vertex_positions is not None else {}
+        )
+        building_block_vertices = self._normalize_building_blocks(
+            building_blocks=building_blocks,
+        )
         building_block_vertices = self._with_unaligning_vertices(
             building_block_vertices=building_block_vertices,
+        )
+        building_block_vertices = self._with_positioned_vertices(
+            building_block_vertices=building_block_vertices,
+            vertex_positions=self._vertex_positions,
         )
         building_block_vertices = self._assign_aligners(
             building_block_vertices=building_block_vertices,
             vertex_alignments=self._vertex_alignments,
         )
         self._check_building_block_vertices(building_block_vertices)
+        self._edge_prototypes = self._normalize_edge_prototypes(
+            vertex_positions=self._vertex_positions,
+            vertices={
+                vertex.get_id(): vertex
+                for vertices_ in building_block_vertices.values()
+                for vertex in vertices_
+            },
+        )
         super().__init__(
             building_block_vertices=typing.cast(
                 dict[BuildingBlock, abc.Sequence[Vertex]],
@@ -983,12 +1011,65 @@ class Cage(TopologyGraph):
             edge_groups=None,
         )
 
+    def _with_positioned_vertices(
+        self,
+        building_block_vertices: dict[
+            BuildingBlock, abc.Sequence[_CageVertex]
+        ],
+        vertex_positions: dict[int, np.ndarray],
+    ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
+        clone = dict(building_block_vertices)
+        for building_block, vertices in clone.items():
+            new_vertices = []
+            for vertex in vertices:
+                if vertex.get_id() in self._vertex_positions:
+                    # Opinion needed, I am pre-reversing the scale
+                    # because altering the scale code is topology level,
+                    # which I am trying to avoid.
+                    new_vertex = vertex.with_position(
+                        vertex_positions[vertex.get_id()]
+                        / self._get_scale(building_block_vertices)
+                    )
+
+                    new_vertex = new_vertex.with_use_neighbor_placement(False)
+                    new_vertices.append(new_vertex)
+                else:
+                    new_vertices.append(vertex)
+
+            clone[building_block] = tuple(new_vertices)
+
+        return clone
+
+    @classmethod
+    def _normalize_edge_prototypes(
+        cls,
+        vertex_positions: dict[int, np.ndarray],
+        vertices: dict[int:Vertex],
+    ) -> tuple[Edge, ...]:
+        new_prototypes = []
+        for edge in cls._edge_prototypes:
+            vertex1_id = edge.get_vertex1_id()
+            vertex2_id = edge.get_vertex2_id()
+            if any((i in vertex_positions for i in (vertex1_id, vertex2_id))):
+                new_edge = Edge(
+                    id=edge.get_id(),
+                    vertex1=vertices[vertex1_id],
+                    vertex2=vertices[vertex2_id],
+                    periodicity=edge.get_periodicity(),
+                )
+                new_prototypes.append(new_edge)
+            else:
+                new_prototypes.append(edge)
+
+        return tuple(new_prototypes)
+
     @classmethod
     def _normalize_building_blocks(
         cls,
-        building_blocks: typing.Union[
-            typing.Iterable[BuildingBlock],
-            dict[BuildingBlock, tuple[int, ...]],
+        building_blocks: typing.Iterable[BuildingBlock]
+        | dict[
+            BuildingBlock,
+            tuple[int, ...],
         ],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
         # Use tuple here because it prints nicely.
@@ -1089,6 +1170,7 @@ class Cage(TopologyGraph):
     def clone(self) -> Cage:
         clone = self._clone()
         clone._vertex_alignments = dict(self._vertex_alignments)
+        clone._vertex_positions = dict(self._vertex_positions)
         return clone
 
     @classmethod
@@ -1241,6 +1323,8 @@ class Cage(TopologyGraph):
         Get the vertex alignments.
 
         Returns:
+
             The vertex alignments.
+
         """
         return dict(self._vertex_alignments)
