@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import stk
 
@@ -82,6 +83,44 @@ def _get_palladium_cispbi_sqpl() -> stk.BuildingBlock:
                             }
                         )
                     ),
+                    optimizer=stk.MCHammer(
+                        num_steps=150,
+                        random_seed=1000,
+                    ),
+                ),
+            ),
+            smiles=(
+                "[H]C1=C2C([H])=C([H])N(->[Pd+2]3(<-N4=C([H])C([H])=C"
+                "(C([H])=C4[H])C4=C([H])C([H])=N(->[Pd+2]5(<-N6=C([H]"
+                ")C([H])=C(C([H])=C6[H])C6=C([H])C([H])=N(->[Pd+2]7(<"
+                "-N8=C([H])C([H])=C(C([H])=C8[H])C8=C([H])C([H])=N(->"
+                "[Pd+2]9(<-N%10=C([H])C([H])=C2C([H])=C%10[H])<-N([H]"
+                ")([H])C([H])([H])C([H])([H])N->9([H])[H])C([H])=C8[H"
+                "])<-N([H])([H])C([H])([H])C([H])([H])N->7([H])[H])C("
+                "[H])=C6[H])<-N([H])([H])C([H])([H])C([H])([H])N->5(["
+                "H])[H])C([H])=C4[H])<-N([H])([H])C([H])([H])C([H])(["
+                "H])N->3([H])[H])=C1[H]"
+            ),
+            name=name,
+        ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M4L4Square(
+                    corners=_get_palladium_cispbi_sqpl(),
+                    linkers=get_other_linker(),
+                    reaction_factory=stk.DativeReactionFactory(
+                        reaction_factory=stk.GenericReactionFactory(
+                            bond_orders={
+                                frozenset(
+                                    {
+                                        stk.GenericFunctionalGroup,
+                                        stk.GenericFunctionalGroup,
+                                    }
+                                ): 9,
+                            }
+                        )
+                    ),
+                    vertex_positions={0: np.array([2, 0, 2])},
                     optimizer=stk.MCHammer(
                         num_steps=150,
                         random_seed=1000,
