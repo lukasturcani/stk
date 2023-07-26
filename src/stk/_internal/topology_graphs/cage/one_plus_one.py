@@ -4,8 +4,17 @@ One Plus One
 
 """
 
+import typing
+
 import numpy as np
 
+from stk._internal.building_block import BuildingBlock
+from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.optimizers.optimizer import Optimizer
+from stk._internal.reaction_factories.generic_reaction_factory import (
+    GenericReactionFactory,
+)
+from stk._internal.reaction_factories.reaction_factory import ReactionFactory
 from stk._internal.topology_graphs.edge import Edge
 from stk._internal.utilities.utilities import get_acute_vector
 
@@ -170,6 +179,94 @@ class OnePlusOne(Cage):
     See :class:`.Cage` for more details and examples.
 
     """
+
+    def __init__(
+        self,
+        building_blocks: typing.Iterable[BuildingBlock]
+        | dict[BuildingBlock, tuple[int, ...]],
+        vertex_alignments: typing.Optional[dict[int, int]] = None,
+        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        num_processes: int = 1,
+        optimizer: Optimizer = NullOptimizer(),
+    ) -> None:
+        """
+        Initialize a :class:`.OnePlusOne`.
+
+        The `vertex_positions` argument is not available for this class
+        due to strict positioning of the edges.
+
+        Parameters:
+
+            building_blocks:
+                Can be a :class:`iterable` of :class:`.BuildingBlock`
+                instances, which should be placed on the topology
+                graph.
+
+                Can also be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on. A :class:`dict` is
+                required when there are multiple building blocks with
+                the same number of functional groups, because in this
+                case the desired placement is ambiguous.
+
+
+            vertex_alignments:
+                A mapping from the id of a :class:`.Vertex`
+                to an :class:`.Edge` connected to it.
+                The :class:`.Edge` is used to align the first
+                :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+                placed on that vertex. Only vertices which need to have
+                their default edge changed need to be present in the
+                :class:`dict`. If ``None`` then the default edge is used
+                for each vertex. Changing which :class:`.Edge` is used will
+                mean that the topology graph represents different
+                structural isomers. The edge is referred to by a number
+                between ``0`` (inclusive) and the number of edges the
+                vertex is connected to (exclusive).
+
+            reaction_factory:
+                The reaction factory to use for creating bonds between
+                building blocks.
+
+            num_processes:
+                The number of parallel processes to create during
+                :meth:`construct`.
+
+            optimizer:
+                Used to optimize the structure of the constructed
+                molecule.
+
+        Raises:
+
+            :class:`AssertionError`
+                If the any building block does not have a
+                valid number of functional groups.
+
+            :class:`ValueError`
+                If the there are multiple building blocks with the
+                same number of functional_groups in `building_blocks`,
+                and they are not explicitly assigned to vertices. The
+                desired placement of building blocks is ambiguous in
+                this case.
+
+            :class:`~.cage.UnoccupiedVertexError`
+                If a vertex of the cage topology graph does not have a
+                building block placed on it.
+
+            :class:`~.cage.OverlyOccupiedVertexError`
+                If a vertex of the cage topology graph has more than
+                one building block placed on it.
+
+        """
+
+        super().__init__(
+            building_blocks,
+            vertex_alignments=vertex_alignments,
+            vertex_positions=None,
+            reaction_factory=reaction_factory,
+            num_processes=num_processes,
+            optimizer=optimizer,
+        )
 
     _x = 1
     _vertex_prototypes = (
