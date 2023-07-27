@@ -90,7 +90,7 @@ from ...case_data import CaseData
         ),
     ),
 )
-def polymer_linear(request) -> CaseData:
+def polymer_linear(request: pytest.FixtureRequest) -> CaseData:
     return request.param(
         f"{request.fixturename}{request.param_index}",
     )

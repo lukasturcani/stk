@@ -588,7 +588,7 @@ class Linear(TopologyGraph):
 
     @staticmethod
     def _normalize_repeating_unit(
-        repeating_unit: typing.Union[str, tuple[int, ...]],
+        repeating_unit: str | tuple[int, ...],
     ) -> tuple[int, ...]:
         if isinstance(repeating_unit, tuple):
             return repeating_unit

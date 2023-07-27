@@ -2,9 +2,11 @@ Video Tutorials
 ===============
 
 Below is a list of video tutorials made by `Andrew Tarzia`__, which
-provide a thorough introduction to :mod:`.stk`.
+provide a thorough introduction to :mod:`.stk`. More videos can be found
+here__.
 
 __ https://github.com/andrewtarzia
+__ https://youtube.com/@andrewtarzia1790
 
 Basics of *stk*
 ---------------
@@ -80,3 +82,4 @@ notebook is available here__.
 __ https://www.youtube.com/watch?v=1BBhPeIRV_E&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc_ZwZgO&index=7
 __ https://github.com/andrewtarzia/SpinDry
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
+

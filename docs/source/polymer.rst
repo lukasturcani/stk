@@ -1,5 +1,5 @@
-Polymer
-=======
+Polymers
+========
 
 
 .. toctree::
