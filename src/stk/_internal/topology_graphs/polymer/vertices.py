@@ -7,8 +7,6 @@ from stk._internal.topology_graphs.vertex import Vertex
 
 from ..edge import Edge
 
-from ..edge import Edge
-
 logger = logging.getLogger(__name__)
 
 
