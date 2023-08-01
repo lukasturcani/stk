@@ -68,7 +68,7 @@ class Vertex:
 
     def _with_scale(
         self: _VertexT,
-        scale: typing.Union[float, tuple[float, float, float]],
+        scale: float | tuple[float, float, float],
     ) -> _VertexT:
         """
         Modify the vertex.
@@ -80,7 +80,7 @@ class Vertex:
 
     def with_scale(
         self,
-        scale: typing.Union[float, tuple[float, float, float]],
+        scale: float | tuple[float, float, float],
     ) -> Vertex:
         """
         Get a clone with a scaled position.

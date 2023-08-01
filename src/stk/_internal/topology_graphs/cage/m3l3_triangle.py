@@ -159,8 +159,8 @@ class M3L3Triangle(Cage):
         | dict[BuildingBlock, tuple[int, ...]],
         linkers: typing.Iterable[BuildingBlock]
         | dict[BuildingBlock, tuple[int, ...]],
-        vertex_alignments: typing.Optional[dict[int, int]] = None,
-        vertex_positions: typing.Optional[dict[int, np.ndarray]] = None,
+        vertex_alignments: dict[int, int] | None = None,
+        vertex_positions: dict[int, np.ndarray] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),

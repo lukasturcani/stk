@@ -882,8 +882,8 @@ class Cage(TopologyGraph):
         self,
         building_blocks: typing.Iterable[BuildingBlock]
         | dict[BuildingBlock, tuple[int, ...]],
-        vertex_alignments: typing.Optional[dict[int, int]] = None,
-        vertex_positions: typing.Optional[dict[int, np.ndarray]] = None,
+        vertex_alignments: dict[int, int] | None = None,
+        vertex_positions: dict[int, np.ndarray] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -987,7 +987,7 @@ class Cage(TopologyGraph):
             vertex_alignments=self._vertex_alignments,
         )
         self._check_building_block_vertices(building_block_vertices)
-        self._edge_prototypes = self._normalize_edge_prototypes(
+        edges = self._normalize_edge_prototypes(
             vertex_positions=self._vertex_positions,
             vertices={
                 vertex.get_id(): vertex
@@ -1000,7 +1000,7 @@ class Cage(TopologyGraph):
                 dict[BuildingBlock, abc.Sequence[Vertex]],
                 building_block_vertices,
             ),
-            edges=self._edge_prototypes,
+            edges=edges,
             reaction_factory=reaction_factory,
             construction_stages=tuple(
                 partial(self._has_degree, degree)
@@ -1026,6 +1026,9 @@ class Cage(TopologyGraph):
                     # Opinion needed, I am pre-reversing the scale
                     # because altering the scale code is topology level,
                     # which I am trying to avoid.
+                    # Also, mypy error with different output from
+                    # with_position, than _CageVertex.
+                    #  "Vertex" has no attribute "with_use_neighbor_placement"
                     new_vertex = vertex.with_position(
                         vertex_positions[vertex.get_id()]
                         / self._get_scale(building_block_vertices)
@@ -1036,6 +1039,10 @@ class Cage(TopologyGraph):
                 else:
                     new_vertices.append(vertex)
 
+            # I might need explanations for these, but another mypy error
+            # I do not understand:
+            # Argument 1 to "tuple" has incompatible type "list[Vertex]"
+            # ; expected "Iterable[_CageVertex]"
             clone[building_block] = tuple(new_vertices)
 
         return clone
@@ -1044,7 +1051,7 @@ class Cage(TopologyGraph):
     def _normalize_edge_prototypes(
         cls,
         vertex_positions: dict[int, np.ndarray],
-        vertices: dict[int:Vertex],
+        vertices: dict[int, Vertex],
     ) -> tuple[Edge, ...]:
         new_prototypes = []
         for edge in cls._edge_prototypes:
@@ -1176,7 +1183,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _get_vertices(
         cls,
-        vertex_ids: typing.Union[int, typing.Iterable[int]],
+        vertex_ids: int | typing.Iterable[int],
     ) -> typing.Iterator[_CageVertex]:
         """
         Yield vertex prototypes.
@@ -1290,6 +1297,11 @@ class Cage(TopologyGraph):
             building_block_vertices,
         )
 
+    # mypy error I do not understand:
+    # "_get_scale" of "Cage" has incompatible type
+    # "dict[BuildingBlock, Sequence[_CageVertex]]"; expected
+    # "dict[BuildingBlock, Sequence[Vertex]]" ---> inheritence though?
+    # Is it because it is in a dict?
     def _get_scale(
         self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
