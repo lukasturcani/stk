@@ -273,10 +273,10 @@ class M4L6Tetrahedron(Cage):
     _x = 1 / (2 * np.sqrt(2))
     _y = 0.5
     _vertex_prototypes = (
-        NonLinearVertex(0, [_y, 0, -_x]),
-        NonLinearVertex(1, [-_y, 0, -_x]),
-        NonLinearVertex(2, [0, _y, _x]),
-        NonLinearVertex(3, [0, -_y, _x]),
+        NonLinearVertex(0, np.array([_y, 0, -_x])),
+        NonLinearVertex(1, np.array([-_y, 0, -_x])),
+        NonLinearVertex(2, np.array([0, _y, _x])),
+        NonLinearVertex(3, np.array([0, -_y, _x])),
     )
 
     _edge_prototypes = (

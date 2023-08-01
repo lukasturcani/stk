@@ -4,6 +4,7 @@ Twelve Plus Thirty
 
 """
 
+import numpy as np
 from scipy.constants import golden
 
 from stk._internal.topology_graphs.edge import Edge
@@ -117,18 +118,18 @@ class TwelvePlusThirty(Cage):
     # Vertices of a regular origin-centred icosahedron
     # Source: http://eusebeia.dyndns.org/4d/icosahedron
     _non_linears = (
-        NonLinearVertex(0, [0, 1, golden]),
-        NonLinearVertex(1, [0, -1, golden]),
-        NonLinearVertex(2, [0, 1, -golden]),
-        NonLinearVertex(3, [0, -1, -golden]),
-        NonLinearVertex(4, [1, golden, 0]),
-        NonLinearVertex(5, [-1, golden, 0]),
-        NonLinearVertex(6, [1, -golden, 0]),
-        NonLinearVertex(7, [-1, -golden, 0]),
-        NonLinearVertex(8, [golden, 0, 1]),
-        NonLinearVertex(9, [-golden, 0, 1]),
-        NonLinearVertex(10, [golden, 0, -1]),
-        NonLinearVertex(11, [-golden, 0, -1]),
+        NonLinearVertex(0, np.array([0, 1, golden])),
+        NonLinearVertex(1, np.array([0, -1, golden])),
+        NonLinearVertex(2, np.array([0, 1, -golden])),
+        NonLinearVertex(3, np.array([0, -1, -golden])),
+        NonLinearVertex(4, np.array([1, golden, 0])),
+        NonLinearVertex(5, np.array([-1, golden, 0])),
+        NonLinearVertex(6, np.array([1, -golden, 0])),
+        NonLinearVertex(7, np.array([-1, -golden, 0])),
+        NonLinearVertex(8, np.array([golden, 0, 1])),
+        NonLinearVertex(9, np.array([-golden, 0, 1])),
+        NonLinearVertex(10, np.array([golden, 0, -1])),
+        NonLinearVertex(11, np.array([-golden, 0, -1])),
     )
 
     _vertex_prototypes = (

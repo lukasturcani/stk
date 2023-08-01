@@ -4,6 +4,8 @@ M8L6 Cube
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -205,42 +207,42 @@ class M8L6Cube(Cage):
     _non_linears = (
         NonLinearVertex(
             id=0,
-            position=[1, 1, 1],
+            position=np.array([1, 1, 1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=1,
-            position=[1, -1, 1],
+            position=np.array([1, -1, 1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=2,
-            position=[-1, -1, 1],
+            position=np.array([-1, -1, 1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=3,
-            position=[-1, 1, 1],
+            position=np.array([-1, 1, 1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=4,
-            position=[1, 1, -1],
+            position=np.array([1, 1, -1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=5,
-            position=[1, -1, -1],
+            position=np.array([1, -1, -1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=6,
-            position=[-1, -1, -1],
+            position=np.array([-1, -1, -1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=7,
-            position=[-1, 1, -1],
+            position=np.array([-1, 1, -1]),
             use_neighbor_placement=False,
         ),
     )
@@ -249,32 +251,32 @@ class M8L6Cube(Cage):
         *_non_linears,
         NonLinearVertex(
             id=8,
-            position=[0, 0, 1],
+            position=np.array([0, 0, 1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=9,
-            position=[1, 0, 0],
+            position=np.array([1, 0, 0]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=10,
-            position=[0, 1, 0],
+            position=np.array([0, 1, 0]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=11,
-            position=[-1, 0, 0],
+            position=np.array([-1, 0, 0]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=12,
-            position=[0, 0, -1],
+            position=np.array([0, 0, -1]),
             use_neighbor_placement=False,
         ),
         NonLinearVertex(
             id=13,
-            position=[0, -1, 0],
+            position=np.array([0, -1, 0]),
             use_neighbor_placement=False,
         ),
     )

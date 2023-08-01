@@ -276,9 +276,9 @@ class M3L3Triangle(Cage):
     _x = 2 * np.sqrt(3) / 4
     _y = 2
     _angled_vertices = (
-        AngledVertex(0, [0, _x, 0]),
-        AngledVertex(1, [_y / 2, -_x, 0]),
-        AngledVertex(2, [-_y / 2, -_x, 0]),
+        AngledVertex(0, np.array([0, _x, 0])),
+        AngledVertex(1, np.array([_y / 2, -_x, 0])),
+        AngledVertex(2, np.array([-_y / 2, -_x, 0])),
     )
 
     _vertex_prototypes = (

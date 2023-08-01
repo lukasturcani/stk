@@ -274,14 +274,14 @@ class M4L4Square(Cage):
         )
 
     _vertex_prototypes = (
-        AngledVertex(0, [1, 1, 0]),
-        AngledVertex(1, [1, -1, 0]),
-        AngledVertex(2, [-1, -1, 0]),
-        AngledVertex(3, [-1, 1, 0]),
-        LinearVertex(4, [1, 0, 0], False),
-        LinearVertex(5, [0, -1, 0], False),
-        LinearVertex(6, [-1, 0, 0], False),
-        LinearVertex(7, [0, 1, 0], False),
+        AngledVertex(0, np.array([1, 1, 0])),
+        AngledVertex(1, np.array([1, -1, 0])),
+        AngledVertex(2, np.array([-1, -1, 0])),
+        AngledVertex(3, np.array([-1, 1, 0])),
+        LinearVertex(4, np.array([1, 0, 0]), False),
+        LinearVertex(5, np.array([0, -1, 0]), False),
+        LinearVertex(6, np.array([-1, 0, 0]), False),
+        LinearVertex(7, np.array([0, 1, 0]), False),
     )
 
     _edge_prototypes = (

@@ -224,10 +224,10 @@ class M4L6TetrahedronSpacer(Cage):
     """
 
     _non_linears = (
-        NonLinearVertex(0, [0, 0, np.sqrt(6) / 2]),
-        NonLinearVertex(1, [-1, -np.sqrt(3) / 3, -np.sqrt(6) / 6]),
-        NonLinearVertex(2, [1, -np.sqrt(3) / 3, -np.sqrt(6) / 6]),
-        NonLinearVertex(3, [0, 2 * np.sqrt(3) / 3, -np.sqrt(6) / 6]),
+        NonLinearVertex(0, np.array([0, 0, np.sqrt(6) / 2])),
+        NonLinearVertex(1, np.array([-1, -np.sqrt(3) / 3, -np.sqrt(6) / 6])),
+        NonLinearVertex(2, np.array([1, -np.sqrt(3) / 3, -np.sqrt(6) / 6])),
+        NonLinearVertex(3, np.array([0, 2 * np.sqrt(3) / 3, -np.sqrt(6) / 6])),
     )
 
     _vertex_prototypes = (

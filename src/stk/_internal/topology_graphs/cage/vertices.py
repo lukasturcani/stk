@@ -141,7 +141,11 @@ class _CageVertex(Vertex):
         return self._use_neighbor_placement
 
     @classmethod
-    def init_at_center(cls, id: int, vertices: tuple[Vertex]) -> typing.Self:
+    def init_at_center(
+        cls,
+        id: int,
+        vertices: tuple[Vertex, ...],
+    ) -> typing.Self:
         """
         Initialize a :class:`._CageVertex` in the middle of `vertices`.
 
@@ -161,9 +165,11 @@ class _CageVertex(Vertex):
 
         return cls(
             id=id,
-            position=(
-                sum(vertex.get_position() for vertex in vertices)
-                / len(vertices)
+            position=np.array(
+                (
+                    sum(vertex.get_position() for vertex in vertices)
+                    / len(vertices)
+                )
             ),
         )
 

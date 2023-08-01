@@ -4,6 +4,8 @@ Eight Plus Twelve
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -113,14 +115,14 @@ class EightPlusTwelve(Cage):
     """
 
     _non_linears = (
-        NonLinearVertex(0, [-1, 1, -1]),
-        NonLinearVertex(1, [-1, -1, -1]),
-        NonLinearVertex(2, [1, 1, -1]),
-        NonLinearVertex(3, [1, -1, -1]),
-        NonLinearVertex(4, [-1, 1, 1]),
-        NonLinearVertex(5, [-1, -1, 1]),
-        NonLinearVertex(6, [1, 1, 1]),
-        NonLinearVertex(7, [1, -1, 1]),
+        NonLinearVertex(0, np.array([-1, 1, -1])),
+        NonLinearVertex(1, np.array([-1, -1, -1])),
+        NonLinearVertex(2, np.array([1, 1, -1])),
+        NonLinearVertex(3, np.array([1, -1, -1])),
+        NonLinearVertex(4, np.array([-1, 1, 1])),
+        NonLinearVertex(5, np.array([-1, -1, 1])),
+        NonLinearVertex(6, np.array([1, 1, 1])),
+        NonLinearVertex(7, np.array([1, -1, 1])),
     )
 
     _vertex_prototypes = (

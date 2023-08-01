@@ -4,6 +4,8 @@ Four Plus Six 2
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -113,14 +115,14 @@ class FourPlusSix2(Cage):
     """
 
     _non_linears = (
-        NonLinearVertex(0, [1, 0, 1]),
-        NonLinearVertex(1, [-1, 0, 1]),
-        NonLinearVertex(2, [1, 0, -1]),
-        NonLinearVertex(3, [-1, 0, -1]),
-        LinearVertex(4, [0, -1, 1], False),
-        LinearVertex(5, [0, 1, 1], False),
-        LinearVertex(6, [0, -1, -1], False),
-        LinearVertex(7, [0, 1, -1], False),
+        NonLinearVertex(0, np.array([1, 0, 1])),
+        NonLinearVertex(1, np.array([-1, 0, 1])),
+        NonLinearVertex(2, np.array([1, 0, -1])),
+        NonLinearVertex(3, np.array([-1, 0, -1])),
+        LinearVertex(4, np.array([0, -1, 1]), False),
+        LinearVertex(5, np.array([0, 1, 1]), False),
+        LinearVertex(6, np.array([0, -1, -1]), False),
+        LinearVertex(7, np.array([0, 1, -1]), False),
     )
 
     _vertex_prototypes = (

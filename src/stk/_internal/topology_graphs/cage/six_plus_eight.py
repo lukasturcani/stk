@@ -4,6 +4,8 @@ Six Plus Eight
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -111,12 +113,12 @@ class SixPlusEight(Cage):
 
     _x = 1
     _non_linears = (
-        NonLinearVertex(0, [-_x, _x, 0]),
-        NonLinearVertex(1, [-_x, -_x, 0]),
-        NonLinearVertex(2, [_x, _x, 0]),
-        NonLinearVertex(3, [_x, -_x, 0]),
-        NonLinearVertex(4, [0, 0, _x]),
-        NonLinearVertex(5, [0, 0, -_x]),
+        NonLinearVertex(0, np.array([-_x, _x, 0])),
+        NonLinearVertex(1, np.array([-_x, -_x, 0])),
+        NonLinearVertex(2, np.array([_x, _x, 0])),
+        NonLinearVertex(3, np.array([_x, -_x, 0])),
+        NonLinearVertex(4, np.array([0, 0, _x])),
+        NonLinearVertex(5, np.array([0, 0, -_x])),
     )
 
     _vertex_prototypes = (

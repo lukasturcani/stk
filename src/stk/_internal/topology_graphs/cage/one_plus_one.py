@@ -270,8 +270,8 @@ class OnePlusOne(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        OnePlusOneVertex(0, [_x, 0.0, 0.0], [1, 0, 0], False),
-        OnePlusOneVertex(1, [-_x, 0.0, 0.0], [-1, 0, 0], False),
+        OnePlusOneVertex(0, np.array([_x, 0.0, 0.0]), [1, 0, 0], False),
+        OnePlusOneVertex(1, np.array([-_x, 0.0, 0.0]), [-1, 0, 0], False),
     )
     _edge_prototypes = (
         Edge(

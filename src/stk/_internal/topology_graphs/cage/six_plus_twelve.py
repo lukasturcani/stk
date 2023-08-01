@@ -3,6 +3,7 @@ Six Plus Twelve
 ===============
 
 """
+import numpy as np
 
 from stk._internal.topology_graphs.edge import Edge
 
@@ -113,12 +114,12 @@ class SixPlusTwelve(Cage):
     """
 
     _non_linears = (
-        NonLinearVertex(0, [-1, -1, 0]),
-        NonLinearVertex(1, [-1, 1, 0]),
-        NonLinearVertex(2, [1, -1, 0]),
-        NonLinearVertex(3, [1, 1, 0]),
-        NonLinearVertex(4, [0, 0, 1]),
-        NonLinearVertex(5, [0, 0, -1]),
+        NonLinearVertex(0, np.array([-1, -1, 0])),
+        NonLinearVertex(1, np.array([-1, 1, 0])),
+        NonLinearVertex(2, np.array([1, -1, 0])),
+        NonLinearVertex(3, np.array([1, 1, 0])),
+        NonLinearVertex(4, np.array([0, 0, 1])),
+        NonLinearVertex(5, np.array([0, 0, -1])),
     )
 
     _vertex_prototypes = (

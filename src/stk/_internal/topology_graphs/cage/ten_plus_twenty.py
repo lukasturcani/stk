@@ -3,6 +3,7 @@ Ten Plus Twenty
 ===============
 
 """
+import numpy as np
 
 from stk._internal.topology_graphs.edge import Edge
 
@@ -115,16 +116,16 @@ class TenPlusTwenty(Cage):
     _x = 1.5
     _z = _x / 2
     _non_linears = (
-        NonLinearVertex(0, [-_x, _x, -_z]),
-        NonLinearVertex(1, [-_x, -_x, -_z]),
-        NonLinearVertex(2, [_x, _x, -_z]),
-        NonLinearVertex(3, [_x, -_x, -_z]),
-        NonLinearVertex(4, [-_x, _x, _z]),
-        NonLinearVertex(5, [-_x, -_x, _z]),
-        NonLinearVertex(6, [_x, _x, _z]),
-        NonLinearVertex(7, [_x, -_x, _z]),
-        NonLinearVertex(8, [0, 0, _x]),
-        NonLinearVertex(9, [0, 0, -_x]),
+        NonLinearVertex(0, np.array([-_x, _x, -_z])),
+        NonLinearVertex(1, np.array([-_x, -_x, -_z])),
+        NonLinearVertex(2, np.array([_x, _x, -_z])),
+        NonLinearVertex(3, np.array([_x, -_x, -_z])),
+        NonLinearVertex(4, np.array([-_x, _x, _z])),
+        NonLinearVertex(5, np.array([-_x, -_x, _z])),
+        NonLinearVertex(6, np.array([_x, _x, _z])),
+        NonLinearVertex(7, np.array([_x, -_x, _z])),
+        NonLinearVertex(8, np.array([0, 0, _x])),
+        NonLinearVertex(9, np.array([0, 0, -_x])),
     )
 
     _vertex_prototypes = (
