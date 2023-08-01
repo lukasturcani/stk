@@ -397,6 +397,98 @@ class Cage(TopologyGraph):
                 ),
             )
 
+        *Construction with Custom Vertex Positions*
+
+        For :class:`.Cage` topologies, it is possible to redefine the
+        vertex positions by hand with the `vertex_positions` argument.
+
+        The parameter maps the id of a vertex to a numpy array for its
+        new position. The alignment should be modifed to match the new
+        vertex position.
+
+        It is possible to change some or all vertex positions.
+
+        Consider that the vertex positions that are provided by the user
+        are not scaled like the default ideal topology positions.
+        Additionally, existing placement rules for other vertices are
+        maintained; particularly, the effect of `vertex.init_at_center`.
+
+
+        .. testcode:: change-vertex-positions
+
+            import stk
+            import numpy as np
+
+            bb1 = stk.BuildingBlock(
+                smiles='NCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock(
+                smiles='O=CC(C=O)C=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+
+            cage = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(bb1, bb2),
+                    # Build tetrahedron with tilt.
+                    vertex_positions={
+                        0: 5 * np.array([0, 1.5, 1.2]),
+                        1: 5 * np.array([-1, -0.6, -0.41]),
+                        2: 5 * np.array([1, -0.6, -0.41]),
+                        3: 5 * np.array([0, 1.2, -0.41]),
+                    },
+                ),
+            )
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+            import numpy as np
+
+            bb1 = stk.BuildingBlock(
+                smiles='NCCN',
+                functional_groups=[stk.PrimaryAminoFactory()],
+            )
+            bb2 = stk.BuildingBlock(
+                smiles='O=CC(C=O)C=O',
+                functional_groups=[stk.AldehydeFactory()],
+            )
+
+            cage = stk.ConstructedMolecule(
+                topology_graph=stk.cage.FourPlusSix(
+                    building_blocks=(bb1, bb2),
+                    vertex_positions={
+                        0: 5 * np.array([0, 1.5, 1.2]),
+                        1: 5 * np.array([-1, -0.6, -0.41]),
+                        2: 5 * np.array([1, -0.6, -0.41]),
+                        3: 5 * np.array([0, 1.2, -0.41]),
+                    },
+                ),
+            )
+
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        cage.get_atoms(),
+                        cage.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=bond.get_order(),
+                    ) for bond in cage.get_bonds()
+                ),
+            )
+
+
+
         *Metal-Organic Cage Construction*
 
         A series of common metal-organic cage topologies are provided
