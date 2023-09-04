@@ -1,11 +1,3 @@
-"""
-Macrocycle Vertices
-===================
-
-"""
-
-from __future__ import annotations
-
 import typing
 
 import numpy as np
@@ -54,8 +46,8 @@ class CycleVertex(Vertex):
         self._flip = flip
         self._angle = angle
 
-    def clone(self) -> CycleVertex:
-        clone = self._clone()
+    def clone(self) -> typing.Self:
+        clone = super().clone()
         clone._flip = self._flip
         clone._angle = self._angle
         return clone

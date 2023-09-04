@@ -1,10 +1,4 @@
-"""
-One Plus One
-============
-
-"""
-
-import typing
+from collections.abc import Iterable
 
 import numpy as np
 
@@ -182,16 +176,14 @@ class OnePlusOne(Cage):
 
     def __init__(
         self,
-        building_blocks: typing.Iterable[BuildingBlock]
+        building_blocks: Iterable[BuildingBlock]
         | dict[BuildingBlock, tuple[int, ...]],
-        vertex_alignments: typing.Optional[dict[int, int]] = None,
+        vertex_alignments: dict[int, int] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
         """
-        Initialize a :class:`.OnePlusOne`.
-
         The `vertex_positions` argument is not available for this class
         due to strict positioning of the edges.
 

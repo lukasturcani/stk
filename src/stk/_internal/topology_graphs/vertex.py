@@ -1,11 +1,3 @@
-"""
-Vertex
-======
-
-"""
-
-from __future__ import annotations
-
 import typing
 
 import numpy as np
@@ -13,8 +5,6 @@ import numpy as np
 from stk._internal.building_block import BuildingBlock
 
 from .edge import Edge
-
-_VertexT = typing.TypeVar("_VertexT", bound="Vertex")
 
 
 class Vertex:
@@ -67,21 +57,19 @@ class Vertex:
         return self._id
 
     def _with_scale(
-        self: _VertexT,
+        self,
         scale: float | tuple[float, float, float],
-    ) -> _VertexT:
+    ) -> typing.Self:
         """
         Modify the vertex.
-
         """
-
         self._position *= scale
         return self
 
     def with_scale(
         self,
         scale: float | tuple[float, float, float],
-    ) -> Vertex:
+    ) -> typing.Self:
         """
         Get a clone with a scaled position.
 
@@ -101,65 +89,44 @@ class Vertex:
 
         return self.clone()._with_scale(scale)
 
-    def _clone(self: _VertexT) -> _VertexT:
-        clone = self.__class__.__new__(self.__class__)
-        Vertex.__init__(clone, self._id, self._position)
-        return clone
-
-    def clone(self) -> Vertex:
+    def clone(self) -> typing.Self:
         """
         Return a clone.
 
         Returns:
-
             The clone.
-
         """
-
-        return self._clone()
+        clone = self.__class__.__new__(self.__class__)
+        Vertex.__init__(clone, self._id, self._position)
+        return clone
 
     def get_position(self) -> np.ndarray:
         """
         Get the position.
 
         Returns:
-
             The position of the :class:`Vertex`.
-
         """
-
         return np.array(self._position)
 
-    def _with_position(
-        self: _VertexT,
-        position: np.ndarray,
-    ) -> _VertexT:
+    def _with_position(self, position: np.ndarray) -> typing.Self:
         """
         Modify the vertex.
-
         """
-
         self._position = np.array(position, dtype=np.float64)
         return self
 
-    def with_position(
-        self,
-        position: np.ndarray,
-    ) -> Vertex:
+    def with_position(self, position: np.ndarray) -> typing.Self:
         """
         Get a clone at a certain position.
 
         Parameters:
-
             position:
                 The desired position of the clone.
 
         Returns:
-
             The clone.
-
         """
-
         return self.clone()._with_position(position)
 
     def get_cell(self) -> np.ndarray:
