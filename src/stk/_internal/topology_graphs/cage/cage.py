@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing
 from collections import Counter, abc, defaultdict
 from functools import partial
@@ -968,7 +966,7 @@ class Cage(TopologyGraph):
 
     def __init__(
         self,
-        building_blocks: typing.Iterable[BuildingBlock]
+        building_blocks: abc.Iterable[BuildingBlock]
         | dict[BuildingBlock, tuple[int, ...]],
         vertex_alignments: dict[int, int] | None = None,
         vertex_positions: dict[int, np.ndarray] | None = None,
@@ -977,8 +975,6 @@ class Cage(TopologyGraph):
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
         """
-        Initialize a :class:`.Cage`.
-
         Parameters:
 
             building_blocks:
@@ -1262,7 +1258,7 @@ class Cage(TopologyGraph):
                 "The following vertices are unoccupied " f"{unassigned_ids}."
             )
 
-    def clone(self) -> Cage:
+    def clone(self) -> typing.Self:
         clone = self._clone()
         clone._vertex_alignments = dict(self._vertex_alignments)
         clone._vertex_positions = dict(self._vertex_positions)
@@ -1415,7 +1411,7 @@ class Cage(TopologyGraph):
     def with_building_blocks(
         self,
         building_block_map: dict[BuildingBlock, BuildingBlock],
-    ) -> Cage:
+    ) -> typing.Self:
         return self.clone()._with_building_blocks(building_block_map)
 
     def get_vertex_alignments(self) -> dict[int, int]:
