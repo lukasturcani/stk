@@ -33,8 +33,6 @@ class _CageVertex(Vertex):
         aligner_edge: int = 0,
     ) -> None:
         """
-        Initialize a :class:`._CageVertex`.
-
         Parameters:
 
             id:
