@@ -321,7 +321,6 @@ class Cage(TopologyGraph):
                 ),
             )
 
-
         You can combine this with the `vertex_alignments` parameter
 
         .. testcode:: multi-building-block-cage-construction
@@ -413,7 +412,6 @@ class Cage(TopologyGraph):
         Additionally, existing placement rules for other vertices are
         maintained; particularly, the effect of `vertex.init_at_center`.
 
-
         .. testcode:: change-vertex-positions
 
             import stk
@@ -421,16 +419,16 @@ class Cage(TopologyGraph):
 
             bb1 = stk.BuildingBlock(
                 smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
+                functional_groups=stk.PrimaryAminoFactory(),
             )
             bb2 = stk.BuildingBlock(
                 smiles='O=CC(C=O)C=O',
-                functional_groups=[stk.AldehydeFactory()],
+                functional_groups=stk.AldehydeFactory(),
             )
 
             cage = stk.ConstructedMolecule(
                 topology_graph=stk.cage.FourPlusSix(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     # Build tetrahedron with tilt.
                     vertex_positions={
                         0: 5 * np.array([0, 1.5, 1.2]),
@@ -449,16 +447,16 @@ class Cage(TopologyGraph):
 
             bb1 = stk.BuildingBlock(
                 smiles='NCCN',
-                functional_groups=[stk.PrimaryAminoFactory()],
+                functional_groups=stk.PrimaryAminoFactory(),
             )
             bb2 = stk.BuildingBlock(
                 smiles='O=CC(C=O)C=O',
-                functional_groups=[stk.AldehydeFactory()],
+                functional_groups=stk.AldehydeFactory(),
             )
 
             cage = stk.ConstructedMolecule(
                 topology_graph=stk.cage.FourPlusSix(
-                    building_blocks=(bb1, bb2),
+                    building_blocks=[bb1, bb2],
                     vertex_positions={
                         0: 5 * np.array([0, 1.5, 1.2]),
                         1: 5 * np.array([-1, -0.6, -0.41]),
@@ -486,8 +484,6 @@ class Cage(TopologyGraph):
                     ) for bond in cage.get_bonds()
                 ),
             )
-
-
 
         *Metal-Organic Cage Construction*
 
