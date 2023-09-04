@@ -1,10 +1,5 @@
-"""
-M4L4 Square
-===========
-
-"""
-
 import typing
+from collections.abc import Iterable
 
 import numpy as np
 
@@ -155,9 +150,9 @@ class M4L4Square(Cage):
 
     def __init__(
         self,
-        corners: typing.Iterable[BuildingBlock]
+        corners: Iterable[BuildingBlock]
         | dict[BuildingBlock, tuple[int, ...]],
-        linkers: typing.Iterable[BuildingBlock]
+        linkers: Iterable[BuildingBlock]
         | dict[BuildingBlock, tuple[int, ...]],
         vertex_alignments: dict[int, int] | None = None,
         vertex_positions: dict[int, np.ndarray] | None = None,
@@ -166,8 +161,6 @@ class M4L4Square(Cage):
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
         """
-        Initialize a :class:`.M4L4Square`.
-
         Parameters:
 
             corners:
