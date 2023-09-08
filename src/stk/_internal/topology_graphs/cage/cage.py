@@ -1110,8 +1110,8 @@ class Cage(TopologyGraph):
             for vertex in vertices:
                 if vertex.get_id() in self._vertex_positions:
                     scale = self._get_scale(
-                        building_block_vertices
-                    )  # type: ignore
+                        building_block_vertices  # type: ignore
+                    )
                     # Pre-reversing the scale
                     # because altering the scale code is topology level,
                     # which I am trying to avoid.
