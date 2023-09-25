@@ -333,7 +333,7 @@ class ProgressPlotter:
             ProgressPlotter: The plotter is returned.
         """
         sns.set(style="darkgrid")
-        fig = plt.figure(figsize=[8, 4.5])
+        fig = plt.figure(figsize=(8, 4.5))
         palette = sns.color_palette("deep")
 
         # It's possible that all values were filtered out, and trying
