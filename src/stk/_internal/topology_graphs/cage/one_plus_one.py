@@ -184,9 +184,6 @@ class OnePlusOne(Cage):
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
         """
-        The `vertex_positions` argument is not available for this class
-        due to strict positioning of the edges.
-
         Parameters:
 
             building_blocks:
@@ -248,6 +245,11 @@ class OnePlusOne(Cage):
             :class:`~.cage.OverlyOccupiedVertexError`
                 If a vertex of the cage topology graph has more than
                 one building block placed on it.
+
+        Notes:
+
+            The `vertex_positions` argument is not available for this class
+            due to strict positioning of the edges.
 
         """
 

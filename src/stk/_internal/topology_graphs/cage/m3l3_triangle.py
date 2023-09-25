@@ -39,13 +39,11 @@ class M3L3Triangle(Cage):
             smiles=(
                 'C1=CC(=CC=C1C2=CC=NC=C2)C3=CC=NC=C3'
             ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
+            functional_groups=stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
         )
 
         cage = stk.ConstructedMolecule(
@@ -98,13 +96,11 @@ class M3L3Triangle(Cage):
             smiles=(
                 'C1=CC(=CC=C1C2=CC=NC=C2)C3=CC=NC=C3'
             ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
+            functional_groups=stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
         )
 
         cage = stk.ConstructedMolecule(
