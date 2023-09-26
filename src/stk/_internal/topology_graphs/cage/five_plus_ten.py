@@ -120,21 +120,21 @@ class FivePlusTen(Cage):
     _s2 = np.sin(4 * np.pi / 5)
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [0, 1, 0], False),
-        NonLinearVertex(1, [_s1, _c1, 0], False),
-        NonLinearVertex(2, [_s2, -_c2, 0], False),
-        NonLinearVertex(3, [-_s2, -_c2, 0], False),
-        NonLinearVertex(4, [-_s1, _c1, 0], False),
-        LinearVertex(5, [_s1, 1 + _c1, 0.5], False),
-        LinearVertex(6, [_s1, 1 + _c1, -0.5], False),
-        LinearVertex(7, [_s1 + _s2, _c1 - _c2, 0.5], False),
-        LinearVertex(8, [_s1 + _s2, _c1 - _c2, -0.5], False),
-        LinearVertex(9, [0, -2 * _c2, 0.5], False),
-        LinearVertex(10, [0, -2 * _c2, -0.5], False),
-        LinearVertex(11, [-_s2 - _s1, -_c2 + _c1, 0.5], False),
-        LinearVertex(12, [-_s2 - _s1, -_c2 + _c1, -0.5], False),
-        LinearVertex(13, [-_s1, 1 + _c1, 0.5], False),
-        LinearVertex(14, [-_s1, 1 + _c1, -0.5], False),
+        NonLinearVertex(0, np.array([0, 1, 0]), False),
+        NonLinearVertex(1, np.array([_s1, _c1, 0]), False),
+        NonLinearVertex(2, np.array([_s2, -_c2, 0]), False),
+        NonLinearVertex(3, np.array([-_s2, -_c2, 0]), False),
+        NonLinearVertex(4, np.array([-_s1, _c1, 0]), False),
+        LinearVertex(5, np.array([_s1, 1 + _c1, 0.5]), False),
+        LinearVertex(6, np.array([_s1, 1 + _c1, -0.5]), False),
+        LinearVertex(7, np.array([_s1 + _s2, _c1 - _c2, 0.5]), False),
+        LinearVertex(8, np.array([_s1 + _s2, _c1 - _c2, -0.5]), False),
+        LinearVertex(9, np.array([0, -2 * _c2, 0.5]), False),
+        LinearVertex(10, np.array([0, -2 * _c2, -0.5]), False),
+        LinearVertex(11, np.array([-_s2 - _s1, -_c2 + _c1, 0.5]), False),
+        LinearVertex(12, np.array([-_s2 - _s1, -_c2 + _c1, -0.5]), False),
+        LinearVertex(13, np.array([-_s1, 1 + _c1, 0.5]), False),
+        LinearVertex(14, np.array([-_s1, 1 + _c1, -0.5]), False),
     )
 
     _edge_prototypes = (

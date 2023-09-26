@@ -104,10 +104,10 @@ class TwoPlusTwo(Cage):
 
     _x = 1
     _vertex_prototypes = (
-        NonLinearVertex(0, [_x, 0, -_x / np.sqrt(2)], False),
-        NonLinearVertex(1, [-_x, 0, -_x / np.sqrt(2)], False),
-        NonLinearVertex(2, [0, _x, _x / np.sqrt(2)], False),
-        NonLinearVertex(3, [0, -_x, _x / np.sqrt(2)], False),
+        NonLinearVertex(0, np.array([_x, 0, -_x / np.sqrt(2)]), False),
+        NonLinearVertex(1, np.array([-_x, 0, -_x / np.sqrt(2)]), False),
+        NonLinearVertex(2, np.array([0, _x, _x / np.sqrt(2)]), False),
+        NonLinearVertex(3, np.array([0, -_x, _x / np.sqrt(2)]), False),
     )
 
     _edge_prototypes = (

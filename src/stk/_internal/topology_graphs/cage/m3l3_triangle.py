@@ -1,15 +1,14 @@
-"""
-M3L3 Triangle
-=============
-
-"""
+from collections.abc import Iterable
 
 import numpy as np
 
+from stk._internal.building_block import BuildingBlock
 from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.reaction_factories.generic_reaction_factory import (
     GenericReactionFactory,
 )
+from stk._internal.reaction_factories.reaction_factory import ReactionFactory
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -40,13 +39,11 @@ class M3L3Triangle(Cage):
             smiles=(
                 'C1=CC(=CC=C1C2=CC=NC=C2)C3=CC=NC=C3'
             ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
+            functional_groups=stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
         )
 
         cage = stk.ConstructedMolecule(
@@ -99,13 +96,11 @@ class M3L3Triangle(Cage):
             smiles=(
                 'C1=CC(=CC=C1C2=CC=NC=C2)C3=CC=NC=C3'
             ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
+            functional_groups=stk.SmartsFunctionalGroupFactory(
+                smarts='[#6]~[#7X2]~[#6]',
+                bonders=(1, ),
+                deleters=(),
+            ),
         )
 
         cage = stk.ConstructedMolecule(
@@ -150,61 +145,95 @@ class M3L3Triangle(Cage):
 
     def __init__(
         self,
-        corners,
-        linkers,
-        vertex_alignments=None,
-        reaction_factory=GenericReactionFactory(),
-        num_processes=1,
-        optimizer=NullOptimizer(),
-    ):
+        corners: Iterable[BuildingBlock]
+        | dict[BuildingBlock, tuple[int, ...]],
+        linkers: Iterable[BuildingBlock]
+        | dict[BuildingBlock, tuple[int, ...]],
+        vertex_alignments: dict[int, int] | None = None,
+        vertex_positions: dict[int, np.ndarray] | None = None,
+        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        num_processes: int = 1,
+        optimizer: Optimizer = NullOptimizer(),
+    ) -> None:
         """
-        Initialize a :class:`.M3L3Triangle`.
+        Parameters:
 
-        Parameters
-        ----------
-        corners : :class:`dict` or :class:`.BuildingBlock`
-            Can be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+            corners:
+                Can be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on.
 
-            Can also be a :class:`.BuildingBlock` instance, which
-            should be placed on all corner vertices on the topology
-            graph.
+                Can also be a :class:`.BuildingBlock` instance, which
+                should be placed on all corner vertices on the topology
+                graph.
 
-        linkers : :class:`dict` or :class:`.BuildingBlock`
-            Can be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on.
+            linkers:
+                Can be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on.
 
-            Can also be a :class:`.BuildingBlock` instance, which
-            should be placed on all linker vertices on the topology
-            graph.
+                Can also be a :class:`.BuildingBlock` instance, which
+                should be placed on all linker vertices on the topology
+                graph.
 
-        vertex_alignments : :class:`dict`, optional
-            A mapping from the id of a :class:`.Vertex`
-            to an :class:`.Edge` connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default edge changed need to be present in the
-            :class:`dict`. If ``None`` then the default edge is used
-            for each vertex. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers. The edge is referred to by a number
-            between ``0`` (inclusive) and the number of edges the
-            vertex is connected to (exclusive).
+            vertex_alignments:
+                A mapping from the id of a :class:`.Vertex`
+                to an :class:`.Edge` connected to it.
+                The :class:`.Edge` is used to align the first
+                :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+                placed on that vertex. Only vertices which need to have
+                their default edge changed need to be present in the
+                :class:`dict`. If ``None`` then the default edge is used
+                for each vertex. Changing which :class:`.Edge` is used will
+                mean that the topology graph represents different
+                structural isomers. The edge is referred to by a number
+                between ``0`` (inclusive) and the number of edges the
+                vertex is connected to (exclusive).
 
-        reaction_factory : :class:`.ReactionFactory`, optional
-            The reaction factory to use for creating bonds between
-            building blocks.
+            vertex_positions:
+                A mapping from the id of a :class:`.Vertex` to a custom
+                :class:`.BuildingBlock` position. The default vertex
+                alignment algorithm is still applied. Only vertices
+                which need to have their default position changed need
+                to be present in the :class:`dict`. Note that any
+                vertices with modified positions will not be scaled like
+                the rest of the building block positions and will not
+                use neighbor placements in its positioning if requested
+                by the default topology. If ``None`` then the default
+                placement algorithm is used for each vertex.
 
-        num_processes : :class:`int`, optional
-            The number of parallel processes to create during
-            :meth:`construct`.
+            reaction_factory:
+                The reaction factory to use for creating bonds between
+                building blocks.
 
-        optimizer : :class:`.Optimizer`, optional
-            Used to optimize the structure of the constructed
-            molecule.
+            num_processes:
+                The number of parallel processes to create during
+                :meth:`construct`.
+
+            optimizer:
+                Used to optimize the structure of the constructed
+                molecule.
+
+        Raises:
+
+            :class:`AssertionError`
+                If the any building block does not have a
+                valid number of functional groups.
+
+            :class:`ValueError`
+                If the there are multiple building blocks with the
+                same number of functional_groups in `building_blocks`,
+                and they are not explicitly assigned to vertices. The
+                desired placement of building blocks is ambiguous in
+                this case.
+
+            :class:`~.cage.UnoccupiedVertexError`
+                If a vertex of the cage topology graph does not have a
+                building block placed on it.
+
+            :class:`~.cage.OverlyOccupiedVertexError`
+                If a vertex of the cage topology graph has more than
+                one building block placed on it.
 
         """
 
@@ -226,6 +255,7 @@ class M3L3Triangle(Cage):
         super().__init__(
             building_blocks,
             vertex_alignments=vertex_alignments,
+            vertex_positions=vertex_positions,
             reaction_factory=reaction_factory,
             num_processes=num_processes,
             optimizer=optimizer,
@@ -234,9 +264,9 @@ class M3L3Triangle(Cage):
     _x = 2 * np.sqrt(3) / 4
     _y = 2
     _angled_vertices = (
-        AngledVertex(0, [0, _x, 0]),
-        AngledVertex(1, [_y / 2, -_x, 0]),
-        AngledVertex(2, [-_y / 2, -_x, 0]),
+        AngledVertex(0, np.array([0, _x, 0])),
+        AngledVertex(1, np.array([_y / 2, -_x, 0])),
+        AngledVertex(2, np.array([-_y / 2, -_x, 0])),
     )
 
     _vertex_prototypes = (

@@ -4,6 +4,8 @@ Two Plus Four
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.cage.cage import Cage
 from stk._internal.topology_graphs.cage.vertices import (
     LinearVertex,
@@ -115,12 +117,12 @@ class TwoPlusFour(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0, -1]),
-        NonLinearVertex(1, [0, 0, 1]),
-        LinearVertex(2, [2, 0, 0], False),
-        LinearVertex(3, [-2, 0, 0], False),
-        LinearVertex(4, [0, 2, 0], False),
-        LinearVertex(5, [0, -2, 0], False),
+        NonLinearVertex(0, np.array([0, 0, -1])),
+        NonLinearVertex(1, np.array([0, 0, 1])),
+        LinearVertex(2, np.array([2, 0, 0]), False),
+        LinearVertex(3, np.array([-2, 0, 0]), False),
+        LinearVertex(4, np.array([0, 2, 0]), False),
+        LinearVertex(5, np.array([0, -2, 0]), False),
     )
 
     _edge_prototypes = (

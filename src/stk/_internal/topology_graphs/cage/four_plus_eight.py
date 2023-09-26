@@ -4,6 +4,8 @@ Four Plus Eight
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.cage.cage import Cage
 from stk._internal.topology_graphs.cage.vertices import (
     LinearVertex,
@@ -115,18 +117,18 @@ class FourPlusEight(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [-1, -1, 0], False),
-        NonLinearVertex(1, [-1, 1, 0], False),
-        NonLinearVertex(2, [1, -1, 0], False),
-        NonLinearVertex(3, [1, 1, 0], False),
-        LinearVertex(4, [-2, 0, 1], False),
-        LinearVertex(5, [-2, 0, -1], False),
-        LinearVertex(6, [0, 2, 1], False),
-        LinearVertex(7, [0, 2, -1], False),
-        LinearVertex(8, [0, -2, 1], False),
-        LinearVertex(9, [0, -2, -1], False),
-        LinearVertex(10, [2, 0, 1], False),
-        LinearVertex(11, [2, 0, -1], False),
+        NonLinearVertex(0, np.array([-1, -1, 0]), False),
+        NonLinearVertex(1, np.array([-1, 1, 0]), False),
+        NonLinearVertex(2, np.array([1, -1, 0]), False),
+        NonLinearVertex(3, np.array([1, 1, 0]), False),
+        LinearVertex(4, np.array([-2, 0, 1]), False),
+        LinearVertex(5, np.array([-2, 0, -1]), False),
+        LinearVertex(6, np.array([0, 2, 1]), False),
+        LinearVertex(7, np.array([0, 2, -1]), False),
+        LinearVertex(8, np.array([0, -2, 1]), False),
+        LinearVertex(9, np.array([0, -2, -1]), False),
+        LinearVertex(10, np.array([2, 0, 1]), False),
+        LinearVertex(11, np.array([2, 0, -1]), False),
     )
 
     _edge_prototypes = (

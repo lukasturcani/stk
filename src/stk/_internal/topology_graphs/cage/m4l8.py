@@ -4,6 +4,8 @@ M4L8
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -153,18 +155,18 @@ class M4L8(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [1, 0, 0]),
-        NonLinearVertex(1, [0, 1, 0]),
-        NonLinearVertex(2, [-1, 0, 0]),
-        NonLinearVertex(3, [0, -1, 0]),
-        LinearVertex(4, [1, 1, 0.5], False),
-        LinearVertex(5, [1, 1, -0.5], False),
-        LinearVertex(6, [1, -1, 0.5], False),
-        LinearVertex(7, [1, -1, -0.5], False),
-        LinearVertex(8, [-1, -1, 0.5], False),
-        LinearVertex(9, [-1, -1, -0.5], False),
-        LinearVertex(10, [-1, 1, 0.5], False),
-        LinearVertex(11, [-1, 1, -0.5], False),
+        NonLinearVertex(0, np.array([1, 0, 0])),
+        NonLinearVertex(1, np.array([0, 1, 0])),
+        NonLinearVertex(2, np.array([-1, 0, 0])),
+        NonLinearVertex(3, np.array([0, -1, 0])),
+        LinearVertex(4, np.array([1, 1, 0.5]), False),
+        LinearVertex(5, np.array([1, 1, -0.5]), False),
+        LinearVertex(6, np.array([1, -1, 0.5]), False),
+        LinearVertex(7, np.array([1, -1, -0.5]), False),
+        LinearVertex(8, np.array([-1, -1, 0.5]), False),
+        LinearVertex(9, np.array([-1, -1, -0.5]), False),
+        LinearVertex(10, np.array([-1, 1, 0.5]), False),
+        LinearVertex(11, np.array([-1, 1, -0.5]), False),
     )
 
     _edge_prototypes = (

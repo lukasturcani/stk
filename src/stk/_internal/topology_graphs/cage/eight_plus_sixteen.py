@@ -116,14 +116,14 @@ class EightPlusSixteen(Cage):
 
     _x = 2
     _non_linears = (
-        NonLinearVertex(0, [-0.5 * _x, 0.5 * _x, -0.35 * _x]),
-        NonLinearVertex(1, [-0.5 * _x, -0.5 * _x, -0.35 * _x]),
-        NonLinearVertex(2, [0.5 * _x, -0.5 * _x, -0.35 * _x]),
-        NonLinearVertex(3, [0.5 * _x, 0.5 * _x, -0.35 * _x]),
-        NonLinearVertex(4, [-_x * np.sqrt(2) / 2, 0, _x * 0.35]),
-        NonLinearVertex(5, [0, -_x * np.sqrt(2) / 2, _x * 0.35]),
-        NonLinearVertex(6, [_x * np.sqrt(2) / 2, 0, _x * 0.35]),
-        NonLinearVertex(7, [0, _x * np.sqrt(2) / 2, _x * 0.35]),
+        NonLinearVertex(0, np.array([-0.5 * _x, 0.5 * _x, -0.35 * _x])),
+        NonLinearVertex(1, np.array([-0.5 * _x, -0.5 * _x, -0.35 * _x])),
+        NonLinearVertex(2, np.array([0.5 * _x, -0.5 * _x, -0.35 * _x])),
+        NonLinearVertex(3, np.array([0.5 * _x, 0.5 * _x, -0.35 * _x])),
+        NonLinearVertex(4, np.array([-_x * np.sqrt(2) / 2, 0, _x * 0.35])),
+        NonLinearVertex(5, np.array([0, -_x * np.sqrt(2) / 2, _x * 0.35])),
+        NonLinearVertex(6, np.array([_x * np.sqrt(2) / 2, 0, _x * 0.35])),
+        NonLinearVertex(7, np.array([0, _x * np.sqrt(2) / 2, _x * 0.35])),
     )
 
     _vertex_prototypes = (

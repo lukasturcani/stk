@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import stk
 
@@ -48,11 +49,11 @@ from ...building_blocks import (
                 topology_graph=stk.cage.M3L3Triangle(
                     corners=stk.BuildingBlock(
                         smiles="C1CC(C1Br)Br",
-                        functional_groups=[stk.BromoFactory()],
+                        functional_groups=stk.BromoFactory(),
                     ),
                     linkers=stk.BuildingBlock(
                         smiles="C(#CBr)Br",
-                        functional_groups=[stk.BromoFactory()],
+                        functional_groups=stk.BromoFactory(),
                     ),
                 ),
             ),
@@ -68,11 +69,11 @@ from ...building_blocks import (
                 topology_graph=stk.cage.M3L3Triangle(
                     corners=stk.BuildingBlock(
                         smiles="C1CC(CC(C1)Br)Br",
-                        functional_groups=[stk.BromoFactory()],
+                        functional_groups=stk.BromoFactory(),
                     ),
                     linkers=stk.BuildingBlock(
                         smiles="C(#CBr)Br",
-                        functional_groups=[stk.BromoFactory()],
+                        functional_groups=stk.BromoFactory(),
                     ),
                 ),
             ),
@@ -89,12 +90,32 @@ from ...building_blocks import (
                 topology_graph=stk.cage.M3L3Triangle(
                     corners=stk.BuildingBlock(
                         smiles="C(CBr)Br",
-                        functional_groups=[stk.BromoFactory()],
+                        functional_groups=stk.BromoFactory(),
                     ),
                     linkers=stk.BuildingBlock(
                         smiles="C(#CBr)Br",
-                        functional_groups=[stk.BromoFactory()],
+                        functional_groups=stk.BromoFactory(),
                     ),
+                ),
+            ),
+            smiles=(
+                "[H]C1([H])C#CC([H])([H])C([H])([H])C#CC([H])([H])C([H"
+                "])([H])C#CC1([H])[H]"
+            ),
+            name=name,
+        ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cage.M3L3Triangle(
+                    corners=stk.BuildingBlock(
+                        smiles="C(CBr)Br",
+                        functional_groups=stk.BromoFactory(),
+                    ),
+                    linkers=stk.BuildingBlock(
+                        smiles="C(#CBr)Br",
+                        functional_groups=stk.BromoFactory(),
+                    ),
+                    vertex_positions={0: np.array([2, 0, 2])},
                 ),
             ),
             smiles=(

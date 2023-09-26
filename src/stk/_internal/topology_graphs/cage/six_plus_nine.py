@@ -116,12 +116,12 @@ class SixPlusNine(Cage):
 
     # source: http://eusebeia.dyndns.org/4d/prism3
     _non_linears = (
-        NonLinearVertex(0, [-1, -1 / np.sqrt(3), -1]),
-        NonLinearVertex(1, [-1, -1 / np.sqrt(3), 1]),
-        NonLinearVertex(2, [1, -1 / np.sqrt(3), -1]),
-        NonLinearVertex(3, [1, -1 / np.sqrt(3), 1]),
-        NonLinearVertex(4, [0, 2 / np.sqrt(3), -1]),
-        NonLinearVertex(5, [0, 2 / np.sqrt(3), 1]),
+        NonLinearVertex(0, np.array([-1, -1 / np.sqrt(3), -1])),
+        NonLinearVertex(1, np.array([-1, -1 / np.sqrt(3), 1])),
+        NonLinearVertex(2, np.array([1, -1 / np.sqrt(3), -1])),
+        NonLinearVertex(3, np.array([1, -1 / np.sqrt(3), 1])),
+        NonLinearVertex(4, np.array([0, 2 / np.sqrt(3), -1])),
+        NonLinearVertex(5, np.array([0, 2 / np.sqrt(3), 1])),
     )
     _vertex_prototypes = (
         *_non_linears,

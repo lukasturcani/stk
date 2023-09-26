@@ -4,6 +4,8 @@ Cage Vertices
 
 """
 
+import typing
+
 import numpy as np
 from scipy.spatial.distance import euclidean
 
@@ -25,32 +27,30 @@ class _CageVertex(Vertex):
 
     def __init__(
         self,
-        id,
-        position,
-        use_neighbor_placement=True,
-        aligner_edge=0,
-    ):
+        id: int,
+        position: np.ndarray,
+        use_neighbor_placement: bool = True,
+        aligner_edge: int = 0,
+    ) -> None:
         """
-        Initialize a :class:`._CageVertex`.
+        Parameters:
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the vertex.
+            id:
+                The id of the vertex.
 
-        position : :class:`tuple` of :class:`float`
-            The position of the vertex.
+            position:
+                The position of the vertex.
 
-        use_neighbor_placement : :class:`bool`, optional
-            If ``True``, the position of the vertex will be updated
-            based on the neighboring functional groups.
+            use_neighbor_placement:
+                If ``True``, the position of the vertex will be updated
+                based on the neighboring functional groups.
 
-        aligner_edge : :class:`int`, optional
-            The edge which is used to align the :class:`.BuildingBlock`
-            placed on the vertex. The first :class:`.FunctionalGroup`
-            is rotated such that it lies exactly on this
-            :class:`.Edge`. Must be between ``0`` and the number of
-            edges the vertex is connected to.
+            aligner_edge:
+                The edge which is used to align the :class:`.BuildingBlock`
+                placed on the vertex. The first :class:`.FunctionalGroup`
+                is rotated such that it lies exactly on this
+                :class:`.Edge`. Must be between ``0`` and the number of
+                edges the vertex is connected to.
 
         """
 
@@ -64,7 +64,7 @@ class _CageVertex(Vertex):
         clone._use_neighbor_placement = self._use_neighbor_placement
         return clone
 
-    def _with_aligner_edge(self, aligner_edge):
+    def _with_aligner_edge(self, aligner_edge: int) -> typing.Self:
         """
         Modify the instance.
 
@@ -73,31 +73,63 @@ class _CageVertex(Vertex):
         self._aligner_edge = aligner_edge
         return self
 
-    def with_aligner_edge(self, aligner_edge):
+    def with_aligner_edge(self, aligner_edge: int) -> typing.Self:
         """
         Return a clone with a different `aligner_edge`.
 
-        Parameters
-        ----------
-        aligner_edge : :class:`int`
-            The aligner edge of the clone.
+        Parameters:
 
-        Returns
-        -------
-        :class:`._CageVertex`
+            aligner_edge:
+                The aligner edge of the clone.
+
+        Returns:
+
             The clone. Has the same type as the original instance.
 
         """
 
         return self.clone()._with_aligner_edge(aligner_edge)
 
-    def use_neighbor_placement(self):
+    def _with_use_neighbor_placement(
+        self,
+        use_neighbor_placement: bool,
+    ) -> typing.Self:
+        """
+        Modify the instance.
+
+        """
+
+        self._use_neighbor_placement = use_neighbor_placement
+        return self
+
+    def with_use_neighbor_placement(
+        self,
+        use_neighbor_placement: bool,
+    ) -> typing.Self:
+        """
+        Return a clone with a different `use_neighbor_placement`.
+
+        Parameters:
+
+            use_neighbor_placement:
+                ``True`` if the position should be updated based on neighbors.
+
+        Returns:
+
+            The clone. Has the same type as the original instance.
+
+        """
+
+        return self.clone()._with_use_neighbor_placement(
+            use_neighbor_placement
+        )
+
+    def use_neighbor_placement(self) -> bool:
         """
         ``True`` if the position should be updated based on neighbors.
 
-        Returns
-        -------
-        :class:`bool`
+        Returns:
+
             ``True`` if the position of the vertex should be updated
             based on the positions of functional groups on neighboring
             vertices.
@@ -107,47 +139,51 @@ class _CageVertex(Vertex):
         return self._use_neighbor_placement
 
     @classmethod
-    def init_at_center(cls, id, vertices):
+    def init_at_center(
+        cls,
+        id: int,
+        vertices: tuple[Vertex, ...],
+    ) -> typing.Self:
         """
         Initialize a :class:`._CageVertex` in the middle of `vertices`.
 
-        Parameters
-        ----------
-        id : :class:`int`
-            The id of the initialized vertex.
+        Parameters:
 
-        vertices : :class:`tuple` of :class:`.Vertex`
-            The vertices at whose center this one needs to be.
+            id:
+                The id of the initialized vertex.
 
-        Returns
-        -------
-        :class:`._CageVertex`
+            vertices:
+                The vertices at whose center this one needs to be.
+
+        Returns:
+
             The new vertex.
 
         """
 
         return cls(
             id=id,
-            position=(
-                sum(vertex.get_position() for vertex in vertices)
-                / len(vertices)
+            position=np.array(
+                (
+                    sum(vertex.get_position() for vertex in vertices)
+                    / len(vertices)
+                )
             ),
         )
 
-    def get_aligner_edge(self):
+    def get_aligner_edge(self) -> int:
         """
         Return the aligner edge of the vertex.
 
-        Returns
-        -------
-        :class:`int`
+        Returns:
+
             The aligner edge.
 
         """
 
         return self._aligner_edge
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"Vertex(id={self._id}, "
             f"position={self._position.tolist()}, "
@@ -162,6 +198,7 @@ class LinearVertex(_CageVertex):
             "groups but has "
             f"{building_block.get_num_functional_groups()}."
         )
+
         building_block = building_block.with_centroid(
             position=self._position,
             atom_ids=building_block.get_placer_ids(),

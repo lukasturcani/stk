@@ -4,6 +4,8 @@ M2L4 Lantern
 
 """
 
+import numpy as np
+
 from stk._internal.topology_graphs.edge import Edge
 
 from .cage import Cage
@@ -153,12 +155,12 @@ class M2L4Lantern(Cage):
     """
 
     _vertex_prototypes = (
-        NonLinearVertex(0, [0, 0.5, 0]),
-        NonLinearVertex(1, [0, -0.5, 0]),
-        LinearVertex(2, [1, 0, 0], False),
-        LinearVertex(3, [0, 0, 1], False),
-        LinearVertex(4, [-1, 0, 0], False),
-        LinearVertex(5, [0, 0, -1], False),
+        NonLinearVertex(0, np.array([0, 0.5, 0])),
+        NonLinearVertex(1, np.array([0, -0.5, 0])),
+        LinearVertex(2, np.array([1, 0, 0]), False),
+        LinearVertex(3, np.array([0, 0, 1]), False),
+        LinearVertex(4, np.array([-1, 0, 0]), False),
+        LinearVertex(5, np.array([0, 0, -1]), False),
     )
 
     _edge_prototypes = (
