@@ -1,6 +1,7 @@
+import pathlib
+
 import pytest
 import stk
-import pathlib
 
 from ..case_data import CaseData
 
