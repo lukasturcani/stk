@@ -1,5 +1,6 @@
 import pytest
 import stk
+import pathlib
 
 from ..case_data import CaseData
 
@@ -10,7 +11,7 @@ from ..case_data import CaseData
     ],
 )
 def path(tmpdir, request):
-    return str(tmpdir / request.param)
+    return pathlib.Path(tmpdir) / request.param
 
 
 class InitFromFileData:
