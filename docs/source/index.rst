@@ -31,12 +31,13 @@
    :caption: Topology Graphs
    :maxdepth: 2
 
+   Topology Graph Components <vertices_and_edges>
    Polymers <polymer>
    Small Molecules <small>
    Organic & Metal-Organic Cages <cage>
    Covalent Organic Frameworks <cof>
    Metal Complexes <metal_complex>
-   Host Guest Complex <_autosummary/stk.host_guest.Complex>
+   Host Guest Complex <host_guest>
    Macrocycle <_autosummary/stk.macrocycle.Macrocycle>
    [n]Rotaxane <_autosummary/stk.rotaxane.NRotaxane>
    Adding Topology Graphs <_autosummary/stk.TopologyGraph>
