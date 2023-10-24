@@ -31,7 +31,7 @@
    :caption: Topology Graphs
    :maxdepth: 2
 
-   Topology Graph Components <vertices_and_edges>
+   Topology Graph Components <graph_components>
    Polymers <polymer>
    Small Molecules <small>
    Organic & Metal-Organic Cages <cage>
