@@ -523,6 +523,7 @@ class MetalComplex(TopologyGraph):
         reaction_factory: typing.Optional[ReactionFactory] = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Initialize a :class:`.MetalComplex`.
@@ -564,6 +565,10 @@ class MetalComplex(TopologyGraph):
             optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
+
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
 
         """
 
@@ -608,6 +613,7 @@ class MetalComplex(TopologyGraph):
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=None,
+            scale_multiplier=scale_multiplier,
         )
 
     def _normalize_metals(
@@ -736,7 +742,7 @@ class MetalComplex(TopologyGraph):
         self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
-        return 1
+        return self._scale_multiplier * 1
 
     def clone(self) -> MetalComplex:
         return self._clone()

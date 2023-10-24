@@ -182,6 +182,7 @@ class OnePlusOne(Cage):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -225,6 +226,10 @@ class OnePlusOne(Cage):
                 Used to optimize the structure of the constructed
                 molecule.
 
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
+
         Raises:
 
             :class:`AssertionError`
@@ -260,6 +265,7 @@ class OnePlusOne(Cage):
             reaction_factory=reaction_factory,
             num_processes=num_processes,
             optimizer=optimizer,
+            scale_multiplier=scale_multiplier,
         )
 
     _x = 1

@@ -168,6 +168,7 @@ class TopologyGraph:
         num_processes: int,
         optimizer: Optimizer,
         edge_groups: tuple[EdgeGroup, ...] | None = None,
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -219,7 +220,13 @@ class TopologyGraph:
             edge_groups:
                 The edge groups of the topology graph, if ``None``,
                 every :class:`.Edge` is in its own edge group.
+
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
+
         """
+        self._scale_multiplier = scale_multiplier
         self._scale = scale = self._get_scale(building_block_vertices)
 
         def apply_scale(item):
@@ -332,6 +339,7 @@ class TopologyGraph:
         clone._implementation = self._implementation
         clone._optimizer = self._optimizer
         clone._edge_groups = self._edge_groups
+        clone._scale_multiplier = self._scale_multiplier
         return clone
 
     def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:

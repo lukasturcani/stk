@@ -313,6 +313,53 @@ from ...case_data import CaseData
             ),
             name=name,
         ),
+        lambda name: CaseData(
+            molecule=stk.ConstructedMolecule(
+                topology_graph=stk.cof.Hexagonal(
+                    building_blocks=(
+                        stk.BuildingBlock(
+                            smiles="C1(C(C(C(C(C1Br)Br)Br)Br)Br)Br",
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                        stk.BuildingBlock(
+                            smiles="C(Br)Br",
+                            functional_groups=[stk.BromoFactory()],
+                        ),
+                    ),
+                    lattice_size=(2, 2, 1),
+                    scale_multiplier=0.8,
+                ),
+            ),
+            smiles=(
+                "[H]C([H])(Br)C1([H])C([H])(Br)C2([H])C([H])([H])C3([H"
+                "])C([H])(C([H])([H])Br)C([H])(Br)C4([H])C([H])([H])C5"
+                "([H])C([H])(C([H])([H])Br)C([H])(Br)C6([H])C([H])([H]"
+                ")C7([H])C([H])(C([H])([H])Br)C([H])(Br)C([H])(Br)C8(["
+                "H])C([H])([H])C9([H])C([H])(Br)C([H])(Br)C%10([H])C(["
+                "H])([H])C%11([H])C([H])(Br)C([H])(Br)C%12([H])C([H])("
+                "[H])C%13([H])C([H])(Br)C([H])(Br)C([H])(Br)C([H])(C(["
+                "H])([H])Br)C%13([H])C([H])([H])C%13([H])C([H])(Br)C(["
+                "H])(C([H])([H])Br)C%14([H])C([H])([H])C%15([H])C([H])"
+                "(Br)C([H])(C([H])([H])Br)C%16([H])C([H])([H])C%17([H]"
+                ")C([H])(Br)C([H])(C([H])([H])Br)C([H])(C([H])([H])Br)"
+                "C%18([H])C([H])([H])C%19([H])C([H])(C([H])([H])Br)C(["
+                "H])(C([H])([H])Br)C%20([H])C([H])([H])C%21([H])C([H])"
+                "(C([H])([H])Br)C([H])(C([H])([H])Br)C([H])(C([H])([H]"
+                ")C2([H])C([H])(C([H])([H])Br)C1([H])C([H])([H])Br)C1("
+                "[H])C([H])([H])C3([H])C4([H])C([H])([H])C2([H])C3([H]"
+                ")C([H])([H])C5([H])C6([H])C([H])([H])C4([H])C([H])(C("
+                "[H])([H])C87[H])C5([H])C([H])([H])C9([H])C%10([H])C(["
+                "H])([H])C6([H])C7([H])C([H])([H])C%11([H])C%12([H])C("
+                "[H])([H])C%13([H])C%14([H])C([H])([H])C7([H])C7([H])C"
+                "([H])([H])C%15([H])C%16([H])C([H])([H])C8([H])C([H])("
+                "C([H])([H])C%17%18[H])C9([H])C([H])([H])C%19([H])C%20"
+                "([H])C([H])([H])C([H])(C2([H])C([H])([H])C%211[H])C1("
+                "[H])C([H])([H])C9([H])C2([H])C([H])([H])C([H])(C5([H]"
+                ")C([H])([H])C6([H])C7([H])C([H])([H])C82[H])C4([H])C("
+                "[H])([H])C31[H]"
+            ),
+            name=name,
+        ),
         # Two placer atom linear BB.
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(

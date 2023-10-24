@@ -1,18 +1,28 @@
 import itertools as it
-from collections import Counter
+import typing
+from collections import Counter, abc
 from functools import partial
 from operator import getitem
 
 import numpy as np
 
+from stk._internal.building_block import BuildingBlock
+from stk._internal.construction_result.construction_result import (
+    ConstructionResult,
+)
 from stk._internal.construction_result.periodic import (
     PeriodicConstructionResult,
 )
 from stk._internal.optimizers.null import (
     NullOptimizer,
 )
+from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.reaction_factories.generic_reaction_factory import (
     GenericReactionFactory,
+)
+from stk._internal.reaction_factories.reaction_factory import ReactionFactory
+from stk._internal.topology_graphs.edge import (
+    Edge,
 )
 from stk._internal.topology_graphs.edge_group import (
     EdgeGroup,
@@ -20,9 +30,10 @@ from stk._internal.topology_graphs.edge_group import (
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
+from stk._internal.topology_graphs.vertex import Vertex
 
 from .edge import CofEdge
-from .vertices import UnaligningVertex
+from .vertices import UnaligningVertex, _CofVertex
 
 
 class UnoccupiedVertexError(Exception):
@@ -308,6 +319,11 @@ class Cof(TopologyGraph):
 
     """
 
+    _allowed_degrees: typing.ClassVar[dict[int, int]]
+    _vertex_prototypes: typing.ClassVar[tuple[_CofVertex, ...]]
+    _edge_prototypes: typing.ClassVar[tuple[Edge, ...]]
+    _lattice_constants: typing.ClassVar[tuple[np.ndarray, ...]]
+
     def __init_subclass__(cls, **kwargs):
         vertex_degrees = Counter(
             vertex_id
@@ -318,84 +334,90 @@ class Cof(TopologyGraph):
 
     def __init__(
         self,
-        building_blocks,
-        lattice_size,
-        periodic=False,
-        vertex_alignments=None,
-        reaction_factory=GenericReactionFactory(),
-        num_processes=1,
-        optimizer=NullOptimizer(),
-    ):
+        building_blocks: abc.Iterable[BuildingBlock]
+        | dict[BuildingBlock, tuple[int, ...]],
+        lattice_size: tuple[int, int, int],
+        periodic: bool = False,
+        vertex_alignments: dict[int, int] | None = None,
+        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        num_processes: int = 1,
+        optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
+    ) -> None:
         """
         Initialize a :class:`.Cof` instance.
 
-        Parameters
-        ----------
-        building_blocks : :class:`tuple` or :class:`dict`
-            Can be a :class:`tuple` of :class:`.BuildingBlock`
-            instances, which should be placed on the topology graph.
+        Parameters:
 
-            Can also be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on. A :class:`dict` is
-            required when there are multiple building blocks with the
-            same number of functional groups, because in this case
-            the desired placement is ambiguous.
+            building_blocks:
+                Can be a :class:`tuple` of :class:`.BuildingBlock`
+                instances, which should be placed on the topology graph.
 
-        lattice_size : :class:`tuple` of :class:`int`
-            The size of the lattice in the x, y and z directions.
+                Can also be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on. A :class:`dict` is
+                required when there are multiple building blocks with the
+                same number of functional groups, because in this case
+                the desired placement is ambiguous.
 
-        periodic : :class:`bool`, optional
-            Toggle the construction of a periodic molecule. If
-            ``True``, periodic bonds will be made across the edges of
-            the lattice.
+            lattice_size:
+                The size of the lattice in the x, y and z directions.
 
-        vertex_alignments : :class:`dict`, optional
-            A mapping from the id of a :class:`.Vertex`
-            to an :class:`.Edge` connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default edge changed need to be present in the
-            :class:`dict`. If ``None`` then the default edge is used
-            for each vertex. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers. The edge is referred to by a number
-            between ``0`` (inclusive) and the number of edges the
-            vertex is connected to (exclusive).
+            periodic:
+                Toggle the construction of a periodic molecule. If
+                ``True``, periodic bonds will be made across the edges of
+                the lattice.
 
-        reaction_factory : :class:`.ReactionFactory`, optional
-            The reaction factory to use for creating bonds between
-            building blocks.
+            vertex_alignments:
+                A mapping from the id of a :class:`.Vertex`
+                to an :class:`.Edge` connected to it.
+                The :class:`.Edge` is used to align the first
+                :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+                placed on that vertex. Only vertices which need to have
+                their default edge changed need to be present in the
+                :class:`dict`. If ``None`` then the default edge is used
+                for each vertex. Changing which :class:`.Edge` is used will
+                mean that the topology graph represents different
+                structural isomers. The edge is referred to by a number
+                between ``0`` (inclusive) and the number of edges the
+                vertex is connected to (exclusive).
 
-        num_processes : :class:`int`, optional
-            The number of parallel processes to create during
-            :meth:`construct`.
+            reaction_factory:
+                The reaction factory to use for creating bonds between
+                building blocks.
 
-        optimizer : :class:`.Optimizer`, optional
-            Used to optimize the structure of the constructed
-            molecule.
+            num_processes:
+                The number of parallel processes to create during
+                :meth:`construct`.
 
-        Raises
-        ------
-        :class:`AssertionError`
-            If the any building block does not have a
-            valid number of functional groups.
+            optimizer:
+                Used to optimize the structure of the constructed
+                molecule.
 
-        :class:`ValueError`
-            If the there are multiple building blocks with the
-            same number of functional_groups in `building_blocks`,
-            and they are not explicitly assigned to vertices. The
-            desired placement of building blocks is ambiguous in
-            this case.
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
 
-        :class:`~.cof.UnoccupiedVertexError`
-            If a vertex of the COF topology graph does not have a
-            building block placed on it.
+        Raises:
 
-        :class:`~.cof.OverlyOccupiedVertexError`
-            If a vertex of the COF topology graph has more than one
-            building block placed on it.
+            :class:`AssertionError`
+                If the any building block does not have a
+                valid number of functional groups.
+
+            :class:`ValueError`
+                If the there are multiple building blocks with the
+                same number of functional_groups in `building_blocks`,
+                and they are not explicitly assigned to vertices. The
+                desired placement of building blocks is ambiguous in
+                this case.
+
+            :class:`~.cof.UnoccupiedVertexError`
+                If a vertex of the COF topology graph does not have a
+                building block placed on it.
+
+            :class:`~.cof.OverlyOccupiedVertexError`
+                If a vertex of the COF topology graph has more than one
+                building block placed on it.
 
         """
 
@@ -451,13 +473,17 @@ class Cof(TopologyGraph):
             building_block_vertices=building_block_vertices,
         )
         super().__init__(
-            building_block_vertices=building_block_vertices,
+            building_block_vertices=typing.cast(
+                dict[BuildingBlock, abc.Sequence[Vertex]],
+                building_block_vertices,
+            ),
             edges=edges,
             reaction_factory=reaction_factory,
             construction_stages=(),
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=self._get_edge_groups(edges),
+            scale_multiplier=scale_multiplier,
         )
 
     @staticmethod
@@ -513,25 +539,26 @@ class Cof(TopologyGraph):
         clone._periodic = self._periodic
         return clone
 
-    def _get_edge_groups(self, edges):
+    def _get_edge_groups(
+        self, edges: typing.Iterable[Edge]
+    ) -> typing.Iterable[EdgeGroup] | None:
         """
         Get the edge groups for the COF.
 
-        Parameters
-        ----------
-        edges : :class:`iterable` of :class:`.Edge`
-            The edges which are to be placed into edge groups.
+        Parameters:
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.EdgeGroup`
+            edges:
+                The edges which are to be placed into edge groups.
+
+        Returns:
+
             The edge groups. These are returned when the lattice is
             not periodic, which means that some edges should not be
             part of an edge group, in order to prevent bond formation
             across the edges of the lattice.
 
-        None : :class:`NoneType`
-            If an edge group is to be created for every single edge.
+            None:
+                If an edge group is to be created for every single edge.
 
         """
 
@@ -542,20 +569,19 @@ class Cof(TopologyGraph):
             EdgeGroup((edge,)) for edge in edges if not edge.is_periodic()
         )
 
-    def _get_vertices(self, lattice):
+    def _get_vertices(self, lattice: list) -> typing.Iterable[_CofVertex]:
         """
         Get the vertices in the `lattice`.
 
-        Parameters
-        ----------
-        lattice : :class:`list`
-            A nested list which can be in the form
-            ``lattice[x][y][z][vertex_id]`` which returns a vertex
-            in the (x, y, z) cell of the lattice.
+        Parameters:
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.Vertex`
+            lattice:
+                A nested list which can be in the form
+                ``lattice[x][y][z][vertex_id]`` which returns a vertex
+                in the (x, y, z) cell of the lattice.
+
+        Returns:
+
             All the vertices extracted from `lattice`.
 
         """
@@ -572,29 +598,28 @@ class Cof(TopologyGraph):
                 vertices[vertex.get_id()] = vertex
         return tuple(vertices)
 
-    def _get_lattice(self, vertex_alignments):
+    def _get_lattice(self, vertex_alignments: dict) -> list:
         """
         Get the vertices of the topology graph instance.
 
-        Parameters
-        ---------
-        vertex_alignments : :class:`dict`
-            A mapping from the id of a :class:`.Vertex`
-            to an :class:`.Edge` connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default edge changed need to be present in the
-            :class:`dict`. If ``None`` then the default edge is used
-            for each vertex. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers. The edge is referred to by a number
-            between ``0`` (inclusive) and the number of edges the
-            vertex is connected to (exclusive).
+        Parameters:
 
-        Returns
-        -------
-        :class:`list`
+            vertex_alignments:
+                A mapping from the id of a :class:`.Vertex`
+                to an :class:`.Edge` connected to it.
+                The :class:`.Edge` is used to align the first
+                :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+                placed on that vertex. Only vertices which need to have
+                their default edge changed need to be present in the
+                :class:`dict`. If ``None`` then the default edge is used
+                for each vertex. Changing which :class:`.Edge` is used will
+                mean that the topology graph represents different
+                structural isomers. The edge is referred to by a number
+                between ``0`` (inclusive) and the number of edges the
+                vertex is connected to (exclusive).
+
+        Returns:
+
             A nested :class:`list` which can be indexed as
             ``vertices[x][y][z]``, which will return a :class:`dict`
             for the unit cell at (x, y, z). The :class:`dict` maps
@@ -605,7 +630,7 @@ class Cof(TopologyGraph):
 
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         # vertex_clones is indexed as vertex_clones[x][y][z]
-        lattice = [[[{} for _ in zdim] for _ in ydim] for _ in xdim]
+        lattice: list = [[[{} for _ in zdim] for _ in ydim] for _ in xdim]
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
         vertices = it.product(cells, self._vertex_prototypes)
@@ -622,22 +647,21 @@ class Cof(TopologyGraph):
             )
         return lattice
 
-    def _get_edges(self, lattice):
+    def _get_edges(self, lattice: list) -> typing.Iterable[Edge]:
         """
         Create the edges of the topology graph instance.
 
-        Parameters
-        ----------
-        lattice : :class:`list`
-            A nested :class:`list` which can be indexed as
-            ``vertices[x][y][z]``, which will return a :class:`dict`
-            for the unit cell at (x, y, z). The :class:`dict` maps
-            the vertices in :attr:`_vertex_prototypes` to the clones
-            for that unit cell.
+        Parameters:
 
-        Returns
-        -------
-        :class:`tuple` of :class:`.Edge`
+            lattice:
+                A nested :class:`list` which can be indexed as
+                ``vertices[x][y][z]``, which will return a :class:`dict`
+                for the unit cell at (x, y, z). The :class:`dict` maps
+                the vertices in :attr:`_vertex_prototypes` to the clones
+                for that unit cell.
+
+        Returns:
+
             The edges of the topology graph instance.
 
         """
@@ -682,41 +706,40 @@ class Cof(TopologyGraph):
     @classmethod
     def _get_building_block_vertices(
         cls,
-        building_blocks,
-        vertices,
-        edges,
-    ):
+        building_blocks: typing.Iterable[BuildingBlock],
+        vertices: typing.Iterable[_CofVertex],
+        edges: typing.Iterable[Edge],
+    ) -> dict[BuildingBlock, abc.Sequence[_CofVertex]]:
         """
         Map building blocks to the vertices of the graph.
 
-        Parameters
-        ----------
-        building_blocks : :class:`iterable` of :class:`.BuildingBlock`
-            The building blocks which need to be mapped to `vertices`.
+        Parameters:
 
-        vertices : :class:`iterable` of :class:`.Vertex`
-            The vertices which need to have a building block map to
-            them.
+            building_blocks:
+                The building blocks which need to be mapped to `vertices`.
 
-        edges : :class:`iterable`of :class:`.Edge`
-            The edges of the graph.
+            vertices:
+                The vertices which need to have a building block map to
+                them.
 
-        Returns
-        -------
-        :class:`dict`
+            edges:
+                The edges of the graph.
+
+        Returns:
+
             Maps each building block in `building_blocks` to a
             :class:`list` of the :class:`.Vertex` instances it should
             be placed on.
 
-        Raises
-        ------
-        :class:`AssertionError`
-            If the any building block does not have a
-            valid number of functional groups.
+        Raises:
 
-        :class:`ValueError`
-            If there are multiple building blocks with the same number
-            of functional groups.
+            :class:`AssertionError`
+                If the any building block does not have a
+                valid number of functional groups.
+
+            :class:`ValueError`
+                If there are multiple building blocks with the same number
+                of functional groups.
 
         """
 
@@ -742,7 +765,7 @@ class Cof(TopologyGraph):
             vertex_id for edge in edges for vertex_id in edge.get_vertex_ids()
         )
 
-        building_block_vertices = {}
+        building_block_vertices = {}  # type: ignore[var-annotated]
         for vertex in vertices:
             vertex_degree = vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
@@ -752,16 +775,15 @@ class Cof(TopologyGraph):
             building_block_vertices[building_block].append(vertex)
         return building_block_vertices
 
-    def _get_lattice_constants(self):
+    def _get_lattice_constants(self) -> typing.Iterator[np.ndarray]:
         return self._lattice_constants
 
-    def construct(self):
+    def construct(self) -> ConstructionResult:
         """
         Construct a :class:`.ConstructedMolecule`.
 
-        Returns
-        -------
-        :class:`.PeriodicConstructionResult`
+        Returns:
+
             The data describing the :class:`.ConstructedMolecule`.
 
         """
@@ -772,8 +794,10 @@ class Cof(TopologyGraph):
         return PeriodicConstructionResult(state, self._lattice_size)
 
     def _get_scale(self, building_block_vertices):
-        return 5 * max(
-            bb.get_maximum_diameter() for bb in building_block_vertices
+        return (
+            self._scale_multiplier
+            * 5
+            * max(bb.get_maximum_diameter() for bb in building_block_vertices)
         )
 
     def __repr__(self):

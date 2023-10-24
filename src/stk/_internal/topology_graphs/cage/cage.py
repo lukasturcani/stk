@@ -973,6 +973,7 @@ class Cage(TopologyGraph):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -1026,6 +1027,10 @@ class Cage(TopologyGraph):
             optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
+
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
 
         Raises:
 
@@ -1081,6 +1086,7 @@ class Cage(TopologyGraph):
                 },
             )
         )
+
         super().__init__(
             building_block_vertices=typing.cast(
                 dict[BuildingBlock, abc.Sequence[Vertex]],
@@ -1095,6 +1101,7 @@ class Cage(TopologyGraph):
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=None,
+            scale_multiplier=scale_multiplier,
         )
 
     def _with_positioned_vertices(
@@ -1379,7 +1386,9 @@ class Cage(TopologyGraph):
         self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
-        return max(bb.get_maximum_diameter() for bb in building_block_vertices)
+        return self._scale_multiplier * max(
+            bb.get_maximum_diameter() for bb in building_block_vertices
+        )
 
     def _get_construction_state(self) -> _CageConstructionState:
         return _CageConstructionState(

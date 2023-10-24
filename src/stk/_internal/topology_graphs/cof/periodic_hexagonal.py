@@ -1,16 +1,14 @@
-"""
-Periodic Hexagonal
-==================
-
-"""
-
+from collections import abc
 
 import numpy as np
 
+from stk._internal.building_block import BuildingBlock
 from stk._internal.optimizers.null import NullOptimizer
+from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.reaction_factories.generic_reaction_factory import (
     GenericReactionFactory,
 )
+from stk._internal.reaction_factories.reaction_factory import ReactionFactory
 from stk._internal.topology_graphs.edge import Edge
 
 from .cof import Cof
@@ -121,78 +119,84 @@ class PeriodicHexagonal(Cof):
 
     def __init__(
         self,
-        building_blocks,
-        lattice_size,
-        vertex_alignments=None,
-        reaction_factory=GenericReactionFactory(),
-        num_processes=1,
-        optimizer=NullOptimizer(),
-    ):
+        building_blocks: abc.Iterable[BuildingBlock]
+        | dict[BuildingBlock, tuple[int, ...]],
+        lattice_size: tuple[int, int, int],
+        vertex_alignments: dict[int, int] | None = None,
+        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        num_processes: int = 1,
+        optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
+    ) -> None:
         """
         Initialize a :class:`.PeriodicHexagonal` instance.
 
-        Parameters
-        ----------
-        building_blocks : :class:`tuple` or :class:`dict`
-            Can be a :class:`tuple` of :class:`.BuildingBlock`
-            instances, which should be placed on the topology graph.
+        Parameters:
 
-            Can also be a :class:`dict` which maps the
-            :class:`.BuildingBlock` instances to the ids of the
-            vertices it should be placed on. A :class:`dict` is
-            required when there are multiple building blocks with the
-            same number of functional groups, because in this case
-            the desired placement is ambiguous.
+            building_blocks:
+                Can be a :class:`tuple` of :class:`.BuildingBlock`
+                instances, which should be placed on the topology graph.
 
-        lattice_size : :class:`tuple` of :class:`int`
-            The size of the lattice in the x, y and z directions.
+                Can also be a :class:`dict` which maps the
+                :class:`.BuildingBlock` instances to the ids of the
+                vertices it should be placed on. A :class:`dict` is
+                required when there are multiple building blocks with the
+                same number of functional groups, because in this case
+                the desired placement is ambiguous.
 
-        vertex_alignments : :class:`dict`, optional
-            A mapping from the id of a :class:`.Vertex`
-            to an :class:`.Edge` connected to it.
-            The :class:`.Edge` is used to align the first
-            :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
-            placed on that vertex. Only vertices which need to have
-            their default edge changed need to be present in the
-            :class:`dict`. If ``None`` then the default edge is used
-            for each vertex. Changing which :class:`.Edge` is used will
-            mean that the topology graph represents different
-            structural isomers. The edge is referred to by a number
-            between ``0`` (inclusive) and the number of edges the
-            vertex is connected to (exclusive).
+            lattice_size:
+                The size of the lattice in the x, y and z directions.
 
-        reaction_factory : :class:`.ReactionFactory`, optional
-            The reaction factory to use for creating bonds between
-            building blocks.
+            vertex_alignments:
+                A mapping from the id of a :class:`.Vertex`
+                to an :class:`.Edge` connected to it.
+                The :class:`.Edge` is used to align the first
+                :class:`.FunctionalGroup` of a :class:`.BuildingBlock`
+                placed on that vertex. Only vertices which need to have
+                their default edge changed need to be present in the
+                :class:`dict`. If ``None`` then the default edge is used
+                for each vertex. Changing which :class:`.Edge` is used will
+                mean that the topology graph represents different
+                structural isomers. The edge is referred to by a number
+                between ``0`` (inclusive) and the number of edges the
+                vertex is connected to (exclusive).
 
-        num_processes : :class:`int`, optional
-            The number of parallel processes to create during
-            :meth:`construct`.
+            reaction_factory:
+                The reaction factory to use for creating bonds between
+                building blocks.
 
-        optimizer : :class:`.Optimizer`, optional
-            Used to optimize the structure of the constructed
-            molecule.
+            num_processes:
+                The number of parallel processes to create during
+                :meth:`construct`.
 
-        Raises
-        ------
-        :class:`AssertionError`
-            If the any building block does not have a
-            valid number of functional groups.
+            optimizer:
+                Used to optimize the structure of the constructed
+                molecule.
 
-        :class:`ValueError`
-            If the there are multiple building blocks with the
-            same number of functional_groups in `building_blocks`,
-            and they are not explicitly assigned to vertices. The
-            desired placement of building blocks is ambiguous in
-            this case.
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
 
-        :class:`~.cof.UnoccupiedVertexError`
-            If a vertex of the COF topology graph does not have a
-            building block placed on it.
+        Raises:
 
-        :class:`~.cof.OverlyOccupiedVertexError`
-            If a vertex of the COF topology graph has more than one
-            building block placed on it.
+            :class:`AssertionError`
+                If the any building block does not have a
+                valid number of functional groups.
+
+            :class:`ValueError`
+                If the there are multiple building blocks with the
+                same number of functional_groups in `building_blocks`,
+                and they are not explicitly assigned to vertices. The
+                desired placement of building blocks is ambiguous in
+                this case.
+
+            :class:`~.cof.UnoccupiedVertexError`
+                If a vertex of the COF topology graph does not have a
+                building block placed on it.
+
+            :class:`~.cof.OverlyOccupiedVertexError`
+                If a vertex of the COF topology graph has more than one
+                building block placed on it.
 
         """
 
@@ -204,6 +208,7 @@ class PeriodicHexagonal(Cof):
             reaction_factory=reaction_factory,
             num_processes=num_processes,
             optimizer=optimizer,
+            scale_multiplier=scale_multiplier,
         )
 
     _lattice_constants = _a, _b, _c = (

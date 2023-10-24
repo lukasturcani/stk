@@ -381,6 +381,7 @@ class Linear(TopologyGraph):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -439,6 +440,10 @@ class Linear(TopologyGraph):
             optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
+
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
 
         Raises:
 
@@ -505,6 +510,7 @@ class Linear(TopologyGraph):
             construction_stages=(),
             optimizer=optimizer,
             num_processes=num_processes,
+            scale_multiplier=scale_multiplier,
         )
 
     @staticmethod
@@ -661,7 +667,9 @@ class Linear(TopologyGraph):
         self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
     ) -> float:
-        return max(bb.get_maximum_diameter() for bb in building_block_vertices)
+        return self._scale_multiplier * max(
+            bb.get_maximum_diameter() for bb in building_block_vertices
+        )
 
     def with_building_blocks(
         self,

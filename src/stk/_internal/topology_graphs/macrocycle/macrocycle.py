@@ -337,6 +337,7 @@ class Macrocycle(TopologyGraph):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Initialize a :class:`Macrocycle` instance.
@@ -388,6 +389,10 @@ class Macrocycle(TopologyGraph):
             optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
+
+            scale_multiplier:
+                Used to provide better control over topology graph scaling.
+                Multiplies the `_get_scale` output for this class.
 
         Raises:
 
@@ -472,6 +477,7 @@ class Macrocycle(TopologyGraph):
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=None,
+            scale_multiplier=scale_multiplier,
         )
 
     def clone(self) -> Macrocycle:
@@ -516,6 +522,7 @@ class Macrocycle(TopologyGraph):
             length
             * 0.25
             * max(bb.get_maximum_diameter() for bb in building_block_vertices)
+            * self._scale_multiplier
         )
 
     def with_building_blocks(
