@@ -83,3 +83,26 @@ __ https://www.youtube.com/watch?v=1BBhPeIRV_E&list=PLIWYdPQ9hLzVngMF8NOkiApMtgc
 __ https://github.com/andrewtarzia/SpinDry
 __ https://github.com/andrewtarzia/stk-examples/tree/main/notebooks_from_videos
 
+
+Swapping Hosts and Guests in Complexes
+--------------------------------------
+
+`The new video`__ shows an example of loading an existing host-guest
+complex into :mod:`.stk`, extracting the different molecules
+(with :mod:`networkx`), and then building new complexes from that.
+The code is available here__.
+
+__ https://youtu.be/J29eoc9CZ98?si=vOEH45GPp_W0f5k4
+__ https://github.com/andrewtarzia/stk-examples/blob/main/replace_guest/replace_guest.py
+
+
+Processing *stk* building blocks before construction
+----------------------------------------------------
+
+`This video`__ shows the use of the new :mod:`bbprepared` library__
+that helps to process automatically generated :mod:`stk` BuildingBlock
+conformers to be better fit for construction.
+
+__ https://youtu.be/dbQwhlpf5Jc?si=7l9Y_ISEmFlY2FtV
+__ https://github.com/andrewtarzia/bbprepared
+
