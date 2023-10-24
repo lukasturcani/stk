@@ -43,6 +43,28 @@ on GitHub, and you can update your ``stk`` with::
 
     $ pip install stk --upgrade
 
+Installing a development enviromnent is easy too:
+
+#. Use a new Python 3.11 environment through `conda`_ or `mamba`_.
+#. Install `just`_.
+#. Clone the :mod:`.stk` repository.
+#. Setup development enviromnent::
+
+   $ just dev
+
+#. Setup the `MongoDB`_ container (make sure `docker` is installed)::
+
+   $ just mongo
+
+#. Test installation (running `black`, `mypy`, `pytest` and tests `make` on the docs)::
+
+   $ just check
+
+.. _`mamba`: https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install
+.. _`conda`: https://docs.conda.io/en/latest/
+.. _`just`: https://github.com/casey/just
+.. _`MongoDB`: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+
 How To Cite
 ===========
 
@@ -78,6 +100,10 @@ __ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembl
 
 using stk
 ---------
+
+* Using stk for constructing larger numbers of coarse-grained models: `Systematic exploration of accessible topologies of cage molecules via minimalistic models`__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2023/sc/d3sc03991a
 
 * `The effect of disorder in multi-component covalent organic frameworks`__
 
