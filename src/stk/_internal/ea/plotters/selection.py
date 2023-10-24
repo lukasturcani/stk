@@ -233,7 +233,7 @@ class SelectionPlotter(typing.Generic[T]):
             hue="heat_map",
             palette="magma_r",
             data=df,
-            s=[200 for _ in range(len(counter.keys()))],
+            size=[200 for _ in range(len(counter.keys()))],
             ax=ax,
         )
         ax.get_legend().remove()
