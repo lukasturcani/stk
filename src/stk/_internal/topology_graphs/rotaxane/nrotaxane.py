@@ -1,8 +1,12 @@
-from collections.abc import Iterable
+import typing
+from collections import abc
 
 import numpy as np
 
 from stk._internal.building_block import BuildingBlock
+from stk._internal.construction_state.construction_state import (
+    ConstructionState,
+)
 from stk._internal.optimizers.null import NullOptimizer
 from stk._internal.optimizers.optimizer import Optimizer
 from stk._internal.reaction_factories.generic_reaction_factory import (
@@ -11,6 +15,7 @@ from stk._internal.reaction_factories.generic_reaction_factory import (
 from stk._internal.topology_graphs.topology_graph.topology_graph import (
     TopologyGraph,
 )
+from stk._internal.topology_graphs.vertex import Vertex
 
 from .vertices import AxleVertex, CycleVertex
 
@@ -375,10 +380,10 @@ class NRotaxane(TopologyGraph):
     def __init__(
         self,
         axle: BuildingBlock,
-        cycles: Iterable[BuildingBlock],
-        repeating_unit: str | Iterable[int],
+        cycles: abc.Iterable[BuildingBlock],
+        repeating_unit: str | abc.Iterable[int],
         num_repeating_units: int,
-        orientations: Iterable[float] | None = None,
+        orientations: abc.Iterable[float] | None = None,
         random_seed: int | np.random.Generator | None = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -491,7 +496,7 @@ class NRotaxane(TopologyGraph):
             building_block_vertices=self._get_building_block_vertices(
                 axle=axle,
                 cycles=tuple(cycles),
-                vertices=vertices,
+                vertices=tuple(vertices),
             ),
             edges=(),
             reaction_factory=GenericReactionFactory(),
@@ -501,7 +506,7 @@ class NRotaxane(TopologyGraph):
             edge_groups=None,
         )
 
-    def clone(self):
+    def clone(self) -> typing.Self:
         clone = super().clone()
         clone._repeating_unit = self._repeating_unit
         clone._num_repeating_units = self._num_repeating_units
@@ -509,13 +514,20 @@ class NRotaxane(TopologyGraph):
         return clone
 
     @staticmethod
-    def _normalize_repeating_unit(repeating_unit):
+    def _normalize_repeating_unit(
+        repeating_unit: str | tuple[int, ...],
+    ) -> tuple[int, ...]:
         if isinstance(repeating_unit, tuple):
             return repeating_unit
         base = ord("A")
         return tuple(ord(letter) - base for letter in repeating_unit)
 
-    def _get_building_block_vertices(self, axle, cycles, vertices):
+    def _get_building_block_vertices(
+        self,
+        axle: BuildingBlock,
+        cycles: abc.Iterable[BuildingBlock],
+        vertices: tuple[Vertex, ...],
+    ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         threads = self._repeating_unit * self._num_repeating_units
         building_block_vertices = {}
         building_block_vertices[axle] = vertices[0:1]
@@ -525,10 +537,14 @@ class NRotaxane(TopologyGraph):
             building_block_vertices[bb].append(vertex)
         return building_block_vertices
 
-    def _run_reactions(self, state):
+    def _run_reactions(self, state: ConstructionState) -> ConstructionState:
         return state
 
-    def _get_scale(self, building_block_vertices):
+    @staticmethod
+    def _get_scale(
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
+    ) -> float:
         axle = next(iter(building_block_vertices))
         return 0.8 * axle.get_maximum_diameter()
 
