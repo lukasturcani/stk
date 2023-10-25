@@ -477,7 +477,12 @@ class Macrocycle(TopologyGraph):
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=None,
-            scale_multiplier=scale_multiplier,
+            # Handles the different scaling applied to macrocycles.
+            scale_multiplier=(
+                scale_multiplier
+                * len(self._repeating_unit)
+                * self._num_repeating_units
+            ),
         )
 
     def clone(self) -> Macrocycle:
@@ -513,16 +518,15 @@ class Macrocycle(TopologyGraph):
             building_block_vertices,
         )
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        length = len(self._repeating_unit) * self._num_repeating_units
         return (
-            length
-            * 0.25
+            0.25
             * max(bb.get_maximum_diameter() for bb in building_block_vertices)
-            * self._scale_multiplier
+            * scale_multiplier
         )
 
     def with_building_blocks(
