@@ -227,7 +227,9 @@ class TopologyGraph:
 
         """
         self._scale_multiplier = scale_multiplier
-        self._scale = scale = self._get_scale(building_block_vertices)
+        self._scale = scale = self._get_scale(
+            building_block_vertices, self._scale_multiplier
+        )
 
         def apply_scale(item):
             return item.with_scale(scale)
@@ -275,7 +277,9 @@ class TopologyGraph:
             building_block_map.get(bb, bb): tuple(map(undo_scale, vertices))
             for bb, vertices in self._building_block_vertices.items()
         }
-        scale = self._get_scale(building_block_vertices)
+        scale = self._get_scale(
+            building_block_vertices, self._scale_multiplier
+        )
 
         def scale_vertex(vertex):
             return vertex.with_scale(scale)
@@ -443,12 +447,10 @@ class TopologyGraph:
             ),
         )
 
+    @staticmethod
     def _get_scale(
-        self,
-        building_block_vertices: dict[
-            BuildingBlock,
-            abc.Sequence[Vertex],
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
         """
         Get the scale, which should be applied to topology graph.

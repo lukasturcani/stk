@@ -738,11 +738,12 @@ class MetalComplex(TopologyGraph):
         for vertex_id in vertex_ids:
             yield self._ligand_vertex_prototypes[vertex_id]
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        return self._scale_multiplier * 1
+        return scale_multiplier * 1
 
     def clone(self) -> MetalComplex:
         return self._clone()

@@ -793,9 +793,13 @@ class Cof(TopologyGraph):
     def _get_construction_result(self, state):
         return PeriodicConstructionResult(state, self._lattice_size)
 
-    def _get_scale(self, building_block_vertices):
+    @staticmethod
+    def _get_scale(
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
+    ) -> float:
         return (
-            self._scale_multiplier
+            scale_multiplier
             * 5
             * max(bb.get_maximum_diameter() for bb in building_block_vertices)
         )

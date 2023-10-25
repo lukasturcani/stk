@@ -1070,6 +1070,7 @@ class Cage(TopologyGraph):
         building_block_vertices = self._with_positioned_vertices(
             building_block_vertices=building_block_vertices,
             vertex_positions=self._vertex_positions,
+            scale_multiplier=scale_multiplier,
         )
         building_block_vertices = self._assign_aligners(
             building_block_vertices=building_block_vertices,
@@ -1110,6 +1111,7 @@ class Cage(TopologyGraph):
             BuildingBlock, abc.Sequence[_CageVertex]
         ],
         vertex_positions: dict[int, np.ndarray],
+        scale_multiplier: float,
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
         clone = dict(building_block_vertices)
         for building_block, vertices in clone.items():
@@ -1117,7 +1119,8 @@ class Cage(TopologyGraph):
             for vertex in vertices:
                 if vertex.get_id() in self._vertex_positions:
                     scale = self._get_scale(
-                        building_block_vertices  # type: ignore
+                        building_block_vertices,  # type: ignore
+                        scale_multiplier=scale_multiplier,
                     )
                     # Pre-reversing the scale
                     # because altering the scale code is topology level,
@@ -1382,11 +1385,12 @@ class Cage(TopologyGraph):
             building_block_vertices,
         )
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        return self._scale_multiplier * max(
+        return scale_multiplier * max(
             bb.get_maximum_diameter() for bb in building_block_vertices
         )
 

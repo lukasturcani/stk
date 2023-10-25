@@ -525,9 +525,10 @@ class Complex(TopologyGraph):
     ) -> ConstructionState:
         return state
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
         return 1.0
 

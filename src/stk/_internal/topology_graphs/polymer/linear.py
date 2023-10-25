@@ -663,11 +663,12 @@ class Linear(TopologyGraph):
 
         return clone
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        return self._scale_multiplier * max(
+        return scale_multiplier * max(
             bb.get_maximum_diameter() for bb in building_block_vertices
         )
 
