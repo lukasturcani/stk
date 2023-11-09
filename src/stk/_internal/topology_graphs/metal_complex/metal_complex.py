@@ -30,11 +30,9 @@ from .vertices import (
     UnaligningVertex,
 )
 
-_LigandVertex = typing.Union[
-    UnaligningVertex,
-    MonoDentateLigandVertex,
-    BiDentateLigandVertex,
-]
+_LigandVertex = (
+    UnaligningVertex | MonoDentateLigandVertex | BiDentateLigandVertex
+)
 
 
 class MetalComplex(TopologyGraph):
@@ -512,14 +510,8 @@ class MetalComplex(TopologyGraph):
 
     def __init__(
         self,
-        metals: typing.Union[
-            BuildingBlock,
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
-        ligands: typing.Union[
-            BuildingBlock,
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
+        metals: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
+        ligands: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
         reaction_factory: typing.Optional[ReactionFactory] = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
@@ -617,9 +609,10 @@ class MetalComplex(TopologyGraph):
 
     def _normalize_metals(
         self,
-        metals: typing.Union[
+        metals: BuildingBlock
+        | dict[
             BuildingBlock,
-            dict[BuildingBlock, tuple[int, ...]],
+            tuple[int, ...],
         ],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         """
@@ -651,10 +644,7 @@ class MetalComplex(TopologyGraph):
 
     def _normalize_ligands(
         self,
-        ligands: typing.Union[
-            BuildingBlock,
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
+        ligands: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
     ) -> dict[BuildingBlock, tuple[_LigandVertex, ...]]:
         """
         Return a map ligands and vertices.
