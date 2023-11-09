@@ -1029,8 +1029,7 @@ class Cage(TopologyGraph):
                 molecule.
 
             scale_multiplier:
-                Used to provide better control over topology graph scaling.
-                Multiplies the `_get_scale` output for this class.
+                Scales the positions of the vertices.
 
         Raises:
 
@@ -1161,7 +1160,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _normalize_building_blocks(
         cls,
-        building_blocks: typing.Iterable[BuildingBlock]
+        building_blocks: abc.Iterable[BuildingBlock]
         | dict[
             BuildingBlock,
             tuple[int, ...],
@@ -1271,7 +1270,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _get_vertices(
         cls,
-        vertex_ids: int | typing.Iterable[int],
+        vertex_ids: int | abc.Iterable[int],
     ) -> typing.Iterator[_CageVertex]:
         """
         Yield vertex prototypes.
@@ -1320,7 +1319,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _get_building_block_vertices(
         cls,
-        building_blocks: typing.Iterable[BuildingBlock],
+        building_blocks: abc.Iterable[BuildingBlock],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
         """
         Map building blocks to the vertices of the graph.

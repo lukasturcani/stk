@@ -442,8 +442,7 @@ class Linear(TopologyGraph):
                 molecule.
 
             scale_multiplier:
-                Used to provide better control over topology graph scaling.
-                Multiplies the `_get_scale` output for this class.
+                Scales the positions of the vertices.
 
         Raises:
 

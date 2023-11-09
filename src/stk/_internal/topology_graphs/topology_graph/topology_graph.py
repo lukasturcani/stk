@@ -222,8 +222,7 @@ class TopologyGraph:
                 every :class:`.Edge` is in its own edge group.
 
             scale_multiplier:
-                Used to provide better control over topology graph scaling.
-                Multiplies the `_get_scale` output for this class.
+                Scales the positions of the vertices.
 
         """
         self._scale_multiplier = scale_multiplier
@@ -405,8 +404,7 @@ class TopologyGraph:
         Yields:
             A lattice constant.
         """
-        return
-        yield
+        return iter(())
 
     def construct(self) -> ConstructionResult:
         """
