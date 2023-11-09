@@ -454,7 +454,7 @@ class Complex(TopologyGraph):
     def __init__(
         self,
         host: BuildingBlock,
-        guests: typing.Union[Guest, typing.Iterable[Guest]],
+        guests: typing.Union[Guest, abc.Iterable[Guest]],
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
@@ -494,7 +494,7 @@ class Complex(TopologyGraph):
     def _get_vertices_from_guests(
         self,
         host: BuildingBlock,
-        guests: typing.Union[Guest, typing.Iterable[Guest]],
+        guests: typing.Union[Guest, abc.Iterable[Guest]],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         if isinstance(guests, Guest):
             guests = (guests,)
