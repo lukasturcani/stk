@@ -15,7 +15,7 @@ import re
 import tarfile
 import time
 import typing
-from collections import deque
+from collections import abc, deque
 from contextlib import contextmanager
 
 import numpy as np
@@ -246,7 +246,7 @@ periodic_table = {
 
 
 T = typing.TypeVar("T")
-OneOrMany = typing.Union[T, typing.Iterable[T]]
+OneOrMany = typing.Union[T, abc.Iterable[T]]
 
 
 class Cell:

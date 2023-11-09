@@ -1176,8 +1176,8 @@ in this way, and you can mix different types of
 a :mod:`~.functional_groups.functional_group` instances with
 :mod:`~.functional_group_factory` instances.
 
-Changing Bonder and Deleter Atoms in Functional Group Factories
-===============================================================
+Changing Bonder, Placer and Deleter Atoms in Functional Group Factories
+=======================================================================
 
 In the previous example, you saw that during creation of a
 :class:`.Bromo` instance, you can specify which atoms have bonds
@@ -1269,6 +1269,29 @@ to which atom in the functional group. The same is true for any
 other :mod:`~.functional_group_factory`. Note that the number you
 provide to the factory, is not the id of the atom found in the
 molecule!!
+
+Finally, each :mod:`~.functional_group_factory` allows for the user to
+provide the placer ids, which tell :mod:`stk` which atoms in a functional
+group should be used for aligning and placing the molecule during
+construction. In most cases, this is not an important parameter and the
+default behaviour (where placers and bonders are equivalent) is
+appropropriate. However, in cases where your building block is small,
+you may get `NAN` or `division by zero` errors due to the vectors in a
+building block overlapping. If this occurs, we recommend using bonder
+and deleter atoms as placers like so:
+
+.. testcode:: changing-bonder-and-deleter-atoms-in-fg-factories
+
+    bb2 = stk.BuildingBlock(
+        smiles='C(Br)(Br)Br',
+        functional_groups=stk.BromoFactory(
+            # Defaults.
+            bonders=(0,),
+            deleters=(1,),
+            # Include both atoms.
+            placers=(0, 1)
+        ),
+    )
 
 Handling Molecules with Metal Atoms and Dative Bonds
 ====================================================

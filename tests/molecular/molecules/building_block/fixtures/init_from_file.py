@@ -10,7 +10,7 @@ from ..case_data import CaseData
     ],
 )
 def path(tmpdir, request):
-    return str(tmpdir / request.param)
+    return tmpdir / request.param
 
 
 class InitFromFileData:

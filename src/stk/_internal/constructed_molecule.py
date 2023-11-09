@@ -571,7 +571,7 @@ class ConstructedMolecule(Molecule):
 
     def with_structure_from_file(
         self,
-        path: str,
+        path: pathlib.Path | str,
         extension: str | None = None,
     ) -> typing.Self:
         """
@@ -599,7 +599,7 @@ class ConstructedMolecule(Molecule):
 
             ConstructedMolecule: A clone with atomic positions found in `path`.
         """
-        return super().with_structure_from_file(path, extension)
+        return super().with_structure_from_file(str(path), extension)
 
     def write(
         self,

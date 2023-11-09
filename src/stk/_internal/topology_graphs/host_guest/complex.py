@@ -128,7 +128,8 @@ class Complex(TopologyGraph):
 
         You can use :class:`.ConstructedMolecule` instances as the
         host, but you should turn them into a :class:`.BuildingBlock`
-        first
+        first. For guest molecules, you must define a
+        :class:`.Guest` from a :class:`.BuildingBlock`.
 
         .. testcode:: construction
 
@@ -210,7 +211,8 @@ class Complex(TopologyGraph):
                 ),
             )
 
-        You can also generate complexes with multiple guests.
+        You can also generate complexes with multiple
+        :class:`.Guest` molecules.
 
         .. testcode:: multi-guest-construction
 
@@ -407,8 +409,8 @@ class Complex(TopologyGraph):
 
         *Changing the Position of the Guest*
 
-        You can change the position and orientation of the guest, as
-        well as its displacement
+        You can change the position and orientation of the
+        :class:`.Guest`, as well as its displacement
 
         .. testcode:: changing-the-position-of-the-guest
 
@@ -452,7 +454,7 @@ class Complex(TopologyGraph):
     def __init__(
         self,
         host: BuildingBlock,
-        guests: typing.Union[Guest, typing.Iterable[Guest]],
+        guests: typing.Union[Guest, abc.Iterable[Guest]],
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
     ) -> None:
@@ -492,7 +494,7 @@ class Complex(TopologyGraph):
     def _get_vertices_from_guests(
         self,
         host: BuildingBlock,
-        guests: typing.Union[Guest, typing.Iterable[Guest]],
+        guests: typing.Union[Guest, abc.Iterable[Guest]],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         if isinstance(guests, Guest):
             guests = (guests,)
@@ -523,9 +525,10 @@ class Complex(TopologyGraph):
     ) -> ConstructionState:
         return state
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
         return 1.0
 

@@ -973,6 +973,7 @@ class Cage(TopologyGraph):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -1027,6 +1028,9 @@ class Cage(TopologyGraph):
                 Used to optimize the structure of the constructed
                 molecule.
 
+            scale_multiplier:
+                Scales the positions of the vertices.
+
         Raises:
 
             :class:`AssertionError`
@@ -1065,6 +1069,7 @@ class Cage(TopologyGraph):
         building_block_vertices = self._with_positioned_vertices(
             building_block_vertices=building_block_vertices,
             vertex_positions=self._vertex_positions,
+            scale_multiplier=scale_multiplier,
         )
         building_block_vertices = self._assign_aligners(
             building_block_vertices=building_block_vertices,
@@ -1081,6 +1086,7 @@ class Cage(TopologyGraph):
                 },
             )
         )
+
         super().__init__(
             building_block_vertices=typing.cast(
                 dict[BuildingBlock, abc.Sequence[Vertex]],
@@ -1095,6 +1101,7 @@ class Cage(TopologyGraph):
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=None,
+            scale_multiplier=scale_multiplier,
         )
 
     def _with_positioned_vertices(
@@ -1103,6 +1110,7 @@ class Cage(TopologyGraph):
             BuildingBlock, abc.Sequence[_CageVertex]
         ],
         vertex_positions: dict[int, np.ndarray],
+        scale_multiplier: float,
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
         clone = dict(building_block_vertices)
         for building_block, vertices in clone.items():
@@ -1110,7 +1118,8 @@ class Cage(TopologyGraph):
             for vertex in vertices:
                 if vertex.get_id() in self._vertex_positions:
                     scale = self._get_scale(
-                        building_block_vertices  # type: ignore
+                        building_block_vertices,  # type: ignore
+                        scale_multiplier=scale_multiplier,
                     )
                     # Pre-reversing the scale
                     # because altering the scale code is topology level,
@@ -1151,7 +1160,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _normalize_building_blocks(
         cls,
-        building_blocks: typing.Iterable[BuildingBlock]
+        building_blocks: abc.Iterable[BuildingBlock]
         | dict[
             BuildingBlock,
             tuple[int, ...],
@@ -1261,7 +1270,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _get_vertices(
         cls,
-        vertex_ids: int | typing.Iterable[int],
+        vertex_ids: int | abc.Iterable[int],
     ) -> typing.Iterator[_CageVertex]:
         """
         Yield vertex prototypes.
@@ -1310,7 +1319,7 @@ class Cage(TopologyGraph):
     @classmethod
     def _get_building_block_vertices(
         cls,
-        building_blocks: typing.Iterable[BuildingBlock],
+        building_blocks: abc.Iterable[BuildingBlock],
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
         """
         Map building blocks to the vertices of the graph.
@@ -1375,11 +1384,14 @@ class Cage(TopologyGraph):
             building_block_vertices,
         )
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        return max(bb.get_maximum_diameter() for bb in building_block_vertices)
+        return scale_multiplier * max(
+            bb.get_maximum_diameter() for bb in building_block_vertices
+        )
 
     def _get_construction_state(self) -> _CageConstructionState:
         return _CageConstructionState(

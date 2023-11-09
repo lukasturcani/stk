@@ -381,6 +381,7 @@ class Linear(TopologyGraph):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -403,15 +404,15 @@ class Linear(TopologyGraph):
 
             orientations (list[float]):
                 For each character in the repeating unit, a value
-                between ``0`` and ``1`` (both inclusive) must be given
-                in a :class:`tuple`. It indicates the probability that
-                each monomer will have its orientation along the chain
-                flipped. If ``0`` then the monomer is guaranteed not to
-                flip. If ``1`` it is guaranteed to flip. This allows
-                the user to create head-to-head or head-to-tail chains,
-                as well as chain with a preference for head-to-head or
-                head-to-tail if a number between ``0`` and ``1`` is
-                chosen. If ``None`` then ``0`` is picked in all cases.
+                between ``0`` and ``1`` (both inclusive). It indicates
+                the probability that each monomer will have its
+                orientation along the chain flipped. If ``0`` then the
+                monomer is guaranteed not to flip. If ``1`` it is
+                guaranteed to flip. This allows the user to create
+                head-to-head or head-to-tail chains, as well as chain
+                with a preference for head-to-head or head-to-tail if a
+                number between ``0`` and ``1`` is chosen. If ``None``
+                then ``0`` is picked in all cases.
 
                 It is also possible to supply an orientation for every
                 vertex in the final topology graph. In this case, the
@@ -439,6 +440,9 @@ class Linear(TopologyGraph):
             optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
+
+            scale_multiplier:
+                Scales the positions of the vertices.
 
         Raises:
 
@@ -505,6 +509,7 @@ class Linear(TopologyGraph):
             construction_stages=(),
             optimizer=optimizer,
             num_processes=num_processes,
+            scale_multiplier=scale_multiplier,
         )
 
     @staticmethod
@@ -657,11 +662,14 @@ class Linear(TopologyGraph):
 
         return clone
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        return max(bb.get_maximum_diameter() for bb in building_block_vertices)
+        return scale_multiplier * max(
+            bb.get_maximum_diameter() for bb in building_block_vertices
+        )
 
     def with_building_blocks(
         self,

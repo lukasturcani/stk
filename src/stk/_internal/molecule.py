@@ -762,7 +762,7 @@ class Molecule:
 
     def with_structure_from_file(
         self,
-        path: str,
+        path: pathlib.Path | str,
         extension: str | None = None,
     ) -> typing.Self:
         """
@@ -802,7 +802,7 @@ class Molecule:
             ".xyz": xyz._with_structure_from_xyz,
             ".coord": turbomole._with_structure_from_turbomole,
             ".pdb": pdb._with_structure_from_pdb,
-        }[extension](self.clone(), path)
+        }[extension](self.clone(), str(path))
 
     def with_canonical_atom_ordering(self) -> typing.Self:
         """

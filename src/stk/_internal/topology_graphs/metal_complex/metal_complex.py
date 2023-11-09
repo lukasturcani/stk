@@ -30,11 +30,9 @@ from .vertices import (
     UnaligningVertex,
 )
 
-_LigandVertex = typing.Union[
-    UnaligningVertex,
-    MonoDentateLigandVertex,
-    BiDentateLigandVertex,
-]
+_LigandVertex = (
+    UnaligningVertex | MonoDentateLigandVertex | BiDentateLigandVertex
+)
 
 
 class MetalComplex(TopologyGraph):
@@ -379,10 +377,6 @@ class MetalComplex(TopologyGraph):
                 ),
             )
 
-        However, if each ligand is has a different number of
-        functional groups, they can be provided together in a
-        :class:`tuple`.
-
         Note that the valid vertex identifiers depend on the exact
         metal complex you are using. These are detailed in the
         docstring for that specific metal vertex topology graph.
@@ -516,19 +510,12 @@ class MetalComplex(TopologyGraph):
 
     def __init__(
         self,
-        metals: typing.Union[
-            BuildingBlock,
-            tuple[BuildingBlock, ...],
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
-        ligands: typing.Union[
-            BuildingBlock,
-            tuple[BuildingBlock, ...],
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
+        metals: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
+        ligands: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
         reaction_factory: typing.Optional[ReactionFactory] = None,
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Initialize a :class:`.MetalComplex`.
@@ -541,10 +528,6 @@ class MetalComplex(TopologyGraph):
                 vertices in :attr:`_metal_vertex_prototypes` it should
                 be placed on.
 
-                If each :class:`.BuildingBlock` has a different number
-                of functional groups, they can be supplied together in
-                a :class:`tuple`.
-
                 Can also be a :class:`.BuildingBlock` instance, which
                 should be placed on all
                 :attr:`_metal_vertex_prototypes` on the topology graph.
@@ -554,10 +537,6 @@ class MetalComplex(TopologyGraph):
                 :class:`.BuildingBlock` instances to the indices of the
                 vertices in :attr:`_ligand_vertex_prototypes` it should
                 be placed on.
-
-                If each :class:`.BuildingBlock` has a different number
-                of functional groups, they can be supplied together in
-                a :class:`tuple`.
 
                 Can also be a :class:`.BuildingBlock` instance, which
                 should be placed on all
@@ -578,6 +557,9 @@ class MetalComplex(TopologyGraph):
             optimizer:
                 Used to optimize the structure of the constructed
                 molecule.
+
+            scale_multiplier:
+                Scales the positions of the vertices.
 
         """
 
@@ -622,14 +604,15 @@ class MetalComplex(TopologyGraph):
             num_processes=num_processes,
             optimizer=optimizer,
             edge_groups=None,
+            scale_multiplier=scale_multiplier,
         )
 
     def _normalize_metals(
         self,
-        metals: typing.Union[
+        metals: BuildingBlock
+        | dict[
             BuildingBlock,
-            dict[BuildingBlock, tuple[int, ...]],
-            tuple[BuildingBlock, ...],
+            tuple[int, ...],
         ],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         """
@@ -653,27 +636,6 @@ class MetalComplex(TopologyGraph):
                 metal: tuple(self._get_metal_vertices(ids))
                 for metal, ids in metals.items()
             }
-        elif isinstance(metals, tuple):
-            functional_group_counter = Counter(
-                metal.get_num_functional_groups() for metal in metals
-            )
-            assert all(
-                count == 1 for count in functional_group_counter.values()
-            ), (
-                "Cannot use a tuple when multiple metals "
-                "have the same number of functional groups. "
-                "Use a dictionary instead."
-            )
-            metals_dict = {
-                metal: tuple(
-                    self._get_metal_vertices(
-                        self._metal_vertices_of_degree[
-                            metal.get_num_functional_groups()
-                        ]
-                    )
-                )
-                for metal in metals
-            }
         else:
             ids = range(len(self._metal_vertex_prototypes))
             metals_dict = {metals: tuple(self._get_metal_vertices(ids))}
@@ -682,11 +644,7 @@ class MetalComplex(TopologyGraph):
 
     def _normalize_ligands(
         self,
-        ligands: typing.Union[
-            BuildingBlock,
-            tuple[BuildingBlock, ...],
-            dict[BuildingBlock, tuple[int, ...]],
-        ],
+        ligands: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
     ) -> dict[BuildingBlock, tuple[_LigandVertex, ...]]:
         """
         Return a map ligands and vertices.
@@ -715,28 +673,6 @@ class MetalComplex(TopologyGraph):
                 ligand: tuple(self._get_ligand_vertices(ids))
                 for ligand, ids in ligands.items()
             }
-        elif isinstance(ligands, tuple):
-            functional_group_counter = Counter(
-                ligand.get_num_functional_groups() for ligand in ligands
-            )
-            assert all(
-                count == 1 for count in functional_group_counter.values()
-            ), (
-                "Cannot use a tuple when multiple ligands "
-                "have the same number of functional groups. "
-                "Use a dictionary instead."
-            )
-            ligands_dict = {
-                ligand: tuple(
-                    self._get_ligand_vertices(
-                        self._ligand_vertices_of_degree[
-                            ligand.get_num_functional_groups()
-                        ]
-                    )
-                )
-                for ligand in ligands
-            }
-
         else:
             ids = range(len(self._ligand_vertex_prototypes))
             ligands_dict = {ligands: tuple(self._get_ligand_vertices(ids))}
@@ -791,11 +727,12 @@ class MetalComplex(TopologyGraph):
         for vertex_id in vertex_ids:
             yield self._ligand_vertex_prototypes[vertex_id]
 
+    @staticmethod
     def _get_scale(
-        self,
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
-        return 1
+        return scale_multiplier * 1
 
     def clone(self) -> MetalComplex:
         return self._clone()

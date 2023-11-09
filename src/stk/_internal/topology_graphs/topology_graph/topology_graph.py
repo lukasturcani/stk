@@ -168,6 +168,7 @@ class TopologyGraph:
         num_processes: int,
         optimizer: Optimizer,
         edge_groups: tuple[EdgeGroup, ...] | None = None,
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -219,8 +220,15 @@ class TopologyGraph:
             edge_groups:
                 The edge groups of the topology graph, if ``None``,
                 every :class:`.Edge` is in its own edge group.
+
+            scale_multiplier:
+                Scales the positions of the vertices.
+
         """
-        self._scale = scale = self._get_scale(building_block_vertices)
+        self._scale_multiplier = scale_multiplier
+        self._scale = scale = self._get_scale(
+            building_block_vertices, self._scale_multiplier
+        )
 
         def apply_scale(item):
             return item.with_scale(scale)
@@ -268,7 +276,9 @@ class TopologyGraph:
             building_block_map.get(bb, bb): tuple(map(undo_scale, vertices))
             for bb, vertices in self._building_block_vertices.items()
         }
-        scale = self._get_scale(building_block_vertices)
+        scale = self._get_scale(
+            building_block_vertices, self._scale_multiplier
+        )
 
         def scale_vertex(vertex):
             return vertex.with_scale(scale)
@@ -332,6 +342,7 @@ class TopologyGraph:
         clone._implementation = self._implementation
         clone._optimizer = self._optimizer
         clone._edge_groups = self._edge_groups
+        clone._scale_multiplier = self._scale_multiplier
         return clone
 
     def get_building_blocks(self) -> abc.Iterator[BuildingBlock]:
@@ -393,8 +404,7 @@ class TopologyGraph:
         Yields:
             A lattice constant.
         """
-        return
-        yield
+        return iter(())
 
     def construct(self) -> ConstructionResult:
         """
@@ -435,12 +445,10 @@ class TopologyGraph:
             ),
         )
 
+    @staticmethod
     def _get_scale(
-        self,
-        building_block_vertices: dict[
-            BuildingBlock,
-            abc.Sequence[Vertex],
-        ],
+        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]],
+        scale_multiplier: float,
     ) -> float:
         """
         Get the scale, which should be applied to topology graph.

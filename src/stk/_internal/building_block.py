@@ -399,7 +399,7 @@ class BuildingBlock(Molecule):
     @classmethod
     def init_from_file(
         cls,
-        path: str,
+        path: pathlib.Path | str,
         functional_groups: FunctionalGroup
         | FunctionalGroupFactory
         | Iterable[FunctionalGroup | FunctionalGroupFactory] = (),
@@ -467,7 +467,7 @@ class BuildingBlock(Molecule):
         # with rdkit often have issues, because rdkit tries to do
         # bits of structural analysis like stereocenters. Remake
         # gets rid of all this problematic metadata.
-        molecule = remake(cls._init_funcs[extension](path))
+        molecule = remake(cls._init_funcs[extension](str(path)))
 
         return cls.init_from_rdkit_mol(
             molecule=molecule,
@@ -1104,7 +1104,7 @@ class BuildingBlock(Molecule):
 
     def with_structure_from_file(
         self,
-        path: str,
+        path: pathlib.Path | str,
         extension: str | None = None,
     ) -> typing.Self:
         """
@@ -1133,7 +1133,7 @@ class BuildingBlock(Molecule):
             BuildingBlock: A clone with atomic positions found in `path`.
 
         """
-        return super().with_structure_from_file(path, extension)
+        return super().with_structure_from_file(str(path), extension)
 
     def write(
         self,

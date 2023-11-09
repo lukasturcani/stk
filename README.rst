@@ -43,6 +43,26 @@ on GitHub, and you can update your ``stk`` with::
 
     $ pip install stk --upgrade
 
+Developer Setup
+---------------
+
+#. Install `just`_.
+#. In a new virtual environment run::
+
+  $ just dev
+
+#. Setup the `MongoDB`_ container (make sure ``docker`` is installed)::
+
+  $ just mongo
+
+#. Run code checks::
+
+  $ just check
+
+
+.. _`just`: https://github.com/casey/just
+.. _`MongoDB`: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+
 How To Cite
 ===========
 
@@ -78,6 +98,10 @@ __ https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembl
 
 using stk
 ---------
+
+* Using stk for constructing larger numbers of coarse-grained models: `Systematic exploration of accessible topologies of cage molecules via minimalistic models`__
+
+__ https://pubs.rsc.org/en/content/articlelanding/2023/sc/d3sc03991a
 
 * `The effect of disorder in multi-component covalent organic frameworks`__
 

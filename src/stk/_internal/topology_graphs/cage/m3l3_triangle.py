@@ -154,6 +154,7 @@ class M3L3Triangle(Cage):
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,
         optimizer: Optimizer = NullOptimizer(),
+        scale_multiplier: float = 1.0,
     ) -> None:
         """
         Parameters:
@@ -214,6 +215,9 @@ class M3L3Triangle(Cage):
                 Used to optimize the structure of the constructed
                 molecule.
 
+            scale_multiplier:
+                Scales the positions of the vertices.
+
         Raises:
 
             :class:`AssertionError`
@@ -259,6 +263,7 @@ class M3L3Triangle(Cage):
             reaction_factory=reaction_factory,
             num_processes=num_processes,
             optimizer=optimizer,
+            scale_multiplier=scale_multiplier,
         )
 
     _x = 2 * np.sqrt(3) / 4
