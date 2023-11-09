@@ -525,17 +525,22 @@ class NRotaxane(TopologyGraph):
     def _get_building_block_vertices(
         self,
         axle: BuildingBlock,
-        cycles: abc.Iterable[BuildingBlock],
-        vertices: tuple[Vertex, ...],
+        cycles: abc.Sequence[BuildingBlock],
+        vertices: abc.Sequence[Vertex],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         threads = self._repeating_unit * self._num_repeating_units
-        building_block_vertices = {}
-        building_block_vertices[axle] = vertices[0:1]
+        building_block_vertices: dict[BuildingBlock, list[Vertex]] = {}
+
+        building_block_vertices[axle] = [vertices[0]]
         for cycle_index, vertex in zip(threads, vertices[1:]):
             bb = cycles[cycle_index]
             building_block_vertices[bb] = building_block_vertices.get(bb, [])
             building_block_vertices[bb].append(vertex)
-        return building_block_vertices
+
+        return typing.cast(
+            dict[BuildingBlock, abc.Sequence[Vertex]],
+            building_block_vertices,
+        )
 
     def _run_reactions(self, state: ConstructionState) -> ConstructionState:
         return state
