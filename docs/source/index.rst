@@ -90,25 +90,27 @@ To get :mod:`.stk`, you can install it with pip::
 
   $ pip install stk
 
-Installing a development enviromnent is easy too:
 
-#. Use a new Python 3.11 environment through `conda`_ or `mamba`_.
+Developer Setup
+...............
+
 #. Install `just`_.
-#. Clone the :mod:`.stk` repository.
-#. Setup development enviromnent::
+#. In a new virtual environment run::
 
-   $ just dev
+    $ just dev
+  
 
-#. Setup the `MongoDB`_ container (make sure `docker` is installed)::
+#. Setup the `MongoDB`_ container (make sure ``docker`` is installed)::
 
-   $ just mongo
+    $ just mongo
+  
 
-#. Test installation (running `black`, `mypy`, `pytest` and tests `make` on the docs)::
+#. Run code checks::
 
-   $ just check
+    $ just check
+  
 
-.. _`mamba`: https://mamba.readthedocs.io/en/latest/mamba-installation.html#mamba-install
-.. _`conda`: https://docs.conda.io/en/latest/
+
 .. _`just`: https://github.com/casey/just
 .. _`MongoDB`: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
 
