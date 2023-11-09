@@ -15,7 +15,7 @@ import re
 import tarfile
 import time
 import typing
-from collections import deque, abc
+from collections import abc, deque
 from contextlib import contextmanager
 
 import numpy as np
