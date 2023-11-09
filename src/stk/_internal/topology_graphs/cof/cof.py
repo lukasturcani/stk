@@ -58,271 +58,273 @@ class Cof(TopologyGraph):
     """
     Represents a COF topology graph.
 
-    Notes
-    -----
-    COF topologies are added by creating a subclass, which defines
-    the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
-    attributes.
+    Notes:
+
+        COF topologies are added by creating a subclass, which defines
+        the :attr:`_vertex_prototypes` and :attr:`_edge_prototypes` class
+        attributes.
 
     .. _cof-topology-graph-examples:
 
-    Examples
-    --------
-    *Subclass Implementation*
+    Examples:
 
-    The source code of the subclasses, listed in :mod:`~.cof.cof`,
-    can serve as good examples.
+        *Subclass Implementation*
 
-    *Basic Construction*
+        The source code of the subclasses, listed in :mod:`~.cof.cof`,
+        can serve as good examples.
 
-    :class:`.Cof` instances can be made by providing the building
-    block molecules and lattice size only (using :class:`.Honeycomb`
-    as an example)
+        *Basic Construction*
 
-    .. testcode:: basic-construction
+        :class:`.Cof` instances can be made by providing the building
+        block molecules and lattice size only (using :class:`.Honeycomb`
+        as an example)
 
-        import stk
+        .. testcode:: basic-construction
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-        cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
-        )
+            import stk
 
-    .. moldoc::
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+            cof = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
+            )
 
-        import moldoc.molecule as molecule
-        import stk
+        .. moldoc::
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-        cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
-        )
-        moldoc_display_molecule = molecule.Molecule(
-            atoms=(
-                molecule.Atom(
-                    atomic_number=atom.get_atomic_number(),
-                    position=position,
-                ) for atom, position in zip(
-                    cof.get_atoms(),
-                    cof.get_position_matrix(),
-                )
-            ),
-            bonds=(
-                molecule.Bond(
-                    atom1_id=bond.get_atom1().get_id(),
-                    atom2_id=bond.get_atom2().get_id(),
-                    order=(
-                        1
-                        if bond.get_order() == 9
-                        else bond.get_order()
-                    ),
-                ) for bond in cof.get_bonds()
-            ),
-        )
+            import moldoc.molecule as molecule
+            import stk
 
-    *Suggested Optimization*
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+            cof = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb((bb1, bb2), (3, 3, 1)),
+            )
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        cof.get_atoms(),
+                        cof.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=(
+                            1
+                            if bond.get_order() == 9
+                            else bond.get_order()
+                        ),
+                    ) for bond in cof.get_bonds()
+                ),
+            )
 
-    For :class:`.Cof` topologies, it is recommend to use the
-    :class:`.Collapser` optimizer if using the nonperiodic form.
-    For periodic systems, the :class:`.PeriodicCollapser` is
-    recommended.
+        *Suggested Optimization*
 
-    .. testcode:: suggested-optimization
+        For :class:`.Cof` topologies, it is recommend to use the
+        :class:`.Collapser` optimizer if using the nonperiodic form.
+        For periodic systems, the :class:`.PeriodicCollapser` is
+        recommended.
 
-        import stk
+        .. testcode:: suggested-optimization
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+            import stk
 
-        # Nonperiodic.
-        cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+            # Nonperiodic.
+            cof = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb(
+                    building_blocks=(bb1, bb2),
+                    lattice_size=(3, 3, 1),
+                    # Setting scale_steps to False tends to lead to a
+                    # better structure.
+                    optimizer=stk.Collapser(scale_steps=False),
+                ),
+            )
+
+            # Periodic.
+            cof = stk.ConstructedMolecule(
+                topology_graph=stk.cof.PeriodicHoneycomb(
+                    building_blocks=(bb1, bb2),
+                    lattice_size=(3, 3, 1),
+                    optimizer=stk.PeriodicCollapser(),
+                ),
+            )
+
+        .. moldoc::
+
+            import moldoc.molecule as molecule
+            import stk
+
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+            cof = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb(
+                    building_blocks=(bb1, bb2),
+                    lattice_size=(3, 3, 1),
+                    # Setting scale_steps to False tends to lead to a
+                    # better structure.
+                    optimizer=stk.Collapser(scale_steps=False),
+                ),
+            )
+            moldoc_display_molecule = molecule.Molecule(
+                atoms=(
+                    molecule.Atom(
+                        atomic_number=atom.get_atomic_number(),
+                        position=position,
+                    ) for atom, position in zip(
+                        cof.get_atoms(),
+                        cof.get_position_matrix(),
+                    )
+                ),
+                bonds=(
+                    molecule.Bond(
+                        atom1_id=bond.get_atom1().get_id(),
+                        atom2_id=bond.get_atom2().get_id(),
+                        order=(
+                            1
+                            if bond.get_order() == 9
+                            else bond.get_order()
+                        ),
+                    ) for bond in cof.get_bonds()
+                ),
+            )
+
+        *Accessing the Periodic Information*
+
+        When building periodic :class:`.Cof` instances, the periodic
+        information, such as the unit cell, can be accessed if you use the
+        :class:`.PeriodicConstructionResult` returned by calling
+        :meth:`.Cof.construct`
+
+        .. testcode:: accessing-the-periodic-information
+
+            import stk
+
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+
+            topology_graph = stk.cof.PeriodicHoneycomb(
                 building_blocks=(bb1, bb2),
                 lattice_size=(3, 3, 1),
-                # Setting scale_steps to False tends to lead to a
-                # better structure.
-                optimizer=stk.Collapser(scale_steps=False),
-            ),
-        )
+            )
+            construction_result = topology_graph.construct()
+            cof = stk.ConstructedMolecule.init_from_construction_result(
+                construction_result=construction_result,
+            )
+            periodic_info = construction_result.get_periodic_info()
+            cell_matrix = periodic_info.get_cell_matrix()
+            # Can access all unit-cell parameters.
+            a = periodic_info.get_a()
+            b = periodic_info.get_b()
+            c = periodic_info.get_c()
+            alpha = periodic_info.get_alpha()
+            beta = periodic_info.get_beta()
+            gamma = periodic_info.get_gamma()
+            # Write to .pdb file.
+            writer = stk.PdbWriter()
+            writer.write(
+                molecule=cof,
+                path='cof.pdb',
+                periodic_info=periodic_info,
+            )
 
-        # Periodic.
-        cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.PeriodicHoneycomb(
-                building_blocks=(bb1, bb2),
-                lattice_size=(3, 3, 1),
-                optimizer=stk.PeriodicCollapser(),
-            ),
-        )
+        .. testcleanup:: accessing-the-periodic-information
 
-    .. moldoc::
-
-        import moldoc.molecule as molecule
-        import stk
-
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-
-        cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
-                building_blocks=(bb1, bb2),
-                lattice_size=(3, 3, 1),
-                # Setting scale_steps to False tends to lead to a
-                # better structure.
-                optimizer=stk.Collapser(scale_steps=False),
-            ),
-        )
-        moldoc_display_molecule = molecule.Molecule(
-            atoms=(
-                molecule.Atom(
-                    atomic_number=atom.get_atomic_number(),
-                    position=position,
-                ) for atom, position in zip(
-                    cof.get_atoms(),
-                    cof.get_position_matrix(),
-                )
-            ),
-            bonds=(
-                molecule.Bond(
-                    atom1_id=bond.get_atom1().get_id(),
-                    atom2_id=bond.get_atom2().get_id(),
-                    order=(
-                        1
-                        if bond.get_order() == 9
-                        else bond.get_order()
-                    ),
-                ) for bond in cof.get_bonds()
-            ),
-        )
-
-    *Accessing the Periodic Information*
-
-    When building periodic :class:`.Cof` instances, the periodic
-    information, such as the unit cell, can be accessed if you use the
-    :class:`.PeriodicConstructionResult` returned by calling
-    :meth:`.Cof.construct`
-
-    .. testcode:: accessing-the-periodic-information
-
-        import stk
-
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-
-        topology_graph = stk.cof.PeriodicHoneycomb(
-            building_blocks=(bb1, bb2),
-            lattice_size=(3, 3, 1),
-        )
-        construction_result = topology_graph.construct()
-        cof = stk.ConstructedMolecule.init_from_construction_result(
-            construction_result=construction_result,
-        )
-        periodic_info = construction_result.get_periodic_info()
-        cell_matrix = periodic_info.get_cell_matrix()
-        # Can access all unit-cell parameters.
-        a = periodic_info.get_a()
-        b = periodic_info.get_b()
-        c = periodic_info.get_c()
-        alpha = periodic_info.get_alpha()
-        beta = periodic_info.get_beta()
-        gamma = periodic_info.get_gamma()
-        # Write to .pdb file.
-        writer = stk.PdbWriter()
-        writer.write(
-            molecule=cof,
-            path='cof.pdb',
-            periodic_info=periodic_info,
-        )
-
-    .. testcleanup:: accessing-the-periodic-information
-
-        import os
-        os.remove('cof.pdb')
+            import os
+            os.remove('cof.pdb')
 
 
-    *Structural Isomer Construction*
+        *Structural Isomer Construction*
 
-    Different structural isomers of COFs can be made by using the
-    `vertex_alignments` optional parameter
+        Different structural isomers of COFs can be made by using the
+        `vertex_alignments` optional parameter
 
-    .. testcode:: structural-isomer-construction
+        .. testcode:: structural-isomer-construction
 
-        import stk
+            import stk
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
 
-        cof2 = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
-                building_blocks=(bb1, bb2),
-                lattice_size=(3, 3, 1),
-                vertex_alignments={0: 2, 1: 1, 2: 1},
-            ),
-        )
+            cof2 = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb(
+                    building_blocks=(bb1, bb2),
+                    lattice_size=(3, 3, 1),
+                    vertex_alignments={0: 2, 1: 1, 2: 1},
+                ),
+            )
 
-    The parameter maps the id of a vertex to a number
-    between 0 (inclusive) and the number of edges the vertex is
-    connected to (exclusive). So a vertex connected to three edges
-    can be mapped to ``0``, ``1`` or ``2``.
+        The parameter maps the id of a vertex to a number
+        between 0 (inclusive) and the number of edges the vertex is
+        connected to (exclusive). So a vertex connected to three edges
+        can be mapped to ``0``, ``1`` or ``2``.
 
-    By changing which edge each vertex is aligned with, a different
-    structural isomer of the COF can be formed.
+        By changing which edge each vertex is aligned with, a different
+        structural isomer of the COF can be formed.
 
-    *Multi-Building Block COF Construction*
+        *Multi-Building Block COF Construction*
 
-    You can also build COFs with multiple building blocks, but,
-    if you have multiple building blocks with the same number of
-    functional groups, you have to assign each building block to the
-    vertex you want to place it on
+        You can also build COFs with multiple building blocks, but,
+        if you have multiple building blocks with the same number of
+        functional groups, you have to assign each building block to the
+        vertex you want to place it on
 
-    .. testcode:: multi-building-block-cof-construction
+        .. testcode:: multi-building-block-cof-construction
 
-        import stk
+            import stk
 
-        bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
-        bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
-        bb3 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
-        bb4 = stk.BuildingBlock('BrCC(NCBr)CBr', [stk.BromoFactory()])
+            bb1 = stk.BuildingBlock('BrCCBr', [stk.BromoFactory()])
+            bb2 = stk.BuildingBlock('BrCNCBr', [stk.BromoFactory()])
+            bb3 = stk.BuildingBlock('BrCC(CBr)CBr', [stk.BromoFactory()])
+            bb4 = stk.BuildingBlock('BrCC(NCBr)CBr', [stk.BromoFactory()])
 
-        cof = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
-                # building_blocks is now a dict, which maps building
-                # blocks to the id of the vertices it should be placed
-                # on. You can use ranges to specify the ids.
-                building_blocks={
-                    bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
-                    bb2: 3,
-                    bb3: (0, 10, 11, 15, 16),
-                    bb4: (1, 5, 6),
-                },
-                lattice_size=(2, 2, 1),
-            ),
-        )
+            cof = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb(
+                    # building_blocks is now a dict, which maps building
+                    # blocks to the id of the vertices it should be placed
+                    # on. You can use ranges to specify the ids.
+                    building_blocks={
+                        bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
+                        bb2: 3,
+                        bb3: (0, 10, 11, 15, 16),
+                        bb4: (1, 5, 6),
+                    },
+                    lattice_size=(2, 2, 1),
+                ),
+            )
 
-    You can combine this with the `vertex_alignments` parameter
+        You can combine this with the `vertex_alignments` parameter
 
-    .. testcode:: multi-building-block-cof-construction
+        .. testcode:: multi-building-block-cof-construction
 
-        cof2 = stk.ConstructedMolecule(
-            topology_graph=stk.cof.Honeycomb(
-                building_blocks={
-                    bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
-                    bb2: 3,
-                    bb3: (0, 10, 11, 15, 16),
-                    bb4: (1, 5, 6),
-                },
-                lattice_size=(2, 2, 1),
-                vertex_alignments={0: 2, 1: 1, 2: 1},
-            ),
-        )
+            cof2 = stk.ConstructedMolecule(
+                topology_graph=stk.cof.Honeycomb(
+                    building_blocks={
+                        bb1: (2, 4, 7, 8, 9, 12, 13, 14, 17, 18, 19),
+                        bb2: 3,
+                        bb3: (0, 10, 11, 15, 16),
+                        bb4: (1, 5, 6),
+                    },
+                    lattice_size=(2, 2, 1),
+                    vertex_alignments={0: 2, 1: 1, 2: 1},
+                ),
+            )
 
     """
 
     _allowed_degrees: typing.ClassVar[dict[int, int]]
     _vertex_prototypes: typing.ClassVar[tuple[_CofVertex, ...]]
     _edge_prototypes: typing.ClassVar[tuple[Edge, ...]]
-    _lattice_constants: typing.ClassVar[tuple[np.ndarray, ...]]
+    _lattice_constants: typing.ClassVar[
+        tuple[np.ndarray, np.ndarray, np.ndarray]
+    ]
 
     def __init_subclass__(cls, **kwargs):
         vertex_degrees = Counter(
@@ -395,8 +397,7 @@ class Cof(TopologyGraph):
                 molecule.
 
             scale_multiplier:
-                Used to provide better control over topology graph scaling.
-                Multiplies the `_get_scale` output for this class.
+                Scales the positions of the vertices.
 
         Raises:
 
@@ -456,10 +457,12 @@ class Cof(TopologyGraph):
                 for building_block, ids in building_blocks.items()
             }
         else:
-            building_block_vertices = self._get_building_block_vertices(
-                building_blocks=building_blocks,
-                vertices=vertices,
-                edges=edges,
+            building_block_vertices = (
+                self._get_building_block_vertices(  # type: ignore[assignment]
+                    building_blocks=building_blocks,
+                    vertices=vertices,
+                    edges=edges,
+                )
             )
 
         building_block_vertices = self._with_unaligning_vertices(
@@ -472,6 +475,7 @@ class Cof(TopologyGraph):
             ),
             building_block_vertices=building_block_vertices,
         )
+
         super().__init__(
             building_block_vertices=typing.cast(
                 dict[BuildingBlock, abc.Sequence[Vertex]],
@@ -540,8 +544,9 @@ class Cof(TopologyGraph):
         return clone
 
     def _get_edge_groups(
-        self, edges: typing.Iterable[Edge]
-    ) -> typing.Iterable[EdgeGroup] | None:
+        self,
+        edges: abc.Iterable[Edge],
+    ) -> tuple[EdgeGroup, ...] | None:
         """
         Get the edge groups for the COF.
 
@@ -569,7 +574,10 @@ class Cof(TopologyGraph):
             EdgeGroup((edge,)) for edge in edges if not edge.is_periodic()
         )
 
-    def _get_vertices(self, lattice: list) -> typing.Iterable[_CofVertex]:
+    def _get_vertices(
+        self,
+        lattice: list[list[list[dict[int, _CofVertex]]]],
+    ) -> list[_CofVertex]:
         """
         Get the vertices in the `lattice`.
 
@@ -587,18 +595,20 @@ class Cof(TopologyGraph):
         """
 
         xdim, ydim, zdim = self._lattice_size
-        num_vertices = xdim * ydim * zdim * len(self._vertex_prototypes)
-        vertices = [None for i in range(num_vertices)]
+        vertices = []
         for x, y, z in it.product(
             range(xdim),
             range(ydim),
             range(zdim),
         ):
             for vertex in lattice[x][y][z].values():
-                vertices[vertex.get_id()] = vertex
-        return tuple(vertices)
+                vertices.append(vertex)
+        return sorted(vertices, key=lambda vertex: vertex.get_id())
 
-    def _get_lattice(self, vertex_alignments: dict) -> list:
+    def _get_lattice(
+        self,
+        vertex_alignments: dict[int, int],
+    ) -> list[list[list[dict[int, _CofVertex]]]]:
         """
         Get the vertices of the topology graph instance.
 
@@ -630,7 +640,9 @@ class Cof(TopologyGraph):
 
         xdim, ydim, zdim = (range(dim) for dim in self._lattice_size)
         # vertex_clones is indexed as vertex_clones[x][y][z]
-        lattice: list = [[[{} for _ in zdim] for _ in ydim] for _ in xdim]
+        lattice: list[list[list[dict[int, _CofVertex]]]] = [
+            [[{} for _ in zdim] for _ in ydim] for _ in xdim
+        ]
         # Make a clone of each vertex for each unit cell.
         cells = it.product(xdim, ydim, zdim)
         vertices = it.product(cells, self._vertex_prototypes)
@@ -647,7 +659,7 @@ class Cof(TopologyGraph):
             )
         return lattice
 
-    def _get_edges(self, lattice: list) -> typing.Iterable[Edge]:
+    def _get_edges(self, lattice: list) -> tuple[Edge, ...]:
         """
         Create the edges of the topology graph instance.
 
@@ -706,9 +718,9 @@ class Cof(TopologyGraph):
     @classmethod
     def _get_building_block_vertices(
         cls,
-        building_blocks: typing.Iterable[BuildingBlock],
-        vertices: typing.Iterable[_CofVertex],
-        edges: typing.Iterable[Edge],
+        building_blocks: abc.Iterable[BuildingBlock],
+        vertices: abc.Iterable[_CofVertex],
+        edges: abc.Iterable[Edge],
     ) -> dict[BuildingBlock, abc.Sequence[_CofVertex]]:
         """
         Map building blocks to the vertices of the graph.
@@ -775,8 +787,8 @@ class Cof(TopologyGraph):
             building_block_vertices[building_block].append(vertex)
         return building_block_vertices
 
-    def _get_lattice_constants(self) -> typing.Iterator[np.ndarray]:
-        return self._lattice_constants
+    def _get_lattice_constants(self) -> abc.Iterator[np.ndarray]:
+        yield from self._lattice_constants
 
     def construct(self) -> ConstructionResult:
         """
