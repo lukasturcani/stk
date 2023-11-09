@@ -404,15 +404,15 @@ class Linear(TopologyGraph):
 
             orientations (list[float]):
                 For each character in the repeating unit, a value
-                between ``0`` and ``1`` (both inclusive) must be given
-                in a :class:`tuple`. It indicates the probability that
-                each monomer will have its orientation along the chain
-                flipped. If ``0`` then the monomer is guaranteed not to
-                flip. If ``1`` it is guaranteed to flip. This allows
-                the user to create head-to-head or head-to-tail chains,
-                as well as chain with a preference for head-to-head or
-                head-to-tail if a number between ``0`` and ``1`` is
-                chosen. If ``None`` then ``0`` is picked in all cases.
+                between ``0`` and ``1`` (both inclusive). It indicates
+                the probability that each monomer will have its
+                orientation along the chain flipped. If ``0`` then the
+                monomer is guaranteed not to flip. If ``1`` it is
+                guaranteed to flip. This allows the user to create
+                head-to-head or head-to-tail chains, as well as chain
+                with a preference for head-to-head or head-to-tail if a
+                number between ``0`` and ``1`` is chosen. If ``None``
+                then ``0`` is picked in all cases.
 
                 It is also possible to supply an orientation for every
                 vertex in the final topology graph. In this case, the
