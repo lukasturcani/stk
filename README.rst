@@ -50,20 +50,20 @@ on GitHub, and you can update your ``stk`` with:
 Developer Setup
 ---------------
 
-#. Install `just`_.
-#. In a new virtual environment run:
+1. Install `just`_.
+2. In a new virtual environment run:
 
 .. code-block:: bash
 
   just dev
 
-#. Setup the `MongoDB`_ container (make sure ``docker`` is installed):
+3. Setup the `MongoDB`_ container (make sure ``docker`` is installed):
 
 .. code-block:: bash
 
   just mongo
 
-#. Run code checks:
+4. Run code checks:
 
 .. code-block:: bash
 
