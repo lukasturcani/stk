@@ -1,16 +1,16 @@
 :maintainers:
-    `lukasturcani <https://github.com/lukasturcani/>`_,
-    `andrewtarzia <https://github.com/andrewtarzia/>`_
+  `lukasturcani <https://github.com/lukasturcani/>`_,
+  `andrewtarzia <https://github.com/andrewtarzia/>`_
 :documentation: https://stk.readthedocs.io
 :discord: https://discord.gg/zbCUzuxe2B
 
 .. figure:: docs/source/_static/stk.png
 
 .. image:: https://github.com/lukasturcani/stk/workflows/tests/badge.svg?branch=master
-    :target: https://github.com/lukasturcani/stk/actions?query=branch%3Amaster
+  :target: https://github.com/lukasturcani/stk/actions?query=branch%3Amaster
 
 .. image:: https://readthedocs.org/projects/stk/badge/?version=latest
-    :target: https://stk.readthedocs.io
+  :target: https://stk.readthedocs.io
 
 Overview
 ========
@@ -25,9 +25,11 @@ joined through https://discord.gg/zbCUzuxe2B.
 Installation
 ============
 
-To get ``stk``, you can install it with pip::
+To get ``stk``, you can install it with pip:
 
-    $ pip install stk
+.. code-block:: bash
+
+  pip install stk
 
 If you would like to get updated when a new release of ``stk`` comes
 out, which happens pretty regularly, click on the ``watch`` button on
@@ -36,28 +38,36 @@ from the dropdown menu.
 
 You can see the latest releases here:
 
-    https://github.com/lukasturcani/stk/releases
+  https://github.com/lukasturcani/stk/releases
 
 There will be a corresponding release on ``pip`` for each release
-on GitHub, and you can update your ``stk`` with::
+on GitHub, and you can update your ``stk`` with:
 
-    $ pip install stk --upgrade
+.. code-block:: bash
+
+  pip install stk --upgrade
 
 Developer Setup
 ---------------
 
 #. Install `just`_.
-#. In a new virtual environment run::
+#. In a new virtual environment run:
 
-  $ just dev
+.. code-block:: bash
 
-#. Setup the `MongoDB`_ container (make sure ``docker`` is installed)::
+  just dev
 
-  $ just mongo
+#. Setup the `MongoDB`_ container (make sure ``docker`` is installed):
 
-#. Run code checks::
+.. code-block:: bash
 
-  $ just check
+  just mongo
+
+#. Run code checks:
+
+.. code-block:: bash
+
+  just check
 
 
 .. _`just`: https://github.com/casey/just
@@ -68,11 +78,11 @@ How To Cite
 
 If you use ``stk`` please cite
 
-    https://github.com/lukasturcani/stk
+  https://github.com/lukasturcani/stk
 
 and
 
-    https://aip.scitation.org/doi/10.1063/5.0049708
+  https://aip.scitation.org/doi/10.1063/5.0049708
 
 
 Publications
