@@ -162,14 +162,14 @@ class GenericReactionFactory(ReactionFactory):
 
         try:
             functional_group1, functional_group2 = functional_groups
-        except ValueError:
-            msg = (
+        except ValueError as ex:
+            ex.add_note(
                 f"Two functional groups not found during reaction."
                 "\n    This suggests an issue with edge id "
                 f"{next(edge_group.get_edge_ids())} in your topology graph."
                 f"\n    edge group: {edge_group}"
             )
-            raise ValueError(msg)
+            raise
 
         edge = construction_state.get_edge(
             edge_id=next(edge_group.get_edge_ids()),
