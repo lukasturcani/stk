@@ -11,6 +11,9 @@ class CaseData:
         The functional groups :attr:`.building_block` should be
         holding.
 
+    known_repr : str
+        The representation of the building block.
+
     core_atom_ids : :class:`tuple` of :class:`int`
         The correct core atom ids for :attr:`.building_block`.
 
@@ -23,6 +26,7 @@ class CaseData:
         self,
         building_block,
         functional_groups,
+        known_repr,
         core_atom_ids,
         placer_ids,
     ):
@@ -37,6 +41,9 @@ class CaseData:
         functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
             The functional groups `building_block` should be holding.
 
+        known_repr : str
+            The representation of the building block.
+
         core_atom_ids : :class:`tuple` of :class:`int`
             The correct core atom ids for `building_block`.
 
@@ -47,5 +54,6 @@ class CaseData:
 
         self.building_block = building_block
         self.functional_groups = functional_groups
+        self.known_repr = known_repr
         self.core_atom_ids = core_atom_ids
         self.placer_ids = placer_ids

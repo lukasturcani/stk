@@ -26,6 +26,7 @@ from ..case_data import CaseData
                 ),
             ),
             functional_groups=(),
+            known_repr="BuildingBlock('Br[C+2][C+2]Br', ())",
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
@@ -61,6 +62,12 @@ from ..case_data import CaseData
                     deleters=(stk.Br(3),),
                 ),
             ),
+            known_repr=(
+                "BuildingBlock('Br[C+2][C+2]Br', (Bromo(Br(0), C(1, charge=2),"
+                " bonders=(C(1, charge=2),), deleters=(Br(0),)), Bromo(Br(3), "
+                "C(2, charge=2), bonders=(C(2, charge=2),), deleters=(Br(3),))"
+                "))"
+            ),
             core_atom_ids=(1, 2),
             placer_ids=(1, 2),
         ),
@@ -83,6 +90,7 @@ from ..case_data import CaseData
                 placer_ids=(1, 2),
             ),
             functional_groups=(),
+            known_repr="BuildingBlock('Br[C+2][C+2]Br', ())",
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(1, 2),
         ),
@@ -119,6 +127,12 @@ from ..case_data import CaseData
                     deleters=(stk.Br(3),),
                 ),
             ),
+            known_repr=(
+                "BuildingBlock('Br[C+2][C+2]Br', (Bromo(Br(0), C(1, charge=2),"
+                " bonders=(C(1, charge=2),), deleters=(Br(0),)), Bromo(Br(3), "
+                "C(2, charge=2), bonders=(C(2, charge=2),), deleters=(Br(3),))"
+                "))"
+            ),
             core_atom_ids=(1, 2),
             placer_ids=(0, 3),
         ),
@@ -141,6 +155,7 @@ from ..case_data import CaseData
                 functional_groups=[stk.IodoFactory()],
             ),
             functional_groups=(),
+            known_repr="BuildingBlock('Br[C+2][C+2]Br', ())",
             core_atom_ids=(0, 1, 2, 3),
             placer_ids=(0, 1, 2, 3),
         ),
