@@ -393,7 +393,7 @@ class BuildingBlock(Molecule):
         )
         building_block._with_functional_groups(functional_groups)
         building_block._fg_repr = repr(  # type: ignore[has-type]
-            functional_groups
+            tuple(building_block.get_functional_groups())
         )
         building_block._placer_ids = building_block._normalize_placer_ids(
             placer_ids=placer_ids,
