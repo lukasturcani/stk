@@ -4,7 +4,6 @@ Topology Graph Implementation Utilities
 
 """
 
-
 import typing
 
 import numpy as np

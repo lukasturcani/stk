@@ -169,8 +169,10 @@ class Power(FitnessNormalizer[T]):
 
     def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
         return {
-            record: np.float_power(fitness_value, self._power)
-            if self._filter(fitness_values, record)
-            else fitness_value
+            record: (
+                np.float_power(fitness_value, self._power)
+                if self._filter(fitness_values, record)
+                else fitness_value
+            )
             for record, fitness_value in fitness_values.items()
         }

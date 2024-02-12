@@ -119,8 +119,9 @@ class PeriodicHexagonal(Cof):
 
     def __init__(
         self,
-        building_blocks: abc.Iterable[BuildingBlock]
-        | dict[BuildingBlock, tuple[int, ...]],
+        building_blocks: (
+            abc.Iterable[BuildingBlock] | dict[BuildingBlock, tuple[int, ...]]
+        ),
         lattice_size: tuple[int, int, int],
         vertex_alignments: dict[int, int] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),

@@ -184,8 +184,10 @@ class ShiftUp(FitnessNormalizer[T]):
                 shift[i] = 1 - min_
 
         return {
-            record: fitness_value + shift
-            if self._filter(fitness_values, record)
-            else fitness_value
+            record: (
+                fitness_value + shift
+                if self._filter(fitness_values, record)
+                else fitness_value
+            )
             for record, fitness_value in fitness_values.items()
         }

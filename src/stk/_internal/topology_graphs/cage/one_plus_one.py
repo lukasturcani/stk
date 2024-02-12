@@ -176,8 +176,9 @@ class OnePlusOne(Cage):
 
     def __init__(
         self,
-        building_blocks: Iterable[BuildingBlock]
-        | dict[BuildingBlock, tuple[int, ...]],
+        building_blocks: (
+            Iterable[BuildingBlock] | dict[BuildingBlock, tuple[int, ...]]
+        ),
         vertex_alignments: dict[int, int] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
         num_processes: int = 1,

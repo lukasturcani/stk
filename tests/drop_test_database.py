@@ -6,7 +6,6 @@ manually by developers when they feel the need to.
 
 """
 
-
 import pymongo
 
 
