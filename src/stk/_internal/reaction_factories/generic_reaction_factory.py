@@ -4,6 +4,8 @@ Generic Reaction Factory
 
 """
 
+import textwrap
+
 from stk._internal.functional_groups.aldehyde import Aldehyde
 from stk._internal.functional_groups.alkene import Alkene
 from stk._internal.functional_groups.alkyne import Alkyne
@@ -164,10 +166,12 @@ class GenericReactionFactory(ReactionFactory):
             functional_group1, functional_group2 = functional_groups
         except ValueError as ex:
             ex.add_note(
-                f"Two functional groups not found during reaction."
-                "\n    This suggests an issue with edge id "
-                f"{next(edge_group.get_edge_ids())} in your topology graph."
-                f"\n    edge group: {edge_group}"
+                textwrap.dedent(
+                    f"""\
+    Two functional groups not found during reaction.
+    This suggests an issue with edge id {next(edge_group.get_edge_ids())}
+    in your topology graph. (edge group: {edge_group})"""
+                )
             )
             raise
 
