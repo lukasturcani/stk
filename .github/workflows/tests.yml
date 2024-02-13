@@ -35,7 +35,7 @@ jobs:
           python-version: "3.11"
           cache: "pip"
       - run: "pip install -e '.[dev]'"
-      - run: black --check .
+      - run: ruff format --check .
   pytest:
     runs-on: ubuntu-22.04
     services:

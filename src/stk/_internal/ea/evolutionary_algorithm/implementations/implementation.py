@@ -138,7 +138,7 @@ class Implementation(typing.Generic[T]):
             population, keys = dedupe(
                 items=(
                     molecule_record
-                    for molecule_record, in self._generation_selector.select(
+                    for (molecule_record,) in self._generation_selector.select(
                         population=normalized_fitness_values
                     )
                 ),

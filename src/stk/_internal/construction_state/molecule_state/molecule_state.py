@@ -100,9 +100,9 @@ class MoleculeState:
             edge_id,
             functional_groups,
         ) in summary.get_edge_functional_groups():
-            self._edge_functional_groups[edge_id] = (
-                self._edge_functional_groups.get(edge_id, [])
-            )
+            self._edge_functional_groups[
+                edge_id
+            ] = self._edge_functional_groups.get(edge_id, [])
             self._edge_functional_groups[edge_id].extend(functional_groups)
         return self
 

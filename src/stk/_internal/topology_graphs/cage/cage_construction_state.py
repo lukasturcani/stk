@@ -179,9 +179,9 @@ class _CageConstructionState(ConstructionState):
                 (functional_group,) = building_block.get_functional_groups(
                     fg_id
                 )
-                self._neighbor_positions[neighbor_id] = (
-                    self._neighbor_positions.get(neighbor_id, [])
-                )
+                self._neighbor_positions[
+                    neighbor_id
+                ] = self._neighbor_positions.get(neighbor_id, [])
                 self._neighbor_positions[neighbor_id].append(
                     building_block.get_centroid(
                         atom_ids=functional_group.get_placer_ids(),

@@ -141,9 +141,8 @@ class Power(FitnessNormalizer[T]):
     def __init__(
         self,
         power: float | Iterable[float],
-        filter: Callable[
-            [dict[T, Any], T], bool
-        ] = lambda fitness_values, record: True,
+        filter: Callable[[dict[T, Any], T], bool] = lambda fitness_values,
+        record: True,
     ) -> None:
         """
         Parameters:

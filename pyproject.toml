@@ -28,7 +28,6 @@ readme = "README.rst"
 
 [project.optional-dependencies]
 dev = [
-  "black",
   "ruff",
   "moldoc",
   "mypy",
@@ -53,11 +52,11 @@ documentation = "https://stk.readthedocs.io"
 [tool.setuptools_scm]
 write_to = "src/stk/_version.py"
 
-[tool.black]
-line-length = 79
 
 [tool.ruff]
 line-length = 79
+
+[too.ruff.lint]
 extend-select = ["I"]
 
 [tool.pytest.ini_options]

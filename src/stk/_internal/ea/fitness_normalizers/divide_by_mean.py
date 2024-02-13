@@ -85,9 +85,8 @@ class DivideByMean(FitnessNormalizer[T]):
 
     def __init__(
         self,
-        filter: Callable[
-            [dict[T, Any], T], bool
-        ] = lambda fitness_values, record: True,
+        filter: Callable[[dict[T, Any], T], bool] = lambda fitness_values,
+        record: True,
     ) -> None:
         """
         Parameters:

@@ -366,10 +366,10 @@ class ConstructedMolecule(Molecule):
 
             canonical_building_block = building_blocks[old_building_block]
 
-            (canonical_building_block_atom,) = (
-                canonical_building_block.get_atoms(
-                    atom_ids=canonical_building_block_atom_id,
-                )
+            (
+                canonical_building_block_atom,
+            ) = canonical_building_block.get_atoms(
+                atom_ids=canonical_building_block_atom_id,
             )
 
             return AtomInfo(

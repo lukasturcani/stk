@@ -458,12 +458,10 @@ class Cof(TopologyGraph):
                 for building_block, ids in building_blocks.items()
             }
         else:
-            building_block_vertices = (
-                self._get_building_block_vertices(  # type: ignore[assignment]
-                    building_blocks=building_blocks,
-                    vertices=vertices,
-                    edges=edges,
-                )
+            building_block_vertices = self._get_building_block_vertices(  # type: ignore[assignment]
+                building_blocks=building_blocks,
+                vertices=vertices,
+                edges=edges,
             )
 
         building_block_vertices = self._with_unaligning_vertices(
@@ -782,9 +780,9 @@ class Cof(TopologyGraph):
         for vertex in vertices:
             vertex_degree = vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
-            building_block_vertices[building_block] = (
-                building_block_vertices.get(building_block, [])
-            )
+            building_block_vertices[
+                building_block
+            ] = building_block_vertices.get(building_block, [])
             building_block_vertices[building_block].append(vertex)
         return building_block_vertices
 
