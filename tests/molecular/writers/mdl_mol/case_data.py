@@ -1,34 +1,40 @@
+import stk
+
+
 class CaseData:
     """
     A :class:`.MolWriter` test case.
 
-    Attributes
-    ----------
-    molecule : :class:`.Molecule`
-        Molecule to test.
+    Attributes:
+        molecule:
+            Molecule to test.
 
-    writer : :class:`.MolWriter`
-        The writer to test.
+        writer:
+            The writer to test.
 
-    string : :class:`str`
-        The expected output string.
+        string:
+            The expected output string.
 
     """
 
-    def __init__(self, molecule, writer, string):
+    def __init__(
+        self,
+        molecule: stk.Molecule,
+        writer: stk.MolWriter,
+        string: str,
+    ) -> None:
         """
         Initialize a :class:`.CaseData` instance.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to test.
+        Parameters:
+            molecule:
+                Molecule to test.
 
-        writer : :class:`.MolWriter`
-            The writer to test.
+            writer:
+                The writer to test.
 
-        string : :class:`str`
-            The expected output string.
+            string:
+                The expected output string.
 
         """
 

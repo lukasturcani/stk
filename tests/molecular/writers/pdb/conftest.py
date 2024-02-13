@@ -109,7 +109,7 @@ def _get_cof_case() -> CaseData:
             "  30               \nCONECT    3   35               "
             "\nCONECT   14   36               \nEND\n"
         ),
-        periodic_info=construction_result.get_periodic_info(),
+        periodic_info=construction_result.get_periodic_info(),  # type: ignore[attr-defined]
     )
 
 
