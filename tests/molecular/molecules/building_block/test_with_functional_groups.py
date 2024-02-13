@@ -4,24 +4,27 @@ from ..utilities import (
     is_equivalent_building_block,
     is_equivalent_molecule,
 )
+import stk
+from collections import abc
 
 
-def test_with_functional_groups(building_block, get_functional_groups):
+def test_with_functional_groups(
+    building_block: stk.BuildingBlock,
+    get_functional_groups: abc.Callable,
+) -> None:
     """
     Test :meth:`.BuildingBlock.with_functional_groups`.
 
-    Parameters
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The building block to test.
+    Parameters:
+        building_block:
+            The building block to test.
 
-    get_functional_groups : :class:`callable`
-        Takes a single parameter, `building_block` and returns the
-        `functional_groups` parameter to use for this test.
+        get_functional_groups:
+            Takes a single parameter, `building_block` and returns the
+            `functional_groups` parameter to use for this test.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    Returns:
+        :class:`NoneType`
 
     """
 
@@ -35,21 +38,22 @@ def test_with_functional_groups(building_block, get_functional_groups):
     has_same_structure(building_block, clone)
 
 
-def _test_with_functional_groups(building_block, functional_groups):
+def _test_with_functional_groups(
+    building_block: stk.BuildingBlock,
+    functional_groups: tuple[stk.FunctionalGroup],
+) -> None:
     """
     Test :meth:`.BuildingBlock.with_functional_groups`.
 
-    Parameters
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The building block to test.
+    Parameters:
+        building_block:
+            The building block to test.
 
-    functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The functional groups the new building block should hold.
+        functional_groups:
+            The functional groups the new building block should hold.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    Returns:
+        :class:`NoneType`
 
     """
 

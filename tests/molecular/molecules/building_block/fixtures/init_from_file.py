@@ -1,13 +1,11 @@
 import pytest
 import stk
-
+from collections.abc import Iterable
 from ..case_data import CaseData
 
 
 @pytest.fixture(
-    params=[
-        "building_block.mol",
-    ],
+    params=["building_block.mol"],
 )
 def path(tmpdir, request):
     return tmpdir / request.param
@@ -17,78 +15,76 @@ class InitFromFileData:
     """
     Stores data for the :meth:`.BuildingBlock.init_from_file`.
 
-    Attributes
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The building block, which will be written to a file, so that it
-        can be initialized from it.
+    Attributes:
+        building_block:
+            The building block, which will be written to a file, so
+            that it can be initialized from it.
 
-    init_functional_groups : :class:`iterable`
-        Passed to the `functional_groups` parameter of
-        :meth:`.BuildingBlock.init_from_file`.
+        init_functional_groups:
+            Passed to the `functional_groups` parameter of
+            :meth:`.BuildingBlock.init_from_file`.
 
-    init_placer_ids : :class:`tuple` or :class:`NoneType`
-        Passed to the `placer_ids` parameter of
-        :meth:`.BuildingBlock.init_from_file`.
+        init_placer_ids:
+            Passed to the `placer_ids` parameter of
+            :meth:`.BuildingBlock.init_from_file`.
 
-    case_data_functional_groups : :class:`tuple`
-        The functional groups the initialized building block should
-        have.
+        case_data_functional_groups:
+            The functional groups the initialized building block should
+            have.
 
-    case_data_core_atom_ids : :class:`tuple` of :class:`int`
-        The ids of core atoms the initialized building block should
-        have.
+        case_data_core_atom_ids:
+            The ids of core atoms the initialized building block should
+            have.
 
-    case_data_placer_ids : :class:`tuple` of :class:`int`
-        The ids of *placer* atoms the initialized building block should
-        have.
+        case_data_placer_ids: : :class:`tuple` of :class:`int`
+            The ids of *placer* atoms the initialized building block
+            should have.
 
-    known_repr : str
-        The representation of the building block.
+        known_repr:
+            The representation of the building block.
 
     """
 
     def __init__(
         self,
-        building_block,
-        init_functional_groups,
-        init_placer_ids,
-        case_data_functional_groups,
-        case_data_core_atom_ids,
-        case_data_placer_ids,
-        known_repr,
-    ):
+        building_block: stk.BuildingBlock,
+        init_functional_groups: Iterable,
+        init_placer_ids: tuple | None,
+        case_data_functional_groups: tuple,
+        case_data_core_atom_ids: tuple[int, ...],
+        case_data_placer_ids: tuple[int, ...],
+        known_repr: str,
+    ) -> None:
         """
         Initialize a :class:`.InitFromData` instance.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block, which will be written to a file, so
-            that it can be initialized from it.
+        Parameters:
+            building_block:
+                The building block, which will be written to a file, so
+                that it can be initialized from it.
 
-        init_functional_groups : :class:`iterable`
-            Passed to the `functional_groups` parameter of
-            :meth:`.BuildingBlock.init_from_file`.
+            init_functional_groups:
+                Passed to the `functional_groups` parameter of
+                :meth:`.BuildingBlock.init_from_file`.
 
-        init_placer_ids : :class:`tuple` or :class:`NoneType`
-            Passed to the `placer_ids` parameter of
-            :meth:`.BuildingBlock.init_from_file`.
+            init_placer_ids:
+                Passed to the `placer_ids` parameter of
+                :meth:`.BuildingBlock.init_from_file`.
 
-        case_data_functional_groups : :class:`tuple`
-            The functional groups the initialized building block should
-            have.
+            case_data_functional_groups:
+                The functional groups the initialized building block should
+                have.
 
-        case_data_core_atom_ids : :class:`tuple` of :class:`int`
-            The ids of core atoms the initialized building block should
-            have.
+            case_data_core_atom_ids:
+                The ids of core atoms the initialized building block should
+                have.
 
-        case_data_placer_ids : :class:`tuple` of :class:`int`
-            The ids of *placer* atoms the initialized building block
-            should have.
+            case_data_placer_ids: : :class:`tuple` of :class:`int`
+                The ids of *placer* atoms the initialized building block
+                should have.
 
-        known_repr : str
-            The representation of the building block.
+            known_repr:
+                The representation of the building block.
 
         """
 

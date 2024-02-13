@@ -1,19 +1,19 @@
 import itertools as it
 
+from .case_data import CaseData
 
-def test_get_core_atom_ids(case_data):
+
+def test_get_core_atom_ids(case_data: CaseData) -> None:
     """
     Test :meth:`.BuildingBlock.get_core_atom_ids`.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the building block to test and the correct
-        core atom ids.
+    Parameters:
+        case_data:
+            A test case. Holds the building block to test and the correct
+            core atom ids.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    Returns:
+        :class:`NoneType`
 
     """
 
