@@ -28,12 +28,13 @@ readme = "README.rst"
 
 [project.optional-dependencies]
 dev = [
-  "black",
   "ruff",
   "moldoc",
   "mypy",
   "pip-tools",
-  "pytest",
+  # TODO: Remove pin when https://github.com/TvoroG/pytest-lazy-fixture/issues/65 is resolved.
+  # pytest-lazy-fixture 0.6.0 is incompatible with pytest 8.0.0
+  "pytest<8",
   "pytest-benchmark",
   "pytest-datadir",
   "pytest-lazy-fixture",
@@ -51,11 +52,11 @@ documentation = "https://stk.readthedocs.io"
 [tool.setuptools_scm]
 write_to = "src/stk/_version.py"
 
-[tool.black]
-line-length = 79
 
 [tool.ruff]
 line-length = 79
+
+[too.ruff.lint]
 extend-select = ["I"]
 
 [tool.pytest.ini_options]

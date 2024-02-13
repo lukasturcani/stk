@@ -4,7 +4,6 @@ MAE Updating Utilities
 
 """
 
-
 from stk._internal.utilities.utilities import mol_from_mae_file
 
 

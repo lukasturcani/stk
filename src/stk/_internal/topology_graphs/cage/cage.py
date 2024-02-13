@@ -966,8 +966,9 @@ class Cage(TopologyGraph):
 
     def __init__(
         self,
-        building_blocks: abc.Iterable[BuildingBlock]
-        | dict[BuildingBlock, tuple[int, ...]],
+        building_blocks: (
+            abc.Iterable[BuildingBlock] | dict[BuildingBlock, tuple[int, ...]]
+        ),
         vertex_alignments: dict[int, int] | None = None,
         vertex_positions: dict[int, np.ndarray] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),
@@ -1160,11 +1161,13 @@ class Cage(TopologyGraph):
     @classmethod
     def _normalize_building_blocks(
         cls,
-        building_blocks: abc.Iterable[BuildingBlock]
-        | dict[
-            BuildingBlock,
-            tuple[int, ...],
-        ],
+        building_blocks: (
+            abc.Iterable[BuildingBlock]
+            | dict[
+                BuildingBlock,
+                tuple[int, ...],
+            ]
+        ),
     ) -> dict[BuildingBlock, abc.Sequence[_CageVertex]]:
         # Use tuple here because it prints nicely.
         allowed_degrees = tuple(cls._vertices_of_degree.keys())

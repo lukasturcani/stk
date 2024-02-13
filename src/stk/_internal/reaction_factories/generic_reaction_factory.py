@@ -4,6 +4,8 @@ Generic Reaction Factory
 
 """
 
+import textwrap
+
 from stk._internal.functional_groups.aldehyde import Aldehyde
 from stk._internal.functional_groups.alkene import Alkene
 from stk._internal.functional_groups.alkyne import Alkyne
@@ -159,7 +161,20 @@ class GenericReactionFactory(ReactionFactory):
                 edge_group=edge_group,
             )
         )
-        functional_group1, functional_group2 = functional_groups
+
+        try:
+            functional_group1, functional_group2 = functional_groups
+        except ValueError as ex:
+            ex.add_note(
+                textwrap.dedent(
+                    f"""\
+    Two functional groups not found during reaction.
+    This suggests an issue with edge id {next(edge_group.get_edge_ids())}
+    in your topology graph. (edge group: {edge_group})"""
+                )
+            )
+            raise
+
         edge = construction_state.get_edge(
             edge_id=next(edge_group.get_edge_ids()),
         )

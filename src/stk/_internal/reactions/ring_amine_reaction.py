@@ -99,17 +99,17 @@ class RingAmineReaction(Reaction):
         nc2h1 = C(-8)
         nc2h2 = C(-9)
 
-        yield Bond(n1, n_joiner, 1),
-        yield Bond(n_joiner, n2, 1, self._periodicity),
-        yield Bond(n_joiner, nh1, 1),
-        yield Bond(n_joiner, nh2, 1),
-        yield Bond(c1, nc_joiner1, 1),
-        yield Bond(nc_joiner1, n2, 1, self._periodicity),
-        yield Bond(nc_joiner1, nc1h1, 1),
-        yield Bond(nc_joiner1, nc1h2, 1),
-        yield Bond(nc_joiner2, c2, 1, self._periodicity),
-        yield Bond(n1, nc_joiner2, 1),
-        yield Bond(nc_joiner2, nc2h1, 1),
+        yield (Bond(n1, n_joiner, 1),)
+        yield (Bond(n_joiner, n2, 1, self._periodicity),)
+        yield (Bond(n_joiner, nh1, 1),)
+        yield (Bond(n_joiner, nh2, 1),)
+        yield (Bond(c1, nc_joiner1, 1),)
+        yield (Bond(nc_joiner1, n2, 1, self._periodicity),)
+        yield (Bond(nc_joiner1, nc1h1, 1),)
+        yield (Bond(nc_joiner1, nc1h2, 1),)
+        yield (Bond(nc_joiner2, c2, 1, self._periodicity),)
+        yield (Bond(n1, nc_joiner2, 1),)
+        yield (Bond(nc_joiner2, nc2h1, 1),)
         yield Bond(nc_joiner2, nc2h2, 1)
 
     def _get_deleted_atoms(self):

@@ -68,9 +68,8 @@ class ReplaceFitness(FitnessNormalizer[T]):
     def __init__(
         self,
         get_replacement: Callable[[dict[T, Any]], Any],
-        filter: Callable[
-            [dict[T, Any], T], bool
-        ] = lambda fitness_values, record: True,
+        filter: Callable[[dict[T, Any], T], bool] = lambda fitness_values,
+        record: True,
     ) -> None:
         """
         Parameters:
@@ -97,8 +96,10 @@ class ReplaceFitness(FitnessNormalizer[T]):
     def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
         replacement = self._get_replacement(fitness_values)
         return {
-            record: replacement
-            if self._filter(fitness_values, record)
-            else fitness_value
+            record: (
+                replacement
+                if self._filter(fitness_values, record)
+                else fitness_value
+            )
             for record, fitness_value in fitness_values.items()
         }

@@ -3,6 +3,7 @@ Six Plus Twelve
 ===============
 
 """
+
 import numpy as np
 
 from stk._internal.topology_graphs.edge import Edge

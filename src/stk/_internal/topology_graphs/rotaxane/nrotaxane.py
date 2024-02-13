@@ -489,7 +489,8 @@ class NRotaxane(TopologyGraph):
 
         # Save the chosen orientations for __repr__.
         self._orientations = tuple(
-            int(vertex.get_flip()) for vertex in vertices[1:]  # type:ignore
+            int(vertex.get_flip())  # type: ignore[union-attr]
+            for vertex in vertices[1:]
         )
 
         super().__init__(

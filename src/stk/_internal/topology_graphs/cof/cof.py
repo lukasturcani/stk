@@ -336,8 +336,9 @@ class Cof(TopologyGraph):
 
     def __init__(
         self,
-        building_blocks: abc.Iterable[BuildingBlock]
-        | dict[BuildingBlock, tuple[int, ...]],
+        building_blocks: (
+            abc.Iterable[BuildingBlock] | dict[BuildingBlock, tuple[int, ...]]
+        ),
         lattice_size: tuple[int, int, int],
         periodic: bool = False,
         vertex_alignments: dict[int, int] | None = None,
@@ -457,12 +458,10 @@ class Cof(TopologyGraph):
                 for building_block, ids in building_blocks.items()
             }
         else:
-            building_block_vertices = (
-                self._get_building_block_vertices(  # type: ignore[assignment]
-                    building_blocks=building_blocks,
-                    vertices=vertices,
-                    edges=edges,
-                )
+            building_block_vertices = self._get_building_block_vertices(  # type: ignore[assignment]
+                building_blocks=building_blocks,
+                vertices=vertices,
+                edges=edges,
             )
 
         building_block_vertices = self._with_unaligning_vertices(

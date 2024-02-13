@@ -145,10 +145,12 @@ class M3L3Triangle(Cage):
 
     def __init__(
         self,
-        corners: Iterable[BuildingBlock]
-        | dict[BuildingBlock, tuple[int, ...]],
-        linkers: Iterable[BuildingBlock]
-        | dict[BuildingBlock, tuple[int, ...]],
+        corners: (
+            Iterable[BuildingBlock] | dict[BuildingBlock, tuple[int, ...]]
+        ),
+        linkers: (
+            Iterable[BuildingBlock] | dict[BuildingBlock, tuple[int, ...]]
+        ),
         vertex_alignments: dict[int, int] | None = None,
         vertex_positions: dict[int, np.ndarray] | None = None,
         reaction_factory: ReactionFactory = GenericReactionFactory(),

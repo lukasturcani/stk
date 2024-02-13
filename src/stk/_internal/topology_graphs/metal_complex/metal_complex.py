@@ -609,11 +609,13 @@ class MetalComplex(TopologyGraph):
 
     def _normalize_metals(
         self,
-        metals: BuildingBlock
-        | dict[
-            BuildingBlock,
-            tuple[int, ...],
-        ],
+        metals: (
+            BuildingBlock
+            | dict[
+                BuildingBlock,
+                tuple[int, ...],
+            ]
+        ),
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         """
         Return a map between metals and vertices.

@@ -43,6 +43,9 @@ class InitFromFileData:
         The ids of *placer* atoms the initialized building block should
         have.
 
+    known_repr : str
+        The representation of the building block.
+
     """
 
     def __init__(
@@ -53,6 +56,7 @@ class InitFromFileData:
         case_data_functional_groups,
         case_data_core_atom_ids,
         case_data_placer_ids,
+        known_repr,
     ):
         """
         Initialize a :class:`.InitFromData` instance.
@@ -83,6 +87,9 @@ class InitFromFileData:
             The ids of *placer* atoms the initialized building block
             should have.
 
+        known_repr : str
+            The representation of the building block.
+
         """
 
         self.building_block = building_block
@@ -91,6 +98,7 @@ class InitFromFileData:
         self.case_data_functional_groups = case_data_functional_groups
         self.case_data_core_atom_ids = case_data_core_atom_ids
         self.case_data_placer_ids = case_data_placer_ids
+        self.known_repr = known_repr
 
 
 @pytest.fixture(
@@ -103,6 +111,7 @@ class InitFromFileData:
             case_data_functional_groups=(),
             case_data_core_atom_ids=(0, 1, 2, 3),
             case_data_placer_ids=(0, 1, 2, 3),
+            known_repr="BuildingBlock('Br[C+2][C+2]Br', ())",
         ),
         lambda: InitFromFileData(
             building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
@@ -124,6 +133,12 @@ class InitFromFileData:
             ),
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(1, 2),
+            known_repr=(
+                "BuildingBlock('Br[C+2][C+2]Br', (Bromo(Br(0), C(1, charge=2),"
+                " bonders=(C(1, charge=2),), deleters=(Br(0),)), Bromo(Br(3), "
+                "C(2, charge=2), bonders=(C(2, charge=2),), deleters=(Br(3),))"
+                "))"
+            ),
         ),
         lambda: InitFromFileData(
             building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
@@ -132,6 +147,7 @@ class InitFromFileData:
             case_data_functional_groups=(),
             case_data_core_atom_ids=(0, 1, 2, 3),
             case_data_placer_ids=(1, 2),
+            known_repr="BuildingBlock('Br[C+2][C+2]Br', ())",
         ),
         lambda: InitFromFileData(
             building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
@@ -153,6 +169,12 @@ class InitFromFileData:
             ),
             case_data_core_atom_ids=(1, 2),
             case_data_placer_ids=(0, 3),
+            known_repr=(
+                "BuildingBlock('Br[C+2][C+2]Br', (Bromo(Br(0), C(1, charge=2),"
+                " bonders=(C(1, charge=2),), deleters=(Br(0),)), Bromo(Br(3), "
+                "C(2, charge=2), bonders=(C(2, charge=2),), deleters=(Br(3),))"
+                "))"
+            ),
         ),
         lambda: InitFromFileData(
             building_block=stk.BuildingBlock("Br[C+2][C+2]Br"),
@@ -161,6 +183,7 @@ class InitFromFileData:
             case_data_functional_groups=(),
             case_data_core_atom_ids=(0, 1, 2, 3),
             case_data_placer_ids=(0, 1, 2, 3),
+            known_repr="BuildingBlock('Br[C+2][C+2]Br', ())",
         ),
     ),
 )
@@ -191,4 +214,5 @@ def init_from_file(path, init_from_file_data):
         functional_groups=data.case_data_functional_groups,
         core_atom_ids=data.case_data_core_atom_ids,
         placer_ids=data.case_data_placer_ids,
+        known_repr=data.known_repr,
     )

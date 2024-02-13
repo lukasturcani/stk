@@ -107,9 +107,8 @@ class Multiply(FitnessNormalizer[T]):
     def __init__(
         self,
         coefficient: float | Iterable[float],
-        filter: Callable[
-            [dict[T, Any], T], bool
-        ] = lambda fitness_values, record: True,
+        filter: Callable[[dict[T, Any], T], bool] = lambda fitness_values,
+        record: True,
     ) -> None:
         """
         Parameters:
@@ -135,8 +134,10 @@ class Multiply(FitnessNormalizer[T]):
 
     def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
         return {
-            record: np.multiply(self._coefficient, fitness_value)
-            if self._filter(fitness_values, record)
-            else fitness_value
+            record: (
+                np.multiply(self._coefficient, fitness_value)
+                if self._filter(fitness_values, record)
+                else fitness_value
+            )
             for record, fitness_value in fitness_values.items()
         }

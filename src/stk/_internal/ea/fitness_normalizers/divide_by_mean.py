@@ -85,9 +85,8 @@ class DivideByMean(FitnessNormalizer[T]):
 
     def __init__(
         self,
-        filter: Callable[
-            [dict[T, Any], T], bool
-        ] = lambda fitness_values, record: True,
+        filter: Callable[[dict[T, Any], T], bool] = lambda fitness_values,
+        record: True,
     ) -> None:
         """
         Parameters:
@@ -116,8 +115,10 @@ class DivideByMean(FitnessNormalizer[T]):
         logger.debug(f"Means used: {mean}")
 
         return {
-            record: np.divide(fitness_value, mean)
-            if self._filter(fitness_values, record)
-            else fitness_value
+            record: (
+                np.divide(fitness_value, mean)
+                if self._filter(fitness_values, record)
+                else fitness_value
+            )
             for record, fitness_value in fitness_values.items()
         }

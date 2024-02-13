@@ -4,7 +4,6 @@ Host Guest Complex Vertices
 
 """
 
-
 import numpy as np
 
 from stk._internal.topology_graphs.vertex import Vertex

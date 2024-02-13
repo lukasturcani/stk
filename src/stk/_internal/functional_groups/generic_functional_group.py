@@ -4,7 +4,6 @@ Generic Functional Group
 
 """
 
-
 from __future__ import annotations
 
 import typing
