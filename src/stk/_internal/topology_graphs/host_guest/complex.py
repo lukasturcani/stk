@@ -499,7 +499,7 @@ class Complex(TopologyGraph):
         if isinstance(guests, Guest):
             guests = (guests,)
 
-        building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]]
+        building_block_vertices: dict[BuildingBlock, list[Vertex]]
         building_block_vertices = {host: [HostVertex(0, (0.0, 0.0, 0.0))]}
         for id_, guest in enumerate(guests, 1):
             building_block = guest.get_building_block()
@@ -521,7 +521,7 @@ class Complex(TopologyGraph):
                         target=guest.get_end_vector(),
                     ),
                 ]
-        return building_block_vertices
+        return building_block_vertices  # type: ignore
 
     def clone(self) -> Complex:
         return self._clone()
