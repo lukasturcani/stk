@@ -500,20 +500,27 @@ class Complex(TopologyGraph):
             guests = (guests,)
 
         building_block_vertices: dict[BuildingBlock, abc.Sequence[Vertex]]
-        building_block_vertices = {host: (HostVertex(0, (0.0, 0.0, 0.0)),)}
-        guest_vertices = {
-            guest.get_building_block(): (
-                GuestVertex(
-                    id=i + 1,
-                    position=guest.get_displacement(),
-                    start=guest.get_start_vector(),
-                    target=guest.get_end_vector(),
-                ),
-            )
-            for i, guest in enumerate(guests)
-        }
-        building_block_vertices.update(guest_vertices)
-
+        building_block_vertices = {host: [HostVertex(0, (0.0, 0.0, 0.0))]}
+        for id_, guest in enumerate(guests, 1):
+            building_block = guest.get_building_block()
+            if building_block in building_block_vertices:
+                building_block_vertices[building_block].append(
+                    GuestVertex(
+                        id=id_,
+                        position=guest.get_displacement(),
+                        start=guest.get_start_vector(),
+                        target=guest.get_end_vector(),
+                    ),
+                )
+            else:
+                building_block_vertices[building_block] = [
+                    GuestVertex(
+                        id=id_,
+                        position=guest.get_displacement(),
+                        start=guest.get_start_vector(),
+                        target=guest.get_end_vector(),
+                    ),
+                ]
         return building_block_vertices
 
     def clone(self) -> Complex:
