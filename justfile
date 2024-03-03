@@ -19,7 +19,7 @@ check:
   trap error=1 ERR
 
   echo
-  (set -x; ruff . )
+  (set -x; ruff check . )
 
   echo
   ( set -x; ruff format --check . )
@@ -38,7 +38,7 @@ check:
 # Auto-fix code issues.
 fix:
   ruff format .
-  ruff --fix .
+  ruff check --fix .
 
 # Start a MongoDB instance in docker.
 mongo:
