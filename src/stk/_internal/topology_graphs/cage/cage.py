@@ -1378,9 +1378,9 @@ class Cage(TopologyGraph):
         for vertex in cls._vertex_prototypes:
             vertex_degree = cls._vertex_degrees[vertex.get_id()]
             building_block = building_blocks_by_degree[vertex_degree]
-            building_block_vertices[
-                building_block
-            ] = building_block_vertices.get(building_block, [])
+            building_block_vertices[building_block] = (
+                building_block_vertices.get(building_block, [])
+            )
             building_block_vertices[building_block].append(vertex)
         return typing.cast(
             dict[BuildingBlock, abc.Sequence[_CageVertex]],
