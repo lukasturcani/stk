@@ -410,7 +410,7 @@ class Complex(TopologyGraph):
         *Changing the Position of the Guest*
 
         You can change the position and orientation of the
-        :class:`.Guest`, as well as its displacement
+        :class:`.Guest`
 
         .. testcode:: changing-the-position-of-the-guest
 
@@ -448,6 +448,13 @@ class Complex(TopologyGraph):
                     guests=guest,
                 ),
             )
+
+    Warnings:
+
+        The host of a :class:`.Complex` will always be placed at the
+        origin, not at the centroid of the input building block. Therefore,
+        to place a guest at the centroid of the host use
+        `displacement=(0, 0, 0)`, which is the default behaviour.
 
     """
 
