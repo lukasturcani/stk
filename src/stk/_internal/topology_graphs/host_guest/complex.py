@@ -37,7 +37,7 @@ class Guest:
         building_block: BuildingBlock,
         start_vector: tuple[float, float, float] = (1.0, 0.0, 0.0),
         end_vector: tuple[float, float, float] = (1.0, 0.0, 0.0),
-        displacement: tuple[float, float, float] = (1.0, 0.0, 0.0),
+        displacement: tuple[float, float, float] = (0.0, 0.0, 0.0),
     ) -> None:
         """
         Initialize a :class:`.Guest` instance.
