@@ -7,6 +7,8 @@ from pytest_lazyfixture import lazy_fixture
 # Fixtures need be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
 
+from .case_data import CaseData
+
 
 @pytest.fixture(
     params=(
@@ -17,7 +19,7 @@ from .fixtures import *  # noqa
         lazy_fixture("init_from_rdkit_mol"),
     ),
 )
-def case_data(request):
+def case_data(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 

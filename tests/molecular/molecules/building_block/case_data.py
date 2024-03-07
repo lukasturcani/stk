@@ -1,54 +1,56 @@
+import stk
+
+
 class CaseData:
     """
     A test case.
+    Attributes:
+        building_block:
+            The building block, which will be written to a file, so
+            that it can be initialized from it.
 
-    Attributes
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The building block to test.
+        functional_groups:
+            The functional groups :attr:`.building_block` should be
+            holding.
 
-    functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The functional groups :attr:`.building_block` should be
-        holding.
+        known_repr:
+            The representation of the building block.
 
-    known_repr : str
-        The representation of the building block.
+        core_atom_ids:
+            The correct core atom ids for :attr:`.building_block`.
 
-    core_atom_ids : :class:`tuple` of :class:`int`
-        The correct core atom ids for :attr:`.building_block`.
-
-    placer_ids : :class:`tuple` of :class:`int`
-        The correct *placer* ids for :attr:`.building_block`.
-
+        placer_ids:
+            The correct *placer* ids for :attr:`.building_block`.
     """
 
     def __init__(
         self,
-        building_block,
-        functional_groups,
-        known_repr,
-        core_atom_ids,
-        placer_ids,
-    ):
+        building_block: stk.BuildingBlock,
+        functional_groups: tuple,
+        known_repr: str,
+        core_atom_ids: tuple[int, ...],
+        placer_ids: tuple[int, ...],
+    ) -> None:
         """
         Initialize a :class:`.CaseData` instance.
 
-        Parameters
-        ----------
-        building_block : :class:`.BuildingBlock`
-            The building block to test.
+        Parameters:
+            building_block:
+                The building block, which will be written to a file, so
+                that it can be initialized from it.
 
-        functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
-            The functional groups `building_block` should be holding.
+            functional_groups:
+                The functional groups :attr:`.building_block` should be
+                holding.
 
-        known_repr : str
-            The representation of the building block.
+            known_repr:
+                The representation of the building block.
 
-        core_atom_ids : :class:`tuple` of :class:`int`
-            The correct core atom ids for `building_block`.
+            core_atom_ids:
+                The correct core atom ids for :attr:`.building_block`.
 
-        placer_ids : :class:`tuple` of :class:`int`
-            The correct *placer* ids for `building_block`.
+            placer_ids:
+                The correct *placer* ids for :attr:`.building_block`.
 
         """
 
