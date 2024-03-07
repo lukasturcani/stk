@@ -1,15 +1,18 @@
-def test_to_string(case_data):
+import stk
+
+from .case_data import CaseData
+
+
+def test_to_string(case_data: CaseData) -> None:
     """
     Test writing of molecule to a string.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case.
+    Parameters:
+        case_data:
+            A test case.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    Returns:
+        :class:`NoneType`
 
     """
 
@@ -21,27 +24,30 @@ def test_to_string(case_data):
     )
 
 
-def _test_to_string(molecule, writer, string, periodic_info=None):
+def _test_to_string(
+    molecule: stk.Molecule,
+    writer: stk.TurbomoleWriter,
+    string: str,
+    periodic_info: stk.PeriodicInfo | None = None,
+) -> None:
     """
     Test that the written string matches expected string.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        Molecule to test.
+    Parameters:
+        molecule:
+            Molecule to test.
 
-    writer : :class:`.TurbomoleWriter`
-        The writer to test.
+        writer:
+            The writer to test.
 
-    string : :class:`str`
-        The expected output string.
+        string:
+            The expected output string.
 
-    periodic_info : :class:`.PeriodicInfo`
-        Periodic information.
+        periodic_info:
+            Periodic information.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    Returns:
+        :class:`NoneType`
 
     """
 

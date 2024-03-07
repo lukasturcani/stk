@@ -29,7 +29,7 @@ def case_data(request) -> CaseData:
 
 
 @pytest.fixture
-def building_block(case_data):
+def building_block(case_data: CaseData) -> stk.BuildingBlock:
     """
     A :class:`.BuildingBlock` instance.
 
@@ -50,18 +50,17 @@ def building_block(case_data):
         ),
     )
 )
-def get_functional_groups(request):
+def get_functional_groups(
+    request: pytest.FixtureRequest,
+) -> stk.FunctionalGroup:
     """
-    Yield the functional groups of a `molecule`.
+    Get the functional groups of a `molecule`.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule whose functional groups should be gotten.
+    Parameters:
+        molecule:
+            The molecule whose functional groups should be gotten.
 
-    Yields
-    ------
-    :class:`.FunctionalGroup`
+    Returns:
         A functional group of `molecule`.
 
     """

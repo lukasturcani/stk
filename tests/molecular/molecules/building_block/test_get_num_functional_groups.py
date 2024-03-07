@@ -1,16 +1,18 @@
-def test_get_num_functional_groups(case_data):
+from .case_data import CaseData
+
+
+def test_get_num_functional_groups(case_data: CaseData) -> None:
     """
     Test :meth:`.BuildingBlock.get_num_functional_groups`.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the building block to test and the
-        correct number of functional groups.
+    Parameters:
+        case_data:
+            A test case. Holds the building block to test and the correct
+            functional groups.
 
-    Returns
-    -------
-    None : :class:`NoneType`
+    Returns:
+        :class:`NoneType`
+
 
     """
 

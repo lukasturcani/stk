@@ -1,41 +1,48 @@
+import stk
+
+
 class CaseData:
     """
     A :class:`.TurbomoleWriter` test case.
 
-    Attributes
-    ----------
-    molecule : :class:`.Molecule`
-        Molecule to test.
+    Attributes:
+        molecule:
+            Molecule to test.
 
-    writer : :class:`.TurbomoleWriter`
-        The writer to test.
+        writer:
+            The writer to test.
 
-    string : :class:`str`
-        The expected output string.
+        string:
+            The expected output string.
 
-    periodic_info : :class:`.PeriodicInfo`
-        Information about periodic cell. Required for testing writing
-        of constructed molecules with periodic unit cells.
+        periodic_info:
+            Information about periodic cell. Required for testing writing
+            of constructed molecules with periodic unit cells.
 
     """
 
-    def __init__(self, molecule, writer, string, periodic_info):
+    def __init__(
+        self,
+        molecule: stk.Molecule,
+        writer: stk.TurbomoleWriter,
+        string: str,
+        periodic_info: stk.PeriodicInfo | None,
+    ) -> None:
         """
         Initialize a :class:`.CaseData` instance.
 
-        Parameters
-        ----------
-        molecule : :class:`.Molecule`
-            Molecule to test.
+        Parameters:
+            molecule:
+                Molecule to test.
 
-        writer : :class:`.TurbomoleWriter`
-            The writer to test.
+            writer:
+                The writer to test.
 
-        string : :class:`str`
-            The expected output string.
+            string:
+                The expected output string.
 
-        periodic_info : :class:`.PeriodicInfo`
-            Information about periodic cell.
+            periodic_info:
+                Information about periodic cell.
 
         """
 

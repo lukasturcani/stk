@@ -43,7 +43,7 @@ def _get_cof_case() -> CaseData:
             "1.6749 H\n 7.9667 16.1026 53.582 H\n 7.7801 15.8075 5"
             "1.7756 H\n$end\n"
         ),
-        periodic_info=construction_result.get_periodic_info(),
+        periodic_info=construction_result.get_periodic_info(),  # type: ignore[attr-defined]
     )
 
 
