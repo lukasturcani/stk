@@ -454,7 +454,7 @@ class Complex(TopologyGraph):
         The host of a :class:`.Complex` will always be placed at the
         origin, not at the centroid of the input building block. Therefore,
         to place a guest at the centroid of the host use
-        `displacement=(0, 0, 0)`, which is **now** the default behaviour.
+        `displacement=(0, 0, 0)`, which is the default behaviour.
 
     """
 
