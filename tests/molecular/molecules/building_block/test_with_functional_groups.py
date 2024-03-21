@@ -23,9 +23,6 @@ def test_with_functional_groups(
             Takes a single parameter, `building_block` and returns the
             `functional_groups` parameter to use for this test.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     # Save clone to check immutability.
@@ -51,9 +48,6 @@ def _test_with_functional_groups(
 
         functional_groups:
             The functional groups the new building block should hold.
-
-    Returns:
-        :class:`NoneType`
 
     """
 

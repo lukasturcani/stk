@@ -15,9 +15,6 @@ def test_get_functional_groups(case_data: CaseData) -> None:
             A test case. Holds the building block to test and the correct
             functional groups.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     _test_get_functional_groups(
@@ -39,9 +36,6 @@ def _test_get_functional_groups(
 
         functional_groups:
             The correct functional groups.
-
-    Returns:
-        :class:`NoneType`
 
     """
 

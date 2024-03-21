@@ -15,9 +15,6 @@ def test_write(case_data: CaseData, tmp_path: pathlib.Path) -> None:
         tmp_path:
             Path to temporary directory.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     _test_write(
@@ -49,9 +46,6 @@ def _test_write(
 
         file_path:
             Path to temporary file.
-
-    Returns:
-        :class:`NoneType`
 
     """
 

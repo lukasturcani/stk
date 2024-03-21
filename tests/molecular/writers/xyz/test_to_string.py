@@ -11,9 +11,6 @@ def test_to_string(case_data: CaseData) -> None:
         case_data:
             A test case.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     _test_to_string(
@@ -40,9 +37,6 @@ def _test_to_string(
 
         string:
             The expected output string.
-
-    Returns:
-        :class:`NoneType`
 
     """
 

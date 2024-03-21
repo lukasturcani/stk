@@ -12,9 +12,6 @@ def test_get_core_atom_ids(case_data: CaseData) -> None:
             A test case. Holds the building block to test and the correct
             core atom ids.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     for id1, id2 in it.zip_longest(

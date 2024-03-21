@@ -11,9 +11,6 @@ def test_repr(case_data: CaseData) -> None:
         case_data:
             A test case. Holds the building block to test.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     _test_repr(
@@ -32,9 +29,6 @@ def _test_repr(building_block: stk.BuildingBlock, known_repr: str) -> None:
 
         known_repr:
             The correct representation.
-
-    Returns:
-        :class:`NoneType`
 
     """
 

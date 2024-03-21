@@ -13,9 +13,6 @@ def test_get_placer_ids(case_data: CaseData) -> None:
             A test case. Holds the building block to test and the
             correct placer ids.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     _test_get_placer_ids(
@@ -37,9 +34,6 @@ def _test_get_placer_ids(
 
         placer_ids:
             The correct placer ids.
-
-    Returns:
-        :class:`NoneType`
 
     """
 

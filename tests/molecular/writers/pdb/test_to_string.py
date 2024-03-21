@@ -11,9 +11,6 @@ def test_to_string(case_data: CaseData) -> None:
         case_data:
             A test case.
 
-    Returns:
-        :class:`NoneType`
-
     """
 
     _test_to_string(
@@ -45,9 +42,6 @@ def _test_to_string(
 
         periodic_info:
             Periodic information.
-
-    Returns:
-        :class:`NoneType`
 
     """
 
