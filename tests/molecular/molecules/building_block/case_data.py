@@ -4,11 +4,6 @@ from dataclasses import dataclass
 
 @dataclass(slots=True, frozen=True)
 class CaseData:
-    """
-    A test case.
-
-    """
-
     building_block: stk.BuildingBlock
     functional_groups: tuple
     known_repr: str
