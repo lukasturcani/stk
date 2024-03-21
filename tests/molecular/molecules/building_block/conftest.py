@@ -3,6 +3,7 @@ import itertools as it
 import pytest
 import stk
 from pytest_lazyfixture import lazy_fixture
+from collections import abc
 
 # Fixtures need be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
@@ -52,7 +53,7 @@ def building_block(case_data: CaseData) -> stk.BuildingBlock:
 )
 def get_functional_groups(
     request: pytest.FixtureRequest,
-) -> stk.FunctionalGroup:
+) -> abc.Iterable[stk.FunctionalGroup]:
     """
     Get the functional groups of a `molecule`.
 
