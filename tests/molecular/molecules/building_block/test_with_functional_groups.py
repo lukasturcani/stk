@@ -10,7 +10,7 @@ from collections import abc
 
 def test_with_functional_groups(
     building_block: stk.BuildingBlock,
-    get_functional_groups: abc.Callable,
+    get_functional_groups: abc.Callable[stk.BuildingBlock],
 ) -> None:
     """
     Test :meth:`.BuildingBlock.with_functional_groups`.

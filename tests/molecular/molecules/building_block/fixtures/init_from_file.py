@@ -48,9 +48,9 @@ class InitFromFileData:
     def __init__(
         self,
         building_block: stk.BuildingBlock,
-        init_functional_groups: Iterable,
-        init_placer_ids: tuple | None,
-        case_data_functional_groups: tuple,
+        init_functional_groups: Iterable[stk.FunctionalGroup],
+        init_placer_ids: tuple[int, ...] | None,
+        case_data_functional_groups: tuple[stk.FunctionalGroup, ...],
         case_data_core_atom_ids: tuple[int, ...],
         case_data_placer_ids: tuple[int, ...],
         known_repr: str,
