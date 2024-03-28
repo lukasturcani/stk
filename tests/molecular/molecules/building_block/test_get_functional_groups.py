@@ -3,6 +3,7 @@ import itertools as it
 from ..utilities import is_equivalent_functional_group
 
 import stk
+from collections.abc import Sequence
 from .case_data import CaseData
 
 
@@ -25,7 +26,7 @@ def test_get_functional_groups(case_data: CaseData) -> None:
 
 def _test_get_functional_groups(
     building_block: stk.BuildingBlock,
-    functional_groups: tuple[stk.FunctionalGroup],
+    functional_groups: Sequence[stk.FunctionalGroup],
 ) -> None:
     """
     Test :meth:`.BuildingBlock.get_functional_groups`.

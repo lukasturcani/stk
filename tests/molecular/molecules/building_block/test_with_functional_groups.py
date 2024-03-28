@@ -5,13 +5,13 @@ from ..utilities import (
     is_equivalent_molecule,
 )
 import stk
-from collections import abc
+from collections.abc import Sequence, Callable, Iterator
 
 
 def test_with_functional_groups(
     building_block: stk.BuildingBlock,
-    get_functional_groups: abc.Callable[
-        [stk.BuildingBlock, ...], tuple[stk.FunctionalGroup, ...]
+    get_functional_groups: Callable[
+        [stk.BuildingBlock], Iterator[stk.FunctionalGroup]
     ],
 ) -> None:
     """
@@ -39,7 +39,7 @@ def test_with_functional_groups(
 
 def _test_with_functional_groups(
     building_block: stk.BuildingBlock,
-    functional_groups: tuple[stk.FunctionalGroup],
+    functional_groups: Sequence[stk.FunctionalGroup],
 ) -> None:
     """
     Test :meth:`.BuildingBlock.with_functional_groups`.
