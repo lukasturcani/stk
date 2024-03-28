@@ -1,7 +1,8 @@
 import pytest
 import stk
-from collections.abc import Iterable
+from collections.abc import Sequence
 from ..case_data import CaseData
+from dataclasses import dataclass
 
 
 @pytest.fixture(
@@ -11,90 +12,15 @@ def path(tmpdir, request):
     return tmpdir / request.param
 
 
+@dataclass(frozen=True, slots=True)
 class InitFromFileData:
-    """
-    Stores data for the :meth:`.BuildingBlock.init_from_file`.
-
-    Attributes:
-        building_block:
-            The building block, which will be written to a file, so
-            that it can be initialized from it.
-
-        init_functional_groups:
-            Passed to the `functional_groups` parameter of
-            :meth:`.BuildingBlock.init_from_file`.
-
-        init_placer_ids:
-            Passed to the `placer_ids` parameter of
-            :meth:`.BuildingBlock.init_from_file`.
-
-        case_data_functional_groups:
-            The functional groups the initialized building block should
-            have.
-
-        case_data_core_atom_ids:
-            The ids of core atoms the initialized building block should
-            have.
-
-        case_data_placer_ids: : :class:`tuple` of :class:`int`
-            The ids of *placer* atoms the initialized building block
-            should have.
-
-        known_repr:
-            The representation of the building block.
-
-    """
-
-    def __init__(
-        self,
-        building_block: stk.BuildingBlock,
-        init_functional_groups: Iterable[stk.FunctionalGroup],
-        init_placer_ids: tuple[int, ...] | None,
-        case_data_functional_groups: tuple[stk.FunctionalGroup, ...],
-        case_data_core_atom_ids: tuple[int, ...],
-        case_data_placer_ids: tuple[int, ...],
-        known_repr: str,
-    ) -> None:
-        """
-        Initialize a :class:`.InitFromData` instance.
-
-        Parameters:
-            building_block:
-                The building block, which will be written to a file, so
-                that it can be initialized from it.
-
-            init_functional_groups:
-                Passed to the `functional_groups` parameter of
-                :meth:`.BuildingBlock.init_from_file`.
-
-            init_placer_ids:
-                Passed to the `placer_ids` parameter of
-                :meth:`.BuildingBlock.init_from_file`.
-
-            case_data_functional_groups:
-                The functional groups the initialized building block should
-                have.
-
-            case_data_core_atom_ids:
-                The ids of core atoms the initialized building block should
-                have.
-
-            case_data_placer_ids: : :class:`tuple` of :class:`int`
-                The ids of *placer* atoms the initialized building block
-                should have.
-
-            known_repr:
-                The representation of the building block.
-
-        """
-
-        self.building_block = building_block
-        self.init_functional_groups = init_functional_groups
-        self.init_placer_ids = init_placer_ids
-        self.case_data_functional_groups = case_data_functional_groups
-        self.case_data_core_atom_ids = case_data_core_atom_ids
-        self.case_data_placer_ids = case_data_placer_ids
-        self.known_repr = known_repr
+    building_block: stk.BuildingBlock
+    init_functional_groups: Sequence[stk.FunctionalGroup]
+    init_placer_ids: Sequence[int] | None
+    case_data_functional_groups: Sequence[stk.FunctionalGroup]
+    case_data_core_atom_ids: Sequence[int]
+    case_data_placer_ids: Sequence[int]
+    known_repr: str
 
 
 @pytest.fixture(
