@@ -449,7 +449,7 @@ class Complex(TopologyGraph):
                 ),
             )
 
-    Warnings:
+    .. tip::
 
         The host of a :class:`.Complex` will always be placed at the
         origin, not at the centroid of the input building block. Therefore,
