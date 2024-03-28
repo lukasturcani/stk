@@ -3,9 +3,12 @@ import itertools as it
 import pytest
 import stk
 from pytest_lazyfixture import lazy_fixture
+from collections import abc
 
 # Fixtures need be visible for lazy_fixture() calls.
 from .fixtures import *  # noqa
+
+from .case_data import CaseData
 
 
 @pytest.fixture(
@@ -17,7 +20,7 @@ from .fixtures import *  # noqa
         lazy_fixture("init_from_rdkit_mol"),
     ),
 )
-def case_data(request):
+def case_data(request) -> CaseData:
     """
     A :class:`.CaseData` instance.
 
@@ -27,7 +30,7 @@ def case_data(request):
 
 
 @pytest.fixture
-def building_block(case_data):
+def building_block(case_data: CaseData) -> stk.BuildingBlock:
     """
     A :class:`.BuildingBlock` instance.
 
@@ -48,18 +51,17 @@ def building_block(case_data):
         ),
     )
 )
-def get_functional_groups(request):
+def get_functional_groups(
+    request: pytest.FixtureRequest,
+) -> abc.Iterable[stk.FunctionalGroup]:
     """
-    Yield the functional groups of a `molecule`.
+    Get the functional groups of a `molecule`.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        The molecule whose functional groups should be gotten.
+    Parameters:
+        molecule:
+            The molecule whose functional groups should be gotten.
 
-    Yields
-    ------
-    :class:`.FunctionalGroup`
+    Returns:
         A functional group of `molecule`.
 
     """

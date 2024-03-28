@@ -1,19 +1,17 @@
 import itertools as it
+from .case_data import CaseData
+
+import stk
 
 
-def test_get_placer_ids(case_data):
+def test_get_placer_ids(case_data: CaseData) -> None:
     """
     Test :meth:`.BuildingBlock.get_placer_ids`.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the building block to test and the
-        correct placer ids.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+    Parameters:
+        case_data:
+            A test case. Holds the building block to test and the
+            correct placer ids.
 
     """
 
@@ -23,21 +21,19 @@ def test_get_placer_ids(case_data):
     )
 
 
-def _test_get_placer_ids(building_block, placer_ids):
+def _test_get_placer_ids(
+    building_block: stk.BuildingBlock,
+    placer_ids: tuple[int, ...],
+) -> None:
     """
     Test :meth:`.BuildingBlock.get_placer_ids`.
 
-    Parameters
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The building block to test.
+    Parameters:
+        building_block:
+            The building block to test.
 
-    placer_ids : :class:`tuple` of :class:`int`
-        The correct placer ids.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+        placer_ids:
+            The correct placer ids.
 
     """
 

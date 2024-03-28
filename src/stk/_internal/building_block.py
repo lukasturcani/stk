@@ -782,6 +782,7 @@ class BuildingBlock(Molecule):
         """
 
         self._functional_groups = tuple(functional_groups)
+        self._fg_repr = repr(self._functional_groups)
         return self
 
     def with_functional_groups(
@@ -812,6 +813,7 @@ class BuildingBlock(Molecule):
             functional_group.with_ids(id_map)
             for functional_group in self._functional_groups
         )
+        self._fg_repr = repr(self._functional_groups)
         self._placer_ids = frozenset(
             id_map[placer_id] for placer_id in self._placer_ids
         )

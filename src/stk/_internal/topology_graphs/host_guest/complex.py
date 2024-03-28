@@ -37,7 +37,7 @@ class Guest:
         building_block: BuildingBlock,
         start_vector: tuple[float, float, float] = (1.0, 0.0, 0.0),
         end_vector: tuple[float, float, float] = (1.0, 0.0, 0.0),
-        displacement: tuple[float, float, float] = (1.0, 0.0, 0.0),
+        displacement: tuple[float, float, float] = (0.0, 0.0, 0.0),
     ) -> None:
         """
         Initialize a :class:`.Guest` instance.
@@ -410,7 +410,7 @@ class Complex(TopologyGraph):
         *Changing the Position of the Guest*
 
         You can change the position and orientation of the
-        :class:`.Guest`, as well as its displacement
+        :class:`.Guest`.
 
         .. testcode:: changing-the-position-of-the-guest
 
@@ -448,6 +448,13 @@ class Complex(TopologyGraph):
                     guests=guest,
                 ),
             )
+
+    .. tip::
+
+        The host of a :class:`.Complex` will always be placed at the
+        origin, not at the centroid of the input building block. Therefore,
+        to place a guest at the centroid of the host use
+        `displacement=(0, 0, 0)`, which is the default behaviour.
 
     """
 
@@ -521,7 +528,7 @@ class Complex(TopologyGraph):
                         target=guest.get_end_vector(),
                     ),
                 ]
-        return building_block_vertices  # type: ignore
+        return building_block_vertices  # type: ignore[return-value]
 
     def clone(self) -> Complex:
         return self._clone()

@@ -1,16 +1,15 @@
-def test_repr(case_data):
+from .case_data import CaseData
+
+import stk
+
+
+def test_repr(case_data: CaseData) -> None:
     """
     Test :meth:`.BuildingBlock.__repr__`.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case. Holds the building block to test and the correct
-        functional groups.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+    Parameters:
+        case_data:
+            A test case. Holds the building block to test.
 
     """
 
@@ -20,22 +19,18 @@ def test_repr(case_data):
     )
 
 
-def _test_repr(building_block, known_repr):
+def _test_repr(building_block: stk.BuildingBlock, known_repr: str) -> None:
     """
     Test :meth:`.BuildingBlock.get_functional_groups`.
 
-    Parameters
-    ----------
-    building_block : :class:`.BuildingBlock`
-        The building block to test.
+    Parameters:
+        building_block:
+            The building block to test.
 
-    functional_groups : :class:`tuple` of :class:`.FunctionalGroup`
-        The correct functional groups.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+        known_repr:
+            The correct representation.
 
     """
+
     print(building_block.__repr__(), known_repr)
     assert building_block.__repr__() == known_repr

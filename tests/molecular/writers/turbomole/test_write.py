@@ -1,21 +1,21 @@
-def test_write(case_data, tmp_path):
+import stk
+
+from .case_data import CaseData
+import pathlib
+
+
+def test_write(case_data: CaseData, tmp_path: pathlib.Path) -> None:
     """
     Test writing of molecule to a file.
 
-    Parameters
-    ----------
-    case_data : :class:`.CaseData`
-        A test case.
+    Parameters:
+        case_data:
+            A test case.
 
-    tmp_path : :class:`pathlib2.Path`
-        Path to temporary directory.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+        tmp_path:
+            Path to temporary directory.
 
     """
-
     _test_write(
         molecule=case_data.molecule,
         writer=case_data.writer,
@@ -26,35 +26,30 @@ def test_write(case_data, tmp_path):
 
 
 def _test_write(
-    molecule,
-    writer,
-    string,
-    file_path,
-    periodic_info=None,
+    molecule: stk.Molecule,
+    writer: stk.TurbomoleWriter,
+    string: str,
+    file_path: pathlib.Path,
+    periodic_info: stk.PeriodicInfo | None = None,
 ):
     """
     Test that the written file content matches expected string.
 
-    Parameters
-    ----------
-    molecule : :class:`.Molecule`
-        Molecule to test.
+    Parameters:
+        molecule:
+            Molecule to test.
 
-    writer : :class:`.TurbomoleWriter`
-        The writer to test.
+        writer:
+            The writer to test.
 
-    string : :class:`str`
-        The expected output string.
+        string:
+            The expected output string.
 
-    periodic_info : :class:`.PeriodicInfo`
-        Periodic information.
+        file_path:
+            Path to temporary file.
 
-    file_path : :class:`str`
-        Path to temporary file.
-
-    Returns
-    -------
-    None : :class:`NoneType`
+        periodic_info:
+            Periodic information.
 
     """
 

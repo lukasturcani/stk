@@ -1,9 +1,3 @@
-"""
-Turbomole Writer
-================
-
-"""
-
 from __future__ import annotations
 
 import typing
@@ -11,6 +5,7 @@ import typing
 from stk._internal.molecule import Molecule
 from stk._internal.periodic_info import PeriodicInfo
 from stk._internal.utilities.utilities import OneOrMany
+import pathlib
 
 
 class TurbomoleWriter:
@@ -144,7 +139,7 @@ class TurbomoleWriter:
     def write(
         self,
         molecule: Molecule,
-        path: str,
+        path: pathlib.Path | str,
         atom_ids: typing.Optional[OneOrMany[int]] = None,
         periodic_info: typing.Optional[PeriodicInfo] = None,
     ) -> None:
