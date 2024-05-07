@@ -23,33 +23,21 @@ class M6L6L12Cuboctahedron(Cage):
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
-            functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(4)
-            ),
-            position_matrix=[[0, 0, 0]],
-        )
+        m1 = stk.BuildingBlock('[Ti](Br)(Br)(Br)(Br)(Br)(Br)(Br)(Br)', functional_groups=[stk.BromoFactory()])
 
-        bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
-            ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
-        )
+        bb1 = stk.BuildingBlock('C(OBr)=[O+]Br', functional_groups=[stk.BromoFactory()])
+
+        bb2 = stk.BuildingBlock('[O+](Br)(Br)(Br)', functional_groups=[stk.BromoFactory()])
 
         cage = stk.ConstructedMolecule(
-            topology_graph=stk.cage.M6L12Cube(
-                building_blocks=(bb1, bb2),
-            ),
+            topology_graph = stk.cage.M6L6L12Cuboctahedron(
+                building_blocks = {
+                    m1:range(0,6),
+                    bb1:range(6,18),
+                    bb2:range(18,26)
+                },
+                optimizer=stk.Nulloptimizer(),
+            )
         )
 
         moldoc_display_molecule = molecule.Molecule(
@@ -82,34 +70,21 @@ class M6L6L12Cuboctahedron(Cage):
         import moldoc.molecule as molecule
         import stk
 
-        bb1 = stk.BuildingBlock(
-            smiles='[Pd+2]',
-            functional_groups=(
-                stk.SingleAtom(stk.Pd(0, charge=2))
-                for i in range(4)
-            ),
-            position_matrix=[[0, 0, 0]],
-        )
+        m1 = stk.BuildingBlock('[Ti](Br)(Br)(Br)(Br)(Br)(Br)(Br)(Br)', functional_groups=[stk.BromoFactory()])
 
-        bb2 = stk.BuildingBlock(
-            smiles=(
-                'C1=NC=CC(C2=CC=CC(C3=C'
-                'C=NC=C3)=C2)=C1'
-            ),
-            functional_groups=[
-                stk.SmartsFunctionalGroupFactory(
-                    smarts='[#6]~[#7X2]~[#6]',
-                    bonders=(1, ),
-                    deleters=(),
-                ),
-            ],
-        )
+        bb1 = stk.BuildingBlock('C(OBr)=[O+]Br', functional_groups=[stk.BromoFactory()])
+
+        bb2 = stk.BuildingBlock('[O+](Br)(Br)(Br)', functional_groups=[stk.BromoFactory()])
 
         cage = stk.ConstructedMolecule(
-            topology_graph=stk.cage.M6L12Cube(
-                building_blocks=(bb1, bb2),
+            topology_graph = stk.cage.M6L6L12Cuboctahedron(
+                building_blocks = {
+                    m1:range(0,6),
+                    bb1:range(6,18),
+                    bb2:range(18,26)
+                },
                 optimizer=stk.Collapser(),
-            ),
+            )
         )
 
         moldoc_display_molecule = molecule.Molecule(
@@ -135,10 +110,11 @@ class M6L6L12Cuboctahedron(Cage):
             ),
         )
 
-    Metal building blocks with four functional groups are
+    Metal building blocks with eight functional groups are
     required for this topology.
 
-    Ligand building blocks with two functional groups are required for
+    One ligand building blocks with two functional groups and another ligand 
+    building block with three functional groups are required for
     this topology.
 
     When using a :class:`dict` for the `building_blocks` parameter,
@@ -147,8 +123,9 @@ class M6L6L12Cuboctahedron(Cage):
     :class:`.BuildingBlock`, with the following number of functional
     groups, needs to be assigned to each of the following vertex ids:
 
-        | 4-functional groups: 0 to 5
-        | 2-functional groups: 6 to 17
+        | 8-functional groups: 0  to 5
+        | 2-functional groups: 6  to 17
+        | 3-functional groups: 18 to 25
 
     See :class:`.Cage` for more details and examples.
 
