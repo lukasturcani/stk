@@ -134,12 +134,12 @@ class M6L6L12Cuboctahedron(Cage):
     _x = np.sqrt(2)/2
     _vertex_prototypes = (
         # M
-        NonLinearVertex(0, np.array([1, 0, 0])),
-        NonLinearVertex(1, np.array([0, 1, 0])),
-        NonLinearVertex(2, np.array([-1, 0, 0])),
-        NonLinearVertex(3, np.array([0, -1, 0])),
-        NonLinearVertex(4, np.array([0, 0, 1])),
-        NonLinearVertex(5, np.array([0, 0, -1])),
+        NonLinearVertex(0, np.array([1.5, 0, 0])),
+        NonLinearVertex(1, np.array([0, 1.5, 0])),
+        NonLinearVertex(2, np.array([-1.5, 0, 0])),
+        NonLinearVertex(3, np.array([0, -1.5, 0])),
+        NonLinearVertex(4, np.array([0, 0, 1.5])),
+        NonLinearVertex(5, np.array([0, 0, -1.5])),
         # L1
         LinearVertex(6, np.array([2, 2, 0]), False),
         LinearVertex(7, np.array([2, -2, 0]), False),
