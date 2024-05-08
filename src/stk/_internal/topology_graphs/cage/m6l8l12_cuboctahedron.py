@@ -131,7 +131,7 @@ class M6L6L12Cuboctahedron(Cage):
 
     """
 
-    _x = np.sqrt(2)
+    _x = np.sqrt(2)/2
     _vertex_prototypes = (
         # M
         NonLinearVertex(0, np.array([1, 0, 0])),
