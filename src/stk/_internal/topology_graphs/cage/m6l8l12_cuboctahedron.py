@@ -12,7 +12,7 @@ from .cage import Cage
 from .vertices import LinearVertex, NonLinearVertex
 
 
-class M6L6L12Cuboctahedron(Cage):
+class M6L8L12Cuboctahedron(Cage):
     """
     Represents a cage topology graph.
 
@@ -30,7 +30,7 @@ class M6L6L12Cuboctahedron(Cage):
         bb2 = stk.BuildingBlock('[O+](Br)(Br)(Br)', functional_groups=[stk.BromoFactory()])
 
         cage = stk.ConstructedMolecule(
-            topology_graph = stk.cage.M6L6L12Cuboctahedron(
+            topology_graph = stk.cage.M6L8L12Cuboctahedron(
                 building_blocks = {
                     m1:range(0,6),
                     bb1:range(6,18),
@@ -77,7 +77,7 @@ class M6L6L12Cuboctahedron(Cage):
         bb2 = stk.BuildingBlock('[O+](Br)(Br)(Br)', functional_groups=[stk.BromoFactory()])
 
         cage = stk.ConstructedMolecule(
-            topology_graph = stk.cage.M6L6L12Cuboctahedron(
+            topology_graph = stk.cage.M6L8L12Cuboctahedron(
                 building_blocks = {
                     m1:range(0,6),
                     bb1:range(6,18),
