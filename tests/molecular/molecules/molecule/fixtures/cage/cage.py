@@ -41,6 +41,7 @@ from .two_plus_three import *  # noqa
         lazy_fixture("metal_cage_m4l8"),
         lazy_fixture("metal_cage_m6l2l3_prism"),
         lazy_fixture("metal_cage_m6l12_cube"),
+        lazy_fixture("metal_cage_m6l812_cuboctahedron"),
         lazy_fixture("metal_cage_m8l6_cube"),
         lazy_fixture("metal_cage_m12l24"),
         lazy_fixture("metal_cage_m24l48"),
