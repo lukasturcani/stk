@@ -8,6 +8,7 @@ from .m4l6_tetrahedron_spacer import *  # noqa
 from .m4l8 import *  # noqa
 from .m6l2l3_prism import *  # noqa
 from .m6l12_cube import *  # noqa
+from .m6l8l12_cuboctahedron import *  # noqa
 from .m8l6_cube import *  # noqa
 from .m12l24 import *  # noqa
 from .m24l48 import *  # noqa
