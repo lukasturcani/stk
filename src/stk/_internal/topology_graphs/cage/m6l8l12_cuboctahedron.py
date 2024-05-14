@@ -36,7 +36,7 @@ class M6L8L12Cuboctahedron(Cage):
                     bb1:range(6,18),
                     bb2:range(18,26)
                 },
-                optimizer=stk.Nulloptimizer(),
+                optimizer=stk.Collapser(),
             )
         )
 
@@ -113,7 +113,7 @@ class M6L8L12Cuboctahedron(Cage):
     Metal building blocks with eight functional groups are
     required for this topology.
 
-    One ligand building blocks with two functional groups and another ligand 
+    One ligand building blocks with two functional groups and another ligand
     building block with three functional groups are required for
     this topology.
 
@@ -131,7 +131,7 @@ class M6L8L12Cuboctahedron(Cage):
 
     """
 
-    _x = np.sqrt(2)/2
+    _x = np.sqrt(2) / 2
     _vertex_prototypes = (
         # M
         NonLinearVertex(0, np.array([1.5, 0, 0])),
@@ -154,14 +154,14 @@ class M6L8L12Cuboctahedron(Cage):
         LinearVertex(16, np.array([0, -2, 2]), False),
         LinearVertex(17, np.array([0, -2, -2]), False),
         # L2
-        LinearVertex(18, np.array([ _x, _x, _x]), False),
+        LinearVertex(18, np.array([_x, _x, _x]), False),
         LinearVertex(19, np.array([-_x, _x, _x]), False),
-        LinearVertex(20, np.array([-_x,-_x, _x]), False),
-        LinearVertex(21, np.array([ _x,-_x, _x]), False),
-        LinearVertex(22, np.array([ _x, _x,-_x]), False),
-        LinearVertex(23, np.array([-_x, _x,-_x]), False),
-        LinearVertex(24, np.array([-_x,-_x,-_x]), False),
-        LinearVertex(25, np.array([ _x,-_x,-_x]), False),
+        LinearVertex(20, np.array([-_x, -_x, _x]), False),
+        LinearVertex(21, np.array([_x, -_x, _x]), False),
+        LinearVertex(22, np.array([_x, _x, -_x]), False),
+        LinearVertex(23, np.array([-_x, _x, -_x]), False),
+        LinearVertex(24, np.array([-_x, -_x, -_x]), False),
+        LinearVertex(25, np.array([_x, -_x, -_x]), False),
     )
 
     _edge_prototypes = (
