@@ -10,7 +10,7 @@ from ...building_blocks import get_linker, get_pd_atom
     params=(
         lambda name: CaseData(
             molecule=stk.ConstructedMolecule(
-                topology_graph=stk.cage.M6L8L12Cube(
+                topology_graph=stk.cage.M6L8L12Cuboctahedron(
                     building_blocks={
                         get_pd_atom(): range(6),
                         get_linker(): range(6, 18),

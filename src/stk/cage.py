@@ -22,7 +22,7 @@ from stk._internal.topology_graphs.cage.m4l6_tetrahedron_spacer import (
 from stk._internal.topology_graphs.cage.m4l8 import M4L8
 from stk._internal.topology_graphs.cage.m6l2l3_prism import M6L2L3Prism
 from stk._internal.topology_graphs.cage.m6l12_cube import M6L12Cube
-from stk._internal.topology_graphs.cage.m6l6l12_cuboctahedron import M6L6L12Cuboctahedron
+from stk._internal.topology_graphs.cage.m6l6l12_cuboctahedron import M6L8L12Cuboctahedron
 from stk._internal.topology_graphs.cage.m8l6_cube import M8L6Cube
 from stk._internal.topology_graphs.cage.m12l24 import M12L24
 from stk._internal.topology_graphs.cage.m24l48 import M24L48
@@ -58,7 +58,7 @@ __all__ = [
     "M4L6TetrahedronSpacer",
     "M6L2L3Prism",
     "M6L12Cube",
-    "M6L6L12Cuboctahedron",
+    "M6L8L12Cuboctahedron",
     "M8L6Cube",
     "M12L24",
     "M24L48",
