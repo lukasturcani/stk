@@ -47,6 +47,7 @@ Metal-Organic
   M4L8 <_autosummary/stk.cage.M4L8>
   M6L2L3 Prism <_autosummary/stk.cage.M6L2L3Prism>
   M6L12 Cube <_autosummary/stk.cage.M6L12Cube>
+  M6L8L12 Cuboctahedron <_autosummary/stk.cage.M6L8L12Cuboctahedron>
   M8L6 Cube <_autosummary/stk.cage.M8L6Cube>
   M12L24 <_autosummary/stk.cage.M12L24>
   M24L48 <_autosummary/stk.cage.M24L48>

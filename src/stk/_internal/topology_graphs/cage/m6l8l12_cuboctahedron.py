@@ -1,9 +1,3 @@
-"""
-M6L8L12 Cuboctahedron
-==========
-
-"""
-
 import numpy as np
 
 from stk._internal.topology_graphs.edge import Edge
