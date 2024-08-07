@@ -6,7 +6,7 @@
 
 .. figure:: docs/source/_static/stk.png
 
-.. image:: https://github.com/lukasturcani/stk/workflows/tests/badge.svg?branch=master
+.. image:: https://github.com/lukasturcani/stk/actions/workflows/tests.yml/badge.svg?branch=master
   :target: https://github.com/lukasturcani/stk/actions?query=branch%3Amaster
 
 .. image:: https://readthedocs.org/projects/stk/badge/?version=latest
