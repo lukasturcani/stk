@@ -74,6 +74,9 @@
 
    Modules <modules.rst>
 
+.. tip::
+
+  ⭐ Star us on GitHub! ⭐
 
 ============
 Introduction
@@ -98,17 +101,17 @@ Developer Setup
 #. In a new virtual environment run::
 
     $ just dev
-  
+
 
 #. Setup the `MongoDB`_ container (make sure ``docker`` is installed)::
 
     $ just mongo
-  
+
 
 #. Run code checks::
 
     $ just check
-  
+
 
 
 .. _`just`: https://github.com/casey/just
