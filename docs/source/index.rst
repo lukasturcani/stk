@@ -76,7 +76,7 @@
 
 .. tip::
 
-  ⭐ Star us on GitHub! ⭐
+  ⭐ Star us on `GitHub <https://www.github.com/lukasturcani/stk>`_! ⭐
 
 ============
 Introduction
