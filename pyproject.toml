@@ -20,7 +20,7 @@ dependencies = [
   "MCHammer",
   "SpinDry",
   "vabene",
-  "rdkit",
+  "rdkit != 2024.3.5",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
@@ -29,7 +29,7 @@ readme = "README.rst"
 [project.optional-dependencies]
 dev = [
   "ruff",
-  "moldoc",
+  "moldoc==3.0.0",
   "mypy",
   "pip-tools",
   # TODO: Remove pin when https://github.com/TvoroG/pytest-lazy-fixture/issues/65 is resolved.
