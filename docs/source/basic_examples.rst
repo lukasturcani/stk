@@ -1130,6 +1130,108 @@ from the database. For example,
     pymongo.MongoClient().drop_database(_test_database)
     pymongo.MongoClient = _mongo_client
 
+Visualising Molecular Datasets using chemiscope
+===============================================
+
+
+Requirements
+------------
+
+:mod:`chemiscope` makes it easy for you to write a `.json` or `.json.gz`
+containing :mod:`stk` molecules and their properties; see an example__.
+
+__ https://chemiscope.org/docs/examples/9-showing_custom_bonds.html
+
+To get :mod:`.chemiscope`, you can install it with pip::
+
+  $ pip install chemiscope
+
+Writing to file
+---------------
+
+:mod:`chemiscope` can be used through the `web-interface`__ or can be embedded
+into read-the-docs pages through a sphinx package, like for `toy models`__.
+
+__ https://chemiscope.org/
+
+__ https://cgmodels.readthedocs.io/en/latest/cg_model_jul2023_2p3_ton.html
+
+Either way, you need to write a `.json` or `.json.gz` file
+
+.. code-block:: python
+
+    import stk
+    import stko
+    import chemiscope
+
+    structures = [
+        stk.BuildingBlock(smiles="NCCN"),
+        stk.BuildingBlock(smiles="NCCCN"),
+        # A mostly optimised cage molecule.
+        stk.ConstructedMolecule(
+            topology_graph=stk.cage.FourPlusSix(
+                building_blocks=(
+                    stk.BuildingBlock(
+                        smiles="NCCN",
+                        functional_groups=[stk.PrimaryAminoFactory()],
+                    ),
+                    stk.BuildingBlock(
+                        smiles="O=CC(C=O)C=O",
+                        functional_groups=[stk.AldehydeFactory()],
+                    ),
+                ),
+                optimizer=stk.MCHammer(),
+            ),
+        )
+    ]
+
+    # Write their properties to a dictionary.
+    energy = stko.UFFEnergy()
+    shape_calc = stko.ShapeCalculator()
+    properties = {
+        "uffenergy": [energy.get_energy(molecule) for molecule in structures],
+        "aspheriticty": [
+            shape_calc.get_results(molecule).get_asphericity()
+            for molecule in structures
+        ],
+    }
+
+    # Define stk bonding.
+    shape_dict = chemiscope.convert_stk_bonds_as_shapes(
+        frames=structures,
+        bond_color="#fc5500",
+        bond_radius=0.12,
+    )
+
+    # Write the shape string for settings to turn them on automatically.
+    shape_string = ",".join(shape_dict.keys())
+
+    # Write to file.
+    chemiscope.write_input(
+        path="stk_example.json.gz",
+        frames=structures,
+        properties=properties,
+        meta=dict(name="A name."),
+        settings=chemiscope.quick_settings(
+            x="aspheriticty",
+            y="uffenergy",
+            color="",
+            structure_settings={
+                "shape": shape_string,
+                "atoms": True,
+                "bonds": False,
+                "spaceFilling": False,
+            },
+        ),
+        shapes=shape_dict,
+    )
+
+
+.. seealso::
+
+    chemiscope: https://chemiscope.org/
+
+
 Specifying Functional Groups Individually
 =========================================
 
