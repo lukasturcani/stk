@@ -1137,7 +1137,7 @@ Visualising Molecular Datasets using chemiscope
 Requirements
 ------------
 
-:mod:`chemiscope` makes it easy for you to write a `.json` or `.json.gz`
+:mod:`chemiscope` makes it easy for you to write a ``.json`` or ``.json.gz``
 containing :mod:`stk` molecules and their properties; see an example__.
 
 __ https://chemiscope.org/docs/examples/9-showing_custom_bonds.html
@@ -1156,7 +1156,7 @@ __ https://chemiscope.org/
 
 __ https://cgmodels.readthedocs.io/en/latest/cg_model_jul2023_2p3_ton.html
 
-Either way, you need to write a `.json` or `.json.gz` file
+Either way, you need to write a ``.json`` or ``.json.gz`` file
 
 .. testcode:: saving-to-chemiscope
 
