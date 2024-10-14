@@ -1158,10 +1158,9 @@ __ https://cgmodels.readthedocs.io/en/latest/cg_model_jul2023_2p3_ton.html
 
 Either way, you need to write a `.json` or `.json.gz` file
 
-.. code-block:: python
+.. testcode:: saving-to-chemiscope
 
     import stk
-    import stko
     import chemiscope
 
     structures = [
@@ -1186,13 +1185,10 @@ Either way, you need to write a `.json` or `.json.gz` file
     ]
 
     # Write their properties to a dictionary.
-    energy = stko.UFFEnergy()
-    shape_calc = stko.ShapeCalculator()
     properties = {
-        "uffenergy": [energy.get_energy(molecule) for molecule in structures],
-        "aspheriticty": [
-            shape_calc.get_results(molecule).get_asphericity()
-            for molecule in structures
+        "num_atoms": [molecule.get_num_atoms() for molecule in structures],
+        "num_bonds": [
+            len(list(molecule.get_bonds())) for molecule in structures
         ],
     }
 
@@ -1213,8 +1209,8 @@ Either way, you need to write a `.json` or `.json.gz` file
         properties=properties,
         meta=dict(name="A name."),
         settings=chemiscope.quick_settings(
-            x="aspheriticty",
-            y="uffenergy",
+            x="num_atoms",
+            y="num_bonds",
             color="",
             structure_settings={
                 "shape": shape_string,
@@ -1226,6 +1222,11 @@ Either way, you need to write a `.json` or `.json.gz` file
         shapes=shape_dict,
     )
 
+.. testcleanup:: saving-to-chemiscope
+
+    import pathlib
+
+    pathlib.Path("stk_example.json.gz").unlink()
 
 .. seealso::
 
