@@ -47,7 +47,7 @@ on GitHub, and you can update your ``stk`` with:
 
   pip install stk --upgrade
 
-.. warning::
+Warning:
 
   Note a current restriction on rdkit version stemming from recent changes with
   handling dative smiles strings.
