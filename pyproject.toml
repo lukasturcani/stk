@@ -20,7 +20,10 @@ dependencies = [
   "MCHammer",
   "SpinDry",
   "vabene",
-  "rdkit != 2024.3.5",
+  # Added a new restriction (<2025.3.1 for rdkit because of changes in
+  # rdkit's handling of metal-bonded/dative smiles) - done through manual testing.
+  # This can change if updates to stk occur.
+  "rdkit != 2024.3.5, < 2025.3.1",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
