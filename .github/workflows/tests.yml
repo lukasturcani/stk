@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   ruff:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -17,7 +17,7 @@ jobs:
       - run: "pip install '.[dev]'"
       - run: ruff check .
   mypy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -27,7 +27,7 @@ jobs:
       - run: "pip install -e '.[dev]'"
       - run: mypy src
   ruff-format:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -37,7 +37,7 @@ jobs:
       - run: "pip install -e '.[dev]'"
       - run: ruff format --check .
   pytest:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     services:
       MongoDB:
         image: mongo
@@ -51,7 +51,7 @@ jobs:
       - run: "pip install -e '.[dev]'"
       - run: pytest
   doctest:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     services:
       MongoDB:
         image: mongo
@@ -65,7 +65,7 @@ jobs:
       - run: "pip install -e '.[dev]'"
       - run: make -C docs doctest
   basic-ea:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     services:
       MongoDB:
         image: mongo
@@ -88,7 +88,7 @@ jobs:
           name: basic-ea-rotatable-bonds-plot
           path: rotatable_bonds_progress.png
   intermediate-ea:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     services:
       MongoDB:
         image: mongo
