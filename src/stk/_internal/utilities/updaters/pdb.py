@@ -1,10 +1,11 @@
+import typing
+
 import rdkit.Chem.AllChem as rdkit
 
-import stk
 from stk._internal.utilities.utilities import remake
 
 
-def _with_structure_from_pdb(self, path: str) -> stk.Molecule:
+def _with_structure_from_pdb(self, path: str) -> typing.Self:  # type: ignore[misc]
     """
     Change structure to match a ``.pdb`` file.
 
