@@ -14,8 +14,6 @@ from stk._internal.ea.selection.batch import Batch, BatchKey
 from stk._internal.ea.selection.selectors.selector import Selector
 from stk._internal.key_makers.inchi_key import InchiKey
 
-plt.switch_backend("agg")
-
 T = typing.TypeVar("T", bound=MoleculeRecord)
 
 
