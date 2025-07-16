@@ -194,6 +194,6 @@ class ValueMongoDb(ValueDatabase):
         value = self._values.find_one(key)
         if value is None:
             raise KeyError(
-                "No molecule found in the database with a key of: " f"{key}"
+                f"No molecule found in the database with a key of: {key}"
             )
         return value["v"]

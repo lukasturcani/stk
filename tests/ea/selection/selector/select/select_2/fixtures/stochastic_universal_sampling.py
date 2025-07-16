@@ -17,9 +17,9 @@ def get_topology_graph(num_repeating_units: int) -> stk.TopologyGraph:
 
 
 @pytest.fixture(scope="session")
-def stochastic_universal_sampling_population_1() -> (
-    dict[stk.MoleculeRecord[Any], float]
-):
+def stochastic_universal_sampling_population_1() -> dict[
+    stk.MoleculeRecord[Any], float
+]:
     return {
         stk.MoleculeRecord(
             topology_graph=get_topology_graph(2),

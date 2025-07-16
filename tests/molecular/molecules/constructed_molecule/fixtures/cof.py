@@ -274,7 +274,7 @@ class CofData:
             topology_graph=stk.cof.Kagome,
             building_blocks=(
                 stk.BuildingBlock(
-                    smiles=("Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)" "[C+2]1"),
+                    smiles=("Br[C+]1[C+](Br)[C+](F)[C+](Br)[C+](Br)[C+2]1"),
                     functional_groups=[stk.BromoFactory()],
                 ),
                 stk.BuildingBlock(

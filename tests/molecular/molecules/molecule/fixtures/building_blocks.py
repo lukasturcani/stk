@@ -39,9 +39,7 @@ def get_linker() -> stk.BuildingBlock:
 
 def get_other_linker() -> stk.BuildingBlock:
     return stk.BuildingBlock(
-        smiles=(
-            "[H]C1=NC([H])=C([H])C(C2=C([H])C([H])=NC([H])=C2[H])" "=C1[H]"
-        ),
+        smiles=("[H]C1=NC([H])=C([H])C(C2=C([H])C([H])=NC([H])=C2[H])=C1[H]"),
         functional_groups=[
             stk.SmartsFunctionalGroupFactory(
                 smarts="[#6]~[#7X2]~[#6]",

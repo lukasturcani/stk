@@ -53,10 +53,10 @@ from .fixtures import *  # noqa
         ),
         lambda: stk.BuildingBlock("NCCN"),
         lambda: stk.BuildingBlock(
-            "C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc" "(C#Cc4cccc5cnccc54)cc3c2c1"
+            "C(#Cc1cccc2ccncc21)c1ccc2[nH]c3ccc(C#Cc4cccc5cnccc54)cc3c2c1"
         ),
         lambda: stk.BuildingBlock(
-            "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc" "(C#Cc4cccc5ccncc45)cc3c2c1"
+            "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc(C#Cc4cccc5ccncc45)cc3c2c1"
         ),
         lambda: stk.BuildingBlock("N[C+][C+2]N"),
         lambda: stk.BuildingBlock("NCCN", [stk.PrimaryAminoFactory()]),
