@@ -77,3 +77,31 @@ python_functions = [
   "test_*",
   "benchmark_*",
 ]
+
+[tool.mypy]
+show_error_codes = true
+implicit_optional = false
+warn_no_return = true
+strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+  "scipy.*",
+  "pytest_lazyfixture.*",
+  "pathos.*",
+  "matplotlib.*",
+  "pandas.*",
+  "seaborn.*",
+  "mchammer.*",
+  "spindry.*",
+  "pymongo.*",
+  "vabene.*",
+  "setuptools.*"
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "rdkit.*"
+ignore_missing_imports = true
+follow_imports = "skip"
+follow_imports_for_stubs = true
