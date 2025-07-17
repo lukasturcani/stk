@@ -33,25 +33,21 @@ from .case_data import CaseData
         lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock(
-                "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc"
-                "(C#Cc4cccc5ccncc45)cc3c2c1"
+                "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc(C#Cc4cccc5ccncc45)cc3c2c1"
             ),
             key_name="SMILES",
             key=(
-                "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc"
-                "(C#Cc4cccc5ccncc45)cc3c2c1"
+                "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc(C#Cc4cccc5ccncc45)cc3c2c1"
             ),
         ),
         lambda: CaseData(
             key_maker=stk.Smiles(),
             molecule=stk.BuildingBlock(
-                "C(#Cc1cccc2cnccc21)c1ccc2[nH]c3ccc"
-                "(C#Cc4cccc5ccncc54)cc3c2c1"
+                "C(#Cc1cccc2cnccc21)c1ccc2[nH]c3ccc(C#Cc4cccc5ccncc54)cc3c2c1"
             ),
             key_name="SMILES",
             key=(
-                "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc"
-                "(C#Cc4cccc5ccncc45)cc3c2c1"
+                "C(#Cc1cccc2cnccc12)c1ccc2[nH]c3ccc(C#Cc4cccc5ccncc45)cc3c2c1"
             ),
         ),
         lambda: CaseData(

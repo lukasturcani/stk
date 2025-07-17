@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-plt.switch_backend("agg")
-
 
 class ProgressPlotter:
     """

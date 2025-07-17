@@ -46,7 +46,7 @@ from ...case_data import CaseData
                 ),
             ),
             smiles=(
-                "N1=NN2N1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N" "=NN21"
+                "N1=NN2N1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN1N1N=NN21"
             ),
             name=name,
         ),

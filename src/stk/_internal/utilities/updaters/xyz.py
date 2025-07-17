@@ -63,7 +63,7 @@ def _with_structure_from_xyz(self, path):
     # lines was present in the file.
     if i + 1 != num_atoms:
         raise RuntimeError(
-            f"The number of atom lines in the xyz file, {i+1}, "
+            f"The number of atom lines in the xyz file, {i + 1}, "
             "does not match the number of atoms in the "
             f"molecule, {num_atoms}."
         )

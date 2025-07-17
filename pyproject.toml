@@ -20,7 +20,10 @@ dependencies = [
   "MCHammer",
   "SpinDry",
   "vabene",
-  "rdkit != 2024.3.5",
+  # Added a new restriction (<2025.3.1 for rdkit because of changes in
+  # rdkit's handling of metal-bonded/dative smiles) - done through manual testing.
+  # This can change if updates to stk occur.
+  "rdkit != 2024.3.5, <= 2024.9.1",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
@@ -83,7 +86,6 @@ strict_optional = true
 
 [[tool.mypy.overrides]]
 module = [
-  "rdkit.*",
   "scipy.*",
   "pytest_lazyfixture.*",
   "pathos.*",
@@ -97,3 +99,9 @@ module = [
   "setuptools.*"
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "rdkit.*"
+ignore_missing_imports = true
+follow_imports = "skip"
+follow_imports_for_stubs = true

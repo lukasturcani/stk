@@ -131,7 +131,7 @@ class PdbWriter:
             a2 = bond.get_atom2().get_id()
             if a1 in atoms and a2 in atoms:
                 content.append(
-                    f"{conect:<6}{a1+1:>5}{a2+1:>5}               \n"
+                    f"{conect:<6}{a1 + 1:>5}{a2 + 1:>5}               \n"
                 )
 
         content.append("END\n")

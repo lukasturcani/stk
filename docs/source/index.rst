@@ -93,6 +93,10 @@ To get :mod:`.stk`, you can install it with pip::
 
   $ pip install stk
 
+.. warning::
+
+  Note a current restriction on rdkit version stemming from recent changes with
+  handling dative smiles strings.
 
 Developer Setup
 ...............

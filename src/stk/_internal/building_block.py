@@ -115,7 +115,7 @@ class BuildingBlock(Molecule):
             params.randomSeed = random_seed
             if rdkit.EmbedMolecule(molecule, params) == -1:
                 raise RuntimeError(
-                    f"Embedding with seed value of {random_seed} " "failed."
+                    f"Embedding with seed value of {random_seed} failed."
                 )
             rdkit.Kekulize(molecule)
         else:
@@ -296,7 +296,7 @@ class BuildingBlock(Molecule):
             params.randomSeed = random_seed
             if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
                 raise RuntimeError(
-                    f"Embedding with seed value of {random_seed} " "failed."
+                    f"Embedding with seed value of {random_seed} failed."
                 )
         else:
             # Make sure the position matrix always holds floats.

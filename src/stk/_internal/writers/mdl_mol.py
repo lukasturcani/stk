@@ -77,7 +77,7 @@ class MolWriter:
             a2 = bond.get_atom2().get_id()
             if a1 in id_map and a2 in id_map:
                 bond_lines.append(
-                    f"M  V30 {len(bond_lines)+1} "
+                    f"M  V30 {len(bond_lines) + 1} "
                     f"{int(bond.get_order())} "
                     f"{id_map[a1]} {id_map[a2]}\n"
                 )

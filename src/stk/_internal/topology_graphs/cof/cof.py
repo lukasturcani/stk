@@ -532,7 +532,7 @@ class Cof(TopologyGraph):
 
         if unassigned_ids:
             raise UnoccupiedVertexError(
-                "The following vertices are unoccupied " f"{unassigned_ids}."
+                f"The following vertices are unoccupied {unassigned_ids}."
             )
 
     def clone(self):

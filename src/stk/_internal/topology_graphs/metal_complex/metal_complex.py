@@ -746,4 +746,4 @@ class MetalComplex(TopologyGraph):
         return self.clone()._with_building_blocks(building_block_map)
 
     def __repr__(self) -> str:
-        return f"metal_complex.{self.__class__.__name__}" f"()"
+        return f"metal_complex.{self.__class__.__name__}()"

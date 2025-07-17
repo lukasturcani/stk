@@ -93,7 +93,7 @@ class TurbomoleWriter:
             element = atom.__class__.__name__
             x, y, z = (i for i in coords[atom_id])
             content.append(
-                f" {round(x, 4)} {round(y, 4)} {round(z, 4)} " f"{element}\n"
+                f" {round(x, 4)} {round(y, 4)} {round(z, 4)} {element}\n"
             )
 
         content.append("$end\n")
