@@ -20,7 +20,6 @@ def _with_structure_from_pdb(self, path: str) -> typing.Self:  # type: ignore[mi
 
     """
 
-    # Handle API change, failure gives None.
     rdk_mol = rdkit.MolFromPDBFile(
         pdbFileName=path,
         sanitize=False,
