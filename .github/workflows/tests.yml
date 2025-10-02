@@ -1,112 +1,132 @@
 name: Tests
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-  workflow_dispatch:
+    push:
+        branches:
+            - master
+    pull_request:
+    workflow_dispatch:
 jobs:
-  ruff:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install '.[dev]'"
-      - run: ruff check .
-  mypy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install -e '.[dev]'"
-      - run: mypy src
-  ruff-format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install -e '.[dev]'"
-      - run: ruff format --check .
-  pytest:
-    runs-on: ubuntu-latest
-    services:
-      MongoDB:
-        image: mongo
-        ports: ["27017:27017"]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install -e '.[dev]'"
-      - run: pytest
-  doctest:
-    runs-on: ubuntu-latest
-    services:
-      MongoDB:
-        image: mongo
-        ports: ["27017:27017"]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install -e '.[dev]'"
-      - run: make -C docs doctest
-  basic-ea:
-    runs-on: ubuntu-latest
-    services:
-      MongoDB:
-        image: mongo
-        ports: ["27017:27017"]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install -e '.[dev]'"
-      - run: git clone https://github.com/lukasturcani/basic_ea --depth 1
-      - run: python basic_ea/basic_ea.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: basic-ea-fitness-plot
-          path: fitness_progress.png
-      - uses: actions/upload-artifact@v4
-        with:
-          name: basic-ea-rotatable-bonds-plot
-          path: rotatable_bonds_progress.png
-  intermediate-ea:
-    runs-on: ubuntu-latest
-    services:
-      MongoDB:
-        image: mongo
-        ports: ["27017:27017"]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: "pip install -e '.[dev]'"
-      - run: git clone https://github.com/lukasturcani/intermediate_ea --depth 1
-      - run: python intermediate_ea/intermediate_ea.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: intermediate-ea-fitness-plot
-          path: fitness_progress.png
-      - uses: actions/upload-artifact@v4
-        with:
-          name: intermediate-ea-rotatable-bonds-plot
-          path: rotatable_bonds_progress.png
+    ruff:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: uv run ruff check .
+
+    mypy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: uv run mypy src
+
+    ruff-format:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: uv run ruff format --check .
+
+    pytest:
+        runs-on: ubuntu-latest
+        services:
+            MongoDB:
+                image: mongo
+                ports: ["27017:27017"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: uv run pytest
+
+    doctest:
+        runs-on: ubuntu-latest
+        services:
+            MongoDB:
+                image: mongo
+                ports: ["27017:27017"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: uv run make -C docs doctest
+
+    basic-ea:
+        runs-on: ubuntu-latest
+        services:
+            MongoDB:
+                image: mongo
+                ports: ["27017:27017"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: git clone https://github.com/lukasturcani/basic_ea --depth 1
+            - run: uv run python basic_ea/basic_ea.py
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: basic-ea-fitness-plot
+                  path: fitness_progress.png
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: basic-ea-rotatable-bonds-plot
+                  path: rotatable_bonds_progress.png
+
+    intermediate-ea:
+        runs-on: ubuntu-latest
+        services:
+            MongoDB:
+                image: mongo
+                ports: ["27017:27017"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+            - uses: actions/setup-python@v5
+              with:
+                  python-version-file: "pyproject.toml"
+            - run: uv sync --all-extras --dev
+            - run: git clone https://github.com/lukasturcani/intermediate_ea --depth 1
+            - run: uv run python intermediate_ea/intermediate_ea.py
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: intermediate-ea-fitness-plot
+                  path: fitness_progress.png
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: intermediate-ea-rotatable-bonds-plot
+                  path: rotatable_bonds_progress.png
