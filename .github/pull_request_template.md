@@ -2,6 +2,10 @@ Related Issues: <!-- Add related issues here, e.g. #121 #341 -->
 Requested Reviewers: @lukasturcani <!-- Add other reviewers here -->
 *Note for Reviewers: If you accept the review request add a :+1: to this post*
 
+Results from `$ uv run coordinate_check tests/ coordinate_outputs`:
+Average RMSD: <!--Fill in-->
+Structures with significant RMSDs: <!--Fill in-->
+
 <!--
 Talk about what a user would see (a big, a new feature) and what
 user goals weren't being met. If the commit fixes a bug, describe how

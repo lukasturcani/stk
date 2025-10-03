@@ -51,6 +51,9 @@ dev = [
 github = "https://github.com/lukasturcani/stk"
 documentation = "https://stk.readthedocs.io"
 
+[project.scripts]
+coordinate_check = "stk._internal.scripts.coordinate_check:main"
+
 [tool.setuptools_scm]
 write_to = "src/stk/_version.py"
 
