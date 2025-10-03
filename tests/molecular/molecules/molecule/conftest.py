@@ -2,9 +2,10 @@ import os
 
 import numpy as np
 import pytest
-import stk
 from pytest_lazyfixture import lazy_fixture
 from rdkit.Chem import AllChem as rdkit
+
+import stk
 
 from .case_data import CaseData
 
