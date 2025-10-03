@@ -1,4 +1,5 @@
 import pytest
+
 import stk
 
 from ....case_data import CaseData
@@ -28,16 +29,15 @@ from ...building_blocks import get_fe_atom, get_mo_1
                 )
             ),
             smiles=(
-                "[H]C1=C([H])N(->[Fe+2](<-N2=C([H])C3=C(C([H])=C2[H])C"
-                "([H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H]"
-                ")(<-N2=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])"
-                "C([H])([H])C([H])([H])C3([H])[H])(<-N2=C([H])C3=C(C("
-                "[H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H])(["
-                "H])C3([H])[H])(<-N2=C([H])C3=C(C([H])=C2[H])C([H])(["
-                "H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H])<-N2="
-                "C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])C([H])"
-                "([H])C([H])([H])C3([H])[H])=C([H])C2=C1C([H])([H])C("
-                "[H])([H])C([H])([H])C([H])([H])C2([H])[H]"
+                "[H]C1=C([H])[N](->[Fe+2](<-[N]2=C([H])C3=C(C([H])=C2[H])C(["
+                "H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H])(<-[N]2"
+                "=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C"
+                "([H])([H])C3([H])[H])(<-[N]2=C([H])C3=C(C([H])=C2[H])C([H])"
+                "([H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H])(<-[N]2=C("
+                "[H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H"
+                "])([H])C3([H])[H])<-[N]2=C([H])C3=C(C([H])=C2[H])C([H])([H]"
+                ")C([H])([H])C([H])([H])C([H])([H])C3([H])[H])=C([H])C2=C1C("
+                "[H])([H])C([H])([H])C([H])([H])C([H])([H])C2([H])[H]"
             ),
             name=name,
         ),
@@ -61,16 +61,15 @@ from ...building_blocks import get_fe_atom, get_mo_1
                 )
             ),
             smiles=(
-                "[H]C1=C([H])N(->[Fe+2](<-N2=C([H])C3=C(C([H])=C2[H])C"
-                "([H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H]"
-                ")(<-N2=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])"
-                "C([H])([H])C([H])([H])C3([H])[H])(<-N2=C([H])C3=C(C("
-                "[H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H])(["
-                "H])C3([H])[H])(<-N2=C([H])C3=C(C([H])=C2[H])C([H])(["
-                "H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H])<-N2="
-                "C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])C([H])"
-                "([H])C([H])([H])C3([H])[H])=C([H])C2=C1C([H])([H])C("
-                "[H])([H])C([H])([H])C([H])([H])C2([H])[H]"
+                "[H]C1=C([H])[N](->[Fe+2](<-[N]2=C([H])C3=C(C([H])=C2[H])C(["
+                "H])([H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H])(<-[N]2"
+                "=C([H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C"
+                "([H])([H])C3([H])[H])(<-[N]2=C([H])C3=C(C([H])=C2[H])C([H])"
+                "([H])C([H])([H])C([H])([H])C([H])([H])C3([H])[H])(<-[N]2=C("
+                "[H])C3=C(C([H])=C2[H])C([H])([H])C([H])([H])C([H])([H])C([H"
+                "])([H])C3([H])[H])<-[N]2=C([H])C3=C(C([H])=C2[H])C([H])([H]"
+                ")C([H])([H])C([H])([H])C([H])([H])C3([H])[H])=C([H])C2=C1C("
+                "[H])([H])C([H])([H])C([H])([H])C([H])([H])C2([H])[H]"
             ),
             name=name,
         ),

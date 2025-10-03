@@ -1,4 +1,5 @@
 import pytest
+
 import stk
 
 from ....case_data import CaseData
@@ -41,8 +42,8 @@ def _get_bi_1() -> stk.BuildingBlock:
                 )
             ),
             smiles=(
-                "[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]2(<-N1([H])"
-                "[H])<-N([H])([H])C([H])([H])C([H])([H])N->2([H])[H]"
+                "[H]C1([H])C([H])([H])[N]([H])([H])->[Pd+2]2(<-[N]1([H])"
+                "[H])<-[N]([H])([H])C([H])([H])C([H])([H])[N]->2([H])[H]"
             ),
             name=name,
         ),
@@ -66,8 +67,8 @@ def _get_bi_1() -> stk.BuildingBlock:
                 )
             ),
             smiles=(
-                "[H]C1([H])C([H])([H])N([H])([H])->[Pd+2]2(<-N1([H])"
-                "[H])<-N([H])([H])C([H])([H])C([H])([H])N->2([H])[H]"
+                "[H]C1([H])C([H])([H])[N]([H])([H])->[Pd+2]2(<-[N]1([H])"
+                "[H])<-[N]([H])([H])C([H])([H])C([H])([H])[N]->2([H])[H]"
             ),
             name=name,
         ),

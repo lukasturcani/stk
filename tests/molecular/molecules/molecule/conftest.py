@@ -239,7 +239,7 @@ def _get_dative_molecule() -> rdkit.Mol:
                     molecule=_get_dative_molecule(),
                 )
             ),
-            smiles="N->[Fe+2]",
+            smiles="[NH3]->[Fe+2]",
             name=name,
         ),
         lambda name: CaseData(
