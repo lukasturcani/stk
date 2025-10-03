@@ -8,6 +8,17 @@ class Smiles(MoleculeKeyMaker):
     """
     Used to get the SMILES of molecules.
 
+    .. warning::
+
+        SMILES strings generated with ``stk`` version ``v2025.07.17.0`` or sooner
+        (using ``rdkit`` version ``2024.9.1`` or sooner) will be different than newer
+        versions due to a change in handling the valence of organic atoms bound to
+        metals. Details can be found in the ``rdkit`` release notes `2025_03_1`_.
+        No changes occur in ``stk`` construction. An example change in SMILES:
+        ``CCCO->[Fe+2]`` becomes ``CCC[OH]->[Fe+2]``.
+
+    .. _`2025_03_1`: https://github.com/rdkit/rdkit/releases/tag/Release_2025_03_1
+
     Examples:
 
         *Adding SMILES to a Molecule's JSON*
