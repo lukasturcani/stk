@@ -1,6 +1,7 @@
 import pathlib
 
 import atomlite
+import numpy as np
 
 import stk
 
@@ -15,7 +16,6 @@ def test_atomlite(molecule: CaseData) -> None:
         path.unlink()
 
     database = atomlite.Database(path)
-
     assert database.num_entries() == 0
     for mol, prop in zip(
         molecule.molecules,
@@ -31,6 +31,13 @@ def test_atomlite(molecule: CaseData) -> None:
         )
 
         entry = database.get_entry(key)
+
+        assert np.allclose(
+            mol.get_position_matrix(),
+            mol.with_structure_from_atomlite(
+                database_path=path, key=key
+            ).get_position_matrix(),
+        )
 
         assert entry.molecule == atomlite.json_from_rdkit(mol.to_rdkit_mol())
         assert entry.molecule == mol.to_atomlite()
