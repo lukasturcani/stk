@@ -622,11 +622,19 @@ class ConstructedMolecule(Molecule):
 
             Molecule: A clone with atomic positions found in `path`.
 
+        Raises:
+
+            ValueError: If the entry is not found in the database.
+
         """
-        rdkit_molecule = atomlite.json_to_rdkit(
-            atomlite.Database(database_path).get_entry(key).molecule
-        )
-        return self.clone().init_from_rdkit_mol(rdkit_molecule)
+
+        entry = atomlite.Database(database_path).get_entry(key)
+        if entry is None:
+            msg = f"Entry {key} not found in database."
+            raise ValueError(msg)
+
+        position_matrix = np.array(entry.molecule["conformers"][0])
+        return self.clone().with_position_matrix(position_matrix)
 
     def write(
         self,

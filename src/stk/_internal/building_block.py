@@ -580,11 +580,19 @@ class BuildingBlock(Molecule):
 
             Molecule: A clone with atomic positions found in `path`.
 
+        Raises:
+
+            ValueError: If the entry is not found in the database.
+
         """
-        rdkit_molecule = atomlite.json_to_rdkit(
-            atomlite.Database(database_path).get_entry(key).molecule
-        )
-        return self.clone().init_from_rdkit_mol(rdkit_molecule)
+
+        entry = atomlite.Database(database_path).get_entry(key)
+        if entry is None:
+            msg = f"Entry {key} not found in database."
+            raise ValueError(msg)
+
+        position_matrix = np.array(entry.molecule["conformers"][0])
+        return self.clone().with_position_matrix(position_matrix)
 
     @classmethod
     def init_from_atomlite(
@@ -645,10 +653,18 @@ class BuildingBlock(Molecule):
 
             BuildingBlock: The building block.
 
+        Raises:
+
+            ValueError: If the entry is not found in the database.
+
         """
-        rdkit_molecule = atomlite.json_to_rdkit(
-            atomlite.Database(database_path).get_entry(key).molecule
-        )
+
+        entry = atomlite.Database(database_path).get_entry(key)
+        if entry is None:
+            msg = f"Entry {key} not found in database."
+            raise ValueError(msg)
+
+        rdkit_molecule = atomlite.json_to_rdkit(entry.molecule)
         building_block = cls.__new__(cls)
         building_block._init_from_rdkit_mol(
             molecule=rdkit_molecule,
