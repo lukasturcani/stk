@@ -3,6 +3,7 @@ import pathlib
 import typing
 from collections.abc import Iterable, Iterator
 
+import atomlite
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 from scipy.spatial.distance import euclidean
@@ -759,6 +760,17 @@ class Molecule:
             mol.GetAtomWithIdx(atom_id).SetNoImplicit(True)
         mol.AddConformer(rdkit_conf)
         return mol
+
+    def to_atomlite(self) -> atomlite.Molecule:
+        """
+        Return an :mod:`atomlite` representation.
+
+        Returns:
+
+            The molecule in :mod:`atomlite` JSON format.
+
+        """
+        return atomlite.json_from_rdkit(self.to_rdkit_mol())
 
     def with_structure_from_file(
         self,

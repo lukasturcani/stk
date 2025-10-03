@@ -5,6 +5,7 @@ import typing
 from collections.abc import Collection, Iterable, Iterator
 from functools import partial
 
+import atomlite
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import vabene
@@ -554,6 +555,103 @@ class BuildingBlock(Molecule):
         building_block = cls.__new__(cls)
         building_block._init_from_rdkit_mol(
             molecule=molecule,
+            functional_groups=functional_groups,
+            placer_ids=placer_ids,
+        )
+        return building_block
+
+    def with_structure_from_atomlite(
+        self,
+        database_path: pathlib.Path,
+        key: str,
+    ) -> typing.Self:
+        """
+        Return a clone, with its structure taken from an atomlite database.
+
+        Parameters:
+
+            database_path:
+                The path to an :mod:`atomlite` database.
+
+            key:
+                The key of the molecule in the database.
+
+        Returns:
+
+            Molecule: A clone with atomic positions found in `path`.
+
+        """
+        rdkit_molecule = atomlite.json_to_rdkit(
+            atomlite.Database(database_path).get_entry(key).molecule
+        )
+        return self.clone().init_from_rdkit_mol(rdkit_molecule)
+
+    @classmethod
+    def init_from_atomlite(
+        cls,
+        database_path: pathlib.Path,
+        key: str,
+        functional_groups: (
+            FunctionalGroup
+            | FunctionalGroupFactory
+            | Iterable[FunctionalGroup | FunctionalGroupFactory]
+        ) = (),
+        placer_ids: Iterable[int] | None = None,
+    ) -> typing.Self:
+        """
+        Initialize from an :mod:`atomlite` database entry.
+
+        Parameters:
+
+            database_path:
+                The path to an :mod:`atomlite` database.
+
+            key:
+                The key of the molecule in the database.
+
+            functional_groups (FunctionalGroup \
+| FunctionalGroupFactory \
+| list[FunctionalGroup | FunctionalGroupFactory]):
+                :class:`.FunctionalGroup` instances added to the
+                building block and :class:`.FunctionalGroupFactory`
+                instances used to create :class:`.FunctionalGroup`
+                instances added to the building block.
+                :class:`.FunctionalGroup` instances are used to
+                identify which atoms are modified during
+                :class:`.ConstructedMolecule` construction.
+
+            placer_ids (list[int]):
+                The ids of *placer* atoms. These are the atoms which
+                should be used for calculating the position of the
+                building block. Depending on the values passed to
+                `placer_ids`, and the functional groups in the building
+                block, different *placer* ids will be used by the
+                building block.
+
+                #. `placer_ids` is passed to the initializer: the
+                   passed *placer* ids will be used by the building
+                   block.
+
+                #. `placer_ids` is ``None`` and the building block has
+                   functional groups: The *placer* ids of the
+                   functional groups will be used as the *placer* ids
+                   of the building block.
+
+                #. `placer_ids` is ``None`` and `functional_groups` is
+                   empty. All atoms of the molecule will be used for
+                   *placer* ids.
+
+        Returns:
+
+            BuildingBlock: The building block.
+
+        """
+        rdkit_molecule = atomlite.json_to_rdkit(
+            atomlite.Database(database_path).get_entry(key).molecule
+        )
+        building_block = cls.__new__(cls)
+        building_block._init_from_rdkit_mol(
+            molecule=rdkit_molecule,
             functional_groups=functional_groups,
             placer_ids=placer_ids,
         )

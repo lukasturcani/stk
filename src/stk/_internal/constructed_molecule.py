@@ -3,6 +3,7 @@ import pathlib
 import typing
 from collections.abc import Iterable, Iterator
 
+import atomlite
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
@@ -600,6 +601,32 @@ class ConstructedMolecule(Molecule):
             ConstructedMolecule: A clone with atomic positions found in `path`.
         """
         return super().with_structure_from_file(str(path), extension)
+
+    def with_structure_from_atomlite(
+        self,
+        database_path: pathlib.Path,
+        key: str,
+    ) -> typing.Self:
+        """
+        Return a clone, with its structure taken from an atomlite database.
+
+        Parameters:
+
+            database_path:
+                The path to an :mod:`atomlite` database.
+
+            key:
+                The key of the molecule in the database.
+
+        Returns:
+
+            Molecule: A clone with atomic positions found in `path`.
+
+        """
+        rdkit_molecule = atomlite.json_to_rdkit(
+            atomlite.Database(database_path).get_entry(key).molecule
+        )
+        return self.clone().init_from_rdkit_mol(rdkit_molecule)
 
     def write(
         self,
