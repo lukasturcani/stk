@@ -35,7 +35,7 @@ def test_atomlite(molecule: CaseData) -> None:
         assert np.allclose(
             mol.get_position_matrix(),
             mol.with_structure_from_atomlite(
-                database_path=path, key=key
+                database=database, key=key
             ).get_position_matrix(),
         )
 

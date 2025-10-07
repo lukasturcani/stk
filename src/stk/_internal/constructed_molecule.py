@@ -604,7 +604,7 @@ class ConstructedMolecule(Molecule):
 
     def with_structure_from_atomlite(
         self,
-        database_path: pathlib.Path,
+        database: atomlite.Database,
         key: str,
     ) -> typing.Self:
         """
@@ -612,8 +612,8 @@ class ConstructedMolecule(Molecule):
 
         Parameters:
 
-            database_path:
-                The path to an :mod:`atomlite` database.
+            database:
+                The :mod:`atomlite` database.
 
             key:
                 The key of the molecule in the database.
@@ -628,7 +628,7 @@ class ConstructedMolecule(Molecule):
 
         """
 
-        entry = atomlite.Database(database_path).get_entry(key)
+        entry = database.get_entry(key)
         if entry is None:
             msg = f"Entry {key} not found in database."
             raise ValueError(msg)
