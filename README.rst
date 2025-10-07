@@ -56,11 +56,12 @@ Developer Setup
 ---------------
 
 1. Install `just`_.
-2. In a new virtual environment run:
+2. Install `uv`_.
+2. In the source directory, run:
 
 .. code-block:: bash
 
-  just dev
+  just setup
 
 3. Setup the `MongoDB`_ container (make sure ``docker`` is installed):
 
@@ -76,6 +77,7 @@ Developer Setup
 
 
 .. _`just`: https://github.com/casey/just
+.. _`uv`: https://docs.astral.sh
 .. _`MongoDB`: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
 
 How To Cite

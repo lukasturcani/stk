@@ -234,7 +234,7 @@ class SelectionPlotter(typing.Generic[T]):
             size=[200 for _ in range(len(counter.keys()))],
             ax=ax,
         )
-        ax.get_legend().remove()
+        ax.get_legend().remove()  # type: ignore[union-attr]
         # https://tinyurl.com/2p9drmkh
         plt.rcParams["axes.grid"] = False
         ax.figure.colorbar(sm, ax=ax).set_label(self._heat_map_label)
