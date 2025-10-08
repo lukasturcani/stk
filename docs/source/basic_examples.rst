@@ -1444,7 +1444,7 @@ function may be a good idea
         return molecule.GetConformer().GetPositions()
 
 
-    smiles = 'CCCO->[Fe+2]'
+    smiles = 'CCC[OH]->[Fe+2]'
     bb2 = stk.BuildingBlock(
         smiles=smiles,
         position_matrix=get_position_matrix(smiles),

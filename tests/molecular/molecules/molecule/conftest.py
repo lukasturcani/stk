@@ -2,9 +2,10 @@ import os
 
 import numpy as np
 import pytest
-import stk
 from pytest_lazyfixture import lazy_fixture
 from rdkit.Chem import AllChem as rdkit
+
+import stk
 
 from .case_data import CaseData
 
@@ -238,7 +239,7 @@ def _get_dative_molecule() -> rdkit.Mol:
                     molecule=_get_dative_molecule(),
                 )
             ),
-            smiles="N->[Fe+2]",
+            smiles="[NH3]->[Fe+2]",
             name=name,
         ),
         lambda name: CaseData(

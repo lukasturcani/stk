@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 import stk
 
 from ....case_data import CaseData
@@ -31,18 +32,18 @@ from ...building_blocks import get_linker, get_pd_atom
                 ),
             ),
             smiles=(
-                "[H]C1=C([H])C2=C([H])C(=C1[H])C1=C([H])C([H])=N(->["
-                "Pd+2]34<-N5=C([H])C([H])=C(C([H])=C5[H])C5=C([H])C("
-                "[H])=C([H])C(=C5[H])C5=C([H])C([H])=N(->[Pd+2]6(<-N"
-                "7=C([H])C([H])=C(C([H])=C7[H])C7=C([H])C([H])=C([H]"
-                ")C(=C7[H])C7=C([H])C([H])=N(->[Pd+2](<-N8=C([H])C(["
-                "H])=C(C([H])=C8[H])C8=C([H])C(=C([H])C([H])=C8[H])C"
-                "8=C([H])C([H])=N->3C([H])=C8[H])(<-N3=C([H])C([H])="
-                "C(C([H])=C3[H])C3=C([H])C(=C([H])C([H])=C3[H])C3=C("
-                "[H])C([H])=N->4C([H])=C3[H])<-N3=C([H])C([H])=C(C(["
-                "H])=C3[H])C3=C([H])C(=C([H])C([H])=C3[H])C3=C([H])C"
-                "([H])=N->6C([H])=C3[H])C([H])=C7[H])<-N3=C([H])C([H"
-                "])=C2C([H])=C3[H])C([H])=C5[H])C([H])=C1[H]"
+                "[H]C1=C([H])C2C3=C([H])C([H])=[N](->[Pd+2]45<-[N]6=C([H]"
+                ")C([H])=C(C7=C([H])C([H])=C([H])C(C8=C([H])C([H])=[N](->"
+                "[Pd+2]9(<-[N]%10=C([H])C([H])=C(C%11=C([H])C(C%12=C([H])"
+                "C([H])=[N](->[Pd+2](<-[N]%13=C([H])C([H])=C(C(=C1[H])C=2"
+                "[H])C([H])=C%13[H])(<-[N]1=C([H])C([H])=C(C2=C([H])C([H]"
+                ")=C([H])C(C%13=C([H])C([H])=[N]->4C([H])=C%13[H])=C2[H])"
+                "C([H])=C1[H])<-[N]1=C([H])C([H])=C(C2=C([H])C([H])=C([H]"
+                ")C(C4=C([H])C([H])=[N]->9C([H])=C4[H])=C2[H])C([H])=C1[H"
+                "])C([H])=C%12[H])=C([H])C([H])=C%11[H])C([H])=C%10[H])<-"
+                "[N]1=C([H])C([H])=C(C2=C([H])C(C4=C([H])C([H])=[N]->5C(["
+                "H])=C4[H])=C([H])C([H])=C2[H])C([H])=C1[H])C([H])=C8[H])"
+                "=C7[H])C([H])=C6[H])C([H])=C3[H]"
             ),
             name=name,
         ),
@@ -69,18 +70,17 @@ from ...building_blocks import get_linker, get_pd_atom
                 ),
             ),
             smiles=(
-                "[H]C1=C([H])C2=C([H])C(=C1[H])C1=C([H])C([H])=N(->["
-                "Pd+2]34<-N5=C([H])C([H])=C(C([H])=C5[H])C5=C([H])C("
-                "[H])=C([H])C(=C5[H])C5=C([H])C([H])=N(->[Pd+2]6(<-N"
-                "7=C([H])C([H])=C(C([H])=C7[H])C7=C([H])C([H])=C([H]"
-                ")C(=C7[H])C7=C([H])C([H])=N(->[Pd+2](<-N8=C([H])C(["
-                "H])=C(C([H])=C8[H])C8=C([H])C(=C([H])C([H])=C8[H])C"
-                "8=C([H])C([H])=N->3C([H])=C8[H])(<-N3=C([H])C([H])="
-                "C(C([H])=C3[H])C3=C([H])C(=C([H])C([H])=C3[H])C3=C("
-                "[H])C([H])=N->4C([H])=C3[H])<-N3=C([H])C([H])=C(C(["
-                "H])=C3[H])C3=C([H])C(=C([H])C([H])=C3[H])C3=C([H])C"
-                "([H])=N->6C([H])=C3[H])C([H])=C7[H])<-N3=C([H])C([H"
-                "])=C2C([H])=C3[H])C([H])=C5[H])C([H])=C1[H]"
+                "[H]C1=C([H])C2C3=C([H])C([H])=[N](->[Pd+2]45<-[N]6=C([H])C(["
+                "H])=C(C7=C([H])C([H])=C([H])C(C8=C([H])C([H])=[N](->[Pd+2]9("
+                "<-[N]%10=C([H])C([H])=C(C%11=C([H])C(C%12=C([H])C([H])=[N](-"
+                ">[Pd+2](<-[N]%13=C([H])C([H])=C(C(=C1[H])C=2[H])C([H])=C%13["
+                "H])(<-[N]1=C([H])C([H])=C(C2=C([H])C([H])=C([H])C(C%13=C([H]"
+                ")C([H])=[N]->4C([H])=C%13[H])=C2[H])C([H])=C1[H])<-[N]1=C([H"
+                "])C([H])=C(C2=C([H])C([H])=C([H])C(C4=C([H])C([H])=[N]->9C(["
+                "H])=C4[H])=C2[H])C([H])=C1[H])C([H])=C%12[H])=C([H])C([H])=C"
+                "%11[H])C([H])=C%10[H])<-[N]1=C([H])C([H])=C(C2=C([H])C(C4=C("
+                "[H])C([H])=[N]->5C([H])=C4[H])=C([H])C([H])=C2[H])C([H])=C1["
+                "H])C([H])=C8[H])=C7[H])C([H])=C6[H])C([H])=C3[H]"
             ),
             name=name,
         ),

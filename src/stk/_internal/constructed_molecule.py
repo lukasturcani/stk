@@ -3,6 +3,7 @@ import pathlib
 import typing
 from collections.abc import Iterable, Iterator
 
+import atomlite
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
@@ -600,6 +601,40 @@ class ConstructedMolecule(Molecule):
             ConstructedMolecule: A clone with atomic positions found in `path`.
         """
         return super().with_structure_from_file(str(path), extension)
+
+    def with_structure_from_atomlite(
+        self,
+        database: atomlite.Database,
+        key: str,
+    ) -> typing.Self:
+        """
+        Return a clone, with its structure taken from an atomlite database.
+
+        Parameters:
+
+            database:
+                The :mod:`atomlite` database.
+
+            key:
+                The key of the molecule in the database.
+
+        Returns:
+
+            Molecule: A clone with atomic positions found in `path`.
+
+        Raises:
+
+            ValueError: If the entry is not found in the database.
+
+        """
+
+        entry = database.get_entry(key)
+        if entry is None:
+            msg = f"Entry {key} not found in database."
+            raise ValueError(msg)
+
+        position_matrix = np.array(entry.molecule["conformers"][0])
+        return self.clone().with_position_matrix(position_matrix)
 
     def write(
         self,

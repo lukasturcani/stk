@@ -20,10 +20,8 @@ dependencies = [
   "MCHammer",
   "SpinDry",
   "vabene",
-  # Added a new restriction (<2025.3.1 for rdkit because of changes in
-  # rdkit's handling of metal-bonded/dative smiles) - done through manual testing.
-  # This can change if updates to stk occur.
-  "rdkit != 2024.3.5, <= 2024.9.1",
+  # Avoid one version with bad changes to structure.
+  "rdkit != 2024.3.5",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
@@ -52,6 +50,9 @@ dev = [
 [project.urls]
 github = "https://github.com/lukasturcani/stk"
 documentation = "https://stk.readthedocs.io"
+
+[project.scripts]
+coordinate_check = "stk._internal.scripts.coordinate_check:main"
 
 [tool.setuptools_scm]
 write_to = "src/stk/_version.py"

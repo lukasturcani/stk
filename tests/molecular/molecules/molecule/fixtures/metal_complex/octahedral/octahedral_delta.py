@@ -1,4 +1,5 @@
 import pytest
+
 import stk
 
 from ....case_data import CaseData
@@ -28,9 +29,9 @@ from ...building_blocks import get_fe_atom, get_iron_bi_1
                 )
             ),
             smiles=(
-                "[H]C1=C([H])C([H])=N2->[Fe+2]34(<-N(Br)=C([H])C2=C1[H"
-                "])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)"
-                "<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41"
+                "[H]C1=C([H])C([H])=[N]2->[Fe+2]34(<-[N](Br)=C([H])C2=C1[H])"
+                "(<-[N](Br)=C([H])C1=C([H])C([H])=C([H])C([H])=[N]->31)<-[N]"
+                "(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=[N]->41"
             ),
             name=name,
         ),
@@ -54,9 +55,9 @@ from ...building_blocks import get_fe_atom, get_iron_bi_1
                 )
             ),
             smiles=(
-                "[H]C1=C([H])C([H])=N2->[Fe+2]34(<-N(Br)=C([H])C2=C1[H"
-                "])(<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->31)"
-                "<-N(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=N->41"
+                "[H]C1=C([H])C([H])=[N]2->[Fe+2]34(<-[N](Br)=C([H])C2=C1[H])"
+                "(<-[N](Br)=C([H])C1=C([H])C([H])=C([H])C([H])=[N]->31)<-[N]"
+                "(Br)=C([H])C1=C([H])C([H])=C([H])C([H])=[N]->41"
             ),
             name=name,
         ),
