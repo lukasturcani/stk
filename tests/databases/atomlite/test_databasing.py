@@ -26,7 +26,9 @@ def test_atomlite(molecule: CaseData) -> None:
 
         database.add_entries(
             atomlite.Entry(
-                key=key, molecule=mol.to_atomlite(), properties=prop
+                key=key,
+                molecule=mol.to_atomlite(),
+                properties=prop,
             )
         )
 
@@ -35,7 +37,8 @@ def test_atomlite(molecule: CaseData) -> None:
         assert np.allclose(
             mol.get_position_matrix(),
             mol.with_structure_from_atomlite(
-                database=database, key=key
+                database=database,
+                key=key,
             ).get_position_matrix(),
         )
 
@@ -43,7 +46,7 @@ def test_atomlite(molecule: CaseData) -> None:
         assert entry.molecule == mol.to_atomlite()
         assert (
             stk.Smiles().get_key(
-                mol.init_from_atomlite(database_path=path, key=key)
+                mol.init_from_atomlite(database=database, key=key)
             )
             == key
         )

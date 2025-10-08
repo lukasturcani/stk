@@ -63,7 +63,7 @@ Developer Setup
 
 1. Install `just`_.
 2. Install `uv`_.
-2. In the source directory, run:
+3. In the source directory, run:
 
 .. code-block:: bash
 
