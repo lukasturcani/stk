@@ -276,6 +276,7 @@ def building_block(request) -> CaseData:
         lazy_fixture("macrocycle"),
         lazy_fixture("metal_complex"),
         lazy_fixture("rotaxane"),
+        lazy_fixture("small"),
     ),
 )
 def case_data(request):
