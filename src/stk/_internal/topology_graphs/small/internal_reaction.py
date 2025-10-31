@@ -116,14 +116,13 @@ class InternalReaction(TopologyGraph):
         And multiple reactions can be performed, where the closest pairs should
         react.
 
-
         .. moldoc::
 
             import moldoc.molecule as molecule
             import stk
 
             building_block = stk.BuildingBlock(
-                smiles="CCCC(CCCCI)CCCCCC(I)CC",
+                smiles="ICCCCC(CCCI)CCCCCC(I)CCI",
                 functional_groups=stk.IodoFactory(),
             )
 
