@@ -229,6 +229,10 @@ class InternalReaction(TopologyGraph):
             scale_multiplier:
                 Scales the positions of the vertices.
 
+            reaction_factory:
+                The factory to use for creating reactions between
+                functional groups of building blocks.
+
         Raises:
 
             :class:`ValueError`
