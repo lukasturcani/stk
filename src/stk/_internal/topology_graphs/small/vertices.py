@@ -13,10 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class CoreVertex(Vertex):
-    """
-    Represents a vertex in the core of an ncore topology graph.
-
-    """
+    """Represents a vertex in the core of an ncore topology graph."""
 
     def place_building_block(
         self,
@@ -89,10 +86,7 @@ class CoreVertex(Vertex):
 
 
 class SubstituentVertex(Vertex):
-    """
-    Represents a vertex to be bound to core.
-
-    """
+    """Represents a vertex to be bound to core."""
 
     def place_building_block(
         self,
@@ -130,3 +124,44 @@ class SubstituentVertex(Vertex):
         edges: tuple[Edge, ...],
     ) -> dict[int, int]:
         return {0: edges[0].get_id()}
+
+
+class SingleVertex(Vertex):
+    """Represents a vertex for internal reaction placed at the origin."""
+
+    def place_building_block(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> np.ndarray:
+        return building_block.with_centroid(
+            np.array([0.0, 0.0, 0.0])
+        ).get_position_matrix()
+
+    def map_functional_groups_to_edges(
+        self,
+        building_block: BuildingBlock,
+        edges: tuple[Edge, ...],
+    ) -> dict[int, int]:
+        # The idea is to order the functional groups in building_block
+        # by their angle with the vector running from the placer
+        # centroid to fg0, going in the clockwise direction.
+        # The edges are also ordered by their angle with the vector
+        # running from the edge centroid to the aligner_edge,
+        # going in the clockwise direction.
+        #
+        # Once the fgs and edges are ordered, zip and assign them.
+
+        fg_sorter = _FunctionalGroupSorter(building_block)
+        edge_sorter = _EdgeSorter(
+            edges=edges,
+            aligner_edge=edges[0],
+            axis=fg_sorter.get_axis(),
+        )
+        return {
+            fg_id: edge.get_id()
+            for fg_id, edge in zip(
+                fg_sorter.get_items(),
+                edge_sorter.get_items(),
+            )
+        }

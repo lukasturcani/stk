@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
-import stk
 from pytest_lazyfixture import lazy_fixture
+
+import stk
 
 from ...case_data import CaseData
 
@@ -10,6 +11,7 @@ from ...case_data import CaseData
     params=(
         lazy_fixture("substituent"),
         lazy_fixture("core"),
+        lazy_fixture("single"),
     ),
 )
 def case_data(request: pytest.FixtureRequest) -> CaseData:
@@ -23,6 +25,22 @@ def core(
 ) -> CaseData:
     return CaseData(
         vertex=stk.small.CoreVertex(
+            id=id,
+            position=position,
+        ),
+        id=id,
+        position=position,
+        cell=np.array([0, 0, 0]),
+    )
+
+
+@pytest.fixture
+def single(
+    id: int,
+    position: tuple[float, float, float] | np.ndarray,
+) -> CaseData:
+    return CaseData(
+        vertex=stk.small.SingleVertex(
             id=id,
             position=position,
         ),
