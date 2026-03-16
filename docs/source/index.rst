@@ -10,6 +10,7 @@
 
    Construction Overview <construction_overview>
    Basic Examples <basic_examples>
+   Preparing building blocks <bbprepared>
    Video Tutorials <video_tutorials>
 
 .. toctree::

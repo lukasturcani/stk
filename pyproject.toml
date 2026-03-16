@@ -45,6 +45,7 @@ dev = [
   "sphinx-rtd-theme",
   "twine",
   "chemiscope",
+  "bbprepared",
 ]
 
 [project.urls]
