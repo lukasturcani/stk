@@ -15,8 +15,9 @@ def _get_case_data_1() -> CaseData:
     return CaseData.new(
         fitness_normalizer=stk.Power(
             power=(0.5, 0, -1),
-            filter=lambda fitness_values, record: fitness_values[record]
-            is not None,
+            filter=lambda fitness_values, record: (
+                fitness_values[record] is not None
+            ),
         ),
         fitness_values={
             stk.MoleculeRecord(

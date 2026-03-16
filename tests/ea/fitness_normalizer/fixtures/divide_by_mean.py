@@ -38,8 +38,9 @@ def _get_case_data_2() -> CaseData:
     )
     return CaseData.new(
         fitness_normalizer=stk.DivideByMean(
-            filter=lambda fitness_values, record: fitness_values[record]
-            is not None,
+            filter=lambda fitness_values, record: (
+                fitness_values[record] is not None
+            ),
         ),
         fitness_values={
             stk.MoleculeRecord(

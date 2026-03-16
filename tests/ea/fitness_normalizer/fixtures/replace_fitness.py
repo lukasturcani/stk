@@ -14,14 +14,17 @@ def _get_case_data_1() -> CaseData:
     )
     return CaseData.new(
         fitness_normalizer=stk.ReplaceFitness(
-            get_replacement=lambda fitness_values: min(
-                fitness_value
-                for fitness_value in fitness_values.values()
-                if fitness_value is not None
-            )
-            / 2,
-            filter=lambda fitness_values, record: fitness_values[record]
-            is None,
+            get_replacement=lambda fitness_values: (
+                min(
+                    fitness_value
+                    for fitness_value in fitness_values.values()
+                    if fitness_value is not None
+                )
+                / 2
+            ),
+            filter=lambda fitness_values, record: (
+                fitness_values[record] is None
+            ),
         ),
         fitness_values={
             stk.MoleculeRecord(
