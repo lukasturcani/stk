@@ -1130,6 +1130,7 @@ from the database. For example,
     pymongo.MongoClient().drop_database(_test_database)
     pymongo.MongoClient = _mongo_client
 
+
 Visualising Molecular Datasets using chemiscope
 ===============================================
 
@@ -1138,13 +1139,14 @@ Requirements
 ------------
 
 :mod:`chemiscope` makes it easy for you to write a ``.json`` or ``.json.gz``
-containing :mod:`stk` molecules and their properties; see an example__.
+containing :mod:`stk` molecules and their properties; see an `example`__.
 
 __ https://chemiscope.org/docs/examples/9-stk-custom-bonds.html
 
 To get :mod:`.chemiscope`, you can install it with pip::
 
   $ pip install chemiscope
+
 
 Writing to file
 ---------------
@@ -1209,11 +1211,13 @@ Either way, you need to write a ``.json`` or ``.json.gz`` file
         ),
     )
 
+
 .. testcleanup:: saving-to-chemiscope
 
     import pathlib
 
     pathlib.Path("stk_example.json.gz").unlink()
+
 
 .. seealso::
 

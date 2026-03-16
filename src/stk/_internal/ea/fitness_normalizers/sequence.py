@@ -44,6 +44,7 @@ class NormalizerSequence(FitnessNormalizer[T]):
             )
             normalized_fitness_values = normalizer.normalize(fitness_values)
             assert normalized_fitness_values[record] == 3
+
     """
 
     def __init__(
@@ -55,6 +56,7 @@ class NormalizerSequence(FitnessNormalizer[T]):
             fitness_normalizers (list[FitnessNormalizer[T]]):
                 The :class:`.FitnessNormalizer` instances which should be
                 used in sequence.
+
         """
         self._fitness_normalizers = tuple(fitness_normalizers)
 

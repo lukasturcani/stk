@@ -102,6 +102,7 @@ class Multiply(FitnessNormalizer[T]):
                 (1, 2, 3),
             ))
             assert normalized_fitness_values[record2] is None
+
     """
 
     def __init__(
@@ -127,6 +128,7 @@ class Multiply(FitnessNormalizer[T]):
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
+
         """
         if not isinstance(coefficient, int | float):
             coefficient = tuple(coefficient)

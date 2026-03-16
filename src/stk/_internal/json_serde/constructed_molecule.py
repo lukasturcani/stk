@@ -98,6 +98,7 @@ class ConstructedMoleculeJsonizer:
         a new key will be added to the JSON representation, with its name
         given by :meth:`.MoleculeKeyMaker.get_key_name` and the value
         given by :meth:`.MoleculeKeyMaker.get_key`.
+
     """
 
     def __init__(

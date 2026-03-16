@@ -16,6 +16,7 @@ class FitnessNormalizer(typing.Generic[T]):
     has access to all members in the population when it is calculating
     the normalized fitness value, whereas a :class:`.FitnessCalculator`
     does not.
+
     """
 
     def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
@@ -28,5 +29,6 @@ class FitnessNormalizer(typing.Generic[T]):
                 normalized.
         Returns:
             The new fitness value for each molecule.
+
         """
         raise NotImplementedError()

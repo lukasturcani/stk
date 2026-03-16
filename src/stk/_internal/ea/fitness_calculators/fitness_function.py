@@ -226,6 +226,7 @@ class FitnessFunction(FitnessCalculator[T]):
             stk.ValueMongoDb = _old_init
             pymongo.MongoClient().drop_database(_test_database)
             pymongo.MongoClient = _mongo_client
+
     """
 
     def __init__(

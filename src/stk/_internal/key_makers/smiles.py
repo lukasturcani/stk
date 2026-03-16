@@ -41,6 +41,7 @@ class Smiles(MoleculeKeyMaker):
 
             assert json['molecule']['SMILES'] == 'NCCN'
             assert json['matrix']['SMILES'] == 'NCCN'
+
     """
 
     def __init__(self) -> None:

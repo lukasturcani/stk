@@ -96,6 +96,7 @@ class AboveAverage(Selector[T]):
             for selected1, selected2 in above_avg.select(population):
                 # Do stuff with the selected molecules.
                 pass
+
     """
 
     def __init__(

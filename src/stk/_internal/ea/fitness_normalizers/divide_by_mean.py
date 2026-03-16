@@ -81,6 +81,7 @@ class DivideByMean(FitnessNormalizer[T]):
                 normalized_fitness_values[record1],
                 (1, 1, 1),
             ))
+
     """
 
     def __init__(
@@ -100,6 +101,7 @@ class DivideByMean(FitnessNormalizer[T]):
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
+
         """
         self._filter = filter
 

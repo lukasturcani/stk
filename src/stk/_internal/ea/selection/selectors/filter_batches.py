@@ -46,6 +46,7 @@ class FilterBatches(Selector[T]):
                 # Do stuff with batch. It is one of the 10 best batches and
                 # was selected using roulette selection.
                 pass
+
     """
 
     def __init__(self, filter: Selector[T], selector: Selector[T]) -> None:

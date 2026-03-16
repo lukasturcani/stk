@@ -35,6 +35,7 @@ class InchiKey(MoleculeKeyMaker):
                 json['molecule']['InChIKey']
                 == 'PIICEJLVQHRZGT-UHFFFAOYSA-N'
             )
+
     """
 
     def __init__(self) -> None:

@@ -140,6 +140,7 @@ class ShiftUp(FitnessNormalizer[T]):
                 (1, 1, 3),
             ))
             assert normalized_fitness_values[record2] is None
+
     """
 
     def __init__(
@@ -159,6 +160,7 @@ class ShiftUp(FitnessNormalizer[T]):
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
+
         """
         self._filter = filter
 

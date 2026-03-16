@@ -136,6 +136,7 @@ class Power(FitnessNormalizer[T]):
                 (2, 0.5, 4),
             ))
             assert normalized_fitness_values[record2] is None
+
     """
 
     def __init__(
@@ -161,6 +162,7 @@ class Power(FitnessNormalizer[T]):
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
+
         """
         if not isinstance(power, int | float):
             power = tuple(power)

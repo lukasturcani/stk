@@ -88,6 +88,7 @@ class SelectionPlotter(typing.Generic[T]):
             os.remove('roulette_counter_1.csv')
             os.remove('roulette_counter_2.png')
             os.remove('roulette_counter_2.csv')
+
     """
 
     def __init__(

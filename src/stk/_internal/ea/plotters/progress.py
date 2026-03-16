@@ -260,6 +260,7 @@ class ProgressPlotter:
 
             assert os.path.exists('fitness_plot.png')
             os.remove('fitness_plot.png')
+
     """
 
     def __init__(

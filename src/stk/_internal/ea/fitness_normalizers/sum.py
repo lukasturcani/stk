@@ -82,6 +82,7 @@ class Sum(FitnessNormalizer[T]):
             normalized_fitness_values = normalizer.normalize(fitness_values)
             assert normalized_fitness_values[record1] == 2
             assert normalized_fitness_values[record2] is None
+
     """
 
     def __init__(
@@ -101,6 +102,7 @@ class Sum(FitnessNormalizer[T]):
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
+
         """
         self._filter = filter
 

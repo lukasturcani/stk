@@ -369,6 +369,7 @@ class Linear(TopologyGraph):
                     num_repeating_units=1,
                 ),
             )
+
     """
 
     def __init__(

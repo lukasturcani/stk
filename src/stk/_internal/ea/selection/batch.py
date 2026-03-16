@@ -157,6 +157,7 @@ class Batch(typing.Generic[T]):
             for record in batch:
                 # Do stuff with record.
                 pass
+
     """
 
     __slots__ = "_records", "_fitness_value", "_identity_key"

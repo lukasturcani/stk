@@ -63,6 +63,7 @@ class ReplaceFitness(FitnessNormalizer[T]):
             normalized_fitness_values = replacer.normalize(fitness_values)
             assert normalized_fitness_values[record1] == 2
             assert normalized_fitness_values[record2] == 1
+
     """
 
     def __init__(
@@ -90,6 +91,7 @@ class ReplaceFitness(FitnessNormalizer[T]):
                 :meth:`.normalize` is passed as the first argument, while
                 the second argument will be passed every
                 :class:`.MoleculeRecord` in it, one at a time.
+
         """
         self._get_replacement = get_replacement
         self._filter = filter

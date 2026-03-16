@@ -28,6 +28,7 @@ class Bond:
             assert isinstance(clone.get_atom1(), stk.H)
             assert clone.get_atom2().get_id() == 12
             assert isinstance(clone.get_atom2(), stk.C)
+
     """
 
     def __init__(

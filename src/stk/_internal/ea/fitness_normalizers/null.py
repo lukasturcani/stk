@@ -12,6 +12,7 @@ class NullFitnessNormalizer(FitnessNormalizer[T]):
 
     This normalizer just yields the molecule records passed to it,
     without changing them in any way.
+
     """
 
     def normalize(self, fitness_values: dict[T, Any]) -> dict[T, Any]:
