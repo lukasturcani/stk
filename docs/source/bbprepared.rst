@@ -53,7 +53,7 @@ prescribed functional groups.
 
     import numpy as np
 
-    assert stk.Smiles().get_key(bb) == 'C1C=CN=CC=1C1=CC=C(C2C=NC=CC=2)C=C1'
+    assert stk.Smiles().get_key(bb) == 'c1cncc(-c2ccc(-c3cccnc3)cc2)c1'
     assert bb.get_num_functional_groups() == 2
     assert not np.allclose(
         bb.get_position_matrix(),
