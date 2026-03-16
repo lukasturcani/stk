@@ -1140,7 +1140,7 @@ Requirements
 :mod:`chemiscope` makes it easy for you to write a ``.json`` or ``.json.gz``
 containing :mod:`stk` molecules and their properties; see an example__.
 
-__ https://chemiscope.org/docs/examples/9-showing_custom_bonds.html
+__ https://chemiscope.org/docs/examples/9-stk-custom-bonds.html
 
 To get :mod:`.chemiscope`, you can install it with pip::
 
@@ -1192,16 +1192,6 @@ Either way, you need to write a ``.json`` or ``.json.gz`` file
         ],
     }
 
-    # Define stk bonding.
-    shape_dict = chemiscope.convert_stk_bonds_as_shapes(
-        frames=structures,
-        bond_color="#fc5500",
-        bond_radius=0.12,
-    )
-
-    # Write the shape string for settings to turn them on automatically.
-    shape_string = ",".join(shape_dict.keys())
-
     # Write to file.
     chemiscope.write_input(
         path="stk_example.json.gz",
@@ -1211,15 +1201,12 @@ Either way, you need to write a ``.json`` or ``.json.gz`` file
         settings=chemiscope.quick_settings(
             x="num_atoms",
             y="num_bonds",
-            color="",
             structure_settings={
-                "shape": shape_string,
                 "atoms": True,
-                "bonds": False,
+                "bonds": True,
                 "spaceFilling": False,
             },
         ),
-        shapes=shape_dict,
     )
 
 .. testcleanup:: saving-to-chemiscope
