@@ -1195,9 +1195,9 @@ Either way, you need to write a ``.json`` or ``.json.gz`` file
     # Write to file.
     chemiscope.write_input(
         path="stk_example.json.gz",
-        frames=structures,
+        structures=structures,
         properties=properties,
-        meta=dict(name="A name."),
+        metadata=dict(name="A name."),
         settings=chemiscope.quick_settings(
             x="num_atoms",
             y="num_bonds",
