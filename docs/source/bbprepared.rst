@@ -26,7 +26,7 @@ prescribed functional groups.
 
     # stk BuildingBlock.
     bb = stk.BuildingBlock(
-        smiles="C1C=CN=CC=1C1=CC=C(C2C=NC=CC=2)C=C1",
+        smiles="c1cncc(-c2ccc(-c3cccnc3)cc2)c1",
         functional_groups=stk.SmartsFunctionalGroupFactory(
             smarts="[#6]~[#7X2]~[#6]",
             bonders=(1,),
