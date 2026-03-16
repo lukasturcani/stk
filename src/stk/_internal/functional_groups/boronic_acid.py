@@ -26,9 +26,9 @@ class BoronicAcid(GenericFunctionalGroup):
     def __init__(
         self,
         boron: B,
-        oxygen1: O,  # noqa: Not an ambiguous name.
+        oxygen1: O,
         hydrogen1: H,
-        oxygen2: O,  # noqa: Not an ambiguous name.
+        oxygen2: O,
         hydrogen2: H,
         atom: Atom,
         bonders: tuple[Atom, ...],
@@ -96,7 +96,7 @@ class BoronicAcid(GenericFunctionalGroup):
 
         return self._boron
 
-    def get_oxygen1(self) -> O:  # noqa: Not an ambiguous name.
+    def get_oxygen1(self) -> O:
         """
         Get the ``[oxygen1]`` atom.
 
@@ -120,7 +120,7 @@ class BoronicAcid(GenericFunctionalGroup):
 
         return self._hydrogen1
 
-    def get_oxygen2(self) -> O:  # noqa: Not an ambiguous name.
+    def get_oxygen2(self) -> O:
         """
         Get the ``[oxygen2]`` atom.
 

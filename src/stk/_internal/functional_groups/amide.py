@@ -26,7 +26,7 @@ class Amide(GenericFunctionalGroup):
     def __init__(
         self,
         carbon: C,
-        oxygen: O,  # noqa: Not an ambiguous name.
+        oxygen: O,
         nitrogen: N,
         hydrogen1: H,
         hydrogen2: H,
@@ -96,7 +96,7 @@ class Amide(GenericFunctionalGroup):
 
         return self._carbon
 
-    def get_oxygen(self) -> O:  # noqa: Not an ambiguous name.
+    def get_oxygen(self) -> O:
         """
         Get the ``[oxygen]`` atom.
 

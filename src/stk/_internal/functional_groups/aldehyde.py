@@ -26,7 +26,7 @@ class Aldehyde(GenericFunctionalGroup):
     def __init__(
         self,
         carbon: C,
-        oxygen: O,  # noqa: Not an ambiguous name.
+        oxygen: O,
         hydrogen: H,
         atom: Atom,
         bonders: tuple[Atom, ...],
@@ -86,7 +86,7 @@ class Aldehyde(GenericFunctionalGroup):
 
         return self._carbon
 
-    def get_oxygen(self) -> O:  # noqa: Not an ambiguous name.
+    def get_oxygen(self) -> O:
         """
         Get the oxygen atom.
 
