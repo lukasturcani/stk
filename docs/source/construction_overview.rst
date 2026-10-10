@@ -206,7 +206,7 @@ can be told to perform different transformations on the building block,
 so that its orientation in the constructed molecule changes. For the
 end user, selecting the transformation from a set of
 predefined ones is easy. Also, since the transformation is restricted
-to a single building block on a single vertex, it easy for developers
+to a single building block on a single vertex, it is easy for developers
 to define.
 
 The second major benefit of the topology graph is that the vertices and
