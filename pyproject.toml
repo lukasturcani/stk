@@ -21,11 +21,7 @@ dependencies = [
   "SpinDry",
   "vabene",
   # Avoid one version with bad changes to structure.
-  # "rdkit != 2024.3.5",
-  # Pin the rdkit version to avoid changes in topology and structure with
-  # recent changes.
-  "rdkit==2025.9.5",
-
+  "rdkit != 2024.3.5",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
@@ -37,12 +33,10 @@ dev = [
   "moldoc==3.0.0",
   "mypy",
   "pip-tools",
-  # TODO: Remove pin when https://github.com/TvoroG/pytest-lazy-fixture/issues/65 is resolved.
-  # pytest-lazy-fixture 0.6.0 is incompatible with pytest 8.0.0
-  "pytest<8",
+  "pytest",
   "pytest-benchmark",
   "pytest-datadir",
-  "pytest-lazy-fixture",
+  "pytest-lazy-fixtures",
   "pytest-cov",
   "sphinx",
   "sphinx-copybutton",
