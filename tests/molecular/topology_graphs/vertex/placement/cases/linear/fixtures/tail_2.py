@@ -1,4 +1,5 @@
 import pytest
+
 import stk
 
 from ....case_data import CaseData
@@ -27,7 +28,7 @@ def tail_2(position, building_block_2):
     vertex = stk.polymer.TailVertex(0, position, False)
     return CaseData(
         vertex=vertex,
-        edges=(tuple(get_edges(vertex))[0],),
+        edges=(next(iter(get_edges(vertex))),),
         building_block=building_block_2,
         position=position,
         alignment_tests={

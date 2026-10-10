@@ -1,9 +1,10 @@
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 import pymongo
 import pytest
 import rdkit.Chem.AllChem as rdkit
+
 import stk
 
 from ..case_data import CaseData

@@ -6,11 +6,9 @@ import pytest
         lambda molecule: None,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: list(range(0, min(1, molecule.get_num_atoms()))),
-        lambda molecule: tuple(range(0, min(1, molecule.get_num_atoms()))),
-        lambda molecule: (
-            i for i in range(0, min(1, molecule.get_num_atoms()))
-        ),
+        lambda molecule: list(range(min(1, molecule.get_num_atoms()))),
+        lambda molecule: tuple(range(min(1, molecule.get_num_atoms()))),
+        lambda molecule: (i for i in range(min(1, molecule.get_num_atoms()))),
         pytest.param(
             lambda molecule: (),
             marks=pytest.mark.xfail(strict=True, raises=ValueError),

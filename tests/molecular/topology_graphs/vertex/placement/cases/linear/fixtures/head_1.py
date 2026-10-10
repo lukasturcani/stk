@@ -1,4 +1,5 @@
 import pytest
+
 import stk
 
 from ....case_data import CaseData
@@ -7,7 +8,7 @@ from .utilities import get_centroid, get_closest_point, get_edges
 
 @pytest.fixture
 def head_1(position, flip, building_block_1):
-    point1, point2 = points = (
+    point1, _point2 = points = (
         position + [-10, 0, 0],
         position + [10, 0, 0],
     )

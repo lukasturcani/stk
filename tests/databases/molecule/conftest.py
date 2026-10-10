@@ -1,12 +1,12 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
-    params=(lazy_fixture("molecule_mongo_db"),),
+    params=(lf("molecule_mongo_db"),),
 )
 def case_data(request):
     return request.param

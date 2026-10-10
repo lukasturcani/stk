@@ -1,1 +1,1 @@
-from .small import *  # noqa
+from .small import *

@@ -1,21 +1,21 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from .case_data import CaseData
 
 # Fixtures must be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("above_average"),
-        lazy_fixture("best"),
-        lazy_fixture("filter_batches"),
-        lazy_fixture("filter_molecules"),
-        lazy_fixture("remove_batches"),
-        lazy_fixture("remove_molecules"),
-        lazy_fixture("worst"),
+        lf("above_average"),
+        lf("best"),
+        lf("filter_batches"),
+        lf("filter_molecules"),
+        lf("remove_batches"),
+        lf("remove_molecules"),
+        lf("worst"),
     ),
 )
 def case_data(request: pytest.FixtureRequest) -> CaseData:

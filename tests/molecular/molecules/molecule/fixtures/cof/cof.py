@@ -1,32 +1,32 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
-from .hexagonal import *  # noqa
+from .hexagonal import *
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .honeycomb import *  # noqa
-from .kagome import *  # noqa
-from .linkerless_honeycomb import *  # noqa
-from .periodic_hexagonal import *  # noqa
-from .periodic_honeycomb import *  # noqa
-from .periodic_kagome import *  # noqa
-from .periodic_linkerless_honeycomb import *  # noqa
-from .periodic_square import *  # noqa
-from .square import *  # noqa
+from .honeycomb import *
+from .kagome import *
+from .linkerless_honeycomb import *
+from .periodic_hexagonal import *
+from .periodic_honeycomb import *
+from .periodic_kagome import *
+from .periodic_linkerless_honeycomb import *
+from .periodic_square import *
+from .square import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("cof_honeycomb"),
-        lazy_fixture("cof_kagome"),
-        lazy_fixture("cof_square"),
-        lazy_fixture("cof_hexagonal"),
-        lazy_fixture("cof_linkerless_honeycomb"),
-        lazy_fixture("cof_periodic_honeycomb"),
-        lazy_fixture("cof_periodic_kagome"),
-        lazy_fixture("cof_periodic_square"),
-        lazy_fixture("cof_periodic_hexagonal"),
-        lazy_fixture("cof_periodic_linkerless_honeycomb"),
+        lf("cof_honeycomb"),
+        lf("cof_kagome"),
+        lf("cof_square"),
+        lf("cof_hexagonal"),
+        lf("cof_linkerless_honeycomb"),
+        lf("cof_periodic_honeycomb"),
+        lf("cof_periodic_kagome"),
+        lf("cof_periodic_square"),
+        lf("cof_periodic_hexagonal"),
+        lf("cof_periodic_linkerless_honeycomb"),
     ),
 )
 def cof(request):

@@ -1,3 +1,3 @@
-from .roulette import *  # noqa
-from .stochastic_universal_sampling import *  # noqa
-from .tournament import *  # noqa
+from .roulette import *
+from .stochastic_universal_sampling import *
+from .tournament import *

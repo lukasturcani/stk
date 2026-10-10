@@ -1,12 +1,12 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 # Fixtures must be visible for lazy_fixture() calls.
-from .nrotaxane import *  # noqa
+from .nrotaxane import *
 
 
 @pytest.fixture(
-    params=(lazy_fixture("rotaxane_nrotaxane"),),
+    params=(lf("rotaxane_nrotaxane"),),
 )
 def rotaxane(request):
     return request.param

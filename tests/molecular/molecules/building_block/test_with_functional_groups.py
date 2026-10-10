@@ -1,11 +1,13 @@
+from collections.abc import Callable, Iterator, Sequence
+
+import stk
+
 from ..utilities import (
     are_equivalent_functional_groups,
     has_same_structure,
     is_equivalent_building_block,
     is_equivalent_molecule,
 )
-import stk
-from collections.abc import Sequence, Callable, Iterator
 
 
 def test_with_functional_groups(

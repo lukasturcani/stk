@@ -1,1 +1,1 @@
-from .molecule_mongo_db import *  # noqa
+from .molecule_mongo_db import *

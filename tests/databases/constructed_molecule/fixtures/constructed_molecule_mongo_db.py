@@ -1,9 +1,10 @@
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 import pymongo
 import pytest
 import rdkit.Chem.AllChem as rdkit
+
 import stk
 
 from ..case_data import CaseData
@@ -38,13 +39,11 @@ class CaseDataData:
 @pytest.fixture(
     params=(
         lambda: CaseDataData(
-            get_database=lambda mongo_client: (
-                stk.ConstructedMoleculeMongoDb(
-                    mongo_client=mongo_client,
-                    database="_stk_test_database_for_testing",
-                    put_lru_cache_size=0,
-                    get_lru_cache_size=0,
-                )
+            get_database=lambda mongo_client: stk.ConstructedMoleculeMongoDb(
+                mongo_client=mongo_client,
+                database="_stk_test_database_for_testing",
+                put_lru_cache_size=0,
+                get_lru_cache_size=0,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -65,13 +64,11 @@ class CaseDataData:
             },
         ),
         lambda: CaseDataData(
-            get_database=lambda mongo_client: (
-                stk.ConstructedMoleculeMongoDb(
-                    mongo_client=mongo_client,
-                    database="_stk_test_database_for_testing",
-                    put_lru_cache_size=128,
-                    get_lru_cache_size=128,
-                )
+            get_database=lambda mongo_client: stk.ConstructedMoleculeMongoDb(
+                mongo_client=mongo_client,
+                database="_stk_test_database_for_testing",
+                put_lru_cache_size=128,
+                get_lru_cache_size=128,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -92,25 +89,21 @@ class CaseDataData:
             },
         ),
         lambda: CaseDataData(
-            get_database=lambda mongo_client: (
-                stk.ConstructedMoleculeMongoDb(
-                    mongo_client=mongo_client,
-                    database="_stk_test_database_for_testing",
-                    jsonizer=stk.ConstructedMoleculeJsonizer(
-                        key_makers=(
-                            stk.MoleculeKeyMaker(
-                                key_name="SMILES",
-                                get_key=lambda molecule: (
-                                    rdkit.MolToSmiles(
-                                        mol=molecule.to_rdkit_mol(),
-                                    )
-                                ),
+            get_database=lambda mongo_client: stk.ConstructedMoleculeMongoDb(
+                mongo_client=mongo_client,
+                database="_stk_test_database_for_testing",
+                jsonizer=stk.ConstructedMoleculeJsonizer(
+                    key_makers=(
+                        stk.MoleculeKeyMaker(
+                            key_name="SMILES",
+                            get_key=lambda molecule: rdkit.MolToSmiles(
+                                mol=molecule.to_rdkit_mol(),
                             ),
                         ),
                     ),
-                    put_lru_cache_size=0,
-                    get_lru_cache_size=0,
-                )
+                ),
+                put_lru_cache_size=0,
+                get_lru_cache_size=0,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(
@@ -127,25 +120,21 @@ class CaseDataData:
             key={"SMILES": "Br[C+2][C+2][C+2][C+2]Br"},
         ),
         lambda: CaseDataData(
-            get_database=lambda mongo_client: (
-                stk.ConstructedMoleculeMongoDb(
-                    mongo_client=mongo_client,
-                    database="_stk_test_database_for_testing",
-                    jsonizer=stk.ConstructedMoleculeJsonizer(
-                        key_makers=(
-                            stk.MoleculeKeyMaker(
-                                key_name="SMILES",
-                                get_key=lambda molecule: (
-                                    rdkit.MolToSmiles(
-                                        mol=molecule.to_rdkit_mol(),
-                                    )
-                                ),
+            get_database=lambda mongo_client: stk.ConstructedMoleculeMongoDb(
+                mongo_client=mongo_client,
+                database="_stk_test_database_for_testing",
+                jsonizer=stk.ConstructedMoleculeJsonizer(
+                    key_makers=(
+                        stk.MoleculeKeyMaker(
+                            key_name="SMILES",
+                            get_key=lambda molecule: rdkit.MolToSmiles(
+                                mol=molecule.to_rdkit_mol(),
                             ),
                         ),
                     ),
-                    put_lru_cache_size=128,
-                    get_lru_cache_size=128,
-                )
+                ),
+                put_lru_cache_size=128,
+                get_lru_cache_size=128,
             ),
             molecule=stk.ConstructedMolecule(
                 topology_graph=stk.polymer.Linear(

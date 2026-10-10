@@ -1,23 +1,24 @@
 import itertools as it
-
-import pytest
-import stk
-from pytest_lazyfixture import lazy_fixture
 from collections import abc
 
-# Fixtures need be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+import pytest
+from pytest_lazy_fixtures import lf
+
+import stk
 
 from .case_data import CaseData
+
+# Fixtures need be visible for lazy_fixture() calls.
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("default_init"),
-        lazy_fixture("init_from_file"),
-        lazy_fixture("init"),
-        lazy_fixture("init_from_molecule"),
-        lazy_fixture("init_from_rdkit_mol"),
+        lf("default_init"),
+        lf("init_from_file"),
+        lf("init"),
+        lf("init_from_molecule"),
+        lf("init_from_rdkit_mol"),
     ),
 )
 def case_data(request) -> CaseData:
