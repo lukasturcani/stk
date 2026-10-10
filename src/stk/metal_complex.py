@@ -1,7 +1,7 @@
 from stk._internal.topology_graphs.metal_complex.bidentate_square_planar import (  # noqa
     BidentateSquarePlanar,
 )
-from stk._internal.topology_graphs.metal_complex.cis_protected_square_planar import (  # noqa
+from stk._internal.topology_graphs.metal_complex.cis_protected_square_planar import (
     CisProtectedSquarePlanar,
 )
 from stk._internal.topology_graphs.metal_complex.metal_complex import (
@@ -26,16 +26,16 @@ from stk._internal.topology_graphs.metal_complex.vertices import (
 )
 
 __all__ = [
-    "Porphyrin",
+    "BiDentateLigandVertex",
+    "BidentateSquarePlanar",
+    "CisProtectedSquarePlanar",
+    "MetalComplex",
+    "MetalVertex",
+    "MonoDentateLigandVertex",
     "Octahedral",
     "OctahedralDelta",
     "OctahedralLambda",
-    "MetalComplex",
     "Paddlewheel",
+    "Porphyrin",
     "SquarePlanar",
-    "BidentateSquarePlanar",
-    "CisProtectedSquarePlanar",
-    "BiDentateLigandVertex",
-    "MonoDentateLigandVertex",
-    "MetalVertex",
 ]

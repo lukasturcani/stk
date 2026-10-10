@@ -7,7 +7,6 @@ XYZ Writer
 from __future__ import annotations
 
 import pathlib
-import typing
 
 from stk._internal.molecule import Molecule
 from stk._internal.utilities.utilities import OneOrMany
@@ -46,7 +45,7 @@ class XyzWriter:
     def _write_content(
         self,
         molecule: Molecule,
-        atom_ids: typing.Optional[OneOrMany[int]],
+        atom_ids: OneOrMany[int] | None,  # type: ignore[valid-type]
     ) -> list[str]:
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
@@ -68,7 +67,7 @@ class XyzWriter:
     def to_string(
         self,
         molecule: Molecule,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: OneOrMany[int] | None = None,  # type: ignore[valid-type]
     ) -> str:
         """
         Get the ``.xyz`` string of  `molecule`.
@@ -97,7 +96,7 @@ class XyzWriter:
         self,
         molecule: Molecule,
         path: pathlib.Path | str,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
+        atom_ids: OneOrMany[int] | None = None,  # type: ignore[valid-type]
     ) -> None:
         """
         Write `molecule` to ``.xyz`` file format.

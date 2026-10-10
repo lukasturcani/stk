@@ -10,12 +10,12 @@ from stk._internal.topology_graphs.polymer.vertices import (
 )
 
 __all__ = [
-    "Linear",
-    "TerminalVertex",
     "HeadVertex",
-    "TailVertex",
-    "LinearVertex",
-    "UnaligningVertex",
     "Helix",
     "HelixVertex",
+    "Linear",
+    "LinearVertex",
+    "TailVertex",
+    "TerminalVertex",
+    "UnaligningVertex",
 ]
