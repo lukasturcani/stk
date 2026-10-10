@@ -1,7 +1,8 @@
 import pathlib
 import typing
 from collections import Counter
-from collections.abc import Callable, Iterator, Set
+from collections.abc import Callable, Iterator
+from collections.abc import Set as AbstractSet
 from functools import wraps
 from typing import Any
 
@@ -21,8 +22,8 @@ class SelectMethod(typing.Protocol[T]):
     def __call__(
         self,
         population: dict[T, float],
-        included_batches: Set[BatchKey] | None = None,
-        excluded_batches: Set[BatchKey] | None = None,
+        included_batches: AbstractSet[BatchKey] | None = None,
+        excluded_batches: AbstractSet[BatchKey] | None = None,
     ) -> Iterator[Batch[T]]:
         pass
 
@@ -170,8 +171,8 @@ class SelectionPlotter(typing.Generic[T]):
         @wraps(select)
         def inner(
             population: dict[T, float],
-            included_batches: Set[BatchKey] | None = None,
-            excluded_batches: Set[BatchKey] | None = None,
+            included_batches: AbstractSet[BatchKey] | None = None,
+            excluded_batches: AbstractSet[BatchKey] | None = None,
         ) -> Iterator[Batch[T]]:
             counter = Counter({record: 0 for record in population})
             for selected in select(
