@@ -159,7 +159,7 @@ class Batch(typing.Generic[T]):
                 pass
     """
 
-    __slots__ = "_records", "_fitness_value", "_identity_key"
+    __slots__ = "_fitness_value", "_identity_key", "_records"
 
     def __init__(
         self,
@@ -218,7 +218,7 @@ class Batch(typing.Generic[T]):
     def __iter__(self) -> Iterator[T]:
         return iter(self._records)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Batch):
             return NotImplemented
         return self._fitness_value == other._fitness_value

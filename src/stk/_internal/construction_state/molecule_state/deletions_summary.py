@@ -17,17 +17,17 @@ class _DeletionsSummary:
     """
 
     __slots__ = [
-        "_atoms",
         "_atom_infos",
-        "_bonds",
+        "_atoms",
         "_bond_infos",
-        "_position_matrix",
+        "_bonds",
         "_deleted_atom_ids",
         "_deleted_bond_ids",
-        "_valid_atoms",
+        "_position_matrix",
         "_valid_atom_infos",
-        "_valid_bonds",
+        "_valid_atoms",
         "_valid_bond_infos",
+        "_valid_bonds",
         "_valid_positions",
     ]
 
@@ -127,7 +127,7 @@ class _DeletionsSummary:
             with_atom(atom)
 
         def valid_bond(bond_data):
-            index, bond = bond_data
+            _index, bond = bond_data
             atom1_id = bond.get_atom1().get_id()
             atom2_id = bond.get_atom2().get_id()
             return (

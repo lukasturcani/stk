@@ -355,8 +355,8 @@ class ConstructedMoleculeMongoDb(ConstructedMoleculeDatabase):
         building_block_position_matrix_collection=(
             "building_block_position_matrices"
         ),
-        jsonizer=ConstructedMoleculeJsonizer(),
-        dejsonizer=ConstructedMoleculeDejsonizer(),
+        jsonizer=ConstructedMoleculeJsonizer(),  # noqa: B008
+        dejsonizer=ConstructedMoleculeDejsonizer(),  # noqa: B008
         put_lru_cache_size=128,
         get_lru_cache_size=128,
         indices=("InChIKey",),

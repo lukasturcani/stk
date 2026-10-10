@@ -7,4 +7,4 @@ Rotaxane
 """
 
 from . import vertices  # noqa
-from .nrotaxane import *  # noqa
+from .nrotaxane import *

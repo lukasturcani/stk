@@ -35,14 +35,14 @@ class _ReactionsSummary:
     """
 
     __slots__ = [
-        "_num_atoms",
-        "_atoms",
         "_atom_infos",
-        "_positions",
-        "_bonds",
+        "_atoms",
         "_bond_infos",
+        "_bonds",
         "_deleted_atom_ids",
         "_deleted_bond_ids",
+        "_num_atoms",
+        "_positions",
     ]
 
     def __init__(self, num_atoms, reaction_results):

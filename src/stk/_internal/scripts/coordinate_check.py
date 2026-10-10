@@ -52,8 +52,8 @@ def main() -> None:
     pytest.main(["-k test_get_plane_normal"])
 
     # Compare.
-    new_numpy_files = list(sorted(pos_mats.glob("*.npy")))
-    old_numpy_files = list(sorted(old_pos_mats.glob("*.npy")))
+    new_numpy_files = sorted(pos_mats.glob("*.npy"))
+    old_numpy_files = sorted(old_pos_mats.glob("*.npy"))
     assert len(new_numpy_files) == len(old_numpy_files)
 
     rmsds = []

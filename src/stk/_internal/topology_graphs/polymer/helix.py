@@ -267,9 +267,9 @@ class Helix(TopologyGraph):
         mirror: bool = False,
         orientations: abc.Iterable[float] | None = None,
         random_seed: int | np.random.Generator | None = None,
-        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        reaction_factory: ReactionFactory = GenericReactionFactory(),  # noqa: B008
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
     ) -> None:
         """
@@ -476,7 +476,7 @@ class Helix(TopologyGraph):
             HelixVertex(
                 id=0,
                 position=np.array([radius, 0, 0 * mirror]),
-                flip=random_seed.choice(
+                flip=random_seed.choice(  # type: ignore[arg-type]
                     a=choices,
                     p=[head_orientation, 1 - head_orientation],
                 ),
@@ -485,7 +485,7 @@ class Helix(TopologyGraph):
         edges: list[Edge] = []
         for i, p in enumerate(body_orientations, 1):
             curr_angle = half_step_hsp + i * step_hsp
-            flip = random_seed.choice(choices, p=[p, 1 - p])
+            flip = random_seed.choice(choices, p=[p, 1 - p])  # type: ignore[arg-type]
             vertices.append(
                 HelixVertex(
                     i,
@@ -496,7 +496,7 @@ class Helix(TopologyGraph):
                             curr_angle * v_z * mirror,
                         ]
                     ),
-                    flip,
+                    flip,  # type: ignore[arg-type]
                 ),
             )
             edges.append(Edge(len(edges), vertices[i - 1], vertices[i]))
@@ -511,7 +511,7 @@ class Helix(TopologyGraph):
                         height * mirror,
                     ]
                 ),
-                flip=random_seed.choice(
+                flip=random_seed.choice(  # type: ignore[arg-type]
                     a=choices,
                     p=[tail_orientation, 1 - tail_orientation],
                 ),

@@ -6,8 +6,6 @@ Aldehyde
 
 from __future__ import annotations
 
-import typing
-
 from stk._internal.atom import Atom
 from stk._internal.elements import C, H, O
 
@@ -31,7 +29,7 @@ class Aldehyde(GenericFunctionalGroup):
         atom: Atom,
         bonders: tuple[Atom, ...],
         deleters: tuple[Atom, ...],
-        placers: typing.Optional[tuple[Atom, ...]] = None,
+        placers: tuple[Atom, ...] | None = None,
     ) -> None:
         """
         Initialize a :class:`.Aldehyde` instance.

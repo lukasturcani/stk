@@ -42,16 +42,12 @@ class UnoccupiedVertexError(Exception):
 
     """
 
-    pass
-
 
 class OverlyOccupiedVertexError(Exception):
     """
     When a COF vertex is occupied by more than one building block.
 
     """
-
-    pass
 
 
 class Cof(TopologyGraph):
@@ -342,9 +338,9 @@ class Cof(TopologyGraph):
         lattice_size: tuple[int, int, int],
         periodic: bool = False,
         vertex_alignments: dict[int, int] | None = None,
-        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        reaction_factory: ReactionFactory = GenericReactionFactory(),  # noqa: B008
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
     ) -> None:
         """
@@ -601,7 +597,7 @@ class Cof(TopologyGraph):
             range(zdim),
         ):
             for vertex in lattice[x][y][z].values():
-                vertices.append(vertex)
+                vertices.append(vertex)  # noqa: PERF402
         return sorted(vertices, key=lambda vertex: vertex.get_id())
 
     def _get_lattice(

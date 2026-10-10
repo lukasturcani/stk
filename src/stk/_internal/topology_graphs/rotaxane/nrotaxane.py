@@ -386,7 +386,7 @@ class NRotaxane(TopologyGraph):
         orientations: abc.Iterable[float] | None = None,
         random_seed: int | np.random.Generator | None = None,
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
     ) -> None:
         """
         Parameters:

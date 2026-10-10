@@ -208,4 +208,4 @@ class RandomCrosser(typing.Generic[T]):
             a=self._crossers,  # type: ignore
             p=self._weights,
         )
-        return crosser.cross(records)
+        return crosser.cross(records)  # type: ignore[attr-defined]

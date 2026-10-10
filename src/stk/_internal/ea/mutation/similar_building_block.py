@@ -80,7 +80,7 @@ class SimilarBuildingBlock:
         self,
         building_blocks: Iterable[BuildingBlock],
         is_replaceable: Callable[[BuildingBlock], bool],
-        key_maker: MoleculeKeyMaker = Inchi(),
+        key_maker: MoleculeKeyMaker = Inchi(),  # noqa: B008
         name: str = "SimilarBuildingBlock",
         random_seed: int | np.random.Generator | None = None,
     ) -> None:
@@ -163,7 +163,7 @@ class SimilarBuildingBlock:
         # If the building block has not been chosen before, create an
         # iterator yielding similar molecules from `building_blocks`
         # for it.
-        replaced_key = self._key_maker.get_key(replaced_building_block)
+        replaced_key = self._key_maker.get_key(replaced_building_block)  # type: ignore[arg-type]
         if replaced_key not in similar_building_blocks:
             similar_building_blocks[replaced_key] = iter(
                 sorted(
@@ -206,7 +206,7 @@ class SimilarBuildingBlock:
         # Build the new ConstructedMolecule.
         graph = record.get_topology_graph().with_building_blocks(
             {
-                replaced_building_block: replacement,
+                replaced_building_block: replacement,  # type: ignore[dict-item]
             }
         )
         return MutationRecord(

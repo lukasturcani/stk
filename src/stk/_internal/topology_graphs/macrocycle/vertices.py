@@ -17,7 +17,7 @@ class CycleVertex(Vertex):
     def __init__(
         self,
         id: int,
-        position: typing.Union[np.ndarray, tuple[float, float, float]],
+        position: np.ndarray | tuple[float, float, float],
         flip: bool,
         angle: float,
     ) -> None:
