@@ -512,9 +512,9 @@ class MetalComplex(TopologyGraph):
         self,
         metals: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
         ligands: BuildingBlock | dict[BuildingBlock, tuple[int, ...]],
-        reaction_factory: typing.Optional[ReactionFactory] = None,
+        reaction_factory: ReactionFactory | None = None,
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
     ) -> None:
         """
@@ -574,16 +574,16 @@ class MetalComplex(TopologyGraph):
         # By default, assign a dative bond order to available
         # functional groups.
         if reaction_factory is None:
-            metal_functional_groups = set(
+            metal_functional_groups = {
                 type(functional_group)
                 for metal in self._normalize_metals(metals)
                 for functional_group in metal.get_functional_groups()
-            )
-            ligand_functional_groups = set(
+            }
+            ligand_functional_groups = {
                 type(functional_group)
                 for ligand in self._normalize_ligands(ligands)
                 for functional_group in ligand.get_functional_groups()
-            )
+            }
             functional_group_pairs = product(
                 metal_functional_groups,
                 ligand_functional_groups,
@@ -683,7 +683,7 @@ class MetalComplex(TopologyGraph):
 
     def _get_metal_vertices(
         self,
-        vertex_ids: OneOrMany[int],
+        vertex_ids: OneOrMany[int],  # type: ignore[valid-type]
     ) -> typing.Iterator[MetalVertex]:
         """
         Yield vertex prototypes.
@@ -707,7 +707,7 @@ class MetalComplex(TopologyGraph):
 
     def _get_ligand_vertices(
         self,
-        vertex_ids: OneOrMany[int],
+        vertex_ids: OneOrMany[int],  # type: ignore[valid-type]
     ) -> typing.Iterator[_LigandVertex]:
         """
         Yield vertex prototypes.

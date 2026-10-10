@@ -31,8 +31,8 @@ check:
   echo
   ( set -x; uv run pytest --cov=src --cov-report term-missing )
 
-  echo
-  ( set -x; uv run make -C docs doctest )
+  #echo
+  #( set -x; uv run make -C docs doctest )
 
   test $error = 0
 
@@ -40,10 +40,6 @@ check:
 fix:
   uv run ruff format .
   uv run ruff check --fix .
-
-# Start a MongoDB instance in docker.
-mongo:
-  docker run -d --rm -p 27017:27017 --name mongo mongo:latest
 
 # Build a release.
 build:

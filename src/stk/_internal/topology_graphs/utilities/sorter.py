@@ -15,7 +15,7 @@ class _Sorter:
 
     """
 
-    __slots__ = ["_items", "_reference", "_axis"]
+    __slots__ = ["_axis", "_items", "_reference"]
 
     def __init__(self, items, reference, axis):
         """

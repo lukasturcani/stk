@@ -18,13 +18,13 @@ class MoleculeState:
     """
 
     __slots__ = [
-        "_position_matrix",
-        "_atoms",
         "_atom_infos",
-        "_bonds",
+        "_atoms",
         "_bond_infos",
+        "_bonds",
         "_edge_functional_groups",
         "_num_placements",
+        "_position_matrix",
     ]
 
     def __init__(self):

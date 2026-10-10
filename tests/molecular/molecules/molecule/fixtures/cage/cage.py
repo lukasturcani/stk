@@ -1,14 +1,14 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
-from .metal_topologies import *  # noqa
+from .metal_topologies import *
 
 # All fixtures must be visible for lazy_fixture() call.
-from .three_plus_four import *  # noqa
-from .three_plus_three import *  # noqa
-from .two_plus_five import *  # noqa
-from .two_plus_four import *  # noqa
-from .two_plus_three import *  # noqa
+from .three_plus_four import *
+from .three_plus_three import *
+from .two_plus_five import *
+from .two_plus_four import *
+from .two_plus_three import *
 
 
 @pytest.fixture(

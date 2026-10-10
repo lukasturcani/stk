@@ -246,7 +246,7 @@ periodic_table = {
 
 
 T = typing.TypeVar("T")
-OneOrMany = typing.Union[T, abc.Iterable[T]]
+OneOrMany = T | abc.Iterable[T]  # type: ignore[misc]
 
 
 class Cell:
@@ -487,7 +487,7 @@ def kabsch(coords1, coords2):
     """
 
     h = np.dot(coords1, coords2.T)
-    u, s, v = np.linalg.svd(h)
+    u, _s, v = np.linalg.svd(h)
 
     if int(np.linalg.det(v)) < 0:
         v[:, 2] = -v[:, 2]
@@ -564,11 +564,9 @@ def mol_from_mae_file(mae_path):
         line = [word for word in line if word != '"']
         if len(labels) != len(line):
             raise RuntimeError(
-                (
-                    "Number of labels does"
-                    " not match number of columns"
-                    " in .mae file."
-                )
+                "Number of labels does"
+                " not match number of columns"
+                " in .mae file."
             )
 
         for label, data in zip(labels, line):
@@ -601,11 +599,9 @@ def mol_from_mae_file(mae_path):
     for line in data_block:
         if len(labels) != len(line):
             raise RuntimeError(
-                (
-                    "Number of labels does"
-                    " not match number of "
-                    "columns in .mae file."
-                )
+                "Number of labels does"
+                " not match number of "
+                "columns in .mae file."
             )
 
         for label, data in zip(labels, line):

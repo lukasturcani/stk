@@ -2,10 +2,10 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 
 # All fixtures must be visible for lazy_fixture() call.
-from .octahedral import *  # noqa
-from .paddlewheel import *  # noqa
-from .porphyrin import *  # noqa
-from .square_planar import *  # noqa
+from .octahedral import *
+from .paddlewheel import *
+from .porphyrin import *
+from .square_planar import *
 
 
 @pytest.fixture(

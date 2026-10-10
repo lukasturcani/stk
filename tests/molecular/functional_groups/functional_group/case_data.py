@@ -92,7 +92,7 @@ class GenericCaseData(CaseData):
 
         self.bonders = bonders
         self.deleters = deleters
-        deleter_ids = set(atom.get_id() for atom in deleters)
+        deleter_ids = {atom.get_id() for atom in deleters}
         super().__init__(
             functional_group=functional_group,
             atoms=atoms,

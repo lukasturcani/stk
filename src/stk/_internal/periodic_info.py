@@ -81,7 +81,7 @@ lattice.html
                     / (lengths[j] * lengths[k])
                 ),
             )
-        angles = np.arccos(angles) * 180.0 / np.pi
+        angles = np.arccos(angles) * 180.0 / np.pi  # type: ignore[assignment]
 
         alpha, beta, gamma = angles
         self._alpha = alpha

@@ -1,1 +1,1 @@
-from .paddlewheel import *  # noqa
+from .paddlewheel import *

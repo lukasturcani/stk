@@ -5,7 +5,8 @@ Placements Summary
 """
 
 from collections import defaultdict
-from typing import TYPE_CHECKING, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -34,13 +35,13 @@ class _PlacementsSummary:
     """
 
     __slots__ = [
-        "_atoms",
         "_atom_infos",
-        "_bonds",
+        "_atoms",
         "_bond_infos",
+        "_bonds",
         "_edge_functional_groups",
-        "_position_matrices",
         "_num_atoms",
+        "_position_matrices",
     ]
 
     _atoms: list[Atom]

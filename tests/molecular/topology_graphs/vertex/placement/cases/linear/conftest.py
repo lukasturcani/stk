@@ -1,10 +1,11 @@
 import numpy as np
 import pytest
-import stk
 from pytest_lazyfixture import lazy_fixture
 
+import stk
+
 # Fixtures must by visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(

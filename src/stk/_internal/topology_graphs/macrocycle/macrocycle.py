@@ -330,13 +330,13 @@ class Macrocycle(TopologyGraph):
     def __init__(
         self,
         building_blocks: tuple[BuildingBlock, ...],
-        repeating_unit: typing.Union[str, tuple[int, ...]],
+        repeating_unit: str | tuple[int, ...],
         num_repeating_units: int,
         orientations: tuple[float, ...] | None = None,
         random_seed: int | np.random.Generator | None = None,
-        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        reaction_factory: ReactionFactory = GenericReactionFactory(),  # noqa: B008
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
     ) -> None:
         """
@@ -442,9 +442,11 @@ class Macrocycle(TopologyGraph):
                 CycleVertex(
                     id=vertex_id,
                     position=(np.cos(theta), np.sin(theta), 0),
-                    flip=random_seed.choice(
-                        choices,
-                        p=[flip_chance, 1 - flip_chance],
+                    flip=bool(
+                        random_seed.choice(
+                            choices,
+                            p=[flip_chance, 1 - flip_chance],
+                        )
                     ),
                     angle=theta,
                 )
@@ -493,7 +495,7 @@ class Macrocycle(TopologyGraph):
 
     @staticmethod
     def _normalize_repeating_unit(
-        repeating_unit: typing.Union[str, tuple[int, ...]],
+        repeating_unit: str | tuple[int, ...],
     ) -> tuple[int, ...]:
         if isinstance(repeating_unit, tuple):
             return repeating_unit

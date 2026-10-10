@@ -23,9 +23,9 @@ def check_edge_functional_groups(
             for fg in new_state.get_edge_group_functional_groups(edge_group)
         }
         assert expected_fgs.keys() == new_state_fgs.keys()
-        for fg_key in expected_fgs:
+        for fg_key, fg1 in expected_fgs.items():
             is_equivalent_fg(
-                fg1=expected_fgs[fg_key],
+                fg1=fg1,
                 fg2=new_state_fgs[fg_key],
             )
 

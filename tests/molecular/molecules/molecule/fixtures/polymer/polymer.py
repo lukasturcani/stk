@@ -2,10 +2,10 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 
 from ...case_data import CaseData
-from .helix import *  # noqa
+from .helix import *
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .linear import *  # noqa
+from .linear import *
 
 
 @pytest.fixture(

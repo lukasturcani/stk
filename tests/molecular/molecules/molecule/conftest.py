@@ -10,7 +10,7 @@ import stk
 from .case_data import CaseData
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
@@ -171,11 +171,9 @@ def get_origin(request):
         lambda molecule: 0,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: list(range(0, min(1, molecule.get_num_atoms()))),
-        lambda molecule: tuple(range(0, min(1, molecule.get_num_atoms()))),
-        lambda molecule: (
-            i for i in range(0, min(1, molecule.get_num_atoms()))
-        ),
+        lambda molecule: list(range(min(1, molecule.get_num_atoms()))),
+        lambda molecule: tuple(range(min(1, molecule.get_num_atoms()))),
+        lambda molecule: (i for i in range(min(1, molecule.get_num_atoms()))),
         lambda molecule: (),
         lambda molecule: range(min(molecule.get_num_atoms(), 1)),
         lambda molecule: range(min(molecule.get_num_atoms(), 2)),

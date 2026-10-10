@@ -1,5 +1,5 @@
 import itertools as it
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 
 import stk
 

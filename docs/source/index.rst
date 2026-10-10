@@ -45,30 +45,6 @@
 
 .. toctree::
    :hidden:
-   :caption: Molecular Databases
-   :maxdepth: 2
-
-    Molecule <molecule_databases>
-    Constructed Molecule <constructed_molecule_databases>
-    Value <value_databases>
-
-.. toctree::
-   :hidden:
-   :caption: Evolutionary Algorithm
-   :maxdepth: 2
-
-   Overview <_autosummary/stk.EvolutionaryAlgorithm>
-   Basic Example <basic_ea_example>
-   Intermediate Example <intermediate_ea_example>
-   Fitness Calculators <fitness_calculators>
-   Fitness Normalizers <fitness_normalizers>
-   Selection <selection>
-   Mutation <mutation>
-   Crossover <crossover>
-   Plotting <plotters>
-
-.. toctree::
-   :hidden:
    :caption: Modules
    :maxdepth: 1
 
@@ -82,31 +58,22 @@
 Introduction
 ============
 
-| GitHub: https://www.github.com/lukasturcani/stk
+| GitHub: https://www.github.com/TarziaResearchGroup/stk-lite
 | Discord: https://discord.gg/zbCUzuxe2B
 
 .. figure:: _static/logo.png
 
+``stk-lite`` is a light-weight version of `stk`_ with mostly the same
+functionality.
 
+.. _`stk`: https://stk-lite.readthedocs.io
 
 Installation
 ------------
 
 To get :mod:`.stk`, you can install it with pip::
 
-  $ pip install stk
-
-.. warning::
-
-  SMILES strings generated with ``stk`` version ``v2025.07.17.0`` or sooner
-  (using ``rdkit`` version ``2024.9.1`` or sooner) will be different than newer
-  versions due to a change in handling the valence of organic atoms bound to
-  metals. Details can be found in the ``rdkit`` release notes `2025_03_1`_.
-  No changes occur in ``stk`` construction. An example change in SMILES:
-  ``CCCO->[Fe+2]`` becomes ``CCC[OH]->[Fe+2]``.
-
-.. _`2025_03_1`: https://github.com/rdkit/rdkit/releases/tag/Release_2025_03_1
-
+  $ pip install stk-lite
 
 Developer Setup
 ...............
@@ -118,19 +85,12 @@ Developer Setup
     $ just setup
 
 
-#. Setup the `MongoDB`_ container (make sure ``docker`` is installed)::
-
-    $ just mongo
-
-
 #. Run code checks::
 
     $ just check
 
 .. _`just`: https://github.com/casey/just
 .. _`uv`: https://docs.astral.sh
-.. _`MongoDB`: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
-
 
 Overview
 --------
@@ -165,50 +125,6 @@ Automatic Molecular Design
 discovery of new molecules, which have properties desired by the user.
 This evolutionary algorithm works with any molecule :mod:`stk` can
 construct, even those defined by users.
-
-Databases
-.........
-
-:mod:`.stk` provides tools for the creation of molecular databases,
-and storage of molecular property values. :mod:`stk` comes with
-support for the creation of MongoDB databases, which can be used to
-store molecules constructed by users, or discovered by the
-evolutionary algorithm. In addition, property values calculated for
-those molecules can also be stored and retrieved from the database.
-
-Molecular Database Visualization
-................................
-
-.. image:: https://i.imgur.com/8MCBUGZ.png
-
-:mod:`.stk` has a sibling project called `stk-vis`_, which is a
-cross-platform application, which lets you connect to a database
-created by :mod:`.stk`, and view the molecules deposited into it.
-`stk-vis`_ also shows you any molecular properties you deposited,
-and lets you browse the building blocks of any constructed molecules.
-It's ideal for collaboration between multiple people, because one
-person can deposit a molecule into the database, and another person
-can immediately see and examine it. `stk-vis`_ is a stand-alone
-application and does not require coding or :mod:`.stk` to use.
-
-Features of `stk-vis`_ include
-
-* 3D interactive molecular rendering.
-* Image of the 2D molecular graph.
-* Tabulation of any molecular properties deposited into the
-  database.
-* Sorting molecules according to property values to quickly find ones
-  with the best and worst properties.
-* You can list the building blocks of any constructed molecules.
-  If those building blocks are also constructed molecules, you can
-  list their building blocks as well, and so on.
-* Writing molecules to files.
-
-You read more about `stk-vis`_ here:
-
-  https://github.com/lukasturcani/stk-vis
-
-.. _`stk-vis`: https://github.com/lukasturcani/stk-vis
 
 Usable Defaults
 ...............
@@ -249,26 +165,9 @@ when a new release comes out by going to the `GitHub page`_ and
 click on the ``watch`` button in the top right corner. Then select
 ``Releases only`` from the dropdown menu.
 
-.. _`GitHub page`: https://github.com/lukasturcani/stk
+.. _`GitHub page`: https://github.com/TarziaResearchGroup/stk-lite
 
 Important features in the future will include:
-
-
-Distributed Evolutionary Algorithms
-...................................
-
-Evolutionary algorithms are very simple to parallelize. It's just a
-matter of calculating each fitness value on a separate CPU core.
-However, this idea can be taken further. Instead of calculating the
-fitness function on a separate CPU core, calculate it on a separate
-computer. :mod:`stk` will support fitness functions, which instead
-of calculating the fitness value locally, send the molecule over the
-internet to a server, so that the server is responsible for calculating
-the fitness value, which it then sends back to the client. You will
-be able to keep adding servers as your computational requirements
-increase, and the load will be distributed fairly between them.
-This will allow continuous horizontal scaling of :mod:`stk`
-evolutionary algorithms.
 
 More Molecular Structures
 .........................

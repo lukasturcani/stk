@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import typing
 from collections import abc
 
 from stk._internal.building_block import BuildingBlock
@@ -461,9 +460,9 @@ class Complex(TopologyGraph):
     def __init__(
         self,
         host: BuildingBlock,
-        guests: typing.Union[Guest, abc.Iterable[Guest]],
+        guests: Guest | abc.Iterable[Guest],
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
     ) -> None:
         """
         Initialize an instance of :class:`.Complex`.
@@ -501,7 +500,7 @@ class Complex(TopologyGraph):
     def _get_vertices_from_guests(
         self,
         host: BuildingBlock,
-        guests: typing.Union[Guest, abc.Iterable[Guest]],
+        guests: Guest | abc.Iterable[Guest],
     ) -> dict[BuildingBlock, abc.Sequence[Vertex]]:
         if isinstance(guests, Guest):
             guests = (guests,)

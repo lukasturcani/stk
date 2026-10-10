@@ -28,7 +28,7 @@ class RingAmineFactory(FunctionalGroupFactory):
 
         """
 
-        return super().__init__()
+        super().__init__()
 
     def get_functional_groups(self, molecule):
         ids = get_atom_ids(

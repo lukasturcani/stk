@@ -8,7 +8,6 @@ from functools import partial
 import atomlite
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
-import vabene
 
 from stk._internal.atom import Atom
 from stk._internal.bond import Bond
@@ -40,7 +39,7 @@ class BuildingBlock(Molecule):
 
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
-    _init_funcs = {
+    _init_funcs = {  # noqa: RUF012
         ".mol": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
         ".sdf": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
     }
@@ -197,122 +196,6 @@ class BuildingBlock(Molecule):
             atoms=tuple(molecule.get_atoms()),
             bonds=tuple(molecule.get_bonds()),
             position_matrix=molecule.get_position_matrix(),
-            functional_groups=functional_groups,
-            placer_ids=placer_ids,
-        )
-
-    @classmethod
-    def init_from_vabene_molecule(
-        cls,
-        molecule: vabene.Molecule,
-        functional_groups: (
-            FunctionalGroup
-            | FunctionalGroupFactory
-            | Iterable[FunctionalGroup | FunctionalGroupFactory]
-        ) = (),
-        placer_ids: Iterable[int] | None = None,
-        position_matrix: np.ndarray | None = None,
-    ) -> typing.Self:
-        """
-        Initialize from a :mod:`vabene.Molecule`.
-
-        Notes:
-
-            The molecule is given 3D coordinates with
-            :func:`rdkit.ETKDGv2()`.
-
-        Parameters:
-
-            molecule:
-                The :class:`vabene.Molecule` from which to initialize.
-
-            functional_groups (FunctionalGroup \
-| FunctionalGroupFactory \
-| list[FunctionalGroup | FunctionalGroupFactory]):
-                :class:`.FunctionalGroup` instances added to the
-                building block and :class:`.FunctionalGroupFactory`
-                instances used to create :class:`.FunctionalGroup`
-                instances added to the building block.
-                :class:`.FunctionalGroup` instances are used to
-                identify which atoms are modified during
-                :class:`.ConstructedMolecule` construction.
-
-            placer_ids (list[int]):
-                The ids of *placer* atoms. These are the atoms which
-                should be used for calculating the position of the
-                building block. Depending on the values passed to
-                `placer_ids`, and the functional groups in the building
-                block, different *placer* ids will be used by the
-                building block.
-
-                #. `placer_ids` is passed to the initializer: the
-                   passed *placer* ids will be used by the building
-                   block.
-
-                #. `placer_ids` is ``None`` and the building block has
-                   functional groups: The *placer* ids of the
-                   functional groups will be used as the *placer* ids
-                   of the building block.
-
-                #. `placer_ids` is ``None`` and `functional_groups` is
-                   empty. All atoms of the molecule will be used for
-                   *placer* ids.
-
-            position_matrix:
-                The position matrix the building block should use. If
-                ``None``, :func:`rdkit.ETKDGv2` will be used to
-                calculate it.
-
-        Returns:
-
-            BuildingBlock: The building block.
-
-        Raises:
-
-            :class:`RuntimeError`
-                If embedding the molecule fails.
-
-        """
-
-        editable = rdkit.EditableMol(rdkit.Mol())
-        for atom in molecule.get_atoms():
-            rdkit_atom = rdkit.Atom(atom.get_atomic_number())
-            rdkit_atom.SetFormalCharge(atom.get_charge())
-            editable.AddAtom(rdkit_atom)
-
-        for bond in molecule.get_bonds():
-            editable.AddBond(
-                beginAtomIdx=bond.get_atom1_id(),
-                endAtomIdx=bond.get_atom2_id(),
-                order=rdkit.BondType(bond.get_order()),
-            )
-
-        rdkit_molecule = editable.GetMol()
-        rdkit.SanitizeMol(rdkit_molecule)
-        rdkit_molecule = rdkit.AddHs(rdkit_molecule)
-
-        if position_matrix is None:
-            params = rdkit.ETKDGv2()
-            random_seed = 4
-            params.randomSeed = random_seed
-            if rdkit.EmbedMolecule(rdkit_molecule, params) == -1:
-                raise RuntimeError(
-                    f"Embedding with seed value of {random_seed} failed."
-                )
-        else:
-            # Make sure the position matrix always holds floats.
-            position_matrix = np.array(
-                position_matrix,
-                dtype=np.float64,
-            )
-            conformer = rdkit.Conformer(rdkit_molecule.GetNumAtoms())
-            for atom_id, position in enumerate(position_matrix):
-                conformer.SetAtomPosition(atom_id, position)
-            rdkit_molecule.AddConformer(conformer)
-
-        rdkit.Kekulize(rdkit_molecule)
-        return cls.init_from_rdkit_mol(
-            molecule=rdkit_molecule,
             functional_groups=functional_groups,
             placer_ids=placer_ids,
         )

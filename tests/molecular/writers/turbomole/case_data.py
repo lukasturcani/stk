@@ -1,6 +1,6 @@
-import stk
-
 from dataclasses import dataclass
+
+import stk
 
 
 @dataclass(slots=True, frozen=True)

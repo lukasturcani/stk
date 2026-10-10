@@ -1,1 +1,1 @@
-from ..._test_with_scale import *  # noqa
+from ..._test_with_scale import *

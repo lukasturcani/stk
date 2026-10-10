@@ -2,9 +2,10 @@ from functools import partial
 
 import numpy as np
 import pytest
-import stk
 from pytest_lazyfixture import lazy_fixture
 from scipy.spatial.distance import euclidean
+
+import stk
 
 from ....case_data import CaseData
 

@@ -1,18 +1,18 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
-from .hexagonal import *  # noqa
+from .hexagonal import *
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .honeycomb import *  # noqa
-from .kagome import *  # noqa
-from .linkerless_honeycomb import *  # noqa
-from .periodic_hexagonal import *  # noqa
-from .periodic_honeycomb import *  # noqa
-from .periodic_kagome import *  # noqa
-from .periodic_linkerless_honeycomb import *  # noqa
-from .periodic_square import *  # noqa
-from .square import *  # noqa
+from .honeycomb import *
+from .kagome import *
+from .linkerless_honeycomb import *
+from .periodic_hexagonal import *
+from .periodic_honeycomb import *
+from .periodic_kagome import *
+from .periodic_linkerless_honeycomb import *
+from .periodic_square import *
+from .square import *
 
 
 @pytest.fixture(

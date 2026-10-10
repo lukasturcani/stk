@@ -205,9 +205,9 @@ class InternalReaction(TopologyGraph):
         building_block: BuildingBlock,
         num_reactions: int,
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
-        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        reaction_factory: ReactionFactory = GenericReactionFactory(),  # noqa: B008
     ) -> None:
         """
         Parameters:

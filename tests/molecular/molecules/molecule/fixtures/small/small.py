@@ -4,8 +4,8 @@ from pytest_lazyfixture import lazy_fixture
 from ...case_data import CaseData
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .internal_reaction import *  # noqa
-from .ncore import *  # noqa
+from .internal_reaction import *
+from .ncore import *
 
 
 @pytest.fixture(

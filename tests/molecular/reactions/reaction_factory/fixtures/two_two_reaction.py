@@ -2,6 +2,7 @@ import itertools as it
 
 import numpy as np
 import pytest
+
 import stk
 
 from ..case_data import CaseData
@@ -105,8 +106,8 @@ def get_position_matrix(functional_group1, functional_group2):
         + 1
     )
     position_matrix = np.zeros((size, 3))
-    bonder1, bonder2 = functional_group1.get_bonder_ids()
-    bonder3, bonder4 = functional_group2.get_bonder_ids()
+    bonder1, _ = functional_group1.get_bonder_ids()
+    bonder3, _ = functional_group2.get_bonder_ids()
 
     # Place the first bonder of each functional group close.
     position_matrix[bonder1] = [100, 100, 100]

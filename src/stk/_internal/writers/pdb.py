@@ -7,7 +7,6 @@ PDB Writer
 from __future__ import annotations
 
 import pathlib
-import typing
 
 from stk._internal.molecule import Molecule
 from stk._internal.periodic_info import PeriodicInfo
@@ -68,8 +67,8 @@ class PdbWriter:
     def _write_content(
         self,
         molecule: Molecule,
-        atom_ids: typing.Optional[OneOrMany[int]],
-        periodic_info: typing.Optional[PeriodicInfo] = None,
+        atom_ids: OneOrMany[int] | None,  # type: ignore[valid-type]
+        periodic_info: PeriodicInfo | None = None,
     ) -> list[str]:
         if atom_ids is None:
             atom_ids = range(molecule.get_num_atoms())
@@ -141,8 +140,8 @@ class PdbWriter:
     def to_string(
         self,
         molecule: Molecule,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-        periodic_info: typing.Optional[PeriodicInfo] = None,
+        atom_ids: OneOrMany[int] | None = None,  # type: ignore[valid-type]
+        periodic_info: PeriodicInfo | None = None,
     ) -> str:
         """
         Get a ``.pdb`` file format string of `molecule`.
@@ -178,8 +177,8 @@ class PdbWriter:
         self,
         molecule: Molecule,
         path: pathlib.Path | str,
-        atom_ids: typing.Optional[OneOrMany[int]] = None,
-        periodic_info: typing.Optional[PeriodicInfo] = None,
+        atom_ids: OneOrMany[int] | None = None,  # type: ignore[valid-type]
+        periodic_info: PeriodicInfo | None = None,
     ) -> None:
         """
         Write `molecule` to ``.pdb`` file format.

@@ -6,7 +6,7 @@ Atom Batch
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from stk._internal.atom import Atom
 from stk._internal.atom_info import AtomInfo
@@ -19,7 +19,7 @@ class _AtomBatch:
 
     """
 
-    __slots__ = ["_atoms", "_atom_infos", "_id_map"]
+    __slots__ = ["_atom_infos", "_atoms", "_id_map"]
 
     _atoms: tuple[Atom, ...]
     _atom_infos: tuple[AtomInfo, ...]

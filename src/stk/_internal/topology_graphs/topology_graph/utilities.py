@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
     )
 
 
-class _TopologyGraphImplementation(typing.Protocol):
+class _TopologyGraphImplementation(typing.Protocol):  # noqa: PYI046
     def _place_building_blocks(
         self, state: "ConstructionState"
     ) -> "ConstructionState":

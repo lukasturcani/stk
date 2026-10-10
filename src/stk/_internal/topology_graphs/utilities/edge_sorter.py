@@ -14,10 +14,10 @@ class _EdgeSorter(_Sorter):
     """
 
     __slots__ = [
-        "_items",
-        "_reference",
         "_axis",
         "_edge_centroid",
+        "_items",
+        "_reference",
     ]
 
     def __init__(self, edges, aligner_edge, axis):
