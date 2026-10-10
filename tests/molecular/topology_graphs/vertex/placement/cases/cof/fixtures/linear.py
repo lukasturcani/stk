@@ -63,8 +63,8 @@ def get_fg_position(id, building_block):
 def get_linear_edges(vertex):
     vertex2 = stk.Vertex(1, vertex.get_position() + [-10, 0, 0])
     vertex3 = stk.Vertex(2, vertex.get_position() + [10, 0, 0])
-    yield stk.cof.Edge(0, 0, vertex, vertex2)
-    yield stk.cof.Edge(1, 1, vertex, vertex3)
+    yield stk.cof.CofEdge(0, 0, vertex, vertex2)
+    yield stk.cof.CofEdge(1, 1, vertex, vertex3)
 
 
 @pytest.fixture(params=(0, 1))

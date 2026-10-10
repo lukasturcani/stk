@@ -1,5 +1,5 @@
 from stk._internal.topology_graphs.cof.cof import Cof
-from stk._internal.topology_graphs.cof.edge import CofEdge as Edge
+from stk._internal.topology_graphs.cof.edge import CofEdge
 from stk._internal.topology_graphs.cof.hexagonal import Hexagonal
 from stk._internal.topology_graphs.cof.honeycomb import Honeycomb
 from stk._internal.topology_graphs.cof.kagome import Kagome
@@ -26,7 +26,7 @@ from stk._internal.topology_graphs.cof.vertices import (
 
 __all__ = [
     "Cof",
-    "Edge",
+    "CofEdge",
     "Hexagonal",
     "Honeycomb",
     "Kagome",

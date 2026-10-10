@@ -261,7 +261,7 @@ def get_nonlinear_edges(num_edges, vertex):
     for id_, point in enumerate(
         get_points(center=vertex.get_position(), num_points=num_edges)
     ):
-        yield stk.cof.Edge(id_, id_, vertex, stk.Vertex(id_ + 1, point))
+        yield stk.cof.CofEdge(id_, id_, vertex, stk.Vertex(id_ + 1, point))
 
 
 def order_functional_groups(building_block):
