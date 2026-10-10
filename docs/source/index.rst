@@ -156,7 +156,7 @@ of a given structure should be built.
 Here is a preview of some of the more complex structures
 :mod:`stk` can construct
 
-.. image:: https://i.imgur.com/PvkfoGs.jpg
+.. image:: _static/stk_imgur_figure2.jpeg
 
 Automatic Molecular Design
 ..........................
@@ -179,7 +179,7 @@ those molecules can also be stored and retrieved from the database.
 Molecular Database Visualization
 ................................
 
-.. image:: https://i.imgur.com/8MCBUGZ.png
+.. image:: _static/stk_imgur_figure3.png
 
 :mod:`.stk` has a sibling project called `stk-vis`_, which is a
 cross-platform application, which lets you connect to a database
