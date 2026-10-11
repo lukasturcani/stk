@@ -11,7 +11,7 @@ import typing
 from stk._internal.atom import Atom
 from stk._internal.functional_groups.functional_group import FunctionalGroup
 
-_T = typing.TypeVar("_T", bound="GenericFunctionalGroup")
+_T = typing.TypeVar("_T", bound="GenericFunctionalGroup")  # noqa: PYI018
 
 
 class GenericFunctionalGroup(FunctionalGroup):
@@ -33,7 +33,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         atoms: tuple[Atom, ...],
         bonders: tuple[Atom, ...],
         deleters: tuple[Atom, ...],
-        placers: typing.Optional[tuple[Atom, ...]] = None,
+        placers: tuple[Atom, ...] | None = None,
     ) -> None:
         """
         Initialize a :class:`.GenericFunctionalGroup`.
@@ -55,7 +55,7 @@ class GenericFunctionalGroup(FunctionalGroup):
 
         """
 
-        deleter_set = set(atom.get_id() for atom in deleters)
+        deleter_set = {atom.get_id() for atom in deleters}
         super().__init__(
             atoms=atoms,
             placers=bonders if placers is None else placers,
@@ -66,7 +66,7 @@ class GenericFunctionalGroup(FunctionalGroup):
         self._bonders = bonders
         self._deleters = deleters
 
-    def _clone(self: _T) -> _T:
+    def _clone(self) -> typing.Self:
         clone = super()._clone()
         clone._bonders = self._bonders
         clone._deleters = self._deleters
@@ -88,7 +88,7 @@ class GenericFunctionalGroup(FunctionalGroup):
             placers=tuple(atom_map.get(a.get_id(), a) for a in self._placers),
         )
 
-    def _with_ids(self: _T, id_map: dict[int, int]) -> _T:
+    def _with_ids(self, id_map: dict[int, int]) -> typing.Self:
         super()._with_ids(id_map)
         self._bonders = tuple(
             bonder.with_id(

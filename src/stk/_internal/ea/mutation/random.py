@@ -150,4 +150,4 @@ class RandomMutator:
             a=self._mutators,  # type: ignore
             p=self._weights,
         )
-        return mutator.mutate(record)
+        return mutator.mutate(record)  # type: ignore[attr-defined]

@@ -378,9 +378,9 @@ class Linear(TopologyGraph):
         num_repeating_units: int,
         orientations: abc.Iterable[float] | None = None,
         random_seed: int | np.random.Generator | None = None,
-        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        reaction_factory: ReactionFactory = GenericReactionFactory(),  # noqa: B008
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
     ) -> None:
         """
@@ -551,7 +551,7 @@ class Linear(TopologyGraph):
             HeadVertex(
                 id=0,
                 position=np.array([0, 0, 0]),
-                flip=random_seed.choice(
+                flip=random_seed.choice(  # type: ignore[arg-type]
                     a=choices,
                     p=[head_orientation, 1 - head_orientation],
                 ),
@@ -559,9 +559,9 @@ class Linear(TopologyGraph):
         ]
         edges: list[Edge] = []
         for i, p in enumerate(body_orientations, 1):
-            flip = random_seed.choice(choices, p=[p, 1 - p])
+            flip = random_seed.choice(choices, p=[p, 1 - p])  # type: ignore[arg-type]
             vertices.append(
-                LinearVertex(i, np.array([i, 0, 0]), flip),
+                LinearVertex(i, np.array([i, 0, 0]), flip),  # type: ignore[arg-type]
             )
             edges.append(Edge(len(edges), vertices[i - 1], vertices[i]))
 
@@ -569,7 +569,7 @@ class Linear(TopologyGraph):
             TailVertex(
                 id=len(vertices),
                 position=np.array([len(vertices), 0, 0]),
-                flip=random_seed.choice(
+                flip=random_seed.choice(  # type: ignore[arg-type]
                     a=choices,
                     p=[tail_orientation, 1 - tail_orientation],
                 ),

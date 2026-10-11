@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pymongo
 import pytest
+
 import stk
 
 from ..case_data import CaseData

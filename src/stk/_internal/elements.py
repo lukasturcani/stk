@@ -8,11 +8,11 @@ Defines an :class:`.Atom` class for each element.
 
 from __future__ import annotations
 
-from typing import ClassVar, TypeVar
+from typing import ClassVar, Self, TypeVar
 
 from stk._internal.atom import Atom
 
-_T = TypeVar("_T", bound="AtomImpl")
+_T = TypeVar("_T", bound="AtomImpl")  # noqa: PYI018
 
 
 class AtomImpl(Atom):
@@ -37,7 +37,7 @@ class AtomImpl(Atom):
     def get_id(self) -> int:
         return self._id
 
-    def _with_id(self: _T, id: int) -> _T:
+    def _with_id(self, id: int) -> Self:
         """
         Modify the atom.
 
@@ -137,13 +137,13 @@ class N(AtomImpl):
 
 
 # "O" is a valid elemental symbol.
-class O(AtomImpl):  # noqa
+class O(AtomImpl):
     _atomic_number = 8
 
-    def clone(self) -> O:  # noqa
+    def clone(self) -> O:
         return type(self)(self._id, self._charge)
 
-    def with_id(self, id: int) -> O:  # noqa
+    def with_id(self, id: int) -> O:
         return self.clone()._with_id(id)
 
 
@@ -588,13 +588,13 @@ class Te(AtomImpl):
 
 
 # "I" is a valid elemental symbol.
-class I(AtomImpl):  # noqa
+class I(AtomImpl):
     _atomic_number = 53
 
-    def clone(self) -> I:  # noqa
+    def clone(self) -> I:
         return type(self)(self._id, self._charge)
 
-    def with_id(self, id: int) -> I:  # noqa
+    def with_id(self, id: int) -> I:
         return self.clone()._with_id(id)
 
 

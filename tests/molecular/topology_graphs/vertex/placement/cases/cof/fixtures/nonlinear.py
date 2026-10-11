@@ -2,17 +2,18 @@ from functools import partial
 
 import numpy as np
 import pytest
-import stk
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 from scipy.spatial.distance import euclidean
+
+import stk
 
 from ....case_data import CaseData
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("nonlinear_3"),
-        lazy_fixture("nonlinear_4"),
+        lf("nonlinear_3"),
+        lf("nonlinear_4"),
     ),
 )
 def nonlinear(request):
@@ -260,7 +261,7 @@ def get_nonlinear_edges(num_edges, vertex):
     for id_, point in enumerate(
         get_points(center=vertex.get_position(), num_points=num_edges)
     ):
-        yield stk.cof.Edge(id_, id_, vertex, stk.Vertex(id_ + 1, point))
+        yield stk.cof.CofEdge(id_, id_, vertex, stk.Vertex(id_ + 1, point))
 
 
 def order_functional_groups(building_block):

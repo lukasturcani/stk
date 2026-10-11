@@ -13,7 +13,7 @@ class _AtomBatch:
 
     """
 
-    __slots__ = ["_atoms", "_atom_infos", "_atom_map", "_positions"]
+    __slots__ = ["_atom_infos", "_atom_map", "_atoms", "_positions"]
 
     def __init__(self, atoms, num_atoms):
         """

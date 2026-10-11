@@ -1,7 +1,8 @@
 import itertools
 import logging
 import typing
-from collections.abc import Callable, Iterator, Sequence, Set
+from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Set as AbstractSet
 
 from stk._internal.ea.molecule_record import MoleculeRecord
 from stk._internal.key_makers.molecule import MoleculeKeyMaker
@@ -12,8 +13,8 @@ from .yielded_batches import YieldedBatches
 T = typing.TypeVar("T", bound=MoleculeRecord)
 logger = logging.getLogger(__name__)
 
-IncludedBatches: typing.TypeAlias = "Set[BatchKey] | None"
-ExcludedBatches: typing.TypeAlias = "Set[BatchKey] | None"
+IncludedBatches: typing.TypeAlias = "AbstractSet[BatchKey] | None"
+ExcludedBatches: typing.TypeAlias = "AbstractSet[BatchKey] | None"
 
 
 class Selector(typing.Generic[T]):
@@ -143,8 +144,8 @@ class Selector(typing.Generic[T]):
     def _get_batches(
         self,
         population: dict[T, float],
-        included_batches: Set[BatchKey] | None,
-        excluded_batches: Set[BatchKey] | None,
+        included_batches: AbstractSet[BatchKey] | None,
+        excluded_batches: AbstractSet[BatchKey] | None,
     ) -> Iterator[Batch[T]]:
         """
         Get batches molecules from `population`.

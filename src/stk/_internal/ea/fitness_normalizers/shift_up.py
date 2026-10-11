@@ -144,8 +144,9 @@ class ShiftUp(FitnessNormalizer[T]):
 
     def __init__(
         self,
-        filter: Callable[[dict[T, Any], T], bool] = lambda fitness_values,
-        record: True,
+        filter: Callable[
+            [dict[T, Any], T], bool
+        ] = lambda fitness_values, record: True,
     ) -> None:
         """
         Parameters:
@@ -173,7 +174,7 @@ class ShiftUp(FitnessNormalizer[T]):
         # keepdims ensures that np.min returns a 1-D array, because
         # it will be True if fitness values are scalar and False if
         # they are array-valued.
-        mins = np.min(fmat, axis=0, keepdims=len(fmat.shape) == 1)
+        mins = np.min(fmat, axis=0, keepdims=len(fmat.shape) == 1)  # type: ignore[call-overload]
 
         # Convert all elements in mins which are not to be shifted to 0
         # and make the shift equal to the minimum value + 1.

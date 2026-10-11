@@ -2,6 +2,7 @@ import itertools as it
 
 import numpy as np
 import pytest
+
 import stk
 
 from ..case_data import CaseData

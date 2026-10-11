@@ -1,6 +1,7 @@
 from typing import Any
 
 import numpy as np
+
 import stk
 
 from .case_data import CaseData

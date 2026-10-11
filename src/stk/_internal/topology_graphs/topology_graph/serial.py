@@ -35,9 +35,8 @@ class _Serial:
                 edges,
                 building_blocks,
             )
-            placement_results = map(
-                lambda placement: placement.get_result(),
-                placements,
+            placement_results = (
+                placement.get_result() for placement in placements
             )
             state = state.with_placement_results(
                 vertices=vertices,

@@ -99,7 +99,7 @@ class ValueMongoDb(ValueDatabase):
         mongo_client,
         collection,
         database="stk",
-        key_makers=(InchiKey(),),
+        key_makers=(InchiKey(),),  # noqa: B008
         put_lru_cache_size=128,
         get_lru_cache_size=128,
         indices=("InChIKey",),

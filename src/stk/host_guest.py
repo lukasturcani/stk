@@ -5,8 +5,8 @@ from stk._internal.topology_graphs.host_guest.vertices import (
 )
 
 __all__ = [
-    "Guest",
     "Complex",
-    "HostVertex",
+    "Guest",
     "GuestVertex",
+    "HostVertex",
 ]

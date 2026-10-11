@@ -1,7 +1,8 @@
 import itertools as it
-from .case_data import CaseData
 
 import stk
+
+from .case_data import CaseData
 
 
 def test_get_placer_ids(case_data: CaseData) -> None:

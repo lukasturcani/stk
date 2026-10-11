@@ -1,6 +1,6 @@
-from .case_data import CaseData
-
 import stk
+
+from .case_data import CaseData
 
 
 def test_repr(case_data: CaseData) -> None:

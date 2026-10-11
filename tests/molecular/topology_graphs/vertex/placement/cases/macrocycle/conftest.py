@@ -1,16 +1,17 @@
 import numpy as np
 import pytest
+from pytest_lazy_fixtures import lf
+
 import stk
-from pytest_lazyfixture import lazy_fixture
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("flip"),
-        lazy_fixture("no_flip"),
+        lf("flip"),
+        lf("no_flip"),
     ),
 )
 def case_data(request):

@@ -324,8 +324,8 @@ class MoleculeMongoDb(MoleculeDatabase):
         database="stk",
         molecule_collection="molecules",
         position_matrix_collection="building_block_position_matrices",
-        jsonizer=MoleculeJsonizer(),
-        dejsonizer=MoleculeDejsonizer(),
+        jsonizer=MoleculeJsonizer(),  # noqa: B008
+        dejsonizer=MoleculeDejsonizer(),  # noqa: B008
         put_lru_cache_size=128,
         get_lru_cache_size=128,
         indices=("InChIKey",),

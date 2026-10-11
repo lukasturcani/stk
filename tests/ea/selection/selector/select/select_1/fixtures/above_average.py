@@ -1,8 +1,9 @@
 from typing import Any
 
 import pytest
+from pytest_lazy_fixtures import lf
+
 import stk
-from pytest_lazyfixture import lazy_fixture
 
 from ..case_data import CaseData
 from .utilities import get_rank_fitness
@@ -149,8 +150,8 @@ def above_average_population_2_case_data(
 @pytest.fixture(
     scope="session",
     params=(
-        lazy_fixture("above_average_population_1_case_data"),
-        lazy_fixture("above_average_population_2_case_data"),
+        lf("above_average_population_1_case_data"),
+        lf("above_average_population_2_case_data"),
     ),
 )
 def above_average(request: pytest.FixtureRequest) -> CaseData:

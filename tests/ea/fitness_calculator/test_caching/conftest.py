@@ -1,16 +1,16 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from .case_data import CaseData
 
 # Fixtures must be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("fitness_function"),
-        lazy_fixture("property_vector"),
+        lf("fitness_function"),
+        lf("property_vector"),
     ),
 )
 def case_data(request: pytest.FixtureRequest) -> CaseData:

@@ -12,12 +12,12 @@ class ConstructionResult:
     """
 
     __slots__ = [
-        "_atoms",
-        "_bonds",
         "_atom_infos",
+        "_atoms",
         "_bond_infos",
-        "_position_matrix",
+        "_bonds",
         "_num_building_blocks",
+        "_position_matrix",
     ]
 
     def __init__(self, construction_state):

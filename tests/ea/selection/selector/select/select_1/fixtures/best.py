@@ -1,8 +1,9 @@
 from typing import Any
 
 import pytest
+from pytest_lazy_fixtures import lf
+
 import stk
-from pytest_lazyfixture import lazy_fixture
 
 from ..case_data import CaseData
 
@@ -154,8 +155,8 @@ def best_population_2_case_data(
 @pytest.fixture(
     scope="session",
     params=(
-        lazy_fixture("best_population_1_case_data"),
-        lazy_fixture("best_population_2_case_data"),
+        lf("best_population_1_case_data"),
+        lf("best_population_2_case_data"),
     ),
 )
 def best(request: pytest.FixtureRequest) -> CaseData:

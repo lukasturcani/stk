@@ -1,1 +1,1 @@
-from .six_plus_eight import *  # noqa
+from .six_plus_eight import *

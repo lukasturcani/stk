@@ -12,7 +12,7 @@ class YieldedBatches(typing.Generic[T]):
     Keeps track of batches yielded by :meth:`.Selector.select`.
     """
 
-    __slots__ = ("_molecules", "_batches", "_num", "_key_maker")
+    __slots__ = ("_batches", "_key_maker", "_molecules", "_num")
 
     def __init__(self, key_maker: MoleculeKeyMaker) -> None:
         self._key_maker = key_maker

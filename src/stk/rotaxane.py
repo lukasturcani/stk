@@ -5,7 +5,7 @@ from stk._internal.topology_graphs.rotaxane.vertices import (
 )
 
 __all__ = [
-    "NRotaxane",
-    "CycleVertex",
     "AxleVertex",
+    "CycleVertex",
+    "NRotaxane",
 ]

@@ -18,11 +18,11 @@ class _FunctionalGroupSorter(_Sorter):
     """
 
     __slots__ = [
-        "_items",
-        "_reference",
         "_axis",
-        "_placer_centroid",
         "_building_block",
+        "_items",
+        "_placer_centroid",
+        "_reference",
     ]
 
     def __init__(self, building_block):

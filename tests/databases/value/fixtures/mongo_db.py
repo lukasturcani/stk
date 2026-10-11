@@ -1,8 +1,9 @@
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 import pymongo
 import pytest
+
 import stk
 
 from ..case_data import CaseData

@@ -16,12 +16,12 @@ class GraphState:
     """
 
     __slots__ = [
-        "_vertex_building_blocks",
-        "_vertices",
         "_edges",
         "_lattice_constants",
-        "_vertex_edges",
         "_num_building_blocks",
+        "_vertex_building_blocks",
+        "_vertex_edges",
+        "_vertices",
     ]
 
     def __init__(

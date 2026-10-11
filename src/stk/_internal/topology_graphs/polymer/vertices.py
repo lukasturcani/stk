@@ -104,10 +104,10 @@ class LinearVertex(Vertex):
         building_block: BuildingBlock,
     ) -> tuple[int, int]:
         fg1, fg2 = building_block.get_functional_groups()
-        x1, y1, z1 = building_block.get_centroid(
+        x1, _y1, _z1 = building_block.get_centroid(
             atom_ids=fg1.get_placer_ids(),
         )
-        x2, y2, z2 = building_block.get_centroid(
+        x2, _y2, _z2 = building_block.get_centroid(
             atom_ids=fg2.get_placer_ids(),
         )
         return (0, 1) if x1 < x2 else (1, 0)
@@ -115,8 +115,8 @@ class LinearVertex(Vertex):
     @staticmethod
     def _sort_edges(edges: tuple[Edge, ...]) -> tuple[int, ...]:
         edge1, edge2 = edges
-        x1, y1, z1 = edge1.get_position()
-        x2, y2, z2 = edge2.get_position()
+        x1, _y1, _z1 = edge1.get_position()
+        x2, _y2, _z2 = edge2.get_position()
         if x1 < x2:
             return edge1.get_id(), edge2.get_id()
         else:

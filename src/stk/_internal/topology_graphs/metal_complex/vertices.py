@@ -32,8 +32,6 @@ class MetalVertex(UnaligningVertex):
 
     """
 
-    pass
-
 
 class MonoDentateLigandVertex(Vertex):
     """

@@ -1,16 +1,16 @@
 import numpy as np
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 # Fixtures must be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("cof1"),
-        lazy_fixture("cof2"),
-        lazy_fixture("cof3"),
+        lf("cof1"),
+        lf("cof2"),
+        lf("cof3"),
     ),
 )
 def case_data(request):

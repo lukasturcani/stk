@@ -505,10 +505,7 @@ class TopologyGraph:
             state,
         )
         reactions = tuple(map(get_reaction, self._edge_groups))
-        results = map(
-            lambda reaction: reaction.get_result(),
-            reactions,
-        )
+        results = (reaction.get_result() for reaction in reactions)
         return state.with_reaction_results(reactions, results)
 
     def _get_stages(

@@ -71,8 +71,8 @@ class EvolutionaryAlgorithm(typing.Generic[T]):
         generation_selector: Selector[T],
         mutation_selector: Selector[T],
         crossover_selector: Selector[T],
-        fitness_normalizer: FitnessNormalizer[T] = NullFitnessNormalizer(),
-        key_maker: MoleculeKeyMaker = Inchi(),
+        fitness_normalizer: FitnessNormalizer[T] = NullFitnessNormalizer(),  # noqa: B008
+        key_maker: MoleculeKeyMaker = Inchi(),  # noqa: B008
         num_processes: int | None = None,
     ) -> None:
         """
