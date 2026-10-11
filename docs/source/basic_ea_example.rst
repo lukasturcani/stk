@@ -523,13 +523,13 @@ The final version of our code is best seen here_.
 
 The plot of fitness we produced looks like this:
 
-.. image:: https://i.imgur.com/9Difk6R.png
+.. image:: _static/stk_imgur_figure6.png
 
 which shows us that the EA was pretty good at improving the fitness
 value. Another thing to look at is the plot for the number of
 rotatable bonds
 
-.. image:: https://i.imgur.com/QJKTTEx.png
+.. image:: _static/stk_imgur_figure7.png
 
 
 Clearly, our EA was able to minimize the number of rotatable
@@ -537,11 +537,11 @@ bonds to a low value across all members of the population.
 
 We can also compare the molecules in the initial population
 
-.. image:: https://i.imgur.com/C9Gisxf.png
+.. image:: _static/stk_imgur_figure13.png
 
 to those in the final population
 
-.. image:: https://i.imgur.com/5lq42FZ.png
+.. image:: _static/stk_imgur_figure12.png
 
 where the hydrogen atoms have been left out for clarity. When
 considering that these were chosen out of a search space of 1,000,000

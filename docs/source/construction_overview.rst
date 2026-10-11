@@ -190,7 +190,7 @@ you can convert any :mod:`stk` :class:`.Molecule` into an
 can write it to a file using the various writer classes, such as
 :class:`.MolWriter`.
 
-.. figure:: https://i.imgur.com/UlCnTj9.png
+.. figure:: _static/stk_imgur_figure1.png
     :align: center
 
     The general construction workflow of ``stk``.

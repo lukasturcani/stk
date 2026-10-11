@@ -40,7 +40,7 @@ class EvolutionaryAlgorithm(typing.Generic[T]):
         If you do want to use the default implementation, here is a
         summary of the roles of the different components:
 
-        .. image:: https://i.imgur.com/hGXboaU.png
+        .. image:: ../_static/stk_imgur_figure8.png
 
     Examples:
 

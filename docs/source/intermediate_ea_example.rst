@@ -410,7 +410,7 @@ molecules were selected in each :meth:`~.Selector.select` call.
 This is an example graph, showing which molecules were
 selected for mutation
 
-.. image:: https://i.imgur.com/rx8qayL.png
+.. image:: _static/stk_imgur_figure4.png
 
 
 You will get a new graph written for every :meth:`~.Selector.select`
@@ -429,12 +429,12 @@ basic tutorial, we get our final version, which is best seen here_.
 Here is a plot of how the fitness value change across generations
 
 
-.. image:: https://i.imgur.com/IMoMF4n.png
+.. image:: _static/stk_imgur_figure5.png
 
 
 and here is the change in the number of rotatable bonds
 
-.. image:: https://i.imgur.com/pWVMB14.png
+.. image:: _static/stk_imgur_figure11.png
 
 
 We can see that our EA was pretty good lowering the number the number
@@ -443,11 +443,11 @@ in our fitness function.
 
 Finally, we can compare the initial population
 
-.. image:: https://i.imgur.com/0px3bL0.png
+.. image:: _static/stk_imgur_figure10.png
 
 to the final population
 
-.. image:: https://i.imgur.com/wYHHUBP.png
+.. image:: _static/stk_imgur_figure9.png
 
 Once again, we can see that the complexity of the molecules in the
 final generation is reduced, when compared to the initial population.
