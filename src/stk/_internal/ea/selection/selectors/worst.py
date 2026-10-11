@@ -51,7 +51,7 @@ class Worst(Selector[T]):
         batch_size: int = 1,
         duplicate_molecules: bool = True,
         duplicate_batches: bool = True,
-        key_maker: MoleculeKeyMaker = Inchi(),
+        key_maker: MoleculeKeyMaker = Inchi(),  # noqa: B008
         fitness_modifier: Callable[
             [dict[T, float]], dict[T, float]
         ] = lambda x: x,

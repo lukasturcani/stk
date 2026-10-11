@@ -99,7 +99,7 @@ class RandomTopologyGraph:
         replacement_func = self._generator.choice(
             a=self._replacement_funcs,  # type: ignore
         )
-        replacement = replacement_func(record.get_topology_graph())
+        replacement = replacement_func(record.get_topology_graph())  # type: ignore[operator]
         return MutationRecord(
             molecule_record=MoleculeRecord(replacement),
             mutator_name=self._name,

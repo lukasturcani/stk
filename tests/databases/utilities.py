@@ -30,10 +30,7 @@ def to_hashable(items):
         elif key == "BB":
             yield key, tuple(map(HashableDict, value))
 
-        elif key == "aI":
-            yield key, tuple(tuple(v) for v in value)
-
-        elif key == "bI":
+        elif key == "aI" or key == "bI":
             yield key, tuple(tuple(v) for v in value)
 
         elif key == "nBB":

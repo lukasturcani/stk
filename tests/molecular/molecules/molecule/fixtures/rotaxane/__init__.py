@@ -1,1 +1,1 @@
-from .rotaxane import *  # noqa
+from .rotaxane import *

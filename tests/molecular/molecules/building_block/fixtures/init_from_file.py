@@ -1,8 +1,11 @@
-import pytest
-import stk
 from collections.abc import Sequence
-from ..case_data import CaseData
 from dataclasses import dataclass
+
+import pytest
+
+import stk
+
+from ..case_data import CaseData
 
 
 @pytest.fixture(

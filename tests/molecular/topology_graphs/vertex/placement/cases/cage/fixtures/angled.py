@@ -4,21 +4,22 @@ from functools import partial
 
 import numpy as np
 import pytest
-import stk
 from scipy.spatial.distance import euclidean
+
+import stk
 
 from ....case_data import CaseData
 
 
 @pytest.fixture
 def angled(
-    position: np.ndarray,
+    angled_position: np.ndarray,
     angled_aligner_edge: int,
-    building_block_2: stk.BuildingBlock,
+    angled_building_block: stk.BuildingBlock,
 ) -> CaseData:
     point1, point2 = points = (
-        position + [0, 10, 0],
-        position + [10, 0, 0],
+        angled_position + [0, 10, 0],
+        angled_position + [10, 0, 0],
     )
 
     def get_fg0_point(building_block: stk.BuildingBlock) -> float:
@@ -35,15 +36,15 @@ def angled(
 
     vertex = stk.cage.AngledVertex(
         id=0,
-        position=position,
+        position=angled_position,
         aligner_edge=angled_aligner_edge,
     )
 
     return CaseData(
         vertex=vertex,
         edges=tuple(get_angled_edges(vertex)),
-        building_block=building_block_2,
-        position=position,
+        building_block=angled_building_block,
+        position=angled_position,
         alignment_tests={
             get_fg0_point: (point1 if angled_aligner_edge == 0 else point2),
             get_fg1_point: (point2 if angled_aligner_edge == 0 else point1),
@@ -86,19 +87,20 @@ def angled_aligner_edge(request) -> int:
 @pytest.fixture(
     params=(
         lambda: stk.BuildingBlock(
-            smiles="BrCCNCBr",
+            # Use a more angled building block.
+            smiles="BrC1=CC=CC=C1Br",
             functional_groups=[stk.BromoFactory()],
         ),
     ),
 )
-def building_block_2(request) -> stk.BuildingBlock:
+def angled_building_block(request) -> stk.BuildingBlock:
     return request.param()
 
 
 @pytest.fixture(
     params=([1, 2, -20],),
 )
-def position(request) -> np.ndarray:
+def angled_position(request) -> np.ndarray:
     """
     The `position` of a vertex.
 

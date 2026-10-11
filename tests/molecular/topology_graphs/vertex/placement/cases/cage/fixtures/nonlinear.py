@@ -2,17 +2,18 @@ from functools import partial
 
 import numpy as np
 import pytest
-import stk
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 from scipy.spatial.distance import euclidean
+
+import stk
 
 from ....case_data import CaseData
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("nonlinear_3"),
-        lazy_fixture("nonlinear_4"),
+        lf("nonlinear_3"),
+        lf("nonlinear_4"),
     ),
 )
 def nonlinear(request):

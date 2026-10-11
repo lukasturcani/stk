@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 import stk
 
@@ -9,9 +9,9 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lazy_fixture("substituent"),
-        lazy_fixture("core"),
-        lazy_fixture("single"),
+        lf("substituent"),
+        lf("core"),
+        lf("single"),
     ),
 )
 def case_data(request: pytest.FixtureRequest) -> CaseData:

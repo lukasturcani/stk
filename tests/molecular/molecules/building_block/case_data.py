@@ -1,6 +1,7 @@
-import stk
-from dataclasses import dataclass
 from collections.abc import Sequence
+from dataclasses import dataclass
+
+import stk
 
 
 @dataclass(slots=True, frozen=True)

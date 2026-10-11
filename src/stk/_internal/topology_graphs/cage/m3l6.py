@@ -179,8 +179,8 @@ class M3L6(Cage):
             id=3,
             position=np.array(
                 [
-                    _R * np.cos((_theta + np.pi / 4)),
-                    _R * np.sin((_theta + np.pi / 4)),
+                    _R * np.cos(_theta + np.pi / 4),
+                    _R * np.sin(_theta + np.pi / 4),
                     0.5,
                 ]
             ),
@@ -190,8 +190,8 @@ class M3L6(Cage):
             id=4,
             position=np.array(
                 [
-                    _R * np.cos((_theta + 1 * np.pi / 3)),
-                    _R * np.sin((_theta + 1 * np.pi / 3)),
+                    _R * np.cos(_theta + 1 * np.pi / 3),
+                    _R * np.sin(_theta + 1 * np.pi / 3),
                     -0.5,
                 ]
             ),

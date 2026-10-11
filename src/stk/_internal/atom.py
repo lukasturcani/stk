@@ -53,7 +53,7 @@ class Atom:
     """
 
     # Maps each atomic number (int) to the relevant Atom subclass.
-    _elements: dict[int, type[Atom]] = {}
+    _elements: dict[int, type[Atom]] = {}  # noqa: RUF012
 
     def __init__(
         self,

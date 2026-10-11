@@ -2,6 +2,7 @@ from typing import Any
 
 import pandas as pd
 import pytest
+
 import stk
 
 from .case_data import CaseData

@@ -40,7 +40,7 @@ class BuildingBlock(Molecule):
 
     # Maps file extensions to functions which can be used to
     # create an rdkit molecule from that file type.
-    _init_funcs = {
+    _init_funcs = {  # noqa: RUF012
         ".mol": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
         ".sdf": partial(rdkit.MolFromMolFile, sanitize=False, removeHs=False),
     }

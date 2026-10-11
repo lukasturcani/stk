@@ -3,6 +3,7 @@ from functools import partial
 
 import numpy as np
 import pytest
+
 import stk
 
 from ..utilities import is_clone

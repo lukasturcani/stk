@@ -1,23 +1,23 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from .case_data import CaseData
 
 # Fixtures must be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("add"),
-        lazy_fixture("divide_by_mean"),
-        lazy_fixture("multiply"),
-        lazy_fixture("null"),
-        lazy_fixture("power"),
-        lazy_fixture("replace_fitness"),
-        lazy_fixture("sequence"),
-        lazy_fixture("shift_up"),
-        lazy_fixture("sum"),
+        lf("add"),
+        lf("divide_by_mean"),
+        lf("multiply"),
+        lf("null"),
+        lf("power"),
+        lf("replace_fitness"),
+        lf("sequence"),
+        lf("shift_up"),
+        lf("sum"),
     ),
 )
 def case_data(request: pytest.FixtureRequest) -> CaseData:

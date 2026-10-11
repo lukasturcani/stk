@@ -1,7 +1,8 @@
+import pathlib
+
 import stk
 
 from .case_data import CaseData
-import pathlib
 
 
 def test_write(case_data: CaseData, tmp_path: pathlib.Path) -> None:

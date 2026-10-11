@@ -1,1 +1,1 @@
-from ..._test_get_cell import *  # noqa
+from ..._test_get_cell import *

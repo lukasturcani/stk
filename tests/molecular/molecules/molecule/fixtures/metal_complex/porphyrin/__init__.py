@@ -1,1 +1,1 @@
-from .porphyrin import *  # noqa
+from .porphyrin import *

@@ -6,7 +6,7 @@ Bond Batch
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from stk._internal.bond import Bond
 from stk._internal.bond_info import BondInfo
@@ -19,7 +19,7 @@ class _BondBatch:
 
     """
 
-    __slots__ = ["_bonds", "_bond_infos"]
+    __slots__ = ["_bond_infos", "_bonds"]
 
     _bonds: list[Bond]
     _bond_infos: list[BondInfo]

@@ -98,7 +98,7 @@ class PeriodicCollapser(Optimizer):
             position_matrix=state.get_position_matrix(),
         )
 
-        mch_mol, result = self._optimizer.get_result(
+        mch_mol, _result = self._optimizer.get_result(
             mol=mch_mol,
             bond_pair_ids=tuple(get_long_bond_ids(state)),
             subunits=get_subunits(state),

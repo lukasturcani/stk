@@ -425,8 +425,7 @@ class Molecule:
             atom_ids = list(atom_ids)
 
         positions = self._position_matrix[:, atom_ids].T
-        for atomic_position in positions:
-            yield atomic_position
+        yield from positions
 
     def get_atoms(
         self,
@@ -477,8 +476,7 @@ class Molecule:
 
         """
 
-        for bond in self._bonds:
-            yield bond
+        yield from self._bonds
 
     def get_num_bonds(self) -> int:
         """

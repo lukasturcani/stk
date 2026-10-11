@@ -11,6 +11,7 @@
    Construction Overview <construction_overview>
    Basic Examples <basic_examples>
    Video Tutorials <video_tutorials>
+   Preparing building blocks <bbprepared>
 
 .. toctree::
    :hidden:

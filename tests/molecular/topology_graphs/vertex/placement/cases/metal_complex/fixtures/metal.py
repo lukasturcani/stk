@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
-import stk
 from rdkit.Chem import AllChem as rdkit
+
+import stk
 
 from ....case_data import CaseData
 

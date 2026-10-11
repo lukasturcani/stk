@@ -1,9 +1,9 @@
 import itertools as it
-
-from ..utilities import is_equivalent_functional_group
+from collections.abc import Sequence
 
 import stk
-from collections.abc import Sequence
+
+from ..utilities import is_equivalent_functional_group
 from .case_data import CaseData
 
 

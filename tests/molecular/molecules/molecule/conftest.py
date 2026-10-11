@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 from rdkit.Chem import AllChem as rdkit
 
 import stk
@@ -10,7 +10,7 @@ import stk
 from .case_data import CaseData
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
@@ -143,7 +143,7 @@ def get_origin_0(origin):
 @pytest.fixture(
     params=[
         lambda molecule: molecule.get_centroid(),
-        lazy_fixture("get_origin_0"),
+        lf("get_origin_0"),
     ],
 )
 def get_origin(request):
@@ -171,11 +171,9 @@ def get_origin(request):
         lambda molecule: 0,
         lambda molecule: range(molecule.get_num_atoms()),
         lambda molecule: range(0, molecule.get_num_atoms(), 2),
-        lambda molecule: list(range(0, min(1, molecule.get_num_atoms()))),
-        lambda molecule: tuple(range(0, min(1, molecule.get_num_atoms()))),
-        lambda molecule: (
-            i for i in range(0, min(1, molecule.get_num_atoms()))
-        ),
+        lambda molecule: list(range(min(1, molecule.get_num_atoms()))),
+        lambda molecule: tuple(range(min(1, molecule.get_num_atoms()))),
+        lambda molecule: (i for i in range(min(1, molecule.get_num_atoms()))),
         lambda molecule: (),
         lambda molecule: range(min(molecule.get_num_atoms(), 1)),
         lambda molecule: range(min(molecule.get_num_atoms(), 2)),
@@ -268,15 +266,15 @@ def building_block(request) -> CaseData:
 
 @pytest.fixture(
     params=(
-        lazy_fixture("building_block"),
-        lazy_fixture("cage"),
-        lazy_fixture("cof"),
-        lazy_fixture("polymer"),
-        lazy_fixture("host_guest"),
-        lazy_fixture("macrocycle"),
-        lazy_fixture("metal_complex"),
-        lazy_fixture("rotaxane"),
-        lazy_fixture("small"),
+        lf("building_block"),
+        lf("cage"),
+        lf("cof"),
+        lf("polymer"),
+        lf("host_guest"),
+        lf("macrocycle"),
+        lf("metal_complex"),
+        lf("rotaxane"),
+        lf("small"),
     ),
 )
 def case_data(request):

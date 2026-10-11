@@ -1,6 +1,7 @@
 import pathlib
 
 import pandas as pd
+
 import stk
 
 from .case_data import CaseData

@@ -164,10 +164,8 @@ class _CageVertex(Vertex):
         return cls(
             id=id,
             position=np.array(
-                (
-                    sum(vertex.get_position() for vertex in vertices)
-                    / len(vertices)
-                )
+                sum(vertex.get_position() for vertex in vertices)
+                / len(vertices)
             ),
         )
 

@@ -1,4 +1,5 @@
 import pytest
+
 import stk
 
 from ..case_data import CaseData
@@ -18,16 +19,14 @@ def _get_case_data_1() -> CaseData:
             fitness_normalizers=(
                 stk.Multiply(
                     coefficient=(1, 2, 4),
-                    filter=lambda fitness_values, record: fitness_values[
-                        record
-                    ]
-                    is not None,
+                    filter=lambda fitness_values, record: (
+                        fitness_values[record] is not None
+                    ),
                 ),
                 stk.Sum(
-                    filter=lambda fitness_values, record: fitness_values[
-                        record
-                    ]
-                    is not None,
+                    filter=lambda fitness_values, record: (
+                        fitness_values[record] is not None
+                    ),
                 ),
             ),
         ),

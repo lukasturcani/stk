@@ -1,16 +1,16 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 # Fixtures need to be visible for lazy_fixture() calls.
-from .fixtures import *  # noqa
+from .fixtures import *
 
 
 @pytest.fixture(
     params=(
-        lazy_fixture("linear"),
-        lazy_fixture("nonlinear"),
-        lazy_fixture("unaligning"),
-        lazy_fixture("angled"),
+        lf("linear"),
+        lf("nonlinear"),
+        lf("unaligning"),
+        lf("angled"),
     ),
 )
 def case_data(request):

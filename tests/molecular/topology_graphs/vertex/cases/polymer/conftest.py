@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 import stk
 
@@ -9,11 +9,11 @@ from ...case_data import CaseData
 
 @pytest.fixture(
     params=(
-        lazy_fixture("center"),
-        lazy_fixture("head"),
-        lazy_fixture("tail"),
-        lazy_fixture("unaligning"),
-        lazy_fixture("helix"),
+        lf("center"),
+        lf("head"),
+        lf("tail"),
+        lf("unaligning"),
+        lf("helix"),
     ),
 )
 def case_data(request: pytest.FixtureRequest) -> CaseData:

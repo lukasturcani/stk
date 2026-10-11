@@ -142,7 +142,7 @@ class RandomBuildingBlock:
         # Build the new ConstructedMolecule.
         graph = record.get_topology_graph().with_building_blocks(
             {
-                replaced_building_block: replacement,
+                replaced_building_block: replacement,  # type: ignore[dict-item]
             }
         )
         return MutationRecord(

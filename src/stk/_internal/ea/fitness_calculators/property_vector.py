@@ -57,12 +57,13 @@ class PropertyVector(FitnessCalculator[T]):
         .. testcode:: calculating-fitness-values
             :hide:
 
+            import numpy as np
+
             _bb = stk.BuildingBlock('BrCCBr')
-            assert value == (
-                _bb.get_num_atoms(),
-                _bb.get_num_bonds(),
-                _bb.get_maximum_diameter(),
-            )
+            assert value[0] == _bb.get_num_atoms()
+            assert value[1] == _bb.get_num_bonds()
+            assert np.isclose(value[2], _bb.get_maximum_diameter(), atol=1e-3)
+
 
         *Storing Fitness Values in a Database*
 

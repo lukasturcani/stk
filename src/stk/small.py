@@ -9,9 +9,9 @@ from stk._internal.topology_graphs.small.vertices import (
 )
 
 __all__ = [
-    "NCore",
     "CoreVertex",
-    "SubstituentVertex",
-    "SingleVertex",
     "InternalReaction",
+    "NCore",
+    "SingleVertex",
+    "SubstituentVertex",
 ]

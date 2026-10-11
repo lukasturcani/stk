@@ -1,6 +1,7 @@
 import pytest
+from pytest_lazy_fixtures import lf
+
 import stk
-from pytest_lazyfixture import lazy_fixture
 
 from .case_data import CaseData
 from .utilities import atomic_numbers
@@ -73,8 +74,8 @@ def case_data_2(cls, id, charge):
 
 @pytest.fixture(
     params=(
-        lazy_fixture("case_data_1"),
-        lazy_fixture("case_data_2"),
+        lf("case_data_1"),
+        lf("case_data_2"),
     )
 )
 def case_data(request):

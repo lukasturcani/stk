@@ -203,7 +203,7 @@ class ConstructedMolecule(Molecule):
         Returns:
             The `obj` instance.
         """
-        super(ConstructedMolecule, obj).__init__(
+        super().__init__(
             atoms=construction_result.get_atoms(),
             bonds=construction_result.get_bonds(),
             position_matrix=construction_result.get_position_matrix(),

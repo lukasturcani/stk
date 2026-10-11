@@ -216,7 +216,7 @@ class GeneticRecombination:
                 gene = self._get_gene(building_block)
                 return next(
                     allele
-                    for allele in alleles
+                    for allele in alleles  # noqa: B023
                     if self._get_gene(allele) == gene
                 )
 

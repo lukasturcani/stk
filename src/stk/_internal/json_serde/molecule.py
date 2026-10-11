@@ -102,7 +102,7 @@ class MoleculeJsonizer:
 
     def __init__(
         self,
-        key_makers: OneOrMany[MoleculeKeyMaker] = (InchiKey(),),
+        key_makers: OneOrMany[MoleculeKeyMaker] = (InchiKey(),),  # type: ignore[valid-type] # noqa: B008
     ) -> None:
         """
         Initialize a :class:`.MoleculeJsonizer` instance.
@@ -148,8 +148,8 @@ class MoleculeJsonizer:
             "m": molecule.get_position_matrix().tolist(),
         }
         for key_maker in self._key_makers:
-            key_name = key_maker.get_key_name()
-            key = key_maker.get_key(molecule)
+            key_name = key_maker.get_key_name()  # type: ignore[attr-defined]
+            key = key_maker.get_key(molecule)  # type: ignore[attr-defined]
             # TypedDict does not allow keys which are not listed in the
             # class definition. However, because we wish to create
             # indices on keys created by KeyMakers we need to add

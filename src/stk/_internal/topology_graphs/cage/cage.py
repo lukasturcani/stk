@@ -27,16 +27,12 @@ class UnoccupiedVertexError(Exception):
 
     """
 
-    pass
-
 
 class OverlyOccupiedVertexError(Exception):
     """
     When a cage vertex is occupied by more than one building block.
 
     """
-
-    pass
 
 
 class Cage(TopologyGraph):
@@ -965,9 +961,9 @@ class Cage(TopologyGraph):
         ),
         vertex_alignments: dict[int, int] | None = None,
         vertex_positions: dict[int, np.ndarray] | None = None,
-        reaction_factory: ReactionFactory = GenericReactionFactory(),
+        reaction_factory: ReactionFactory = GenericReactionFactory(),  # noqa: B008
         num_processes: int = 1,
-        optimizer: Optimizer = NullOptimizer(),
+        optimizer: Optimizer = NullOptimizer(),  # noqa: B008
         scale_multiplier: float = 1.0,
     ) -> None:
         """
@@ -1169,7 +1165,7 @@ class Cage(TopologyGraph):
             for building_block in building_blocks:
                 assert (
                     building_block.get_num_functional_groups()
-                    in cls._vertices_of_degree.keys()
+                    in cls._vertices_of_degree
                 ), (
                     "The number of functional groups in "
                     f"{building_block} needs to be one of "
@@ -1235,9 +1231,7 @@ class Cage(TopologyGraph):
             BuildingBlock, abc.Sequence[_CageVertex]
         ],
     ) -> None:
-        unassigned_ids = set(
-            vertex.get_id() for vertex in cls._vertex_prototypes
-        )
+        unassigned_ids = {vertex.get_id() for vertex in cls._vertex_prototypes}
         assigned_ids = set()
         vertices = (
             vertex
@@ -1351,7 +1345,7 @@ class Cage(TopologyGraph):
         building_blocks_by_degree = {}
         for building_block in building_blocks:
             num_fgs = building_block.get_num_functional_groups()
-            assert num_fgs in cls._vertices_of_degree.keys(), (
+            assert num_fgs in cls._vertices_of_degree, (
                 "The number of functional groups in "
                 f"{building_block} needs to be one of "
                 f"{allowed_degrees}, but is "

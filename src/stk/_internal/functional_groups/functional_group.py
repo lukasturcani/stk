@@ -4,7 +4,7 @@ import typing
 
 from stk._internal.atom import Atom
 
-_T = typing.TypeVar("_T", bound="FunctionalGroup")
+_T = typing.TypeVar("_T", bound="FunctionalGroup")  # noqa: PYI018
 
 
 class FunctionalGroup:
@@ -332,7 +332,7 @@ class FunctionalGroup:
 
         return self.clone()._with_ids(id_map)
 
-    def _clone(self: _T) -> _T:
+    def _clone(self) -> typing.Self:
         """
         Return a clone.
 

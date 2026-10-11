@@ -1,1 +1,1 @@
-from .mongo_db import *  # noqa
+from .mongo_db import *
