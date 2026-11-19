@@ -28,7 +28,7 @@ from stk._internal.topology_graphs.cage.m8l6_cube import M8L6Cube
 from stk._internal.topology_graphs.cage.m9l18 import M9L18
 from stk._internal.topology_graphs.cage.m12l24 import M12L24
 from stk._internal.topology_graphs.cage.m24l48 import M24L48
-from stk._internal.topology_graphs.cage.one_plus_one import OnePlusOne
+from stk._internal.topology_graphs.cage.one_plus_one import OnePlusOne, OnePlusOneVertex
 from stk._internal.topology_graphs.cage.six_plus_eight import SixPlusEight
 from stk._internal.topology_graphs.cage.six_plus_nine import SixPlusNine
 from stk._internal.topology_graphs.cage.six_plus_twelve import SixPlusTwelve
@@ -79,6 +79,7 @@ __all__ = [
     "M8L6Cube",
     "NonLinearVertex",
     "OnePlusOne",
+    "OnePlusOneVertex",
     "SixPlusEight",
     "SixPlusNine",
     "SixPlusTwelve",
