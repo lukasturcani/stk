@@ -41,7 +41,7 @@ documentation = "https://stk-lite.readthedocs.io"
 
 
 [tool.setuptools_scm]
-write_to = "src/stk/_version.py"
+version_file = "src/stk/_version.py"
 
 
 [tool.ruff]
